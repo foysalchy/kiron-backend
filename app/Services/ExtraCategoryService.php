@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ExtraCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -71,6 +72,7 @@ class ExtraCategoryService
             }
 
             $category = ExtraCategory::create($data);
+            LogHelper::created('extra_categories', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -105,6 +107,7 @@ class ExtraCategoryService
             }
 
             $category->update($data);
+            LogHelper::updated('extra_categories', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -131,6 +134,7 @@ class ExtraCategoryService
         try {
             $category = $this->getExtraCategoryById($id);
             $category->delete();
+            LogHelper::deleted('extra_categories', $category->id, $category->company_id);
 
             Log::info('Extra category deleted successfully', ['id' => $id]);
 
@@ -153,6 +157,7 @@ class ExtraCategoryService
             }
 
             $category->restore();
+            LogHelper::restored('extra_categories', $category->id, $category->company_id);
 
             Log::info('Extra category restored successfully', ['id' => $id]);
 
@@ -179,6 +184,7 @@ class ExtraCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
+            LogHelper::forceDeleted('extra_categories', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -201,6 +207,7 @@ class ExtraCategoryService
         try {
             $category = $this->getExtraCategoryById($id);
             $category->update(['status' => !$category->status]);
+            LogHelper::statusChanged('extra_categories', $category->id, $category->company_id);
 
             Log::info('Extra category status toggled', ['id' => $id]);
 

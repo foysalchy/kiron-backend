@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MiniCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -71,6 +72,7 @@ class MiniCategoryService
             }
 
             $category = MiniCategory::create($data);
+            LogHelper::created('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -105,6 +107,7 @@ class MiniCategoryService
             }
 
             $category->update($data);
+            LogHelper::updated('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -131,6 +134,7 @@ class MiniCategoryService
         try {
             $category = $this->getMiniCategoryById($id);
             $category->delete();
+            LogHelper::deleted('mega_category', $category->id, $category->company_id);
 
             Log::info('Mini category deleted successfully', ['id' => $id]);
 
@@ -153,6 +157,7 @@ class MiniCategoryService
             }
 
             $category->restore();
+            LogHelper::restored('mega_category', $category->id, $category->company_id);
 
             Log::info('Mini category restored successfully', ['id' => $id]);
 
@@ -179,6 +184,7 @@ class MiniCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
+            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -201,6 +207,7 @@ class MiniCategoryService
         try {
             $category = $this->getMiniCategoryById($id);
             $category->update(['status' => !$category->status]);
+            LogHelper::statusChanged('mega_category', $category->id, $category->company_id);
 
             Log::info('Mini category status toggled', ['id' => $id]);
 

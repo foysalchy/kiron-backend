@@ -58,7 +58,7 @@ class PartyController extends Controller
         return ResponseHelper::success($party, 'Party updated successfully');
     }
 
-  
+
     public function destroy(int $id): JsonResponse
     {
         $this->partyService->deleteParty($id);
@@ -73,7 +73,7 @@ class PartyController extends Controller
         return ResponseHelper::success($party, 'Party restored successfully');
     }
 
-  
+
     public function forceDestroy(int $id): JsonResponse
     {
         $this->partyService->forceDeleteParty($id);
@@ -81,7 +81,7 @@ class PartyController extends Controller
         return ResponseHelper::success(null, 'Party permanently deleted');
     }
 
- 
+
     public function toggleStatus(int $id): JsonResponse
     {
         $party = $this->partyService->toggleStatus($id);
@@ -89,16 +89,15 @@ class PartyController extends Controller
         return ResponseHelper::success($party, 'Party status updated successfully');
     }
 
-    
+
     // Update party balance
-    
+
     public function updateBalance(UpdateBalanceRequest $request, int $id): JsonResponse
     {
-        $party = $this->partyService->updateBalance(
-            $id,
-            $request->input('amount'),
-            $request->input('type', 'add')
-        );
+        $party = $this->partyService->updateBalance($id, [
+            'amount' => $request->input('amount'),
+            'type'   => $request->input('type', 'add'),
+        ]);
 
         return ResponseHelper::success($party, 'Balance updated successfully');
     }

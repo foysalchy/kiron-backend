@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Brand;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -36,10 +37,9 @@ class BrandService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate 
+            return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching brands: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch brands');
@@ -79,13 +79,13 @@ class BrandService
             }
 
             $brand = Brand::create($data);
+            LogHelper::created('brand', $brand->id, $brand->company_id);
 
             DB::commit();
 
             Log::info('Brand created successfully', ['brand_id' => $brand->id]);
 
             return $brand->load('company');
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -118,17 +118,16 @@ class BrandService
             }
 
             $brand->update($data);
+            LogHelper::updated('brand', $brand->id, $brand->company_id);
 
             DB::commit();
 
             Log::info('Brand updated successfully', ['brand_id' => $brand->id]);
 
             return $brand->fresh('company');
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -149,11 +148,11 @@ class BrandService
         try {
             $brand = $this->getBrandById($id);
             $brand->delete();
+            LogHelper::deleted('brand', $brand->id, $brand->company_id);
 
             Log::info('Brand deleted successfully', ['brand_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -175,11 +174,11 @@ class BrandService
             }
 
             $brand->restore();
+            LogHelper::restored('brand', $brand->id, $brand->company_id);
 
             Log::info('Brand restored successfully', ['brand_id' => $id]);
 
             return $brand->load('company');
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -206,17 +205,16 @@ class BrandService
             FileUploadHelper::delete($brand->logo);
 
             $brand->forceDelete();
+            LogHelper::forceDeleted('brand', $brand->id, $brand->company_id);
 
             DB::commit();
 
             Log::info('Brand permanently deleted', ['brand_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -233,11 +231,10 @@ class BrandService
         try {
             $brand = $this->getBrandById($id);
             $brand->update(['status' => !$brand->status]);
-
+            LogHelper::statusChanged('brand', $brand->id, $brand->company_id);
             Log::info('Brand status toggled', ['brand_id' => $id]);
 
             return $brand->load('company');
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -245,6 +242,4 @@ class BrandService
             throw ApiException::serverError('Failed to toggle brand status');
         }
     }
-
-
 }

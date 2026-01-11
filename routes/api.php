@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\PartyController;
@@ -24,6 +25,14 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
+        //action logs
+        Route::prefix('logs')->group(function () {
+            Route::get('/', [LogActionController::class, 'index']);
+            Route::get('/stats', [LogActionController::class, 'stats']);
+            Route::get('/{module}/{companyId}', [LogActionController::class, 'logByModule']);
+            Route::get('/{actionId}', [LogActionController::class, 'logByAction']);
+           
+        });
         // company routes
         Route::prefix('companies')->group(function () {
             Route::get('/search/query', [CompanyController::class, 'search']);
@@ -31,7 +40,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [CompanyController::class, 'index']);
             Route::post('/', [CompanyController::class, 'store']);
             Route::get('/{id}', [CompanyController::class, 'show']);
-            Route::post('/update/{id}', [CompanyController::class, 'update']);
+            Route::post('/update/{id}', [CompanyController::class, 'update'])->name('company');
             Route::delete('/{id}', [CompanyController::class, 'destroy']);
             Route::get('/{id}/restore', [CompanyController::class, 'restore']);
             Route::delete('/{id}/force', [CompanyController::class, 'forceDestroy']);

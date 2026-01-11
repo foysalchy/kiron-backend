@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +84,8 @@ class CompanyService
             }
 
             $company = Company::create($data);
+            LogHelper::created('company', $company->id, $company->id);
+
 
             DB::commit();
 
@@ -126,6 +129,7 @@ class CompanyService
             }
 
             $company->update($data);
+            LogHelper::updated('company', $company->id, $company->id);
 
             DB::commit();
 
@@ -162,6 +166,7 @@ class CompanyService
             $company = $this->getCompanyById($id);
 
             $company->delete();
+            LogHelper::deleted('company', $id, $id);
 
             Log::info('Company deleted successfully', ['company_id' => $id]);
 
@@ -191,6 +196,7 @@ class CompanyService
             }
 
             $company->restore();
+            LogHelper::restored('company', $id, $company->id);
 
             Log::info('Company restored successfully', ['company_id' => $id]);
 
@@ -221,6 +227,7 @@ class CompanyService
             FileUploadHelper::delete($company->logo);
 
             $company->forceDelete();
+            LogHelper::forceDeleted('company', $id, $id);
 
             DB::commit();
 
@@ -246,6 +253,7 @@ class CompanyService
         try {
             $company = $this->getCompanyById($id);
             $company->update(['status' => !$company->status]);
+            LogHelper::statusChanged('company', $id, $company->id);
 
             Log::info('Company status toggled', [
                 'company_id' => $id,
