@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class AttributeGroup extends Model
+{
+    use SoftDeletes;
+
+    protected $fillable = [
+        'company_id',
+        'name',
+        'category',
+        'status',
+    ];
+
+
+
+    protected $hidden = [
+        'deleted_at',
+    ];
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+ 
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', false);
+    }
+
+    public function scopeByCategory($query, string $cat)
+    {
+        return $query->where('category', $cat);
+    }
+
+}
