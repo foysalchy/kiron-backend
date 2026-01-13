@@ -40,7 +40,7 @@ class AttributeService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate 
+            return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
 
