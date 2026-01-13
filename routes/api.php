@@ -20,18 +20,23 @@ Route::prefix('v1')->group(function () {
     Route::get('/ping', function () {
         return 'pong';
     });
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('auth/login', [AuthController::class, 'login']);
+    Route::post('auth/register', [AuthController::class, 'register']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout']);
-
+        //auth 
+        Route::get('auth/profile', [AuthController::class, 'profile']);
+        Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
+        Route::post('auth/password/update', [AuthController::class, 'updatePassword']);
+        Route::post('auth/logout', [AuthController::class, 'logout']);
+        Route::post('auth/logout-all', [AuthController::class, 'logoutAll']);
+        Route::delete('auth/account', [AuthController::class, 'deleteAccount']);
         //action logs
         Route::prefix('logs')->group(function () {
             Route::get('/', [LogActionController::class, 'index']);
             Route::get('/stats', [LogActionController::class, 'stats']);
             Route::get('/{module}/{companyId}', [LogActionController::class, 'logByModule']);
             Route::get('/{actionId}', [LogActionController::class, 'logByAction']);
-           
         });
         // company routes
         Route::prefix('companies')->group(function () {
@@ -131,14 +136,14 @@ Route::prefix('v1')->group(function () {
 
         // Mini Category Routes
         Route::prefix('mini-categories')->group(function () {
-      
+
             Route::get('by-sub', [MiniCategoryController::class, 'getBySubCategory']);
 
             Route::get('/', [MiniCategoryController::class, 'index']);
             Route::post('/', [MiniCategoryController::class, 'store']);
             Route::get('/{id}', [MiniCategoryController::class, 'show']);
-           Route::post('/update/{id}', [MiniCategoryController::class, 'update']);
-         
+            Route::post('/update/{id}', [MiniCategoryController::class, 'update']);
+
             Route::delete('/{id}', [MiniCategoryController::class, 'destroy']);
 
             Route::get('/{id}/restore', [MiniCategoryController::class, 'restore']);
