@@ -45,6 +45,39 @@ class ExtraCategoryService
             throw ApiException::serverError('Failed to fetch extra categories');
         }
     }
+    public function getExtraByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = ExtraCategory::with([ 'miniCategory.subCategory.megaCategory'])->where('company_id',$companyId);
+
+            if (isset($filters['company_id'])) {
+                $query->where('company_id', $filters['company_id']);
+            }
+
+            if (isset($filters['mini_category_id'])) {
+                $query->where('mini_category_id', $filters['mini_category_id']);
+            }
+
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (isset($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching extra categories: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch extra categories');
+        }
+    }
 
     public function getExtraCategoryById(int $id): ExtraCategory
     {

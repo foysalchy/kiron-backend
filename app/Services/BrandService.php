@@ -45,6 +45,32 @@ class BrandService
             throw ApiException::serverError('Failed to fetch brands');
         }
     }
+    public function getBrandByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = Brand::where('company_id',$companyId);
+
+          
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (isset($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching brands: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch brands');
+        }
+    }
 
     /**
      * Get brand by ID

@@ -19,7 +19,7 @@ return new class extends Migration
             // Basic Info
             $table->string('title');
             $table->string('slug')->unique();
-            $table->string('thumbnail')->nullable();
+            $table->string('thumbnail');
             $table->string('video_link')->nullable();
             
             // Categories (JSON)
@@ -44,7 +44,7 @@ return new class extends Migration
             $table->decimal('regular_price', 15, 2);
             $table->enum('discount_type', ['flat', 'percent'])->nullable();
             $table->decimal('discount', 15, 2)->default(0);
-            $table->boolean('purpose');
+            $table->string('purpose');
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
