@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use App\Models\AttributeGroup;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -17,7 +18,7 @@ class AttributeGroupService
     public function getAllAttributeGroup(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-        $query = AttributeGroup::with('company');
+            $query = AttributeGroup::with('company');
 
             // Filter by company
             if (isset($filters['company_id'])) {
@@ -76,6 +77,8 @@ class AttributeGroupService
         try {
 
             $group = AttributeGroup::create($data);
+            LogHelper::created('attribute_group', $group->id, $group->company_id);
+
             Log::info('Attribute group created successfully', ['attribute group id' => $group->id]);
             return $group;
         } catch (\Exception $e) {
@@ -99,6 +102,7 @@ class AttributeGroupService
         try {
             $group = $this->getAttributeGroupById($id);
             $group->update($data);
+            LogHelper::updated('attribute_group', $group->id, $group->company_id);
             Log::info('Attribute Group updated successfully', ['atrribute group id' => $group->id]);
             return $group->fresh();
         } catch (\Exception $e) {
@@ -124,6 +128,7 @@ class AttributeGroupService
             $group->delete();
 
             Log::info('Attribute Group deleted successfully', ['Attribute Group id' => $id]);
+            LogHelper::deleted('attribute_group', $group->id, $group->company_id);
 
             return true;
         } catch (ApiException $e) {
@@ -144,17 +149,18 @@ class AttributeGroupService
     public function restoreAttributeGroup(int $id): AttributeGroup
     {
         try {
-            $company = AttributeGroup::withTrashed()->find($id);
+            $group = AttributeGroup::withTrashed()->find($id);
 
-            if (!$company) {
+            if (!$group) {
                 throw ApiException::notFound('Attribute Group');
             }
 
-            $company->restore();
+            $group->restore();
+            LogHelper::restored('attribute_group', $group->id, $group->company_id);
 
             Log::info('Attribute Group restored successfully', ['Attribute Group id' => $id]);
 
-            return $company;
+            return $group;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -178,9 +184,7 @@ class AttributeGroupService
             }
 
             $group->forceDelete();
-
-
-
+            LogHelper::forceDeleted('attribute_group', $group->id, $group->company_id);
             Log::info('Attribute Group permanently deleted', ['Attribute Group id' => $id]);
 
             return true;
@@ -203,7 +207,7 @@ class AttributeGroupService
         try {
             $group = $this->getAttributeGroupById($id);
             $group->update(['status' => !$group->status]);
-
+            LogHelper::statusChanged('attribute_group', $group->id, $group->company_id);
             Log::info('Attribute Group status toggled', [
                 'atrribute_group_id' => $id,
                 'new_status' => $group->status
@@ -217,5 +221,4 @@ class AttributeGroupService
             throw ApiException::serverError('Failed to toggle Attribute Group status');
         }
     }
-
 }

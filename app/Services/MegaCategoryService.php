@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\MegaCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -66,6 +67,7 @@ class MegaCategoryService
             }
 
             $category = MegaCategory::create($data);
+            LogHelper::created('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -100,6 +102,7 @@ class MegaCategoryService
             }
 
             $category->update($data);
+            LogHelper::updated('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -126,7 +129,7 @@ class MegaCategoryService
         try {
             $category = $this->getMegaCategoryById($id);
             $category->delete();
-
+            LogHelper::deleted('mega_category', $category->id, $category->company_id);
             Log::info('Mega category deleted successfully', ['id' => $id]);
 
             return true;
@@ -148,6 +151,7 @@ class MegaCategoryService
             }
 
             $category->restore();
+            LogHelper::restored('mega_category', $category->id, $category->company_id);
 
             Log::info('Mega category restored successfully', ['id' => $id]);
 
@@ -174,6 +178,7 @@ class MegaCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
+            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id);
 
             DB::commit();
 
@@ -196,6 +201,7 @@ class MegaCategoryService
         try {
             $category = $this->getMegaCategoryById($id);
             $category->update(['status' => !$category->status]);
+            LogHelper::statusChanged('mega_category', $category->id, $category->company_id);
 
             Log::info('Mega category status toggled', ['id' => $id]);
 
@@ -207,6 +213,4 @@ class MegaCategoryService
             throw ApiException::serverError('Failed to toggle status');
         }
     }
-
-   
 }

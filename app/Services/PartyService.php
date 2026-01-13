@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Party;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,7 @@ class PartyService
                 $query->where('status', $filters['status']);
             }
 
-           
+
 
             // Search
             if (isset($filters['search'])) {
@@ -93,6 +94,7 @@ class PartyService
             }
 
             $party = Party::create($data);
+            LogHelper::created('party', $party->id, $party->company_id);
 
             DB::commit();
 
@@ -135,6 +137,7 @@ class PartyService
             }
 
             $party->update($data);
+            LogHelper::updated('party', $party->id, $party->company_id);
 
             DB::commit();
 
@@ -170,6 +173,7 @@ class PartyService
             $party = $this->getPartyById($id);
 
             $party->delete();
+            LogHelper::deleted('party', $party->id, $party->company_id);
 
             Log::info('Party deleted successfully', ['party_id' => $id]);
 
@@ -199,6 +203,7 @@ class PartyService
             }
 
             $party->restore();
+            LogHelper::restored('party', $party->id, $party->company_id);
 
             Log::info('Party restored successfully', ['party_id' => $id]);
 
@@ -228,6 +233,7 @@ class PartyService
             FileUploadHelper::delete($party->profile);
 
             $party->forceDelete();
+            LogHelper::forceDeleted('party', $party->id, $party->company_id);
 
             DB::commit();
 
@@ -253,6 +259,7 @@ class PartyService
         try {
             $party = $this->getPartyById($id);
             $party->update(['status' => !$party->status]);
+            LogHelper::statusChanged('party', $party->id, $party->company_id);
 
             Log::info('Party status toggled', [
                 'party_id' => $id,
@@ -287,6 +294,7 @@ class PartyService
             }
 
             $party->save();
+            LogHelper::custom('balance_updated', 'party', $id, $party->company_id);
 
             DB::commit();
 
@@ -303,7 +311,7 @@ class PartyService
         }
     }
 
- 
+
     public function getSuppliers(int $companyId): Collection
     {
         return Party::byCompany($companyId)->suppliers()->active()->get();
