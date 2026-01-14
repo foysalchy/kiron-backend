@@ -25,7 +25,6 @@ trait CompanyScoped
                         $model->company_id = $user->company_id;
                     }
                 }
-                // If company_id IS already set (super admin specified it), leave it as is
             }
         });
 
@@ -50,11 +49,7 @@ trait CompanyScoped
         // Option 1: Check role column
         return $user->role === 'super_admin';
 
-        // Option 2: Check company_id = 0
-        // return $user->company_id === 0;
 
-        // Option 3: Check is_super_admin flag
-        // return $user->is_super_admin === true;
     }
 
     /**

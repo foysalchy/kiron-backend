@@ -16,7 +16,7 @@ class CompanyController extends Controller
         protected CompanyService $companyService
     ) {}
 
- 
+
     public function index(Request $request): JsonResponse
     {
         $filters = [
@@ -33,7 +33,7 @@ class CompanyController extends Controller
         return ResponseHelper::success($companies, 'Companies retrieved successfully');
     }
 
- 
+
     public function store(StoreCompanyRequest $request): JsonResponse
     {
         $company = $this->companyService->createCompany($request->validated());
@@ -48,7 +48,7 @@ class CompanyController extends Controller
         return ResponseHelper::success($company, 'Company retrieved successfully');
     }
 
-  
+
     public function update(UpdateCompanyRequest $request, int $id): JsonResponse
     {
         $company = $this->companyService->updateCompany($id, $request->validated());
@@ -72,7 +72,7 @@ class CompanyController extends Controller
         return ResponseHelper::success($company, 'Company restored successfully');
     }
 
-  
+
     public function forceDestroy(int $id): JsonResponse
     {
         $this->companyService->forceDeleteCompany($id);

@@ -17,11 +17,12 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'company_id' => ['required'],
+            'company_id' => ['nullable','exists:companies,id'],
             'email' => ['required', 'email', 'unique:users,email'],
             'phone' => ['required', 'string', 'max:20'],
             'alternative_phone' => ['nullable', 'string', 'max:20'],
             'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'role' => ['nullable'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
     }
@@ -30,7 +31,6 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name.required' => 'Name is required',
-            'company_id.required' => 'Company is required',
             'company_id.exists' => 'Selected company does not exist',
             'email.required' => 'Email is required',
             'email.email' => 'Please provide a valid email address',

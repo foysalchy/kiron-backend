@@ -33,12 +33,12 @@ class AuthController extends Controller
         $user = Auth::user();
 
         // Check if user is active
-        // if (!$user->isActive()) {
-        //     Auth::logout();
-        //     throw ValidationException::withMessages([
-        //         'email' => ['Your account is inactive'],
-        //     ]);
-        // }
+        if (!$user->isActive()) {
+            Auth::logout();
+            throw ValidationException::withMessages([
+                'email' => ['Your account is inactive'],
+            ]);
+        }
 
         // Regenerate session
         $request->session()->regenerate();
@@ -90,7 +90,6 @@ class AuthController extends Controller
             Auth::login($user);
 
             // Log registration
-            LogHelper::created('user', $user->id, $user->company_id);
 
             DB::commit();
 
@@ -143,7 +142,7 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'status' => $user->status,
                 'company' => $user->company,
-                'is_super_admin' => $user->isSuperAdmin(),
+            
             ],
         ]);
     }
@@ -249,10 +248,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         // Log logout action
-        if ($user) {
-            LogHelper::custom('logout', 'user', $user->id, $user->company_id);
-        }
-
+      
         // Logout and invalidate session
         Auth::guard('web')->logout();
 
@@ -314,7 +310,6 @@ class AuthController extends Controller
             FileUploadHelper::delete($user->profile);
 
             // Log deletion before deleting user
-            LogHelper::deleted('user', $user->id, $user->company_id);
 
             // Logout
             Auth::guard('web')->logout();
