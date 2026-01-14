@@ -15,12 +15,9 @@ class MiniCategoryService
     public function getAllMiniCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = MiniCategory::with(['company', 'subCategory.megaCategory']);
+            $query = MiniCategory::with([ 'subCategory.megaCategory']);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
+           
             if (isset($filters['sub_category_id'])) {
                 $query->where('sub_category_id', $filters['sub_category_id']);
             }
@@ -45,43 +42,11 @@ class MiniCategoryService
             throw ApiException::serverError('Failed to fetch mini categories');
         }
     }
-    public function getMiniByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = MiniCategory::with([ 'subCategory.megaCategory'])->where('company_id',$companyId);
-
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            if (isset($filters['sub_category_id'])) {
-                $query->where('sub_category_id', $filters['sub_category_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-        } catch (\Exception $e) {
-            Log::error('Error fetching mini categories: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch mini categories');
-        }
-    }
+ 
 
     public function getMiniCategoryById(int $id): MiniCategory
     {
-        $category = MiniCategory::with(['company', 'subCategory.megaCategory'])->find($id);
+        $category = MiniCategory::with(['subCategory.megaCategory'])->find($id);
 
         if (!$category) {
             throw ApiException::notFound('Mini Category');
@@ -111,7 +76,7 @@ class MiniCategoryService
 
             Log::info('Mini category created successfully', ['id' => $category->id]);
 
-            return $category->load(['company', 'subCategory.megaCategory']);
+            return $category->load(['subCategory.megaCategory']);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -146,7 +111,7 @@ class MiniCategoryService
 
             Log::info('Mini category updated successfully', ['id' => $category->id]);
 
-            return $category->fresh(['company', 'subCategory.megaCategory']);
+            return $category->fresh(['subCategory.megaCategory']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -194,7 +159,7 @@ class MiniCategoryService
 
             Log::info('Mini category restored successfully', ['id' => $id]);
 
-            return $category->load(['company', 'subCategory.megaCategory']);
+            return $category->load(['subCategory.megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -244,7 +209,7 @@ class MiniCategoryService
 
             Log::info('Mini category status toggled', ['id' => $id]);
 
-            return $category->load(['company', 'subCategory.megaCategory']);
+            return $category->load(['subCategory.megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -253,10 +218,9 @@ class MiniCategoryService
         }
     }
 
-    public function getBySubCategory(int $subId, int $companyId): Collection
+    public function getBySubCategory(int $subId,): Collection
     {
-        return MiniCategory::byCompany($companyId)
-            ->bySubCategory($subId)
+        return MiniCategory::bySubCategory($subId)
             ->active()
             ->get();
     }

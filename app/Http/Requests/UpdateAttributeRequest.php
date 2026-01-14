@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateAttributeRequest extends FormRequest
+class UpdateAttributeRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -14,23 +15,26 @@ class UpdateAttributeRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'company_id' => ['required','exists:companies,id'],
-            'attribute_group_id' => ['sometimes', 'required', 'exists:attribute_groups,id'],
-            'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'status' => ['boolean'],
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'attribute_group_id' => ['sometimes', 'required', 'exists:attribute_groups,id'],
+                'name' => ['sometimes', 'required', 'string', 'max:255'],
+                'status' => ['boolean'],
+            ]
+        );
     }
 
     public function messages(): array
     {
-        return [
-            'company_id.required' => 'Company is required',
-            'company_id.exists' => 'Selected company does not exist',
-            'attribute_group_id.required' => 'Attribute group is required',
-            'attribute_group_id.exists' => 'Selected attribute group does not exist',
-            'name.required' => 'Attribute name is required',
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'attribute_group_id.required' => 'Attribute group is required',
+                'attribute_group_id.exists' => 'Selected attribute group does not exist',
+                'name.required' => 'Attribute name is required',
+            ]
+        );
     }
 
     protected function failedValidation(Validator $validator)

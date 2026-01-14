@@ -19,38 +19,7 @@ class BrandService
     public function getAllBrands(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Brand::with('company');
-
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-        } catch (\Exception $e) {
-            Log::error('Error fetching brands: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch brands');
-        }
-    }
-    public function getBrandByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = Brand::where('company_id',$companyId);
-
-          
+            $query = Brand::query();
             if (isset($filters['status'])) {
                 $query->where('status', $filters['status']);
             }
@@ -77,7 +46,7 @@ class BrandService
      */
     public function getBrandById(int $id): Brand
     {
-        $brand = Brand::with('company')->find($id);
+        $brand = Brand::find($id);
 
         if (!$brand) {
             throw ApiException::notFound('Brand');
@@ -111,7 +80,7 @@ class BrandService
 
             Log::info('Brand created successfully', ['brand_id' => $brand->id]);
 
-            return $brand->load('company');
+            return $brand;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -150,7 +119,7 @@ class BrandService
 
             Log::info('Brand updated successfully', ['brand_id' => $brand->id]);
 
-            return $brand->fresh('company');
+            return $brand;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -204,7 +173,7 @@ class BrandService
 
             Log::info('Brand restored successfully', ['brand_id' => $id]);
 
-            return $brand->load('company');
+            return $brand;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -260,7 +229,7 @@ class BrandService
             LogHelper::statusChanged('brand', $brand->id, $brand->company_id);
             Log::info('Brand status toggled', ['brand_id' => $id]);
 
-            return $brand->load('company');
+            return $brand;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

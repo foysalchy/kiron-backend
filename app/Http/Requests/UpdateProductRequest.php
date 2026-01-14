@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateProductRequest extends FormRequest
+class UpdateProductRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -17,67 +17,70 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         $productId = $this->route('id');
+        return array_merge(
+            $this->companyRules(),
+            [
+                'brand_id' => ['nullable', 'exists:brands,id'],
 
-        return [
-            'company_id' => ['sometimes', 'required', 'exists:companies,id'],
-            'brand_id' => ['nullable', 'exists:brands,id'],
-            
-            // Basic Info
-            'title' => ['sometimes', 'required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($productId)],
-            'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-            'video_link' => ['nullable', 'url'],
-            
-            // Categories
-            'mega_category_ids' => ['nullable', 'array'],
-            'mega_category_ids.*' => ['exists:mega_categories,id'],
-            'sub_category_ids' => ['nullable', 'array'],
-            'sub_category_ids.*' => ['exists:sub_categories,id'],
-            'mini_category_ids' => ['nullable', 'array'],
-            'mini_category_ids.*' => ['exists:mini_categories,id'],
-            'extra_category_ids' => ['nullable', 'array'],
-            'extra_category_ids.*' => ['exists:extra_categories,id'],
-            
-            // Gallery Images (new images to add)
-            'gallery_images' => ['nullable', 'array'],
-            'gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-            
-            // Description
-            'short_description' => ['nullable', 'string'],
-            'full_description' => ['nullable', 'string'],
-            
-            // Product Type
-            'type' => ['sometimes', 'required', Rule::in(['single', 'variation'])],
-            'sku_codes' => ['nullable', 'array'],
-            'sku_codes.*' => ['string', 'max:255'],
-            
-            // Stock
-            'stock_status' => ['sometimes', 'required', Rule::in(['in_stock', 'out_of_stock'])],
-            'stock_quantity' => ['nullable', 'integer', 'min:0'],
-            
-            // Pricing
-            'regular_price' => ['sometimes', 'required', 'numeric', 'min:0'],
-            'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
-            'discount' => ['nullable', 'numeric', 'min:0'],
-            
-        ];
+                // Basic Info
+                'title' => ['sometimes', 'required', 'string', 'max:255'],
+                'slug' => ['nullable', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($productId)],
+                'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'video_link' => ['nullable', 'url'],
+
+                // Categories
+                'mega_category_ids' => ['nullable', 'array'],
+                'mega_category_ids.*' => ['exists:mega_categories,id'],
+                'sub_category_ids' => ['nullable', 'array'],
+                'sub_category_ids.*' => ['exists:sub_categories,id'],
+                'mini_category_ids' => ['nullable', 'array'],
+                'mini_category_ids.*' => ['exists:mini_categories,id'],
+                'extra_category_ids' => ['nullable', 'array'],
+                'extra_category_ids.*' => ['exists:extra_categories,id'],
+
+                // Gallery Images (new images to add)
+                'gallery_images' => ['nullable', 'array'],
+                'gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+
+                // Description
+                'short_description' => ['nullable', 'string'],
+                'full_description' => ['nullable', 'string'],
+
+                // Product Type
+                'type' => ['sometimes', 'required', Rule::in(['single', 'variation'])],
+                'sku_codes' => ['nullable', 'array'],
+                'sku_codes.*' => ['string', 'max:255'],
+
+                // Stock
+                'stock_status' => ['sometimes', 'required', Rule::in(['in_stock', 'out_of_stock'])],
+                'stock_quantity' => ['nullable', 'integer', 'min:0'],
+
+                // Pricing
+                'regular_price' => ['sometimes', 'required', 'numeric', 'min:0'],
+                'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
+                'discount' => ['nullable', 'numeric', 'min:0'],
+
+            ]
+        );
     }
 
     public function messages(): array
     {
-        return [
-            'company_id.required' => 'Company is required',
-            'title.required' => 'Product title is required',
-            'slug.unique' => 'This slug is already taken',
-            'thumbnail.image' => 'Thumbnail must be an image',
-            'thumbnail.max' => 'Thumbnail size cannot exceed 2MB',
-            'gallery_images.*.image' => 'All gallery files must be images',
-            'gallery_images.*.max' => 'Gallery image size cannot exceed 2MB',
-            'type.required' => 'Product type is required',
-            'stock_status.required' => 'Stock status is required',
-            'regular_price.required' => 'Regular price is required',
-            'regular_price.min' => 'Price must be at least 0',
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'title.required' => 'Product title is required',
+                'slug.unique' => 'This slug is already taken',
+                'thumbnail.image' => 'Thumbnail must be an image',
+                'thumbnail.max' => 'Thumbnail size cannot exceed 2MB',
+                'gallery_images.*.image' => 'All gallery files must be images',
+                'gallery_images.*.max' => 'Gallery image size cannot exceed 2MB',
+                'type.required' => 'Product type is required',
+                'stock_status.required' => 'Stock status is required',
+                'regular_price.required' => 'Regular price is required',
+                'regular_price.min' => 'Price must be at least 0',
+            ]
+        );
     }
 
     protected function failedValidation(Validator $validator)

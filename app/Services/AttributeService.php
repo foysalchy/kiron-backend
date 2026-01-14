@@ -18,12 +18,9 @@ class AttributeService
     public function getAllAttributes(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query =AttributeValue::with(['company', 'attributeGroup']);
+            $query =AttributeValue::with(['attributeGroup']);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
+           
             if (isset($filters['attribute_group_id'])) {
                 $query->where('attribute_group_id', $filters['attribute_group_id']);
             }
@@ -49,47 +46,14 @@ class AttributeService
             throw ApiException::serverError('Failed to fetch attributes');
         }
     }
-    public function getAttributeValueByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query =AttributeValue::with([ 'attributeGroup'])->where('company_id',$companyId);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            if (isset($filters['attribute_group_id'])) {
-                $query->where('attribute_group_id', $filters['attribute_group_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-            return $paginate 
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-
-        } catch (\Exception $e) {
-            Log::error('Error fetching attributes: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch attributes');
-        }
-    }
 
     /**
      * Get attribute by ID
      */
     public function getAttributeById(int $id): AttributeValue
     {
-        $attribute =AttributeValue::with(['company', 'attributeGroup'])->find($id);
+        $attribute =AttributeValue::with(['attributeGroup'])->find($id);
 
         if (!$attribute) {
             throw ApiException::notFound('Attribute');
@@ -108,7 +72,7 @@ class AttributeService
             LogHelper::created('attribute_value', $attribute->id, $attribute->company_id);
             Log::info('Attribute created successfully', ['attribute_id' => $attribute->id]);
 
-            return $attribute->load(['company', 'attributeGroup']);
+            return $attribute->load(['attributeGroup']);
 
         } catch (\Exception $e) {
             Log::error('Attribute creation failed: ' . $e->getMessage());
@@ -127,7 +91,7 @@ class AttributeService
             LogHelper::updated('attribute_value', $attribute->id, $attribute->company_id);
             Log::info('Attribute updated successfully', ['attribute_id' => $attribute->id]);
 
-            return $attribute->fresh(['company', 'attributeGroup']);
+            return $attribute->fresh(['attributeGroup']);
 
         } catch (ApiException $e) {
             throw $e;
@@ -176,7 +140,7 @@ class AttributeService
 
             Log::info('Attribute restored successfully', ['attribute_id' => $id]);
 
-            return $attribute->load(['company', 'attributeGroup']);
+            return $attribute->load(['attributeGroup']);
 
         } catch (ApiException $e) {
             throw $e;
@@ -225,7 +189,7 @@ class AttributeService
 
             Log::info('Attribute status toggled', ['attribute_id' => $id]);
 
-            return $attribute->load(['company', 'attributeGroup']);
+            return $attribute->load(['attributeGroup']);
 
         } catch (ApiException $e) {
             throw $e;

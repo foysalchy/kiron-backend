@@ -14,40 +14,55 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * Login
+     * Login - Cookie based authentication
      */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
+        // Attempt authentication
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
             ]);
         }
 
-        $user = $request->user();
+        $user = Auth::user();
 
-        // Delete old tokens (optional)
-        $user->tokens()->delete();
+        // Check if user is active
+        // if (!$user->isActive()) {
+        //     Auth::logout();
+        //     throw ValidationException::withMessages([
+        //         'email' => ['Your account is inactive'],
+        //     ]);
+        // }
 
-        $token = $user->createToken('api-token')->plainTextToken;
-        LogHelper::custom('login', 'user', $user->id, $user->company_id);
+        // Regenerate session
+        $request->session()->regenerate();
+
+        // Log login action
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
-            'token'   => $token,
-            'user'    => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'company_id' => $user->company_id,
+                'role' => $user->role,
+                'profile' => $user->profile,
+                'profile_url' => $user->profile_url,
+            ],
         ]);
     }
 
-  
-    // Register
-    
+    /**
+     * Register
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
         DB::beginTransaction();
@@ -71,8 +86,8 @@ class AuthController extends Controller
             // Create user
             $user = User::create($data);
 
-            // Create token
-            $token = $user->createToken('api-token')->plainTextToken;
+            // Auto login
+            Auth::login($user);
 
             // Log registration
             LogHelper::created('user', $user->id, $user->company_id);
@@ -82,8 +97,13 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Registration successful',
-                'token'   => $token,
-                'user'    => $user,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'company_id' => $user->company_id,
+                    'role' => $user->role,
+                ],
             ], 201);
 
         } catch (\Exception $e) {
@@ -106,10 +126,25 @@ class AuthController extends Controller
      */
     public function profile(Request $request): JsonResponse
     {
+        $user = $request->user()->load('company');
+
         return response()->json([
             'success' => true,
             'message' => 'Profile retrieved successfully',
-            'user' => $request->user()->load('company'),
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'alternative_phone' => $user->alternative_phone,
+                'profile' => $user->profile,
+                'profile_url' => $user->profile_url,
+                'company_id' => $user->company_id,
+                'role' => $user->role,
+                'status' => $user->status,
+                'company' => $user->company,
+                'is_super_admin' => $user->isSuperAdmin(),
+            ],
         ]);
     }
 
@@ -144,7 +179,13 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Profile updated successfully',
-                'user' => $user->fresh(),
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'profile_url' => $user->profile_url,
+                ],
             ]);
 
         } catch (\Exception $e) {
@@ -177,17 +218,17 @@ class AuthController extends Controller
                 ]);
             }
 
+            // Update password
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
 
-            // Delete all tokens (force re-login)
-            $user->tokens()->delete();
+            // Log password change
             LogHelper::custom('password_changed', 'user', $user->id, $user->company_id);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Password updated successfully. Please login again.',
+                'message' => 'Password updated successfully',
             ]);
 
         } catch (ValidationException $e) {
@@ -201,17 +242,22 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout
+     * Logout - Cookie based
      */
     public function logout(Request $request): JsonResponse
     {
         $user = $request->user();
 
         // Log logout action
-        LogHelper::custom('logout', 'user', $user->id, $user->company_id);
+        if ($user) {
+            LogHelper::custom('logout', 'user', $user->id, $user->company_id);
+        }
 
-        // Delete current token
-        $request->user()->currentAccessToken()->delete();
+        // Logout and invalidate session
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'success' => true,
@@ -220,22 +266,27 @@ class AuthController extends Controller
     }
 
     /**
-     * Logout from all devices
+     * Check authentication status
      */
-    public function logoutAll(Request $request): JsonResponse
+    public function check(Request $request): JsonResponse
     {
-        $user = $request->user();
-
-        // Log logout from all devices
-        LogHelper::custom('logout_all', 'user', $user->id, $user->company_id);
-
-        // Delete all tokens
-        $user->tokens()->delete();
+        if ($request->user()) {
+            return response()->json([
+                'authenticated' => true,
+                'user' => [
+                    'id' => $request->user()->id,
+                    'name' => $request->user()->name,
+                    'email' => $request->user()->email,
+                    'company_id' => $request->user()->company_id,
+                    'role' => $request->user()->role,
+                    'is_super_admin' => $request->user()->isSuperAdmin(),
+                ],
+            ]);
+        }
 
         return response()->json([
-            'success' => true,
-            'message' => 'Logged out from all devices successfully',
-        ]);
+            'authenticated' => false,
+        ], 401);
     }
 
     /**
@@ -265,8 +316,10 @@ class AuthController extends Controller
             // Log deletion before deleting user
             LogHelper::deleted('user', $user->id, $user->company_id);
 
-            // Delete all tokens
-            $user->tokens()->delete();
+            // Logout
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
             // Delete user
             $user->delete();

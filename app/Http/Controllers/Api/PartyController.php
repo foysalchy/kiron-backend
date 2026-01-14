@@ -20,7 +20,6 @@ class PartyController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'company_id' => $request->query('company_id'),
             'type' => $request->query('type'),
             'status' => $request->query('status'),
             'search' => $request->query('search'),
@@ -33,23 +32,6 @@ class PartyController extends Controller
 
         return ResponseHelper::success($parties, 'Parties retrieved successfully');
     }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'company_id' => $request->query('company_id'),
-            'type' => $request->query('type'),
-            'status' => $request->query('status'),
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
-
-        $parties = $this->partyService->getParyByCompany($filters,$request->user()->company_id, true);
-
-        return ResponseHelper::success($parties, 'Parties retrieved successfully');
-    }
-
 
     public function store(StorePartyRequest $request): JsonResponse
     {
@@ -123,13 +105,8 @@ class PartyController extends Controller
      */
     public function getSuppliers(Request $request): JsonResponse
     {
-        $companyId = $request->query('company_id');
-
-        if (!$companyId) {
-            throw ApiException::badRequest('Company ID is required');
-        }
-
-        $suppliers = $this->partyService->getSuppliers($companyId);
+        
+        $suppliers = $this->partyService->getSuppliers();
 
         return ResponseHelper::success($suppliers, 'Suppliers retrieved successfully');
     }
@@ -139,13 +116,9 @@ class PartyController extends Controller
      */
     public function getCustomers(Request $request): JsonResponse
     {
-        $companyId = $request->query('company_id');
+        
 
-        if (!$companyId) {
-            throw ApiException::badRequest('Company ID is required');
-        }
-
-        $customers = $this->partyService->getCustomers($companyId);
+        $customers = $this->partyService->getCustomers();
 
         return ResponseHelper::success($customers, 'Customers retrieved successfully');
     }
@@ -163,7 +136,6 @@ class PartyController extends Controller
 
         $parties = $this->partyService->searchParties(
             $term,
-            $request->query('company_id'),
             $request->query('type')
         );
 

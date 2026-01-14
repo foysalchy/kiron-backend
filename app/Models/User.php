@@ -27,6 +27,7 @@ class User extends Authenticatable
         'alternative_phone',
         'profile',
         'status',
+        'role',
         'password',
     ];
 
@@ -56,5 +57,23 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'super_admin';
+    }
+    public function isActive(): bool
+    {
+        return $this->status === 1;
+    }
+
+    public function canAccessCompany(int $companyId): bool
+    {
+        // Super admin can access any company
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        return $this->company_id == $companyId;
     }
 }

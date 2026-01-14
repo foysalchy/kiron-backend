@@ -16,9 +16,7 @@ class SubCategoryService
         try {
             $query = SubCategory::with(['megaCategory']);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
+           
 
             if (isset($filters['mega_category_id'])) {
                 $query->where('mega_category_id', $filters['mega_category_id']);
@@ -44,40 +42,11 @@ class SubCategoryService
             throw ApiException::serverError('Failed to fetch sub categories');
         }
     }
-    public function getSubByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = SubCategory::with([ 'megaCategory'])->where('company_id',$companyId);
 
-    
-            if (isset($filters['mega_category_id'])) {
-                $query->where('mega_category_id', $filters['mega_category_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-        } catch (\Exception $e) {
-            Log::error('Error fetching sub categories: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch sub categories');
-        }
-    }
 
     public function getSubCategoryById(int $id): SubCategory
     {
-        $category = SubCategory::with(['company', 'megaCategory'])->find($id);
+        $category = SubCategory::with(['megaCategory'])->find($id);
 
         if (!$category) {
             throw ApiException::notFound('Sub Category');
@@ -106,7 +75,7 @@ class SubCategoryService
 
             Log::info('Sub category created successfully', ['id' => $category->id]);
 
-            return $category->load(['company', 'megaCategory']);
+            return $category->load([ 'megaCategory']);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -140,7 +109,7 @@ class SubCategoryService
 
             Log::info('Sub category updated successfully', ['id' => $category->id]);
 
-            return $category->fresh(['company', 'megaCategory']);
+            return $category->fresh(['megaCategory']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -186,7 +155,7 @@ class SubCategoryService
 
             Log::info('Sub category restored successfully', ['id' => $id]);
 
-            return $category->load(['company', 'megaCategory']);
+            return $category->load(['megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -234,7 +203,7 @@ class SubCategoryService
 
             Log::info('Sub category status toggled', ['id' => $id]);
 
-            return $category->load(['company', 'megaCategory']);
+            return $category->load([ 'megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -243,23 +212,20 @@ class SubCategoryService
         }
     }
 
-    public function getByMegaCategory(int $megaId, int $companyId): Collection
+    public function getByMegaCategory(int $megaId): Collection
     {
-        return SubCategory::byCompany($companyId)
-            ->byMegaCategory($megaId)
+        return SubCategory::byMegaCategory($megaId)
             ->active()
             ->orderBy('order')
             ->get();
     }
 
-    public function searchSubCategories(string $term, ?int $companyId = null): Collection
+    public function searchSubCategories(string $term): Collection
     {
-        $query = SubCategory::with(['company', 'megaCategory'])
+        $query = SubCategory::with(['megaCategory'])
             ->where('name', 'like', "%{$term}%");
 
-        if ($companyId) {
-            $query->where('company_id', $companyId);
-        }
+        
 
         return $query->get();
     }
