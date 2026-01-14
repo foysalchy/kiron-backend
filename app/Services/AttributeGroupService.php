@@ -54,6 +54,45 @@ class AttributeGroupService
             throw ApiException::serverError('Failed to fetch attribute group');
         }
     }
+    public function getAttributeGroupByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = AttributeGroup::where('company_id', $companyId);
+
+            // Filter by company
+            if (isset($filters['company_id'])) {
+                $query->where('company_id', $filters['company_id']);
+            }
+            // Apply filters
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (isset($filters['category'])) {
+                $query->where('category', $filters['category']);
+            }
+
+            if (isset($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', "%{$filters['search']}%")
+                        ->orWhere('category', 'like', "%{$filters['search']}%");
+                });
+            }
+
+            // Sorting
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            // Return paginated or all
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching attribute group: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch attribute group');
+        }
+    }
 
     /**
      * Get Attribute Group by ID

@@ -14,12 +14,42 @@ class SubCategoryService
     public function getAllSubCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = SubCategory::with(['company', 'megaCategory']);
+            $query = SubCategory::with(['megaCategory']);
 
             if (isset($filters['company_id'])) {
                 $query->where('company_id', $filters['company_id']);
             }
 
+            if (isset($filters['mega_category_id'])) {
+                $query->where('mega_category_id', $filters['mega_category_id']);
+            }
+
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (isset($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching sub categories: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch sub categories');
+        }
+    }
+    public function getSubByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = SubCategory::with([ 'megaCategory'])->where('company_id',$companyId);
+
+    
             if (isset($filters['mega_category_id'])) {
                 $query->where('mega_category_id', $filters['mega_category_id']);
             }

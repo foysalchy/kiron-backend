@@ -49,6 +49,40 @@ class AttributeService
             throw ApiException::serverError('Failed to fetch attributes');
         }
     }
+    public function getAttributeValueByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query =AttributeValue::with([ 'attributeGroup'])->where('company_id',$companyId);
+
+            if (isset($filters['company_id'])) {
+                $query->where('company_id', $filters['company_id']);
+            }
+
+            if (isset($filters['attribute_group_id'])) {
+                $query->where('attribute_group_id', $filters['attribute_group_id']);
+            }
+
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+            if (isset($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate 
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching attributes: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch attributes');
+        }
+    }
 
     /**
      * Get attribute by ID

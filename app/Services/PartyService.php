@@ -60,6 +60,47 @@ class PartyService
             throw ApiException::serverError('Failed to fetch parties');
         }
     }
+    public function getParyByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = Party::where('company_id',$companyId);
+
+          
+
+            // Filter by type
+            if (isset($filters['type'])) {
+                $query->where('type', $filters['type']);
+            }
+
+            // Filter by status
+            if (isset($filters['status'])) {
+                $query->where('status', $filters['status']);
+            }
+
+
+
+            // Search
+            if (isset($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', "%{$filters['search']}%")
+                        ->orWhere('email', 'like', "%{$filters['search']}%")
+                        ->orWhere('phone', 'like', "%{$filters['search']}%");
+                });
+            }
+
+            // Sorting
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching parties: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch parties');
+        }
+    }
 
     /**
      * Get party by ID
