@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateWarehouseRequest extends FormRequest
+class StoreCellRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,20 +24,28 @@ class UpdateWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => 'sometimes|required|exists:companies,id',
-            'name'       => 'sometimes|required|string|max:255',
-            'location'   => 'nullable|string|max:500',
-            'status'     => 'sometimes|required|integer|in:0,1',
+            'company_id' => 'required|exists:companies,id',
+            'rack_id'    => 'required|exists:racks,id',
+            'name'       => 'required|string|max:255',
+            'status'     => 'required|integer|in:0,1',
         ];
     }
+    /**
+     * Custom error messages.
+     */
     public function messages(): array
     {
         return [
-            'company_id.exists' => 'Selected company does not exist',
-            'name.required'     => 'Warehouse Name is required',
-            'status.in'         => 'Status must be 0 (Inactive) or 1 (Active)',
+            'company_id.exists' => 'The selected company is invalid.',
+            'rack_id.exists'    => 'The selected rack does not exist.',
+            'name.required'     => 'The cell name is mandatory.',
+            'status.required'   => 'Please specify if the cell is active (1) or inactive (0).',
         ];
     }
+
+    /**
+     * Handle a failed validation attempt.
+     */
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(

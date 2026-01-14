@@ -14,11 +14,7 @@ class WarehouseService
      */
     public function getAllWarehouses(array $filters, bool $paginate = true)
     {
-        $query = Warehouse::with(['company']);
-
-        if (!empty($filters['company_id'])) {
-            $query->where('company_id', $filters['company_id']);
-        }
+        $query = Warehouse::query();
 
         if (isset($filters['status']) && $filters['status'] !== "") {
             $query->where('status', (int)$filters['status']);
@@ -44,7 +40,7 @@ class WarehouseService
      */
     public function getWarehouseById(int $id): Warehouse
     {
-        $warehouse = Warehouse::with(['company'])->find($id);
+        $warehouse = Warehouse::find($id);
         if (!$warehouse) {
             throw ApiException::notFound('Warehouse');
         }
@@ -61,7 +57,7 @@ class WarehouseService
             LogHelper::created('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse created successfully', ['warehouse_id' => $warehouse->id]);
 
-            return $warehouse->load(['company']);
+            return $warehouse;
 
         } catch (\Exception $e) {
             Log::error('Warehouse creation failed: ' . $e->getMessage());
@@ -83,7 +79,7 @@ class WarehouseService
             LogHelper::updated('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse Updated Successfully', ['warehouse_id' => $warehouse->id]);
 
-            return $warehouse->fresh(['company']);
+            return $warehouse->fresh();
 
         } catch (ApiException $e) {
             throw $e;
@@ -130,7 +126,7 @@ class WarehouseService
             $warehouse->restore();
             LogHelper::restored('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse restored successfully', ['warehouse_id' => $id]);
-            return $warehouse->load(['company']);
+            return $warehouse;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -180,7 +176,7 @@ class WarehouseService
             LogHelper::statusChanged('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse status toggled', ['warehouse_id' => $id, 'new_status' => $newStatus]);
 
-            return $warehouse->load(['company']);
+            return $warehouse;
 
         } catch (ApiException $e) {
             throw $e;

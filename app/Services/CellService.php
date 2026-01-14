@@ -1,0 +1,182 @@
+<?php
+
+namespace App\Services;
+
+use App\Exceptions\ApiException;
+use App\Helpers\LogHelper;
+use App\Models\Cell;
+use App\Models\Rack;
+use Illuminate\Support\Facades\Log;
+
+class CellService
+{
+    /**
+     * Get all cell with optional pagination
+     */
+    public function getAllCells(array $filters, bool $paginate = true)
+    {
+        $query = Cell::with(['rack']);
+
+        if (!empty($filters['rack_id'])) {
+            $query->where('rack_id', $filters['rack_id']);
+        }
+
+        if (isset($filters['status']) && $filters['status'] !== "") {
+            $query->where('status', (int)$filters['status']);
+        }
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortOrder = $filters['sort_order'] ?? 'desc';
+        $query->orderBy($sortBy, $sortOrder);
+
+        return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+    }
+
+    /**
+     * Get cell by ID
+     */
+    public function getCellById(int $id): Cell
+    {
+        $cell = Cell::with(['rack'])->find($id);
+        if (!$cell) {
+            throw ApiException::notFound('cell');
+        }
+        return $cell;
+    }
+
+    /**
+     * Create a new cell
+     */
+    public function createCell(array $data): Cell
+    {
+        try {
+            $cell =Cell::create($data);
+            LogHelper::created('cell', $cell->id, $cell->company_id);
+            Log::info('Cell created successfully', ['cell_id' => $cell->id]);
+
+            return $cell->load(['rack']);
+
+        } catch (\Exception $e) {
+            Log::error('Cell creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create cell');
+        }
+    }
+
+
+    /**
+     * Update cell
+     */
+    public function updateCell(int $id, array $data): Cell
+    {
+        try {
+            $cell = $this->getCellById($id);
+
+            $cell->update($data);
+
+            LogHelper::updated('cell', $cell->id, $cell->company_id);
+            Log::info('Cell Updated Successfully', ['cell_id' => $cell->id]);
+
+            return $cell->fresh(['rack']);
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Cell update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update cell');
+        }
+    }
+    /**
+     * Delete cell (soft delete)
+     */
+    public function deleteCell(int $id): bool
+    {
+        try {
+            $cell = $this->getCellById($id);
+
+            $cell->delete();
+
+            LogHelper::deleted('cell', $cell->id, $cell->company_id);
+            Log::info('Cell deleted successfully', ['cell_id' => $id]);
+
+            return true;
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Cell deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to delete cell');
+        }
+    }
+    /**
+     * Restore soft deleted cell
+     */
+    public function restoreCell(int $id): Cell
+    {
+        try {
+            $cell = Cell::withTrashed()->find($id);
+            if (!$cell) {
+                throw ApiException::notFound('Cell');
+            }
+            $cell->restore();
+            LogHelper::restored('cell',$cell->id,$cell->company_id);
+            return $cell->load(relations: ['rack']);
+        } catch (ApiException $e) {
+            throw $e;
+        }catch(\Exception $e)
+        {
+            Log::error('Cell restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore data');
+        }
+    }
+    /**
+     * Permanently delete an cell
+     */
+    public function forceDeleteCell(int $id): bool
+    {
+        try {
+            $cell = Cell::withTrashed()->find($id);
+            if (!$cell) {
+                throw ApiException::notFound('Cell');
+            }
+            $cell->forceDelete();
+            LogHelper::forceDeleted('cell', $id, $cell->company_id);
+            return true;
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Cell permanent deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete cell');
+        }
+    }
+    /**
+     * Toggle rack status (Active/Inactive)
+     */
+    public function toggleStatus(int $id): Cell
+    {
+        try {
+            $cell = $this->getCellById($id);
+
+            $newStatus = $cell->status == 1 ? 0 : 1;
+            $cell->update(['status' => $newStatus]);
+
+            LogHelper::statusChanged('cell', $cell->id, $cell->company_id);
+            Log::info('Cell status toggled', ['cell_id' => $id, 'new_status' => $newStatus]);
+
+            return $cell->load(['rack']);
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Cell status toggle failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle cell status');
+        }
+    }
+
+}

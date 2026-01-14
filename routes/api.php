@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\LogActionController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
@@ -184,7 +187,40 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [WarehouseController::class, 'restore']);
             Route::delete('/{id}/force', [WarehouseController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [WarehouseController::class, 'toggleStatus']);
-
+        });
+        // Area Routes
+        Route::prefix('areas')->group(function () {
+            Route::get('/', [AreaController::class, 'index']);
+            Route::post('/', [AreaController::class, 'store']);
+            Route::get('/{id}', [AreaController::class, 'show']);
+            Route::post('/update/{id}', [AreaController::class, 'update']);
+            Route::delete('/{id}', [AreaController::class, 'destroy']);
+            Route::get('/{id}/restore', [AreaController::class, 'restore']);
+            Route::delete('/{id}/force', [AreaController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AreaController::class, 'toggleStatus']);
+        });
+        // Rack Routes
+        Route::prefix('racks')->group(function () {
+            Route::get('/', [RackController::class, 'index']);
+            Route::post('/', [RackController::class, 'store']);
+            Route::get('/{id}', [RackController::class, 'show']);
+            Route::post('/update/{id}', [RackController::class, 'update']);
+            Route::delete('/{id}', [RackController::class, 'destroy']);
+            Route::get('/{id}/restore', [RackController::class, 'restore']);
+            Route::delete('/{id}/force', [RackController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [RackController::class, 'toggleStatus']);
+        });
+        // Cell Routes
+        Route::prefix('cells')->group(function () {
+            Route::get('/', [CellController::class, 'index']);
+            Route::post('/', [CellController::class, 'store']);
+            Route::get('/{id}', [CellController::class, 'show']);
+            Route::post('/update/{id}', [CellController::class, 'update']);
+            Route::delete('/{id}', [CellController::class, 'destroy']);
+            Route::get('/{id}/restore', [CellController::class, 'restore']);
+            Route::delete('/{id}/force', [CellController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CellController::class, 'toggleStatus']);
+        });
         Route::prefix('products')->group(function () {
             Route::get('/', [ProductController::class, 'index']);
             Route::post('/', [ProductController::class, 'store']);
