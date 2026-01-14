@@ -6,6 +6,8 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Area;
 use App\Models\Warehouse;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class AreaService
@@ -13,31 +15,36 @@ class AreaService
     /**
      * Get all area with optional pagination
      */
-    public function getAllAreas(array $filters, bool $paginate = true)
+    public function getAllAreas(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
-        $query = Area::with(['warehouse']);
+        try {
+            $query = Area::with(['warehouse']);
 
-        
-        if (!empty($filters['warehouse_id'])) {
-            $query->where('warehouse_id', $filters['warehouse_id']);
+
+            if (!empty($filters['warehouse_id'])) {
+                $query->where('warehouse_id', $filters['warehouse_id']);
+            }
+
+            if (isset($filters['status']) && $filters['status'] !== "") {
+                $query->where('status', (int)$filters['status']);
+            }
+
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+        } catch (\Throwable $e) {
+            Log::error('Error fetching areas: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch areas');
         }
-
-        if (isset($filters['status']) && $filters['status'] !== "") {
-            $query->where('status', (int)$filters['status']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'created_at';
-        $sortOrder = $filters['sort_order'] ?? 'desc';
-        $query->orderBy($sortBy, $sortOrder);
-
-        return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
     }
 
     /**
