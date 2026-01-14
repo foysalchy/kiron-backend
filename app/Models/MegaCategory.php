@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +10,7 @@ use Illuminate\Support\Str;
 
 class MegaCategory extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,CompanyScoped;
 
     protected $fillable = [
         'company_id',

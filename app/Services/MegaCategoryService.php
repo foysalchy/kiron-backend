@@ -15,11 +15,7 @@ class MegaCategoryService
     public function getAllMegaCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = MegaCategory::with('company');
-
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
+            $query = MegaCategory::query();
 
             if (isset($filters['status'])) {
                 $query->where('status', $filters['status']);
@@ -40,38 +36,11 @@ class MegaCategoryService
             throw ApiException::serverError('Failed to fetch mega categories');
         }
     }
-    public function getMegaByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = MegaCategory::where('company_id',$companyId);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-        } catch (\Exception $e) {
-            Log::error('Error fetching mega categories: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch mega categories');
-        }
-    }
 
     public function getMegaCategoryById(int $id): MegaCategory
     {
-        $category = MegaCategory::with('company')->find($id);
+        $category = MegaCategory::find($id);
 
         if (!$category) {
             throw ApiException::notFound('Mega Category');
@@ -101,7 +70,7 @@ class MegaCategoryService
 
             Log::info('Mega category created successfully', ['id' => $category->id]);
 
-            return $category->load('company');
+            return $category;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -136,7 +105,7 @@ class MegaCategoryService
 
             Log::info('Mega category updated successfully', ['id' => $category->id]);
 
-            return $category->fresh('company');
+            return $category;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -183,7 +152,7 @@ class MegaCategoryService
 
             Log::info('Mega category restored successfully', ['id' => $id]);
 
-            return $category->load('company');
+            return $category;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -233,7 +202,7 @@ class MegaCategoryService
 
             Log::info('Mega category status toggled', ['id' => $id]);
 
-            return $category->load('company');
+            return $category;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

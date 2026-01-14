@@ -19,53 +19,7 @@ class PartyService
     public function getAllParties(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Party::with('company');
-
-            // Filter by company
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            // Filter by type
-            if (isset($filters['type'])) {
-                $query->where('type', $filters['type']);
-            }
-
-            // Filter by status
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-
-
-            // Search
-            if (isset($filters['search'])) {
-                $query->where(function ($q) use ($filters) {
-                    $q->where('name', 'like', "%{$filters['search']}%")
-                        ->orWhere('email', 'like', "%{$filters['search']}%")
-                        ->orWhere('phone', 'like', "%{$filters['search']}%");
-                });
-            }
-
-            // Sorting
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-        } catch (\Exception $e) {
-            Log::error('Error fetching parties: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch parties');
-        }
-    }
-    public function getParyByCompany(array $filters = [], int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = Party::where('company_id',$companyId);
-
-          
+            $query = Party::query();
 
             // Filter by type
             if (isset($filters['type'])) {
@@ -107,7 +61,7 @@ class PartyService
      */
     public function getPartyById(int $id): Party
     {
-        $party = Party::with('company')->find($id);
+        $party = Party::find($id);
 
         if (!$party) {
             throw ApiException::notFound('Party');
@@ -141,7 +95,7 @@ class PartyService
 
             Log::info('Party created successfully', ['party_id' => $party->id]);
 
-            return $party->load('company');
+            return $party;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -184,7 +138,7 @@ class PartyService
 
             Log::info('Party updated successfully', ['party_id' => $party->id]);
 
-            return $party->fresh()->load('company');
+            return $party->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -248,7 +202,7 @@ class PartyService
 
             Log::info('Party restored successfully', ['party_id' => $id]);
 
-            return $party->load('company');
+            return $party;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -307,7 +261,7 @@ class PartyService
                 'new_status' => $party->status
             ]);
 
-            return $party->load('company');
+            return $party;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -345,6 +299,8 @@ class PartyService
             ]);
 
             return $party->load('company');
+        } catch (ApiException $e) {
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Balance update failed: ' . $e->getMessage());
@@ -353,29 +309,26 @@ class PartyService
     }
 
 
-    public function getSuppliers(int $companyId): Collection
+    public function getSuppliers(): Collection
     {
-        return Party::byCompany($companyId)->suppliers()->active()->get();
+        return Party::suppliers()->active()->get();
     }
 
 
-    public function getCustomers(int $companyId): Collection
+    public function getCustomers(): Collection
     {
-        return Party::byCompany($companyId)->customers()->active()->get();
+        return Party::customers()->active()->get();
     }
 
-    public function searchParties(string $term, ?int $companyId = null, ?int $type = null): Collection
+    public function searchParties(string $term, ?int $type = null): Collection
     {
-        $query = Party::with('company')
-            ->where(function ($q) use ($term) {
-                $q->where('name', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%")
-                    ->orWhere('phone', 'like', "%{$term}%");
-            });
+        $query = Party::where(function ($q) use ($term) {
+            $q->where('name', 'like', "%{$term}%")
+                ->orWhere('email', 'like', "%{$term}%")
+                ->orWhere('phone', 'like', "%{$term}%");
+        });
 
-        if ($companyId) {
-            $query->where('company_id', $companyId);
-        }
+
 
         if ($type) {
             $query->where('type', $type);

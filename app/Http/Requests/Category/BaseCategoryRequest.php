@@ -26,8 +26,12 @@ abstract class BaseCategoryRequest extends FormRequest
 
     protected function baseRules(): array
     {
+        $user = $this->user();
         return [
-            'company_id' => ['required', 'exists:companies,id'],
+            'company_id' => [
+                $user->isSuperAdmin() ? 'required' : 'prohibited',
+                'exists:companies,id'
+            ],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
@@ -37,8 +41,13 @@ abstract class BaseCategoryRequest extends FormRequest
 
     protected function baseUpdateRules(): array
     {
+        $user = $this->user();
+
         return [
-            'company_id' => ['sometimes', 'required', 'exists:companies,id'],
+            'company_id' => [
+                $user->isSuperAdmin() ? 'sometimes|required' : 'prohibited',
+                'exists:companies,id'
+            ],
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'slug' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],

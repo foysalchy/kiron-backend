@@ -18,7 +18,6 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'company_id' => $request->query('company_id'),
             'brand_id' => $request->query('brand_id'),
             'status' => $request->query('status'),
             'type' => $request->query('type'),

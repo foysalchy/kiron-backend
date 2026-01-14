@@ -19,7 +19,6 @@ class AttributeGroupController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'company_id' => $request->query('company_id'),
             'status' => $request->query('status'),
             'category' => $request->query('category'),
             'search' => $request->query('search'),
@@ -29,22 +28,6 @@ class AttributeGroupController extends Controller
         ];
 
         $data = $this->attributeGroupService->getAllAttributeGroup($filters, true);
-
-        return ResponseHelper::success($data, 'Attribute Group retrieved successfully');
-    }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'company_id' => $request->query('company_id'),
-            'status' => $request->query('status'),
-            'category' => $request->query('category'),
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
-
-        $data = $this->attributeGroupService->getAttributeGroupByCompany($filters,$request->user()->company_id, true);
 
         return ResponseHelper::success($data, 'Attribute Group retrieved successfully');
     }

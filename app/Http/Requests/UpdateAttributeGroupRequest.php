@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class UpdateAttributeGroupRequest extends FormRequest
+class UpdateAttributeGroupRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -16,24 +16,27 @@ class UpdateAttributeGroupRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'company_id' => ['required', 'exists:companies,id'],
-            'name' => ['sometimes', 'string', 'max:255'],
-            'category' => ['sometimes', 'string', Rule::in(['Single', 'Multiple'])],
-            'status' => ['integer'],
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'name' => ['sometimes', 'string', 'max:255'],
+                'category' => ['sometimes', 'string', Rule::in(['Single', 'Multiple'])],
+                'status' => ['integer'],
+            ]
+        );
     }
 
     public function messages(): array
     {
-      return [
-            'company_id.required' => 'Company is required',
-            'company_id.exists' => 'Selected company does not exist',
-            'categoey.required' => 'category is required',
-            'categoey.in' => 'category must be valied type',
-            'name.required' => 'Name is required'
-            
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'categoey.required' => 'category is required',
+                'categoey.in' => 'category must be valied type',
+                'name.required' => 'Name is required'
+
+            ]
+        );
     }
     protected function failedValidation(Validator $validator)
     {

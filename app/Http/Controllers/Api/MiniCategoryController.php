@@ -20,7 +20,6 @@ class MiniCategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'company_id' => $request->query('company_id'),
             'sub_category_id' => $request->query('sub_category_id'),
             'status' => $request->query('status'),
             'search' => $request->query('search'),
@@ -33,22 +32,7 @@ class MiniCategoryController extends Controller
 
         return  ResponseHelper::success($data, 'Mini categories retrieved successfully');
     }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'company_id' => $request->query('company_id'),
-            'sub_category_id' => $request->query('sub_category_id'),
-            'status' => $request->query('status'),
-            'search' => $request->query('search'),
-              'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
-
-        $data = $this->miniCategoryService->getMiniByCompany($filters,$request->user()->company_id, true);
-
-        return  ResponseHelper::success($data, 'Mini categories retrieved successfully');
-    }
+ 
 
     public function store(StoreMiniCategoryRequest $request): JsonResponse
     {
@@ -102,13 +86,12 @@ class MiniCategoryController extends Controller
     public function getBySubCategory(Request $request): JsonResponse
     {
         $subId = $request->query('sub_category_id');
-        $companyId = $request->query('company_id');
 
-        if (!$subId || !$companyId) {
-            throw ApiException::badRequest('Sub Category ID and Company ID are required');
+        if (!$subId) {
+            throw ApiException::badRequest('Sub Category ID is required');
         }
 
-        $data = $this->miniCategoryService->getBySubCategory($subId, $companyId);
+        $data = $this->miniCategoryService->getBySubCategory($subId);
 
         return  ResponseHelper::success($data, 'Mini categories retrieved successfully');
     }

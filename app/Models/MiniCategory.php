@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class MiniCategory extends Model
 {
-    use  SoftDeletes;
+    use  SoftDeletes,CompanyScoped;
 
     protected $fillable = [
         'company_id',

@@ -20,10 +20,6 @@ class ProductService
         try {
             $query = Product::with([ 'brand', 'galleries']);
 
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
@@ -74,72 +70,14 @@ class ProductService
             throw ApiException::serverError('Failed to fetch products');
         }
     }
-    public function getAllCompanyProducts(array $filters = [],int $companyId, bool $paginate = true): Collection|LengthAwarePaginator
-    {
-        try {
-            $query = Product::with([ 'brand', 'galleries'])->where('company_id',$companyId);
-
-            if (isset($filters['company_id'])) {
-                $query->where('company_id', $filters['company_id']);
-            }
-
-            if (isset($filters['brand_id'])) {
-                $query->where('brand_id', $filters['brand_id']);
-            }
-
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
-            }
-
-            if (isset($filters['type'])) {
-                $query->where('type', $filters['type']);
-            }
-
-            if (isset($filters['stock_status'])) {
-                $query->where('stock_status', $filters['stock_status']);
-            }
-
-            if (isset($filters['purpose'])) {
-                if ($filters['purpose'] === 'website') {
-                    $query->where('purpose_website', true);
-                } elseif ($filters['purpose'] === 'pos') {
-                    $query->where('purpose_pos', true);
-                }
-            }
-
-            if (isset($filters['search'])) {
-                $query->where(function ($q) use ($filters) {
-                    $q->where('title', 'like', "%{$filters['search']}%");
-                       
-                });
-            }
-
-            $sortBy = $filters['sort_by'] ?? 'created_at';
-            $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
-
-
-            if ($paginate) {
-                $result = $query->paginate($filters['per_page'] ?? 15);
-                Product::loadCategoriesForCollection($result->getCollection());
-                return $result;
-            } else {
-                $result = $query->get();
-                Product::loadCategoriesForCollection($result);
-                return $result;
-            }
-        } catch (\Exception $e) {
-            Log::error('Error fetching products: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch products');
-        }
-    }
+ 
 
     /**
      * Get product by ID
      */
     public function getProductById(int $id): Product
     {
-        $product = Product::with(['company', 'brand', 'galleries'])->find($id);
+        $product = Product::with(['brand', 'galleries'])->find($id);
 
         if (!$product) {
             throw ApiException::notFound('Product');
@@ -184,7 +122,7 @@ class ProductService
             Log::info('Product created successfully', ['product_id' => $product->id]);
             LogHelper::created('product', $product->id, $product->company_id);
 
-            return $product->load(['company', 'brand', 'galleries']);
+            return $product->load(['brand', 'galleries']);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -238,7 +176,7 @@ class ProductService
             Log::info('Product updated successfully', ['product_id' => $product->id]);
             LogHelper::updated('product', $product->id, $product->company_id);
 
-            return $product->fresh(['company', 'brand', 'galleries']);
+            return $product->fresh(['brand', 'galleries']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -292,7 +230,7 @@ class ProductService
             Log::info('Product restored successfully', ['product_id' => $id]);
             LogHelper::restored('product', $id, $product->company_id);
 
-            return $product->load(['company', 'brand', 'galleries']);
+            return $product->load(['brand', 'galleries']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -358,7 +296,7 @@ class ProductService
             Log::info('Product status toggled', ['product_id' => $id]);
             LogHelper::statusChanged('product', $id, $product->company_id);
 
-            return $product->load(['company', 'brand', 'galleries']);
+            return $product->load(['brand', 'galleries']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

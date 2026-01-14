@@ -7,7 +7,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreProductRequest extends FormRequest
+class StoreProductRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -16,8 +16,9 @@ class StoreProductRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'company_id' => ['required', 'exists:companies,id'],
+     return array_merge(
+            $this->companyRules(),
+            [
             'brand_id' => ['nullable', 'exists:brands,id'],
 
             // Basic Info
@@ -59,13 +60,14 @@ class StoreProductRequest extends FormRequest
 
             // Purpose
             'purpose' => ['nullable'],
-        ];
+        ]);
     }
 
     public function messages(): array
     {
-        return [
-            'company_id.required' => 'Company is required',
+      return array_merge(
+            $this->companyMessages(),
+            [
             'title.required' => 'Product title is required',
             'slug.unique' => 'This slug is already taken',
             'thumbnail.required' => 'Thumbnail  is required',
@@ -78,7 +80,7 @@ class StoreProductRequest extends FormRequest
             'stock_quantity.required_if' => 'Stock quantity is required when product is in stock',
             'regular_price.required' => 'Regular price is required',
             'regular_price.min' => 'Price must be at least 0',
-        ];
+        ]);
     }
 
     protected function failedValidation(Validator $validator)

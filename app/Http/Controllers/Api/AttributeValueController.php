@@ -20,7 +20,6 @@ class AttributeValueController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'company_id' => $request->query('company_id'),
             'attribute_group_id' => $request->query('attribute_group_id'),
             'status' => $request->query('status'),
             'search' => $request->query('search'),

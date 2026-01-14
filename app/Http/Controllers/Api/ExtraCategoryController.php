@@ -29,22 +29,6 @@ class ExtraCategoryController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->extraCategoryService->getExtraByCompany($filters,$request->user()->company_id, true);
-
-        return  ResponseHelper::success($data, 'Extra categories retrieved successfully');
-    }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'company_id' => $request->query('company_id'),
-            'mini_category_id' => $request->query('mini_category_id'),
-            'status' => $request->query('status'),
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
-
         $data = $this->extraCategoryService->getAllExtraCategories($filters, true);
 
         return  ResponseHelper::success($data, 'Extra categories retrieved successfully');
@@ -102,13 +86,12 @@ class ExtraCategoryController extends Controller
     public function getByMiniCategory(Request $request): JsonResponse
     {
         $miniId = $request->query('mini_category_id');
-        $companyId = $request->query('company_id');
 
-        if (!$miniId || !$companyId) {
-            throw ApiException::badRequest('Mini Category ID and Company ID are required');
+        if (!$miniId) {
+            throw ApiException::badRequest('Mini Category ID  are required');
         }
 
-        $data = $this->extraCategoryService->getByMiniCategory($miniId, $companyId);
+        $data = $this->extraCategoryService->getByMiniCategory($miniId);
 
         return ResponseHelper::success($data, 'Extra categories retrieved successfully');
     }
