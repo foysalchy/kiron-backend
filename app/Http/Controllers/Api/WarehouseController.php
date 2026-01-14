@@ -19,7 +19,7 @@ class WarehouseController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            
+
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
@@ -34,12 +34,7 @@ class WarehouseController extends Controller
     {
         $data = $this->warehouseService->createWarehouse($request->validated());
 
-        $token = $request->bearerToken();
-
-        return ResponseHelper::success([
-            'warehouse' => $data,
-            'token'     => $token],
-             'Warehouse created successfully');
+        return ResponseHelper::success($data, 'Warehouse created successfully', 201);
     }
     public function show(int $id): JsonResponse
     {

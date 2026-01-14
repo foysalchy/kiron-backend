@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class WarehouseService
@@ -12,8 +14,9 @@ class WarehouseService
     /**
      * Get all warehouses with optional pagination
      */
-    public function getAllWarehouses(array $filters, bool $paginate = true)
-    {
+    public function getAllWarehouses(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+{
+    try {
         $query = Warehouse::query();
 
         if (isset($filters['status']) && $filters['status'] !== "") {
@@ -24,7 +27,7 @@ class WarehouseService
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('location', 'like', "%{$search}%");
+                  ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
@@ -32,8 +35,15 @@ class WarehouseService
         $sortOrder = $filters['sort_order'] ?? 'desc';
         $query->orderBy($sortBy, $sortOrder);
 
-        return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+        return $paginate
+            ? $query->paginate($filters['per_page'] ?? 15)
+            : $query->get();
+
+    } catch (\Exception $e) {
+        Log::error('Error fetching warehouses: ' . $e->getMessage());
+        throw ApiException::serverError('Failed to fetch warehouses');
     }
+}
 
     /**
      * Get warehouse by ID

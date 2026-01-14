@@ -4,8 +4,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\BaseCompanyRequest;
 
-class UpdateWarehouseRequest extends FormRequest
+class UpdateWarehouseRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,20 +23,24 @@ class UpdateWarehouseRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id' => 'sometimes|required|exists:companies,id',
-            'name'       => 'sometimes|required|string|max:255',
-            'location'   => 'nullable|string|max:500',
-            'status'     => 'sometimes|required|integer|in:0,1',
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'name'     => ['sometimes', 'required', 'string', 'max:255'],
+                'location' => ['nullable', 'string', 'max:500'],
+                'status'   => ['sometimes', 'required', 'integer', 'in:0,1'],
+            ]
+        );
     }
     public function messages(): array
     {
-        return [
-            'company_id.exists' => 'Selected company does not exist',
-            'name.required'     => 'Warehouse Name is required',
-            'status.in'         => 'Status must be 0 (Inactive) or 1 (Active)',
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'name.required' => 'Warehouse Name is required.',
+                'status.in'     => 'Status must be 0 (Inactive) or 1 (Active).',
+            ]
+        );
     }
     protected function failedValidation(Validator $validator)
     {

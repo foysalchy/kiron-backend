@@ -25,7 +25,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/ping', function () {
         return 'pong';
     });
-    
+
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
 
@@ -59,7 +59,7 @@ Route::prefix('v1')->group(function () {
         });
         //party routes
         Route::prefix('parties')->group(function () {
-       
+
             Route::get('search', [PartyController::class, 'search']);
             Route::get('suppliers', [PartyController::class, 'getSuppliers']);
             Route::get('customers', [PartyController::class, 'getCustomers']);
@@ -76,7 +76,7 @@ Route::prefix('v1')->group(function () {
 
         //attribute group
         Route::prefix('attribute-group')->group(function () {
-        
+
             Route::get('/', [AttributeGroupController::class, 'index']);
             Route::post('/', [AttributeGroupController::class, 'store']);
             Route::get('/{id}', [AttributeGroupController::class, 'show']);
@@ -90,7 +90,7 @@ Route::prefix('v1')->group(function () {
         // Attribute Routes
         Route::prefix('attribute-value')->group(function () {
 
-      
+
             Route::get('/', [AttributeValueController::class, 'index']);
             Route::post('/', [AttributeValueController::class, 'store']);
             Route::get('/{id}', [AttributeValueController::class, 'show']);
@@ -103,7 +103,7 @@ Route::prefix('v1')->group(function () {
 
         // Brand Routes
         Route::prefix('brands')->group(function () {
-          
+
             Route::get('/', [BrandController::class, 'index']);
             Route::post('/', [BrandController::class, 'store']);
             Route::get('/{id}', [BrandController::class, 'show']);
@@ -116,7 +116,7 @@ Route::prefix('v1')->group(function () {
 
         // Mega Category Routes
         Route::prefix('mega-categories')->group(function () {
-           
+
             Route::get('/', [MegaCategoryController::class, 'index']);
             Route::post('/', [MegaCategoryController::class, 'store']);
             Route::get('/{id}', [MegaCategoryController::class, 'show']);
@@ -131,7 +131,7 @@ Route::prefix('v1')->group(function () {
         // Sub Category Routes
         Route::prefix('sub-categories')->group(function () {
             Route::get('search', [SubCategoryController::class, 'search']);
-          
+
             Route::get('by-mega', [SubCategoryController::class, 'getByMegaCategory']);
 
             Route::get('/', [SubCategoryController::class, 'index']);
@@ -165,7 +165,7 @@ Route::prefix('v1')->group(function () {
         // Extra Category Routes
         Route::prefix('extra-categories')->group(function () {
             Route::get('by-mini', [ExtraCategoryController::class, 'getByMiniCategory']);
-          
+
             Route::get('/', [ExtraCategoryController::class, 'index']);
             Route::post('/', [ExtraCategoryController::class, 'store']);
             Route::get('/{id}', [ExtraCategoryController::class, 'show']);
