@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/register', [AuthController::class, 'register']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        //auth 
+        //auth
         Route::get('auth/profile', [AuthController::class, 'profile']);
         Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
         Route::post('auth/password/update', [AuthController::class, 'updatePassword']);
@@ -175,6 +176,16 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [ExtraCategoryController::class, 'toggleStatus']);
             Route::patch('/{id}/update-order', [ExtraCategoryController::class, 'updateOrder']);
         });
+        // Warehouse Routes
+        Route::prefix('warehouses')->group(function () {
+            Route::get('/', [WarehouseController::class, 'index']);
+            Route::post('/', [WarehouseController::class, 'store']);
+            Route::get('/{id}', [WarehouseController::class, 'show']);
+            Route::post('/update/{id}', [WarehouseController::class, 'update']);
+            Route::delete('/{id}', [WarehouseController::class, 'destroy']);
+            Route::get('/{id}/restore', [WarehouseController::class, 'restore']);
+            Route::delete('/{id}/force', [WarehouseController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [WarehouseController::class, 'toggleStatus']);
 
         Route::prefix('products')->group(function () {
             Route::get('/by-company', [ProductController::class, 'getByCompany']);
