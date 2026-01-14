@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateWarehouseRequest extends FormRequest
+class StoreRackRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,18 +24,19 @@ class UpdateWarehouseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => 'sometimes|required|exists:companies,id',
-            'name'       => 'sometimes|required|string|max:255',
-            'location'   => 'nullable|string|max:500',
-            'status'     => 'sometimes|required|integer|in:0,1',
+            'company_id'   => 'required|exists:companies,id',
+            'area_id'      => 'required|exists:areas,id',
+            'name'         => 'required|string|max:255',
+            'status'       => 'nullable|integer|in:0,1',
         ];
     }
     public function messages(): array
     {
         return [
-            'company_id.exists' => 'Selected company does not exist',
-            'name.required'     => 'Warehouse Name is required',
-            'status.in'         => 'Status must be 0 (Inactive) or 1 (Active)',
+            'company_id.exists' => 'Selected company is invalid.',
+            'area_id.exists'    => 'The selected area does not exist.',
+            'name.required'     => 'The rack name field is mandatory.',
+            'status.required'   => 'Status must be active (1) or inactive (0).',
         ];
     }
     protected function failedValidation(Validator $validator)

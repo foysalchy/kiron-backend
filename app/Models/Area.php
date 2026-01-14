@@ -27,6 +27,10 @@ class Area extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(related: Warehouse::class);
+    }
     public function racks(): HasMany
     {
         return $this->hasMany(Rack::class);

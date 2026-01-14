@@ -27,6 +27,10 @@ class Rack extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
+    }
     public function cells(): HasMany
     {
         return $this->hasMany(Cell::class);

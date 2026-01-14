@@ -27,5 +27,9 @@ class Cell extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function rack(): BelongsTo
+    {
+        return $this->belongsTo(Rack::class);
+    }
 
 }

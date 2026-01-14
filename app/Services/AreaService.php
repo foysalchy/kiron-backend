@@ -15,11 +15,9 @@ class AreaService
      */
     public function getAllAreas(array $filters, bool $paginate = true)
     {
-        $query = Area::with(['company','warehouse']);
+        $query = Area::with(['warehouse']);
 
-        if (!empty($filters['company_id'])) {
-            $query->where('company_id', $filters['company_id']);
-        }
+        
         if (!empty($filters['warehouse_id'])) {
             $query->where('warehouse_id', $filters['warehouse_id']);
         }
@@ -47,7 +45,7 @@ class AreaService
      */
     public function getAreaById(int $id): Area
     {
-        $area = Area::with(['company','warehouse'])->find($id);
+        $area = Area::with(['warehouse'])->find($id);
         if (!$area) {
             throw ApiException::notFound('area');
         }
@@ -64,7 +62,7 @@ class AreaService
             LogHelper::created('area', $area->id, $area->company_id);
             Log::info('Area created successfully', ['area_id' => $area->id]);
 
-            return $area->load(['company','warehouse']);
+            return $area->load(['warehouse']);
 
         } catch (\Exception $e) {
             Log::error('Area creation failed: ' . $e->getMessage());
@@ -76,6 +74,110 @@ class AreaService
     /**
      * Update area
      */
+    public function updateArea(int $id, array $data): Area
+    {
+        try {
+            $area = $this->getAreaById($id);
 
+            $area->update($data);
+
+            LogHelper::updated('area', $area->id, $area->company_id);
+            Log::info('Area Updated Successfully', ['area_id' => $area->id]);
+
+            return $area->fresh(['warehouse']);
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Area update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update area');
+        }
+    }
+    /**
+     * Delete area (soft delete)
+     */
+    public function deleteArea(int $id): bool
+    {
+        try {
+            $area = $this->getAreaById($id);
+
+            $area->delete();
+
+            LogHelper::deleted('area', $area->id, $area->company_id);
+            Log::info('Area deleted successfully', ['area_id' => $id]);
+
+            return true;
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Area deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to delete area');
+        }
+    }
+    /**
+     * Restore soft deleted area
+     */
+    public function restoreArea(int $id): Area
+    {
+        try {
+            $area = Area::withTrashed()->find($id);
+            if (!$area) {
+                throw ApiException::notFound('Area');
+            }
+            $area->restore();
+            LogHelper::restored('area',$area->id,$area->company_id);
+            return $area->load(['warehouse']);
+        } catch (ApiException $e) {
+            throw $e;
+        }catch(\Exception $e)
+        {
+            Log::error('Area restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore data');
+        }
+    }
+    /**
+     * Permanently delete an area
+     */
+    public function forceDeleteArea(int $id): bool
+    {
+        try {
+            $area = Area::withTrashed()->find($id);
+            if (!$area) {
+                throw ApiException::notFound('Area');
+            }
+            $area->forceDelete();
+            LogHelper::forceDeleted('area', $id, $area->company_id);
+            return true;
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Area permanent deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete area');
+        }
+    }
+    /**
+     * Toggle area status (Active/Inactive)
+     */
+    public function toggleStatus(int $id): Area
+    {
+        try {
+            $area = $this->getAreaById($id);
+
+            $newStatus = $area->status == 1 ? 0 : 1;
+            $area->update(['status' => $newStatus]);
+
+            LogHelper::statusChanged('area', $area->id, $area->company_id);
+            Log::info('Area status toggled', ['area_id' => $id, 'new_status' => $newStatus]);
+
+            return $area->load(['warehouse']);
+
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Area status toggle failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle area status');
+        }
+    }
 
 }
