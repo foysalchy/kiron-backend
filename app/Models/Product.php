@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -84,6 +85,10 @@ class Product extends Model
         return $this->hasMany(Gallery::class);
     }
 
+
+
+
+
     // Scopes
     public function scopeActive($query)
     {
@@ -105,7 +110,7 @@ class Product extends Model
         return $query->where('stock_status', 'in_stock');
     }
 
-   
+
     public function scopeSingleType($query)
     {
         return $query->where('type', 'single');
@@ -154,5 +159,59 @@ class Product extends Model
     public function getIsInStockAttribute(): bool
     {
         return $this->stock_status === 'in_stock' && $this->stock_quantity > 0;
+    }
+
+  
+    public static function loadCategoriesForCollection($products) : Collection
+    {
+        if ($products->isEmpty()) {
+            return $products;
+        }
+
+        $megaIds = $products->pluck('mega_category_ids')->flatten()->unique()->filter();
+        $subIds = $products->pluck('sub_category_ids')->flatten()->unique()->filter();
+        $miniIds = $products->pluck('mini_category_ids')->flatten()->unique()->filter();
+        $extraIds = $products->pluck('extra_category_ids')->flatten()->unique()->filter();
+
+
+        $megaCategories = $megaIds->isNotEmpty()
+            ? MegaCategory::whereIn('id', $megaIds)->select('id', 'name', 'slug')->get()->keyBy('id')
+            : collect();
+
+        $subCategories = $subIds->isNotEmpty()
+            ? SubCategory::whereIn('id', $subIds)->select('id', 'name', 'slug')->get()->keyBy('id')
+            : collect();
+
+        $miniCategories = $miniIds->isNotEmpty()
+            ? MiniCategory::whereIn('id', $miniIds)->select('id', 'name', 'slug')->get()->keyBy('id')
+            : collect();
+
+        $extraCategories = $extraIds->isNotEmpty()
+            ? ExtraCategory::whereIn('id', $extraIds)->select('id', 'name', 'slug')->get()->keyBy('id')
+            : collect();
+
+        $products->each(function ($product) use ($megaCategories, $subCategories, $miniCategories, $extraCategories) {
+            $product->setRelation(
+                'mega_categories',
+                collect($product->mega_category_ids)->map(fn($id) => $megaCategories->get($id))->filter()->values()
+            );
+
+            $product->setRelation(
+                'sub_categories',
+                collect($product->sub_category_ids)->map(fn($id) => $subCategories->get($id))->filter()->values()
+            );
+
+            $product->setRelation(
+                'mini_categories',
+                collect($product->mini_category_ids)->map(fn($id) => $miniCategories->get($id))->filter()->values()
+            );
+
+            $product->setRelation(
+                'extra_categories',
+                collect($product->extra_category_ids)->map(fn($id) => $extraCategories->get($id))->filter()->values()
+            );
+        });
+
+        return $products;
     }
 }

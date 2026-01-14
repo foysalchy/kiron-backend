@@ -33,6 +33,22 @@ class PartyController extends Controller
 
         return ResponseHelper::success($parties, 'Parties retrieved successfully');
     }
+    public function getByCompany(Request $request): JsonResponse
+    {
+        $filters = [
+            'company_id' => $request->query('company_id'),
+            'type' => $request->query('type'),
+            'status' => $request->query('status'),
+            'search' => $request->query('search'),
+            'sort_by' => $request->query('sort_by', 'created_at'),
+            'sort_order' => $request->query('sort_order', 'desc'),
+            'per_page' => $request->query('per_page', 15),
+        ];
+
+        $parties = $this->partyService->getParyByCompany($filters,$request->user()->company_id, true);
+
+        return ResponseHelper::success($parties, 'Parties retrieved successfully');
+    }
 
 
     public function store(StorePartyRequest $request): JsonResponse

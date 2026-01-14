@@ -29,6 +29,22 @@ class ExtraCategoryController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
+        $data = $this->extraCategoryService->getExtraByCompany($filters,$request->user()->company_id, true);
+
+        return  ResponseHelper::success($data, 'Extra categories retrieved successfully');
+    }
+    public function getByCompany(Request $request): JsonResponse
+    {
+        $filters = [
+            'company_id' => $request->query('company_id'),
+            'mini_category_id' => $request->query('mini_category_id'),
+            'status' => $request->query('status'),
+            'search' => $request->query('search'),
+            'sort_by' => $request->query('sort_by', 'created_at'),
+            'sort_order' => $request->query('sort_order', 'desc'),
+            'per_page' => $request->query('per_page', 15),
+        ];
+
         $data = $this->extraCategoryService->getAllExtraCategories($filters, true);
 
         return  ResponseHelper::success($data, 'Extra categories retrieved successfully');
