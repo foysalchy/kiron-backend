@@ -15,28 +15,33 @@ class RackService
      */
     public function getAllRacks(array $filters, bool $paginate = true)
     {
-        $query = Rack::with(['area']);
+        try {
+            $query = Rack::with(['area']);
 
-        if (!empty($filters['area_id'])) {
-            $query->where('area_id', $filters['area_id']);
+            if (!empty($filters['area_id'])) {
+                $query->where('area_id', $filters['area_id']);
+            }
+
+            if (isset($filters['status']) && $filters['status'] !== "") {
+                $query->where('status', (int)$filters['status']);
+            }
+
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+        } catch (\Throwable $e) {
+            Log::error('Error fetching rack: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch racks');
         }
-
-        if (isset($filters['status']) && $filters['status'] !== "") {
-            $query->where('status', (int)$filters['status']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'created_at';
-        $sortOrder = $filters['sort_order'] ?? 'desc';
-        $query->orderBy($sortBy, $sortOrder);
-
-        return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
     }
 
     /**

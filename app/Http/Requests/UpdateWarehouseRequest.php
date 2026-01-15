@@ -4,9 +4,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use App\Http\Requests\BaseCompanyRequest;
+use App\Http\Requests\UpdateBaseCompanyRequest;
 
-class UpdateWarehouseRequest extends BaseCompanyRequest
+class UpdateWarehouseRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.

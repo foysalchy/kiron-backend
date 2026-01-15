@@ -4,10 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use App\Http\Requests\UpdateBaseCompanyRequest;
 
-class UpdateCellRequest extends UpdateBaseCompanyRequest
+class StoreSliderRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,11 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'rack_id' => ['sometimes', 'required', 'exists:racks,id'],
-                'name'    => ['sometimes', 'required', 'string', 'max:255'],
-                'status'  => ['sometimes', 'required', 'integer', 'in:0,1'],
+                'title'       => ['required', 'string', 'max:255'],
+                'subtitle'    => ['nullable', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'image'       => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'status'      => ['nullable', 'integer', 'in:0,1'],
             ]
         );
     }
@@ -38,8 +40,10 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'rack_id.exists' => 'The selected rack does not exist.',
-                'status.in'      => 'Status must be 1 for Active or 0 for Inactive.',
+                'title.required' => 'Slider title is required.',
+                'image.required' => 'A slider image is required.',
+                'image.image'    => 'The file must be an image.',
+                'image.max'      => 'The image size cannot exceed 2MB.',
             ]
         );
     }

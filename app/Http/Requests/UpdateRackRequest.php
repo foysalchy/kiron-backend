@@ -5,8 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\UpdateBaseCompanyRequest;
 
-class UpdateRackRequest extends FormRequest
+class UpdateRackRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,21 +24,25 @@ class UpdateRackRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id'   => 'sometimes|required|exists:companies,id',
-            'area_id'      => 'sometimes|required|exists:areas,id',
-            'name'         => 'sometimes|required|string|max:255',
-            'status'       => 'sometimes|integer|in:0,1',
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'area_id' => ['sometimes', 'required', 'exists:areas,id'],
+                'name'    => ['sometimes', 'required', 'string', 'max:255'],
+                'status'  => ['sometimes', 'integer', 'in:0,1'],
+            ]
+        );
     }
     public function messages(): array
     {
-        return [
-            'company_id.exists' => 'Selected company is invalid.',
-            'area_id.exists'    => 'The selected area does not exist.',
-            'name.required'     => 'The name field is mandatory.',
-            'status.in'         => 'Status must be 1 (Active) or 0 (Inactive).',
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'area_id.exists' => 'The selected area does not exist.',
+                'name.required'  => 'The name field is mandatory.',
+                'status.in'      => 'Status must be 1 (Active) or 0 (Inactive).',
+            ]
+        );
     }
     protected function failedValidation(Validator $validator)
     {

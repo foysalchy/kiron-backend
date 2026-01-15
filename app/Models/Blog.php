@@ -5,20 +5,30 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Cell extends Model
+class Blog extends Model
 {
-    use SoftDeletes,CompanyScoped;
+        use SoftDeletes,CompanyScoped;
+
 
     protected $fillable = [
         'company_id',
-        'rack_id',
+        'title',
         'name',
+        'short',
+        'body',
+        'body_2',
+        'body_3',
+        'images',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
         'status',
     ];
-
+    protected $casts = [
+        'images' => 'array',
+    ];
 
 
     protected $hidden = ['deleted_at'];
@@ -28,11 +38,8 @@ class Cell extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function rack(): BelongsTo
-    {
-        return $this->belongsTo(Rack::class);
-    }
-    //company scope
+
+    // Scopes
     public function scopeActive($query)
     {
         return $query->where('status', true);
@@ -43,4 +50,12 @@ class Cell extends Model
         return $query->where('company_id', $companyId);
     }
 
+    // Accessors
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        if ($this->images && is_array($this->images) && count($this->images) > 0) {
+            return asset('storage/' . $this->images[0]);
+        }
+        return null;
+    }
 }

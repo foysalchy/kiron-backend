@@ -5,8 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\BaseCompanyRequest;
 
-class StoreCellRequest extends FormRequest
+class StoreCellRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,24 +24,28 @@ class StoreCellRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id' => 'required|exists:companies,id',
-            'rack_id'    => 'required|exists:racks,id',
-            'name'       => 'required|string|max:255',
-            'status'     => 'required|integer|in:0,1',
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'rack_id' => ['required', 'exists:racks,id'],
+                'name'    => ['required', 'string', 'max:255'],
+                'status'  => ['required', 'integer', 'in:0,1'],
+            ]
+        );
     }
     /**
      * Custom error messages.
      */
     public function messages(): array
     {
-        return [
-            'company_id.exists' => 'The selected company is invalid.',
-            'rack_id.exists'    => 'The selected rack does not exist.',
-            'name.required'     => 'The cell name is mandatory.',
-            'status.required'   => 'Please specify if the cell is active (1) or inactive (0).',
-        ];
+        return array_merge(
+            $this->companyMessages(), 
+            [
+                'rack_id.exists'  => 'The selected rack does not exist.',
+                'name.required'   => 'The cell name is mandatory.',
+                'status.required' => 'Please specify if the cell is active (1) or inactive (0).',
+            ]
+        );
     }
 
     /**

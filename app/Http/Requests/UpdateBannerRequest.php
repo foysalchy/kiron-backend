@@ -4,10 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateCellRequest extends UpdateBaseCompanyRequest
+class UpdateBannerRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,10 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'rack_id' => ['sometimes', 'required', 'exists:racks,id'],
-                'name'    => ['sometimes', 'required', 'string', 'max:255'],
-                'status'  => ['sometimes', 'required', 'integer', 'in:0,1'],
+                'title'       => ['sometimes', 'required', 'string', 'max:255'],
+                'description' => ['nullable', 'string'],
+                'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'status'      => ['sometimes', 'integer', 'in:0,1'],
             ]
         );
     }
@@ -38,8 +39,9 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'rack_id.exists' => 'The selected rack does not exist.',
-                'status.in'      => 'Status must be 1 for Active or 0 for Inactive.',
+                'title.required' => 'Banner title cannot be empty.',
+                'image.image'    => 'The file must be an image.',
+                'image.max'      => 'The image size cannot exceed 2MB.',
             ]
         );
     }
@@ -49,7 +51,7 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'Validation failed',
+                'message' => 'Update validation failed',
                 'errors'  => $validator->errors(),
             ], 422)
         );
