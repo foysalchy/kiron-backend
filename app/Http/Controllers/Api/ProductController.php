@@ -33,25 +33,7 @@ class ProductController extends Controller
 
         return ResponseHelper::success($data, 'Products retrieved successfully');
     }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'brand_id' => $request->query('brand_id'),
-            'status' => $request->query('status'),
-            'type' => $request->query('type'),
-            'stock_status' => $request->query('stock_status'),
-            'purpose' => $request->query('purpose'), // website or pos
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
-
-        $data = $this->productService->getAllCompanyProducts($filters,$request->user()->company_id, true);
-
-        return ResponseHelper::success($data, 'Products retrieved successfully');
-    }
-
+   
     public function store(StoreProductRequest $request): JsonResponse
     {
         $data = $this->productService->createProduct($request->validated());

@@ -1,0 +1,162 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\CompanyScoped;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Purchase extends Model
+{
+    use SoftDeletes, CompanyScoped;
+
+    const STATUS_DRAFT = 0;
+    const STATUS_COMPLETED = 1;
+    const STATUS_CANCELLED = 2;
+
+    const PAYMENT_UNPAID = 0;
+    const PAYMENT_PARTIAL = 1;
+    const PAYMENT_PAID = 2;
+
+    protected $fillable = [
+        'company_id',
+        'warehouse_id',
+        'supplier_id',
+        'reference_no',
+        'purchase_date',
+        'total_quantities',
+        'subtotal',
+        'other_charges',
+        'discount_on_all',
+        'round_off',
+        'grand_total',
+        'payment_amount',
+        'payment_type',
+        'account',
+        'payment_note',
+        'status',
+        'payment_status',
+        'note',
+    ];
+
+    protected $casts = [
+        'purchase_date' => 'date',
+        'total_quantities' => 'integer',
+        'subtotal' => 'decimal:2',
+        'other_charges' => 'decimal:2',
+        'discount_on_all' => 'decimal:2',
+        'round_off' => 'decimal:2',
+        'grand_total' => 'decimal:2',
+        'payment_amount' => 'decimal:2',
+        'status' => 'integer',
+        'payment_status' => 'integer',
+    ];
+
+    protected $appends = [
+        'status_text',
+        'payment_status_text',
+        'due_amount',
+    ];
+
+    // Relationships
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class)->select('id','name');
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Party::class, 'supplier_id')->select('id','name');
+    }
+
+    public function purchaseDetails(): HasMany
+    {
+        return $this->hasMany(PurchaseDetail::class);
+    }
+
+    // Scopes
+    public function scopeByWarehouse($query, int $warehouseId)
+    {
+        return $query->where('warehouse_id', $warehouseId);
+    }
+
+    public function scopeBySupplier($query, int $supplierId)
+    {
+        return $query->where('supplier_id', $supplierId);
+    }
+
+    public function scopeByStatus($query, int $status)
+    {
+        return $query->where('status', $status);
+    }
+
+    public function scopeByPaymentStatus($query, int $paymentStatus)
+    {
+        return $query->where('payment_status', $paymentStatus);
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', self::STATUS_COMPLETED);
+    }
+
+    public function scopeDraft($query)
+    {
+        return $query->where('status', self::STATUS_DRAFT);
+    }
+
+    // Accessors
+    public function getStatusTextAttribute(): string
+    {
+        return match($this->status) {
+            self::STATUS_DRAFT => 'Draft',
+            self::STATUS_COMPLETED => 'Completed',
+            self::STATUS_CANCELLED => 'Cancelled',
+            default => 'Unknown',
+        };
+    }
+
+    public function getPaymentStatusTextAttribute(): string
+    {
+        return match($this->payment_status) {
+            self::PAYMENT_UNPAID => 'Unpaid',
+            self::PAYMENT_PARTIAL => 'Partial',
+            self::PAYMENT_PAID => 'Paid',
+            default => 'Unknown',
+        };
+    }
+
+    public function getDueAmountAttribute(): float
+    {
+        $paid = $this->payment_amount ?? 0;
+        return max(0, $this->grand_total - $paid);
+    }
+
+    // Helper Methods
+    public function isDraft(): bool
+    {
+        return $this->status === self::STATUS_DRAFT;
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === self::STATUS_CANCELLED;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === self::PAYMENT_PAID;
+    }
+}

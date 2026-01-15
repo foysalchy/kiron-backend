@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\UpdateBaseCompanyRequest;
 
 class UpdateBrandRequest extends UpdateBaseCompanyRequest
 {
