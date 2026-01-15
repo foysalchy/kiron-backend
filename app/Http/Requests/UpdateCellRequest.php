@@ -5,8 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\BaseCompanyRequest;
 
-class UpdateCellRequest extends FormRequest
+class UpdateCellRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,20 +24,24 @@ class UpdateCellRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id' => 'sometimes|required|exists:companies,id',
-            'rack_id'    => 'sometimes|required|exists:racks,id',
-            'name'       => 'sometimes|required|string|max:255',
-            'status'     => 'sometimes|required|integer|in:0,1',
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'rack_id' => ['sometimes', 'required', 'exists:racks,id'],
+                'name'    => ['sometimes', 'required', 'string', 'max:255'],
+                'status'  => ['sometimes', 'required', 'integer', 'in:0,1'],
+            ]
+        );
     }
     public function messages(): array
     {
-        return [
-            'company_id.exists' => 'The selected company is invalid.',
-            'rack_id.exists'    => 'The selected rack does not exist.',
-            'status.in'         => 'Status must be 1 for Active or 0 for Inactive.',
-        ];
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'rack_id.exists' => 'The selected rack does not exist.',
+                'status.in'      => 'Status must be 1 for Active or 0 for Inactive.',
+            ]
+        );
     }
 
     protected function failedValidation(Validator $validator)

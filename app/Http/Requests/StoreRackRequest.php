@@ -5,8 +5,9 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\BaseCompanyRequest;
 
-class StoreRackRequest extends FormRequest
+class StoreRackRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,21 +24,25 @@ class StoreRackRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'company_id'   => 'required|exists:companies,id',
-            'area_id'      => 'required|exists:areas,id',
-            'name'         => 'required|string|max:255',
-            'status'       => 'nullable|integer|in:0,1',
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'area_id' => ['required', 'exists:areas,id'],
+                'name'    => ['required', 'string', 'max:255'],
+                'status'  => ['nullable', 'integer', 'in:0,1'],
+            ]
+        );
     }
     public function messages(): array
     {
-        return [
-            'company_id.exists' => 'Selected company is invalid.',
-            'area_id.exists'    => 'The selected area does not exist.',
-            'name.required'     => 'The rack name field is mandatory.',
-            'status.required'   => 'Status must be active (1) or inactive (0).',
-        ];
+        return array_merge(
+            $this->companyMessages(), 
+            [
+                'area_id.exists'  => 'The selected area does not exist.',
+                'name.required'   => 'The rack name field is mandatory.',
+                'status.in'       => 'Status must be active (1) or inactive (0).',
+            ]
+        );
     }
     protected function failedValidation(Validator $validator)
     {

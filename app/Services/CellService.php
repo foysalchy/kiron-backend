@@ -15,28 +15,33 @@ class CellService
      */
     public function getAllCells(array $filters, bool $paginate = true)
     {
-        $query = Cell::with(['rack']);
+        try {
+            $query = Cell::with(['rack']);
 
-        if (!empty($filters['rack_id'])) {
-            $query->where('rack_id', $filters['rack_id']);
+            if (!empty($filters['rack_id'])) {
+                $query->where('rack_id', $filters['rack_id']);
+            }
+
+            if (isset($filters['status']) && $filters['status'] !== "") {
+                $query->where('status', (int)$filters['status']);
+            }
+
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+        } catch (\Throwable $e) {
+            Log::error('Error fetching cell: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch cells');
         }
-
-        if (isset($filters['status']) && $filters['status'] !== "") {
-            $query->where('status', (int)$filters['status']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            });
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'created_at';
-        $sortOrder = $filters['sort_order'] ?? 'desc';
-        $query->orderBy($sortBy, $sortOrder);
-
-        return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
     }
 
     /**
