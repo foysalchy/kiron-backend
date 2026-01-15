@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
@@ -11,9 +12,11 @@ use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
+use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RackController;
+use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
@@ -231,6 +234,40 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [ProductController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [ProductController::class, 'toggleStatus']);
             Route::patch('/{id}/update-stock', [ProductController::class, 'updateStock']);
+        });
+
+        // Page Routes
+        Route::prefix('pages')->group(function () {
+            Route::get('/', [PageController::class, 'index']);
+            Route::post('/', [PageController::class, 'store']);
+            Route::get('/{id}', [PageController::class, 'show']);
+            Route::post('/update/{id}', [PageController::class, 'update']);
+            Route::delete('/{id}', [PageController::class, 'destroy']);
+            Route::get('/{id}/restore', [PageController::class, 'restore']);
+            Route::delete('/{id}/force', [PageController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [PageController::class, 'toggleStatus']);
+        });
+        // Slider Routes
+        Route::prefix('sliders')->group(function () {
+            Route::get('/', [SlideController::class, 'index']);
+            Route::post('/', [SlideController::class, 'store']);
+            Route::get('/{id}', [SlideController::class, 'show']);
+            Route::post('/update/{id}', [SlideController::class, 'update']);
+            Route::delete('/{id}', [SlideController::class, 'destroy']);
+            Route::get('/{id}/restore', [SlideController::class, 'restore']);
+            Route::delete('/{id}/force', [SlideController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [SlideController::class, 'toggleStatus']);
+        });
+        // Banner Routes
+        Route::prefix('banners')->group(function () {
+            Route::get('/', [BannerController::class, 'index']);
+            Route::post('/', [BannerController::class, 'store']);
+            Route::get('/{id}', [BannerController::class, 'show']);
+            Route::post('/update/{id}', [BannerController::class, 'update']);
+            Route::delete('/{id}', [BannerController::class, 'destroy']);
+            Route::get('/{id}/restore', [BannerController::class, 'restore']);
+            Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
         });
     });
 });
