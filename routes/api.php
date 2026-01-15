@@ -13,7 +13,9 @@ use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\RackController;
+use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
@@ -29,7 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
 
-    Route::middleware('auth:sanctum','company.access')->group(function () {
+    Route::middleware('auth:sanctum', 'company.access')->group(function () {
         //auth
         Route::get('auth/profile', [AuthController::class, 'profile']);
         Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
@@ -221,6 +223,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [CellController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CellController::class, 'toggleStatus']);
         });
+
+        //prouducts
         Route::prefix('products')->group(function () {
             Route::get('/', [ProductController::class, 'index']);
             Route::post('/', [ProductController::class, 'store']);
@@ -232,6 +236,30 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [ProductController::class, 'toggleStatus']);
             Route::patch('/{id}/update-stock', [ProductController::class, 'updateStock']);
         });
+
+        Route::prefix('purchases')->group(function () {
+            Route::get('/', [PurchaseController::class, 'index']);
+            Route::post('/', [PurchaseController::class, 'store']);
+            Route::get('/{id}', [PurchaseController::class, 'show']);
+            Route::post('/update/{id}', [PurchaseController::class, 'update']);
+            Route::delete('/{id}', [PurchaseController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [PurchaseController::class, 'changeStatus']);
+            Route::post('/{id}/add-payment', [PurchaseController::class, 'addPayment']);
+            Route::get('{id}/restore', [PurchaseController::class, 'restore']);
+            Route::delete('{id}/force', [PurchaseController::class, 'forceDestroy']);
+        });
+        Route::prefix('requisitions')->group(function () {
+            Route::get('/', [RequisitionController::class, 'index']);
+            Route::post('/', [RequisitionController::class, 'store']);
+            Route::get('/{id}', [RequisitionController::class, 'show']);
+            Route::post('/update/{id}', [RequisitionController::class, 'update']);
+            Route::delete('/{id}', [RequisitionController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [RequisitionController::class, 'changeStatus']);
+            Route::post('{id}/approve', [RequisitionController::class, 'approve']);
+            Route::post('{id}/reject', [RequisitionController::class, 'reject']);
+            Route::post('{id}/complete', [RequisitionController::class, 'complete']);
+            Route::get('{id}/restore', [RequisitionController::class, 'restore']);
+            Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
+        });
     });
 });
-

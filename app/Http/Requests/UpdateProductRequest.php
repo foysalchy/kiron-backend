@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Http\Requests\BaseCompanyRequest;
+use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateProductRequest extends BaseCompanyRequest
+class UpdateProductRequest extends UpdateBaseCompanyRequest
 {
     public function authorize(): bool
     {

@@ -11,6 +11,8 @@ use App\Services\MegaCategoryService;
 use App\Services\MiniCategoryService;
 use App\Services\PartyService;
 use App\Services\ProductService;
+use App\Services\PurchaseService;
+use App\Services\RequisitionService;
 use App\Services\SubCategoryService;
 use App\Services\WarehouseService;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExtraCategoryService::class);
         $this->app->bind(WarehouseService::class);
         $this->app->bind(ProductService::class);
+        $this->app->bind(PurchaseService::class);
+        $this->app->bind(RequisitionService::class);
     }
 
     /**
