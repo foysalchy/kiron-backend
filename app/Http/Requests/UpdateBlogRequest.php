@@ -31,15 +31,15 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'title'            => ['sometimes', 'required', 'string', 'max:255'],
-                'slug'             => ['sometimes','required','string','max:255',Rule::unique('blogs', 'slug')->ignore($blogId)],
+                'slug'             => ['sometimes', 'required', 'string', 'max:255', Rule::unique('blogs', 'slug')->ignore($blogId)],
                 'short'            => ['sometimes', 'required', 'string'],
                 'body'             => ['nullable', 'string'],
                 'body_2'           => ['nullable', 'string'],
                 'body_3'           => ['nullable', 'string'],
 
                 // Images (JSON array of files)
-                'images'           => ['nullable', 'array'],
-                'images.*'         => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'images'   => ['sometimes', 'nullable', 'array'],
+                'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
 
                 // SEO Metadata
                 'meta_title'       => ['nullable', 'string', 'max:255'],
