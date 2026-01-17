@@ -8,14 +8,17 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
+use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
@@ -272,6 +275,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [BannerController::class, 'restore']);
             Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
+        });
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
             Route::post('/', [PurchaseController::class, 'store']);
@@ -282,6 +286,38 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/add-payment', [PurchaseController::class, 'addPayment']);
             Route::get('{id}/restore', [PurchaseController::class, 'restore']);
             Route::delete('{id}/force', [PurchaseController::class, 'forceDestroy']);
+        });
+        Route::prefix('purchase-returns')->group(function () {
+            Route::get('/', [PurchaseReturnController::class, 'index']);
+            Route::post('/', [PurchaseReturnController::class, 'store']);
+            Route::get('/{id}', [PurchaseReturnController::class, 'show']);
+            Route::post('/update/{id}', [PurchaseReturnController::class, 'update']);
+            Route::delete('/{id}', [PurchaseReturnController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [PurchaseReturnController::class, 'changeStatus']);
+            Route::get('{id}/restore', [PurchaseReturnController::class, 'restore']);
+            Route::delete('{id}/force', [PurchaseReturnController::class, 'forceDestroy']);
+        });
+        Route::prefix('coupons')->group(function () {
+            Route::get('/', [CouponController::class, 'index']);
+            Route::post('/', [CouponController::class, 'store']);
+            Route::get('/{id}', [CouponController::class, 'show']);
+            Route::post('/update/{id}', [CouponController::class, 'update']);
+            Route::delete('/{id}', [CouponController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [CouponController::class, 'changeStatus']);
+            Route::post('/validate', [CouponController::class, 'validate']);
+        });
+        Route::prefix('pos-order')->group(function () {
+            Route::get('/', [PosOrderController::class, 'index']);
+            Route::post('/', [PosOrderController::class, 'store']);
+            Route::get('/{id}', [PosOrderController::class, 'show']);
+            Route::post('/update/{id}', [PosOrderController::class, 'update']);
+            Route::delete('/{id}', [PosOrderController::class, 'destroy']);
+            Route::get('hold/list', [PosOrderController::class, 'heldOrders']);
+            Route::post('{id}/cancel', [PosOrderController::class, 'cancel']);
+            Route::post('{id}/complete', [PosOrderController::class, 'complete']);
+            Route::post('{id}/hold', [PosOrderController::class, 'hold']);
+            Route::post('{id}/resume', [PosOrderController::class, 'resume']);
+          
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);
@@ -298,3 +334,4 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
