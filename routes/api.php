@@ -9,9 +9,11 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
+
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
+
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
@@ -280,6 +282,18 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [BannerController::class, 'restore']);
             Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
+        });
+
+        // Blog Routes
+        Route::prefix('blogs')->group(function () {
+            Route::get('/', [BlogController::class, 'index']);
+            Route::post('/', [BlogController::class, 'store']);
+            Route::get('/{id}', [BlogController::class, 'show']);
+            Route::post('/update/{id}', [BlogController::class, 'update']);
+            Route::delete('/{id}', [BlogController::class, 'destroy']);
+            Route::get('/{id}/restore', [BlogController::class, 'restore']);
+            Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
         });
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
