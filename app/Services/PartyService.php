@@ -36,6 +36,16 @@ class PartyService
                 }
                
             }
+            if (isset($filters['balance'])) {
+                if ($filters['balance'] === 'pay') {
+                    // Balance < 0
+                    $query->whereRaw('(balance + 0) < 0');
+                } elseif ($filters['balance'] === 'receive') {
+                    // Balance > 0
+                    $query->whereRaw('(balance + 0) > 0');
+                }
+            }
+
 
 
 
