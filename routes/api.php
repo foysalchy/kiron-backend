@@ -81,6 +81,7 @@ Route::prefix('v1')->group(function () {
             Route::get('search', [PartyController::class, 'search']);
             Route::get('suppliers', [PartyController::class, 'getSuppliers']);
             Route::get('customers', [PartyController::class, 'getCustomers']);
+            
             Route::get('/', [PartyController::class, 'index']);
             Route::post('/', [PartyController::class, 'store']);
             Route::get('/{id}', [PartyController::class, 'show']);

@@ -29,7 +29,12 @@ class PartyService
 
             // Filter by status
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if($filters['status']==3){
+                    $query->onlyTrashed();
+                }else{
+                    $query->where('status', $filters['status']);
+                }
+               
             }
 
 
