@@ -3,14 +3,14 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
-class PurchaseReturn extends Model
+class OrderReturn extends Model
 {
-    use CompanyScoped, SoftDeletes;
+    use HasFactory, SoftDeletes,CompanyScoped;
 
     // Status constants
     public const STATUS_PENDING = 0;
@@ -21,8 +21,9 @@ class PurchaseReturn extends Model
 
     protected $fillable = [
         'company_id',
-        'purchase_id',
-        'supplier_id',
+        'warehouse_id',
+        'customer_id',
+        'order_id',
         'return_no',
         'return_date',
         'reason',
@@ -41,10 +42,19 @@ class PurchaseReturn extends Model
     protected $casts = [
         'return_date' => 'date',
         'total_quantities' => 'integer',
+        'subtotal' => 'decimal:2',
+        'other_charges' => 'decimal:2',
+        'discount_on_all' => 'decimal:2',
+        'coupon_discount' => 'decimal:2',
+        'round_off' => 'decimal:2',
         'grand_total' => 'decimal:2',
+        'refund_amount' => 'decimal:2',
         'status' => 'integer',
     ];
 
+    /**
+     * Boot method for auto-generating return number
+     */
     protected static function boot()
     {
         parent::boot();
@@ -56,6 +66,28 @@ class PurchaseReturn extends Model
         });
     }
 
+    /**
+     * Generate return number
+     */
+    public static function generateReturnNumber(): string
+    {
+        $prefix = 'RTN';
+        $date = now()->format('Ymd');
+
+        $lastReturn = self::whereDate('created_at', now())
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastReturn) {
+            $lastNumber = (int) substr($lastReturn->return_no, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        // Example: RTN-20260117-0001
+    }
 
     /**
      * Relationships
@@ -65,25 +97,35 @@ class PurchaseReturn extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function purchase(): BelongsTo
+    public function warehouse(): BelongsTo
     {
-        return $this->belongsTo(Purchase::class);
+        return $this->belongsTo(Warehouse::class);
     }
 
-    public function supplier(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(Party::class, 'supplier_id')->select('id', 'name', 'type');
+        return $this->belongsTo(Party::class, 'customer_id');
     }
 
-    public function purchaseReturnDetails(): HasMany
+    public function order(): BelongsTo
     {
-        return $this->hasMany(PurchaseReturnDetail::class);
+        return $this->belongsTo(Order::class);
+    }
+
+    public function orderReturnDetails(): HasMany
+    {
+        return $this->hasMany(OrderReturnDetail::class);
+    }
+
+    public function orderReturnPayments(): HasMany
+    {
+        return $this->hasMany(OrderReturnPayment::class);
     }
 
     /**
-     * Status helper methods
+     * Status helpers
      */
-        public function isPending(): bool
+    public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
     }
@@ -111,7 +153,7 @@ class PurchaseReturn extends Model
     /**
      * Get status label
      */
-  public function getStatusLabelAttribute(): string
+    public function getStatusLabelAttribute(): string
     {
         return match($this->status) {
             self::STATUS_PENDING => 'Pending',
@@ -123,11 +165,10 @@ class PurchaseReturn extends Model
         };
     }
 
-
     /**
      * Scopes
      */
-       public function scopePending($query)
+    public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
     }
@@ -140,27 +181,5 @@ class PurchaseReturn extends Model
     public function scopeWaiting($query)
     {
         return $query->where('status', self::STATUS_WAITING);
-    }
-
-    public static function generateReturnNumber(): string
-    {
-        $prefix = 'RTN';
-        $date = now()->format('Ymd');
-
-        // Get last return number for today
-        $lastReturn = self::whereDate('created_at', now())
-            ->orderBy('id', 'desc')
-            ->first();
-
-        if ($lastReturn) {
-            // Extract last 4 digits
-            $lastNumber = (int) substr($lastReturn->return_no, -4);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        // Example: RTN-20260117-0001
     }
 }

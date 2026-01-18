@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->string('profile')->nullable();
+            $table->string('password');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
             $table->softDeletes();
