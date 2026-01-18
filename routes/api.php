@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
+use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PosOrderController;
@@ -279,6 +280,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [BannerController::class, 'restore']);
             Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
+        });
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
             Route::post('/', [PurchaseController::class, 'store']);
@@ -367,6 +369,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [EmployeeTypeController::class, 'restore']);
             Route::delete('/{id}/force', [EmployeeTypeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [EmployeeTypeController::class, 'toggleStatus']);
+        });
+        // office_locations type Routes
+        Route::prefix('employee-types')->group(function () {
+            Route::get('/', [OfficeLocationController::class, 'index']);
+            Route::post('/', [OfficeLocationController::class, 'store']);
+            Route::get('/{id}', [OfficeLocationController::class, 'show']);
+            Route::post('/update/{id}', [OfficeLocationController::class, 'update']);
+            Route::delete('/{id}', [OfficeLocationController::class, 'destroy']);
+            Route::get('/{id}/restore', [OfficeLocationController::class, 'restore']);
+            Route::delete('/{id}/force', [OfficeLocationController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [OfficeLocationController::class, 'toggleStatus']);
         });
     });
 });
