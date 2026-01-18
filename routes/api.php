@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
 
 use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 
@@ -385,7 +386,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [EmployeeTypeController::class, 'toggleStatus']);
         });
         // office_locations type Routes
-        Route::prefix('employee-types')->group(function () {
+        Route::prefix('office-locations')->group(function () {
             Route::get('/', [OfficeLocationController::class, 'index']);
             Route::post('/', [OfficeLocationController::class, 'store']);
             Route::get('/{id}', [OfficeLocationController::class, 'show']);
@@ -394,6 +395,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [OfficeLocationController::class, 'restore']);
             Route::delete('/{id}/force', [OfficeLocationController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [OfficeLocationController::class, 'toggleStatus']);
+        });
+        // employee Routes
+        Route::prefix('employees')->group(function () {
+            Route::get('/', [EmployeeController::class, 'index']);
+            Route::post('/', [EmployeeController::class, 'store']);
+            Route::get('/{id}', [EmployeeController::class, 'show']);
+            Route::post('/update/{id}', [EmployeeController::class, 'update']);
+            Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+            Route::get('/{id}/restore', [EmployeeController::class, 'restore']);
+            Route::delete('/{id}/force', [EmployeeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [EmployeeController::class, 'toggleStatus']);
         });
     });
 });

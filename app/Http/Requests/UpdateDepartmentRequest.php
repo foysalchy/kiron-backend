@@ -14,7 +14,7 @@ class UpdateDepartmentRequest extends UpdateBaseCompanyRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; 
     }
 
     /**

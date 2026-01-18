@@ -140,6 +140,7 @@ class PageService
      */
     public function deletePage(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $page = $this->getPageById($id);
             $page->delete();
@@ -147,10 +148,13 @@ class PageService
 
             Log::info('Page deleted successfully', ['page_id' => $id]);
 
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Page deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete page');
         }
@@ -161,6 +165,7 @@ class PageService
      */
     public function restorePage(int $id): Page
     {
+        DB::beginTransaction();
         try {
             $page = Page::withTrashed()->find($id);
 
@@ -173,10 +178,13 @@ class PageService
 
             Log::info('Page restored successfully', ['page_id' => $id]);
 
+            DB::commit();
             return $page;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Page restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore page');
         }
@@ -223,16 +231,20 @@ class PageService
      */
     public function toggleStatus(int $id): Page
     {
+        DB::beginTransaction();
         try {
             $page = $this->getPageById($id);
             $page->update(['status' => !$page->status]);
             LogHelper::statusChanged('page', $page->id, $page->company_id);
             Log::info('Page status toggled', ['page_id' => $id]);
 
+            DB::commit();
             return $page;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Page status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle page status');
         }

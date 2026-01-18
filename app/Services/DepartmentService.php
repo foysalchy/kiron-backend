@@ -7,6 +7,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class DepartmentService
@@ -21,6 +22,12 @@ class DepartmentService
 
             if (isset($filters['status']) && $filters['status'] !== "") {
                 $query->where('status', (int)$filters['status']);
+            }
+            if(!empty($filters['parent_department'])){
+                $query->where('parent_department',$filters['parent_department']);
+            }
+            if(!empty($filters['in_charge'])){
+                $query->where('in_charge',$filters['in_charge']);
             }
 
             if (!empty($filters['search'])) {
@@ -60,11 +67,15 @@ class DepartmentService
      */
     public function createDepartment(array $data): Department
     {
+        DB::beginTransaction();
         try {
             $department = Department::create($data);
             LogHelper::created('department', $department->id, $department->company_id);
+            DB::commit();
+            Log::info('Department created successfully',['department_id' => $department->id]);
             return $department;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Department creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create department');
         }
@@ -75,15 +86,20 @@ class DepartmentService
      */
     public function updateDepartment(int $id, array $data): Department
     {
+        DB::beginTransaction();
         try {
             $department = $this->getDepartmentById($id);
             $department->update($data);
 
             LogHelper::updated('department', $department->id, $department->company_id);
+            DB::commit();
+            Log::info('Department Updated Successfully',['department_id'=>$department->id]);
             return $department->fresh();
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Department update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update department');
         }
@@ -94,13 +110,20 @@ class DepartmentService
      */
     public function deleteDepartment(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $department = $this->getDepartmentById($id);
             $department->delete();
 
             LogHelper::deleted('department', $department->id, $department->company_id);
+            DB::commit();
+            Log::info('Department Deleted Successfully',['department_id'=>$id]);
             return true;
-        } catch (\Exception $e) {
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        }catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Department deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete department');
         }
@@ -111,6 +134,7 @@ class DepartmentService
      */
     public function restoreDepartment(int $id): Department
     {
+        DB::beginTransaction();
         try {
             $department = Department::withTrashed()->find($id);
             if (!$department) {
@@ -118,6 +142,7 @@ class DepartmentService
             }
             $department->restore();
             LogHelper::restored('department', $department->id, $department->company_id);
+            DB::commit();
             return $department;
         } catch (\Exception $e) {
             Log::error('Department restoration failed: ' . $e->getMessage());
@@ -129,6 +154,7 @@ class DepartmentService
      */
     public function forceDeleteDepartment(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $department =Department::withTrashed()->find($id);
 
@@ -140,12 +166,14 @@ class DepartmentService
             LogHelper::forceDeleted('department_value', $department->id, $department->company_id);
 
             Log::info('Department permanently deleted', ['department_id' => $id]);
-
+            DB::commit();
             return true;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Department permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete department');
         }
@@ -155,16 +183,19 @@ class DepartmentService
      */
     public function toggleStatus(int $id): Department
     {
+        DB::beginTransaction();
         try {
             $department = $this->getDepartmentById($id);
             $department->update(['status' => !$department->status]);
             LogHelper::statusChanged('department', $department->id, $department->company_id);
             Log::info('Department status toggled', ['department_id' => $id]);
-
+            DB::commit();
             return $department;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Department status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle department status');
         }
