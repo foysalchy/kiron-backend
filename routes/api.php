@@ -5,11 +5,17 @@ use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
+
+use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
+
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
@@ -276,6 +282,19 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
         });
+
+        // Blog Routes
+        Route::prefix('blogs')->group(function () {
+            Route::get('/', [BlogController::class, 'index']);
+            Route::post('/', [BlogController::class, 'store']);
+            Route::get('/{id}', [BlogController::class, 'show']);
+            Route::post('/update/{id}', [BlogController::class, 'update']);
+            Route::delete('/{id}', [BlogController::class, 'destroy']);
+            Route::get('/{id}/restore', [BlogController::class, 'restore']);
+            Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
+        });
+
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
             Route::post('/', [PurchaseController::class, 'store']);
@@ -331,6 +350,39 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [RequisitionController::class, 'complete']);
             Route::get('{id}/restore', [RequisitionController::class, 'restore']);
             Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
+        });
+        // job title Routes
+        Route::prefix('jobs')->group(function () {
+            Route::get('/', [JobTitleController::class, 'index']);
+            Route::post('/', [JobTitleController::class, 'store']);
+            Route::get('/{id}', [JobTitleController::class, 'show']);
+            Route::post('/update/{id}', [JobTitleController::class, 'update']);
+            Route::delete('/{id}', [JobTitleController::class, 'destroy']);
+            Route::get('/{id}/restore', [JobTitleController::class, 'restore']);
+            Route::delete('/{id}/force', [JobTitleController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [JobTitleController::class, 'toggleStatus']);
+        });
+        // department Routes
+        Route::prefix('departments')->group(function () {
+            Route::get('/', [DepartmentController::class, 'index']);
+            Route::post('/', [DepartmentController::class, 'store']);
+            Route::get('/{id}', [DepartmentController::class, 'show']);
+            Route::post('/update/{id}', [DepartmentController::class, 'update']);
+            Route::delete('/{id}', [DepartmentController::class, 'destroy']);
+            Route::get('/{id}/restore', [DepartmentController::class, 'restore']);
+            Route::delete('/{id}/force', [DepartmentController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [DepartmentController::class, 'toggleStatus']);
+        });
+        // employee type Routes
+        Route::prefix('employee-types')->group(function () {
+            Route::get('/', [EmployeeTypeController::class, 'index']);
+            Route::post('/', [EmployeeTypeController::class, 'store']);
+            Route::get('/{id}', [EmployeeTypeController::class, 'show']);
+            Route::post('/update/{id}', [EmployeeTypeController::class, 'update']);
+            Route::delete('/{id}', [EmployeeTypeController::class, 'destroy']);
+            Route::get('/{id}/restore', [EmployeeTypeController::class, 'restore']);
+            Route::delete('/{id}/force', [EmployeeTypeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [EmployeeTypeController::class, 'toggleStatus']);
         });
     });
 });

@@ -7,55 +7,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Blog extends Model
+class OfficeLocation extends Model
 {
-        use SoftDeletes,CompanyScoped;
-
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
-        'title',
-        'slug',
-        'short',
-        'body',
-        'body_2',
-        'body_3',
-        'images',
-        'meta_title',
-        'meta_description',
-        'meta_keywords',
+        'location_name',
+        'address',
+        'country',
+        'division',
+        'district',
+        'thana',
+        'description',
         'status',
     ];
-    protected $casts = [
-        'images' => 'array',
-    ];
-
 
     protected $hidden = ['deleted_at'];
 
     // Relationships
+    /**
+     * Get the company that owns the office location.
+     */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
     // Scopes
+    /**
+     * Scope a query to only include active office locations.
+     */
     public function scopeActive($query)
     {
-        return $query->where('status', true);
+        return $query->where('status', 1);
     }
 
+    /**
+     * Scope a query to only include locations of a specific company.
+     */
     public function scopeByCompany($query, int $companyId)
     {
         return $query->where('company_id', $companyId);
-    }
-
-    // Accessors
-    public function getThumbnailUrlAttribute(): ?string
-    {
-        if ($this->images && is_array($this->images) && count($this->images) > 0) {
-            return asset('storage/' . $this->images[0]);
-        }
-        return null;
     }
 }
