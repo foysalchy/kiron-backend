@@ -41,7 +41,8 @@ class AuthController extends Controller
         }
 
         // Regenerate session
-        $request->session()->regenerate();
+        // $request->session()->regenerate();
+         $token = $user->createToken('api-token')->plainTextToken;
 
         // Log login action
 
@@ -57,6 +58,7 @@ class AuthController extends Controller
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
             ],
+            'token' => $token,
         ]);
     }
 
