@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{PurchaseDetail, PurchaseReturn, PurchaseReturnDetail};
+use App\Models\{Purchase, PurchaseDetail, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -83,27 +83,48 @@ class PurchaseReturnService
 
         try {
             $items = $data['items'];
-            unset($data['items']);
-
-            // Calculate totals from purchase details
-            $totals = $this->calculateTotals($items, $data['purchase_id']);
+            $payments = $data['payments'] ?? [];
+            unset($data['items'], $data['payments']);
+            $purchase = Purchase::find($data['purchase_id']);
+            if (!$purchase) {
+                throw ApiException::notFound('Purchase');
+            }
+            $data['warehouse_id'] = $purchase->warehouse_id;
+            $totals = $this->calculateTotals($items, $data);
             $data = array_merge($data, $totals);
-
+            $totalRefund = 0;
+            if (!empty($payments)) {
+                $totalRefund = array_sum(array_column($payments, 'amount'));
+            }
+            $data['refund_amount'] = $totalRefund;
             // Create purchase return
             $purchaseReturn = PurchaseReturn::create($data);
 
             // Create purchase return details
             foreach ($items as $item) {
-                $itemTotal = $this->calculateItemTotal($item, $data['purchase_id']);
+                $itemTotal = $this->calculateItemTotal($item);
 
                 PurchaseReturnDetail::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'] ?? 0,
+                    'tax' => $item['tax'] ?? 0,
                     'total' => $itemTotal,
                 ]);
             }
-
+            if (!empty($payments)) {
+                foreach ($payments as $payment) {
+                    PurchasePaymentReturn::create([
+                        'purchase_return_id' => $purchaseReturn->id,
+                        'amount' => $payment['amount'],
+                        'payment_method' => $payment['payment_method'],
+                        'reference_no' => $payment['reference_no'] ?? null,
+                        'note' => $payment['note'] ?? null,
+                    ]);
+                }
+            }
             DB::commit();
 
             Log::info('Purchase return created successfully', ['purchase_return_id' => $purchaseReturn->id]);
@@ -155,7 +176,7 @@ class PurchaseReturnService
                 $purchaseReturn->purchaseReturnDetails()->delete();
 
                 foreach ($items as $item) {
-                    $itemTotal = $this->calculateItemTotal($item, $purchaseId);
+                    $itemTotal = $this->calculateItemTotal($item);
 
                     PurchaseReturnDetail::create([
                         'purchase_return_id' => $purchaseReturn->id,
@@ -226,30 +247,14 @@ class PurchaseReturnService
     /**
      * Calculate item total from purchase detail
      */
-    private function calculateItemTotal(array $item, int $purchaseId): float
+    private function calculateItemTotal(array $item): float
     {
-        $productId = $item['product_id'];
         $quantity = $item['quantity'];
+        $unitPrice = $item['unit_price'];
+        $discount = $item['discount'] ?? 0;
+        $tax = $item['tax'] ?? 0;
 
-        // Get price info from purchase detail
-        $purchaseDetail = PurchaseDetail::where('purchase_id', $purchaseId)
-            ->where('product_id', $productId)
-            ->first();
-
-        if (!$purchaseDetail) {
-            return 0;
-        }
-
-        $price = $purchaseDetail->purchase_price;
-        $discount = $purchaseDetail->discount ?? 0;
-        $tax = $purchaseDetail->tax ?? 0;
-
-        $subtotal = $quantity * $price;
-        $discountPerUnit = $discount / $purchaseDetail->quantity;
-        $taxPerUnit = $tax / $purchaseDetail->quantity;
-
-        $afterDiscount = $subtotal - ($discountPerUnit * $quantity);
-        $total = $afterDiscount + ($taxPerUnit * $quantity);
+        $total = ($quantity * $unitPrice) - $discount + $tax;
 
         return round($total, 2);
     }
@@ -257,22 +262,29 @@ class PurchaseReturnService
     /**
      * Calculate purchase return totals
      */
-    private function calculateTotals(array $items, int $purchaseId): array
+    private function calculateTotals(array $items, array $data): array
     {
         $totalQuantities = 0;
-        $grandTotal = 0;
+        $subtotal = 0;
 
         foreach ($items as $item) {
             $totalQuantities += $item['quantity'];
-            $grandTotal += $this->calculateItemTotal($item, $purchaseId);
+            $subtotal += $this->calculateItemTotal($item);
         }
+
+        $otherCharges = $data['other_charges'] ?? 0;
+        $discountOnAll = $data['discount_on_all'] ?? 0;
+        $couponDiscount = $data['coupon_discount'] ?? 0;
+        $roundOff = $data['round_off'] ?? 0;
+
+        $grandTotal = $subtotal + $otherCharges - $discountOnAll - $couponDiscount + $roundOff;
 
         return [
             'total_quantities' => $totalQuantities,
+            'subtotal' => round($subtotal, 2),
             'grand_total' => round($grandTotal, 2),
         ];
     }
-
 
     /**
      * Change purchase return status

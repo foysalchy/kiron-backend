@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pos_order_payments', function (Blueprint $table) {
+        Schema::create('purchase_payment_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pos_order_id')->constrained('pos_orders')->onDelete('cascade');
+             $table->foreignId('purchase_return_id')->constrained('purchase_returns')->onDelete('cascade');
 
             $table->decimal('amount', 15, 2);
-            $table->string('payment_method')->comment('cash, card, bank, mobile_banking');
+            $table->string('payment_method')->comment('cash, card, bank, mobile_banking, cheque');
             $table->string('reference_no')->nullable();
             $table->text('note')->nullable();
-            
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pos_order_payments');
+        Schema::dropIfExists('purchase_payment_returns');
     }
 };

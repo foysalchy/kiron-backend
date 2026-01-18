@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\OfficeLocationController;
+use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PosOrderController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
+use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
@@ -330,14 +332,30 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [PosOrderController::class, 'index']);
             Route::post('/', [PosOrderController::class, 'store']);
             Route::get('/{id}', [PosOrderController::class, 'show']);
-            Route::post('/update/{id}', [PosOrderController::class, 'update']);
-            Route::delete('/{id}', [PosOrderController::class, 'destroy']);
-            Route::get('hold/list', [PosOrderController::class, 'heldOrders']);
+            Route::get('hold/list/{warehouseId}', [PosOrderController::class, 'heldOrders']);
             Route::post('{id}/cancel', [PosOrderController::class, 'cancel']);
             Route::post('{id}/complete', [PosOrderController::class, 'complete']);
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
 
+        });
+        Route::prefix('sales-order')->group(function () {
+            Route::get('/', [SalesOrderController::class, 'index']);
+            Route::post('/', [SalesOrderController::class, 'store']);
+            Route::get('/{id}', [SalesOrderController::class, 'show']);
+            Route::post('{id}/cancel', [SalesOrderController::class, 'cancel']);
+            Route::post('{id}/complete', [SalesOrderController::class, 'complete']);
+        });
+
+        Route::prefix('orders-return')->group(function () {
+            Route::get('/', [OrderReturnController::class, 'index']);
+            Route::post('/', [OrderReturnController::class, 'store']);
+            Route::get('/{id}', [OrderReturnController::class, 'show']);
+            Route::post('/update/{id}', [OrderReturnController::class, 'update']);
+            Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
+            Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
+     
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);
@@ -409,4 +427,3 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
-

@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_return_details', function (Blueprint $table) {
+        Schema::create('order_return_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_return_id')->constrained('purchase_returns')->onDelete('cascade');
+            $table->foreignId('order_return_id')->constrained('order_returns')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
+
             $table->integer('quantity');
             $table->decimal('unit_price', 15, 2);
             $table->decimal('discount', 15, 2)->nullable()->default(0);
             $table->decimal('tax', 15, 2)->nullable()->default(0);
             $table->decimal('total', 15, 2);
-            $table->timestamps();
+                 $table->timestamps();
         });
     }
 
@@ -29,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_return_details');
+        Schema::dropIfExists('order_return_details');
     }
 };

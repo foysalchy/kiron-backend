@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
@@ -8,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
-class PosOrder extends Model
+class Order extends Model
 {
     use HasFactory, SoftDeletes,CompanyScoped;
+
+    // Order types
+    public const TYPE_POS = 'pos';
+    public const TYPE_SALES = 'sales';
 
     // Status constants
     public const STATUS_PENDING = 0;
@@ -19,7 +22,7 @@ class PosOrder extends Model
     public const STATUS_ON_HOLD = 3;
 
     // Payment status constants
-    public const PAYMENT_PENDING = 0;
+    public const PAYMENT_UNPAID = 0;
     public const PAYMENT_PARTIAL = 1;
     public const PAYMENT_PAID = 2;
 
@@ -28,16 +31,19 @@ class PosOrder extends Model
         'warehouse_id',
         'customer_id',
         'coupon_id',
+        'type',
         'order_no',
+        'reference_no',
         'order_date',
         'is_walk_in',
-        'total_items',
+        'total_quantities',
         'subtotal',
-        'discount_amount',
-        'tax_amount',
+        'other_charges',
+        'discount_on_all',
+        'coupon_discount',
+        'round_off',
         'grand_total',
-        'paid_amount',
-        'change_amount',
+        'payment_amount',
         'payment_status',
         'status',
         'note',
@@ -45,27 +51,57 @@ class PosOrder extends Model
     ];
 
     protected $casts = [
-        'order_date' => 'datetime',
+        'order_date' => 'date',
         'is_walk_in' => 'boolean',
-        'total_items' => 'integer',
+        'total_quantities' => 'integer',
         'subtotal' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'tax_amount' => 'decimal:2',
+        'other_charges' => 'decimal:2',
+        'discount_on_all' => 'decimal:2',
+        'coupon_discount' => 'decimal:2',
+        'round_off' => 'decimal:2',
         'grand_total' => 'decimal:2',
-        'paid_amount' => 'decimal:2',
-        'change_amount' => 'decimal:2',
+        'payment_amount' => 'decimal:2',
         'payment_status' => 'integer',
         'status' => 'integer',
     ];
+
+    /**
+     * Boot method for auto-generating order number
+     */
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($order) {
             if (empty($order->order_no)) {
-                $order->order_no = self::generateOrderNumber();
+                $order->order_no = self::generateOrderNumber($order->type);
             }
         });
+    }
+
+    /**
+     * Generate order number based on type
+     */
+    public static function generateOrderNumber(string $type): string
+    {
+        $prefix = $type === self::TYPE_POS ? 'POS' : 'SALE';
+        $date = now()->format('Ymd');
+
+        // Get last order number for today and this type
+        $lastOrder = self::where('type', $type)
+            ->whereDate('created_at', now())
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastOrder) {
+            $lastNumber = (int) substr($lastOrder->order_no, -4);
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        // Example: POS-20260117-0001 or SALE-20260117-0001
     }
 
     /**
@@ -91,14 +127,27 @@ class PosOrder extends Model
         return $this->belongsTo(Coupon::class);
     }
 
-    public function posOrderDetails(): HasMany
+    public function orderDetails(): HasMany
     {
-        return $this->hasMany(PosOrderDetail::class);
+        return $this->hasMany(OrderDetail::class);
     }
 
-    public function posOrderPayments(): HasMany
+    public function orderPayments(): HasMany
     {
-        return $this->hasMany(PosOrderPayment::class);
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    /**
+     * Type helpers
+     */
+    public function isPOS(): bool
+    {
+        return $this->type === self::TYPE_POS;
+    }
+
+    public function isSales(): bool
+    {
+        return $this->type === self::TYPE_SALES;
     }
 
     /**
@@ -127,12 +176,12 @@ class PosOrder extends Model
     /**
      * Payment status helpers
      */
-    public function isPaymentPending(): bool
+    public function isUnpaid(): bool
     {
-        return $this->payment_status === self::PAYMENT_PENDING;
+        return $this->payment_status === self::PAYMENT_UNPAID;
     }
 
-    public function isPaymentPartial(): bool
+    public function isPartialPaid(): bool
     {
         return $this->payment_status === self::PAYMENT_PARTIAL;
     }
@@ -143,11 +192,23 @@ class PosOrder extends Model
     }
 
     /**
+     * Get type label
+     */
+    public function getTypeLabelAttribute(): string
+    {
+        return match($this->type) {
+            self::TYPE_POS => 'POS Order',
+            self::TYPE_SALES => 'Sales Order',
+            default => 'Unknown',
+        };
+    }
+
+    /**
      * Get status label
      */
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
+        return match($this->status) {
             self::STATUS_PENDING => 'Pending',
             self::STATUS_COMPLETED => 'Completed',
             self::STATUS_CANCELLED => 'Cancelled',
@@ -161,8 +222,8 @@ class PosOrder extends Model
      */
     public function getPaymentStatusLabelAttribute(): string
     {
-        return match ($this->payment_status) {
-            self::PAYMENT_PENDING => 'Pending',
+        return match($this->payment_status) {
+            self::PAYMENT_UNPAID => 'Unpaid',
             self::PAYMENT_PARTIAL => 'Partial',
             self::PAYMENT_PAID => 'Paid',
             default => 'Unknown',
@@ -172,6 +233,16 @@ class PosOrder extends Model
     /**
      * Scopes
      */
+    public function scopePOS($query)
+    {
+        return $query->where('type', self::TYPE_POS);
+    }
+
+    public function scopeSales($query)
+    {
+        return $query->where('type', self::TYPE_SALES);
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
@@ -182,34 +253,13 @@ class PosOrder extends Model
         return $query->where('status', self::STATUS_COMPLETED);
     }
 
-    public function scopeToday($query)
-    {
-        return $query->whereDate('order_date', today());
-    }
-
     public function scopeOnHold($query)
     {
         return $query->where('status', self::STATUS_ON_HOLD);
     }
-    public static function generateOrderNumber(): string
+
+    public function scopeToday($query)
     {
-        $prefix = 'POS';
-        $date = now()->format('Ymd');
-
-        // Get last order number for today
-        $lastOrder = self::whereDate('created_at', now())
-            ->orderBy('id', 'desc')
-            ->first();
-
-        if ($lastOrder) {
-            // Extract last 4 digits
-            $lastNumber = (int) substr($lastOrder->order_no, -4);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
-        }
-
-        return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        // Example: POS-20260117-0001
+        return $query->whereDate('order_date', today());
     }
 }
