@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_returns', function (Blueprint $table) {
+        Schema::create('order_returns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-            $table->foreignId('purchase_id')->constrained('purchases')->onDelete('restrict');
-            $table->foreignId('supplier_id')->constrained('parties')->onDelete('restrict');
+            $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('restrict');
+            $table->foreignId('customer_id')->nullable()->constrained('parties')->onDelete('set null');
+            $table->foreignId('order_id')->constrained('orders')->onDelete('restrict');
 
             // Return Info
             $table->string('return_no')->unique();
             $table->date('return_date');
             $table->text('reason')->nullable();
-            // Totals (auto-calculated from items)
+
+            // Totals
             $table->integer('total_quantities')->default(0);
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('other_charges', 10, 2)->default(0)->comment('Manual entry');
@@ -47,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_returns');
+        Schema::dropIfExists('order_returns');
     }
 };

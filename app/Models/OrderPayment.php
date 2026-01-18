@@ -5,10 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PosOrderPayment extends Model
+class OrderPayment extends Model
 {
-    protected $fillable = [
-        'pos_order_id',
+     protected $fillable = [
+        'order_id',
         'amount',
         'payment_method',
         'reference_no',
@@ -19,8 +19,8 @@ class PosOrderPayment extends Model
         'amount' => 'decimal:2',
     ];
 
-    public function posOrder(): BelongsTo
+    public function order(): BelongsTo
     {
-        return $this->belongsTo(PosOrder::class);
+        return $this->belongsTo(Order::class);
     }
 }

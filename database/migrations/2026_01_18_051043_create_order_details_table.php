@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pos_order_details', function (Blueprint $table) {
+        Schema::create('order_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pos_order_id')->constrained('pos_orders')->onDelete('cascade');
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
 
             $table->integer('quantity');
             $table->decimal('unit_price', 15, 2);
-            $table->decimal('discount', 15, 2)->default(0);
-            $table->decimal('tax', 15, 2)->default(0);
-            $table->decimal('subtotal', 15, 2);
+            $table->decimal('discount', 15, 2)->nullable()->default(0);
+            $table->decimal('tax', 15, 2)->nullable()->default(0);
+            $table->decimal('total', 15, 2);
 
             $table->timestamps();
         });
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pos_order_details');
+        Schema::dropIfExists('order_details');
     }
 };

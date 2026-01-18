@@ -23,7 +23,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Attempt authentication
+        // Attempt authentication (no session)
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
@@ -40,14 +40,17 @@ class AuthController extends Controller
             ]);
         }
 
-        // Regenerate session
-        $request->session()->regenerate();
+        // Revoke old tokens (optional but recommended)
+        $user->tokens()->delete();
 
-        // Log login action
+        // Create token
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
+            'token' => $token,
+            'token_type' => 'Bearer',
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -59,7 +62,6 @@ class AuthController extends Controller
             ],
         ]);
     }
-
     /**
      * Register
      */
@@ -104,7 +106,6 @@ class AuthController extends Controller
                     'role' => $user->role,
                 ],
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -142,7 +143,7 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'status' => $user->status,
                 'company' => $user->company,
-            
+
             ],
         ]);
     }
@@ -186,7 +187,6 @@ class AuthController extends Controller
                     'profile_url' => $user->profile_url,
                 ],
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -229,7 +229,6 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Password updated successfully',
             ]);
-
         } catch (ValidationException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -247,13 +246,8 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        // Log logout action
-      
-        // Logout and invalidate session
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Revoke only the current access token
+        $user->currentAccessToken()->delete();
 
         return response()->json([
             'success' => true,
@@ -325,7 +319,6 @@ class AuthController extends Controller
                 'success' => true,
                 'message' => 'Account deleted successfully',
             ]);
-
         } catch (ValidationException $e) {
             DB::rollBack();
             throw $e;

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePosOrderRequest;
-use App\Services\PosOrderService;
+use App\Http\Requests\StoreOrderRequest;
+use App\Services\OrderService;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\{JsonResponse, Request};
 
-class PosOrderController extends Controller
+class POSOrderController extends Controller
 {
     public function __construct(
-        protected PosOrderService $posOrderService
+        protected OrderService $orderService
     ) {}
 
     /**
@@ -20,9 +20,9 @@ class PosOrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
+            'type' => 'pos',
             'warehouse_id' => $request->query('warehouse_id'),
             'customer_id' => $request->query('customer_id'),
-            'is_walk_in' => $request->query('is_walk_in'),
             'status' => $request->query('status'),
             'payment_status' => $request->query('payment_status'),
             'date_from' => $request->query('date_from'),
@@ -33,7 +33,7 @@ class PosOrderController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->posOrderService->getAllPosOrders($filters, true);
+        $data = $this->orderService->getAllOrders($filters, true);
 
         return ResponseHelper::success($data, 'POS orders retrieved successfully');
     }
@@ -41,9 +41,9 @@ class PosOrderController extends Controller
     /**
      * Create new POS order
      */
-    public function store(StorePosOrderRequest $request): JsonResponse
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $data = $this->posOrderService->createPosOrder($request->validated());
+        $data = $this->orderService->createPOSOrder($request->validated());
 
         return ResponseHelper::success($data, 'POS order created successfully', 201);
     }
@@ -53,7 +53,13 @@ class PosOrderController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $data = $this->posOrderService->getPosOrderById($id);
+        $data = $this->orderService->getOrderById($id,'pos');
+
+        return ResponseHelper::success($data, 'POS order retrieved successfully');
+    }
+    public function heldOrders(int $warehouseId): JsonResponse
+    {
+        $data = $this->orderService->getHoldOrderList($warehouseId,'pos');
 
         return ResponseHelper::success($data, 'POS order retrieved successfully');
     }
@@ -63,7 +69,7 @@ class PosOrderController extends Controller
      */
     public function cancel(int $id): JsonResponse
     {
-        $data = $this->posOrderService->cancelOrder($id);
+        $data = $this->orderService->cancelOrder($id,'pos');
 
         return ResponseHelper::success($data, 'POS order cancelled successfully');
     }
@@ -73,7 +79,7 @@ class PosOrderController extends Controller
      */
     public function complete(int $id): JsonResponse
     {
-        $data = $this->posOrderService->completeOrder($id);
+        $data = $this->orderService->completeOrder($id,'pos');
 
         return ResponseHelper::success($data, 'POS order completed successfully');
     }
@@ -87,7 +93,7 @@ class PosOrderController extends Controller
             'hold_ref' => 'nullable|string|max:500',
         ]);
 
-        $data = $this->posOrderService->holdOrder($id, $request->hold_ref);
+        $data = $this->orderService->holdOrder($id, $request->hold_reason,'pos');
 
         return ResponseHelper::success($data, 'POS order put on hold successfully');
     }
@@ -97,22 +103,8 @@ class PosOrderController extends Controller
      */
     public function resume(int $id): JsonResponse
     {
-        $data = $this->posOrderService->resumeOrder($id);
+        $data = $this->orderService->resumeOrder($id,'pos');
 
         return ResponseHelper::success($data, 'POS order resumed successfully');
-    }
-
-    /**
-     * Get all held orders
-     */
-    public function heldOrders(Request $request): JsonResponse
-    {
-        $request->validate([
-            'warehouse_id' => 'required|exists:warehouses,id',
-        ]);
-
-        $data = $this->posOrderService->getHeldOrders($request->warehouse_id);
-
-        return ResponseHelper::success($data, 'Held orders retrieved successfully');
     }
 }
