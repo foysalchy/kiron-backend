@@ -74,9 +74,9 @@ class StorePurchaseRequest extends BaseCompanyRequest
 
     public function messages(): array
     {
-        return [
-            'company_id.required' => 'Company ID is required for super admin',
-            'company_id.prohibited' => 'Regular users cannot specify company_id',
+    return array_merge(
+            $this->companyMessages(),
+            [
             'warehouse_id.required' => 'Warehouse is required',
             'warehouse_id.exists' => 'Selected warehouse does not belong to your company.',
             'supplier_id.required' => 'Supplier is required',
@@ -92,7 +92,7 @@ class StorePurchaseRequest extends BaseCompanyRequest
             'items.*.quantity.min' => 'Quantity must be at least 1',
             'items.*.purchase_price.required' => 'Purchase price is required',
             'items.*.unit_cost.required' => 'Unit Cost  is required',
-        ];
+        ]);
     }
     protected function failedValidation(Validator $validator)
     {
