@@ -14,7 +14,7 @@ class StoreDepartmentRequest extends BaseCompanyRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; 
     }
 
     /**

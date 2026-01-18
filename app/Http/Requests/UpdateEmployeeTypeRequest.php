@@ -14,7 +14,7 @@ class UpdateEmployeeTypeRequest extends UpdateBaseCompanyRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; 
     }
 
     /**

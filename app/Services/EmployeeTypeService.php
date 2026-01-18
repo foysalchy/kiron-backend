@@ -7,6 +7,7 @@ use App\Helpers\LogHelper;
 use App\Models\EmployeeType;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class EmployeeTypeService
@@ -61,14 +62,16 @@ class EmployeeTypeService
      */
     public function createEmployeeType(array $data): EmployeeType
     {
+        DB::beginTransaction();
         try {
             $employeeType = EmployeeType::create($data);
 
             LogHelper::created('employee_type', $employeeType->id, $employeeType->company_id);
             Log::info('Employee Type created successfully', ['type_id' => $employeeType->id]);
-
+            DB::commit();
             return $employeeType;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create employee type');
         }
@@ -79,17 +82,20 @@ class EmployeeTypeService
      */
     public function updateEmployeeType(int $id, array $data): EmployeeType
     {
+        DB::beginTransaction();
         try {
             $employeeType = $this->getEmployeeTypeById($id);
             $employeeType->update($data);
 
             LogHelper::updated('employee_type', $employeeType->id, $employeeType->company_id);
             Log::info('Employee Type Updated Successfully', ['type_id' => $employeeType->id]);
-
+            DB::commit();
             return $employeeType->fresh();
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update employee type');
         }
@@ -100,6 +106,7 @@ class EmployeeTypeService
      */
     public function deleteEmployeeType(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $employeeType = $this->getEmployeeTypeById($id);
             $employeeType->delete();
@@ -107,10 +114,13 @@ class EmployeeTypeService
             LogHelper::deleted('employee_type', $employeeType->id, $employeeType->company_id);
             Log::info('Employee Type deleted successfully', ['type_id' => $id]);
 
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete employee type');
         }
@@ -121,6 +131,7 @@ class EmployeeTypeService
      */
     public function restoreEmployeeType(int $id): EmployeeType
     {
+        DB::beginTransaction();
         try {
             $employeeType = EmployeeType::withTrashed()->find($id);
             if (!$employeeType) {
@@ -130,11 +141,13 @@ class EmployeeTypeService
 
             LogHelper::restored('employee_type', $employeeType->id, $employeeType->company_id);
             Log::info('Employee Type restored successfully', ['type_id' => $id]);
-
+            DB::commit();
             return $employeeType;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore employee type');
         }
@@ -145,6 +158,7 @@ class EmployeeTypeService
      */
     public function forceDeleteEmployeeType(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $employeeType = EmployeeType::withTrashed()->find($id);
             if (!$employeeType) {
@@ -155,10 +169,13 @@ class EmployeeTypeService
             LogHelper::forceDeleted('employee_type', $id, $employeeType->company_id);
             Log::info('Employee Type permanently deleted', ['type_id' => $id]);
 
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete employee type');
         }
@@ -169,6 +186,7 @@ class EmployeeTypeService
      */
     public function toggleStatus(int $id): EmployeeType
     {
+        DB::beginTransaction();
         try {
             $employeeType = $this->getEmployeeTypeById($id);
 
@@ -178,10 +196,13 @@ class EmployeeTypeService
             LogHelper::statusChanged('employee_type', $employeeType->id, $employeeType->company_id);
             Log::info('Employee Type status toggled', ['type_id' => $id, 'new_status' => $newStatus]);
 
+            DB::commit();
             return $employeeType;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Employee Type status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle employee type status');
         }

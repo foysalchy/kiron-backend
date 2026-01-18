@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
 
 use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 
@@ -19,6 +20,7 @@ use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
+use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
@@ -296,7 +298,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
         });
-
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
             Route::post('/', [PurchaseController::class, 'store']);
@@ -336,6 +337,7 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [PosOrderController::class, 'complete']);
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
+
         });
         Route::prefix('sales-order')->group(function () {
             Route::get('/', [SalesOrderController::class, 'index']);
@@ -400,6 +402,28 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [EmployeeTypeController::class, 'restore']);
             Route::delete('/{id}/force', [EmployeeTypeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [EmployeeTypeController::class, 'toggleStatus']);
+        });
+        // office_locations type Routes
+        Route::prefix('office-locations')->group(function () {
+            Route::get('/', [OfficeLocationController::class, 'index']);
+            Route::post('/', [OfficeLocationController::class, 'store']);
+            Route::get('/{id}', [OfficeLocationController::class, 'show']);
+            Route::post('/update/{id}', [OfficeLocationController::class, 'update']);
+            Route::delete('/{id}', [OfficeLocationController::class, 'destroy']);
+            Route::get('/{id}/restore', [OfficeLocationController::class, 'restore']);
+            Route::delete('/{id}/force', [OfficeLocationController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [OfficeLocationController::class, 'toggleStatus']);
+        });
+        // employee Routes
+        Route::prefix('employees')->group(function () {
+            Route::get('/', [EmployeeController::class, 'index']);
+            Route::post('/', [EmployeeController::class, 'store']);
+            Route::get('/{id}', [EmployeeController::class, 'show']);
+            Route::post('/update/{id}', [EmployeeController::class, 'update']);
+            Route::delete('/{id}', [EmployeeController::class, 'destroy']);
+            Route::get('/{id}/restore', [EmployeeController::class, 'restore']);
+            Route::delete('/{id}/force', [EmployeeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [EmployeeController::class, 'toggleStatus']);
         });
     });
 });

@@ -140,17 +140,20 @@ class BannerService
      */
     public function deleteBanner(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $banner = $this->getBannerById($id);
             $banner->delete();
             LogHelper::deleted('banner', $banner->id, $banner->company_id);
-
+            DB::commit();
             Log::info('Banner deleted successfully', ['banner_id' => $id]);
 
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Banner deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete banner');
         }
@@ -161,6 +164,7 @@ class BannerService
      */
     public function restoreBanner(int $id): Banner
     {
+        DB::beginTransaction();
         try {
             $banner = Banner::withTrashed()->find($id);
 
@@ -172,11 +176,13 @@ class BannerService
             LogHelper::restored('banner', $banner->id, $banner->company_id);
 
             Log::info('Banner restored successfully', ['banner_id' => $id]);
-
+            DB::commit();
             return $banner;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Banner restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore banner');
         }
@@ -223,16 +229,24 @@ class BannerService
      */
     public function toggleStatus(int $id): Banner
     {
+        DB::beginTransaction();
         try {
             $banner = $this->getBannerById($id);
-            $banner->update(['status' => !$banner->status]);
+
+            $newStatus = $banner->status == 1 ? 0 : 1;
+            $banner->update(['status' => $newStatus]);
+
             LogHelper::statusChanged('banner', $banner->id, $banner->company_id);
-            Log::info('Banner status toggled', ['banner_id' => $id]);
+            DB::commit();
+            Log::info('Banner status toggled', ['banner_id' => $id, 'new_status' => $newStatus]);
 
             return $banner;
+
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Banner status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle banner status');
         }

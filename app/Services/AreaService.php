@@ -8,6 +8,7 @@ use App\Models\Area;
 use App\Models\Warehouse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AreaService
@@ -64,14 +65,17 @@ class AreaService
      */
     public function createArea(array $data): Area
     {
+        DB::beginTransaction();
         try {
             $area =Area::create($data);
             LogHelper::created('area', $area->id, $area->company_id);
+            DB::commit();
             Log::info('Area created successfully', ['area_id' => $area->id]);
 
             return $area->load(['warehouse']);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Area creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create area');
         }
@@ -83,19 +87,23 @@ class AreaService
      */
     public function updateArea(int $id, array $data): Area
     {
+        DB::beginTransaction();
         try {
             $area = $this->getAreaById($id);
 
             $area->update($data);
 
             LogHelper::updated('area', $area->id, $area->company_id);
+            DB::commit();
             Log::info('Area Updated Successfully', ['area_id' => $area->id]);
 
             return $area->fresh(['warehouse']);
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Area update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update area');
         }
@@ -105,19 +113,23 @@ class AreaService
      */
     public function deleteArea(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $area = $this->getAreaById($id);
 
             $area->delete();
 
             LogHelper::deleted('area', $area->id, $area->company_id);
+            DB::commit();
             Log::info('Area deleted successfully', ['area_id' => $id]);
 
             return true;
 
         } catch (ApiException $e) {
             throw $e;
+            DB::rollBack();
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Area deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete area');
         }
@@ -127,6 +139,7 @@ class AreaService
      */
     public function restoreArea(int $id): Area
     {
+        DB::beginTransaction();
         try {
             $area = Area::withTrashed()->find($id);
             if (!$area) {
@@ -134,11 +147,14 @@ class AreaService
             }
             $area->restore();
             LogHelper::restored('area',$area->id,$area->company_id);
+            DB::commit();
             return $area->load(['warehouse']);
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         }catch(\Exception $e)
         {
+            DB::rollBack();
             Log::error('Area restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore data');
         }
@@ -148,6 +164,7 @@ class AreaService
      */
     public function forceDeleteArea(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $area = Area::withTrashed()->find($id);
             if (!$area) {
@@ -155,10 +172,13 @@ class AreaService
             }
             $area->forceDelete();
             LogHelper::forceDeleted('area', $id, $area->company_id);
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Area permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete area');
         }
@@ -168,6 +188,7 @@ class AreaService
      */
     public function toggleStatus(int $id): Area
     {
+        DB::beginTransaction();
         try {
             $area = $this->getAreaById($id);
 
@@ -175,13 +196,16 @@ class AreaService
             $area->update(['status' => $newStatus]);
 
             LogHelper::statusChanged('area', $area->id, $area->company_id);
+            DB::commit();
             Log::info('Area status toggled', ['area_id' => $id, 'new_status' => $newStatus]);
 
             return $area->load(['warehouse']);
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Area status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle area status');
         }

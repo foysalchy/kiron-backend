@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Cell;
 use App\Models\Rack;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CellService
@@ -61,14 +62,17 @@ class CellService
      */
     public function createCell(array $data): Cell
     {
+        DB::beginTransaction();
         try {
             $cell =Cell::create($data);
             LogHelper::created('cell', $cell->id, $cell->company_id);
+            DB::commit();
             Log::info('Cell created successfully', ['cell_id' => $cell->id]);
 
             return $cell->load(['rack']);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Cell creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create cell');
         }
@@ -80,19 +84,23 @@ class CellService
      */
     public function updateCell(int $id, array $data): Cell
     {
+        DB::beginTransaction();
         try {
             $cell = $this->getCellById($id);
 
             $cell->update($data);
 
             LogHelper::updated('cell', $cell->id, $cell->company_id);
+            DB::commit();
             Log::info('Cell Updated Successfully', ['cell_id' => $cell->id]);
 
             return $cell->fresh(['rack']);
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Cell update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update cell');
         }
@@ -102,19 +110,23 @@ class CellService
      */
     public function deleteCell(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $cell = $this->getCellById($id);
 
             $cell->delete();
 
             LogHelper::deleted('cell', $cell->id, $cell->company_id);
+            DB::commit();
             Log::info('Cell deleted successfully', ['cell_id' => $id]);
 
             return true;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Cell deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete cell');
         }

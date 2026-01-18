@@ -7,6 +7,7 @@ use App\Helpers\LogHelper;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class WarehouseService
@@ -62,14 +63,17 @@ class WarehouseService
      */
     public function createWarehouse(array $data): Warehouse
     {
+        DB::beginTransaction();
         try {
             $warehouse =Warehouse::create($data);
             LogHelper::created('warehouse', $warehouse->id, $warehouse->company_id);
+            DB::commit();
             Log::info('Warehouse created successfully', ['warehouse_id' => $warehouse->id]);
 
             return $warehouse;
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create warehouse');
         }
@@ -81,6 +85,7 @@ class WarehouseService
      */
     public function updateWarehouse(int $id, array $data): Warehouse
     {
+        DB::beginTransaction();
         try {
             $warehouse = $this->getWarehouseById($id);
 
@@ -89,11 +94,14 @@ class WarehouseService
             LogHelper::updated('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse Updated Successfully', ['warehouse_id' => $warehouse->id]);
 
+            DB::commit();
             return $warehouse->fresh();
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update warehouse');
         }
@@ -104,6 +112,7 @@ class WarehouseService
      */
     public function deleteWarehouse(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $warehouse = $this->getWarehouseById($id);
 
@@ -112,11 +121,14 @@ class WarehouseService
             LogHelper::deleted('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse deleted successfully', ['warehouse_id' => $id]);
 
+            DB::commit();
             return true;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete warehouse');
         }
@@ -128,6 +140,7 @@ class WarehouseService
 
     public function restoreWarehouse(int $id): Warehouse
     {
+        DB::beginTransaction();
         try {
            $warehouse = Warehouse::withTrashed()->find($id);
            if (!$warehouse) {
@@ -136,10 +149,13 @@ class WarehouseService
             $warehouse->restore();
             LogHelper::restored('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse restored successfully', ['warehouse_id' => $id]);
+            DB::commit();
             return $warehouse;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore warehouse');
         }
@@ -150,6 +166,7 @@ class WarehouseService
      */
     public function forceDeleteWarehouse(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $warehouse = Warehouse::withTrashed()->find($id);
 
@@ -162,11 +179,14 @@ class WarehouseService
             LogHelper::forceDeleted('warehouse', $id, $warehouse->company_id);
             Log::info('Warehouse permanently deleted', ['warehouse_id' => $id]);
 
+            DB::commit();
             return true;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete warehouse');
         }
@@ -177,6 +197,7 @@ class WarehouseService
      */
     public function toggleStatus(int $id): Warehouse
     {
+        DB::beginTransaction();
         try {
             $warehouse = $this->getWarehouseById($id);
 
@@ -186,11 +207,14 @@ class WarehouseService
             LogHelper::statusChanged('warehouse', $warehouse->id, $warehouse->company_id);
             Log::info('Warehouse status toggled', ['warehouse_id' => $id, 'new_status' => $newStatus]);
 
+            DB::commit();
             return $warehouse;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Warehouse status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle warehouse status');
         }

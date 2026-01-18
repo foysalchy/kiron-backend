@@ -69,7 +69,7 @@ class BlogService
                         2048
                     );
                 }
-                $data['images'] = $uploadedImages; 
+                $data['images'] = $uploadedImages;
             }
 
             $blog = Blog::create($data);
@@ -149,13 +149,20 @@ class BlogService
      */
     public function deleteBlog(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $blog = $this->getBlogById($id);
             $blog->delete();
 
             LogHelper::deleted('blog', $id, $blog->company_id);
+            DB::commit();
             return true;
-        } catch (\Exception $e) {
+        }catch(ApiException $e){
+            DB::rollBack();
+            throw $e;
+        }
+        catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Blog deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete blog');
         }
@@ -165,6 +172,7 @@ class BlogService
      */
     public function restoreBlog(int $id): Blog
     {
+        DB::beginTransaction();
         try {
             $blog = Blog::withTrashed()->find($id);
 
@@ -176,11 +184,13 @@ class BlogService
             LogHelper::restored('blog', $blog->id, $blog->company_id);
 
             Log::info('Blog restored successfully', ['blog_id' => $id]);
-
+            DB::commit();
             return $blog;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Blog restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore blog');
         }
@@ -221,19 +231,31 @@ class BlogService
     }
 
     /**
-     * Toggle blog status
+     * Toggle blog status (Active/Inactive)
      */
     public function toggleStatus(int $id): Blog
     {
+        DB::beginTransaction();
         try {
             $blog = $this->getBlogById($id);
-            $blog->update(['status' => !$blog->status]);
 
-            LogHelper::statusChanged('blog', $id, $blog->company_id);
+            $newStatus = $blog->status == 1 ? 0 : 1;
+            $blog->update(['status' => $newStatus]);
+
+            LogHelper::statusChanged('blog', $blog->id, $blog->company_id);
+
+            DB::commit();
+            Log::info('Blog status toggled successfully', ['blog_id' => $id, 'new_status' => $newStatus]);
+
             return $blog;
+
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Blog status toggle failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to toggle status');
+            throw ApiException::serverError('Failed to toggle blog status');
         }
     }
 }

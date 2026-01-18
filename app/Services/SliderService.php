@@ -140,6 +140,7 @@ class SliderService
      */
     public function deleteSlider(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $slider = $this->getSliderById($id);
             $slider->delete();
@@ -147,10 +148,13 @@ class SliderService
 
             Log::info('Slider deleted successfully', ['slider_id' => $id]);
 
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Slider deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete slider');
         }
@@ -161,6 +165,7 @@ class SliderService
      */
     public function restoreSlider(int $id): Slider
     {
+        DB::beginTransaction();
         try {
             $slider = Slider::withTrashed()->find($id);
 
@@ -173,10 +178,13 @@ class SliderService
 
             Log::info('Slider restored successfully', ['slider_id' => $id]);
 
+            DB::commit();
             return $slider;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Slider restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore slider');
         }
@@ -223,16 +231,20 @@ class SliderService
      */
     public function toggleStatus(int $id): Slider
     {
+        DB::beginTransaction();
         try {
             $slider = $this->getSliderById($id);
             $slider->update(['status' => !$slider->status]);
             LogHelper::statusChanged('slider', $slider->id, $slider->company_id);
             Log::info('Slider status toggled', ['slider_id' => $id]);
 
+            DB::commit();
             return $slider;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Slider status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle slider status');
         }

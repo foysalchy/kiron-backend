@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Cell;
 use App\Models\Rack;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RackService
@@ -61,14 +62,17 @@ class RackService
      */
     public function createRack(array $data): Rack
     {
+        DB::beginTransaction();
         try {
             $rack =Rack::create($data);
             LogHelper::created('rack', $rack->id, $rack->company_id);
             Log::info('Rack created successfully', ['rack_id' => $rack->id]);
 
+            DB::commit();
             return $rack->load(['area']);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Rack creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create rack');
         }
@@ -80,6 +84,7 @@ class RackService
      */
     public function updateRack(int $id, array $data): Rack
     {
+        DB::beginTransaction();
         try {
             $rack = $this->getRackById($id);
 
@@ -88,11 +93,14 @@ class RackService
             LogHelper::updated('rack', $rack->id, $rack->company_id);
             Log::info('Rack Updated Successfully', ['rack_id' => $rack->id]);
 
+            DB::commit();
             return $rack->fresh(['area']);
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Rack update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update rack');
         }
@@ -102,6 +110,7 @@ class RackService
      */
     public function deleteRack(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $rack = $this->getRackById($id);
 
@@ -110,11 +119,14 @@ class RackService
             LogHelper::deleted('rack', $rack->id, $rack->company_id);
             Log::info('Rack deleted successfully', ['rack_id' => $id]);
 
+            DB::commit();
             return true;
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Rack deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete rack');
         }
@@ -124,6 +136,7 @@ class RackService
      */
     public function restoreRack(int $id): Rack
     {
+        DB::beginTransaction();
         try {
             $rack = Rack::withTrashed()->find($id);
             if (!$rack) {
@@ -131,11 +144,14 @@ class RackService
             }
             $rack->restore();
             LogHelper::restored('rack',$rack->id,$rack->company_id);
+            DB::commit();
             return $rack->load(relations: ['area']);
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         }catch(\Exception $e)
         {
+            DB::rollBack();
             Log::error('Rack restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore data');
         }
@@ -145,6 +161,7 @@ class RackService
      */
     public function forceDeleteRack(int $id): bool
     {
+        DB::beginTransaction();
         try {
             $rack = Rack::withTrashed()->find($id);
             if (!$rack) {
@@ -152,10 +169,13 @@ class RackService
             }
             $rack->forceDelete();
             LogHelper::forceDeleted('rack', $id, $rack->company_id);
+            DB::commit();
             return true;
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Rack permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete rack');
         }
@@ -165,6 +185,7 @@ class RackService
      */
     public function toggleStatus(int $id): Rack
     {
+        DB::beginTransaction();
         try {
             $rack = $this->getRackById($id);
 
@@ -174,11 +195,14 @@ class RackService
             LogHelper::statusChanged('rack', $rack->id, $rack->company_id);
             Log::info('Rack status toggled', ['rack_id' => $id, 'new_status' => $newStatus]);
 
+            DB::commit();
             return $rack->load(['area']);
 
         } catch (ApiException $e) {
+            DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Rack status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle rack status');
         }

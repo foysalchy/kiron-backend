@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
@@ -19,11 +18,13 @@ class DepartmentController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
-            'status'     => $request->query('status'),
-            'search'     => $request->query('search'),
-            'sort_by'    => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page'   => $request->query('per_page', 15),
+            'status'            => $request->query('status'),
+            'parent_department' => $request->query('parent_department'),
+            'in_charge'         => $request->query('in_charge'),
+            'search'            => $request->query('search'),
+            'sort_by'           => $request->query('sort_by', 'created_at'),
+            'sort_order'        => $request->query('sort_order', 'desc'),
+            'per_page'          => $request->query('per_page', 15),
         ];
 
         $data = $this->departmentService->getAllDepartments($filters, true);
