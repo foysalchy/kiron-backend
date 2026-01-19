@@ -85,6 +85,16 @@ class PartyService
 
         return $party;
     }
+    public function getProfileWithLog(int $id): Party
+    {
+        $party = Party::with('logs')->find($id);
+
+        if (!$party) {
+            throw ApiException::notFound('Party');
+        }
+
+        return $party;
+    }
 
     /**
      * Create a new party

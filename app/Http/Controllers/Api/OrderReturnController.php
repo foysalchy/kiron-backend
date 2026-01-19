@@ -113,4 +113,24 @@ class OrderReturnController extends Controller
 
         return ResponseHelper::success($data, 'Order return status updated successfully');
     }
+
+    /**
+     * Restore purchase return
+     */
+    public function restore(int $id): JsonResponse
+    {
+        $data = $this->orderReturnService->restoreOrderReturn($id);
+
+        return ResponseHelper::success($data, 'Order return restored successfully');
+    }
+
+    /**
+     * Force delete purchase return
+     */
+    public function forceDestroy(int $id): JsonResponse
+    {
+        $this->orderReturnService->forceDeleteOrderReturn($id);
+
+        return ResponseHelper::success(null, 'Order return permanently deleted successfully');
+    }
 }

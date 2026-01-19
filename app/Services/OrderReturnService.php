@@ -222,7 +222,6 @@ class OrderReturnService
                 'customer',
                 'order',
                 'orderReturnDetails.product',
-                'orderReturnPayments'
             ]);
         } catch (ApiException $e) {
             DB::rollBack();
@@ -378,6 +377,72 @@ class OrderReturnService
 
             Log::error('Order return deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete order return');
+        }
+    }
+
+        public function restoreOrderReturn(int $id): OrderReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = OrderReturn::onlyTrashed()->find($id);
+
+            if (!$orderReturn) {
+                throw ApiException::notFound('Order Return');
+            }
+
+            $orderReturn->restore();
+
+            DB::commit();
+
+            Log::info('Order return restored successfully', ['order_return_id' => $id]);
+            LogHelper::custom('restored', 'ordeer_return', $id, $orderReturn->company_id);
+
+            return $orderReturn;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order return restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore order return');
+        }
+    }
+
+    /**
+     * Force delete order return
+     */
+    public function forceDeleteOrderReturn(int $id): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = OrderReturn::withTrashed()->find($id);
+
+            if (!$orderReturn) {
+                throw ApiException::notFound('Order Return');
+            }
+
+            OrderReturnDetail::where('order_return_id', $id)->delete();
+
+            $companyId = $orderReturn->company_id;
+            $orderReturn->forceDelete();
+
+            DB::commit();
+
+            Log::info('Order return permanently deleted', ['order_return_id' => $id]);
+            LogHelper::custom('force_deleted', 'order_return', $id, $companyId);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Permanent order return deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete order return');
         }
     }
 }

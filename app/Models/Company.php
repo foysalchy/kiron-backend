@@ -28,29 +28,47 @@ class Company extends Model
     protected $hidden = [
         'deleted_at',
     ];
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
     public function parties()
     {
         return $this->hasMany(Party::class);
     }
-    protected static function booted()
+    public function warehouses()
     {
-        static::deleting(function ($company) {
-
-            // soft delete
-            if (! $company->isForceDeleting()) {
-                $company->parties()->delete();
-            }
-
-            // force delete
-            if ($company->isForceDeleting()) {
-                $company->parties()->forceDelete();
-            }
-        });
-
-        static::restoring(function ($company) {
-            $company->parties()->withTrashed()->restore();
-        });
+        return $this->hasMany(Warehouse::class);
     }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+    public function coupons()
+    {
+        return $this->hasMany(Coupon::class);
+    }
+    public function requisitions()
+    {
+        return $this->hasMany(Requisition::class);
+    }
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
+    public function purchaseReturns()
+    {
+        return $this->hasMany(PurchaseReturn::class);
+    }
+    public function orderReturns()
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
 
     // Scopes
     public function scopeActive($query)

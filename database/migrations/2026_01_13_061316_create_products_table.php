@@ -39,6 +39,7 @@ return new class extends Migration
             // Stock
             $table->enum('stock_status', ['in_stock', 'out_of_stock'])->default('in_stock');
             $table->integer('stock_quantity')->default(0);
+            $table->integer('available_stock')->default(0);
             
             // Pricing
             $table->decimal('regular_price', 15, 2);

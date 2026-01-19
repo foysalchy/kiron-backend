@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
+use App\Models\Product;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -67,12 +68,48 @@ class StoreOrderRequest extends BaseCompanyRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Either customer_id or is_walk_in must be provided
+
+            // 1️⃣ Either customer_id or is_walk_in must be provided
             if (!$this->customer_id && !$this->is_walk_in) {
-                $validator->errors()->add('customer_id', 'Either customer or walk-in flag is required');
+                $validator->errors()->add(
+                    'customer_id',
+                    'Either customer or walk-in flag is required'
+                );
+            }
+
+            // 2️⃣ Stock quantity validation
+            if ($this->has('items') && is_array($this->items)) {
+
+                $user = $this->user();
+                $companyId = $user->isSuperAdmin()
+                    ? $this->input('company_id')
+                    : $user->company_id;
+
+                foreach ($this->items as $index => $item) {
+
+                    if (!isset($item['product_id'], $item['quantity'])) {
+                        continue;
+                    }
+
+                    $product = Product::where('id', $item['product_id'])
+                        ->where('company_id', $companyId)
+                        ->first();
+
+                    if (! $product) {
+                        continue; // product exists rule already handles this
+                    }
+
+                    if ($item['quantity'] > $product->available_stock) {
+                        $validator->errors()->add(
+                            "items.$index.quantity",
+                            "Requested quantity ({$item['quantity']}) exceeds available stock ({$product->available_stock})."
+                        );
+                    }
+                }
             }
         });
     }
+
 
     public function messages(): array
     {

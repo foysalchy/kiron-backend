@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Order, OrderDetail, OrderPayment};
+use App\Models\{Order, OrderDetail, OrderPayment, Product};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -197,6 +197,9 @@ class OrderService
                     'tax' => $item['tax'] ?? 0,
                     'total' => $itemTotal,
                 ]);
+                $product=Product::where('id',$item['product_id'])->first();
+                $product->available_stock=$product->available_stock-$item['quantity'];
+                $product->update();
             }
 
             // Create payments (for both POS and Sales if provided)

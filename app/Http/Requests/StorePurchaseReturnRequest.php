@@ -3,9 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
-use App\Models\{PurchaseDetail, PurchaseReturnDetail};
+use App\Models\{Party, PurchaseDetail, PurchaseReturnDetail};
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StorePurchaseReturnRequest extends BaseCompanyRequest
 {
@@ -16,11 +17,18 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
 
     public function rules(): array
     {
+
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin()
+            ? $this->input('company_id')
+            : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
-                'purchase_id' => ['required', 'exists:purchases,id'],
-                'supplier_id' => ['required', 'exists:parties,id'],
+                'purchase_id' => ['required', Rule::exists('purchases', 'id')
+                    ->where('company_id', $companyId)],
+                'supplier_id' => ['required', Rule::exists('parties', 'id')->where('type', Party::TYPE_SUPPLIER)
+                    ->where('company_id', $companyId)],
                 'return_date' => ['required', 'date'],
                 'reason' => ['nullable', 'string'],
                 'return_date' => ['required', 'date'],
