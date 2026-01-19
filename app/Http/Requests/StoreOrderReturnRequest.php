@@ -3,11 +3,12 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
-use App\Models\{PurchaseDetail, PurchaseReturnDetail};
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Models\OrderDetail;
+use Illuminate\Validation\Rule;
 
-class StorePurchaseReturnRequest extends BaseCompanyRequest
+class StoreOrderReturnRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -16,13 +17,15 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
 
     public function rules(): array
     {
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin()
+            ? $this->input('company_id')
+            : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
-                'purchase_id' => ['required', 'exists:purchases,id'],
-                'supplier_id' => ['required', 'exists:parties,id'],
-                'return_date' => ['required', 'date'],
-                'reason' => ['nullable', 'string'],
+                'order_id' => ['required',   Rule::exists('orders', 'id')
+                    ->where('company_id', $companyId),],
                 'return_date' => ['required', 'date'],
                 'reason' => ['nullable', 'string'],
 
@@ -52,18 +55,18 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->has('items') && $this->has('purchase_id')) {
-                $this->validatePurchaseReturnItems($validator);
+            if ($this->has('items') && $this->has('order_id')) {
+                $this->validateReturnItems($validator);
             }
         });
     }
 
     /**
-     * Validate purchase return items
+     * Validate return items against original order
      */
-    protected function validatePurchaseReturnItems($validator)
+    protected function validateReturnItems($validator)
     {
-        $purchaseId = $this->input('purchase_id');
+        $orderId = $this->input('order_id');
         $items = $this->input('items', []);
 
         foreach ($items as $index => $item) {
@@ -74,24 +77,26 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
                 continue;
             }
 
-            // Check if product exists in purchase details with the given purchase_id
-            $purchaseDetail = PurchaseDetail::where('purchase_id', $purchaseId)
+            // Check if product exists in order details
+            $orderDetail = OrderDetail::where('order_id', $orderId)
                 ->where('product_id', $productId)
                 ->first();
 
-            if (!$purchaseDetail) {
+            if (!$orderDetail) {
                 $validator->errors()->add(
                     "items.{$index}.product_id",
-                    "Product does not exist in the selected purchase."
+                    "Product does not exist in the selected order."
                 );
                 continue;
             }
 
 
-            if ($returnQuantity > $purchaseDetail->quantity) {
+
+
+            if ($returnQuantity > $orderDetail->quantity) {
                 $validator->errors()->add(
                     "items.{$index}.quantity",
-                    " Purchased: {$purchaseDetail->quantity}, Request to returned: {$returnQuantity}."
+                    " Order : {$orderDetail->quantity}, Request to returned: {$returnQuantity}."
                 );
             }
         }
@@ -102,14 +107,13 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'purchase_id.required' => 'Purchase is required',
-                'supplier_id.required' => 'Supplier is required',
+                'order_id.required' => 'Order is required',
+                'order_id.exists' => 'Selected order does not belong to your company.',
                 'return_date.required' => 'Return date is required',
-
                 'items.required' => 'At least one item is required',
                 'items.*.product_id.required' => 'Product is required for each item',
                 'items.*.quantity.required' => 'Quantity is required',
-                'items.*.quantity.min' => 'Quantity must be at least 1',
+                'items.*.unit_price.required' => 'Unit price is required',
             ]
         );
     }

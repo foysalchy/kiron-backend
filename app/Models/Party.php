@@ -26,6 +26,7 @@ class Party extends Model
         'address',
         'balance',
         'profile',
+        'password',
         'status',
     ];
 

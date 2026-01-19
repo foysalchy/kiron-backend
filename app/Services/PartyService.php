@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class PartyService
 {
@@ -28,8 +29,23 @@ class PartyService
 
             // Filter by status
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if($filters['status']==3){
+                    $query->onlyTrashed();
+                }else{
+                    $query->where('status', $filters['status']);
+                }
+               
             }
+            if (isset($filters['balance'])) {
+                if ($filters['balance'] === 'pay') {
+                    // Balance < 0
+                    $query->whereRaw('(balance + 0) < 0');
+                } elseif ($filters['balance'] === 'receive') {
+                    // Balance > 0
+                    $query->whereRaw('(balance + 0) > 0');
+                }
+            }
+
 
 
 
@@ -87,7 +103,7 @@ class PartyService
                     2048
                 );
             }
-
+            $data['password']=Hash::make($data['password']);
             $party = Party::create($data);
             LogHelper::created('party', $party->id, $party->company_id);
 

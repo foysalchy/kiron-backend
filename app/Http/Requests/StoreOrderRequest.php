@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
 
-class StorePosOrderRequest extends BaseCompanyRequest
+class StoreOrderRequest extends BaseCompanyRequest
 {
     public function authorize(): bool
     {
@@ -46,11 +46,15 @@ class StorePosOrderRequest extends BaseCompanyRequest
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
 
+                'other_charges' => ['nullable', 'numeric', 'min:0'],
+                'discount_on_all' => ['nullable', 'numeric', 'min:0'],
+                'round_off' => ['nullable', 'numeric'],
+
                 'coupon_code' => ['nullable', 'string', 'exists:coupons,code'],
 
-                'payments' => ['required', 'array', 'min:1'],
-                'payments.*.amount' => ['required', 'numeric', 'min:0'],
-                'payments.*.payment_method' => ['required', 'string', 'in:cash,card,bank,mobile_banking'],
+                'payments' => ['nullable', 'array'],
+                'payments.*.amount' => ['required_with:payments', 'numeric', 'min:0'],
+                'payments.*.payment_method' => ['required_with:payments', 'string', 'in:cash,bank,card,cheque,mobile_banking'],
                 'payments.*.reference_no' => ['nullable', 'string'],
                 'payments.*.note' => ['nullable', 'string'],
 
