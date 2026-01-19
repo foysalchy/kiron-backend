@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -437,6 +438,17 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/change-status', [AttendanceController::class, 'changeStatus']);
             Route::get('{id}/restore', [AttendanceController::class, 'restore']);
             Route::delete('{id}/force', [AttendanceController::class, 'forceDestroy']);
+        });
+        //payheads routes
+        Route::prefix('pay-heads')->group(function () {
+            Route::get('/', [PayHeadController::class, 'index']);
+            Route::post('/', [PayHeadController::class, 'store']);
+            Route::get('/{id}', [PayHeadController::class, 'show']);
+            Route::post('/update/{id}', [PayHeadController::class, 'update']);
+            Route::delete('/{id}', [PayHeadController::class, 'destroy']);
+            Route::patch('/{id}/toggle-status', [PayHeadController::class, 'toggleStatus']);
+            Route::get('{id}/restore', [PayHeadController::class, 'restore']);
+            Route::delete('{id}/force', [PayHeadController::class, 'forceDestroy']);
         });
     });
 });
