@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AreaController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
@@ -81,7 +82,7 @@ Route::prefix('v1')->group(function () {
             Route::get('search', [PartyController::class, 'search']);
             Route::get('suppliers', [PartyController::class, 'getSuppliers']);
             Route::get('customers', [PartyController::class, 'getCustomers']);
-            
+
             Route::get('/', [PartyController::class, 'index']);
             Route::post('/', [PartyController::class, 'store']);
             Route::get('/{id}', [PartyController::class, 'show']);
@@ -356,7 +357,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
             Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
             Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
-     
+
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);
@@ -425,6 +426,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [EmployeeController::class, 'restore']);
             Route::delete('/{id}/force', [EmployeeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [EmployeeController::class, 'toggleStatus']);
+        });
+        //attendance routes
+        Route::prefix('attendances')->group(function () {
+            Route::get('/', [AttendanceController::class, 'index']);
+            Route::post('/', [AttendanceController::class, 'store']);
+            Route::get('/{id}', [AttendanceController::class, 'show']);
+            Route::post('/update/{id}', [AttendanceController::class, 'update']);
+            Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [AttendanceController::class, 'changeStatus']);
+            Route::get('{id}/restore', [AttendanceController::class, 'restore']);
+            Route::delete('{id}/force', [AttendanceController::class, 'forceDestroy']);
         });
     });
 });

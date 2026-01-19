@@ -38,7 +38,7 @@ class OfficeLocationController extends Controller
      */
     public function store(StoreOfficeLocationRequest $request): JsonResponse
     {
-        // $request->validated() 
+        // $request->validated()
         $data = $this->locationService->createLocation($request->validated());
 
         return ResponseHelper::success($data, 'Office location created successfully', 201);

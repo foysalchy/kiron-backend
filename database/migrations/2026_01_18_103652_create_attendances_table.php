@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('working_hours')->nullable();
             $table->time('late_time')->nullable();
             $table->time('over_time')->nullable();
-            $table->string('status')->default('Present')->comment('Present, Absent, Weekend, Late, early-out,holiday');
+            $table->tinyInteger('status')->default('1')->comment('1=Present, 0=Absent, 2=Weekend, 3=Late, 4=Early_Out, 5=Holiday');
             $table->boolean('is_late')->default(false);
             $table->boolean('is_early_out')->default(false);
             $table->timestamps();

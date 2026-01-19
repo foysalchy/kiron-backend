@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Attendance;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class StoreAttendanceRequest extends BaseCompanyRequest
 {
@@ -24,15 +26,30 @@ class StoreAttendanceRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin() ? $this->input('company_id') : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
-                'employee_id'  => ['required', 'exists:employees,id'],
+                'employee_id' => [
+                    'required',
+                    Rule::exists('employees', 'id')->where('company_id', $companyId),
+                ],
                 'date'         => ['required', 'date'],
                 'in_time'      => ['nullable', 'date_format:H:i'],
                 'out_time'     => ['nullable', 'date_format:H:i', 'after:in_time'],
                 'grace_time'   => ['nullable', 'integer', 'min:0'],
-                'status'       => ['required', 'string', 'in:Present,Absent,Weekend,Late,early-out,holiday'],
+                'status'       => [
+                    'required',
+                    Rule::in([
+                        Attendance::STATUS_ABSENT,
+                        Attendance::STATUS_PRESENT,
+                        Attendance::STATUS_WEEKEND,
+                        Attendance::STATUS_LATE,
+                        Attendance::STATUS_EARLY_OUT,
+                        Attendance::STATUS_HOLIDAY
+                    ])
+                ],
                 'is_late'      => ['boolean'],
                 'is_early_out' => ['boolean'],
             ]
@@ -44,11 +61,10 @@ class StoreAttendanceRequest extends BaseCompanyRequest
             $this->companyMessages(),
             [
                 'employee_id.required' => 'Employee selection is mandatory.',
-                'employee_id.exists'   => 'The selected employee does not exist.',
+                'employee_id.exists'   => 'The selected employee does not belong to the company.',
                 'date.required'        => 'Attendance date is required.',
-                'in_time.date_format'  => 'In-time must be in HH:mm format.',
-                'out_time.after'       => 'Out-time must be after in-time.',
                 'status.required'      => 'Attendance status is required.',
+                'status.in'            => 'Invalid attendance status provided.',
             ]
         );
     }
