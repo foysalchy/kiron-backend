@@ -158,7 +158,7 @@ class PurchaseReturnService
                 throw ApiException::badRequest('Cannot update cancelled purchase return');
             }
 
-            if ($purchaseReturn->isCompleted()) {
+            if ($purchaseReturn->isCleared()) {
                 throw ApiException::badRequest('Cannot update completed purchase return');
             }
 
@@ -167,9 +167,9 @@ class PurchaseReturnService
 
             // If items are provided, recalculate totals
             if ($items) {
-                $purchaseId = $data['purchase_id'] ?? $purchaseReturn->purchase_id;
 
-                $totals = $this->calculateTotals($items, $purchaseId);
+
+                $totals = $this->calculateTotals($items, $data);
                 $data = array_merge($data, $totals);
 
                 // Delete old details and create new ones
@@ -207,6 +207,54 @@ class PurchaseReturnService
 
             Log::error('Purchase return update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update purchase return');
+        }
+    }
+    /**
+     * Add payment to return
+     */
+    public function addPayment(int $id, array $paymentData): PurchaseReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchaseReturn = $this->getPurchaseReturnById($id);
+
+            // Cannot add payment to cancelled return
+            if ($purchaseReturn->isCancelled()) {
+                throw ApiException::badRequest('Cannot add payment to cancelled return');
+            }
+
+            // Create payment
+            PurchasePaymentReturn::create([
+                'purchase_return_id' => $id,
+                'amount' => $paymentData['amount'],
+                'payment_method' => $paymentData['payment_method'],
+                'reference_no' => $paymentData['reference_no'] ?? null,
+                'note' => $paymentData['note'] ?? null,
+            ]);
+
+            // Update refund amount
+            $totalRefund = $purchaseReturn->purchaseReturnPayments()->sum('amount') + $paymentData['amount'];
+            $purchaseReturn->update(['refund_amount' => $totalRefund]);
+
+            DB::commit();
+
+            Log::info('Payment added to return', ['order_return_id' => $id]);
+            LogHelper::custom('payment_added', 'order_return', $id, $purchaseReturn->company_id);
+
+            return $purchaseReturn->fresh([
+                'purchase',
+                'supplier',
+                'purchaseReturnDetails.product'
+            ]);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Add payment failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to add payment');
         }
     }
 

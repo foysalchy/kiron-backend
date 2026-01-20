@@ -3,9 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\UpdateBaseCompanyRequest;
-use App\Models\{PurchaseDetail, PurchaseReturnDetail};
+use App\Models\{Party, PurchaseDetail, PurchaseReturnDetail};
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
 {
@@ -16,11 +17,17 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
 
     public function rules(): array
     {
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin()
+            ? $this->input('company_id')
+            : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
-                'purchase_id' => ['sometimes', 'exists:purchases,id'],
-                'supplier_id' => ['sometimes', 'exists:parties,id'],
+                'purchase_id' => ['sometimes', Rule::exists('purchases', 'id')
+                    ->where('company_id', $companyId)],
+                'supplier_id' => ['sometimes', Rule::exists('parties', 'id')->where('type', Party::TYPE_SUPPLIER)
+                    ->where('company_id', $companyId)],
                 'return_date' => ['sometimes', 'date'],
 
                 'items' => ['sometimes', 'array', 'min:1'],
@@ -49,7 +56,6 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
     {
         $purchaseId = $this->input('purchase_id');
         $items = $this->input('items', []);
-        $currentReturnId = $this->route('id') ?? $this->route('purchase_return');
 
         foreach ($items as $index => $item) {
             $productId = $item['product_id'] ?? null;
@@ -59,7 +65,7 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
                 continue;
             }
 
-            // Check if product exists in purchase details
+            // Check if product exists in purchase details with the given purchase_id
             $purchaseDetail = PurchaseDetail::where('purchase_id', $purchaseId)
                 ->where('product_id', $productId)
                 ->first();
@@ -72,9 +78,8 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
                 continue;
             }
 
-            $availableQuantity = $purchaseDetail->quantity;
 
-            if ($returnQuantity > $availableQuantity) {
+            if ($returnQuantity > $purchaseDetail->quantity) {
                 $validator->errors()->add(
                     "items.{$index}.quantity",
                     " Purchased: {$purchaseDetail->quantity}, Request to returned: {$returnQuantity}."

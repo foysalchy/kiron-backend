@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
@@ -72,6 +73,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [CompanyController::class, 'store']);
             Route::get('/{id}', [CompanyController::class, 'show']);
             Route::post('/update/{id}', [CompanyController::class, 'update'])->name('company');
+            Route::get('/{id}/delation-summary', [CompanyController::class, 'deletionSummary']);
+            Route::get('/{id}/can-delete', [CompanyController::class, 'canDeleteCompany']);
             Route::delete('/{id}', [CompanyController::class, 'destroy']);
             Route::get('/{id}/restore', [CompanyController::class, 'restore']);
             Route::delete('/{id}/force', [CompanyController::class, 'forceDestroy']);
@@ -93,6 +96,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [PartyController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PartyController::class, 'toggleStatus']);
             Route::patch('/{id}/update-balance', [PartyController::class, 'updateBalance']);
+            Route::get('/{id}/profile', [PartyController::class, 'profile']);
         });
 
         //attribute group
@@ -321,6 +325,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/change-status', [PurchaseReturnController::class, 'changeStatus']);
             Route::get('{id}/restore', [PurchaseReturnController::class, 'restore']);
             Route::delete('{id}/force', [PurchaseReturnController::class, 'forceDestroy']);
+            Route::post('/{id}/add-payment', [PurchaseReturnController::class, 'addPayment']);
         });
         Route::prefix('coupons')->group(function () {
             Route::get('/', [CouponController::class, 'index']);
@@ -340,7 +345,6 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [PosOrderController::class, 'complete']);
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
-
         });
         Route::prefix('sales-order')->group(function () {
             Route::get('/', [SalesOrderController::class, 'index']);
@@ -358,6 +362,12 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
             Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
             Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
+
+            Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
+            Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
+        });
+        Route::prefix('inventroy')->group(function () {
+            Route::get('/summary', [InventroyController::class, 'index']);
 
         });
         Route::prefix('requisitions')->group(function () {

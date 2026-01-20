@@ -7,13 +7,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreCompanyRequest, UpdateCompanyRequest};
 use App\Services\CompanyService;
 use App\Exceptions\ApiException;
+use App\Services\CompanyDeletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
     public function __construct(
-        protected CompanyService $companyService
+        protected CompanyService $companyService,
+        protected CompanyDeletionService $companyDelationService
     ) {}
 
 
@@ -59,15 +61,27 @@ class CompanyController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
-        $this->companyService->deleteCompany($id);
+        $this->companyDelationService->softDelete($id);
 
         return ResponseHelper::success(null, 'Company deleted successfully');
+    }
+    public function deletionSummary(int $id): JsonResponse
+    {
+        $data = $this->companyDelationService->getDeletionSummary($id);
+
+        return ResponseHelper::success($data, 'Company deletion summary retrived successfully');
+    }
+    public function canDeleteCompany(int $id): JsonResponse
+    {
+        $data =  $this->companyDelationService->canDelete($id);
+
+        return ResponseHelper::success($data, 'Company deletion check');
     }
 
 
     public function restore(int $id): JsonResponse
     {
-        $company = $this->companyService->restoreCompany($id);
+        $company = $this->companyDelationService->restore($id);
 
         return ResponseHelper::success($company, 'Company restored successfully');
     }
@@ -75,7 +89,7 @@ class CompanyController extends Controller
 
     public function forceDestroy(int $id): JsonResponse
     {
-        $this->companyService->forceDeleteCompany($id);
+        $this->companyDelationService->forceDelete($id);
 
         return ResponseHelper::success(null, 'Company permanently deleted');
     }
