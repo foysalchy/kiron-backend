@@ -14,8 +14,7 @@ class EmployeeController extends Controller
 {
     public function __construct(
         protected EmployeeService $employeeService
-    )
-    {}
+    ){}
     public function index(Request $request):JsonResponse
     {
     $filters = [

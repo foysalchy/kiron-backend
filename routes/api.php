@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AreaController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -360,11 +362,13 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
             Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
             Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
+
             Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
             Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
         });
         Route::prefix('inventroy')->group(function () {
             Route::get('/summary', [InventroyController::class, 'index']);
+
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);
@@ -433,6 +437,28 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [EmployeeController::class, 'restore']);
             Route::delete('/{id}/force', [EmployeeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [EmployeeController::class, 'toggleStatus']);
+        });
+        //attendance routes
+        Route::prefix('attendances')->group(function () {
+            Route::get('/', [AttendanceController::class, 'index']);
+            Route::post('/', [AttendanceController::class, 'store']);
+            Route::get('/{id}', [AttendanceController::class, 'show']);
+            Route::post('/update/{id}', [AttendanceController::class, 'update']);
+            Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+            Route::patch('/{id}/change-status', [AttendanceController::class, 'changeStatus']);
+            Route::get('{id}/restore', [AttendanceController::class, 'restore']);
+            Route::delete('{id}/force', [AttendanceController::class, 'forceDestroy']);
+        });
+        //payheads routes
+        Route::prefix('pay-heads')->group(function () {
+            Route::get('/', [PayHeadController::class, 'index']);
+            Route::post('/', [PayHeadController::class, 'store']);
+            Route::get('/{id}', [PayHeadController::class, 'show']);
+            Route::post('/update/{id}', [PayHeadController::class, 'update']);
+            Route::delete('/{id}', [PayHeadController::class, 'destroy']);
+            Route::patch('/{id}/toggle-status', [PayHeadController::class, 'toggleStatus']);
+            Route::get('{id}/restore', [PayHeadController::class, 'restore']);
+            Route::delete('{id}/force', [PayHeadController::class, 'forceDestroy']);
         });
     });
 });
