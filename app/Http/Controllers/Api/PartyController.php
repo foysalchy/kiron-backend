@@ -48,6 +48,12 @@ class PartyController extends Controller
 
         return ResponseHelper::success($party, 'Party retrieved successfully');
     }
+    public function profile(int $id): JsonResponse
+    {
+        $party = $this->partyService->getProfileWithLog($id);
+
+        return ResponseHelper::success($party, 'Party retrieved successfully');
+    }
 
 
     public function update(UpdatePartyRequest $request, int $id): JsonResponse

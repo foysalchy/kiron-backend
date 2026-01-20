@@ -79,6 +79,10 @@ class PurchaseReturn extends Model
     {
         return $this->hasMany(PurchaseReturnDetail::class);
     }
+    public function purchaseReturnPayments(): HasMany
+    {
+        return $this->hasMany(PurchasePaymentReturn::class);
+    }
 
     /**
      * Status helper methods

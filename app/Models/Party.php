@@ -6,11 +6,12 @@ use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Party extends Model
 {
-    use HasFactory, SoftDeletes,CompanyScoped;
+    use HasFactory, SoftDeletes, CompanyScoped;
 
     // Type constants
     const TYPE_SUPPLIER = 1;
@@ -30,7 +31,7 @@ class Party extends Model
         'status',
     ];
 
-   
+
 
     protected $hidden = [
         'deleted_at',
@@ -39,13 +40,18 @@ class Party extends Model
 
     protected $appends = [
         'type_text',
-        
+
     ];
 
     // Relationships
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function logs(): HasMany
+    {
+        return $this->hasMany(ActionLog::class, 'action_id', 'id')
+            ->where('module', 'party');
     }
 
     // Scopes
@@ -74,7 +80,7 @@ class Party extends Model
         return $query->where('company_id', $companyId);
     }
 
-   
+
 
     // Accessors
     public function getTypeTextAttribute(): string
@@ -82,7 +88,7 @@ class Party extends Model
         return $this->type === self::TYPE_SUPPLIER ? 'Supplier' : 'Customer';
     }
 
-  
+
     public function getProfileUrlAttribute(): ?string
     {
         return $this->profile ? asset('storage/' . $this->profile) : null;
@@ -98,6 +104,4 @@ class Party extends Model
     {
         return $this->type === self::TYPE_CUSTOMER;
     }
-
-   
 }

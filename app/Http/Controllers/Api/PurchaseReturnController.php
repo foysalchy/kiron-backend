@@ -65,6 +65,27 @@ class PurchaseReturnController extends Controller
 
         return ResponseHelper::success($data, 'Purchase return updated successfully');
     }
+    /**
+     * Add payment to return
+     */
+    public function addPayment(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0',
+            'payment_method' => 'required|string|in:cash,card,bank,mobile_banking,cheque',
+            'reference_no' => 'nullable|string',
+            'note' => 'nullable|string',
+        ]);
+
+        $data = $this->purchaseReturnService->addPayment($id, $request->only([
+            'amount',
+            'payment_method',
+            'reference_no',
+            'note'
+        ]));
+
+        return ResponseHelper::success($data, 'Payment added successfully');
+    }
 
     /**
      * Delete purchase return

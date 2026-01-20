@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
+use App\Models\Party;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,7 @@ class StorePurchaseRequest extends BaseCompanyRequest
                     'required',
                     Rule::exists('parties', 'id')
                         ->where('company_id', $companyId)
-                        ->where('type', 1),
+                        ->where('type', Party::TYPE_SUPPLIER),
                 ],
                 'reference_no' => ['required', 'string', 'max:255', 'unique:purchases,reference_no'],
                 'purchase_date' => ['required', 'date'],

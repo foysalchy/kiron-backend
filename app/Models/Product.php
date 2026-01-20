@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class Product extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
@@ -27,6 +27,7 @@ class Product extends Model
         'extra_category_ids',
         'short_description',
         'full_description',
+        'warehouse_info',
         'type',
         'sku_codes',
         'stock_status',
@@ -43,6 +44,7 @@ class Product extends Model
         'sub_category_ids' => 'array',
         'mini_category_ids' => 'array',
         'extra_category_ids' => 'array',
+        'warehouse_info' => 'array',
         'sku_codes' => 'array',
         'stock_quantity' => 'integer',
         'regular_price' => 'decimal:2',
@@ -66,6 +68,9 @@ class Product extends Model
                     $product->slug = $originalSlug . '-' . $count;
                     $count++;
                 }
+            }
+            if (empty($product->available_stock)) {
+                $product->available_stock = $product->stock_quantity ?? 0;
             }
         });
     }
@@ -162,8 +167,8 @@ class Product extends Model
         return $this->stock_status === 'in_stock' && $this->stock_quantity > 0;
     }
 
-  
-    public static function loadCategoriesForCollection($products) : Collection
+
+    public static function loadCategoriesForCollection($products): Collection
     {
         if ($products->isEmpty()) {
             return $products;
