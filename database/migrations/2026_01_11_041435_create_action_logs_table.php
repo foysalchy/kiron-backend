@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->unsignedBigInteger('action_id');
             $table->string('action');
+            $table->string('action_type')->nullable();
             $table->string('module');
             $table->timestamps();
             $table->softDeletes();

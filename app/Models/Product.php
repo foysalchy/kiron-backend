@@ -32,6 +32,7 @@ class Product extends Model
         'sku_codes',
         'stock_status',
         'stock_quantity',
+        'available_stock',
         'regular_price',
         'discount_type',
         'discount',
@@ -83,7 +84,7 @@ class Product extends Model
 
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Brand::class)->select('id','name');
     }
 
     public function galleries(): HasMany
@@ -113,7 +114,7 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->where('stock_status', 'in_stock');
+        return $query->where('stock_status', 'in_stock')->select('id','brand_id','title','thumbnail','available_stock','stock_quantity','stock_status');
     }
 
 
