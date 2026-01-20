@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pay_rolls', function (Blueprint $table) {
+        Schema::create('pay_roll_pay_heads', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('payroll_type')->comment('weekly, monthly, quarterly,tri_annual,bi_annual,annual');
-            $table->string('payment_type')->nullable()->comment('cash, bank, card, cheque, bkash');
+            $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
+            $table->foreignId('pay_head_id')->constrained('pay_heads')->cascadeOnDelete();
+            $table->string('type')->comment('amount');
+            $table->decimal('amount', 15, 2)->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pay_rolls');
+        Schema::dropIfExists('pay_roll_pay_heads');
     }
 };

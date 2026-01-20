@@ -28,7 +28,6 @@ class StorePayHeadRequest extends BaseCompanyRequest
                 'name'        => ['required', 'string', 'max:255'],
                 'type'        => ['required', Rule::in(['addition', 'deduction'])],
                 'description' => ['nullable', 'string'],
-                'status'      => ['nullable', 'integer', 'in:0,1'],
             ]);
 
     }

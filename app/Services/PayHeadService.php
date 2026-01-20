@@ -199,28 +199,4 @@ class PayHeadService
         }
     }
 
-    /**
-     * Toggle pay head status
-     */
-    public function toggleStatus(int $id): PayHead
-    {
-        try {
-            $payHead = $this->getPayHeadById($id);
-            $payHead->update(['status' => !$payHead->status]);
-            LogHelper::statusChanged('payHead', $payHead->id, $payHead->company_id);
-
-            Log::info('Pay head status toggled', [
-                'pay_head_id' => $id,
-                'new_status' => $payHead->status
-            ]);
-
-            return $payHead;
-        } catch (ApiException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('Pay head status toggle failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to toggle pay head status');
-        }
-    }
-
 }

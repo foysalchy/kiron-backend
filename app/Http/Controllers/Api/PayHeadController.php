@@ -93,13 +93,5 @@ class PayHeadController extends Controller
         return ResponseHelper::success(null, 'Pay head permanently deleted');
     }
 
-    /**
-     * Toggle pay head status (Active/Inactive).
-     */
-    public function toggleStatus(int $id): JsonResponse
-    {
-        $payHead = $this->payHeadService->toggleStatus($id);
 
-        return ResponseHelper::success($payHead, 'Pay head status updated successfully');
-    }
 }

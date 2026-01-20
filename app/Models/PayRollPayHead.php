@@ -5,33 +5,35 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PayRoll extends Model
+class PayRollPayHead extends Model
 {
     use SoftDeletes,CompanyScoped;
     protected $fillable = [
         'company_id',
-        'name',
-        'payroll_type',
-        'payment_type',
+        'pay_roll_id',
+        'pay_head_id',
+        'type',
+        'amount',
     ];
     protected $hidden = ['deleted_at'];
-    // Scopes
-
+        // Scopes
     public function scopeByCompany($query, int $companyId)
     {
         return $query->where('company_id', $companyId);
     }
-    // Relationships
+        // Relationships
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
-    public function positions(): HasMany
+    public function payRoll(): BelongsTo
     {
-        return $this->hasMany(Position::class);
+        return $this->belongsTo(PayRoll::class);
     }
-
+    public function payHead(): BelongsTo
+    {
+        return $this->belongsTo(PayHead::class);
+    }
 }
