@@ -29,12 +29,11 @@ class PartyService
 
             // Filter by status
             if (isset($filters['status'])) {
-                if($filters['status']==3){
+                if ($filters['status'] == 3) {
                     $query->onlyTrashed();
-                }else{
+                } else {
                     $query->where('status', $filters['status']);
                 }
-               
             }
             if (isset($filters['balance'])) {
                 if ($filters['balance'] === 'pay') {
@@ -87,7 +86,7 @@ class PartyService
     }
     public function getProfileWithLog(int $id): Party
     {
-        $party = Party::with('logs')->find($id);
+        $party = Party::with('logs.user:id,name')->find($id);
 
         if (!$party) {
             throw ApiException::notFound('Party');
@@ -113,7 +112,7 @@ class PartyService
                     2048
                 );
             }
-            $data['password']=Hash::make($data['password']);
+            $data['password'] = Hash::make($data['password']);
             $party = Party::create($data);
             LogHelper::created('party', $party->id, $party->company_id);
 
@@ -306,16 +305,21 @@ class PartyService
         try {
             $party = $this->getPartyById($id);
 
+            $action = null;
+
             if ($data['type'] === 'add') {
                 $party->balance += $data['amount'];
+                $action = 'balance_add';
             } elseif ($data['type'] === 'subtract') {
-                $party->balance -=  $data['amount'];
+                $party->balance -= $data['amount'];
+                $action = 'balance_subtract';
             } elseif ($data['type'] === 'set') {
-                $party->balance =  $data['amount'];
+                $party->balance = $data['amount'];
+                $action = 'balance_set';
             }
 
             $party->save();
-            LogHelper::custom('balance_updated', 'party', $id, $party->company_id);
+            LogHelper::custom($action, 'party', $id, $party->company_id, $data['amount']);
 
             DB::commit();
 
