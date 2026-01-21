@@ -12,7 +12,7 @@ class Position extends Model
     use SoftDeletes,CompanyScoped;
     protected $fillable = [
         'company_id',
-        'pay_roll_id',
+        'pay_roll_id', 
         'name',
         'type',
         'head_count',

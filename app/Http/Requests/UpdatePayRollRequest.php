@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class UpdatePayRollRequest extends UpdateBaseCompanyRequest
 {
@@ -22,8 +25,41 @@ class UpdatePayRollRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-        return [
-            //
-        ];
+        return array_merge(
+            $this->companyRules(),
+            [
+                'name'         => ['sometimes', 'required', 'string', 'max:255'],
+                'payroll_type' => ['sometimes','required','string',Rule::in(['weekly', 'monthly', 'quarterly', 'tri_annual', 'bi_annual', 'annual'])],
+                'payment_type' => ['nullable','string',Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash', 'nagad'])],
+            ]
+        );
+    }
+    /**
+     * Custom messages for validation errors.
+     */
+    public function messages(): array
+    {
+        return array_merge(
+            $this->companyMessages(),
+            [
+                'name.required'         => 'Payroll name cannot be empty.',
+                'payroll_type.required' => 'Payroll period is required.',
+                'payroll_type.in'       => 'Invalid payroll period selected.',
+            ]
+        );
+    }
+
+    /**
+     * Handle a failed validation attempt.
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422)
+        );
     }
 }

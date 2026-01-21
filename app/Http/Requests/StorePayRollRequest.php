@@ -30,8 +30,8 @@ class StorePayRollRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'name' => ['required', 'string', 'max:255'],
-                'payroll_type' => ['required', Rule::in(['fixed', 'hourly', 'contractual'])],
-                'payment_type' => ['required', Rule::in(['monthly', 'weekly', 'bi-weekly', 'daily'])],
+                'payroll_type' => ['required', Rule::in(['weekly', 'monthly', 'quarterly', 'tri_annual', 'bi_annual', 'annual'])],
+                'payment_type' => ['required', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash',])],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]
         );

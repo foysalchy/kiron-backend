@@ -6,9 +6,8 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Validation\Rule;
 
-class UpdatePayHeadRequest extends UpdateBaseCompanyRequest
+class UpdatePayRollPayHeadRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,24 +24,20 @@ class UpdatePayHeadRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-        return array_merge(
-            $this->companyRules(),
-            [
-                'name' => ['sometimes', 'required', 'string', 'max:255'],
-                'type' => ['sometimes', 'required', 'string', Rule::in(['addition', 'deduction'])],
-                'description' => ['nullable', 'string'],
-            ]
-        );
+       return array_merge($this->companyRules(), [
+            'pay_roll_id'   => ['sometimes', 'required', 'exists:pay_rolls,id'],
+            'pay_head_name' => ['sometimes', 'required', 'exists:pay_heads,name'],
+            'type'          => ['sometimes', 'required', 'string'],
+            'amount'        => ['sometimes', 'required', 'numeric', 'min:0'],
+        ]);
     }
     public function messages(): array
     {
-        return array_merge(
-            $this->companyMessages(),
-            [
-                'name.required' => 'Pay head name cannot be empty.',
-                'type.in' => 'Invalid type selected.',
-            ]
-        );
+        return array_merge($this->companyMessages(), [
+            'amount.numeric'        => 'The amount must be a number.',
+            'pay_roll_id.exists'    => 'Invalid payroll selected.',
+            'pay_head_name.exists'  => 'Invalid pay head name selected.',
+        ]);
     }
 
     protected function failedValidation(Validator $validator)
@@ -51,7 +46,7 @@ class UpdatePayHeadRequest extends UpdateBaseCompanyRequest
             response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors'  => $validator->errors(),
             ], 422)
         );
     }

@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PayHeadController;
+use App\Http\Controllers\Api\PayRollController;
+use App\Http\Controllers\Api\PayRollPayHeadController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -490,16 +492,35 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [AttendanceController::class, 'restore']);
             Route::delete('{id}/force', [AttendanceController::class, 'forceDestroy']);
         });
-        //payheads routes
+        //pay-heads routes
         Route::prefix('pay-heads')->group(function () {
             Route::get('/', [PayHeadController::class, 'index']);
             Route::post('/', [PayHeadController::class, 'store']);
             Route::get('/{id}', [PayHeadController::class, 'show']);
             Route::post('/update/{id}', [PayHeadController::class, 'update']);
             Route::delete('/{id}', [PayHeadController::class, 'destroy']);
-            Route::patch('/{id}/toggle-status', [PayHeadController::class, 'toggleStatus']);
             Route::get('{id}/restore', [PayHeadController::class, 'restore']);
             Route::delete('{id}/force', [PayHeadController::class, 'forceDestroy']);
+        });
+        //pay-roll routes
+        Route::prefix('pay-rolls')->group(function () {
+            Route::get('/', [PayRollController::class, 'index']);
+            Route::post('/', [PayRollController::class, 'store']);
+            Route::get('/{id}', [PayRollController::class, 'show']);
+            Route::post('/update/{id}', [PayRollController::class, 'update']);
+            Route::delete('/{id}', [PayRollController::class, 'destroy']);
+            Route::get('{id}/restore', [PayRollController::class, 'restore']);
+            Route::delete('{id}/force', [PayRollController::class, 'forceDestroy']);
+        });
+        //pay-roll-pay-heads routes
+        Route::prefix('pay-roll-pay-heads')->group(function () {
+            Route::get('/', [PayRollPayHeadController::class, 'index']);
+            Route::post('/', [PayRollPayHeadController::class, 'store']);
+            Route::get('/{id}', [PayRollPayHeadController::class, 'show']);
+            Route::post('/update/{id}', [PayRollPayHeadController::class, 'update']);
+            Route::delete('/{id}', [PayRollPayHeadController::class, 'destroy']);
+            Route::get('{id}/restore', [PayRollPayHeadController::class, 'restore']);
+            Route::delete('{id}/force', [PayRollPayHeadController::class, 'forceDestroy']);
         });
     });
 });

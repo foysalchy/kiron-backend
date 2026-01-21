@@ -16,20 +16,11 @@ class PayHead extends Model
         'name',
         'type',// addition / deduction
         'description',
-        'status',
     ];
     protected $hidden = ['deleted_at'];
-    protected $casts = [
-        'status' => 'integer',
-    ];
     const TYPE_ADDITION = 'addition';
     const TYPE_DEDUCTION = 'deduction';
     // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-
     public function scopeByCompany($query, int $companyId)
     {
         return $query->where('company_id', $companyId);
