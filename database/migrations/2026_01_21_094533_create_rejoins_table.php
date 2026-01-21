@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('positions', function (Blueprint $table) {
+        Schema::create('rejoins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('type')->comment('shared,single');
-            $table->integer('head_count')->default(0);
-            $table->unsignedBigInteger('supervisor_id')->nullable();
-            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
+            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            $table->date('rejoin_date')->nullable();
+            $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('positions');
+        Schema::dropIfExists('rejoins');
     }
 };
