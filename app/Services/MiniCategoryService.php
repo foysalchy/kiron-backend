@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\MiniCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -15,9 +16,9 @@ class MiniCategoryService
     public function getAllMiniCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = MiniCategory::with([ 'subCategory.megaCategory']);
+            $query = MiniCategory::with(['subCategory.megaCategory']);
 
-           
+
             if (isset($filters['sub_category_id'])) {
                 $query->where('sub_category_id', $filters['sub_category_id']);
             }
@@ -42,7 +43,7 @@ class MiniCategoryService
             throw ApiException::serverError('Failed to fetch mini categories');
         }
     }
- 
+
 
     public function getMiniCategoryById(int $id): MiniCategory
     {
@@ -70,7 +71,7 @@ class MiniCategoryService
             }
 
             $category = MiniCategory::create($data);
-            LogHelper::created('mega_category', $category->id, $category->company_id);
+            LogHelper::created('mini_category', $category->id, $category->company_id,$category->name);
 
             DB::commit();
 
@@ -105,7 +106,7 @@ class MiniCategoryService
             }
 
             $category->update($data);
-            LogHelper::updated('mega_category', $category->id, $category->company_id);
+            LogHelper::updated('mini_category', $category->id, $category->company_id,$category->name);
 
             DB::commit();
 
@@ -132,7 +133,7 @@ class MiniCategoryService
         try {
             $category = $this->getMiniCategoryById($id);
             $category->delete();
-            LogHelper::deleted('mega_category', $category->id, $category->company_id);
+            LogHelper::deleted('mini_category', $category->id, $category->company_id,$category->name);
 
             Log::info('Mini category deleted successfully', ['id' => $id]);
 
@@ -155,7 +156,7 @@ class MiniCategoryService
             }
 
             $category->restore();
-            LogHelper::restored('mega_category', $category->id, $category->company_id);
+            LogHelper::restored('mini_category', $category->id, $category->company_id,$category->name);
 
             Log::info('Mini category restored successfully', ['id' => $id]);
 
@@ -182,7 +183,7 @@ class MiniCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
-            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id);
+            LogHelper::forceDeleted('mini_category', $category->id, $category->company_id,$category->name);
 
             DB::commit();
 
@@ -204,8 +205,16 @@ class MiniCategoryService
     {
         try {
             $category = $this->getMiniCategoryById($id);
-            $category->update(['status' => !$category->status]);
-            LogHelper::statusChanged('mega_category', $category->id, $category->company_id);
+            $currentStatus = Status::from($category->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $category->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('mini_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
 
             Log::info('Mini category status toggled', ['id' => $id]);
 
@@ -224,6 +233,4 @@ class MiniCategoryService
             ->active()
             ->get();
     }
-
-    
 }

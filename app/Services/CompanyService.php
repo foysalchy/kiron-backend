@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -20,8 +21,12 @@ class CompanyService
             $query = Company::query();
 
             // Apply filters
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+          if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['business_type'])) {

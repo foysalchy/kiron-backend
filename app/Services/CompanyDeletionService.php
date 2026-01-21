@@ -83,7 +83,7 @@ class CompanyDeletionService
                 'deleted_counts' => $deletedCounts
             ]);
 
-            LogHelper::deleted('company', $company->id, $company->id);
+            LogHelper::deleted('company', $company->id, $company->id, 'soft delete ' . $company->name);
 
             return true;
         } catch (\Exception $e) {
@@ -159,7 +159,7 @@ class CompanyDeletionService
                 'deleted_counts' => $deletedCounts
             ]);
 
-            LogHelper::custom('force_deleted', 'company', $companyId, $companyId);
+            LogHelper::custom('force_deleted', 'company', $companyId, $companyId , "Permanently Delete Company " . $company->name);
 
             return true;
         } catch (\Exception $e) {
@@ -234,7 +234,7 @@ class CompanyDeletionService
                 'restored_counts' => $restoredCounts
             ]);
 
-            LogHelper::custom('restored', 'company', $company->id, $company->id);
+            LogHelper::custom('restored', 'company', $company->id, $company->id,'restore company ' .$company->name);
 
             return true;
         } catch (\Exception $e) {

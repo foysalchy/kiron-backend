@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 
@@ -62,12 +63,12 @@ class Bin extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 1);
+        return $query->where('status', Status::Active->value);
     }
 
     public function scopeInactive($query)
     {
-        return $query->where('status', 0);
+        return $query->where('status', Status::Inactive->value);
     }
 
     public function scopeByWarehouse($query, $warehouseId)

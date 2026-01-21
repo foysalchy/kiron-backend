@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\AttributeValue;
@@ -18,15 +18,19 @@ class AttributeService
     public function getAllAttributes(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query =AttributeValue::with(['attributeGroup']);
+            $query = AttributeValue::with(['attributeGroup']);
 
-           
+
             if (isset($filters['attribute_group_id'])) {
                 $query->where('attribute_group_id', $filters['attribute_group_id']);
             }
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {
@@ -40,7 +44,6 @@ class AttributeService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching attributes: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch attributes');
@@ -53,7 +56,7 @@ class AttributeService
      */
     public function getAttributeById(int $id): AttributeValue
     {
-        $attribute =AttributeValue::with(['attributeGroup'])->find($id);
+        $attribute = AttributeValue::with(['attributeGroup'])->find($id);
 
         if (!$attribute) {
             throw ApiException::notFound('Attribute');
@@ -68,12 +71,11 @@ class AttributeService
     public function createAttribute(array $data): AttributeValue
     {
         try {
-            $attribute =AttributeValue::create($data);
-            LogHelper::created('attribute_value', $attribute->id, $attribute->company_id);
+            $attribute = AttributeValue::create($data);
+            LogHelper::created('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
             Log::info('Attribute created successfully', ['attribute_id' => $attribute->id]);
 
             return $attribute->load(['attributeGroup']);
-
         } catch (\Exception $e) {
             Log::error('Attribute creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create attribute');
@@ -88,11 +90,10 @@ class AttributeService
         try {
             $attribute = $this->getAttributeById($id);
             $attribute->update($data);
-            LogHelper::updated('attribute_value', $attribute->id, $attribute->company_id);
+            LogHelper::updated('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
             Log::info('Attribute updated successfully', ['attribute_id' => $attribute->id]);
 
             return $attribute->fresh(['attributeGroup']);
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -109,12 +110,11 @@ class AttributeService
         try {
             $attribute = $this->getAttributeById($id);
             $attribute->delete();
-            LogHelper::deleted('attribute_value', $attribute->id, $attribute->company_id);
+            LogHelper::deleted('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
 
             Log::info('Attribute deleted successfully', ['attribute_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -129,19 +129,18 @@ class AttributeService
     public function restoreAttribute(int $id): AttributeValue
     {
         try {
-            $attribute =AttributeValue::withTrashed()->find($id);
+            $attribute = AttributeValue::withTrashed()->find($id);
 
             if (!$attribute) {
                 throw ApiException::notFound('Attribute');
             }
 
             $attribute->restore();
-            LogHelper::restored('attribute_value', $attribute->id, $attribute->company_id);
+            LogHelper::restored('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
 
             Log::info('Attribute restored successfully', ['attribute_id' => $id]);
 
             return $attribute->load(['attributeGroup']);
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -156,19 +155,18 @@ class AttributeService
     public function forceDeleteAttribute(int $id): bool
     {
         try {
-            $attribute =AttributeValue::withTrashed()->find($id);
+            $attribute = AttributeValue::withTrashed()->find($id);
 
             if (!$attribute) {
                 throw ApiException::notFound('Attribute');
             }
 
             $attribute->forceDelete();
-            LogHelper::forceDeleted('attribute_value', $attribute->id, $attribute->company_id);
+            LogHelper::forceDeleted('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
 
             Log::info('Attribute permanently deleted', ['attribute_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -184,13 +182,21 @@ class AttributeService
     {
         try {
             $attribute = $this->getAttributeById($id);
-            $attribute->update(['status' => !$attribute->status]);
-            LogHelper::statusChanged('attribute_value', $attribute->id, $attribute->company_id);
+            // current status as enum
+            $currentStatus = Status::from($attribute->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $attribute->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('attribute_value', $attribute->id, $attribute->company_id,$attribute->name .' new status '. $newStatus->label());
 
             Log::info('Attribute status toggled', ['attribute_id' => $id]);
 
             return $attribute->load(['attributeGroup']);
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -198,5 +204,4 @@ class AttributeService
             throw ApiException::serverError('Failed to toggle attribute status');
         }
     }
-
 }

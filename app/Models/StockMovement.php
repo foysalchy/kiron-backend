@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +14,6 @@ class StockMovement extends Model
 {
     use SoftDeletes, CompanyScoped;
 
-    const STATUS_PENDING = 0;
-    const STATUS_APPROVED = 1;
-    const STATUS_CANCELLED = 2;
     protected $fillable = [
         'company_id',
         'movement_number',
@@ -81,31 +79,22 @@ class StockMovement extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-       // Accessors
-    public function getStatusTextAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_PENDING => 'Pending',
-            self::STATUS_CANCELLED => 'Cancelled',
-            self::STATUS_APPROVED => 'Completed',
-            default => 'Unknown',
-        };
-    }
+
 
     // Helper Methods
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === Status::Pending->value;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === Status::Cancelled->value;
     }
 
-    public function isCompleted(): bool
+    public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === Status::Approved->value;
     }
 }
 

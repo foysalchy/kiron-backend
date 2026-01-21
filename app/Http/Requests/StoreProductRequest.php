@@ -37,11 +37,11 @@ class StoreProductRequest extends BaseCompanyRequest
                 'extra_category_ids' => ['nullable', 'array'],
                 'extra_category_ids.*' => ['exists:extra_categories,id'],
                 //warehouse info
-                'warehouse_info' => 'nullable|array',
+                'warehouse_info' => 'required|array',
                 'warehouse_info.*.warehouse_id' => 'required|integer',
-                'warehouse_info.*.area_id' => 'required|integer',
-                'warehouse_info.*.rack_id' => 'required|integer',
-                'warehouse_info.*.cell_id' => 'required|integer',
+                'warehouse_info.*.bin_id' => 'nullable|integer',
+                'warehouse_info.*.quantity' => 'required|integer',
+             
             
                 // Gallery Images
                 'gallery_images' => ['nullable', 'array'],
@@ -54,10 +54,6 @@ class StoreProductRequest extends BaseCompanyRequest
                 'type' => ['required', Rule::in(['single', 'variation'])],
                 'sku_codes' => ['nullable', 'array'],
                 'sku_codes.*' => ['string', 'max:255'],
-
-                // Stock
-                'stock_status' => ['required', Rule::in(['in_stock', 'out_of_stock'])],
-                'stock_quantity' => ['required_if:stock_status,in_stock', 'integer', 'min:0'],
 
                 // Pricing
                 'regular_price' => ['required', 'numeric', 'min:0'],
@@ -83,8 +79,7 @@ class StoreProductRequest extends BaseCompanyRequest
                 'gallery_images.*.image' => 'All gallery files must be images',
                 'gallery_images.*.max' => 'Gallery image size cannot exceed 2MB',
                 'type.required' => 'Product type is required',
-                'stock_status.required' => 'Stock status is required',
-                'stock_quantity.required_if' => 'Stock quantity is required when product is in stock',
+              
                 'regular_price.required' => 'Regular price is required',
                 'regular_price.min' => 'Price must be at least 0',
             ]

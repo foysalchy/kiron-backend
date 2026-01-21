@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 
 class ProductStockLedger extends Model
 {
-  
+
 
     protected $fillable = [
         'product_id',
@@ -39,6 +39,16 @@ class ProductStockLedger extends Model
     const TYPE_ADJUSTMENT = 'adjustment';
     const TYPE_RETURN = 'return';
     const TYPE_INITIAL_STOCK = 'initial_stock';
+
+    public const TYPES = [
+        self::TYPE_PURCHASE,
+        self::TYPE_SALE,
+        self::TYPE_TRANSFER_IN,
+        self::TYPE_TRANSFER_OUT,
+        self::TYPE_ADJUSTMENT,
+        self::TYPE_RETURN,
+        self::TYPE_INITIAL_STOCK,
+    ];
 
     /**
      * Relationships
@@ -126,7 +136,7 @@ class ProductStockLedger extends Model
      */
     public function getTransactionTypeNameAttribute(): string
     {
-        return match($this->transaction_type) {
+        return match ($this->transaction_type) {
             self::TYPE_PURCHASE => 'Purchase',
             self::TYPE_SALE => 'Sale',
             self::TYPE_TRANSFER_IN => 'Transfer In',
@@ -212,8 +222,4 @@ class ProductStockLedger extends Model
 
         return $limit ? $query->limit($limit)->get() : $query->get();
     }
-
-  
-
-   
 }

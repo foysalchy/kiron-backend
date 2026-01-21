@@ -263,6 +263,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [ProductController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [ProductController::class, 'toggleStatus']);
             Route::patch('/{id}/update-stock', [ProductController::class, 'updateStock']);
+            Route::post('/{id}/stock/add', [ProductController::class, 'addStock']);
+            Route::post('/{id}/stock/remove', [ProductController::class, 'removeStock']);
+            Route::post('/{id}/stock/adjust', [ProductController::class, 'adjustStock']);
+            Route::get('/{id}/stock/history', [ProductController::class, 'stockHistory']);
+            Route::get('/{id}/stock/warehouse', [ProductController::class, 'warehouseStock']);
         });
 
         // Page Routes

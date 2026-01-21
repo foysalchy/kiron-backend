@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Brand;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -21,9 +22,12 @@ class BrandService
         try {
             $query = Brand::query();
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             if (isset($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");
             }
@@ -74,7 +78,7 @@ class BrandService
             }
 
             $brand = Brand::create($data);
-            LogHelper::created('brand', $brand->id, $brand->company_id);
+            LogHelper::created('brand', $brand->id, $brand->company_id,$brand->name );
 
             DB::commit();
 
@@ -113,7 +117,7 @@ class BrandService
             }
 
             $brand->update($data);
-            LogHelper::updated('brand', $brand->id, $brand->company_id);
+            LogHelper::updated('brand', $brand->id, $brand->company_id,$brand->name );
 
             DB::commit();
 
@@ -143,7 +147,7 @@ class BrandService
         try {
             $brand = $this->getBrandById($id);
             $brand->delete();
-            LogHelper::deleted('brand', $brand->id, $brand->company_id);
+            LogHelper::deleted('brand', $brand->id, $brand->company_id,$brand->name);
 
             Log::info('Brand deleted successfully', ['brand_id' => $id]);
 
@@ -169,7 +173,7 @@ class BrandService
             }
 
             $brand->restore();
-            LogHelper::restored('brand', $brand->id, $brand->company_id);
+            LogHelper::restored('brand', $brand->id, $brand->company_id,$brand->name);
 
             Log::info('Brand restored successfully', ['brand_id' => $id]);
 
@@ -200,7 +204,7 @@ class BrandService
             FileUploadHelper::delete($brand->logo);
 
             $brand->forceDelete();
-            LogHelper::forceDeleted('brand', $brand->id, $brand->company_id);
+            LogHelper::forceDeleted('brand', $brand->id, $brand->company_id,$brand->name);
 
             DB::commit();
 
@@ -225,9 +229,18 @@ class BrandService
     {
         try {
             $brand = $this->getBrandById($id);
-            $brand->update(['status' => !$brand->status]);
-            LogHelper::statusChanged('brand', $brand->id, $brand->company_id);
-            Log::info('Brand status toggled', ['brand_id' => $id]);
+               // current status as enum
+            $currentStatus = Status::from($brand->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $brand->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('brand', $brand->id, $brand->company_id,$brand->name . 'new status '. $newStatus->label());
+            Log::info('Brand status toggled', ['brand_id' => $id,'new_status'=>$newStatus->label()]);
 
             return $brand;
         } catch (ApiException $e) {

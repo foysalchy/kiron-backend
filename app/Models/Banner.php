@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Banner extends Model
 {
-        use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
 
     protected $fillable = [
@@ -32,7 +33,7 @@ class Banner extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', true);
+        return $query->where('status', Status::Active->value);
     }
 
     public function scopeByCompany($query, int $companyId)
