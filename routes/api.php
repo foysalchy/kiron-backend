@@ -31,11 +31,13 @@ use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
+use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\RackController;
+use App\Http\Controllers\Api\RejoinController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\SalesOrderController;
@@ -521,6 +523,23 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [PayRollPayHeadController::class, 'destroy']);
             Route::get('{id}/restore', [PayRollPayHeadController::class, 'restore']);
             Route::delete('{id}/force', [PayRollPayHeadController::class, 'forceDestroy']);
+        });
+        //positions routes
+        Route::prefix('positions')->group(function () {
+            Route::get('/', [PositionController::class, 'index']);
+            Route::post('/', [PositionController::class, 'store']);
+            Route::get('/{id}', [PositionController::class, 'show']);
+            Route::post('/update/{id}', [PositionController::class, 'update']);
+            Route::delete('/{id}', [PositionController::class, 'destroy']);
+            Route::get('{id}/restore', [PositionController::class, 'restore']);
+            Route::delete('{id}/force', [PositionController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [PositionController::class, 'toggleStatus']);
+        });
+        //rejoins routes
+        Route::prefix('rejoins')->group(function () {
+            Route::get('/', [RejoinController::class, 'index']);
+            Route::post('/', [RejoinController::class, 'store']);
+            Route::get('/{id}', [RejoinController::class, 'show']);
         });
     });
 });
