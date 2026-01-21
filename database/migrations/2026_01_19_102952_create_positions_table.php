@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
             $table->string('name');
-            $table->string('type')->default('fixed');
+            $table->string('type')->comment('shared,single');
             $table->integer('head_count')->default(0);
             $table->unsignedBigInteger('supervisor_id')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
