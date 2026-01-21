@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\ExtraCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -45,7 +46,7 @@ class ExtraCategoryService
             throw ApiException::serverError('Failed to fetch extra categories');
         }
     }
- 
+
 
     public function getExtraCategoryById(int $id): ExtraCategory
     {
@@ -73,7 +74,7 @@ class ExtraCategoryService
             }
 
             $category = ExtraCategory::create($data);
-            LogHelper::created('extra_categories', $category->id, $category->company_id);
+            LogHelper::created('extra_categories', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -108,13 +109,13 @@ class ExtraCategoryService
             }
 
             $category->update($data);
-            LogHelper::updated('extra_categories', $category->id, $category->company_id);
+            LogHelper::updated('extra_categories', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
             Log::info('Extra category updated successfully', ['id' => $category->id]);
 
-            return $category->fresh([ 'miniCategory.subCategory.megaCategory']);
+            return $category->fresh(['miniCategory.subCategory.megaCategory']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -135,7 +136,7 @@ class ExtraCategoryService
         try {
             $category = $this->getExtraCategoryById($id);
             $category->delete();
-            LogHelper::deleted('extra_categories', $category->id, $category->company_id);
+            LogHelper::deleted('extra_categories', $category->id, $category->company_id, $category->name);
 
             Log::info('Extra category deleted successfully', ['id' => $id]);
 
@@ -158,7 +159,7 @@ class ExtraCategoryService
             }
 
             $category->restore();
-            LogHelper::restored('extra_categories', $category->id, $category->company_id);
+            LogHelper::restored('extra_categories', $category->id, $category->company_id, $category->name);
 
             Log::info('Extra category restored successfully', ['id' => $id]);
 
@@ -185,7 +186,7 @@ class ExtraCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
-            LogHelper::forceDeleted('extra_categories', $category->id, $category->company_id);
+            LogHelper::forceDeleted('extra_categories', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -207,12 +208,20 @@ class ExtraCategoryService
     {
         try {
             $category = $this->getExtraCategoryById($id);
-            $category->update(['status' => !$category->status]);
-            LogHelper::statusChanged('extra_categories', $category->id, $category->company_id);
+            $currentStatus = Status::from($category->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $category->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('extra_categories', $category->id, $category->company_id,$category->name . ' new status '. $newStatus->label());
 
             Log::info('Extra category status toggled', ['id' => $id]);
 
-            return $category->load([ 'miniCategory.subCategory.megaCategory']);
+            return $category->load(['miniCategory.subCategory.megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

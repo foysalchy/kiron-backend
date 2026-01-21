@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Party;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -29,7 +30,7 @@ class PartyService
 
             // Filter by status
             if (isset($filters['status'])) {
-                if ($filters['status'] == 3) {
+                if ($filters['status'] == Status::Trashed->value) {
                     $query->onlyTrashed();
                 } else {
                     $query->where('status', $filters['status']);
@@ -114,7 +115,7 @@ class PartyService
             }
             $data['password'] = Hash::make($data['password']);
             $party = Party::create($data);
-            LogHelper::created('party', $party->id, $party->company_id);
+            LogHelper::created('party', $party->id, $party->company_id, $party->type_text . " created");
 
             DB::commit();
 
@@ -157,7 +158,7 @@ class PartyService
             }
 
             $party->update($data);
-            LogHelper::updated('party', $party->id, $party->company_id);
+            LogHelper::updated('party', $party->id, $party->company_id,$party->type_text . " updated");
 
             DB::commit();
 
@@ -193,7 +194,7 @@ class PartyService
             $party = $this->getPartyById($id);
 
             $party->delete();
-            LogHelper::deleted('party', $party->id, $party->company_id);
+            LogHelper::deleted('party', $party->id, $party->company_id,$party->type_text . " deleted");
 
             Log::info('Party deleted successfully', ['party_id' => $id]);
 
@@ -223,7 +224,7 @@ class PartyService
             }
 
             $party->restore();
-            LogHelper::restored('party', $party->id, $party->company_id);
+            LogHelper::restored('party', $party->id, $party->company_id,$party->type_text . " restore");
 
             Log::info('Party restored successfully', ['party_id' => $id]);
 
@@ -253,7 +254,7 @@ class PartyService
             FileUploadHelper::delete($party->profile);
 
             $party->forceDelete();
-            LogHelper::forceDeleted('party', $party->id, $party->company_id);
+            LogHelper::forceDeleted('party', $party->id, $party->company_id,$party->type_text . " permanently deleted");
 
             DB::commit();
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,12 +32,12 @@ class AttributeGroup extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', true);
+        return $query->where('status', Status::Active->value);
     }
 
     public function scopeInactive($query)
     {
-        return $query->where('status', false);
+        return $query->where('status', Status::Inactive->value);
     }
 
     public function scopeByCategory($query, string $cat)

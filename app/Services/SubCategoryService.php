@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\SubCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -70,6 +72,7 @@ class SubCategoryService
             }
 
             $category = SubCategory::create($data);
+            LogHelper::created('sub_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -104,6 +107,7 @@ class SubCategoryService
             }
 
             $category->update($data);
+            LogHelper::updated('sub_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -130,6 +134,7 @@ class SubCategoryService
         try {
             $category = $this->getSubCategoryById($id);
             $category->delete();
+            LogHelper::deleted('sub_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Sub category deleted successfully', ['id' => $id]);
 
@@ -152,6 +157,7 @@ class SubCategoryService
             }
 
             $category->restore();
+            LogHelper::restored('sub_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Sub category restored successfully', ['id' => $id]);
 
@@ -180,6 +186,7 @@ class SubCategoryService
             $category->forceDelete();
 
             DB::commit();
+            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Sub category permanently deleted', ['id' => $id]);
 
@@ -199,8 +206,16 @@ class SubCategoryService
     {
         try {
             $category = $this->getSubCategoryById($id);
-            $category->update(['status' => !$category->status]);
-
+           $currentStatus = Status::from($category->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $category->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('sub_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
             Log::info('Sub category status toggled', ['id' => $id]);
 
             return $category->load([ 'megaCategory']);

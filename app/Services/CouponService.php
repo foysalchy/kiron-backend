@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{Coupon, CouponUsage};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -20,17 +21,20 @@ class CouponService
             $query = Coupon::query();
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             if (isset($filters['discount_type'])) {
                 $query->where('discount_type', $filters['discount_type']);
             }
 
             if (isset($filters['search'])) {
-                $query->where(function($q) use ($filters) {
+                $query->where(function ($q) use ($filters) {
                     $q->where('code', 'like', "%{$filters['search']}%")
-                      ->orWhere('name', 'like', "%{$filters['search']}%");
+                        ->orWhere('name', 'like', "%{$filters['search']}%");
                 });
             }
 
@@ -42,10 +46,9 @@ class CouponService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate 
+            return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching coupons: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch coupons');
@@ -92,14 +95,15 @@ class CouponService
             $data['used_count'] = 0;
 
             $coupon = Coupon::create($data);
-
+            $discountText = $coupon->discount_type === Coupon::DISCOUNT_FIXED
+                ? $coupon->discount_value
+                : $coupon->discount_value . '%';
             DB::commit();
 
             Log::info('Coupon created successfully', ['coupon_id' => $coupon->id]);
-            LogHelper::created('coupon', $coupon->id, $coupon->company_id);
+            LogHelper::created('coupon', $coupon->id, $coupon->company_id, 'coupon code ' . $coupon->code . ' amount ' . $discountText);
 
             return $coupon;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -124,18 +128,18 @@ class CouponService
             }
 
             $coupon->update($data);
-
+            $discountText = $coupon->discount_type === Coupon::DISCOUNT_FIXED
+                ? $coupon->discount_value
+                : $coupon->discount_value . '%';
             DB::commit();
 
             Log::info('Coupon updated successfully', ['coupon_id' => $coupon->id]);
-            LogHelper::updated('coupon', $coupon->id, $coupon->company_id);
+            LogHelper::updated('coupon', $coupon->id, $coupon->company_id, 'coupon code ' . $coupon->code . ' amount ' . $discountText);
 
             return $coupon->fresh();
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -164,14 +168,12 @@ class CouponService
             DB::commit();
 
             Log::info('Coupon deleted successfully', ['coupon_id' => $id]);
-            LogHelper::deleted('coupon', $id, $coupon->company_id);
+            LogHelper::deleted('coupon', $id, $coupon->company_id, $coupon->code);
 
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -215,10 +217,8 @@ class CouponService
                 'discount_amount' => $discountAmount,
                 'final_amount' => $orderAmount - $discountAmount,
             ];
-
         } catch (ApiException $e) {
             throw $e;
-
         } catch (\Exception $e) {
             Log::error('Coupon validation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to validate coupon');
@@ -250,12 +250,11 @@ class CouponService
             DB::commit();
 
             Log::info('Coupon applied successfully', [
-                'coupon_id' => $couponId, 
+                'coupon_id' => $couponId,
                 'order_id' => $orderId
             ]);
 
             return $usage;
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -271,13 +270,15 @@ class CouponService
     {
         try {
             $coupon = $this->getCouponById($id);
-            $coupon->update(['status' => $status]);
+            $getStatus = Status::from($status);
+            $coupon->update([
+                'status' => $getStatus->value
+            ]);
 
-            Log::info('Coupon status changed', ['coupon_id' => $id, 'status' => $status]);
-            LogHelper::custom('status_changed', 'coupon', $id, $coupon->company_id);
+            Log::info('Coupon status changed', ['coupon_id' => $id, 'status' => $getStatus->label()]);
+            LogHelper::custom('status_changed', 'coupon', $id, $coupon->company_id,$getStatus->label());
 
             return $coupon;
-
         } catch (\Exception $e) {
             Log::error('Coupon status change failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to change status');

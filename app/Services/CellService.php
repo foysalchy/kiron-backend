@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Cell;
@@ -23,8 +24,12 @@ class CellService
                 $query->where('rack_id', $filters['rack_id']);
             }
 
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (!empty($filters['search'])) {
@@ -64,13 +69,12 @@ class CellService
     {
         DB::beginTransaction();
         try {
-            $cell =Cell::create($data);
-            LogHelper::created('cell', $cell->id, $cell->company_id);
+            $cell = Cell::create($data);
+            LogHelper::created('cell', $cell->id, $cell->company_id,$cell->name);
             DB::commit();
             Log::info('Cell created successfully', ['cell_id' => $cell->id]);
 
             return $cell->load(['rack']);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Cell creation failed: ' . $e->getMessage());
@@ -90,12 +94,11 @@ class CellService
 
             $cell->update($data);
 
-            LogHelper::updated('cell', $cell->id, $cell->company_id);
+            LogHelper::updated('cell', $cell->id, $cell->company_id,$cell->name);
             DB::commit();
             Log::info('Cell Updated Successfully', ['cell_id' => $cell->id]);
 
             return $cell->fresh(['rack']);
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -116,12 +119,11 @@ class CellService
 
             $cell->delete();
 
-            LogHelper::deleted('cell', $cell->id, $cell->company_id);
+            LogHelper::deleted('cell', $cell->id, $cell->company_id,$cell->name);
             DB::commit();
             Log::info('Cell deleted successfully', ['cell_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -142,12 +144,11 @@ class CellService
                 throw ApiException::notFound('Cell');
             }
             $cell->restore();
-            LogHelper::restored('cell',$cell->id,$cell->company_id);
+            LogHelper::restored('cell', $cell->id, $cell->company_id,$cell->name);
             return $cell->load(relations: ['rack']);
         } catch (ApiException $e) {
             throw $e;
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             Log::error('Cell restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore data');
         }
@@ -163,7 +164,7 @@ class CellService
                 throw ApiException::notFound('Cell');
             }
             $cell->forceDelete();
-            LogHelper::forceDeleted('cell', $id, $cell->company_id);
+            LogHelper::forceDeleted('cell', $id, $cell->company_id,$cell->name);
             return true;
         } catch (ApiException $e) {
             throw $e;
@@ -180,14 +181,21 @@ class CellService
         try {
             $cell = $this->getCellById($id);
 
-            $newStatus = $cell->status == 1 ? 0 : 1;
-            $cell->update(['status' => $newStatus]);
+            // current status as enum
+            $currentStatus = Status::from($cell->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $cell->update([
+                'status' => $newStatus->value
+            ]);
 
-            LogHelper::statusChanged('cell', $cell->id, $cell->company_id);
-            Log::info('Cell status toggled', ['cell_id' => $id, 'new_status' => $newStatus]);
+            LogHelper::statusChanged('cell', $cell->id, $cell->company_id,$cell->name . ' new status '.$newStatus->label());
+            Log::info('Cell status toggled', ['cell_id' => $id, 'new_status' => $newStatus->label()]);
 
             return $cell->load(['rack']);
-
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -195,5 +203,4 @@ class CellService
             throw ApiException::serverError('Failed to toggle cell status');
         }
     }
-
 }

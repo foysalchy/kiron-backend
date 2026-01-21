@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Bin;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -38,7 +39,11 @@ class BinService
             }
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {
@@ -91,14 +96,14 @@ class BinService
             $data['status'] = $data['status'] ?? 1;
 
             $bin = Bin::create($data);
-
+            LogHelper::created('bin', $bin->id, $bin->company_id,$bin->name);
             DB::commit();
 
             Log::info('Bin created successfully', [
                 'bin_id' => $bin->id,
                 'bin_code' => $bin->bin_code
             ]);
-        
+
 
             return $this->getBinById($bin->id);
         } catch (ApiException $e) {
@@ -122,19 +127,21 @@ class BinService
             $bin = $this->getBinById($id);
 
             // Check if bin_code already exists (except current bin)
-            if (isset($data['bin_code']) && 
+            if (
+                isset($data['bin_code']) &&
                 Bin::where('bin_code', $data['bin_code'])
-                    ->where('id', '!=', $id)
-                    ->exists()) {
+                ->where('id', '!=', $id)
+                ->exists()
+            ) {
                 throw ApiException::badRequest('Bin code already exists');
             }
 
             $bin->update($data);
 
+            LogHelper::updated('bin', $id, $bin->company_id,$bin->name);
             DB::commit();
 
             Log::info('Bin updated', ['bin_id' => $id]);
-            LogHelper::updated('bin', $id, $bin->company_id);
 
             return $this->getBinById($bin->id);
         } catch (ApiException $e) {
@@ -167,13 +174,13 @@ class BinService
                 throw ApiException::badRequest('Cannot delete bin that contains stock');
             }
 
-       
+
             $bin->delete();
 
+            LogHelper::deleted('bin', $id, $bin->companyId,$bin->name);
             DB::commit();
 
             Log::info('Bin deleted', ['bin_id' => $id]);
-            LogHelper::deleted('bin', $id, $bin->companyId);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -194,24 +201,27 @@ class BinService
         try {
             $bin = $this->getBinById($id);
 
-            if (!in_array($status, [0, 1])) {
+            if (!in_array($status, [Status::Inactive->value, Status::Active->value])) {
                 throw ApiException::badRequest('Invalid status value');
             }
 
             // If deactivating, check if bin has stock
-            if ($status == 0 && $this->binHasStock($id)) {
+            if ($status == Status::Inactive->value && $this->binHasStock($id)) {
                 throw ApiException::badRequest('Cannot deactivate bin that contains stock');
             }
+            //  status as enum
+            $getStatus = Status::from($status);
+            $bin->update([
+                'status' => $getStatus->value
+            ]);
 
-            $bin->update(['status' => $status]);
-
+            LogHelper::custom('status_changed', 'bin', $id, $bin->company_id,$bin->name . 'new status' . $getStatus->label());
             DB::commit();
 
             Log::info('Bin status changed', [
                 'bin_id' => $id,
-                'status' => $status
+                'status' => $getStatus->label()
             ]);
-            LogHelper::custom('status_changed', 'bin', $id, $bin->company_id);
 
             return $this->getBinById($bin->id);
         } catch (ApiException $e) {

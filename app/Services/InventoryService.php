@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\AttributeGroup;
+use App\Models\Bin;
 use App\Models\Product;
 use App\Models\ProductStockLedger;
 use App\Models\StockMovement;
@@ -160,7 +162,7 @@ class InventoryService
             // Validate stock availability
             $this->validateStockAvailability($items, $data['source_warehouse_id']);
 
-            $data['status'] = StockMovement::STATUS_PENDING;
+            $data['status'] = Status::Pending->value;
 
             // Create movement (movement_number auto-generated in boot method)
             $movement = StockMovement::create($data);
@@ -176,6 +178,8 @@ class InventoryService
                     'serial_numbers' => $item['serial_numbers'] ?? null,
                 ]);
             }
+            $totalQuantity = collect($items)->sum('quantity');
+            LogHelper::created('stock_movement', $movement->id, $movement->company_id, $movement->movement_number .' total quantity ' . $totalQuantity);
 
             DB::commit();
 
@@ -183,7 +187,6 @@ class InventoryService
                 'movement_id' => $movement->id,
                 'movement_number' => $movement->movement_number
             ]);
-            LogHelper::created('stock_movement', $movement->id, $movement->company_id);
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -236,11 +239,12 @@ class InventoryService
                     'serial_numbers' => $item['serial_numbers'] ?? null,
                 ]);
             }
+            $totalQuantity = collect($items)->sum('quantity');
 
+            LogHelper::updated('stock_movement', $id, $movement->company_id,$movement->movement_number . ' total quantity ' . $totalQuantity);
             DB::commit();
 
             Log::info('Stock movement updated', ['movement_id' => $id]);
-            LogHelper::updated('stock_movement', $id, $movement->company_id);
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -263,7 +267,7 @@ class InventoryService
         try {
             $movement = StockMovement::with('items.product')->findOrFail($id);
 
-            if ($movement->status !== StockMovement::STATUS_PENDING) {
+            if ($movement->status !== Status::Pending->value) {
                 throw ApiException::badRequest('Only pending movements can be approved');
             }
 
@@ -304,7 +308,7 @@ class InventoryService
             }
 
             $movement->update([
-                'status' => StockMovement::STATUS_APPROVED,
+                'status' => Status::Approved->value,
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
             ]);
@@ -312,7 +316,7 @@ class InventoryService
             DB::commit();
 
             Log::info('Stock movement approved', ['movement_id' => $id]);
-            LogHelper::custom('approved', 'stock_movement', $id, $movement->company_id,'approved stock movement');
+            LogHelper::custom('approved', 'stock_movement', $id, $movement->company_id,$movement->movement_number .' approved');
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -335,20 +339,20 @@ class InventoryService
         try {
             $movement = $this->getMovementById($id);
 
-            if ($movement->status !== StockMovement::STATUS_PENDING) {
+            if ($movement->status !== Status::Pending->value) {
                 throw ApiException::badRequest('Only pending movements can be cancelled');
             }
 
-            if ($movement->status === StockMovement::STATUS_CANCELLED) {
+            if ($movement->status === Status::Cancelled->value) {
                 throw ApiException::badRequest('Movement is already cancelled');
             }
 
-            $movement->update(['status' => StockMovement::STATUS_CANCELLED]);
+            $movement->update(['status' => Status::Cancelled->value]);
 
             DB::commit();
 
             Log::info('Stock movement cancelled', ['movement_id' => $id]);
-            LogHelper::custom('cancelled', 'stock_movement', $id,$movement->company_id,'cancelled');
+            LogHelper::custom('cancelled', 'stock_movement', $id, $movement->company_id, $movement->movement_number .' movement cancelled');
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -371,7 +375,7 @@ class InventoryService
         try {
             $movement = $this->getMovementById($id);
 
-            if ($movement->status === StockMovement::STATUS_APPROVED) {
+            if ($movement->status === Status::Approved->value) {
                 throw ApiException::badRequest('Approved movements cannot be deleted');
             }
             $movement->delete();
@@ -379,7 +383,7 @@ class InventoryService
             DB::commit();
 
             Log::info('Stock movement deleted', ['movement_id' => $id]);
-            LogHelper::deleted('stock_movement', $id, $movement->company_id);
+            LogHelper::deleted('stock_movement', $id, $movement->company_id, $movement->movement_number .' movement deleted');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -421,7 +425,7 @@ class InventoryService
     public function getBinsByWarehouse(int $warehouseId): Collection
     {
         try {
-            return \App\Models\Bin::where('warehouse_id', $warehouseId)
+            return Bin::where('warehouse_id', $warehouseId)
                 ->where('status', 1)
                 ->get();
         } catch (\Exception $e) {

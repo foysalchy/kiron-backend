@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
@@ -21,7 +22,11 @@ class BannerService
         try {
             $query = Banner::query();
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['title']) && $filters['title'] !== '') {
@@ -74,7 +79,7 @@ class BannerService
             }
 
             $banner = Banner::create($data);
-            LogHelper::created('banner', $banner->id, $banner->company_id);
+            LogHelper::created('banner', $banner->id, $banner->company_id,$banner->title);
 
             DB::commit();
 
@@ -113,7 +118,7 @@ class BannerService
             }
 
             $banner->update($data);
-            LogHelper::updated('banner', $banner->id, $banner->company_id);
+            LogHelper::updated('banner', $banner->id, $banner->company_id,$banner->title);
 
             DB::commit();
 
@@ -144,7 +149,7 @@ class BannerService
         try {
             $banner = $this->getBannerById($id);
             $banner->delete();
-            LogHelper::deleted('banner', $banner->id, $banner->company_id);
+            LogHelper::deleted('banner', $banner->id, $banner->company_id,$banner->title);
             DB::commit();
             Log::info('Banner deleted successfully', ['banner_id' => $id]);
 
@@ -173,7 +178,7 @@ class BannerService
             }
 
             $banner->restore();
-            LogHelper::restored('banner', $banner->id, $banner->company_id);
+            LogHelper::restored('banner', $banner->id, $banner->company_id,$banner->title);
 
             Log::info('Banner restored successfully', ['banner_id' => $id]);
             DB::commit();
@@ -206,7 +211,7 @@ class BannerService
             FileUploadHelper::delete($banner->image);
 
             $banner->forceDelete();
-            LogHelper::forceDeleted('banner', $banner->id, $banner->company_id);
+            LogHelper::forceDeleted('banner', $banner->id, $banner->company_id,$banner->title);
 
             DB::commit();
 
@@ -232,16 +237,21 @@ class BannerService
         DB::beginTransaction();
         try {
             $banner = $this->getBannerById($id);
-
-            $newStatus = $banner->status == 1 ? 0 : 1;
-            $banner->update(['status' => $newStatus]);
-
-            LogHelper::statusChanged('banner', $banner->id, $banner->company_id);
+            // current status as enum
+            $currentStatus = Status::from($banner->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $banner->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('banner', $banner->id, $banner->company_id,$banner->title . 'new status ' .$newStatus->label());
             DB::commit();
-            Log::info('Banner status toggled', ['banner_id' => $id, 'new_status' => $newStatus]);
+            Log::info('Banner status toggled', ['banner_id' => $id, 'new_status' => $newStatus->label()]);
 
             return $banner;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;

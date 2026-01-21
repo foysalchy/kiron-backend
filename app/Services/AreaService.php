@@ -93,7 +93,7 @@ class AreaService
 
             $area->update($data);
 
-            LogHelper::updated('area', $area->id, $area->company_id);
+            LogHelper::updated('area', $area->id, $area->company_id,);
             DB::commit();
             Log::info('Area Updated Successfully', ['area_id' => $area->id]);
 

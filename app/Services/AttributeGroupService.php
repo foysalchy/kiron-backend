@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -20,12 +21,15 @@ class AttributeGroupService
         try {
             $query = AttributeGroup::query();
 
-           
+
             // Apply filters
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             if (isset($filters['category'])) {
                 $query->where('category', $filters['category']);
             }
@@ -75,7 +79,7 @@ class AttributeGroupService
         try {
 
             $group = AttributeGroup::create($data);
-            LogHelper::created('attribute_group', $group->id, $group->company_id);
+            LogHelper::created('attribute_group', $group->id, $group->company_id,$group->name);
 
             Log::info('Attribute group created successfully', ['attribute group id' => $group->id]);
             return $group;
@@ -100,7 +104,7 @@ class AttributeGroupService
         try {
             $group = $this->getAttributeGroupById($id);
             $group->update($data);
-            LogHelper::updated('attribute_group', $group->id, $group->company_id);
+            LogHelper::updated('attribute_group', $group->id, $group->company_id,$group->name);
             Log::info('Attribute Group updated successfully', ['atrribute group id' => $group->id]);
             return $group->fresh();
         } catch (\Exception $e) {
@@ -126,7 +130,7 @@ class AttributeGroupService
             $group->delete();
 
             Log::info('Attribute Group deleted successfully', ['Attribute Group id' => $id]);
-            LogHelper::deleted('attribute_group', $group->id, $group->company_id);
+            LogHelper::deleted('attribute_group', $group->id, $group->company_id,$group->name);
 
             return true;
         } catch (ApiException $e) {
@@ -154,7 +158,7 @@ class AttributeGroupService
             }
 
             $group->restore();
-            LogHelper::restored('attribute_group', $group->id, $group->company_id);
+            LogHelper::restored('attribute_group', $group->id, $group->company_id,$group->name);
 
             Log::info('Attribute Group restored successfully', ['Attribute Group id' => $id]);
 
@@ -182,7 +186,7 @@ class AttributeGroupService
             }
 
             $group->forceDelete();
-            LogHelper::forceDeleted('attribute_group', $group->id, $group->company_id);
+            LogHelper::forceDeleted('attribute_group', $group->id, $group->company_id,$group->name);
             Log::info('Attribute Group permanently deleted', ['Attribute Group id' => $id]);
 
             return true;
@@ -204,8 +208,19 @@ class AttributeGroupService
     {
         try {
             $group = $this->getAttributeGroupById($id);
-            $group->update(['status' => !$group->status]);
-            LogHelper::statusChanged('attribute_group', $group->id, $group->company_id);
+            // current status as enum
+            $currentStatus = Status::from($group->status);
+
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+
+            // update using enum value
+            $group->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('attribute_group', $group->id, $group->company_id,$group->name .' new status ' . $newStatus->label());
             Log::info('Attribute Group status toggled', [
                 'atrribute_group_id' => $id,
                 'new_status' => $group->status

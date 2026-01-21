@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\MegaCategory;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
@@ -18,7 +19,11 @@ class MegaCategoryService
             $query = MegaCategory::query();
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {
@@ -64,7 +69,7 @@ class MegaCategoryService
             }
 
             $category = MegaCategory::create($data);
-            LogHelper::created('mega_category', $category->id, $category->company_id);
+            LogHelper::created('mega_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -99,7 +104,7 @@ class MegaCategoryService
             }
 
             $category->update($data);
-            LogHelper::updated('mega_category', $category->id, $category->company_id);
+            LogHelper::updated('mega_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -126,7 +131,7 @@ class MegaCategoryService
         try {
             $category = $this->getMegaCategoryById($id);
             $category->delete();
-            LogHelper::deleted('mega_category', $category->id, $category->company_id);
+            LogHelper::deleted('mega_category', $category->id, $category->company_id, $category->name);
             Log::info('Mega category deleted successfully', ['id' => $id]);
 
             return true;
@@ -148,7 +153,7 @@ class MegaCategoryService
             }
 
             $category->restore();
-            LogHelper::restored('mega_category', $category->id, $category->company_id);
+            LogHelper::restored('mega_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Mega category restored successfully', ['id' => $id]);
 
@@ -175,7 +180,7 @@ class MegaCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
-            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id);
+            LogHelper::forceDeleted('mega_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -197,8 +202,16 @@ class MegaCategoryService
     {
         try {
             $category = $this->getMegaCategoryById($id);
-            $category->update(['status' => !$category->status]);
-            LogHelper::statusChanged('mega_category', $category->id, $category->company_id);
+            $currentStatus = Status::from($category->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $category->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('mega_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
 
             Log::info('Mega category status toggled', ['id' => $id]);
 

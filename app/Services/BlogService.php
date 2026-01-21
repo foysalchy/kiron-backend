@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Blog;
 use App\Exceptions\ApiException;
 use App\Helpers\{FileUploadHelper, LogHelper};
@@ -20,22 +21,26 @@ class BlogService
             $query = Blog::query();
 
             //filter
-            if (isset($filters['status'])&& $filters['status']!=='') {
-                $query->where('status',$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-            if (isset($filters['search'])&& $filters['search']!=='') {
-                $query->where(function ($q) use ($filters){
-                    $q->where('title','like',"%{$filters['search']}%")
-                    ->orWhere('short','like',"%{$filters['search']}%");
+            if (isset($filters['search']) && $filters['search'] !== '') {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('title', 'like', "%{$filters['search']}%")
+                        ->orWhere('short', 'like', "%{$filters['search']}%");
                 });
             }
             $sortBy = $filters['sort_by'] ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy,$sortOrder);
+            $query->orderBy($sortBy, $sortOrder);
 
             return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
         } catch (\Exception $e) {
-            Log::error('Error fetching blogs: ' .$e->getMessage());
+            Log::error('Error fetching blogs: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch blogs');
         }
     }
@@ -44,7 +49,7 @@ class BlogService
      */
     public function getBlogById(int $id): Blog
     {
-        $blog= Blog::find($id);
+        $blog = Blog::find($id);
         if (!$blog) {
             throw ApiException::notFound('Blog');
         }
@@ -74,10 +79,10 @@ class BlogService
 
             $blog = Blog::create($data);
 
+            LogHelper::created('blog', $blog->id, $blog->company_id,$blog->title);
             DB::commit();
 
             Log::info('Blog created successfully', ['blog_id' => $blog->id]);
-            LogHelper::created('blog', $blog->id, $blog->company_id);
 
             return $blog;
         } catch (\Exception $e) {
@@ -128,10 +133,10 @@ class BlogService
 
             $blog->update($data);
 
+            LogHelper::updated('blog', $blog->id, $blog->company_id,$blog->title);
             DB::commit();
 
             Log::info('Blog updated successfully', ['blog_id' => $blog->id]);
-            LogHelper::updated('blog', $blog->id, $blog->company_id);
 
             return $blog->fresh();
         } catch (ApiException $e) {
@@ -154,14 +159,13 @@ class BlogService
             $blog = $this->getBlogById($id);
             $blog->delete();
 
-            LogHelper::deleted('blog', $id, $blog->company_id);
+            LogHelper::deleted('blog', $id, $blog->company_id,$blog->title);
             DB::commit();
             return true;
-        }catch(ApiException $e){
+        } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Blog deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete blog');
@@ -181,7 +185,7 @@ class BlogService
             }
 
             $blog->restore();
-            LogHelper::restored('blog', $blog->id, $blog->company_id);
+            LogHelper::restored('blog', $blog->id, $blog->company_id,$blog->title);
 
             Log::info('Blog restored successfully', ['blog_id' => $id]);
             DB::commit();
@@ -221,7 +225,7 @@ class BlogService
 
             DB::commit();
 
-            LogHelper::forceDeleted('blog', $id, $blog->company_id);
+            LogHelper::forceDeleted('blog', $id, $blog->company_id,$blog->title);
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -239,16 +243,23 @@ class BlogService
         try {
             $blog = $this->getBlogById($id);
 
-            $newStatus = $blog->status == 1 ? 0 : 1;
-            $blog->update(['status' => $newStatus]);
+            // current status as enum
+            $currentStatus = Status::from($blog->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $blog->update([
+                'status' => $newStatus->value
+            ]);
 
-            LogHelper::statusChanged('blog', $blog->id, $blog->company_id);
+            LogHelper::statusChanged('blog', $blog->id, $blog->company_id,$blog->title .' new status ' .$newStatus->label());
 
             DB::commit();
-            Log::info('Blog status toggled successfully', ['blog_id' => $id, 'new_status' => $newStatus]);
+            Log::info('Blog status toggled successfully', ['blog_id' => $id, 'new_status' => $newStatus->label()]);
 
             return $blog;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
