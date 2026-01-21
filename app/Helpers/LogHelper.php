@@ -14,6 +14,7 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
     ): ?ActionLog {
         try {
@@ -23,6 +24,7 @@ class LogHelper
                 'action_id' => $actionId,
                 'action' => $action,
                 'module' => $module,
+                'action_type' => $actionType,
             ]);
         } catch (\Exception $e) {
             // Silent fail - don't break the main operation
@@ -38,9 +40,10 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
     ): ?ActionLog {
-        return self::log('created', $module, $actionId, $companyId, $userId);
+        return self::log('created', $module, $actionId, $companyId,  $actionType, $userId);
     }
 
     /**
@@ -50,10 +53,11 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log('updated', $module, $actionId, $companyId, $userId);
+        return self::log('updated', $module, $actionId, $companyId,$actionType, $userId);
     }
 
     /**
@@ -63,10 +67,11 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log('deleted', $module, $actionId, $companyId, $userId);
+        return self::log('deleted', $module, $actionId, $companyId,$actionType, $userId);
     }
 
     /**
@@ -76,10 +81,11 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log('restored', $module, $actionId, $companyId, $userId);
+        return self::log('restored', $module, $actionId, $companyId, $actionType, $userId);
     }
 
     /**
@@ -89,10 +95,11 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log('force_deleted', $module, $actionId, $companyId, $userId);
+        return self::log('force_deleted', $module, $actionId, $companyId, $actionType, $userId);
     }
 
     /**
@@ -102,10 +109,11 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log('status_changed', $module, $actionId, $companyId, $userId);
+        return self::log('status_changed', $module, $actionId, $companyId, $actionType, $userId);
     }
 
     /**
@@ -116,16 +124,17 @@ class LogHelper
         string $module,
         int $actionId,
         int $companyId,
+        ?string $actionType = null,
         ?int $userId = null
 
     ): ?ActionLog {
-        return self::log($action, $module, $actionId, $companyId, $userId);
+        return self::log($action, $module, $actionId, $companyId, $actionType, $userId);
     }
 
     /**
      * Get activity logs for a module
      */
-    public static function getByModule(string $module, ?int $companyId = null, int $limit =20 )
+    public static function getByModule(string $module, ?int $companyId = null, int $limit = 20)
     {
         $query = ActionLog::with(['user', 'company'])
             ->where('module', $module)
@@ -141,7 +150,7 @@ class LogHelper
     /**
      * Get activity logs for a specific record
      */
-    public static function getByRecord( int $actionId, int $limit = 20)
+    public static function getByRecord(int $actionId, int $limit = 20)
     {
         return ActionLog::with(['user', 'company'])
             ->where('action_id', $actionId)
@@ -192,40 +201,39 @@ class LogHelper
     /**
      * Get statistics
      */
-public static function getStats(?int $companyId = null, ?int $userId = null, int $days = 30): array
-{
-    $query = ActionLog::where('created_at', '>=', now()->subDays($days));
+    public static function getStats(?int $companyId = null, ?int $userId = null, int $days = 30): array
+    {
+        $query = ActionLog::where('created_at', '>=', now()->subDays($days));
 
-    if ($companyId) {
-        $query->where('company_id', $companyId);
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+
+        $actionCounts = (clone $query)
+            ->selectRaw('action, COUNT(*) as count')
+            ->groupBy('action')
+            ->pluck('count', 'action')
+            ->toArray();
+
+
+        $moduleCounts = (clone $query)
+            ->selectRaw('module, COUNT(*) as count')
+            ->groupBy('module')
+            ->pluck('count', 'module')
+            ->toArray();
+
+        return [
+            'total_actions' => array_sum($actionCounts),
+            'created' => $actionCounts['created'] ?? 0,
+            'updated' => $actionCounts['updated'] ?? 0,
+            'deleted' => $actionCounts['deleted'] ?? 0,
+            'by_module' => $moduleCounts,
+            'by_action' => $actionCounts,
+        ];
     }
-
-    if ($userId) {
-        $query->where('user_id', $userId);
-    }
-
-  
-    $actionCounts = (clone $query)
-        ->selectRaw('action, COUNT(*) as count')
-        ->groupBy('action')
-        ->pluck('count', 'action')
-        ->toArray();
-
-   
-    $moduleCounts = (clone $query)
-        ->selectRaw('module, COUNT(*) as count')
-        ->groupBy('module')
-        ->pluck('count', 'module')
-        ->toArray();
-
-    return [
-        'total_actions' => array_sum($actionCounts),
-        'created' => $actionCounts['created'] ?? 0,
-        'updated' => $actionCounts['updated'] ?? 0,
-        'deleted' => $actionCounts['deleted'] ?? 0,
-        'by_module' => $moduleCounts,
-        'by_action' => $actionCounts,
-    ];
-}
-
 }

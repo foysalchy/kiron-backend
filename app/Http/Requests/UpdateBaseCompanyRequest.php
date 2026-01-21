@@ -14,10 +14,9 @@ abstract class UpdateBaseCompanyRequest extends FormRequest
         $user = $this->user();
 
         return [
-            'company_id' => [
-                $user->isSuperAdmin() ? 'sometimes|required' : 'prohibited',
-                'exists:companies,id',
-            ],
+            'company_id' => $user->isSuperAdmin()
+                ? ['sometimes', 'required', 'exists:companies,id']
+                : ['prohibited'],
         ];
     }
 

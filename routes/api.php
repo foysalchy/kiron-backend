@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CellController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LogActionController;
@@ -37,6 +39,7 @@ use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\SalesOrderController;
+use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
@@ -368,9 +371,47 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
             Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
         });
-        Route::prefix('inventroy')->group(function () {
-            Route::get('/summary', [InventroyController::class, 'index']);
+        Route::prefix('bin')->group(function () {
+            Route::get('/', [BinController::class, 'index']);
+            Route::post('/', [BinController::class, 'store']);
+            Route::get('/{id}', [BinController::class, 'show']);
+            Route::put('/{id}', [BinController::class, 'update']);
+            Route::delete('/{id}', [BinController::class, 'destroy']);
 
+            // Status change
+            Route::post('/{id}/change-status', [BinController::class, 'changeStatus']);
+
+            // Filter by location
+            Route::get('/by-warehouse', [BinController::class, 'byWarehouse']);
+            Route::get('/by-area', [BinController::class, 'byArea']);
+            Route::get('/by-rack', [BinController::class, 'byRack']);
+        });
+        Route::prefix('inventroy')->group(function () {
+            Route::get('/summary', [InventoryController::class, 'index']);
+            Route::get('movements', [InventoryController::class, 'movements']);
+
+            // CRUD operations
+            Route::post('movements', [InventoryController::class, 'store']);
+            Route::get('movements/{id}', [InventoryController::class, 'show']);
+            Route::put('movements/{id}', [InventoryController::class, 'update']);
+            Route::delete('movements/{id}', [InventoryController::class, 'destroy']);
+
+            // Actions
+            Route::post('movements/{id}/approve', [InventoryController::class, 'approve']);
+            Route::post('movements/{id}/cancel', [InventoryController::class, 'cancel']);
+        });
+        Route::prefix('inventroy/movement-requests')->group(function () {
+            Route::get('/', [StockMovementRequestController::class, 'index']);
+            Route::post('/', [StockMovementRequestController::class, 'store']);
+            Route::get('/{id}', [StockMovementRequestController::class, 'show']);
+            Route::put('/{id}', [StockMovementRequestController::class, 'update']);
+            Route::delete('/{id}', [StockMovementRequestController::class, 'destroy']);
+
+            // Actions
+            Route::post('/{id}/approve', [StockMovementRequestController::class, 'approve']);
+            Route::post('/{id}/reject', [StockMovementRequestController::class, 'reject']);
+            Route::post('/{id}/cancel', [StockMovementRequestController::class, 'cancel']);
+            Route::post('/{id}/convert-to-movement', [StockMovementRequestController::class, 'convertToMovement']);
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);

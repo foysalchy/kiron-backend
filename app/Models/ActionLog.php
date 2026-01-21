@@ -16,6 +16,7 @@ class ActionLog extends Model
         'user_id',
         'action_id',
         'action',
+        'action_type',
         'module',
     ];
 
@@ -30,12 +31,12 @@ class ActionLog extends Model
     // Relationships
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Company::class)->select('id','name');
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->select('id','name');
     }
 
     // Scopes
