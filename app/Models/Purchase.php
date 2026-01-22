@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,10 +12,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Purchase extends Model
 {
     use SoftDeletes, CompanyScoped;
-
-    const STATUS_DRAFT = 0;
-    const STATUS_COMPLETED = 1;
-    const STATUS_CANCELLED = 2;
 
     const PAYMENT_UNPAID = 0;
     const PAYMENT_PARTIAL = 1;
@@ -54,12 +51,28 @@ class Purchase extends Model
         'payment_status' => 'integer',
     ];
 
-    protected $appends = [
-        'status_text',
-        'payment_status_text',
-        'due_amount',
-    ];
+    protected static function boot()
+    {
+        parent::boot();
 
+        static::creating(function ($model) {
+            $model->reference_no = self::generateReferenceNumber();
+        });
+    }
+
+    public static function generateReferenceNumber(): string
+    {
+        $date = now()->format('Ymd');
+        $lastPurchase = self::whereDate('created_at', now())
+            ->latest('id')
+            ->first();
+
+        $number = $lastPurchase ? (int) substr($lastPurchase->reference_no, -4) + 1 : 1;
+
+        return 'PUR-' . $date . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+    }
+
+ 
     // Relationships
     public function company(): BelongsTo
     {
@@ -68,12 +81,12 @@ class Purchase extends Model
 
     public function warehouse(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class)->select('id','name');
+        return $this->belongsTo(Warehouse::class)->select('id', 'name');
     }
 
     public function supplier(): BelongsTo
     {
-        return $this->belongsTo(Party::class, 'supplier_id')->select('id','name');
+        return $this->belongsTo(Party::class, 'supplier_id')->select('id', 'name');
     }
 
     public function purchaseDetails(): HasMany
@@ -104,28 +117,18 @@ class Purchase extends Model
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', self::STATUS_COMPLETED);
+        return $query->where('status', Status::Completed->value);
     }
 
     public function scopeDraft($query)
     {
-        return $query->where('status', self::STATUS_DRAFT);
+        return $query->where('status', Status::Draft->value);
     }
 
-    // Accessors
-    public function getStatusTextAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_DRAFT => 'Draft',
-            self::STATUS_COMPLETED => 'Completed',
-            self::STATUS_CANCELLED => 'Cancelled',
-            default => 'Unknown',
-        };
-    }
 
     public function getPaymentStatusTextAttribute(): string
     {
-        return match($this->payment_status) {
+        return match ($this->payment_status) {
             self::PAYMENT_UNPAID => 'Unpaid',
             self::PAYMENT_PARTIAL => 'Partial',
             self::PAYMENT_PAID => 'Paid',
@@ -142,17 +145,17 @@ class Purchase extends Model
     // Helper Methods
     public function isDraft(): bool
     {
-        return $this->status === self::STATUS_DRAFT;
+        return $this->status === Status::Draft->value;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return $this->status === Status::Completed->value;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === Status::Cancelled->value;
     }
 
     public function isPaid(): bool

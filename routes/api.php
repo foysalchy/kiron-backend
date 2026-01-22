@@ -41,6 +41,7 @@ use App\Http\Controllers\Api\RejoinController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\SalesOrderController;
+use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\WarehouseController;
@@ -419,6 +420,15 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/reject', [StockMovementRequestController::class, 'reject']);
             Route::post('/{id}/cancel', [StockMovementRequestController::class, 'cancel']);
             Route::post('/{id}/convert-to-movement', [StockMovementRequestController::class, 'convertToMovement']);
+        });
+        Route::prefix('inventroy/adjustments')->group(function () {
+            Route::get('/', [StockAdjustmentController::class, 'index']);
+            Route::post('/', [StockAdjustmentController::class, 'store']);
+            Route::get('/{id}', [StockAdjustmentController::class, 'show']);
+            Route::put('/{id}', [StockAdjustmentController::class, 'update']);
+            Route::delete('/{id}', [StockAdjustmentController::class, 'destroy']);
+            Route::post('/{id}/restore', [StockAdjustmentController::class, 'restore']);
+            Route::delete('/{id}/force', [StockAdjustmentController::class, 'forceDestroy']);
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Status;
 use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -41,13 +42,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                         ->where('company_id', $companyId)
                         ->where('type', 1),
                 ],
-                'reference_no' => [
-                    'sometimes',
-                    'required',
-                    'string',
-                    'max:255',
-                    Rule::unique('purchases', 'reference_no')->ignore($purchaseId)
-                ],
+
                 'purchase_date' => ['sometimes', 'required', 'date'],
 
                 // Purchase Details
@@ -75,7 +70,14 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 'payment_note' => ['nullable', 'string'],
 
                 // Status
-                'status' => ['nullable', Rule::in([0, 1, 2])],
+                'status' => [
+                    'nullable',
+                    Rule::in([
+                        Status::Draft->value,      // 13
+                        Status::Cancelled->value,  // 10
+                        Status::Completed->value,  // 8
+                    ]),
+                ],
                 'note' => ['nullable', 'string'],
             ]
         );
@@ -88,8 +90,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
             [
                 'warehouse_id.required' => 'Warehouse is required',
                 'supplier_id.required' => 'Supplier is required',
-                'reference_no.required' => 'Reference number is required',
-                'reference_no.unique' => 'Reference number already exists',
+
                 'purchase_date.required' => 'Purchase date is required',
                 'unit_cost.required' => 'Purchase date is required',
                 'items.required' => 'At least one item is required',

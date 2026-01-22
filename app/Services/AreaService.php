@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Area;
@@ -26,8 +27,12 @@ class AreaService
                 $query->where('warehouse_id', $filters['warehouse_id']);
             }
 
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (!empty($filters['search'])) {
@@ -67,13 +72,12 @@ class AreaService
     {
         DB::beginTransaction();
         try {
-            $area =Area::create($data);
-            LogHelper::created('area', $area->id, $area->company_id);
+            $area = Area::create($data);
+            LogHelper::created('area', $area->id, $area->company_id,$area->name);
             DB::commit();
             Log::info('Area created successfully', ['area_id' => $area->id]);
 
             return $area->load(['warehouse']);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Area creation failed: ' . $e->getMessage());
@@ -93,12 +97,11 @@ class AreaService
 
             $area->update($data);
 
-            LogHelper::updated('area', $area->id, $area->company_id,);
+            LogHelper::updated('area', $area->id, $area->company_id,$area->name);
             DB::commit();
             Log::info('Area Updated Successfully', ['area_id' => $area->id]);
 
             return $area->fresh(['warehouse']);
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -119,12 +122,11 @@ class AreaService
 
             $area->delete();
 
-            LogHelper::deleted('area', $area->id, $area->company_id);
+            LogHelper::deleted('area', $area->id, $area->company_id,$area->name);
             DB::commit();
             Log::info('Area deleted successfully', ['area_id' => $id]);
 
             return true;
-
         } catch (ApiException $e) {
             throw $e;
             DB::rollBack();
@@ -146,14 +148,13 @@ class AreaService
                 throw ApiException::notFound('Area');
             }
             $area->restore();
-            LogHelper::restored('area',$area->id,$area->company_id);
+            LogHelper::restored('area', $area->id, $area->company_id,$area->name);
             DB::commit();
             return $area->load(['warehouse']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Area restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore data');
@@ -171,7 +172,7 @@ class AreaService
                 throw ApiException::notFound('Area');
             }
             $area->forceDelete();
-            LogHelper::forceDeleted('area', $id, $area->company_id);
+            LogHelper::forceDeleted('area', $id, $area->company_id,$area->name);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -192,15 +193,23 @@ class AreaService
         try {
             $area = $this->getAreaById($id);
 
-            $newStatus = $area->status == 1 ? 0 : 1;
-            $area->update(['status' => $newStatus]);
+            $currentStatus = Status::from($area->status);
 
-            LogHelper::statusChanged('area', $area->id, $area->company_id);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+
+            // update using enum value
+            $area->update([
+                'status' => $newStatus->value
+            ]);
+
+            LogHelper::statusChanged('area', $area->id, $area->company_id,$area->name .' new status '.$newStatus->label());
             DB::commit();
-            Log::info('Area status toggled', ['area_id' => $id, 'new_status' => $newStatus]);
+            Log::info('Area status toggled', ['area_id' => $id, 'new_status' => $newStatus->label()]);
 
             return $area->load(['warehouse']);
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -210,5 +219,4 @@ class AreaService
             throw ApiException::serverError('Failed to toggle area status');
         }
     }
-
 }

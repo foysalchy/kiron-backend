@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\OfficeLocation;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -21,16 +22,20 @@ class OfficeLocationService
             $query = OfficeLocation::query();
 
             // Filter by status
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', $filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             // Search by location name or address
             if (isset($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('location_name', 'like', "%{$filters['search']}%")
-                      ->orWhere('address', 'like', "%{$filters['search']}%")
-                      ->orWhere('district', 'like', "%{$filters['search']}%");
+                        ->orWhere('address', 'like', "%{$filters['search']}%")
+                        ->orWhere('district', 'like', "%{$filters['search']}%");
                 });
             }
 
@@ -71,7 +76,7 @@ class OfficeLocationService
 
         try {
             $location = OfficeLocation::create($data);
-            LogHelper::created('office_location', $location->id, $location->company_id);
+            LogHelper::created('office_location', $location->id, $location->company_id, $location->location_name);
 
             DB::commit();
 
@@ -97,7 +102,7 @@ class OfficeLocationService
             $location = $this->getLocationById($id);
 
             $location->update($data);
-            LogHelper::updated('office_location', $location->id, $location->company_id);
+            LogHelper::updated('office_location', $location->id, $location->company_id, $location->location_name);
 
             DB::commit();
 
@@ -124,7 +129,7 @@ class OfficeLocationService
         try {
             $location = $this->getLocationById($id);
             $location->delete();
-            LogHelper::deleted('office_location', $location->id, $location->company_id);
+            LogHelper::deleted('office_location', $location->id, $location->company_id, $location->location_name);
 
             Log::info('Office Location deleted successfully', ['location_id' => $id]);
 
@@ -153,7 +158,7 @@ class OfficeLocationService
             }
 
             $location->restore();
-            LogHelper::restored('office_location', $location->id, $location->company_id);
+            LogHelper::restored('office_location', $location->id, $location->company_id, $location->location_name);
 
             Log::info('Office Location restored successfully', ['location_id' => $id]);
 
@@ -181,7 +186,7 @@ class OfficeLocationService
             }
 
             $location->forceDelete();
-            LogHelper::forceDeleted('office_location', $location->id, $location->company_id);
+            LogHelper::forceDeleted('office_location', $location->id, $location->company_id, $location->location_name);
 
             DB::commit();
 
@@ -207,9 +212,16 @@ class OfficeLocationService
         DB::beginTransaction();
         try {
             $location = $this->getLocationById($id);
-            $location->update(['status' => !$location->status]);
-
-            LogHelper::statusChanged('office_location', $location->id, $location->company_id);
+            $currentStatus = Status::from($location->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $location->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('office_location', $location->id, $location->company_id, $location->location_name . ' new status ' . $newStatus->label());
             Log::info('Office Location status toggled', ['location_id' => $id]);
             DB::commit();
             return $location;

@@ -19,6 +19,10 @@ enum Status: int
   case Suspended  = 12;
   case Draft      = 13;
   case Trashed    = 14;
+  case Hold       = 15;
+  case Waiting    = 16;
+  case Cleared    = 17;
+  case NotCleared = 18;
 
   public function label(): string
   {
@@ -38,6 +42,10 @@ enum Status: int
       self::Suspended  => 'Suspended',
       self::Draft      => 'Draft',
       self::Trashed    => 'Deleted',
+      self::Hold       => 'Hold',
+      self::Waiting    => 'Waiting',
+      self::Cleared    => 'Cleared',
+      self::NotCleared => 'NotCleared',
     };
   }
 

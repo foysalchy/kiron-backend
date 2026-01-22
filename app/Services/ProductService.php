@@ -619,7 +619,7 @@ class ProductService
             $serialNumbers = $data['serial_numbers'] ?? null;
             $adjustmentQuantity = $data['quantity']; // Can be + or -
             $adjustmentType = $data['transaction_type'] ?? 'adjustment';
-                    $referenceType = $data['reference_type'] ?? 'StockAdjustment';
+            $referenceType = $data['reference_type'] ?? 'StockAdjustment';
             $referenceId = $data['reference_id'] ?? null;
             $notes = $data['notes'] ?? 'Manual stock adjustment';
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,13 +12,6 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 class OrderReturn extends Model
 {
     use HasFactory, SoftDeletes,CompanyScoped;
-
-    // Status constants
-    public const STATUS_PENDING = 0;
-    public const STATUS_CLEARED = 1;
-    public const STATUS_NOT_CLEARED = 2;
-    public const STATUS_WAITING = 3;
-    public const STATUS_CANCELLED = 4;
 
     protected $fillable = [
         'company_id',
@@ -127,59 +121,46 @@ class OrderReturn extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === Status::Pending->value;
     }
 
     public function isCleared(): bool
     {
-        return $this->status === self::STATUS_CLEARED;
+        return $this->status === Status::Cleared->value;
     }
 
     public function isNotCleared(): bool
     {
-        return $this->status === self::STATUS_NOT_CLEARED;
+        return $this->status === Status::NotCleared->value;
     }
 
     public function isWaiting(): bool
     {
-        return $this->status === self::STATUS_WAITING;
+        return $this->status === Status::Waiting->value;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === Status::Cancelled;
     }
 
-    /**
-     * Get status label
-     */
-    public function getStatusLabelAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_PENDING => 'Pending',
-            self::STATUS_CLEARED => 'Cleared',
-            self::STATUS_NOT_CLEARED => 'Not Cleared',
-            self::STATUS_WAITING => 'Waiting',
-            self::STATUS_CANCELLED => 'Cancelled',
-            default => 'Unknown',
-        };
-    }
+
 
     /**
      * Scopes
      */
     public function scopePending($query)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('status', Status::Pending->value);
     }
 
     public function scopeCleared($query)
     {
-        return $query->where('status', self::STATUS_CLEARED);
+        return $query->where('status', Status::Cleared->value);
     }
 
     public function scopeWaiting($query)
     {
-        return $query->where('status', self::STATUS_WAITING);
+        return $query->where('status', Status::Waiting->value);
     }
 }

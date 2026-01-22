@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,13 +15,6 @@ class Order extends Model
     // Order types
     public const TYPE_POS = 'pos';
     public const TYPE_SALES = 'sales';
-
-    // Status constants
-    public const STATUS_PENDING = 0;
-    public const STATUS_COMPLETED = 1;
-    public const STATUS_CANCELLED = 2;
-    public const STATUS_ON_HOLD = 3;
-
     // Payment status constants
     public const PAYMENT_UNPAID = 0;
     public const PAYMENT_PARTIAL = 1;
@@ -155,22 +149,22 @@ class Order extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === Status::Pending->value;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return $this->status === Status::Completed->value;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === Status::Cancelled->value;
     }
 
     public function isOnHold(): bool
     {
-        return $this->status === self::STATUS_ON_HOLD;
+        return $this->status === Status::Hold->value;
     }
 
     /**
@@ -203,19 +197,7 @@ class Order extends Model
         };
     }
 
-    /**
-     * Get status label
-     */
-    public function getStatusLabelAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_PENDING => 'Pending',
-            self::STATUS_COMPLETED => 'Completed',
-            self::STATUS_CANCELLED => 'Cancelled',
-            self::STATUS_ON_HOLD => 'On Hold',
-            default => 'Unknown',
-        };
-    }
+   
 
     /**
      * Get payment status label
@@ -245,17 +227,17 @@ class Order extends Model
 
     public function scopePending($query)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('status', Status::Pending->value);
     }
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', self::STATUS_COMPLETED);
+        return $query->where('status', Status::Completed->value);
     }
 
     public function scopeOnHold($query)
     {
-        return $query->where('status', self::STATUS_ON_HOLD);
+        return $query->where('status', Status::Hold->value);
     }
 
     public function scopeToday($query)

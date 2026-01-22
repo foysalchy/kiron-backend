@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Models\Employee;
 use App\Models\OfficeLocation;
@@ -23,8 +24,12 @@ class EmployeeService
             $query = Employee::with(['department', 'jobTitle', 'officeLocation', 'employeeType']);
 
             // Filters
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (!empty($filters['department_id'])) {
@@ -35,7 +40,7 @@ class EmployeeService
                 $query->where('employee_type_id', $filters['employee_type_id']);
             }
             if (!empty($filters['from_date']) && !empty($filters['to_date'])) {
-                $query->whereBetween('joining_date', [$filters['from_date'],$filters['to_date']]);
+                $query->whereBetween('joining_date', [$filters['from_date'], $filters['to_date']]);
             }
 
             // Search by Name, Email or Phone
@@ -43,8 +48,8 @@ class EmployeeService
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%");
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
                 });
             }
 
@@ -94,7 +99,7 @@ class EmployeeService
             }
 
             $employee = Employee::create($data);
-            LogHelper::created('employee', $employee->id, $employee->company_id);
+            LogHelper::created('employee', $employee->id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name);
 
             DB::commit();
             Log::info('Employee created successfully', ['employee_id' => $employee->id]);
@@ -132,7 +137,7 @@ class EmployeeService
             }
 
             $employee->update($data);
-            LogHelper::updated('employee', $employee->id, $employee->company_id);
+            LogHelper::updated('employee', $employee->id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name);
 
             DB::commit();
             Log::info('Employee updated successfully', ['employee_id' => $employee->id]);
@@ -162,17 +167,15 @@ class EmployeeService
         try {
             $employee = $this->getEmployeeById($id);
             $employee->delete();
-            LogHelper::deleted('employee', $id, $employee->company_id);
+            LogHelper::deleted('employee', $id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name);
 
             DB::commit();
             Log::info('Employee deleted successfully', ['employee_id' => $id]);
             return true;
-        } catch (ApiException $e)
-        {
+        } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Employee deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete employee');
@@ -190,14 +193,13 @@ class EmployeeService
             if (!$employee) throw ApiException::notFound('Employee');
 
             $employee->restore();
-            LogHelper::restored('employee', $id, $employee->company_id);
+            LogHelper::restored('employee', $id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name);
             DB::commit();
             return $employee;
-        } catch (ApiException $e)
-        {
+        } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Employee restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore employee');
@@ -220,7 +222,7 @@ class EmployeeService
             }
 
             $employee->forceDelete();
-            LogHelper::forceDeleted('employee', $id, $employee->company_id);
+            LogHelper::forceDeleted('employee', $id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name);
 
             DB::commit();
             return true;
@@ -242,16 +244,22 @@ class EmployeeService
         DB::beginTransaction();
         try {
             $employee = $this->getEmployeeById($id);
-            $employee->update(['status' => $employee->status == 1 ? 0 : 1]);
-            LogHelper::statusChanged('employee', $id, $employee->company_id);
-
+            $currentStatus = Status::from($employee->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $employee->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('employee', $id, $employee->company_id, $employee->first_name . ' ' . $employee->last_name . ' new status ' . $newStatus->label());
             DB::commit();
             return $employee;
-        } catch (ApiException $e)
-        {
+        } catch (ApiException $e) {
             DB::rollBack();
-            throw $e; }
-        catch (\Exception $e) {
+            throw $e;
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Employee status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle employee status');

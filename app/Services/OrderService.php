@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{Order, OrderDetail, OrderPayment, Product};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -12,9 +13,16 @@ use Carbon\Carbon;
 
 class OrderService
 {
+    protected ProductService $productService;
+    protected CouponService $couponService;
+
     public function __construct(
-        protected CouponService $couponService
-    ) {}
+        CouponService $couponService,
+        ProductService $productService
+    ) {
+        $this->productService = $productService;
+        $this->couponService = $couponService;
+    }
 
     /**
      * Get all orders
@@ -97,6 +105,10 @@ class OrderService
 
         return $order;
     }
+
+    /**
+     * Get hold order list
+     */
     public function getHoldOrderList(int $id, $type): Collection
     {
         $order = Order::with([
@@ -106,9 +118,9 @@ class OrderService
             'orderDetails.product',
             'orderPayments'
         ])->where('type', $type)
-        ->where('warehouse_id', $id)
-        ->where('status', Order::STATUS_ON_HOLD)
-        ->get();
+            ->where('warehouse_id', $id)
+            ->where('status', Status::Hold->value)
+            ->get();
 
         if (!$order) {
             throw ApiException::notFound('Order');
@@ -149,7 +161,6 @@ class OrderService
 
             unset($data['items'], $data['payments'], $data['coupon_code']);
 
-
             $data['order_date'] = $data['order_date'] ?? Carbon::now();
 
             // Calculate totals
@@ -172,7 +183,7 @@ class OrderService
                 $data['grand_total'] -= $data['coupon_discount'];
             }
 
-            // Handle payments - both POS and Sales use order_payments table
+            // Handle payments
             $totalPaid = 0;
             if (!empty($payments)) {
                 $totalPaid = array_sum(array_column($payments, 'amount'));
@@ -181,10 +192,10 @@ class OrderService
             $data['payment_amount'] = $totalPaid;
             $data['payment_status'] = $this->determinePaymentStatus($data['grand_total'], $totalPaid);
 
-            // Create order (order_no auto-generated in boot method)
+            // Create order
             $order = Order::create($data);
 
-            // Create order details
+            // Create order details and deduct stock
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
 
@@ -197,12 +208,14 @@ class OrderService
                     'tax' => $item['tax'] ?? 0,
                     'total' => $itemTotal,
                 ]);
-                $product=Product::where('id',$item['product_id'])->first();
-                $product->available_stock=$product->available_stock-$item['quantity'];
-                $product->update();
+
+                // Deduct stock using ProductService (for completed/pending orders, not hold)
+                if ($order->status !== Status::Hold->value) {
+                    $this->deductOrderStock($order, $item);
+                }
             }
 
-            // Create payments (for both POS and Sales if provided)
+            // Create payments
             if (!empty($payments)) {
                 foreach ($payments as $payment) {
                     OrderPayment::create([
@@ -230,7 +243,8 @@ class OrderService
 
             Log::info('Order created successfully', [
                 'order_id' => $order->id,
-                'type' => $order->type
+                'type' => $order->type,
+                'status' => $order->status
             ]);
             LogHelper::created('order', $order->id, $order->company_id);
 
@@ -248,6 +262,232 @@ class OrderService
             throw ApiException::serverError('Failed to create order: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Cancel order
+     */
+    public function cancelOrder(int $id, string $type): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($id, $type);
+
+            if ($order->isCompleted()) {
+                throw ApiException::badRequest('Cannot cancel completed order');
+            }
+
+            if ($order->isCancelled()) {
+                throw ApiException::badRequest('Order is already cancelled');
+            }
+
+            $oldStatus = $order->status;
+
+            // If order was pending/completed (not on hold), restore stock
+            if ($oldStatus !== Status::Hold->value) {
+                $this->restoreOrderStock($order);
+            }
+
+            $order->update(['status' => Status::Cancelled->value]);
+
+            DB::commit();
+
+            Log::info('Order cancelled', ['order_id' => $id]);
+            LogHelper::custom('cancelled', 'order', $id, $order->company_id);
+
+            return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order cancellation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to cancel order');
+        }
+    }
+
+    /**
+     * Complete order
+     */
+    public function completeOrder(int $id, string $type): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($id, $type);
+
+            if ($order->isCompleted()) {
+                throw ApiException::badRequest('Order is already completed');
+            }
+
+            if ($order->isCancelled()) {
+                throw ApiException::badRequest('Cannot complete cancelled order');
+            }
+
+            $oldStatus = $order->status;
+
+            // If order was on hold, deduct stock now
+            if ($oldStatus === Status::Hold->value) {
+                foreach ($order->orderDetails as $detail) {
+                    $this->deductOrderStock($order, [
+                        'product_id' => $detail->product_id,
+                        'quantity' => $detail->quantity
+                    ]);
+                }
+            }
+
+            $order->update(['status' => Status::Completed->value]);
+
+            DB::commit();
+
+            Log::info('Order completed', ['order_id' => $id]);
+            LogHelper::custom('completed', 'order', $id, $order->company_id);
+
+            return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order completion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to complete order');
+        }
+    }
+
+    /**
+     * Hold order (POS only)
+     */
+    public function holdOrder(int $id, ?string $ref = null, string $type): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($id, $type);
+
+            if (!$order->isPOS()) {
+                throw ApiException::badRequest('Only POS orders can be put on hold');
+            }
+
+            if ($order->isCompleted() || $order->isCancelled()) {
+                throw ApiException::badRequest('Cannot hold completed or cancelled order');
+            }
+
+            if ($order->isOnHold()) {
+                throw ApiException::badRequest('Order is already on hold');
+            }
+
+            $oldStatus = $order->status;
+
+            // If order was pending, restore stock (will be deducted when resumed/completed)
+            if ($oldStatus === Status::Pending->value) {
+                $this->restoreOrderStock($order);
+            }
+
+            $order->update([
+                'status' => Status::Hold->value,
+                'hold_ref' => $ref,
+            ]);
+
+            DB::commit();
+
+            Log::info('Order put on hold', ['order_id' => $id]);
+            LogHelper::custom('on_hold', 'order', $id, $order->company_id);
+
+            return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order hold failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to hold order');
+        }
+    }
+
+    /**
+     * Resume held order
+     */
+    public function resumeOrder(int $id, string $type): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($id, $type);
+
+            if (!$order->isOnHold()) {
+                throw ApiException::badRequest('Order is not on hold');
+            }
+
+            // Deduct stock when resuming
+            foreach ($order->orderDetails as $detail) {
+                $this->deductOrderStock($order, [
+                    'product_id' => $detail->product_id,
+                    'quantity' => $detail->quantity
+                ]);
+            }
+
+            $order->update([
+                'status' => Status::Pending->value,
+                'hold_ref' => null,
+            ]);
+
+            DB::commit();
+
+            Log::info('Order resumed from hold', ['order_id' => $id]);
+            LogHelper::custom('resumed', 'order', $id, $order->company_id);
+
+            return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order resume failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to resume order');
+        }
+    }
+
+    /**
+     * Deduct stock for order item
+     */
+    private function deductOrderStock(Order $order, array $item): void
+    {
+        $this->productService->removeStockFromWarehouse($item['product_id'], [
+            'warehouse_id' => $order->warehouse_id,
+            'bin_id' => null,
+            'quantity' => $item['quantity'],
+            'batch_number' => null,
+            'serial_numbers' => null,
+            'transaction_type' => 'sale',
+            'reference_type' => $order->type === Order::TYPE_POS ? 'POSOrder' : 'SalesOrder',
+            'reference_id' => $order->id,
+            'notes' => "Stock deducted for order: {$order->order_no}"
+        ]);
+    }
+
+    /**
+     * Restore stock for cancelled/held order
+     */
+    private function restoreOrderStock(Order $order): void
+    {
+        foreach ($order->orderDetails as $detail) {
+            $this->productService->addStockToWarehouse($detail->product_id, [
+                'warehouse_id' => $order->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'return',
+                'reference_type' => 'OrderCancellation',
+                'reference_id' => $order->id,
+                'notes' => "Stock restored from cancelled/held order: {$order->order_no}"
+            ]);
+        }
+    }
+
+    // ========================================
+    // CALCULATION METHODS
+    // ========================================
 
     /**
      * Calculate item total
@@ -304,155 +544,5 @@ class OrderService
         }
 
         return Order::PAYMENT_PARTIAL;
-    }
-
-    /**
-     * Cancel order
-     */
-    public function cancelOrder(int $id, string $type): Order
-    {
-        DB::beginTransaction();
-
-        try {
-            $order = $this->getOrderById($id, $type);
-
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Cannot cancel completed order');
-            }
-
-            if ($order->isCancelled()) {
-                throw ApiException::badRequest('Order is already cancelled');
-            }
-
-            $order->update(['status' => Order::STATUS_CANCELLED]);
-
-            DB::commit();
-
-            Log::info('Order cancelled', ['order_id' => $id]);
-            LogHelper::custom('cancelled', 'order', $id, $order->company_id);
-
-            return $order;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Order cancellation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to cancel order');
-        }
-    }
-
-    /**
-     * Complete order
-     */
-    public function completeOrder(int $id, string $type): Order
-    {
-        DB::beginTransaction();
-
-        try {
-            $order = $this->getOrderById($id, $type);
-
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Order is already completed');
-            }
-
-            if ($order->isCancelled()) {
-                throw ApiException::badRequest('Cannot complete cancelled order');
-            }
-
-            $order->update(['status' => Order::STATUS_COMPLETED]);
-
-            DB::commit();
-
-            Log::info('Order completed', ['order_id' => $id]);
-            LogHelper::custom('completed', 'order', $id, $order->company_id);
-
-            return $order;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Order completion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to complete order');
-        }
-    }
-
-    /**
-     * Hold order (POS only)
-     */
-    public function holdOrder(int $id, ?string $ref = null, string $type): Order
-    {
-        DB::beginTransaction();
-
-        try {
-            $order = $this->getOrderById($id, $type);
-
-            if (!$order->isPOS()) {
-                throw ApiException::badRequest('Only POS orders can be put on hold');
-            }
-
-            if ($order->isCompleted() || $order->isCancelled()) {
-                throw ApiException::badRequest('Cannot hold completed or cancelled order');
-            }
-
-            if ($order->isOnHold()) {
-                throw ApiException::badRequest('Order is already on hold');
-            }
-
-            $order->update([
-                'status' => Order::STATUS_ON_HOLD,
-                'hold_ref' => $ref,
-            ]);
-
-            DB::commit();
-
-            Log::info('Order put on hold', ['order_id' => $id]);
-            LogHelper::custom('on_hold', 'order', $id, $order->company_id);
-
-            return $order;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Order hold failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to hold order');
-        }
-    }
-
-    /**
-     * Resume held order
-     */
-    public function resumeOrder(int $id, string $type): Order
-    {
-        DB::beginTransaction();
-
-        try {
-            $order = $this->getOrderById($id, $type);
-
-            if (!$order->isOnHold()) {
-                throw ApiException::badRequest('Order is not on hold');
-            }
-
-            $order->update([
-                'status' => Order::STATUS_PENDING,
-                'hold_ref' => null,
-            ]);
-
-            DB::commit();
-
-            Log::info('Order resumed from hold', ['order_id' => $id]);
-            LogHelper::custom('resumed', 'order', $id, $order->company_id);
-
-            return $order;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Order resume failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to resume order');
-        }
     }
 }

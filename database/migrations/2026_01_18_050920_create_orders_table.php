@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -39,7 +40,7 @@ return new class extends Migration
             $table->tinyInteger('payment_status')->default(0)->comment('0=unpaid, 1=partial, 2=paid');
 
             // Status
-            $table->tinyInteger('status')->default(0)->comment('0=pending, 1=completed, 2=cancelled, 3=on_hold');
+            $table->tinyInteger('status')->default(Status::Pending->value);
             $table->text('note')->nullable();
             $table->text('hold_ref')->nullable();
 
