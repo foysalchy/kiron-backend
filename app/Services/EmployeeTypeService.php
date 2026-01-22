@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\EmployeeType;
@@ -21,10 +22,13 @@ class EmployeeTypeService
             $query = EmployeeType::query();
 
             // Status Filter
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             // Search by Name
             if (!empty($filters['search'])) {
                 $search = $filters['search'];
@@ -66,7 +70,7 @@ class EmployeeTypeService
         try {
             $employeeType = EmployeeType::create($data);
 
-            LogHelper::created('employee_type', $employeeType->id, $employeeType->company_id);
+            LogHelper::created('employee_type', $employeeType->id, $employeeType->company_id, $employeeType->type_name);
             Log::info('Employee Type created successfully', ['type_id' => $employeeType->id]);
             DB::commit();
             return $employeeType;
@@ -87,7 +91,7 @@ class EmployeeTypeService
             $employeeType = $this->getEmployeeTypeById($id);
             $employeeType->update($data);
 
-            LogHelper::updated('employee_type', $employeeType->id, $employeeType->company_id);
+            LogHelper::updated('employee_type', $employeeType->id, $employeeType->company_id, $employeeType->type_name);
             Log::info('Employee Type Updated Successfully', ['type_id' => $employeeType->id]);
             DB::commit();
             return $employeeType->fresh();
@@ -111,7 +115,7 @@ class EmployeeTypeService
             $employeeType = $this->getEmployeeTypeById($id);
             $employeeType->delete();
 
-            LogHelper::deleted('employee_type', $employeeType->id, $employeeType->company_id);
+            LogHelper::deleted('employee_type', $employeeType->id, $employeeType->company_id, $employeeType->type_name);
             Log::info('Employee Type deleted successfully', ['type_id' => $id]);
 
             DB::commit();
@@ -139,7 +143,7 @@ class EmployeeTypeService
             }
             $employeeType->restore();
 
-            LogHelper::restored('employee_type', $employeeType->id, $employeeType->company_id);
+            LogHelper::restored('employee_type', $employeeType->id, $employeeType->company_id, $employeeType->type_name);
             Log::info('Employee Type restored successfully', ['type_id' => $id]);
             DB::commit();
             return $employeeType;
@@ -166,7 +170,7 @@ class EmployeeTypeService
             }
             $employeeType->forceDelete();
 
-            LogHelper::forceDeleted('employee_type', $id, $employeeType->company_id);
+            LogHelper::forceDeleted('employee_type', $id, $employeeType->company_id, $employeeType->type_name);
             Log::info('Employee Type permanently deleted', ['type_id' => $id]);
 
             DB::commit();
@@ -190,11 +194,18 @@ class EmployeeTypeService
         try {
             $employeeType = $this->getEmployeeTypeById($id);
 
-            $newStatus = $employeeType->status == 1 ? 0 : 1;
-            $employeeType->update(['status' => $newStatus]);
+            $currentStatus = Status::from($employeeType->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $employeeType->update([
+                'status' => $newStatus->value
+            ]);
 
-            LogHelper::statusChanged('employee_type', $employeeType->id, $employeeType->company_id);
-            Log::info('Employee Type status toggled', ['type_id' => $id, 'new_status' => $newStatus]);
+            LogHelper::statusChanged('employee_type', $employeeType->id, $employeeType->company_id, $employeeType->type_name . ' new status ' . $newStatus->label());
+            Log::info('Employee Type status toggled', ['type_id' => $id, 'new_status' => $newStatus->label()]);
 
             DB::commit();
             return $employeeType;

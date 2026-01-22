@@ -39,6 +39,7 @@ class ProductStockLedger extends Model
     const TYPE_ADJUSTMENT = 'adjustment';
     const TYPE_RETURN = 'return';
     const TYPE_INITIAL_STOCK = 'initial_stock';
+    const TYPE_CORRECTION = 'correction';
 
     public const TYPES = [
         self::TYPE_PURCHASE,
@@ -48,6 +49,7 @@ class ProductStockLedger extends Model
         self::TYPE_ADJUSTMENT,
         self::TYPE_RETURN,
         self::TYPE_INITIAL_STOCK,
+        self::TYPE_CORRECTION,
     ];
 
     /**

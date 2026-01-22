@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{AddPurchasePaymentRequest, StorePurchaseRequest, UpdatePurchaseRequest};
 use App\Services\PurchaseService;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\{JsonResponse, Request};
+use Illuminate\Validation\Rule;
 
 class PurchaseController extends Controller
 {
@@ -65,7 +67,14 @@ class PurchaseController extends Controller
     public function changeStatus(Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|in:0,1,2',
+            'status' => [
+                'required',
+                Rule::in([
+                    Status::Draft->value,      // 13
+                    Status::Cancelled->value,  // 10
+                    Status::Completed->value,  // 8
+                ]),
+            ],
         ]);
 
         $data = $this->purchaseService->changeStatus($id, $request->status);

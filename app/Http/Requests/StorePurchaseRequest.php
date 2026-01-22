@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Status;
 use App\Http\Requests\BaseCompanyRequest;
 use App\Models\Party;
 use Illuminate\Contracts\Validation\Validator;
@@ -39,7 +40,6 @@ class StorePurchaseRequest extends BaseCompanyRequest
                         ->where('company_id', $companyId)
                         ->where('type', Party::TYPE_SUPPLIER),
                 ],
-                'reference_no' => ['required', 'string', 'max:255', 'unique:purchases,reference_no'],
                 'purchase_date' => ['required', 'date'],
 
                 // Purchase Details
@@ -65,9 +65,14 @@ class StorePurchaseRequest extends BaseCompanyRequest
                 'payment_type' => ['nullable', Rule::in(['cash', 'bank', 'card', 'cheque'])],
                 'account' => ['nullable', 'string', 'max:255'],
                 'payment_note' => ['nullable', 'string'],
-
-                // Status
-                'status' => ['nullable', Rule::in([0, 1, 2])],
+                'status' => [
+                    'nullable',
+                    Rule::in([
+                        Status::Draft->value,      // 13
+                        Status::Cancelled->value,  // 10
+                        Status::Completed->value,  // 8
+                    ]),
+                ],
                 'note' => ['nullable', 'string'],
             ]
         );
@@ -75,25 +80,24 @@ class StorePurchaseRequest extends BaseCompanyRequest
 
     public function messages(): array
     {
-    return array_merge(
+        return array_merge(
             $this->companyMessages(),
             [
-            'warehouse_id.required' => 'Warehouse is required',
-            'warehouse_id.exists' => 'Selected warehouse does not belong to your company.',
-            'supplier_id.required' => 'Supplier is required',
-            'supplier_id.exists'  => 'Selected supplier is invalid or does not belong to your company.',
-            'reference_no.required' => 'Reference number is required',
-            'reference_no.unique' => 'Reference number already exists',
-            'purchase_date.required' => 'Purchase date is required',
-            'items.required' => 'At least one item is required',
-            'items.*.product_id.required' => 'Product is required for each item',
-            'items.*.product_id.exists' =>
-            'Selected product does not belong to the selected company.',
-            'items.*.quantity.required' => 'Quantity is required',
-            'items.*.quantity.min' => 'Quantity must be at least 1',
-            'items.*.purchase_price.required' => 'Purchase price is required',
-            'items.*.unit_cost.required' => 'Unit Cost  is required',
-        ]);
+                'warehouse_id.required' => 'Warehouse is required',
+                'warehouse_id.exists' => 'Selected warehouse does not belong to your company.',
+                'supplier_id.required' => 'Supplier is required',
+                'supplier_id.exists'  => 'Selected supplier is invalid or does not belong to your company.',
+                'purchase_date.required' => 'Purchase date is required',
+                'items.required' => 'At least one item is required',
+                'items.*.product_id.required' => 'Product is required for each item',
+                'items.*.product_id.exists' =>
+                'Selected product does not belong to the selected company.',
+                'items.*.quantity.required' => 'Quantity is required',
+                'items.*.quantity.min' => 'Quantity must be at least 1',
+                'items.*.purchase_price.required' => 'Purchase price is required',
+                'items.*.unit_cost.required' => 'Unit Cost  is required',
+            ]
+        );
     }
     protected function failedValidation(Validator $validator)
     {

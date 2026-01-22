@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\JobTitle;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -15,22 +16,25 @@ class JobTitleService
     /**
      * Get all job with optional pagination
      */
-   public function getAllJobTitles(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllJobTitles(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
             $query = JobTitle::query();
 
             // Status Filter
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             // Search by Title or Description
             if (!empty($filters['search'])) {
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
+                        ->orWhere('description', 'like', "%{$search}%");
                 });
             }
 
@@ -68,7 +72,7 @@ class JobTitleService
         DB::beginTransaction();
         try {
             $jobTitle = JobTitle::create($data);
-            LogHelper::created('job_title', $jobTitle->id, $jobTitle->company_id);
+            LogHelper::created('job_title', $jobTitle->id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
             Log::info('Job Title created successfully', ['id' => $jobTitle->id]);
             return $jobTitle;
@@ -89,14 +93,14 @@ class JobTitleService
         try {
             $jobTitle = $this->getJobTitleById($id);
             $jobTitle->update($data);
-            LogHelper::updated('job_title', $id, $jobTitle->company_id);
+            LogHelper::updated('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
             Log::info('Job Title updated successfully', ['id' => $id]);
             return $jobTitle->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Job Title update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update job title');
@@ -109,7 +113,7 @@ class JobTitleService
         try {
             $jobTitle = $this->getJobTitleById($id);
             $jobTitle->delete();
-            LogHelper::deleted('job_title', $id, $jobTitle->company_id);
+            LogHelper::deleted('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             Log::info('Job Title deleted (Soft)', ['id' => $id]);
 
             DB::commit();
@@ -127,7 +131,7 @@ class JobTitleService
             $jobTitle = JobTitle::withTrashed()->find($id);
             if (!$jobTitle) throw ApiException::notFound('Job Title');
             $jobTitle->restore();
-            LogHelper::restored('job_title', $id, $jobTitle->company_id);
+            LogHelper::restored('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
             return $jobTitle;
         } catch (\Exception $e) {
@@ -143,14 +147,13 @@ class JobTitleService
             $jobTitle = JobTitle::withTrashed()->find($id);
             if (!$jobTitle) throw ApiException::notFound('Job Title');
             $jobTitle->forceDelete();
-            LogHelper::forceDeleted('job_title', $id, $jobTitle->company_id);
+            LogHelper::forceDeleted('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
             return true;
-        }
-        catch (ApiException $e) {
+        } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Job Title permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete');
@@ -162,8 +165,16 @@ class JobTitleService
         DB::beginTransaction();
         try {
             $jobTitle = $this->getJobTitleById($id);
-            $jobTitle->update(['status' => $jobTitle->status == 1 ? 0 : 1]);
-            LogHelper::statusChanged('job_title', $id, $jobTitle->company_id);
+            $currentStatus = Status::from($jobTitle->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $jobTitle->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('job_title', $id, $jobTitle->company_id, $jobTitle->title .' new status '. $newStatus->label());
             DB::commit();
             return $jobTitle;
         } catch (\Exception $e) {
@@ -171,5 +182,4 @@ class JobTitleService
             throw ApiException::serverError('Failed to toggle status');
         }
     }
-
 }

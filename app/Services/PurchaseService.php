@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\{Purchase, PurchaseDetail};
+use App\Enums\Status;
+use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +12,13 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class PurchaseService
 {
+    protected ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
      * Get all purchases with optional pagination
      */
@@ -114,17 +122,22 @@ class PurchaseService
                 ]);
             }
 
+            // ✅ If purchase is completed, add stock to warehouse
+            if ($data['status'] == Status::Completed->value) {
+                $this->addPurchaseStockToWarehouse($purchase);
+            }
+
             DB::commit();
 
             Log::info('Purchase created successfully', ['purchase_id' => $purchase->id]);
-            LogHelper::created('purchase', $purchase->id, $purchase->company_id);
+            LogHelper::created('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);
 
             return $purchase->load(['warehouse', 'supplier', 'purchaseDetails.product']);
         } catch (\Exception $e) {
             DB::rollBack();
 
             Log::error('Purchase creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create purchase');
+            throw ApiException::serverError('Failed to create purchase: ' . $e->getMessage());
         }
     }
 
@@ -143,11 +156,19 @@ class PurchaseService
                 throw ApiException::badRequest('Cannot update cancelled purchase');
             }
 
+            // Store old status
+            $oldStatus = $purchase->status;
+
             $items = $data['items'] ?? null;
             unset($data['items']);
 
             // If items are provided, recalculate totals
             if ($items) {
+                // If purchase was completed, we need to reverse old stock first
+                if ($oldStatus == Status::Completed->value) {
+                    $this->removePurchaseStockFromWarehouse($purchase);
+                }
+
                 $totals = $this->calculateTotals($items, $data);
                 $data = array_merge($data, $totals);
 
@@ -174,6 +195,13 @@ class PurchaseService
                         'total' => $itemTotal,
                     ]);
                 }
+
+                // If new status is completed, add new stock
+                if (($data['status'] ?? $oldStatus) == Status::Completed->value) {
+                    $purchase->update($data); // Update first to get new items
+                    $purchase->refresh();
+                    $this->addPurchaseStockToWarehouse($purchase);
+                }
             } else if (isset($data['payment_amount'])) {
                 // Only payment updated
                 $data['payment_status'] = $this->determinePaymentStatus(
@@ -187,7 +215,7 @@ class PurchaseService
             DB::commit();
 
             Log::info('Purchase updated successfully', ['purchase_id' => $purchase->id]);
-            LogHelper::updated('purchase', $purchase->id, $purchase->company_id);
+            LogHelper::updated('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);
 
             return $purchase->fresh(['warehouse', 'supplier', 'purchaseDetails.product']);
         } catch (ApiException $e) {
@@ -197,7 +225,7 @@ class PurchaseService
             DB::rollBack();
 
             Log::error('Purchase update failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to update purchase');
+            throw ApiException::serverError('Failed to update purchase: ' . $e->getMessage());
         }
     }
 
@@ -234,6 +262,224 @@ class PurchaseService
             throw ApiException::serverError('Failed to delete purchase');
         }
     }
+
+    /**
+     * Change purchase status
+     */
+    public function changeStatus(int $id, int $status): Purchase
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchase = $this->getPurchaseById($id);
+            $oldStatus = $purchase->status;
+
+            // If changing from draft to completed, add stock
+            if ($oldStatus == Status::Draft->value && $status == Status::Completed->value) {
+                $this->addPurchaseStockToWarehouse($purchase);
+            }
+
+            // If changing from completed to draft/cancelled, remove stock
+            if ($oldStatus == Status::Completed->value && $status != Status::Completed->value) {
+                $this->removePurchaseStockFromWarehouse($purchase);
+            }
+
+            $getStatus = Status::from($status);
+            $purchase->update([
+                'status' => $getStatus->value
+            ]);
+
+            DB::commit();
+
+            Log::info('Purchase status changed', [
+                'purchase_id' => $id,
+                'old_status' => $oldStatus,
+                'new_status' => $status
+            ]);
+            LogHelper::custom('status_changed', 'purchase', $id, $purchase->company_id,'purchase status marked as '. $getStatus->label());
+
+            return $purchase->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Purchase status change failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to change status: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Add payment
+     */
+    public function addPayment(int $id, array $paymentData): Purchase
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchase = $this->getPurchaseById($id);
+
+            $currentPaid = $purchase->payment_amount ?? 0;
+            $newPaid = $currentPaid + $paymentData['amount'];
+
+            $purchase->update([
+                'payment_amount' => $newPaid,
+                'payment_type' => $paymentData['payment_type'] ?? $purchase->payment_type,
+                'account' => $paymentData['account'] ?? $purchase->account,
+                'payment_note' => $paymentData['payment_note'] ?? $purchase->payment_note,
+                'payment_status' => $this->determinePaymentStatus($purchase->grand_total, $newPaid),
+            ]);
+
+            DB::commit();
+
+            Log::info('Payment added to purchase', ['purchase_id' => $id, 'amount' => $paymentData['amount']]);
+            LogHelper::custom('payment_added', 'purchase', $id, $purchase->company_id);
+
+            return $purchase;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Add payment failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to add payment');
+        }
+    }
+
+    /**
+     * Restore purchase
+     */
+    public function restorePurchase(int $id): Purchase
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchase = Purchase::withTrashed()->find($id);
+
+            if (!$purchase) {
+                throw ApiException::notFound('Purchase');
+            }
+
+            $purchase->restore();
+
+            DB::commit();
+
+            Log::info('Purchase restored successfully', ['purchase_id' => $id]);
+            LogHelper::custom('restored', 'purchase', $id, $purchase->company_id);
+
+            return $purchase->load(['purchaseDetails.product']);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Purchase restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore purchase');
+        }
+    }
+
+    /**
+     * Force delete purchase
+     */
+    public function forceDeletePurchase(int $id): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchase = Purchase::withTrashed()->find($id);
+
+            if (!$purchase) {
+                throw ApiException::notFound('Purchase');
+            }
+
+            // Delete all purchase details first
+            PurchaseDetail::where('purchase_id', $id)->forceDelete();
+
+            // Delete related stock ledgers
+            ProductStockLedger::where('reference_type', 'Purchase')
+                ->where('reference_id', $id)
+                ->forceDelete();
+
+            // Permanently delete the purchase
+            $companyId = $purchase->company_id;
+            $purchase->forceDelete();
+
+            DB::commit();
+
+            Log::info('Purchase permanently deleted', ['purchase_id' => $id]);
+            LogHelper::custom('force_deleted', 'purchase', $id, $companyId);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Permanent purchase deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete purchase');
+        }
+    }
+
+    // ========================================
+    // STOCK MANAGEMENT METHODS
+    // ========================================
+
+    /**
+     * Add purchase stock to warehouse
+     */
+    private function addPurchaseStockToWarehouse(Purchase $purchase): void
+    {
+        foreach ($purchase->purchaseDetails as $detail) {
+            $this->productService->addStockToWarehouse($detail->product_id, [
+                'warehouse_id' => $purchase->warehouse_id,
+                'bin_id' => null, // Can be added later if needed
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'purchase',
+                'reference_type' => 'Purchase',
+                'reference_id' => $purchase->id,
+                'notes' => "Purchase stock added - Reference: {$purchase->reference_no}"
+            ]);
+
+            Log::info('Stock added for purchase item', [
+                'purchase_id' => $purchase->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
+    /**
+     * Remove purchase stock from warehouse (Reverse)
+     */
+    private function removePurchaseStockFromWarehouse(Purchase $purchase): void
+    {
+        foreach ($purchase->purchaseDetails as $detail) {
+            $this->productService->removeStockFromWarehouse($detail->product_id, [
+                'warehouse_id' => $purchase->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'adjustment',
+                'reference_type' => 'PurchaseReversal',
+                'reference_id' => $purchase->id,
+                'notes' => "Purchase stock reversed - Reference: {$purchase->reference_no}"
+            ]);
+
+            Log::info('Stock removed for purchase reversal', [
+                'purchase_id' => $purchase->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
+    // ========================================
+    // PRIVATE HELPER METHODS
+    // ========================================
 
     /**
      * Calculate item total
@@ -292,127 +538,5 @@ class PurchaseService
         }
 
         return Purchase::PAYMENT_PARTIAL;
-    }
-
-    /**
-     * Change purchase status
-     */
-    public function changeStatus(int $id, int $status): Purchase
-    {
-        try {
-            $purchase = $this->getPurchaseById($id);
-            $purchase->update(['status' => $status]);
-
-            Log::info('Purchase status changed', ['purchase_id' => $id, 'status' => $status]);
-            LogHelper::custom('status_changed', 'purchase', $id, $purchase->company_id);
-
-            return $purchase;
-        } catch (\Exception $e) {
-            Log::error('Purchase status change failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to change status');
-        }
-    }
-
-    /**
-     * Add payment
-     */
-    public function addPayment(int $id, array $paymentData): Purchase
-    {
-        DB::beginTransaction();
-
-        try {
-            $purchase = $this->getPurchaseById($id);
-
-            $currentPaid = $purchase->payment_amount ?? 0;
-            $newPaid = $currentPaid + $paymentData['amount'];
-
-            $purchase->update([
-                'payment_amount' => $newPaid,
-                'payment_type' => $paymentData['payment_type'] ?? $purchase->payment_type,
-                'account' => $paymentData['account'] ?? $purchase->account,
-                'payment_note' => $paymentData['payment_note'] ?? $purchase->payment_note,
-                'payment_status' => $this->determinePaymentStatus($purchase->grand_total, $newPaid),
-            ]);
-
-            DB::commit();
-
-            Log::info('Payment added to purchase', ['purchase_id' => $id, 'amount' => $paymentData['amount']]);
-            LogHelper::custom('payment_added', 'purchase', $id, $purchase->company_id);
-
-            return $purchase;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Add payment failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to add payment');
-        }
-    }
-
-    public function restorePurchase(int $id): Purchase
-    {
-        DB::beginTransaction();
-
-        try {
-            $purchase = Purchase::withTrashed()->find($id);
-
-            if (!$purchase) {
-                throw ApiException::notFound('Purchase');
-            }
-
-            $purchase->restore();
-
-            DB::commit();
-
-            Log::info('purchase restored successfully', ['purchase_id' => $id]);
-            LogHelper::custom('restored', 'purchase', $id, $purchase->company_id);
-
-            return $purchase->load(['purchaseDetails.product']);
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Purchase restoration failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to restore purchase');
-        }
-    }
-
-    /**
-     * Permanently delete a requisition
-     */
-    public function forceDeletePurchase(int $id): bool
-    {
-        DB::beginTransaction();
-
-        try {
-            $purchase = Purchase::withTrashed()->find($id);
-
-            if (!$purchase) {
-                throw ApiException::notFound('Requisition');
-            }
-
-            // Delete all requisition details first
-            PurchaseDetail::where('purchase_id', $id)->delete();
-
-            // Permanently delete the requisition
-            $companyId = $purchase->company_id;
-            $purchase->forceDelete();
-
-            DB::commit();
-
-            Log::info('Requisition permanently deleted', ['purchase_id' => $id]);
-            LogHelper::custom('force_deleted', 'purchase', $id, $companyId);
-
-            return true;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Permanent requisition deletion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to permanently delete requisition');
-        }
     }
 }

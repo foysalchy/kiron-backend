@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Attendance;
@@ -16,7 +18,7 @@ class AttendanceService
     public function getAllAttendances(array $filters = [], bool $paginate = true): array
     {
         try {
-            $query = Attendance::with(['employee.department', 'employee.jobTitle','employee.employeeType', 'employee.officeLocation']);
+            $query = Attendance::with(['employee.department', 'employee.jobTitle', 'employee.employeeType', 'employee.officeLocation']);
 
             $date = $filters['date'] ?? now()->toDateString();
             $query->whereDate('date', $date);
@@ -26,15 +28,19 @@ class AttendanceService
                 => $q->where('department_id', $filters['department_id']));
             }
 
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', $filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (!empty($filters['search'])) {
                 $search = $filters['search'];
                 $query->whereHas('employee', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
-                      ->orWhere('phone', 'like', "%{$search}%");
+                        ->orWhere('phone', 'like', "%{$search}%");
                 });
             }
 
@@ -60,7 +66,6 @@ class AttendanceService
                 'stats' => $stats,
                 'list'  => $list
             ];
-
         } catch (\Exception $e) {
             Log::error('Error fetching attendance: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch attendance records');
@@ -91,10 +96,16 @@ class AttendanceService
             $data = $this->calculateAttendanceMetrics($data, $employee);
 
             $attendance = Attendance::create($data);
+            $message = sprintf(
+                'Employee %s %s marked as %s',
+                $employee->first_name,
+                $employee->last_name,
+                $attendance->status_text
+            );
 
+            LogHelper::created('attendance', $attendance->id, $attendance->company_id, $message);
             DB::commit();
             Log::info('Attendance created', ['id' => $attendance->id]);
-            LogHelper::created('attendance', $attendance->id, $attendance->company_id);
 
             return $attendance->load('employee');
         } catch (\Exception $e) {
@@ -115,9 +126,15 @@ class AttendanceService
             $attendance = $this->getAttendanceById($id);
             $data = $this->calculateAttendanceMetrics($data, $attendance->employee);
             $attendance->update($data);
+            $message = sprintf(
+                'Employee %s %s marked as %s',
+                $attendance->employee->first_name,
+                $attendance->employee->last_name,
+                $attendance->status_text
+            );
             DB::commit();
 
-            LogHelper::updated('attendance', $id, $attendance->company_id);
+            LogHelper::updated('attendance', $id, $attendance->company_id,$message);
             return $attendance->fresh('employee');
         } catch (ApiException $e) {
             DB::rollBack();
@@ -193,7 +210,7 @@ class AttendanceService
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Attendance deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete attendance');
@@ -225,7 +242,7 @@ class AttendanceService
     /**
      * Permanently Delete
      */
-   public function forceDeleteAttendance(int $id): bool
+    public function forceDeleteAttendance(int $id): bool
     {
         DB::beginTransaction();
         try {
@@ -264,7 +281,7 @@ class AttendanceService
             $attendance->update(['status' => $status]);
 
             DB::commit();
-            LogHelper::custom('status_changed', 'attendance', $id, $attendance->company_id);
+            LogHelper::custom('status_changed', 'attendance', $id, $attendance->company_id,$attendance->status_text);
 
             return $attendance;
         } catch (ApiException $e) {

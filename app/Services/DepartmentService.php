@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\Department;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -20,22 +21,26 @@ class DepartmentService
         try {
             $query = Department::query();
 
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-            if(!empty($filters['parent_department'])){
-                $query->where('parent_department',$filters['parent_department']);
+            if (!empty($filters['parent_department'])) {
+                $query->where('parent_department', $filters['parent_department']);
             }
-            if(!empty($filters['in_charge'])){
-                $query->where('in_charge',$filters['in_charge']);
+            if (!empty($filters['in_charge'])) {
+                $query->where('in_charge', $filters['in_charge']);
             }
 
             if (!empty($filters['search'])) {
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('code', 'like', "%{$search}%")
-                      ->orWhere('in_charge', 'like', "%{$search}%");
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('in_charge', 'like', "%{$search}%");
                 });
             }
 
@@ -70,9 +75,9 @@ class DepartmentService
         DB::beginTransaction();
         try {
             $department = Department::create($data);
-            LogHelper::created('department', $department->id, $department->company_id);
+            LogHelper::created('department', $department->id, $department->company_id, $department->name);
             DB::commit();
-            Log::info('Department created successfully',['department_id' => $department->id]);
+            Log::info('Department created successfully', ['department_id' => $department->id]);
             return $department;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -91,9 +96,9 @@ class DepartmentService
             $department = $this->getDepartmentById($id);
             $department->update($data);
 
-            LogHelper::updated('department', $department->id, $department->company_id);
+            LogHelper::updated('department', $department->id, $department->company_id, $department->name);
             DB::commit();
-            Log::info('Department Updated Successfully',['department_id'=>$department->id]);
+            Log::info('Department Updated Successfully', ['department_id' => $department->id]);
             return $department->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
@@ -115,14 +120,14 @@ class DepartmentService
             $department = $this->getDepartmentById($id);
             $department->delete();
 
-            LogHelper::deleted('department', $department->id, $department->company_id);
+            LogHelper::deleted('department', $department->id, $department->company_id, $department->name);
             DB::commit();
-            Log::info('Department Deleted Successfully',['department_id'=>$id]);
+            Log::info('Department Deleted Successfully', ['department_id' => $id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Department deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete department');
@@ -141,7 +146,7 @@ class DepartmentService
                 throw ApiException::notFound('Department');
             }
             $department->restore();
-            LogHelper::restored('department', $department->id, $department->company_id);
+            LogHelper::restored('department', $department->id, $department->company_id, $department->name);
             DB::commit();
             return $department;
         } catch (\Exception $e) {
@@ -156,19 +161,18 @@ class DepartmentService
     {
         DB::beginTransaction();
         try {
-            $department =Department::withTrashed()->find($id);
+            $department = Department::withTrashed()->find($id);
 
             if (!$department) {
                 throw ApiException::notFound('Department');
             }
 
             $department->forceDelete();
-            LogHelper::forceDeleted('department_value', $department->id, $department->company_id);
+            LogHelper::forceDeleted('department_value', $department->id, $department->company_id, $department->name);
 
             Log::info('Department permanently deleted', ['department_id' => $id]);
             DB::commit();
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -178,7 +182,7 @@ class DepartmentService
             throw ApiException::serverError('Failed to permanently delete department');
         }
     }
-     /**
+    /**
      * Toggle department status
      */
     public function toggleStatus(int $id): Department
@@ -186,8 +190,16 @@ class DepartmentService
         DB::beginTransaction();
         try {
             $department = $this->getDepartmentById($id);
-            $department->update(['status' => !$department->status]);
-            LogHelper::statusChanged('department', $department->id, $department->company_id);
+            $currentStatus = Status::from($department->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $department->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('department', $department->id, $department->company_id, $department->name . ' new status '.$newStatus->label());
             Log::info('Department status toggled', ['department_id' => $id]);
             DB::commit();
             return $department;

@@ -210,12 +210,10 @@ class AttributeGroupService
             $group = $this->getAttributeGroupById($id);
             // current status as enum
             $currentStatus = Status::from($group->status);
-
             // toggle logic
             $newStatus = $currentStatus === Status::Active
                 ? Status::Inactive
                 : Status::Active;
-
             // update using enum value
             $group->update([
                 'status' => $newStatus->value
