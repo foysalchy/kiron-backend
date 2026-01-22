@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->date('rejoin_date')->nullable();
             $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');
+            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

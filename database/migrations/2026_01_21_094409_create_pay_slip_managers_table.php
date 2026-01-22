@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();
             $table->foreignId('pay_roll_pay_head_id')->constrained('pay_roll_pay_heads')->cascadeOnDelete();
             $table->date('date');
+            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

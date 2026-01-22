@@ -15,14 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
+            $table->string('letter')->nullable()->comment('img or pdf');
             $table->string('type')->comment('resignation, termination');
+            $table->json('resign_rule_ids');
             $table->date('letter_received_date')->nullable();
             $table->date('resign_date')->nullable();
-            $table->string('letter')->nullable()->comment('img or pdf');
-            $table->json('rules')->nullable();
             $table->text('reason')->nullable();
             $table->text('activities')->nullable()->comment('good or bad');
             $table->boolean('is_applied')->default(false);
+            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

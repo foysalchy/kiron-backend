@@ -36,11 +36,7 @@ class RejoinController extends Controller
      */
     public function store(StoreRejoinRequest $request): JsonResponse
     {
-        // Rejoin typically needs the company_id from the authenticated user
-        $validatedData = $request->validated();
-        $validatedData['company_id'] = auth()->user()->company_id;
-
-        $data = $this->rejoinService->createRejoin($validatedData);
+         $data = $this->rejoinService->createRejoin($request->validated());
 
         return ResponseHelper::success($data, 'Employee rejoined successfully', 201);
     }

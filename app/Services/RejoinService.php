@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
@@ -17,14 +18,22 @@ class RejoinService
     public function getAllRejoins(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Rejoin::with(['employee:id,full_name']);
+            $query = Rejoin::with(['employee:id,first_name']);
 
-            if (isset($filters['search']) && $filters['search'] !== '') {
-                $search = $filters['search'];
-                $query->whereHas('employee', function ($q) use ($search) {
-                    $q->where('full_name', 'like', "%{$search}%");
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
+            }
+
+            if (isset($filters['search'])) {
+                $query->whereHas('employee', function ($q) use ($filters) {
+                    $q->where('first_name', 'like', "%{$filters['search']}%");
                 });
             }
+
 
             $sortBy = $filters['sort_by'] ?? 'rejoin_date';
             $sortOrder = $filters['sort_order'] ?? 'desc';
@@ -61,11 +70,10 @@ class RejoinService
 
         try {
             // Handle appointment letter upload
-            if (isset($data['appointment_letter'])) {
+            if (isset($data['appointment_letter']) && $data['appointment_letter']->isValid()) {
                 $data['appointment_letter'] = FileUploadHelper::uploadImage(
                     $data['appointment_letter'],
-                    'rejoins/letters',
-                    'public'
+                    'rejoins/letters'
                 );
             }
 
