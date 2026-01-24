@@ -64,7 +64,7 @@ class PayRollService
             $payRoll = PayRoll::create($data);
 
             // Log the creation
-            LogHelper::created('payroll', $payRoll->id, $payRoll->company_id);
+            LogHelper::created('payroll', $payRoll->id, $payRoll->company_id,$payRoll->name .' payment type ' .$payRoll->payment_type);
 
             DB::commit();
             Log::info('PayRoll created successfully', ['id' => $payRoll->id]);
@@ -92,7 +92,7 @@ class PayRollService
             $payRoll->update($data);
 
             // Log the update
-            LogHelper::updated('payroll', $payRoll->id, $payRoll->company_id);
+            LogHelper::updated('payroll', $payRoll->id, $payRoll->company_id,$payRoll->name .' payment type ' .$payRoll->payment_type);
 
             DB::commit();
             Log::info('PayRoll updated successfully', ['id' => $id]);
@@ -120,7 +120,7 @@ class PayRollService
             $payRoll->delete();
 
             // Log the deletion
-            LogHelper::deleted('payroll', $payRoll->id, $payRoll->company_id);
+            LogHelper::deleted('payroll', $payRoll->id, $payRoll->company_id,$payRoll->name .' payment type ' .$payRoll->payment_type);
 
             DB::commit();
             Log::info('PayRoll soft deleted', ['id' => $id]);
@@ -151,7 +151,7 @@ class PayRollService
             }
 
             $payRoll->restore();
-            LogHelper::restored('payroll', $payRoll->id, $payRoll->company_id);
+            LogHelper::restored('payroll', $payRoll->id, $payRoll->company_id,$payRoll->name .' payment type ' .$payRoll->payment_type);
 
             DB::commit();
             return $payRoll;
@@ -180,7 +180,7 @@ class PayRollService
             }
 
             $payRoll->forceDelete();
-            LogHelper::forceDeleted('payroll', $payRoll->id, $payRoll->company_id);
+            LogHelper::forceDeleted('payroll', $payRoll->id, $payRoll->company_id,$payRoll->name .' payment type ' .$payRoll->payment_type);
 
             DB::commit();
             return true;

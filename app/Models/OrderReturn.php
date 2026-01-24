@@ -43,7 +43,7 @@ class OrderReturn extends Model
         'round_off' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'refund_amount' => 'decimal:2',
-        'status' => 'integer',
+    
     ];
 
     /**
@@ -141,7 +141,7 @@ class OrderReturn extends Model
 
     public function isCancelled(): bool
     {
-        return $this->status === Status::Cancelled;
+        return $this->status === Status::Cancelled->value;
     }
 
 

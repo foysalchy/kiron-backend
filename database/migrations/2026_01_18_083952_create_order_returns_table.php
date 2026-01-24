@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -36,7 +37,7 @@ return new class extends Migration
             $table->decimal('refund_amount', 15, 2)->default(0)->comment('Total refunded');
 
             // Status
-            $table->tinyInteger('status')->default(0)->comment('0=pending, 1=cleared, 2=not_cleared, 3=waiting, 4=cancelled');
+            $table->tinyInteger('status')->default(Status::Pending->value)->comment('2=pending, 17=cleared, 18=not_cleared, 16=waiting, 10=cancelled');
             $table->text('note')->nullable();
 
             $table->timestamps();

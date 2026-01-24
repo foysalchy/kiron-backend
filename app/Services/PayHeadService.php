@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\PayHead;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB ,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 
 class PayHeadService
@@ -24,8 +25,12 @@ class PayHeadService
             if (isset($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");
             }
-            if (isset($filters['status']) && $filters['status'] == 3) {
-                $query->onlyTrashed();
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
             // Sorting
             $sortBy = $filters['sort_by'] ?? 'created_at';
@@ -35,7 +40,6 @@ class PayHeadService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching pay heads: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch pay heads');
@@ -63,7 +67,7 @@ class PayHeadService
 
         try {
             $payHead = PayHead::create($data);
-            LogHelper::created('payHead', $payHead->id, $payHead->company_id);
+            LogHelper::created('payHead', $payHead->id, $payHead->company_id,$payHead->name);
 
             DB::commit();
 
@@ -92,7 +96,7 @@ class PayHeadService
             $payHead = $this->getPayHeadById($id);
 
             $payHead->update($data);
-            LogHelper::updated('payHead', $payHead->id, $payHead->company_id);
+            LogHelper::updated('payHead', $payHead->id, $payHead->company_id,$payHead->name);
 
             DB::commit();
 
@@ -124,7 +128,7 @@ class PayHeadService
             $payHead = $this->getPayHeadById($id);
 
             $payHead->delete();
-            LogHelper::deleted('payHead', $payHead->id, $payHead->company_id);
+            LogHelper::deleted('payHead', $payHead->id, $payHead->company_id,$payHead->name);
 
             Log::info('Pay head deleted successfully', ['pay_head_id' => $id]);
 
@@ -154,7 +158,7 @@ class PayHeadService
             }
 
             $payHead->restore();
-            LogHelper::restored('payHead', $payHead->id, $payHead->company_id);
+            LogHelper::restored('payHead', $payHead->id, $payHead->company_id,$payHead->name);
 
             Log::info('Pay head restored successfully', ['pay_head_id' => $id]);
 
@@ -182,7 +186,7 @@ class PayHeadService
             }
 
             $payHead->forceDelete();
-            LogHelper::forceDeleted('payHead', $payHead->id, $payHead->company_id);
+            LogHelper::forceDeleted('payHead', $payHead->id, $payHead->company_id,$payHead->name);
 
             DB::commit();
 
@@ -198,5 +202,4 @@ class PayHeadService
             throw ApiException::serverError('Failed to permanently delete pay head');
         }
     }
-
 }

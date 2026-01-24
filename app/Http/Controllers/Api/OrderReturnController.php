@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreOrderReturnRequest, UpdateOrderReturnRequest};
 use App\Services\OrderReturnService;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\{JsonResponse, Request};
+use Illuminate\Validation\Rule;
 
 class OrderReturnController extends Controller
 {
@@ -106,7 +108,16 @@ class OrderReturnController extends Controller
     public function changeStatus(Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|integer|in:0,1,2,3,4',
+            'status' => [
+                'required',
+                Rule::in([
+                    Status::Pending->value,      // 2
+                    Status::Waiting->value,  // 16
+                    Status::Cancelled->value,  // 10
+                    Status::NotCleared->value,  // 18
+                    Status::Cleared->value,  // 17
+                ]),
+            ],
         ]);
 
         $data = $this->orderReturnService->changeStatus($id, $request->status);
