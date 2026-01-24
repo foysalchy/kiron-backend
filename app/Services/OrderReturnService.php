@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order};
+use App\Enums\Status;
+use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order, Product};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +12,13 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class OrderReturnService
 {
+    protected ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
      * Get all order returns
      */
@@ -104,6 +112,7 @@ class OrderReturnService
             if (!$order) {
                 throw ApiException::notFound('Order');
             }
+
             $data['warehouse_id'] = $order->warehouse_id;
             $data['customer_id'] = $order->customer_id;
 
@@ -136,6 +145,11 @@ class OrderReturnService
                 ]);
             }
 
+            // ✅ Add returned stock to warehouse (if status is Cleared)
+            if ($orderReturn->status === Status::Cleared->value) {
+                $this->addReturnedStockToWarehouse($orderReturn);
+            }
+
             // Create payments if provided
             if (!empty($payments)) {
                 foreach ($payments as $payment) {
@@ -151,8 +165,11 @@ class OrderReturnService
 
             DB::commit();
 
-            Log::info('Order return created successfully', ['order_return_id' => $orderReturn->id]);
-            LogHelper::created('order_return', $orderReturn->id, $orderReturn->company_id);
+            Log::info('Order return created successfully', [
+                'order_return_id' => $orderReturn->id,
+                'status' => $orderReturn->status
+            ]);
+            LogHelper::created('order_return', $orderReturn->id, $orderReturn->company_id, 'total quantities ' . $orderReturn->total_quantities . ' refund amount ' . $orderReturn->refund_amount);
 
             return $orderReturn->load([
                 'warehouse',
@@ -215,7 +232,7 @@ class OrderReturnService
             DB::commit();
 
             Log::info('Order return updated successfully', ['order_return_id' => $orderReturn->id]);
-            LogHelper::updated('order_return', $orderReturn->id, $orderReturn->company_id);
+            LogHelper::updated('order_return', $orderReturn->id, $orderReturn->company_id, 'total quantities ' . $orderReturn->total_quantities . ' refund amount ' . $orderReturn->refund_amount);
 
             return $orderReturn->fresh([
                 'warehouse',
@@ -231,6 +248,53 @@ class OrderReturnService
 
             Log::error('Order return update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update order return');
+        }
+    }
+
+    /**
+     * Change status
+     */
+    public function changeStatus(int $id, int $status): OrderReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = $this->getOrderReturnById($id);
+            $oldStatus = $orderReturn->status;
+
+            // If changing from non-cleared to cleared, add stock
+            if ($oldStatus !== Status::Cleared->value && $status === Status::Cleared->value) {
+                $this->addReturnedStockToWarehouse($orderReturn);
+            }
+
+            // If changing from cleared to non-cleared, remove stock
+            if ($oldStatus === Status::Cleared->value && $status !== Status::Cleared->value) {
+                $this->removeReturnedStockFromWarehouse($orderReturn);
+            }
+
+            $getStatus = Status::from($status);
+            $orderReturn->update([
+                'status' => $getStatus->value
+            ]);
+
+
+            DB::commit();
+
+            Log::info('Order return status changed', [
+                'order_return_id' => $id,
+                'old_status' => $oldStatus,
+                'new_status' => $getStatus->label()
+            ]);
+            LogHelper::custom('status_changed', 'order_return', $id, $orderReturn->company_id, 'purchase return no: ' . $orderReturn->return_no . ' new status ' . $getStatus->label());
+
+            return $orderReturn->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Status change failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to change status: ' . $e->getMessage());
         }
     }
 
@@ -265,7 +329,7 @@ class OrderReturnService
             DB::commit();
 
             Log::info('Payment added to return', ['order_return_id' => $id]);
-            LogHelper::custom('payment_added', 'order_return', $id, $orderReturn->company_id);
+            LogHelper::custom('payment_added', 'order_return', $id, $orderReturn->company_id, $orderReturn->return_no . ' receive payment ' .  $paymentData['amount']);
 
             return $orderReturn->fresh([
                 'warehouse',
@@ -286,23 +350,173 @@ class OrderReturnService
     }
 
     /**
-     * Change status
+     * Delete return
      */
-    public function changeStatus(int $id, int $status): OrderReturn
+    public function deleteOrderReturn(int $id): bool
     {
+        DB::beginTransaction();
+
         try {
             $orderReturn = $this->getOrderReturnById($id);
-            $orderReturn->update(['status' => $status]);
 
-            Log::info('Order return status changed', ['order_return_id' => $id, 'status' => $status]);
-            LogHelper::custom('status_changed', 'order_return', $id, $orderReturn->company_id);
+            // Only pending returns can be deleted
+            if (!$orderReturn->isPending()) {
+                throw ApiException::badRequest('Only pending returns can be deleted');
+            }
 
-            return $orderReturn;
+            $orderReturn->delete();
+
+            DB::commit();
+
+            Log::info('Order return deleted successfully', ['order_return_id' => $id]);
+            LogHelper::deleted('order_return', $id, $orderReturn->company_id, $orderReturn->return_no);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
-            Log::error('Status change failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to change status');
+            DB::rollBack();
+
+            Log::error('Order return deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to delete order return');
         }
     }
+
+    /**
+     * Restore order return
+     */
+    public function restoreOrderReturn(int $id): OrderReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = OrderReturn::onlyTrashed()->find($id);
+
+            if (!$orderReturn) {
+                throw ApiException::notFound('Order Return');
+            }
+
+            $orderReturn->restore();
+
+            DB::commit();
+
+            Log::info('Order return restored successfully', ['order_return_id' => $id]);
+            LogHelper::custom('restored', 'order_return', $id, $orderReturn->company_id, $orderReturn->retrun_no);
+
+            return $orderReturn;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order return restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore order return');
+        }
+    }
+
+    /**
+     * Force delete order return
+     */
+    public function forceDeleteOrderReturn(int $id): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = OrderReturn::withTrashed()->find($id);
+
+            if (!$orderReturn) {
+                throw ApiException::notFound('Order Return');
+            }
+            // Only pending returns can be deleted
+            if (!$orderReturn->isPending()) {
+                throw ApiException::badRequest('Only pending returns can be deleted');
+            }
+
+
+            // Delete details
+            OrderReturnDetail::where('order_return_id', $id)->delete();
+
+            // Delete payments
+            OrderReturnPayment::where('order_return_id', $id)->delete();
+
+
+
+            $companyId = $orderReturn->company_id;
+            $orderReturn->forceDelete();
+
+            DB::commit();
+
+            Log::info('Order return permanently deleted', ['order_return_id' => $id]);
+            LogHelper::custom('force_deleted', 'order_return', $id, $companyId, $orderReturn->return_no);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Permanent order return deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete order return');
+        }
+    }
+
+
+
+    /**
+     * Add returned stock to warehouse
+     */
+    private function addReturnedStockToWarehouse(OrderReturn $orderReturn): void
+    {
+        foreach ($orderReturn->orderReturnDetails as $detail) {
+            $this->productService->addStockToWarehouse($detail->product_id, [
+                'warehouse_id' => $orderReturn->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'return',
+                'reference_type' => 'OrderReturn',
+                'reference_id' => $orderReturn->id,
+                'notes' => "Stock returned from order: {$orderReturn->order->order_no} - Return: {$orderReturn->return_no}"
+            ]);
+
+            Log::info('Stock added for returned item', [
+                'order_return_id' => $orderReturn->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
+    /**
+     * Remove returned stock from warehouse (Status change from Cleared to other)
+     */
+    private function removeReturnedStockFromWarehouse(OrderReturn $orderReturn): void
+    {
+        foreach ($orderReturn->orderReturnDetails as $detail) {
+            $this->productService->removeStockFromWarehouse($detail->product_id, [
+                'warehouse_id' => $orderReturn->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'adjustment',
+                'reference_type' => 'OrderReturnReversal',
+                'reference_id' => $orderReturn->id,
+                'notes' => "Stock removed - Return status changed from Cleared: {$orderReturn->return_no}"
+            ]);
+
+            Log::info('Stock removed for return status change', [
+                'order_return_id' => $orderReturn->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
 
     /**
      * Calculate item total
@@ -344,105 +558,5 @@ class OrderReturnService
             'subtotal' => round($subtotal, 2),
             'grand_total' => round($grandTotal, 2),
         ];
-    }
-
-    /**
-     * Delete return
-     */
-    public function deleteOrderReturn(int $id): bool
-    {
-        DB::beginTransaction();
-
-        try {
-            $orderReturn = $this->getOrderReturnById($id);
-
-            // Only pending returns can be deleted
-            if (!$orderReturn->isPending()) {
-                throw ApiException::badRequest('Only pending returns can be deleted');
-            }
-
-            $orderReturn->delete();
-
-            DB::commit();
-
-            Log::info('Order return deleted successfully', ['order_return_id' => $id]);
-            LogHelper::deleted('order_return', $id, $orderReturn->company_id);
-
-            return true;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Order return deletion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to delete order return');
-        }
-    }
-
-        public function restoreOrderReturn(int $id): OrderReturn
-    {
-        DB::beginTransaction();
-
-        try {
-            $orderReturn = OrderReturn::onlyTrashed()->find($id);
-
-            if (!$orderReturn) {
-                throw ApiException::notFound('Order Return');
-            }
-
-            $orderReturn->restore();
-
-            DB::commit();
-
-            Log::info('Order return restored successfully', ['order_return_id' => $id]);
-            LogHelper::custom('restored', 'ordeer_return', $id, $orderReturn->company_id);
-
-            return $orderReturn;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Order return restoration failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to restore order return');
-        }
-    }
-
-    /**
-     * Force delete order return
-     */
-    public function forceDeleteOrderReturn(int $id): bool
-    {
-        DB::beginTransaction();
-
-        try {
-            $orderReturn = OrderReturn::withTrashed()->find($id);
-
-            if (!$orderReturn) {
-                throw ApiException::notFound('Order Return');
-            }
-
-            OrderReturnDetail::where('order_return_id', $id)->delete();
-
-            $companyId = $orderReturn->company_id;
-            $orderReturn->forceDelete();
-
-            DB::commit();
-
-            Log::info('Order return permanently deleted', ['order_return_id' => $id]);
-            LogHelper::custom('force_deleted', 'order_return', $id, $companyId);
-
-            return true;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Permanent order return deletion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to permanently delete order return');
-        }
     }
 }

@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\JobTitleController;
+use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -444,6 +446,34 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [RequisitionController::class, 'complete']);
             Route::get('{id}/restore', [RequisitionController::class, 'restore']);
             Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
+        });
+        // Templates Routes
+        Route::prefix('templates')->group(function () {
+            Route::get('/', [TemplateController::class, 'index']);
+            Route::post('/', [TemplateController::class, 'store']);
+            Route::get('/{id}', [TemplateController::class, 'show']);
+            Route::get('/slug/{slug}', [TemplateController::class, 'showBySlug']);
+            Route::post('/update/{id}', [TemplateController::class, 'update']);
+            Route::patch('/{id}', [TemplateController::class, 'update']);
+            Route::delete('/{id}', [TemplateController::class, 'destroy']);
+
+            // Additional actions
+            Route::get('/{id}/restore', [TemplateController::class, 'restore']);
+            Route::delete('/{id}/force', [TemplateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [TemplateController::class, 'toggleStatus']);
+        });
+        // Landing Pages Routes
+        Route::prefix('landing-pages')->group(function () {
+            Route::get('/', [LandingPageController::class, 'index']);
+            Route::post('/', [LandingPageController::class, 'store']);
+            Route::get('/{id}', [LandingPageController::class, 'show']);
+            Route::get('/slug/{slug}', [LandingPageController::class, 'showBySlug']);
+            Route::post('/update/{id}', [LandingPageController::class, 'update']);
+            Route::patch('/{id}', [LandingPageController::class, 'update']);
+            Route::delete('/{id}', [LandingPageController::class, 'destroy']);
+            Route::get('/{id}/restore', [LandingPageController::class, 'restore']);
+            Route::delete('/{id}/force', [LandingPageController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LandingPageController::class, 'toggleStatus']);
         });
         // job title Routes
         Route::prefix('jobs')->group(function () {

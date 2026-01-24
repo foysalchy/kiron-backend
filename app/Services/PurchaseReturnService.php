@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\{Purchase, PurchaseDetail, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
+use App\Enums\Status;
+use App\Models\{Purchase, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,6 +12,13 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class PurchaseReturnService
 {
+    protected ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
     /**
      * Get all purchase returns with optional pagination
      */
@@ -85,18 +93,26 @@ class PurchaseReturnService
             $items = $data['items'];
             $payments = $data['payments'] ?? [];
             unset($data['items'], $data['payments']);
+
+            // Get purchase details
             $purchase = Purchase::find($data['purchase_id']);
             if (!$purchase) {
                 throw ApiException::notFound('Purchase');
             }
+
             $data['warehouse_id'] = $purchase->warehouse_id;
+
+            // Calculate totals
             $totals = $this->calculateTotals($items, $data);
             $data = array_merge($data, $totals);
+
+            // Calculate refund amount
             $totalRefund = 0;
             if (!empty($payments)) {
                 $totalRefund = array_sum(array_column($payments, 'amount'));
             }
             $data['refund_amount'] = $totalRefund;
+
             // Create purchase return
             $purchaseReturn = PurchaseReturn::create($data);
 
@@ -114,6 +130,13 @@ class PurchaseReturnService
                     'total' => $itemTotal,
                 ]);
             }
+
+            // ✅ Remove returned stock from warehouse (if status is Cleared)
+            if ($purchaseReturn->status === Status::Cleared->value) {
+                $this->removeReturnedStockFromWarehouse($purchaseReturn);
+            }
+
+            // Create payments if provided
             if (!empty($payments)) {
                 foreach ($payments as $payment) {
                     PurchasePaymentReturn::create([
@@ -125,10 +148,14 @@ class PurchaseReturnService
                     ]);
                 }
             }
+
             DB::commit();
 
-            Log::info('Purchase return created successfully', ['purchase_return_id' => $purchaseReturn->id]);
-            LogHelper::created('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id);
+            Log::info('Purchase return created successfully', [
+                'purchase_return_id' => $purchaseReturn->id,
+                'status' => $purchaseReturn->status
+            ]);
+            LogHelper::created('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id, 'total quantities ' . $purchaseReturn->total_quantities . ' refund amount ' . $purchaseReturn->refund_amount);
 
             return $purchaseReturn->load([
                 'purchase',
@@ -139,7 +166,7 @@ class PurchaseReturnService
             DB::rollBack();
 
             Log::error('Purchase return creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create purchase return');
+            throw ApiException::serverError('Failed to create purchase return: ' . $e->getMessage());
         }
     }
 
@@ -159,7 +186,7 @@ class PurchaseReturnService
             }
 
             if ($purchaseReturn->isCleared()) {
-                throw ApiException::badRequest('Cannot update completed purchase return');
+                throw ApiException::badRequest('Cannot update cleared purchase return');
             }
 
             $items = $data['items'] ?? null;
@@ -167,8 +194,6 @@ class PurchaseReturnService
 
             // If items are provided, recalculate totals
             if ($items) {
-
-
                 $totals = $this->calculateTotals($items, $data);
                 $data = array_merge($data, $totals);
 
@@ -182,6 +207,9 @@ class PurchaseReturnService
                         'purchase_return_id' => $purchaseReturn->id,
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
+                        'unit_price' => $item['unit_price'],
+                        'discount' => $item['discount'] ?? 0,
+                        'tax' => $item['tax'] ?? 0,
                         'total' => $itemTotal,
                     ]);
                 }
@@ -192,7 +220,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Purchase return updated successfully', ['purchase_return_id' => $purchaseReturn->id]);
-            LogHelper::updated('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id);
+            LogHelper::updated('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id, 'total quantities ' . $purchaseReturn->total_quantities . ' refund amount ' . $purchaseReturn->refund_amount);
 
             return $purchaseReturn->fresh([
                 'purchase',
@@ -209,6 +237,54 @@ class PurchaseReturnService
             throw ApiException::serverError('Failed to update purchase return');
         }
     }
+
+    /**
+     * Change purchase return status
+     */
+    public function changeStatus(int $id, int $status): PurchaseReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchaseReturn = $this->getPurchaseReturnById($id);
+            $oldStatus = $purchaseReturn->status;
+
+            // If changing from non-cleared to cleared, remove stock
+            if ($oldStatus !== Status::Cleared->value && $status === Status::Cleared->value) {
+                $this->removeReturnedStockFromWarehouse($purchaseReturn);
+            }
+
+            // If changing from cleared to non-cleared, restore stock
+            if ($oldStatus === Status::Cleared->value && $status !== Status::Cleared->value) {
+                $this->addReturnedStockToWarehouse($purchaseReturn);
+            }
+
+            $getStatus = Status::from($status);
+            $purchaseReturn->update([
+                'status' => $getStatus->value
+            ]);
+
+
+            DB::commit();
+
+            Log::info('Purchase return status changed', [
+                'purchase_return_id' => $id,
+                'old_status' => $oldStatus,
+                'new_status' => $status
+            ]);
+            LogHelper::custom('status_changed', 'purchase_return', $id, $purchaseReturn->company_id,'purchase return no: '. $purchaseReturn->return_no .' new status ' . $getStatus->label());
+
+            return $purchaseReturn->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Purchase return status change failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to change status: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Add payment to return
      */
@@ -239,8 +315,8 @@ class PurchaseReturnService
 
             DB::commit();
 
-            Log::info('Payment added to return', ['order_return_id' => $id]);
-            LogHelper::custom('payment_added', 'order_return', $id, $purchaseReturn->company_id);
+            Log::info('Payment added to purchase return', ['purchase_return_id' => $id]);
+            LogHelper::custom('payment_added', 'purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no . ' receive payment '.  $paymentData['amount']);
 
             return $purchaseReturn->fresh([
                 'purchase',
@@ -268,9 +344,9 @@ class PurchaseReturnService
         try {
             $purchaseReturn = $this->getPurchaseReturnById($id);
 
-            // Only draft purchase returns can be deleted
-            if (!$purchaseReturn->isDraft()) {
-                throw ApiException::badRequest('Only draft purchase returns can be deleted');
+            // Only pending purchase returns can be deleted
+            if (!$purchaseReturn->isPending()) {
+                throw ApiException::badRequest('Only pending purchase returns can be deleted');
             }
 
             $purchaseReturn->delete();
@@ -278,7 +354,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Purchase return deleted successfully', ['purchase_return_id' => $id]);
-            LogHelper::deleted('purchase_return', $id, $purchaseReturn->company_id);
+            LogHelper::deleted('purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no);
 
             return true;
         } catch (ApiException $e) {
@@ -291,6 +367,143 @@ class PurchaseReturnService
             throw ApiException::serverError('Failed to delete purchase return');
         }
     }
+
+    /**
+     * Restore purchase return
+     */
+    public function restorePurchaseReturn(int $id): PurchaseReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchaseReturn = PurchaseReturn::onlyTrashed()->find($id);
+
+            if (!$purchaseReturn) {
+                throw ApiException::notFound('Purchase Return');
+            }
+
+            $purchaseReturn->restore();
+
+            DB::commit();
+
+            Log::info('Purchase return restored successfully', ['purchase_return_id' => $id]);
+            LogHelper::custom('restored', 'purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no);
+
+            return $purchaseReturn->load(['purchase', 'supplier', 'purchaseReturnDetails.product']);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Purchase return restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore purchase return');
+        }
+    }
+
+    /**
+     * Force delete purchase return
+     */
+    public function forceDeletePurchaseReturn(int $id): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $purchaseReturn = PurchaseReturn::withTrashed()->find($id);
+
+            if (!$purchaseReturn) {
+                throw ApiException::notFound('Purchase Return');
+            }
+              // Only pending returns can be deleted
+            if (!$purchaseReturn->isPending()) {
+                throw ApiException::badRequest('Only pending returns can be deleted');
+            }
+
+            // Delete details
+            PurchaseReturnDetail::where('purchase_return_id', $id)->delete();
+
+            // Delete payments
+            PurchasePaymentReturn::where('purchase_return_id', $id)->delete();
+
+            $companyId = $purchaseReturn->company_id;
+            $purchaseReturn->forceDelete();
+
+            DB::commit();
+
+            Log::info('Purchase return permanently deleted', ['purchase_return_id' => $id]);
+            LogHelper::custom('force_deleted', 'purchase_return', $id, $companyId,$purchaseReturn->return_no);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Permanent purchase return deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete purchase return');
+        }
+    }
+
+    // ========================================
+    // STOCK MANAGEMENT PRIVATE METHODS
+    // ========================================
+
+    /**
+     * Remove returned stock from warehouse (Deduct from inventory)
+     */
+    private function removeReturnedStockFromWarehouse(PurchaseReturn $purchaseReturn): void
+    {
+        foreach ($purchaseReturn->purchaseReturnDetails as $detail) {
+            $this->productService->removeStockFromWarehouse($detail->product_id, [
+                'warehouse_id' => $purchaseReturn->purchase->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'return',
+                'reference_type' => 'PurchaseReturn',
+                'reference_id' => $purchaseReturn->id,
+                'notes' => "Stock returned to supplier - Purchase: {$purchaseReturn->purchase->reference_no} - Return: {$purchaseReturn->return_no}"
+            ]);
+
+            Log::info('Stock removed for returned item', [
+                'purchase_return_id' => $purchaseReturn->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
+    /**
+     * Add returned stock back to warehouse (Status change from Cleared to other)
+     */
+    private function addReturnedStockToWarehouse(PurchaseReturn $purchaseReturn): void
+    {
+        foreach ($purchaseReturn->purchaseReturnDetails as $detail) {
+            $this->productService->addStockToWarehouse($detail->product_id, [
+                'warehouse_id' => $purchaseReturn->purchase->warehouse_id,
+                'bin_id' => null,
+                'quantity' => $detail->quantity,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'adjustment',
+                'reference_type' => 'PurchaseReturnReversal',
+                'reference_id' => $purchaseReturn->id,
+                'notes' => "Stock restored - Return status changed from Cleared: {$purchaseReturn->return_no}"
+            ]);
+
+            Log::info('Stock restored for return status change', [
+                'purchase_return_id' => $purchaseReturn->id,
+                'product_id' => $detail->product_id,
+                'quantity' => $detail->quantity
+            ]);
+        }
+    }
+
+    // ========================================
+    // CALCULATION METHODS
+    // ========================================
 
     /**
      * Calculate item total from purchase detail
@@ -332,93 +545,5 @@ class PurchaseReturnService
             'subtotal' => round($subtotal, 2),
             'grand_total' => round($grandTotal, 2),
         ];
-    }
-
-    /**
-     * Change purchase return status
-     */
-    public function changeStatus(int $id, int $status): PurchaseReturn
-    {
-        try {
-            $purchaseReturn = $this->getPurchaseReturnById($id);
-            $purchaseReturn->update(['status' => $status]);
-
-            Log::info('Purchase return status changed', ['purchase_return_id' => $id, 'status' => $status]);
-            LogHelper::custom('status_changed', 'purchase_return', $id, $purchaseReturn->company_id);
-
-            return $purchaseReturn;
-        } catch (\Exception $e) {
-            Log::error('Purchase return status change failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to change status');
-        }
-    }
-
-    /**
-     * Restore purchase return
-     */
-    public function restorePurchaseReturn(int $id): PurchaseReturn
-    {
-        DB::beginTransaction();
-
-        try {
-            $purchaseReturn = PurchaseReturn::onlyTrashed()->find($id);
-
-            if (!$purchaseReturn) {
-                throw ApiException::notFound('Purchase Return');
-            }
-
-            $purchaseReturn->restore();
-
-            DB::commit();
-
-            Log::info('Purchase return restored successfully', ['purchase_return_id' => $id]);
-            LogHelper::custom('restored', 'purchase_return', $id, $purchaseReturn->company_id);
-
-            return $purchaseReturn->load(['purchase', 'supplier', 'purchaseReturnDetails.product']);
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Purchase return restoration failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to restore purchase return');
-        }
-    }
-
-    /**
-     * Force delete purchase return
-     */
-    public function forceDeletePurchaseReturn(int $id): bool
-    {
-        DB::beginTransaction();
-
-        try {
-            $purchaseReturn = PurchaseReturn::withTrashed()->find($id);
-
-            if (!$purchaseReturn) {
-                throw ApiException::notFound('Purchase Return');
-            }
-
-            PurchaseReturnDetail::where('purchase_return_id', $id)->forceDelete();
-
-            $companyId = $purchaseReturn->company_id;
-            $purchaseReturn->forceDelete();
-
-            DB::commit();
-
-            Log::info('Purchase return permanently deleted', ['purchase_return_id' => $id]);
-            LogHelper::custom('force_deleted', 'purchase_return', $id, $companyId);
-
-            return true;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            Log::error('Permanent purchase return deletion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to permanently delete purchase return');
-        }
     }
 }

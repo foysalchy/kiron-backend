@@ -77,7 +77,7 @@ class PayRollPayHeadService
             unset($data['pay_head_name']);
 
             $record = PayRollPayHead::create($data);
-            LogHelper::created('payRollPayHead', $record->id, $record->company_id);
+            LogHelper::created('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
 
             DB::commit();
             return $record->load('payHead', 'payRoll');
@@ -112,7 +112,7 @@ class PayRollPayHeadService
             }
 
             $record->update($data);
-            LogHelper::updated('payRollPayHead', $record->id, $record->company_id);
+            LogHelper::updated('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
 
             DB::commit();
             return $record->fresh(['payHead', 'payRoll']);
@@ -135,7 +135,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->delete();
-            LogHelper::deleted('payRollPayHead', $record->id, $record->company_id);
+            LogHelper::deleted('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
 
             DB::commit();
             return true;
@@ -158,7 +158,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->restore();
-            LogHelper::restored('payRollPayHead', $record->id, $record->company_id);
+            LogHelper::restored('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
 
             DB::commit();
             return $record;
@@ -180,7 +180,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->forceDelete();
-            LogHelper::forceDeleted('payRollPayHead', $id, $record->company_id);
+            LogHelper::forceDeleted('payRollPayHead', $id, $record->company_id,$record->type . ' amount '. $record->amount);
 
             DB::commit();
             return true;
