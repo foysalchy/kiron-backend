@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rejoins', function (Blueprint $table) {
+        Schema::create('leave_applications', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->date('rejoin_date')->nullable();
-            $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');
-            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
+            $table->foreignId('leave_type_id')->constrained('leave_types')->cascadeOnDelete();
+            $table->date('from_date');
+            $table->date('to_date');
+            $table->text('reason')->nullable();
+            $table->string('document')->nullable();
+            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rejoins');
+        Schema::dropIfExists('leave_applications');
     }
 };

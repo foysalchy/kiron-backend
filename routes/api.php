@@ -38,8 +38,10 @@ use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\RejoinController;
+use App\Http\Controllers\Api\ResignationController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
+use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
@@ -549,6 +551,24 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PositionController::class, 'restore']);
             Route::delete('{id}/force', [PositionController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PositionController::class, 'toggleStatus']);
+        });
+        //resign rules routes
+        Route::prefix('resign-rules')->group(function () {
+            Route::get('/', [ResignRuleController::class, 'index']);
+            Route::post('/', [ResignRuleController::class, 'store']);
+            Route::get('/{id}', [ResignRuleController::class, 'show']);
+            Route::post('/update/{id}', [ResignRuleController::class, 'update']);
+            Route::delete('/{id}', [ResignRuleController::class, 'destroy']);
+            Route::get('{id}/restore', [ResignRuleController::class, 'restore']);
+            Route::delete('{id}/force', [ResignRuleController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [ResignRuleController::class, 'toggleStatus']);
+        });
+        //resignations routes
+        Route::prefix('resignations')->group(function () {
+            Route::get('/', [ResignationController::class, 'index']);
+            Route::post('/', [ResignationController::class, 'store']);
+            Route::get('/{id}', [ResignationController::class, 'show']);
+            Route::patch('/{id}/toggle-status', [ResignationController::class, 'toggleStatus']);
         });
         //rejoins routes
         Route::prefix('rejoins')->group(function () {
