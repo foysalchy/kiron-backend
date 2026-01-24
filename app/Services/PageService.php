@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
@@ -21,9 +22,12 @@ class PageService
         try {
             $query = Page::query();
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
-
             if (isset($filters['search'])) {
                 $query->where('title', 'like', "%{$filters['search']}%");
             }
@@ -74,7 +78,7 @@ class PageService
             }
 
             $page = Page::create($data);
-            LogHelper::created('page', $page->id, $page->company_id);
+            LogHelper::created('page', $page->id, $page->company_id, $page->title);
 
             DB::commit();
 
@@ -113,7 +117,7 @@ class PageService
             }
 
             $page->update($data);
-            LogHelper::updated('page', $page->id, $page->company_id);
+            LogHelper::updated('page', $page->id, $page->company_id, $page->title);
 
             DB::commit();
 
@@ -144,7 +148,7 @@ class PageService
         try {
             $page = $this->getPageById($id);
             $page->delete();
-            LogHelper::deleted('page', $page->id, $page->company_id);
+            LogHelper::deleted('page', $page->id, $page->company_id, $page->title);
 
             Log::info('Page deleted successfully', ['page_id' => $id]);
 
@@ -174,7 +178,7 @@ class PageService
             }
 
             $page->restore();
-            LogHelper::restored('page', $page->id, $page->company_id);
+            LogHelper::restored('page', $page->id, $page->company_id, $page->title);
 
             Log::info('Page restored successfully', ['page_id' => $id]);
 
@@ -208,7 +212,7 @@ class PageService
             FileUploadHelper::delete($page->image);
 
             $page->forceDelete();
-            LogHelper::forceDeleted('page', $page->id, $page->company_id);
+            LogHelper::forceDeleted('page', $page->id, $page->company_id, $page->title);
 
             DB::commit();
 
@@ -234,8 +238,16 @@ class PageService
         DB::beginTransaction();
         try {
             $page = $this->getPageById($id);
-            $page->update(['status' => !$page->status]);
-            LogHelper::statusChanged('page', $page->id, $page->company_id);
+            $currentStatus = Status::from($page->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $page->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::statusChanged('page', $page->id, $page->company_id,$page->title .' new status '.$newStatus->label());
             Log::info('Page status toggled', ['page_id' => $id]);
 
             DB::commit();

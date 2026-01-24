@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Employee;
@@ -29,7 +31,7 @@ class PositionService
             }
             // Filter by Status
             if (isset($filters['status'])) {
-                if ($filters['status'] === 'trashed') {
+                if ($filters['status'] == Status::Trashed->value) {
                     $query->onlyTrashed();
                 } else {
                     $query->where('status', $filters['status']);
@@ -54,7 +56,7 @@ class PositionService
      */
     public function getPositionById(int $id): Position
     {
-        $query = Position::with('payRoll','supervisor')->find($id);
+        $query = Position::with('payRoll', 'supervisor')->find($id);
         if (!$query) {
             throw ApiException::notFound('Position not found');
         }
@@ -69,30 +71,30 @@ class PositionService
         try {
             if (isset($data['payroll_name'])) {
                 $payroll = PayRoll::where('name', $data['payroll_name'])
-                ->where('company_id', $data['company_id'])
-                ->first();
+                    ->where('company_id', $data['company_id'])
+                    ->first();
                 if (!$payroll) throw ApiException::notFound('Payroll with this name');
 
                 $data['pay_roll_id'] = $payroll->id;
                 unset($data['payroll_name']);
             }
-            if(isset($data['supervisor_name'])){
+            if (isset($data['supervisor_name'])) {
                 $supervisor = Employee::where('name', $data['supervisor_name'])
-                ->where('company_id', $data['company_id'])
-                ->first();
+                    ->where('company_id', $data['company_id'])
+                    ->first();
                 if (!$supervisor) throw ApiException::notFound('Supervisor with this name');
 
                 $data['supervisor_id'] = $supervisor->id;
                 unset($data['supervisor_name']);
             }
             $record = Position::create($data);
-            LogHelper::created('Position', $record->id, $data['company_id']);
+            LogHelper::created('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
-            return $record->load('payRoll','supervisor');
+            return $record->load('payRoll', 'supervisor');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Position creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create position');
@@ -109,17 +111,17 @@ class PositionService
 
             if (isset($data['payroll_name'])) {
                 $payroll = PayRoll::where('name', $data['payroll_name'])
-                ->where('company_id', $data['company_id'])
-                ->first();
+                    ->where('company_id', $data['company_id'])
+                    ->first();
                 if (!$payroll) throw ApiException::notFound('Payroll with this name');
 
                 $data['pay_roll_id'] = $payroll->id;
                 unset($data['payroll_name']);
             }
-            if(isset($data['supervisor_name'])){
+            if (isset($data['supervisor_name'])) {
                 $supervisor = Employee::where('name', $data['supervisor_name'])
-                ->where('company_id', $data['company_id'])
-                ->first();
+                    ->where('company_id', $data['company_id'])
+                    ->first();
                 if (!$supervisor) throw ApiException::notFound('Supervisor with this name');
 
                 $data['supervisor_id'] = $supervisor->id;
@@ -127,13 +129,13 @@ class PositionService
             }
 
             $record->update($data);
-            LogHelper::updated('Position', $record->id, $record->company_id,$record->type);
+            LogHelper::updated('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
-            return $record->load('payRoll','supervisor');
+            return $record->load('payRoll', 'supervisor');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Position update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update position');
@@ -148,7 +150,7 @@ class PositionService
         try {
             $record = $this->getPositionById($id);
             $record->delete();
-            LogHelper::deleted('Position', $record->id, $record->company_id);
+            LogHelper::deleted('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -172,9 +174,9 @@ class PositionService
                 throw ApiException::notFound('Position not found or not deleted');
             }
             $record->restore();
-            LogHelper::restored('Position', $record->id, $record->company_id);
+            LogHelper::restored('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
-            return $record->load('payRoll','supervisor');
+            return $record->load('payRoll', 'supervisor');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -196,7 +198,7 @@ class PositionService
                 throw ApiException::notFound('Position not found');
             }
             $record->forceDelete();
-            LogHelper::forceDeleted('Position', $record->id, $record->company_id);
+            LogHelper::forceDeleted('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -216,12 +218,18 @@ class PositionService
         DB::beginTransaction();
         try {
             $record = $this->getPositionById($id);
-            $record->status = !$record->status;
-            $record->save();
-            $statusName = $record->status ? 'Active' : 'Inactive';
-            LogHelper::updated('Position Status Toggled', $record->id, $record->company_id,$statusName);
+            $currentStatus = Status::from($record->status);
+            // toggle logic
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+            // update using enum value
+            $record->update([
+                'status' => $newStatus->value
+            ]);
+            LogHelper::updated('Position Status Toggled', $record->id, $record->company_id,$record->name .' new status '.$newStatus->label());
             DB::commit();
-            return $record->load('payRoll','supervisor');
+            return $record->load('payRoll', 'supervisor');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
