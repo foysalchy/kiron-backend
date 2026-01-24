@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AreaController;
+use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
@@ -18,9 +19,11 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\JobTitleController;
+use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
@@ -576,5 +579,39 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [RejoinController::class, 'store']);
             Route::get('/{id}', [RejoinController::class, 'show']);
         });
+        //holidays routes
+        Route::prefix('holidays')->group(function () {
+            Route::get('/', [HolidayController::class, 'index']);
+            Route::post('/', [HolidayController::class, 'store']);
+            Route::get('/{id}', [HolidayController::class, 'show']);
+            Route::post('/update/{id}', [HolidayController::class, 'update']);
+            Route::delete('/{id}', [HolidayController::class, 'destroy']);
+            Route::get('{id}/restore', [HolidayController::class, 'restore']);
+            Route::delete('{id}/force', [HolidayController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [HolidayController::class, 'toggleStatus']);
+        });
+        //leave-types routes
+        Route::prefix('leave-types')->group(function () {
+            Route::get('/', [LeaveTypeController::class, 'index']);
+            Route::post('/', [LeaveTypeController::class, 'store']);
+            Route::get('/{id}', [LeaveTypeController::class, 'show']);
+            Route::post('/update/{id}', [LeaveTypeController::class, 'update']);
+            Route::delete('/{id}', [LeaveTypeController::class, 'destroy']);
+            Route::get('{id}/restore', [LeaveTypeController::class, 'restore']);
+            Route::delete('{id}/force', [LeaveTypeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LeaveTypeController::class, 'toggleStatus']);
+        });
+        //assign-leaves routes
+        Route::prefix('assign-leaves')->group(function () {
+            Route::get('/', [AssignLeaveTypeController::class, 'index']);
+            Route::post('/', [AssignLeaveTypeController::class, 'store']);
+            Route::get('/{id}', [AssignLeaveTypeController::class, 'show']);
+            Route::post('/update/{id}', [AssignLeaveTypeController::class, 'update']);
+            Route::delete('/{id}', [AssignLeaveTypeController::class, 'destroy']);
+            Route::get('{id}/restore', [AssignLeaveTypeController::class, 'restore']);
+            Route::delete('{id}/force', [AssignLeaveTypeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AssignLeaveTypeController::class, 'toggleStatus']);
+        });
+            
     });
 });

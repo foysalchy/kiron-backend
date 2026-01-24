@@ -16,9 +16,11 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();
             $table->foreignId('leave_type_id')->constrained('leave_types')->cascadeOnDelete();
+            $table->decimal('leave_count', 8, 2)->default(0);
             $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
+            $table->unique(['position_id', 'leave_type_id'], 'pos_leave_unique');
         });
     }
 

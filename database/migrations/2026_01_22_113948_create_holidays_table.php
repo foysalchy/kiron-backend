@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->integer('number_of_days');
+            $table->integer('number_of_days')->default(1);
+            $table->date('from_date');
+            $table->date('to_date');
             $table->string('theme_color')->default('#ffffff');
             $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
             $table->timestamps();
