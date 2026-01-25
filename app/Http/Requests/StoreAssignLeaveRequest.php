@@ -9,12 +9,12 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreAssignLeaveRequest extends BaseCompanyRequest
 {
-    /**
+    /** 
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return true; 
     }
 
     /**
@@ -30,7 +30,7 @@ class StoreAssignLeaveRequest extends BaseCompanyRequest
                 'position_id'            => ['required', 'exists:positions,id'],
                 'leaves'                 => ['required', 'array', 'min:1'],
                 'leaves.*.leave_type_id' => ['required', 'exists:leave_types,id'],
-                'leaves.*.leave_count'   => ['required', 'numeric', 'min:0'],
+                'leaves.*.leave_count'   => ['required', 'numeric', 'min:0.5', 'max:365'],
                 'status'                 => ['nullable', 'integer', 'in:0,1'],
             ]
         );

@@ -27,11 +27,10 @@ class UpdateAssignLeaveRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'position_id'            => ['sometimes', 'exists:positions,id'],
-                'leaves'                 => ['sometimes', 'array', 'min:1'],
-                'leaves.*.leave_type_id' => ['required_with:leaves', 'exists:leave_types,id'],
-                'leaves.*.leave_count'   => ['required_with:leaves', 'numeric', 'min:0'],
-                'status'                 => ['sometimes', 'integer', 'in:0,1'],
+                'position_id'   => ['sometimes', 'exists:positions,id'],
+                'leave_type_id' => ['sometimes', 'exists:leave_types,id'],
+                'leave_count'   => ['sometimes', 'numeric', 'min:0.5', 'max:365'],
+                'status'        => ['sometimes', 'integer', 'in:0,1'],
             ]
         );
     }

@@ -69,9 +69,13 @@ class PositionService
     {
         DB::beginTransaction();
         try {
-            if (isset($data['payroll_name'])) {
+           $companyId = $data['company_id'] ?? (auth()->check() ? auth()->user()->company_id : null);
+           if (!$companyId) {
+            throw ApiException::badRequest('Company ID is required');
+        } 
+           if (isset($data['payroll_name'])) {
                 $payroll = PayRoll::where('name', $data['payroll_name'])
-                    ->where('company_id', $data['company_id'])
+                    ->where('company_id', $companyId)
                     ->first();
                 if (!$payroll) throw ApiException::notFound('Payroll with this name');
 
@@ -79,8 +83,8 @@ class PositionService
                 unset($data['payroll_name']);
             }
             if (isset($data['supervisor_name'])) {
-                $supervisor = Employee::where('name', $data['supervisor_name'])
-                    ->where('company_id', $data['company_id'])
+                $supervisor = Employee::where('first_name', $data['supervisor_name'])
+                    ->where('company_id', $companyId)
                     ->first();
                 if (!$supervisor) throw ApiException::notFound('Supervisor with this name');
 
