@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Warehouse;
@@ -16,35 +17,38 @@ class WarehouseService
      * Get all warehouses with optional pagination
      */
     public function getAllWarehouses(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
-{
-    try {
-        $query = Warehouse::query();
+    {
+        try {
+            $query = Warehouse::query();
 
-        if (isset($filters['status']) && $filters['status'] !== "") {
-            $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
+            }
+
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('location', 'like', "%{$search}%");
+                });
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching warehouses: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch warehouses');
         }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
-            });
-        }
-
-        $sortBy = $filters['sort_by'] ?? 'created_at';
-        $sortOrder = $filters['sort_order'] ?? 'desc';
-        $query->orderBy($sortBy, $sortOrder);
-
-        return $paginate
-            ? $query->paginate($filters['per_page'] ?? 15)
-            : $query->get();
-
-    } catch (\Exception $e) {
-        Log::error('Error fetching warehouses: ' . $e->getMessage());
-        throw ApiException::serverError('Failed to fetch warehouses');
     }
-}
 
     /**
      * Get warehouse by ID
@@ -65,13 +69,12 @@ class WarehouseService
     {
         DB::beginTransaction();
         try {
-            $warehouse =Warehouse::create($data);
+            $warehouse = Warehouse::create($data);
             LogHelper::created('warehouse', $warehouse->id, $warehouse->company_id);
             DB::commit();
             Log::info('Warehouse created successfully', ['warehouse_id' => $warehouse->id]);
 
             return $warehouse;
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Warehouse creation failed: ' . $e->getMessage());
@@ -96,7 +99,6 @@ class WarehouseService
 
             DB::commit();
             return $warehouse->fresh();
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -123,7 +125,6 @@ class WarehouseService
 
             DB::commit();
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -142,9 +143,9 @@ class WarehouseService
     {
         DB::beginTransaction();
         try {
-           $warehouse = Warehouse::withTrashed()->find($id);
-           if (!$warehouse) {
-            throw ApiException::notFound('Warehouse');
+            $warehouse = Warehouse::withTrashed()->find($id);
+            if (!$warehouse) {
+                throw ApiException::notFound('Warehouse');
             }
             $warehouse->restore();
             LogHelper::restored('warehouse', $warehouse->id, $warehouse->company_id);
@@ -181,7 +182,6 @@ class WarehouseService
 
             DB::commit();
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -209,7 +209,6 @@ class WarehouseService
 
             DB::commit();
             return $warehouse;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -219,5 +218,4 @@ class WarehouseService
             throw ApiException::serverError('Failed to toggle warehouse status');
         }
     }
-
 }
