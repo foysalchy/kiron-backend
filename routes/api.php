@@ -101,7 +101,9 @@ Route::prefix('v1')->group(function () {
             Route::get('search', [PartyController::class, 'search']);
             Route::get('suppliers', [PartyController::class, 'getSuppliers']);
             Route::get('customers', [PartyController::class, 'getCustomers']);
-
+            Route::get('/export-template', [PartyController::class, 'exportTemplate']);
+            Route::get('/export', [PartyController::class, 'exportData']);
+            Route::post('/import', [PartyController::class, 'import']);
             Route::get('/', [PartyController::class, 'index']);
             Route::post('/', [PartyController::class, 'store']);
             Route::get('/{id}', [PartyController::class, 'show']);
@@ -642,6 +644,5 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [AssignLeaveTypeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [AssignLeaveTypeController::class, 'toggleStatus']);
         });
-            
     });
 });

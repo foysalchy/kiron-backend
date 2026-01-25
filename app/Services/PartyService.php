@@ -12,7 +12,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Exports\PartiesExport;
+use App\Exports\PartiesTemplateExport;
+use App\Imports\PartiesImport;
 class PartyService
 {
     /**
@@ -158,7 +162,7 @@ class PartyService
             }
 
             $party->update($data);
-            LogHelper::updated('party', $party->id, $party->company_id,$party->type_text . " updated");
+            LogHelper::updated('party', $party->id, $party->company_id, $party->type_text . " updated");
 
             DB::commit();
 
@@ -194,7 +198,7 @@ class PartyService
             $party = $this->getPartyById($id);
 
             $party->delete();
-            LogHelper::deleted('party', $party->id, $party->company_id,$party->type_text . " deleted");
+            LogHelper::deleted('party', $party->id, $party->company_id, $party->type_text . " deleted");
 
             Log::info('Party deleted successfully', ['party_id' => $id]);
 
@@ -224,7 +228,7 @@ class PartyService
             }
 
             $party->restore();
-            LogHelper::restored('party', $party->id, $party->company_id,$party->type_text . " restore");
+            LogHelper::restored('party', $party->id, $party->company_id, $party->type_text . " restore");
 
             Log::info('Party restored successfully', ['party_id' => $id]);
 
@@ -254,7 +258,7 @@ class PartyService
             FileUploadHelper::delete($party->profile);
 
             $party->forceDelete();
-            LogHelper::forceDeleted('party', $party->id, $party->company_id,$party->type_text . " permanently deleted");
+            LogHelper::forceDeleted('party', $party->id, $party->company_id, $party->type_text . " permanently deleted");
 
             DB::commit();
 
@@ -366,5 +370,40 @@ class PartyService
         }
 
         return $query->get();
+    }
+
+    /**
+     * Export blank template
+     */
+    public function exportTemplate(string $type = 'csv'): BinaryFileResponse
+    {
+        $filename = 'parties_template.' . $type;
+
+        return Excel::download(new PartiesTemplateExport, $filename);
+    }
+
+    /**
+     * Export existing party data
+     */
+    public function exportData(string $type = 'csv', string $partyType = 'all'): BinaryFileResponse
+    {
+        $filename = 'parties_data_' . time() . '.' . $type;
+
+        return Excel::download(new PartiesExport($partyType), $filename);
+    }
+
+    /**
+     * Import parties from uploaded file
+     */
+    public function import($file): array
+    {
+        $import = new PartiesImport();
+
+        Excel::import($import, $file);
+
+        return [
+            'imported' => $import->getRowCount(),
+            'failed' => $import->getFailedRows(),
+        ];
     }
 }

@@ -28,7 +28,7 @@ class StoreWarehouseRequest extends BaseCompanyRequest
             [
             'name'       => ['required','string','max:255'],
             'location'   => ['nullable','string','max:500'],
-            'status'     => ['required','integer'],
+         
             ]
         );
     }
@@ -39,7 +39,6 @@ class StoreWarehouseRequest extends BaseCompanyRequest
 
             [
                 'name.required'     => 'Warehouse Name is required.',
-                'status.required'   => 'Warehouse status is required.',
                 'location.max'      => 'Location cannot exceed 500 characters.',
             ]
         );
