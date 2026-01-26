@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Employee extends Model
@@ -78,6 +79,14 @@ class Employee extends Model
     public function officeLocation(): BelongsTo
     {
         return $this->belongsTo(OfficeLocation::class);
+    }
+    public function paySlipManager(): HasMany
+    {
+        return $this->hasMany(PaySlipManager::class);
+    }
+    public function generatePayslips(): HasMany
+    {
+        return $this->hasMany(GeneratePayslip::class);
     }
     // --- Scopes ---
 

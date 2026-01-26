@@ -36,6 +36,9 @@ use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
+use App\Http\Controllers\Api\PaySlipManagerController;
+use App\Http\Controllers\Api\PeriodController;
+use App\Http\Controllers\Api\PeriodTypeController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
@@ -52,6 +55,7 @@ use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\TemplateController;
+use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -557,6 +561,26 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PayHeadController::class, 'restore']);
             Route::delete('{id}/force', [PayHeadController::class, 'forceDestroy']);
         });
+        //period-types routes
+        Route::prefix('period-types')->group(function () {
+            Route::get('/', [TypePeriodController::class, 'index']);
+            Route::post('/', [TypePeriodController::class, 'store']);
+            Route::get('/{id}', [TypePeriodController::class, 'show']);
+            Route::post('/update/{id}', [TypePeriodController::class, 'update']);
+            Route::delete('/{id}', [TypePeriodController::class, 'destroy']);
+            Route::get('{id}/restore', [TypePeriodController::class, 'restore']);
+            Route::delete('{id}/force', [TypePeriodController::class, 'forceDestroy']);
+        });
+        //period routes
+        Route::prefix('periods')->group(function () {
+            Route::get('/', [PeriodController::class, 'index']);
+            Route::post('/', [PeriodController::class, 'store']);
+            Route::get('/{id}', [PeriodController::class, 'show']);
+            Route::post('/update/{id}', [PeriodController::class, 'update']);
+            Route::delete('/{id}', [PeriodController::class, 'destroy']);
+            Route::get('{id}/restore', [PeriodController::class, 'restore']);
+            Route::delete('{id}/force', [PeriodController::class, 'forceDestroy']);
+        });
         //pay-roll routes
         Route::prefix('pay-rolls')->group(function () {
             Route::get('/', [PayRollController::class, 'index']);
@@ -587,6 +611,17 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PositionController::class, 'restore']);
             Route::delete('{id}/force', [PositionController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PositionController::class, 'toggleStatus']);
+        });
+        //pay slip manager routes
+        Route::prefix('pay-slip-managers')->group(function () {
+            Route::get('/', [PaySlipManagerController::class, 'index']);
+            Route::post('/', [PaySlipManagerController::class, 'store']);
+            Route::get('/{id}', [PaySlipManagerController::class, 'show']);
+            Route::post('/update/{id}', [PaySlipManagerController::class, 'update']);
+            Route::delete('/{id}', [PaySlipManagerController::class, 'destroy']);
+            Route::get('{id}/restore', [PaySlipManagerController::class, 'restore']);
+            Route::delete('{id}/force', [PaySlipManagerController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [PaySlipManagerController::class, 'toggleStatus']);
         });
         //resign rules routes
         Route::prefix('resign-rules')->group(function () {

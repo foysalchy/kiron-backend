@@ -8,17 +8,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PayRoll extends Model
+class PeriodType extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
+
     protected $fillable = [
         'company_id',
-        'name',
-        'payroll_type',
-        'payment_type',
+        'type',
+        'status',
     ];
     protected $hidden = ['deleted_at'];
     // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+    public function scopeInactive($query)
+    {
+        return $query->where('status', false);
+    }
 
     public function scopeByCompany($query, int $companyId)
     {
@@ -29,13 +37,8 @@ class PayRoll extends Model
     {
         return $this->belongsTo(Company::class);
     }
-    public function positions(): HasMany
+    public function periods(): HasMany
     {
-        return $this->hasMany(Position::class);
+        return $this->hasMany(Period::class);
     }
-    public function paySlipManagers(): HasMany
-    {
-        return $this->hasMany(PaySlipManager::class);
-    }
-
 }

@@ -5,26 +5,31 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PaySlipManager extends Model
+class GeneratePayslip extends Model
 {
     use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
         'employee_id',
-        'payroll_id',
-        'position_id',
-        'total_amount',
+        'pay_slip_id',
+        'pay_roll_pay_head_id',
+        'period',
+        'generated_date',
+        'gross_salary',
+        'total_deduction',
+        'net_salary',
         'status',
     ];
-    protected $hidden = ['deleted_at'];
     protected $casts = [
-        'total_amount' => 'decimal:2',
+        'gross_salary'    => 'decimal:2',
+        'total_deduction' => 'decimal:2',
+        'net_salary'      => 'decimal:2',
+        'generated_date'  => 'date',
     ];
-        // Scopes
+    // Scopes
     public function scopeByCompany($query, int $companyId)
     {
         return $query->where('company_id', $companyId);
@@ -38,6 +43,10 @@ class PaySlipManager extends Model
     {
         return $query->where('status', false);
     }
+    public function scopePaid($query)
+    {
+        return $query->where('status', 9);
+    }
     // Relationships
     public function company(): BelongsTo
     {
@@ -47,16 +56,13 @@ class PaySlipManager extends Model
     {
         return $this->belongsTo(Employee::class);
     }
-    public function payroll(): BelongsTo
+    public function paySlipManager(): BelongsTo
     {
-        return $this->belongsTo(PayRoll::class);
+        return $this->belongsTo(PaySlipManager::class);
     }
-    public function position(): BelongsTo
+    public function payRollPayHead(): BelongsTo
     {
-        return $this->belongsTo(Position::class);
+        return $this->belongsTo(PayRollPayHead::class);
     }
-    public function generatePayslip(): HasMany
-    {
-        return $this->hasMany(GeneratePayslip::class);
-    }
+
 }

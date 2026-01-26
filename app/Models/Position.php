@@ -58,4 +58,8 @@ class Position extends Model
     {
         return $this->hasMany(Employee::class, 'position_id');
     }
+    public function paySlipManagers(): HasMany
+    {
+        return $this->hasMany(PaySlipManager::class);
+    }
 }

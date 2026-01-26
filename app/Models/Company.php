@@ -68,6 +68,14 @@ class Company extends Model
     {
         return $this->hasMany(Order::class);
     }
+    public function paySlipManagers(): HasMany
+    {
+        return $this->hasMany(PaySlipManager::class);
+    }
+    public function generatePayslips(): HasMany
+    {
+        return $this->hasMany(GeneratePayslip::class);
+    }
 
 
     // Scopes
