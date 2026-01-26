@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Cell;
@@ -23,8 +24,12 @@ class RackService
                 $query->where('area_id', $filters['area_id']);
             }
 
-            if (isset($filters['status']) && $filters['status'] !== "") {
-                $query->where('status', (int)$filters['status']);
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (!empty($filters['search'])) {
@@ -64,13 +69,12 @@ class RackService
     {
         DB::beginTransaction();
         try {
-            $rack =Rack::create($data);
+            $rack = Rack::create($data);
             LogHelper::created('rack', $rack->id, $rack->company_id);
             Log::info('Rack created successfully', ['rack_id' => $rack->id]);
 
             DB::commit();
             return $rack->load(['area']);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Rack creation failed: ' . $e->getMessage());
@@ -95,7 +99,6 @@ class RackService
 
             DB::commit();
             return $rack->fresh(['area']);
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -121,7 +124,6 @@ class RackService
 
             DB::commit();
             return true;
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -143,14 +145,13 @@ class RackService
                 throw ApiException::notFound('Rack');
             }
             $rack->restore();
-            LogHelper::restored('rack',$rack->id,$rack->company_id);
+            LogHelper::restored('rack', $rack->id, $rack->company_id);
             DB::commit();
             return $rack->load(relations: ['area']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Rack restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore data');
@@ -197,7 +198,6 @@ class RackService
 
             DB::commit();
             return $rack->load(['area']);
-
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -207,5 +207,4 @@ class RackService
             throw ApiException::serverError('Failed to toggle rack status');
         }
     }
-
 }

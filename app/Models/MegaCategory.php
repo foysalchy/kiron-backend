@@ -21,8 +21,7 @@ class MegaCategory extends Model
     ];
 
     protected $casts = [
-        'status' => 'boolean',
-        'order' => 'integer',
+        'status' => 'integer',
     ];
 
     protected $hidden = ['deleted_at'];

@@ -18,14 +18,18 @@ class SubCategoryService
         try {
             $query = SubCategory::with(['megaCategory']);
 
-           
+
 
             if (isset($filters['mega_category_id'])) {
                 $query->where('mega_category_id', $filters['mega_category_id']);
             }
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {
@@ -78,7 +82,7 @@ class SubCategoryService
 
             Log::info('Sub category created successfully', ['id' => $category->id]);
 
-            return $category->load([ 'megaCategory']);
+            return $category->load(['megaCategory']);
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -206,7 +210,7 @@ class SubCategoryService
     {
         try {
             $category = $this->getSubCategoryById($id);
-           $currentStatus = Status::from($category->status);
+            $currentStatus = Status::from($category->status);
             // toggle logic
             $newStatus = $currentStatus === Status::Active
                 ? Status::Inactive
@@ -215,10 +219,10 @@ class SubCategoryService
             $category->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::statusChanged('sub_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
+            LogHelper::statusChanged('sub_category', $category->id, $category->company_id, $category->name . ' new status ' . $newStatus->label());
             Log::info('Sub category status toggled', ['id' => $id]);
 
-            return $category->load([ 'megaCategory']);
+            return $category->load(['megaCategory']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -240,7 +244,7 @@ class SubCategoryService
         $query = SubCategory::with(['megaCategory'])
             ->where('name', 'like', "%{$term}%");
 
-        
+
 
         return $query->get();
     }

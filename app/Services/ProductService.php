@@ -191,7 +191,9 @@ class ProductService
 
             // Extract gallery data
             $galleryImages = $data['gallery_images'] ?? [];
+            $deleteGalleryIds = $data['deleted_gallery_ids'] ?? [];
             unset($data['gallery_images']);
+            unset($data['deleted_gallery_ids']);
 
             // Update product
             $product->update($data);
