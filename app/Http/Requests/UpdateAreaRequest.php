@@ -29,7 +29,6 @@ class UpdateAreaRequest extends UpdateBaseCompanyRequest
             [
                 'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
                 'name'         => ['sometimes', 'required', 'string', 'max:255'],
-                'status'       => ['sometimes', 'required', 'integer', 'in:0,1'],
             ]
         );
     }
@@ -40,7 +39,6 @@ class UpdateAreaRequest extends UpdateBaseCompanyRequest
             [
                 'warehouse_id.exists' => 'The selected warehouse does not exist.',
                 'name.required'       => 'The name field is mandatory.',
-                'status.required'     => 'Status must be active (1) or inactive (0).',
             ]
         );
     }

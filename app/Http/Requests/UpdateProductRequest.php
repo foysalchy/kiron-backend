@@ -41,6 +41,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 // Gallery Images (new images to add)
                 'gallery_images' => ['nullable', 'array'],
                 'gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'deleted_gallery_ids' => ['nullable', 'array'],
 
                 // Description
                 'short_description' => ['nullable', 'string'],

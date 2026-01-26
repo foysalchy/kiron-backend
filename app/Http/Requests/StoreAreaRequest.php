@@ -29,7 +29,7 @@ class StoreAreaRequest extends BaseCompanyRequest
             [
                 'warehouse_id' => ['required', 'exists:warehouses,id'],
                 'name'         => ['required', 'string', 'max:255'],
-                'status'       => ['required', 'integer', 'in:0,1'],
+            
             ]
         );
 
@@ -42,7 +42,6 @@ class StoreAreaRequest extends BaseCompanyRequest
             [
                 'warehouse_id.exists' => 'The selected warehouse does not exist.',
                 'name.required'       => 'The area name field is mandatory.',
-                'status.required'     => 'Status must be active (1) or inactive (0).',
             ]
         );
     }
