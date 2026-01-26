@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LeaveType extends Model
@@ -45,5 +46,9 @@ class LeaveType extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function leave_applications(): HasMany
+    {
+        return $this->hasMany(LeaveApplication::class);
     }
 }

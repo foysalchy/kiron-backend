@@ -11,7 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
 
 class AssignLeaveService
-{
+{ 
     /**
      * Get all assigned leaves with filtering and pagination
      */
@@ -71,21 +71,17 @@ class AssignLeaveService
     /**
      * Store Assignment (Sync Logic for UI)
      */
-    public function storeAssignment(array $data): bool
+    public function storeAssignment(array $data): Collection
     {
         DB::beginTransaction();
         try {
             $positionId = $data['position_id'];
-            $companyId  = $data['company_id'];
 
-            // delete existing assignments for the position
-            AssignLeaveType::where('position_id', $positionId)
-                           ->where('company_id', $companyId)
-                           ->forceDelete();
+            // Remove existing assignments for the position
+            AssignLeaveType::where('position_id', $positionId)->forceDelete();
 
             foreach ($data['leaves'] as $leave) {
                 AssignLeaveType::create([
-                    'company_id'    => $companyId,
                     'position_id'   => $positionId,
                     'leave_type_id' => $leave['leave_type_id'],
                     'leave_count'   => $leave['leave_count'],
@@ -93,14 +89,21 @@ class AssignLeaveService
                 ]);
             }
 
-            LogHelper::updated('assign_leave_type', $positionId, $companyId, 'Leaves assigned to position');
+            $updatedAssignments = AssignLeaveType::with(['position:id,name', 'leaveType:id,name'])
+                ->where('position_id', $positionId)
+                ->get();
+
+            LogHelper::created('assign_leave_type', $positionId, 2, 'Leaves assigned to position');
             DB::commit();
-            Log::info('Leaves assigned successfully', ['position_id' => $positionId, 'company_id' => $companyId]);
-            return true;
+
+            Log::info('Leaves assigned successfully', ['position_id' => $positionId, 'company_id' => 2]);
+
+            return $updatedAssignments; 
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Assignment creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to assign leaves');
+            throw ApiException::serverError('Failed to assign leaves: ' . $e->getMessage());
         }
     }
 

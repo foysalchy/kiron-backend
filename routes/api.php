@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
+use App\Http\Controllers\Api\LeaveApplicationController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
@@ -644,5 +645,19 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [AssignLeaveTypeController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [AssignLeaveTypeController::class, 'toggleStatus']);
         });
+
+        //leave-application routes
+        Route::prefix('leave-applications')->group(function () {
+            Route::get('/', [LeaveApplicationController::class, 'index']);
+            Route::post('/', [LeaveApplicationController::class, 'store']);
+            Route::get('/{id}', [LeaveApplicationController::class, 'show']);
+            Route::post('/update/{id}', [LeaveApplicationController::class, 'update']);
+            Route::delete('/{id}', [LeaveApplicationController::class, 'destroy']);
+            Route::get('{id}/restore', [LeaveApplicationController::class, 'restore']);
+            Route::delete('{id}/force', [LeaveApplicationController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LeaveApplicationController::class, 'toggleStatus']);
+        });
+            
+
     });
 });

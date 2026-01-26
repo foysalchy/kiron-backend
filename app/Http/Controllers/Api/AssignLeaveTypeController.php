@@ -14,7 +14,7 @@ class AssignLeaveTypeController extends Controller
 {
     public function __construct(
         protected AssignLeaveService $assignLeaveService
-    ) {}
+    ) {} 
 
     /**
      * Display a listing of assigned leaves.
@@ -23,7 +23,7 @@ class AssignLeaveTypeController extends Controller
     {
         $filters = [
             'status'      => $request->query('status'),
-            'search'      => $request->query('search'), // পজিশন নাম দিয়ে সার্চ
+            'search'      => $request->query('search'), 
             'position_id' => $request->query('position_id'),
             'sort_by'     => $request->query('sort_by', 'created_at'),
             'sort_order'  => $request->query('sort_order', 'desc'),
@@ -40,9 +40,9 @@ class AssignLeaveTypeController extends Controller
      */
     public function store(StoreAssignLeaveRequest $request): JsonResponse
     {
-        $this->assignLeaveService->storeAssignment($request->validated());
+        $data = $this->assignLeaveService->storeAssignment($request->validated());
 
-        return ResponseHelper::created(null, 'Leaves assigned successfully to the position');
+        return ResponseHelper::created($data, 'Leaves assigned successfully to the position');
     }
 
     /**
