@@ -9,7 +9,7 @@ use App\Services\PartyService;
 use App\Exceptions\ApiException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class PartyController extends Controller
 {
     public function __construct(
@@ -112,7 +112,7 @@ class PartyController extends Controller
      */
     public function getSuppliers(Request $request): JsonResponse
     {
-        
+
         $suppliers = $this->partyService->getSuppliers();
 
         return ResponseHelper::success($suppliers, 'Suppliers retrieved successfully');
@@ -123,7 +123,7 @@ class PartyController extends Controller
      */
     public function getCustomers(Request $request): JsonResponse
     {
-        
+
 
         $customers = $this->partyService->getCustomers();
 
@@ -147,5 +147,40 @@ class PartyController extends Controller
         );
 
         return ResponseHelper::success($parties, 'Search results retrieved successfully');
+    }
+
+    /**
+     * Export blank template
+     */
+    public function exportTemplate(Request $request): BinaryFileResponse
+    {
+        $type = $request->query('type', 'xlsx'); // csv or xlsx
+
+        return $this->partyService->exportTemplate($type);
+    }
+
+    /**
+     * Export existing party data
+     */
+    public function exportData(Request $request): BinaryFileResponse
+    {
+        $type = $request->query('type', 'xlsx');
+        $partyType = $request->query('party_type', 'all'); // all, 1, 2
+
+        return $this->partyService->exportData($type, $partyType);
+    }
+
+    /**
+     * Import parties from file
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls|max:5120', // 5MB max
+        ]);
+
+        $result = $this->partyService->import($request->file('file'));
+
+        return ResponseHelper::success($result, 'Parties imported successfully');
     }
 }
