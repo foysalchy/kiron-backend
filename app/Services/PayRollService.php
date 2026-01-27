@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\PayRoll;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\Period;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -87,7 +88,7 @@ class PayRollService
         try {
             $payRoll = $this->getPayRollById($id);
             
-            $firstPeriod = \App\Models\Period::with('periodType')->find($periodIds[0]);
+            $firstPeriod = Period::with('periodType')->find($periodIds[0]);
             
             $detectedType = $firstPeriod->periodType->type ?? 'Assigned';
 
