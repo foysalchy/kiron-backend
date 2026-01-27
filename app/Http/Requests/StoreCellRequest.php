@@ -29,7 +29,7 @@ class StoreCellRequest extends BaseCompanyRequest
             [
                 'rack_id' => ['required', 'exists:racks,id'],
                 'name'    => ['required', 'string', 'max:255'],
-                'status'  => ['required', 'integer', 'in:0,1'],
+                'status'  => ['nullable', 'integer', 'in:0,1'],
             ]
         );
     }

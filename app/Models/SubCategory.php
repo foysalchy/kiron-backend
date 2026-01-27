@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class SubCategory extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
     protected $fillable = [
         'company_id',
         'mega_category_id',

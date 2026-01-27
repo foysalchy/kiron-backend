@@ -24,7 +24,11 @@ class MiniCategoryService
             }
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {
@@ -71,7 +75,7 @@ class MiniCategoryService
             }
 
             $category = MiniCategory::create($data);
-            LogHelper::created('mini_category', $category->id, $category->company_id,$category->name);
+            LogHelper::created('mini_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -106,7 +110,7 @@ class MiniCategoryService
             }
 
             $category->update($data);
-            LogHelper::updated('mini_category', $category->id, $category->company_id,$category->name);
+            LogHelper::updated('mini_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -133,7 +137,7 @@ class MiniCategoryService
         try {
             $category = $this->getMiniCategoryById($id);
             $category->delete();
-            LogHelper::deleted('mini_category', $category->id, $category->company_id,$category->name);
+            LogHelper::deleted('mini_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Mini category deleted successfully', ['id' => $id]);
 
@@ -156,7 +160,7 @@ class MiniCategoryService
             }
 
             $category->restore();
-            LogHelper::restored('mini_category', $category->id, $category->company_id,$category->name);
+            LogHelper::restored('mini_category', $category->id, $category->company_id, $category->name);
 
             Log::info('Mini category restored successfully', ['id' => $id]);
 
@@ -183,7 +187,7 @@ class MiniCategoryService
             FileUploadHelper::delete($category->image);
 
             $category->forceDelete();
-            LogHelper::forceDeleted('mini_category', $category->id, $category->company_id,$category->name);
+            LogHelper::forceDeleted('mini_category', $category->id, $category->company_id, $category->name);
 
             DB::commit();
 
@@ -214,7 +218,7 @@ class MiniCategoryService
             $category->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::statusChanged('mini_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
+            LogHelper::statusChanged('mini_category', $category->id, $category->company_id, $category->name . ' new status ' . $newStatus->label());
 
             Log::info('Mini category status toggled', ['id' => $id]);
 
