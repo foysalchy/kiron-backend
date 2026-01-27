@@ -23,14 +23,14 @@ class Period extends Model
         'company_id',
     ];
     protected $hidden = ['deleted_at'];
-    // Scopes
+    // Scopes 
     public function scopeActive($query)
     {
         return $query->where('status', true);
     }
     public function scopeInactive($query)
     {
-        return $query->where('status', false);
+        return $query->where('status', false); 
     }
 
     public function scopeByCompany($query, int $companyId)

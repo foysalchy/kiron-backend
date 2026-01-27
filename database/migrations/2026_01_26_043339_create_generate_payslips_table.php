@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
             $table->foreignId('pay_slip_id')->constrained('pay_slip_managers')->cascadeOnDelete();
             $table->foreignId('pay_roll_pay_head_id')->nullable()->constrained('pay_roll_pay_heads')->cascadeOnDelete();
+            $table->foreignId('period_id')->constrained('periods')->cascadeOnDelete();
             $table->date('generated_date')->comment('e.g., January 2026');
             $table->decimal('gross_salary', 15, 2)->default(0.00);  
             $table->decimal('total_deduction', 15, 2)->default(0.00); 

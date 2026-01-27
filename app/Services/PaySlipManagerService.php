@@ -7,6 +7,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Employee;
 use App\Models\GeneratePayslip;
+use App\Models\PayRoll;
 use App\Models\PayRollPayHead;
 use App\Models\PaySlipManager;
 use Illuminate\Database\Eloquent\Collection;
@@ -52,22 +53,33 @@ class PaySlipManagerService
             throw ApiException::serverError('Failed to fetch Pay Slip Managers');
         }
     }
-/**
- * Get Specific Payslip details based on input
- */
+    /**
+     * Get Periods assigned to a Payroll
+     */
+    public function getPeriodsByPayroll(int $payrollId)
+    {
+        $payroll = PayRoll::with('periods')->find($payrollId);
+        if (!$payroll) {
+            throw ApiException::notFound('Payroll settings not found for this manager.');
+        }
+        return $payroll->periods;
+    }
+    /**
+     * Get Specific Payslip details based on input
+     */
     public function getGeneratePayslipDetails(int $id, array $filters = []): GeneratePayslip
     {
-        if (empty($filters['period'])) {
-            throw ApiException::badRequest('Period is required to fetch payslip details.');
+        if (empty($filters['period_id'])) {
+            throw ApiException::badRequest('Period ID is required to fetch payslip details.');
         }
 
         $record = GeneratePayslip::with([
             'employee', 
+            'period', // Relationship added
             'paySlipManager.position', 
             'paySlipManager.payroll.payRollPayHeads.payHead'
         ])
-        ->where('employee_id', $id) 
-        ->where('period', $filters['period'])
+        ->where('period_id', $filters['period_id']) 
         ->first();
 
         if (!$record) {
@@ -79,79 +91,117 @@ class PaySlipManagerService
     /**
      * Bulk Generate or Regenerate Payslips
      */
-public function processBatchGeneration(array $data, bool $isRegenerate = false): array
-{
-    DB::beginTransaction();
-    try {
-        $processedCount = 0;
-
-        foreach ($data['employee_ids'] as $employeeId) {
-            $employee = Employee::find($employeeId);
-            if (!$employee) continue;
-
-            // 1. Manager record khunja ba default toiri kora
-            $manager = PaySlipManager::where('employee_id', $employeeId)->first();
+    public function processBatchGeneration(array $data, bool $isRegenerate = false): array
+    {
+        DB::beginTransaction();
+        try {
+            $processedCount = 0;
             
-            if (!$manager) {
-                $manager = PaySlipManager::create([
-                    'company_id'  => $employee->company_id,
-                    'employee_id' => $employee->id,
-                    'payroll_id'  => 1, // Default payroll ID check korun database-e
-                    'position_id' => $employee->job_title_id ?? 1,
-                    'status'      => 1,
-                    'total_amount'=> 0.00
-                ]);
-            }
-
-            // 2. Pay Heads calculation (Migration onujayi 'payroll_id')
-            $payRollPayHeads = PayRollPayHead::with('payHead')
-                ->where('pay_roll_id', $manager->payroll_id) 
-                ->get();
-
-            $grossSalary = 0;
-            $totalDeduction = 0;
-
-            foreach ($payRollPayHeads as $payHeadRecord) {
-                $amount = (float)$payHeadRecord->amount;
-                if ($payHeadRecord->payHead && $payHeadRecord->payHead->type === 'Addition') {
-                    $grossSalary += $amount;
-                } else {
-                    $totalDeduction += $amount;
+            foreach ($data['employees'] as $entry) {
+                $employeeId = $entry['employee_id'];
+                $periodId   = $entry['period_id'];
+                
+                // load employee with position
+                $employee = Employee::with('position')->find($employeeId);
+                
+                if (!$employee) {
+                    Log::error("Employee not found: ID $employeeId");
+                    continue;
                 }
+
+                // get current payroll from position
+                $currentPayrollId = $employee->position->pay_roll_id ?? null; 
+
+                if (!$currentPayrollId) {
+                    Log::warning("Pay Roll ID missing in position for Employee: $employeeId");
+                    continue; 
+                }
+
+                // slip manager create or update
+                $manager = PaySlipManager::updateOrCreate(
+                    ['employee_id' => $employeeId],
+                    [
+                        'company_id'  => $employee->company_id,
+                        'payroll_id'  => $currentPayrollId,
+                        'position_id' => $employee->position_id,
+                        'status'      => 1,
+                        'total_amount'=> 0.00
+                    ]
+                );
+
+                // Pay Heads calculation
+                $payRollPayHeads = PayRollPayHead::with('payHead')
+                    ->where('pay_roll_id', $currentPayrollId) 
+                    ->get();
+
+                $grossSalary = 0;
+                $totalDeduction = 0;
+
+                foreach ($payRollPayHeads as $payHeadRecord) {
+                    $amount = (float)$payHeadRecord->amount;
+                    
+                    if ($payHeadRecord->payHead && $payHeadRecord->payHead->type === 'Addition') {
+                        $grossSalary += $amount;
+                    } else {
+                        $totalDeduction += $amount;
+                    }
+                }
+
+                // Regenerate handle
+                if ($isRegenerate) {
+                    GeneratePayslip::where('employee_id', $employeeId)
+                        ->where('period_id', $periodId)
+                        ->delete();
+                }
+
+                GeneratePayslip::create([
+                    'company_id'      => $employee->company_id,
+                    'employee_id'     => $employeeId,
+                    'pay_roll_id'     => $currentPayrollId,
+                    'pay_slip_id'     => $manager->id,
+                    'period_id'       => $periodId,
+                    'generated_date'  => $data['generated_date'],
+                    'gross_salary'    => $grossSalary,
+                    'total_deduction' => $totalDeduction,
+                    'net_salary'      => $grossSalary - $totalDeduction,
+                    'status'          => $data['status'] ?? 0,
+                ]);
+
+                $processedCount++;
             }
 
-            $netSalary = $grossSalary - $totalDeduction;
+            DB::commit();
+            return ['success' => true, 'message' => "Successfully generated $processedCount payslips."];
 
-            // 3. Regenerate logic
-            if ($isRegenerate) {
-                GeneratePayslip::where('employee_id', $employeeId)
-                    ->where('period', $data['period'])
-                    ->delete();
-            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Payroll Error: ' . $e->getMessage());
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
+    }
+    /**
+     * Get Salary Sheet Data
+     */
+    public function getSalarySheetData(array $filters = [])
+    {
+        $query = GeneratePayslip::with([
+            'employee', 
+            'period', 
+            'payRollPayHeads.payHead'
+        ]);
 
-            // 4. Final Insert (pay_roll_pay_head_id ekhon nullable)
-            $payslip = GeneratePayslip::create([
-                'employee_id'          => $employeeId,
-                'pay_slip_id'          => $manager->id,
-                'pay_roll_pay_head_id' => $payRollPayHeads->first()?->id, 
-                'period'               => $data['period'],
-                'generated_date'       => $data['generated_date'],
-                'gross_salary'         => $grossSalary,
-                'total_deduction'      => $totalDeduction,
-                'net_salary'           => $netSalary,
-                'status'               => $data['status'] ?? 1,
-            ]);
-
-            $processedCount++;
+        if (!empty($filters['payroll_id'])) {
+            $query->where('pay_roll_id', $filters['payroll_id']);
         }
 
-        DB::commit();
-        return ['success' => true, 'message' => "Successfully generated $processedCount payslips."];
+        if (!empty($filters['employee_id'])) {
+            $query->where('employee_id', $filters['employee_id']);
+        }
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Payroll Processing Error: ' . $e->getMessage());
-        return ['success' => false, 'error' => $e->getMessage()];
+        if (!empty($filters['period_id'])) {
+            $query->where('period_id', $filters['period_id']);
+        }
+
+        return $query->latest()->paginate($filters['per_page'] ?? 15);
     }
-}
 }

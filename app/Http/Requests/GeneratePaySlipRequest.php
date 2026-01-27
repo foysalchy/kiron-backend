@@ -27,9 +27,9 @@ class GeneratePaySlipRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'employee_ids' => ['required', 'array', 'min:1'],
-                'employee_ids.*' => ['exists:employees,id'],
-                'period' => ['required', 'string'], // e.g., "Jan-26 To Jun-26"
+                'employees' => ['required', 'array', 'min:1'],
+                'employees.*.employee_id' => ['required', 'exists:employees,id'],
+                'employees.*.period_id'   => ['required', 'exists:periods,id'],
                 'generated_date' => ['required', 'date'],
                 'status' => ['integer', 'nullable'],
             ]
@@ -40,11 +40,10 @@ class GeneratePaySlipRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'employee_ids.required' => 'Please select at least one employee.',
-                'employee_ids.array' => 'Employee selection must be an array.',
-                'period.required' => 'The payslip period is required.',
+                'employees.required' => 'Please select at least one employee with their period.',
+                'employees.*.employee_id.exists' => 'Selected employee is invalid.',
+                'employees.*.period_id.required' => 'Each employee must have a selected period.',
                 'generated_date.required' => 'Generation date is required.',
-                'generated_date.date' => 'Please provide a valid date.',
             ]
         );
     }

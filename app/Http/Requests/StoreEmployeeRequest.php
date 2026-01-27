@@ -30,6 +30,7 @@ class StoreEmployeeRequest extends BaseCompanyRequest
                 'employee_type_id'        => ['required', 'exists:employee_types,id'],
                 'job_title_id'            => ['nullable', 'exists:job_titles,id'],
                 'office_location_id'      => ['nullable', 'exists:office_locations,id'],
+                'position_id'             => ['nullable', 'exists:positions,id'],
 
                 // --- General Info ---
                 'first_name'              => ['required', 'string', 'max:100'],
@@ -55,7 +56,6 @@ class StoreEmployeeRequest extends BaseCompanyRequest
                 'permanent_address'       => ['nullable', 'string'],
                 'is_same_address'         => ['boolean'],
 
-                // --- Status ---
                 'status'                  => ['nullable', 'in:0,1'],
             ]
         );

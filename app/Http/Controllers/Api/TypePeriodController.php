@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class TypePeriodController extends Controller
 {
     public function __construct(protected PeriodTypeService $periodTypeService) 
-    {} 
+    {}
 
     /**
      * Get all period types with filters

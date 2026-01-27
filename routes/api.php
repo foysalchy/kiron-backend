@@ -615,14 +615,11 @@ Route::prefix('v1')->group(function () {
         });
         //pay slip manager routes
         Route::prefix('pay-slip-managers')->group(function () {
+            Route::get('/salary-sheet', [PaySlipManagerController::class, 'salarySheet']);
             Route::get('/', [PaySlipManagerController::class, 'index']);
             Route::post('/', [PaySlipManagerController::class, 'store']);
             Route::get('/{id}', [PaySlipManagerController::class, 'show']);
-            Route::post('/update/{id}', [PaySlipManagerController::class, 'update']);
-            Route::delete('/{id}', [PaySlipManagerController::class, 'destroy']);
-            Route::get('{id}/restore', [PaySlipManagerController::class, 'restore']);
-            Route::delete('{id}/force', [PaySlipManagerController::class, 'forceDestroy']);
-            Route::patch('/{id}/toggle-status', [PaySlipManagerController::class, 'toggleStatus']);
+            Route::post('/regenerate', [PaySlipManagerController::class, 'regenerate']);
         });
         //resign rules routes
         Route::prefix('resign-rules')->group(function () {

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GeneratePayslip extends Model
@@ -14,9 +15,10 @@ class GeneratePayslip extends Model
     protected $fillable = [
         'company_id',
         'employee_id',
+        'pay_roll_id',
         'pay_slip_id',
         'pay_roll_pay_head_id',
-        'period',
+        'period_id',
         'generated_date',
         'gross_salary',
         'total_deduction',
@@ -60,9 +62,16 @@ class GeneratePayslip extends Model
     {
         return $this->belongsTo(PaySlipManager::class);
     }
-    public function payRollPayHead(): BelongsTo
+    public function payRollPayHeads(): HasMany
     {
-        return $this->belongsTo(PayRollPayHead::class);
+        return $this->hasMany(PayRollPayHead::class, 'pay_roll_id', 'pay_roll_id');
+    }
+    public function period(): BelongsTo {
+        return $this->belongsTo(Period::class);
+    }
+
+    public function payRoll(): BelongsTo {
+        return $this->belongsTo(PayRoll::class);
     }
 
 }

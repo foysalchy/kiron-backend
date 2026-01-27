@@ -26,7 +26,8 @@ class PaySlipManagerController extends Controller
      */
     public function show(Request $request, int $id): JsonResponse
     {
-        $record = $this->paySlipManagerService->getGeneratePayslipDetails($id, $request->only('period'));
+
+        $record = $this->paySlipManagerService->getGeneratePayslipDetails($id, $request->only('period_id'));
 
         return ResponseHelper::success($record, 'Pay slip details retrieved');
     }
@@ -38,5 +39,27 @@ class PaySlipManagerController extends Controller
         $record = $this->paySlipManagerService->processBatchGeneration($request->validated());
 
         return ResponseHelper::created($record, 'Pay head assigned successfully');
+    }
+    /**
+     * Regenerate payslips for employees
+     */
+    public function regenerate(GeneratePaySlipRequest $request): JsonResponse
+    {
+        $record = $this->paySlipManagerService->processBatchGeneration($request->validated(), true);
+
+        return ResponseHelper::success($record, 'Payslips regenerated successfully');
+    }
+    /**
+     * Get Salary Sheet
+     */
+    public function salarySheet(Request $request): JsonResponse
+    {
+        $records = $this->paySlipManagerService->getSalarySheetData($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Salary sheet retrieved successfully',
+            'data' => $records
+        ]);
     }
 }
