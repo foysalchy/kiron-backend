@@ -590,6 +590,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [PayRollController::class, 'destroy']);
             Route::get('{id}/restore', [PayRollController::class, 'restore']);
             Route::delete('{id}/force', [PayRollController::class, 'forceDestroy']);
+            Route::post('/{id}/assign-periods', [PayRollController::class, 'assignPeriods']);
         });
         //pay-roll-pay-heads routes
         Route::prefix('pay-roll-pay-heads')->group(function () {

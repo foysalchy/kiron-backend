@@ -29,7 +29,6 @@ class UpdatePayRollRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'name'         => ['sometimes', 'required', 'string', 'max:255'],
-                'payroll_type' => ['sometimes','required','string',Rule::in(['weekly', 'monthly', 'quarterly', 'tri_annual', 'bi_annual', 'annual'])],
                 'payment_type' => ['nullable','string',Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash', 'nagad'])],
             ]
         );
@@ -43,8 +42,6 @@ class UpdatePayRollRequest extends UpdateBaseCompanyRequest
             $this->companyMessages(),
             [
                 'name.required'         => 'Payroll name cannot be empty.',
-                'payroll_type.required' => 'Payroll period is required.',
-                'payroll_type.in'       => 'Invalid payroll period selected.',
             ]
         );
     }

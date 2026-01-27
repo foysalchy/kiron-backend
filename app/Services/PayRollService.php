@@ -17,34 +17,30 @@ class PayRollService
     public function getAllPayRolls(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = PayRoll::query();
+            $query = PayRoll::query()->with('periods'); 
 
-            // Search by name
             if (!empty($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");
             }
 
-            // Sorting
             $sortBy = $filters['sort_by'] ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
-
+            return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
         } catch (\Exception $e) {
             Log::error('Error fetching payrolls: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch payroll records');
         }
     }
 
+
     /**
      * Get payroll by ID
      */
     public function getPayRollById(int $id): PayRoll
     {
-        $payRoll = PayRoll::find($id);
+        $payRoll = PayRoll::with(['periods'])->find($id);
 
         if (!$payRoll) {
             throw ApiException::notFound('PayRoll');
@@ -77,6 +73,34 @@ class PayRollService
                 'trace' => $e->getTraceAsString()
             ]);
             throw ApiException::serverError('Failed to create payroll');
+        }
+    }
+    /**
+     * Assign Periods Logic (Pivot Table Update)
+     */
+    /**
+ * Assign periods and automatically detect payroll type
+ */
+    public function assignPeriods(int $id, array $periodIds): PayRoll
+    {
+        DB::beginTransaction();
+        try {
+            $payRoll = $this->getPayRollById($id);
+            
+            $firstPeriod = \App\Models\Period::with('periodType')->find($periodIds[0]);
+            
+            $detectedType = $firstPeriod->periodType->type ?? 'Assigned';
+
+            $payRoll->periods()->sync($periodIds);
+
+            $payRoll->update(['payroll_type' => $detectedType]);
+
+            DB::commit();
+            return $payRoll->fresh(['periods.periodType']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Assignment failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to assign periods');
         }
     }
 

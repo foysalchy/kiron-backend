@@ -61,21 +61,45 @@ class PeriodService
     }
 
     /**
-     * Create a new period
+     * Create multiple periods at once (Bulk Insert)
+     * Supports both Super Admin (manual ID) and Company User (auto-scoped)
      */
-    public function createPeriod(array $data): Period
+    public function createPeriod(array $data): bool
     {
         DB::beginTransaction();
+
         try {
-            $period = Period::create($data);
-            LogHelper::created('period', $period->id, $period->company_id, $period->period_name);
+            $periodTypeId = $data['period_type_id'];
+            
+            $CompanyId = $data['company_id'] ?? null;
+
+            foreach ($data['periods'] as $periodData) {
+                
+                $period = Period::create([
+                    'company_id'     => $CompanyId,
+                    'period_type_id' => $periodTypeId,
+                    'period_name'    => $periodData['period_name'],
+                    'start_date'     => $periodData['start_date'],
+                    'end_date'       => $periodData['end_date'],
+                    'issue_date'     => $periodData['issue_date'],
+                    'status'         => Status::Active->value,
+                ]);
+
+                LogHelper::created('period', $period->id, $period->company_id, $period->period_name);
+            }
+
             DB::commit();
             
-            return $period->load(['periodType']);
+            Log::info('Bulk periods created successfully. Executed by User ID: ' . auth()->id());
+            
+            return true;
+
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Period creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create period');
+            
+            Log::error('Bulk Period creation failed: ' . $e->getMessage());
+            
+            throw ApiException::serverError('Failed to create periods: ' . $e->getMessage());
         }
     }
 

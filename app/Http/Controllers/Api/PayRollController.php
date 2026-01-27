@@ -41,6 +41,20 @@ class PayRollController extends Controller
 
         return ResponseHelper::created($payRoll, 'Payroll created successfully');
     }
+    /**
+     * assign periods to payroll
+     */
+    public function assignPeriods(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'period_ids'   => ['required', 'array'],
+            'period_ids.*' => ['exists:periods,id'],
+        ]);
+
+        $payRoll = $this->payRollService->assignPeriods($id, $data['period_ids']);
+
+        return ResponseHelper::success($payRoll, 'Periods assigned and type updated from Period settings');
+    }
 
     /**
      * Display the specified payroll.

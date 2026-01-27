@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Period extends Model
@@ -44,5 +45,9 @@ class Period extends Model
     public function periodType(): BelongsTo
     {
         return $this->belongsTo(PeriodType::class);
+    }
+     public function payroll(): HasMany
+    {
+        return $this->hasMany(PayRoll::class);
     }
 }
