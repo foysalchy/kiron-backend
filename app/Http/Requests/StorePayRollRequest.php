@@ -29,10 +29,9 @@ class StorePayRollRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'name' => ['required', 'string', 'max:255'],
-                'payroll_type' => ['required', Rule::in(['weekly', 'monthly', 'quarterly', 'tri_annual', 'bi_annual', 'annual'])],
-                'payment_type' => ['required', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash',])],
-                'status'      => ['nullable', 'integer', 'in:0,1'],
+               'name'         => ['required', 'string', 'max:255'],
+                'payment_type' => ['required', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash'])],
+                'status'       => ['nullable', 'integer', 'in:0,1'],
             ]
         );
     }
@@ -42,7 +41,6 @@ class StorePayRollRequest extends BaseCompanyRequest
             $this->companyMessages(),
             [
                 'name.required' => 'Payroll name is required',
-                'payroll_type.required' => 'Payroll type is required',
                 'payment_type.required' => 'Payment type is required',
             ]
         );

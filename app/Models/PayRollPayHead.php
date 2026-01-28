@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PayRollPayHead extends Model
@@ -35,5 +36,9 @@ class PayRollPayHead extends Model
     public function payHead(): BelongsTo
     {
         return $this->belongsTo(PayHead::class);
+    }
+    public function generatePayslip(): HasMany
+    {
+        return $this->hasMany(GeneratePayslip::class);
     }
 }

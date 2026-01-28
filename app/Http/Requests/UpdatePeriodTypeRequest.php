@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
 
-class UpdatePayRollRequest extends UpdateBaseCompanyRequest
+class UpdatePeriodTypeRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,26 +28,27 @@ class UpdatePayRollRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'name'         => ['sometimes', 'required', 'string', 'max:255'],
-                'payment_type' => ['nullable','string',Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash', 'nagad'])],
+                'type' => ['sometimes', 'string', 'max:255', Rule::unique('period_types', 'type')->ignore($this->route('period_type'))],
+                'status' => ['sometimes', 'integer'],
             ]
         );
     }
     /**
-     * Custom messages for validation errors.
+     * Custom validation messages
      */
     public function messages(): array
     {
         return array_merge(
             $this->companyMessages(),
             [
-                'name.required'         => 'Payroll name cannot be empty.',
+                'type.unique' => 'This period type name is already in use.',
+                'status.in'   => 'Status must be either 1 (Active) or 0 (Inactive).',
             ]
         );
     }
 
     /**
-     * Handle a failed validation attempt.
+     * Return JSON response on validation failure
      */
     protected function failedValidation(Validator $validator)
     {

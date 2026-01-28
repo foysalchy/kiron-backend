@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pay_roll_pay_heads', function (Blueprint $table) {
+        Schema::create('periods', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
-            $table->foreignId('pay_head_id')->constrained('pay_heads')->cascadeOnDelete();
-            $table->string('type')->comment('amount,percentage');
-            $table->decimal('amount', 15, 2)->default(0);
+            $table->foreignId('period_type_id')->constrained('period_types')->cascadeOnDelete();
+            $table->string('period_name')->comment('e.g., Jan-24 To Apr-24');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->date('issue_date');
+            $table->tinyInteger('status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pay_roll_pay_heads');
+        Schema::dropIfExists('periods');
     }
 };

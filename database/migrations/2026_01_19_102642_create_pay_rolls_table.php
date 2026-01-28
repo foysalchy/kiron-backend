@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('name');
-            $table->string('payroll_type')->comment('weekly, monthly, quarterly,tri_annual,bi_annual,annual');
+            $table->string('payroll_type')->default('Not Assigned');
             $table->string('payment_type')->nullable()->comment('cash, bank, card, cheque, bkash');
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -65,9 +65,7 @@ class PayRollPayHeadService
     {
         DB::beginTransaction();
         try {
-            $payHead = PayHead::where('name', $data['pay_head_name'])
-                ->where('company_id', $data['company_id'])
-                ->first();
+            $payHead = PayHead::where('name', $data['pay_head_name'])->first();
 
             if (!$payHead) {
                 throw ApiException::notFound('Pay Head with this name');

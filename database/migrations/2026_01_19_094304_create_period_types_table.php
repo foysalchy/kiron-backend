@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pay_roll_pay_heads', function (Blueprint $table) {
+        Schema::create('period_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('pay_roll_id')->constrained('pay_rolls')->cascadeOnDelete();
-            $table->foreignId('pay_head_id')->constrained('pay_heads')->cascadeOnDelete();
-            $table->string('type')->comment('amount,percentage');
-            $table->decimal('amount', 15, 2)->default(0);
+            $table->string('type')->unique()->comment('e.g., Monthly, Quarterly, Yearly, Annually, Bi-Annually, tri-Annually');
+            $table->tinyInteger('status')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pay_roll_pay_heads');
+        Schema::dropIfExists('period_types');
     }
 };

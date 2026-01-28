@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('type')->comment('addition, deduction');
             $table->text('description')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
