@@ -51,6 +51,7 @@ use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
+use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -690,7 +691,17 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [LeaveApplicationController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [LeaveApplicationController::class, 'toggleStatus']);
         });
-            
+        //site settings routes
+        Route::prefix('site-settings')->group(function () {
+            Route::get('/', [SiteSettingController::class, 'index']);
+            Route::post('/', [SiteSettingController::class, 'store']);
+            Route::get('/{id}', [SiteSettingController::class, 'show']);
+            Route::post('/update/{id}', [SiteSettingController::class, 'update']);
+            Route::delete('/{id}', [SiteSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [SiteSettingController::class, 'restore']);
+            Route::delete('{id}/force', [SiteSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [SiteSettingController::class, 'toggleStatus']);
+        });
 
     });
 });
