@@ -29,10 +29,12 @@ use App\Http\Controllers\Api\LeaveApplicationController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
+use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PassChangeController;
 use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
@@ -58,6 +60,7 @@ use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
+use App\Http\Controllers\Api\WocommerceSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -701,6 +704,32 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [SiteSettingController::class, 'restore']);
             Route::delete('{id}/force', [SiteSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SiteSettingController::class, 'toggleStatus']);
+        });
+        //wocommerce settings routes
+        Route::prefix('wocommerces')->group(function () {
+            Route::get('/', [WocommerceSettingController::class, 'index']);
+            Route::post('/', [WocommerceSettingController::class, 'store']);
+            Route::get('/{id}', [WocommerceSettingController::class, 'show']);
+            Route::post('/update/{id}', [WocommerceSettingController::class, 'update']);
+            Route::delete('/{id}', [WocommerceSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [WocommerceSettingController::class, 'restore']);
+            Route::delete('{id}/force', [WocommerceSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
+        });
+        //note template settings routes
+        Route::prefix('note-templates')->group(function () {
+            Route::get('/', [NoteTemplateController::class, 'index']);
+            Route::post('/', [NoteTemplateController::class, 'store']);
+            Route::get('/{id}', [NoteTemplateController::class, 'show']);
+            Route::post('/update/{id}', [NoteTemplateController::class, 'update']);
+            Route::delete('/{id}', [NoteTemplateController::class, 'destroy']);
+            Route::get('{id}/restore', [NoteTemplateController::class, 'restore']);
+            Route::delete('{id}/force', [NoteTemplateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [NoteTemplateController::class, 'toggleStatus']);
+        });
+        //change-pass routes
+        Route::prefix('change-pass')->group(function () {
+            Route::post('/', [PassChangeController::class, 'update']);
         });
 
     });
