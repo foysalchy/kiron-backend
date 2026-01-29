@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
 
@@ -17,7 +18,7 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
-
+use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeaveApplicationController;
 use App\Http\Controllers\Api\LogActionController;
+use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
@@ -36,6 +38,7 @@ use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PassChangeController;
 use App\Http\Controllers\Api\PayHeadController;
+use App\Http\Controllers\Api\PaymentMethodTypeController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
 use App\Http\Controllers\Api\PaySlipManagerController;
@@ -727,10 +730,34 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [NoteTemplateController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [NoteTemplateController::class, 'toggleStatus']);
         });
+        //payment methods routes
+        Route::prefix('payment-methods')->group(function () {
+            Route::get('/', [PaymentMethodTypeController::class, 'index']);
+            Route::post('/', [PaymentMethodTypeController::class, 'store']);
+            Route::get('/{id}', [PaymentMethodTypeController::class, 'show']);
+            Route::post('/update/{id}', [PaymentMethodTypeController::class, 'update']);
+            Route::delete('/{id}', [PaymentMethodTypeController::class, 'destroy']);
+            Route::get('{id}/restore', [PaymentMethodTypeController::class, 'restore']);
+            Route::delete('{id}/force', [PaymentMethodTypeController::class, 'forceDestroy']);
+        });
+        //customer-payments routes
+        Route::prefix('customer-payments')->group(function () {
+            Route::get('/', [CustomerPaymentMethodController::class, 'index']);
+            Route::post('/', [CustomerPaymentMethodController::class, 'store']);
+            Route::get('/{id}', [CustomerPaymentMethodController::class, 'show']);
+            Route::post('/update/{id}', [CustomerPaymentMethodController::class, 'update']);
+            Route::delete('/{id}', [CustomerPaymentMethodController::class, 'destroy']);
+            Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
+            Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
+        
+            });
         //change-pass routes
         Route::prefix('change-pass')->group(function () {
             Route::post('/', [PassChangeController::class, 'update']);
         });
+        //market tools route
+        Route::post('market-tools/update', [MarketController::class, 'update']);
 
     });
 });

@@ -7,32 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class NoteTemplate extends Model
+class Market extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes,CompanyScoped;
 
     protected $fillable = [
         'company_id',
-        'title',
-        'description',
-        'status'
+        'domain_verify',
+        'facebook_pixel_id',
+        'tiktok_pixel_id',
+        'meta_access_token',
+        'google_tag_id',
+        'google_measurement_id',
     ];
-    protected $hidden = ['deleted_at'];
-
-    // Relationships
+    protected $hidden = [
+        'deleted_at',
+    ];
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
-    }
-
-    // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('status', true);
-    }
-    public function scopeInactive($query)
-    {
-        return $query->where('status', false);
     }
     public function scopeByCompany($query, int $companyId)
     {

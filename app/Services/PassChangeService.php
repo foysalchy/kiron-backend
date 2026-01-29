@@ -27,7 +27,7 @@ class PassChangeService
                     throw ApiException::forbidden('Current password does not match.');
                 }
                 $password->update($hashedData);
-            } 
+            }
 
             LogHelper::updated('password', $password->id, $password->company_id, 'Password updated');
             DB::commit();

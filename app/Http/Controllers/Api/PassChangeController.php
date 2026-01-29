@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PassChangeController extends Controller
-{
+{   
     public function __construct(protected PassChangeService $pass)
     {
     }

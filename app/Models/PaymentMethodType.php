@@ -7,25 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class NoteTemplate extends Model
+class PaymentMethodType extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes,CompanyScoped;
 
     protected $fillable = [
         'company_id',
-        'title',
-        'description',
+        'payment_method',
         'status'
     ];
     protected $hidden = ['deleted_at'];
-
-    // Relationships
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     // Scopes
+
+    public function scopeByCompany($query, int $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
     public function scopeActive($query)
     {
         return $query->where('status', true);
@@ -34,8 +31,9 @@ class NoteTemplate extends Model
     {
         return $query->where('status', false);
     }
-    public function scopeByCompany($query, int $companyId)
+    // Relationships
+    public function company(): BelongsTo
     {
-        return $query->where('company_id', $companyId);
+        return $this->belongsTo(Company::class);
     }
 }
