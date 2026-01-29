@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class PassChange extends Model
 {
     use SoftDeletes,CompanyScoped;
-    protected $fillable = [
+    protected $fillable = [ 
         'company_id',
         'current_password',
         'new_password',
