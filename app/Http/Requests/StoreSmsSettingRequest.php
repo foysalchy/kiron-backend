@@ -7,8 +7,8 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreCourierRequest extends BaseCompanyRequest
-{ 
+class StoreSmsSettingRequest extends BaseCompanyRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,29 +27,27 @@ class StoreCourierRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'courier_method_id' => ['required', 'exists:courier_methods,id'],
-                'method_details'    => ['nullable', 'array'],
-                'contact_name'      => ['nullable', 'string', 'max:255'],
-                'phone'             => ['nullable', 'string', 'max:20'],
-                'location'          => ['nullable', 'string', 'max:500'],
-                'status'            => ['nullable'],
+                'event_name' => ['required', 'string', 'max:255'],
+                'message'    => ['required', 'string'],
+                'status'     => ['nullable', 'integer', 'in:0,1'],
             ]
         );
     }
     /**
-     * Custom messages for validation errors.
+     * Custom validation messages.
      */
     public function messages(): array
     {
         return array_merge(
             $this->companyMessages(),
             [
-                'courier_method_id.required' => 'Please select a courier method.',
-                'courier_method_id.exists'   => 'The selected courier method is invalid.',
-                'method_details.array'       => 'Method details must be a valid JSON/Array.',
+                'event_name.required' => 'The SMS event name is required (e.g., order_place).',
+                'message.required'    => 'The SMS message content cannot be empty.',
+                'status.in'           => 'Status must be either 0 (Inactive) or 1 (Active).',
             ]
         );
     }
+
     /**
      * Handle a failed validation attempt.
      */

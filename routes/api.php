@@ -59,6 +59,7 @@ use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -776,6 +777,18 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CourierController::class, 'restore']);
             Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
+        
+        });
+        //sms-settings routes
+        Route::prefix('sms-settings')->group(function () {
+            Route::get('/', [SmsSettingController::class, 'index']);
+            Route::post('/', [SmsSettingController::class, 'store']);
+            Route::get('/{id}', [SmsSettingController::class, 'show']);
+            Route::post('/update/{id}', [SmsSettingController::class, 'update']);
+            Route::delete('/{id}', [SmsSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
+            Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
         
         });
         //change-pass routes

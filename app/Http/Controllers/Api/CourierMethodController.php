@@ -13,8 +13,7 @@ use Illuminate\Http\Request;
 class CourierMethodController extends Controller
 {
     public function __construct(protected CourierMethodService $courierMethodService)
-    {
-    }
+    {}
     public function index(Request $request): JsonResponse
     {
         $filters = [

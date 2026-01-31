@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PaymentMethodType extends Model
-{
+{ 
     use SoftDeletes,CompanyScoped;
 
     protected $fillable = [

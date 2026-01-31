@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourierMethod extends Model
-{
+{ 
     use SoftDeletes,CompanyScoped;
 
     protected $fillable = [

@@ -11,10 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CustomerPaymentMethodController extends Controller
-{
+{ 
     public function __construct(
         protected CustomerPaymentMethodService $paymentService
-    ) {}
+    ) {} 
 
     public function index(Request $request): JsonResponse
     {

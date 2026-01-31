@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Courier extends Model
-{
+class Courier extends Model 
+{ 
     use SoftDeletes,CompanyScoped;
     protected $fillable = [
         'company_id',
