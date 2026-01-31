@@ -4,22 +4,23 @@ namespace App\Models;
 
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class BusinessPaymentMethod extends Model
+class Courier extends Model
 {
     use SoftDeletes,CompanyScoped;
     protected $fillable = [
         'company_id',
-        'payment_method_id',
-        'icon',
-        'bank_name',
-        'branch',
-        'account_holder',
-        'account_number',
+        'courier_method_id',
+        'method_details',
         'contact_name',
         'phone',
-        'status',
+        'location',
+        'status'
+    ];
+    protected $casts = [
+        'method_details' => 'array', 
     ];
     protected $hidden = ['deleted_at'];
 
@@ -38,13 +39,12 @@ class BusinessPaymentMethod extends Model
         return $query->where('status', false);
     }
     // Relationships
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
-    // Accessors
-    public function getIconUrlAttribute(): ?string
+    public function method(): BelongsTo
     {
-        return $this->icon ? asset('storage/' . $this->icon) : null;
+        return $this->belongsTo(CourierMethod::class);
     }
 }

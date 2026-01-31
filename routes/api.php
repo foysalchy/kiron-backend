@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\HolidayController;
@@ -752,6 +754,30 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
         
             });
+        //courier-methods routes
+        Route::prefix('courier-methods')->group(function () {
+            Route::get('/', [CourierMethodController::class, 'index']);
+            Route::post('/', [CourierMethodController::class, 'store']);
+            Route::get('/{id}', [CourierMethodController::class, 'show']);
+            Route::post('/update/{id}', [CourierMethodController::class, 'update']);
+            Route::delete('/{id}', [CourierMethodController::class, 'destroy']);
+            Route::get('{id}/restore', [CourierMethodController::class, 'restore']);
+            Route::delete('{id}/force', [CourierMethodController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CourierMethodController::class, 'toggleStatus']);
+        
+        });
+        //couriers routes
+        Route::prefix('couriers')->group(function () {
+            Route::get('/', [CourierController::class, 'index']);
+            Route::post('/', [CourierController::class, 'store']);
+            Route::get('/{id}', [CourierController::class, 'show']);
+            Route::post('/update/{id}', [CourierController::class, 'update']);
+            Route::delete('/{id}', [CourierController::class, 'destroy']);
+            Route::get('{id}/restore', [CourierController::class, 'restore']);
+            Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
+        
+        });
         //change-pass routes
         Route::prefix('change-pass')->group(function () {
             Route::post('/', [PassChangeController::class, 'update']);
