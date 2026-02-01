@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\{DB,Log};
 
 class SmsSettingService
 {
+    
     /**
      * Get all SMS settings with optional pagination
      */
@@ -51,7 +52,6 @@ class SmsSettingService
             throw ApiException::serverError('Failed to fetch SMS settings');
         }
     }
-
     /**
      * Get SMS setting by ID
      */

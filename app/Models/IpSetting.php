@@ -7,24 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SmsSetting extends Model
+class IpSetting extends Model
 {
-    use SoftDeletes,CompanyScoped; 
+    use SoftDeletes,CompanyScoped;
 
     protected $fillable = [
         'company_id',
-        'event_name',
-        'message',
+        'frequency_minute',
+        'order_limit',
         'status'
     ];
-    
-    protected $hidden = ['deleted_at'];
 
-    // Scopes
-    public function scopeByCompany($query, int $companyId)
-    {
-        return $query->where('company_id', $companyId);
-    }
+     protected $hidden = ['deleted_at'];
+
+    //scoped
     public function scopeActive($query)
     {
         return $query->where('status', true);
@@ -34,10 +30,14 @@ class SmsSetting extends Model
     {
         return $query->where('status', false);
     }
+
+    public function scopeByCompany($query, int $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
     // Relationships
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
-
 }

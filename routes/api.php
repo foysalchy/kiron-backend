@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
+use App\Http\Controllers\Api\IpDirectoryController;
+use App\Http\Controllers\Api\IpSettingController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
@@ -789,6 +791,30 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
             Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
+        
+        });
+        //ip-directories routes
+        Route::prefix('ip-directories')->group(function () {
+            Route::get('/', [IpDirectoryController::class, 'index']);
+            Route::post('/', [IpDirectoryController::class, 'store']);
+            Route::get('/{id}', [IpDirectoryController::class, 'show']);
+            Route::post('/update/{id}', [IpDirectoryController::class, 'update']);
+            Route::delete('/{id}', [IpDirectoryController::class, 'destroy']);
+            Route::get('{id}/restore', [IpDirectoryController::class, 'restore']);
+            Route::delete('{id}/force', [IpDirectoryController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [IpDirectoryController::class, 'toggleStatus']);
+        
+        });
+        //ip-settings routes
+        Route::prefix('ip-settings')->group(function () {
+            Route::get('/', [IpSettingController::class, 'index']);
+            Route::post('/', [IpSettingController::class, 'store']);
+            Route::get('/{id}', [IpSettingController::class, 'show']);
+            Route::post('/update/{id}', [IpSettingController::class, 'update']);
+            Route::delete('/{id}', [IpSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [IpSettingController::class, 'restore']);
+            Route::delete('{id}/force', [IpSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [IpSettingController::class, 'toggleStatus']);
         
         });
         //change-pass routes
