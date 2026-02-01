@@ -1,28 +1,25 @@
-<?php
-
+<?php 
 namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
-use App\Models\BusinessPaymentMethod;
-use App\Models\Page;
+use App\Models\CustomerPaymentMethod;
 use App\Models\PaymentMethodType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\{DB,Log};
 
-class PageService
+class CustomerPaymentMethodService
 {
     /**
-     * Get all business payment methods with optional pagination
+     * Get all customer payment methods with optional pagination
      */
-    public function getAllBusinessPaymentMethods(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllCustomerPaymentMethods(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = BusinessPaymentMethod::query()->with(['paymentMethodType']);
+            $query = CustomerPaymentMethod::query()->with(['paymentMethodType']);
 
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
@@ -32,11 +29,16 @@ class PageService
                 }
             }
 
+            if (!empty($filters['customer_id'])) {
+                $query->where('customer_id', $filters['customer_id']);
+            }
+
             if (!empty($filters['search'])) {
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
-                    $q->where('bank_name', 'like', "%{$search}%")
+                    $q->where('account_holder', 'like', "%{$search}%")
                         ->orWhere('account_number', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
                         ->orWhere('contact_name', 'like', "%{$search}%");
                 });
             }
@@ -49,55 +51,54 @@ class PageService
                 ? $query->paginate($filters['per_page'] ?? 15) 
                 : $query->get();
         } catch (\Exception $e) {
-            Log::error('Error fetching business payment methods: ' . $e->getMessage());
+            Log::error('Error fetching customer payment methods: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch data');
         }
     }
 
     /**
-     * Get business payment method by ID
+     * Get customer payment method by ID
      */
-    public function getBusinessPaymentMethodById(int $id): BusinessPaymentMethod
+    public function getCustomerPaymentMethodById(int $id): CustomerPaymentMethod
     {
-        $method = BusinessPaymentMethod::find($id);
+        $method = CustomerPaymentMethod::find($id);
 
         if (!$method) {
-            throw ApiException::notFound('Business Payment Method');
+            throw ApiException::notFound('Customer Payment Method');
         }
 
         return $method;
     }
 
     /**
-     * Create a new business payment method
+     * Create a new customer payment method
      */
-    public function createBusinessPaymentMethod(array $data): BusinessPaymentMethod
+    public function createCustomerPaymentMethod(array $data): CustomerPaymentMethod
     {
         DB::beginTransaction();
 
         try {
-            // Handle image/icon upload using your FileUploadHelper
+            // Mapping method name to payment_method_id
+            if (isset($data['payment_method'])) {
+                $type = PaymentMethodType::where('payment_method', $data['payment_method'])->first();
+                if (!$type) throw ApiException::notFound('Payment Method Type');
+                $data['payment_method_id'] = $type->id;
+            }
+
             if (isset($data['icon'])) {
                 $data['icon'] = FileUploadHelper::uploadImage(
                     $data['icon'],
-                    'business_payments/icons',
+                    'customer_payments/icons',
                     'public',
                     2048
                 );
             }
 
-            // Mapping method_name string to ID
-            if (isset($data['method_name'])) {
-                $type = PaymentMethodType::where('name', $data['method_name'])->first();
-                if (!$type) throw ApiException::notFound('Payment Method Type');
-                $data['payment_method_id'] = $type->id;
-            }
-
-            $method = BusinessPaymentMethod::create($data);
-            LogHelper::created('business_payment_method', $method->id, $method->company_id, $method->bank_name);
+            $method = CustomerPaymentMethod::create($data);
+            LogHelper::created('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
 
             DB::commit();
-            Log::info('Business Payment Method created successfully', ['id' => $method->id]);
+            Log::info('Customer Payment Method created successfully', ['id' => $method->id]);
 
             return $method;
         } catch (\Exception $e) {
@@ -105,40 +106,39 @@ class PageService
             if (isset($data['icon'])) {
                 FileUploadHelper::delete($data['icon']);
             }
-            Log::error('Business Payment Method creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create business payment method');
+            Log::error('Customer Payment Method creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create customer payment method');
         }
     }
 
     /**
-     * Update business payment method
+     * Update customer payment method
      */
-    public function updateBusinessPaymentMethod(int $id, array $data): BusinessPaymentMethod
+    public function updateCustomerPaymentMethod(int $id, array $data): CustomerPaymentMethod
     {
         DB::beginTransaction();
 
         try {
-            $method = $this->getBusinessPaymentMethodById($id);
+            $method = $this->getCustomerPaymentMethodById($id);
 
-            // Handle icon replacement using FileUploadHelper
             if (isset($data['icon'])) {
                 $data['icon'] = FileUploadHelper::replace(
                     $data['icon'],
                     $method->icon,
-                    'business_payments/icons'
+                    'customer_payments/icons'
                 );
             }
 
-            if (isset($data['method_name'])) {
-                $type = PaymentMethodType::where('name', $data['method_name'])->first();
+            if (isset($data['payment_method'])) {
+                $type = PaymentMethodType::where('payment_method', $data['payment_method'])->first();
                 if ($type) $data['payment_method_id'] = $type->id;
             }
 
             $method->update($data);
-            LogHelper::updated('business_payment_method', $method->id, $method->company_id, $method->bank_name);
+            LogHelper::updated('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
 
             DB::commit();
-            Log::info('Business Payment Method updated successfully', ['id' => $method->id]);
+            Log::info('Customer Payment Method updated successfully', ['id' => $method->id]);
 
             return $method->fresh();
         } catch (ApiException $e) {
@@ -149,47 +149,47 @@ class PageService
             if (isset($data['icon'])) {
                 FileUploadHelper::delete($data['icon']);
             }
-            Log::error('Business Payment Method update failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to update business payment method');
+            Log::error('Customer Payment Method update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update customer payment method');
         }
     }
 
     /**
-     * Delete business payment method (soft delete)
+     * Delete customer payment method (soft delete)
      */
-    public function deleteBusinessPaymentMethod(int $id): bool
+    public function deleteCustomerPaymentMethod(int $id): bool
     {
         DB::beginTransaction();
         try {
-            $method = $this->getBusinessPaymentMethodById($id);
+            $method = $this->getCustomerPaymentMethodById($id);
             $method->delete();
-            LogHelper::deleted('business_payment_method', $method->id, $method->company_id, $method->bank_name);
+            LogHelper::deleted('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
 
             DB::commit();
-            Log::info('Business Payment Method deleted successfully', ['id' => $id]);
+            Log::info('Customer Payment Method deleted successfully', ['id' => $id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Business Payment Method deletion failed: ' . $e->getMessage());
+            Log::error('Customer Payment Method deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete data');
         }
     }
 
     /**
-     * Restore soft deleted record
+     * Restore record
      */
-    public function restoreBusinessPaymentMethod(int $id): BusinessPaymentMethod
+    public function restoreCustomerPaymentMethod(int $id): CustomerPaymentMethod
     {
         DB::beginTransaction();
         try {
-            $method = BusinessPaymentMethod::withTrashed()->find($id);
-            if (!$method) throw ApiException::notFound('Business Payment Method');
+            $method = CustomerPaymentMethod::withTrashed()->find($id);
+            if (!$method) throw ApiException::notFound('Customer Payment Method');
 
             $method->restore();
-            LogHelper::restored('business_payment_method', $method->id, $method->company_id, $method->bank_name);
+            LogHelper::restored('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
 
             DB::commit();
             return $method;
@@ -203,18 +203,18 @@ class PageService
     /**
      * Permanently delete record
      */
-    public function forceDeleteBusinessPaymentMethod(int $id): bool
+    public function forceDeleteCustomerPaymentMethod(int $id): bool
     {
         DB::beginTransaction();
         try {
-            $method = BusinessPaymentMethod::withTrashed()->find($id);
-            if (!$method) throw ApiException::notFound('Business Payment Method');
+            $method = CustomerPaymentMethod::withTrashed()->find($id);
+            if (!$method) throw ApiException::notFound('Customer Payment Method');
 
-            // Delete icon from storage
+            // Delete icon permanently
             FileUploadHelper::delete($method->icon);
 
             $method->forceDelete();
-            LogHelper::forceDeleted('business_payment_method', $method->id, $method->company_id, $method->bank_name);
+            LogHelper::forceDeleted('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
 
             DB::commit();
             return true;
@@ -231,18 +231,17 @@ class PageService
     /**
      * Toggle status
      */
-    public function toggleStatus(int $id): BusinessPaymentMethod
+    public function toggleStatus(int $id): CustomerPaymentMethod
     {
         DB::beginTransaction();
         try {
-            $method = $this->getBusinessPaymentMethodById($id);
+            $method = $this->getCustomerPaymentMethodById($id);
             $currentStatus = Status::from($method->status);
-            
             $newStatus = $currentStatus === Status::Active ? Status::Inactive : Status::Active;
 
             $method->update(['status' => $newStatus->value]);
             
-            LogHelper::statusChanged('business_payment_method', $method->id, $method->company_id, $method->bank_name . ' new status '.$newStatus->label());
+            LogHelper::statusChanged('customer_payment_method', $method->id, $method->company_id, $method->account_holder . ' new status '.$newStatus->label());
             
             DB::commit();
             return $method;

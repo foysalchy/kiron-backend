@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\CompanyController;
 
@@ -17,7 +18,9 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
-
+use App\Http\Controllers\Api\CourierController;
+use App\Http\Controllers\Api\CourierMethodController;
+use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
@@ -27,13 +30,17 @@ use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeaveApplicationController;
 use App\Http\Controllers\Api\LogActionController;
+use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
+use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
+use App\Http\Controllers\Api\PassChangeController;
 use App\Http\Controllers\Api\PayHeadController;
+use App\Http\Controllers\Api\PaymentMethodTypeController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
 use App\Http\Controllers\Api\PaySlipManagerController;
@@ -52,12 +59,14 @@ use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
+use App\Http\Controllers\Api\WocommerceSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -702,6 +711,92 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [SiteSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SiteSettingController::class, 'toggleStatus']);
         });
+        //wocommerce settings routes
+        Route::prefix('wocommerces')->group(function () {
+            Route::get('/', [WocommerceSettingController::class, 'index']);
+            Route::post('/', [WocommerceSettingController::class, 'store']);
+            Route::get('/{id}', [WocommerceSettingController::class, 'show']);
+            Route::post('/update/{id}', [WocommerceSettingController::class, 'update']);
+            Route::delete('/{id}', [WocommerceSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [WocommerceSettingController::class, 'restore']);
+            Route::delete('{id}/force', [WocommerceSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
+        });
+        //note template settings routes
+        Route::prefix('note-templates')->group(function () {
+            Route::get('/', [NoteTemplateController::class, 'index']);
+            Route::post('/', [NoteTemplateController::class, 'store']);
+            Route::get('/{id}', [NoteTemplateController::class, 'show']);
+            Route::post('/update/{id}', [NoteTemplateController::class, 'update']);
+            Route::delete('/{id}', [NoteTemplateController::class, 'destroy']);
+            Route::get('{id}/restore', [NoteTemplateController::class, 'restore']);
+            Route::delete('{id}/force', [NoteTemplateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [NoteTemplateController::class, 'toggleStatus']);
+        });
+        //payment methods routes
+        Route::prefix('payment-methods')->group(function () {
+            Route::get('/', [PaymentMethodTypeController::class, 'index']);
+            Route::post('/', [PaymentMethodTypeController::class, 'store']);
+            Route::get('/{id}', [PaymentMethodTypeController::class, 'show']);
+            Route::post('/update/{id}', [PaymentMethodTypeController::class, 'update']);
+            Route::delete('/{id}', [PaymentMethodTypeController::class, 'destroy']);
+            Route::get('{id}/restore', [PaymentMethodTypeController::class, 'restore']);
+            Route::delete('{id}/force', [PaymentMethodTypeController::class, 'forceDestroy']);
+        });
+        //customer-payments routes
+        Route::prefix('customer-payments')->group(function () {
+            Route::get('/', [CustomerPaymentMethodController::class, 'index']);
+            Route::post('/', [CustomerPaymentMethodController::class, 'store']);
+            Route::get('/{id}', [CustomerPaymentMethodController::class, 'show']);
+            Route::post('/update/{id}', [CustomerPaymentMethodController::class, 'update']);
+            Route::delete('/{id}', [CustomerPaymentMethodController::class, 'destroy']);
+            Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
+            Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
+        
+            });
+        //courier-methods routes
+        Route::prefix('courier-methods')->group(function () {
+            Route::get('/', [CourierMethodController::class, 'index']);
+            Route::post('/', [CourierMethodController::class, 'store']);
+            Route::get('/{id}', [CourierMethodController::class, 'show']);
+            Route::post('/update/{id}', [CourierMethodController::class, 'update']);
+            Route::delete('/{id}', [CourierMethodController::class, 'destroy']);
+            Route::get('{id}/restore', [CourierMethodController::class, 'restore']);
+            Route::delete('{id}/force', [CourierMethodController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CourierMethodController::class, 'toggleStatus']);
+        
+        });
+        //couriers routes
+        Route::prefix('couriers')->group(function () {
+            Route::get('/', [CourierController::class, 'index']);
+            Route::post('/', [CourierController::class, 'store']);
+            Route::get('/{id}', [CourierController::class, 'show']);
+            Route::post('/update/{id}', [CourierController::class, 'update']);
+            Route::delete('/{id}', [CourierController::class, 'destroy']);
+            Route::get('{id}/restore', [CourierController::class, 'restore']);
+            Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
+        
+        });
+        //sms-settings routes
+        Route::prefix('sms-settings')->group(function () {
+            Route::get('/', [SmsSettingController::class, 'index']);
+            Route::post('/', [SmsSettingController::class, 'store']);
+            Route::get('/{id}', [SmsSettingController::class, 'show']);
+            Route::post('/update/{id}', [SmsSettingController::class, 'update']);
+            Route::delete('/{id}', [SmsSettingController::class, 'destroy']);
+            Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
+            Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
+        
+        });
+        //change-pass routes
+        Route::prefix('change-pass')->group(function () {
+            Route::post('/', [PassChangeController::class, 'update']);
+        });
+        //market tools route
+        Route::post('market-tools/update', [MarketController::class, 'update']);
 
     });
 });

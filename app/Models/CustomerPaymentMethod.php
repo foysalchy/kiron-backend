@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\CompanyScoped;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class CustomerPaymentMethod extends Model
+{ 
+    use SoftDeletes,CompanyScoped;
+        protected $fillable = [
+        'company_id',
+        'payment_method_id',
+        'icon',
+        'account_holder',
+        'account_number',
+        'contact_name',
+        'phone',
+        'status',
+    ];
+    protected $hidden = ['deleted_at'];
+
+    // Scopes
+    public function scopeByCompany($query, int $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('status', false);
+    }
+    // Relationships
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+    // Accessors
+    public function getIconUrlAttribute(): ?string
+    {
+        return $this->icon ? asset('storage/' . $this->icon) : null;
+    }
+}
