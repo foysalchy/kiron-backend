@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreRequisitionRequest, UpdateRequisitionRequest};
 use App\Services\RequisitionService;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\{JsonResponse, Request};
+use Illuminate\Validation\Rule;
 
 class RequisitionController extends Controller
 {
@@ -117,8 +119,16 @@ class RequisitionController extends Controller
     public function changeStatus(Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|integer|in:0,1,2,3',
-            'reject_reason' => 'nullable|string|required_if:status,2',
+            'status' => [
+                'required',
+                Rule::in([
+                    Status::Pending->value,
+                    Status::Approved->value,
+                    Status::Completed->value,
+                    Status::Cancelled->value,
+                ]),
+            ],
+            'reject_reason' => ['nullable', 'string'],
         ]);
 
         $data = $this->requisitionService->changeStatus(

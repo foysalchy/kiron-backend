@@ -519,7 +519,7 @@ class ProductService
     public function removeStockFromWarehouse(int $id, array $data): Product
     {
         DB::beginTransaction();
-
+        \Log::info($data);
         try {
             $product = $this->getProductById($id);
 
@@ -682,7 +682,7 @@ class ProductService
                 'new_stock' => $newStock
             ]);
 
-            LogHelper::custom('stock_adjusted', 'product', $id, $product->company_id,'stock adjust quantity =>'.$adjustmentQuantity);
+            LogHelper::custom('stock_adjusted', 'product', $id, $product->company_id, 'stock adjust quantity =>' . $adjustmentQuantity);
 
             return $product->fresh();
         } catch (ApiException $e) {

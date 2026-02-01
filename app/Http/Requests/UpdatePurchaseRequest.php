@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\Status;
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use App\Rules\UniqueProductIds;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -46,7 +47,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 'purchase_date' => ['sometimes', 'required', 'date'],
 
                 // Purchase Details
-                'items' => ['sometimes', 'required', 'array', 'min:1'],
+                'items' => ['sometimes', 'required', 'array', 'min:1', new UniqueProductIds],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')
