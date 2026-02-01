@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\IntegerArray;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,10 +42,10 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'mega_category_ids' => 'array',
-        'sub_category_ids' => 'array',
-        'mini_category_ids' => 'array',
-        'extra_category_ids' => 'array',
+        'mega_category_ids' => IntegerArray::class,
+        'sub_category_ids' => IntegerArray::class,
+        'mini_category_ids' => IntegerArray::class,
+        'extra_category_ids' => IntegerArray::class,
         'warehouse_info' => 'array',
         'sku_codes' => 'array',
         'stock_quantity' => 'integer',
@@ -84,7 +85,7 @@ class Product extends Model
 
     public function brand(): BelongsTo
     {
-        return $this->belongsTo(Brand::class)->select('id','name');
+        return $this->belongsTo(Brand::class)->select('id', 'name');
     }
 
     public function galleries(): HasMany
@@ -114,7 +115,7 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->where('stock_status', 'in_stock')->select('id','brand_id','title','thumbnail','available_stock','stock_quantity','stock_status');
+        return $query->where('stock_status', 'in_stock')->select('id', 'brand_id', 'title', 'thumbnail', 'available_stock', 'stock_quantity', 'stock_status');
     }
 
 

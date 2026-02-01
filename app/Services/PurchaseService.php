@@ -122,10 +122,11 @@ class PurchaseService
                 ]);
             }
 
-            // ✅ If purchase is completed, add stock to warehouse
-            if ($data['status'] == Status::Completed->value) {
+            //  If purchase is completed, add stock to warehouse
+            if (isset($data['status']) && $data['status'] == Status::Completed->value) {
                 $this->addPurchaseStockToWarehouse($purchase);
             }
+
 
             DB::commit();
 
@@ -296,7 +297,7 @@ class PurchaseService
                 'old_status' => $oldStatus,
                 'new_status' => $status
             ]);
-            LogHelper::custom('status_changed', 'purchase', $id, $purchase->company_id,'purchase status marked as '. $getStatus->label());
+            LogHelper::custom('status_changed', 'purchase', $id, $purchase->company_id, 'purchase status marked as ' . $getStatus->label());
 
             return $purchase->fresh();
         } catch (ApiException $e) {
@@ -456,6 +457,7 @@ class PurchaseService
      */
     private function removePurchaseStockFromWarehouse(Purchase $purchase): void
     {
+      
         foreach ($purchase->purchaseDetails as $detail) {
             $this->productService->removeStockFromWarehouse($detail->product_id, [
                 'warehouse_id' => $purchase->warehouse_id,

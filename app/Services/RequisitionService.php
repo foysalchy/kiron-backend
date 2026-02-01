@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{Requisition, RequisitionDetail};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -89,8 +90,8 @@ class RequisitionService
             // Calculate total amount
             $data['total_amount'] = $this->calculateTotalAmount($items);
 
-            // Default status is pending (0)
-            $data['status'] = $data['status'] ?? Requisition::STATUS_PENDING;
+            // Default status is pending (2)
+            $data['status'] = $data['status'] ?? Status::Pending->value;
 
             // Create requisition
             $requisition = Requisition::create($data);
@@ -263,7 +264,7 @@ class RequisitionService
             }
 
             $requisition->update([
-                'status' => Requisition::STATUS_APPROVED,
+                'status' =>Status::Approved->value,
                 'reject_reason' => null,
             ]);
 
@@ -299,7 +300,7 @@ class RequisitionService
             }
 
             $requisition->update([
-                'status' => Requisition::STATUS_REJECTED,
+                'status' =>Status::Cancelled->value,
                 'reject_reason' => $reason,
             ]);
 
@@ -335,7 +336,7 @@ class RequisitionService
             }
 
             $requisition->update([
-                'status' => Requisition::STATUS_COMPLETED,
+                'status' => Status::Completed->value,
             ]);
 
             DB::commit();
@@ -365,9 +366,9 @@ class RequisitionService
 
             $updateData = ['status' => $status];
 
-            if ($status === Requisition::STATUS_REJECTED && $rejectReason) {
+            if ($status === Status::Cancelled->value && $rejectReason) {
                 $updateData['reject_reason'] = $rejectReason;
-            } elseif ($status !== Requisition::STATUS_REJECTED) {
+            } elseif ($status !== Status::Cancelled->value) {
                 $updateData['reject_reason'] = null;
             }
 

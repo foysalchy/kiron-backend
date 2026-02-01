@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-
+use App\Rules\UniqueProductIds;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -26,7 +26,7 @@ class StoreRequisitionRequest extends BaseCompanyRequest
 
                 'request_date' => ['required', 'date'],
                 'need_date' => ['required', 'date', 'after_or_equal:request_date'],
-                'items' => ['required', 'array', 'min:1'],
+                'items' => ['required', 'array', 'min:1', new UniqueProductIds],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')

@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\Status;
 use App\Http\Requests\BaseCompanyRequest;
 use App\Models\Party;
+use App\Rules\UniqueProductIds;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -23,6 +24,7 @@ class StorePurchaseRequest extends BaseCompanyRequest
         $companyId = $user->isSuperAdmin()
             ? $this->input('company_id')
             : $user->company_id;
+
         return array_merge(
             $this->companyRules(),
             [
@@ -49,7 +51,7 @@ class StorePurchaseRequest extends BaseCompanyRequest
                     Rule::exists('products', 'id')
                         ->where('company_id', $companyId),
                 ],
-                'items.*.quantity' => ['required', 'integer', 'min:1'],
+                'items.*.quantity' => ['required', 'integer', 'min:1', new UniqueProductIds],
                 'items.*.purchase_price' => ['required', 'numeric', 'min:0'],
                 'items.*.unit_cost' => ['required', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],

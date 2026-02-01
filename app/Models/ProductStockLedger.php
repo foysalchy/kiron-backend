@@ -194,7 +194,7 @@ class ProductStockLedger extends Model
         }
 
         $lastLedger = $query->latest()->first();
-
+        \Log::info($lastLedger);
         return $lastLedger ? $lastLedger->quantity_after : 0;
     }
 

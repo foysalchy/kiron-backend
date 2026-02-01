@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Models\Company;
 use App\Models\RequisitionDetail;
 use App\Models\User;
@@ -16,10 +18,7 @@ class Requisition extends Model
 {
     use HasFactory, SoftDeletes, CompanyScoped;
 
-    const STATUS_PENDING = 0;
-    const STATUS_APPROVED = 1;
-    const STATUS_REJECTED = 2;
-    const STATUS_COMPLETED = 3;
+
 
     protected $fillable = [
         'company_id',
@@ -40,19 +39,16 @@ class Requisition extends Model
         'status' => 'integer',
     ];
 
-    protected $appends = [
-        'status_text',
-    ];
 
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($requisition) {
             if (empty($requisition->requisition_number)) {
                 $requisition->requisition_number = self::generateRequisitionNumber();
             }
-            
+
             if (empty($requisition->user_id)) {
                 $requisition->user_id = Auth::id();
             }
@@ -67,7 +63,7 @@ class Requisition extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class)->select('id','name');
+        return $this->belongsTo(User::class)->select('id', 'name');
     }
 
     public function requisitionDetails(): HasMany
@@ -88,55 +84,45 @@ class Requisition extends Model
 
     public function scopePending($query)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('status', Status::Pending->value);
     }
 
     public function scopeApproved($query)
     {
-        return $query->where('status', self::STATUS_APPROVED);
+        return $query->where('status', Status::Approved->value);
     }
 
     public function scopeRejected($query)
     {
-        return $query->where('status', self::STATUS_REJECTED);
+        return $query->where('status', Status::Cancelled->value);
     }
 
     public function scopeCompleted($query)
     {
-        return $query->where('status', self::STATUS_COMPLETED);
+        return $query->where('status', Status::Completed->value);
     }
 
     // Accessors
-    public function getStatusTextAttribute(): string
-    {
-        return match($this->status) {
-            self::STATUS_PENDING => 'Pending',
-            self::STATUS_APPROVED => 'Approved',
-            self::STATUS_REJECTED => 'Rejected',
-            self::STATUS_COMPLETED => 'Completed',
-            default => 'Unknown',
-        };
-    }
 
     // Helper Methods
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === Status::Pending->value;
     }
 
     public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === Status::Approved->value;
     }
 
     public function isRejected(): bool
     {
-        return $this->status === self::STATUS_REJECTED;
+        return $this->status === Status::Cancelled->value;
     }
 
     public function isCompleted(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return $this->status === Status::Completed->value;
     }
 
     public function canEdit(): bool
@@ -156,12 +142,12 @@ class Requisition extends Model
     {
         $prefix = 'REQ';
         $date = now()->format('Ymd');
-        
+
         // Get last requisition number for today
         $lastRequisition = self::whereDate('created_at', now())
             ->orderBy('id', 'desc')
             ->first();
-        
+
         if ($lastRequisition) {
             // Extract sequence number from last requisition
             $lastNumber = (int) substr($lastRequisition->requisition_number, -4);
@@ -169,7 +155,7 @@ class Requisition extends Model
         } else {
             $newNumber = 1;
         }
-        
+
         return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
         // Example: REQ-20260115-0001
     }
