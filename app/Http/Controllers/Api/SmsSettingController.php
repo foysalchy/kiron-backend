@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SmsSettingController extends Controller
-{
+{ 
     public function __construct(protected SmsSettingService $smsSettingService)
     {
     }

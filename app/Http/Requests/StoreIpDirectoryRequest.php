@@ -7,16 +7,16 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreSmsSettingRequest extends BaseCompanyRequest
-{   
-    /** 
+class StoreIpDirectoryRequest extends BaseCompanyRequest
+{
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
         return true;
     }
-    
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -27,30 +27,22 @@ class StoreSmsSettingRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'event_name' => ['required', 'string', 'max:255'],
-                'message'    => ['required', 'string'],
-                'status'     => ['nullable', 'integer', 'in:0,1'],
+                'ip_address' => ['required', 'ip', 'max:45'],
+                'status'     => ['nullable', 'integer'],
             ]
         );
     }
-    /**
-     * Custom validation messages.
-     */
     public function messages(): array
     {
         return array_merge(
             $this->companyMessages(),
             [
-                'event_name.required' => 'The SMS event name is required (e.g., order_place).',
-                'message.required'    => 'The SMS message content cannot be empty.',
-                'status.in'           => 'Status must be either 0 (Inactive) or 1 (Active).',
+                'ip_address.required' => 'Please provide a valid IP address.',
+                'ip_address.ip'       => 'The format must be a valid IPv4 or IPv6 address.',
             ]
         );
     }
 
-    /**
-     * Handle a failed validation attempt.
-     */
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
