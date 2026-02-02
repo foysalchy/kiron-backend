@@ -365,6 +365,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PurchaseReturnController::class, 'restore']);
             Route::delete('{id}/force', [PurchaseReturnController::class, 'forceDestroy']);
             Route::post('/{id}/add-payment', [PurchaseReturnController::class, 'addPayment']);
+             Route::get('/products/{id}', [PurchaseReturnController::class, 'purchaseProducts']);
         });
         Route::prefix('coupons')->group(function () {
             Route::get('/', [CouponController::class, 'index']);

@@ -81,9 +81,9 @@ class PurchaseReturn extends Model
     /**
      * Status helper methods
      */
-        public function isPending(): bool
+        public function isDraft(): bool
     {
-        return $this->status === Status::Pending->value;
+        return $this->status === Status::Draft->value;
     }
 
     public function isCleared(): bool
