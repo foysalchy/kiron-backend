@@ -115,7 +115,7 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->where('stock_status', 'in_stock')->select('id', 'brand_id', 'title', 'thumbnail', 'available_stock', 'stock_quantity', 'stock_status');
+        return $query->where('stock_status', 'in_stock');
     }
 
 

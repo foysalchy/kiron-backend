@@ -101,10 +101,27 @@ class POSOrderController extends Controller
     /**
      * Resume held order
      */
-    public function resume(int $id): JsonResponse
+    public function resume(Request $request,int $id): JsonResponse
     {
         $data = $this->orderService->resumeOrder($id,'pos');
 
         return ResponseHelper::success($data, 'POS order resumed successfully');
+    }
+
+    public function dashboard(Request $request): JsonResponse
+    {
+        try {
+            $filters = [
+                'range' => $request->input('range', 'today'),
+                'start' => $request->input('start'),
+                'end' => $request->input('end'),
+            ];
+
+            $data = $this->orderService->getPosDashboardData($filters);
+
+            return ResponseHelper::success($data, 'Dashboard data retrieved successfully');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
+        }
     }
 }
