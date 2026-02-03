@@ -23,6 +23,8 @@ enum Status: int
   case Waiting    = 16;
   case Cleared    = 17;
   case NotCleared = 18;
+  case Replied    = 19;
+  case Closed     = 20;
 
   public function label(): string
   {
@@ -46,6 +48,9 @@ enum Status: int
       self::Waiting    => 'Waiting',
       self::Cleared    => 'Cleared',
       self::NotCleared => 'NotCleared',
+      self::Replied    => 'Replied',
+      self::Closed     => 'Closed',
+
     };
   }
 

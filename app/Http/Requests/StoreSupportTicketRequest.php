@@ -31,7 +31,6 @@ class StoreSupportTicketRequest extends BaseCompanyRequest
                 'subject' => ['required','string','max:255'],
                 'description' => ['required','string','min:10'],
                 'image' => ['nullable','image','mimes:jpeg,png,jpg,gif','max:2048' ],
-                'status' => ['nullable','integer']
             ]
         );
     }

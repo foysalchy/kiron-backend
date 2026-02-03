@@ -839,7 +839,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [SupportTicketController::class, 'index']);
             Route::post('/', [SupportTicketController::class, 'store']);
             Route::get('/{id}', [SupportTicketController::class, 'show']);
-            
+
+            Route::post('/reply', [SupportTicketController::class, 'storeReply']);
+
             Route::middleware(['super_admin'])->group(function () {
                 Route::post('/update/{id}', [SupportTicketController::class, 'update']);
                 Route::delete('/{id}', [SupportTicketController::class, 'destroy']);
