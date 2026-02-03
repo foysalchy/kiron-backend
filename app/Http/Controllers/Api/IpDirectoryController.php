@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class IpDirectoryController extends Controller
-{
+{ 
     public function __construct(
         protected IpDirectoryService $ipDirectoryService
     ) {}

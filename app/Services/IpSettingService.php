@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
 
 class IpSettingService
-{
+{ 
     /**
      * Get all IP settings with optional pagination
      */

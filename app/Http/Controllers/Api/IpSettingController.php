@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class IpSettingController extends Controller
-{
+{ 
     public function __construct(
         protected IpSettingService $ipSettingService
     ) {}

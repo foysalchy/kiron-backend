@@ -2,42 +2,44 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class IpSetting extends Model
-{  
+class SupportDepartment extends Model
+{
     use SoftDeletes,CompanyScoped;
-
     protected $fillable = [
         'company_id',
-        'frequency_minute',
-        'order_limit',
+        'name',
         'status'
     ];
 
      protected $hidden = ['deleted_at'];
 
-    //scoped
+    /**
+     * Scopes
+     */
     public function scopeActive($query)
     {
-        return $query->where('status', true);
+        return $query->where('status', Status::Active->value);
     }
 
     public function scopeInactive($query)
     {
-        return $query->where('status', false);
+        return $query->where('status', Status::Inactive->value);
     }
 
-    public function scopeByCompany($query, int $companyId)
-    {
-        return $query->where('company_id', $companyId);
-    }
     // Relationships
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function supportTicket(): HasMany
+    {
+        return $this->hasMany(SupportTicket::class);
     }
 }

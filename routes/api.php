@@ -65,6 +65,8 @@ use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\SupportDepartmentController;
+use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
@@ -385,6 +387,8 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [PosOrderController::class, 'complete']);
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
+            Route::get('/pos/dashboard', [PosOrderController::class, 'dashboard']);
+
         });
         Route::prefix('sales-order')->group(function () {
             Route::get('/', [SalesOrderController::class, 'index']);
@@ -756,7 +760,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
             Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
-        
+
             });
         //courier-methods routes
         Route::prefix('courier-methods')->group(function () {
@@ -768,7 +772,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CourierMethodController::class, 'restore']);
             Route::delete('{id}/force', [CourierMethodController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CourierMethodController::class, 'toggleStatus']);
-        
+
         });
         //couriers routes
         Route::prefix('couriers')->group(function () {
@@ -780,7 +784,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CourierController::class, 'restore']);
             Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
-        
+
         });
         //sms-settings routes
         Route::prefix('sms-settings')->group(function () {
@@ -792,7 +796,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
             Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
-        
+
         });
         //ip-directories routes
         Route::prefix('ip-directories')->group(function () {
@@ -804,7 +808,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [IpDirectoryController::class, 'restore']);
             Route::delete('{id}/force', [IpDirectoryController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [IpDirectoryController::class, 'toggleStatus']);
-        
+
         });
         //ip-settings routes
         Route::prefix('ip-settings')->group(function () {
@@ -816,7 +820,37 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [IpSettingController::class, 'restore']);
             Route::delete('{id}/force', [IpSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [IpSettingController::class, 'toggleStatus']);
-        
+
+        });
+        //support-departments routes
+        Route::prefix('support-departments')->group(function () {
+            Route::get('/', [SupportDepartmentController::class, 'index']);
+            Route::get('/{id}', [SupportDepartmentController::class, 'show']);
+
+            Route::middleware(['super_admin'])->group(function () {
+                Route::post('/', [SupportDepartmentController::class, 'store']);
+                Route::post('/update/{id}', [SupportDepartmentController::class, 'update']);
+                Route::delete('/{id}', [SupportDepartmentController::class, 'destroy']);
+                Route::get('{id}/restore', [SupportDepartmentController::class, 'restore']);
+                Route::delete('{id}/force', [SupportDepartmentController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [SupportDepartmentController::class, 'toggleStatus']);
+            });
+
+        });
+        //support-tickets routes
+        Route::prefix('support-tickets')->group(function () {
+            Route::get('/', [SupportTicketController::class, 'index']);
+            Route::post('/', [SupportTicketController::class, 'store']);
+            Route::get('/{id}', [SupportTicketController::class, 'show']);
+            
+            Route::middleware(['super_admin'])->group(function () {
+                Route::post('/update/{id}', [SupportTicketController::class, 'update']);
+                Route::delete('/{id}', [SupportTicketController::class, 'destroy']);
+                Route::get('{id}/restore', [SupportTicketController::class, 'restore']);
+                Route::delete('{id}/force', [SupportTicketController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [SupportTicketController::class, 'toggleStatus']);
+        });
+
         });
         //change-pass routes
         Route::prefix('change-pass')->group(function () {

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 
 class OrderService
 {
@@ -191,7 +192,12 @@ class OrderService
 
             $data['payment_amount'] = $totalPaid;
             $data['payment_status'] = $this->determinePaymentStatus($data['grand_total'], $totalPaid);
-
+            if (!isset($data['status'])) {
+                $data['status'] = Status::Pending->value;
+            }
+            if ($data['payment_status'] === Order::PAYMENT_PAID && $data['status'] !== Status::Hold->value) {
+                $data['status'] = Status::Completed->value;
+            }
             // Create order
             $order = Order::create($data);
 
@@ -221,6 +227,7 @@ class OrderService
                     OrderPayment::create([
                         'order_id' => $order->id,
                         'amount' => $payment['amount'],
+                        'change_amount' => $payment['amount'] - $data['grand_total'],
                         'payment_method' => $payment['payment_method'],
                         'reference_no' => $payment['reference_no'] ?? null,
                         'note' => $payment['note'] ?? null,
@@ -239,6 +246,7 @@ class OrderService
                 );
             }
 
+            LogHelper::created('order', $order->id, $order->company_id, 'total amount ' . $itemTotal);
             DB::commit();
 
             Log::info('Order created successfully', [
@@ -246,7 +254,6 @@ class OrderService
                 'type' => $order->type,
                 'status' => $order->status
             ]);
-            LogHelper::created('order', $order->id, $order->company_id);
 
             return $order->load([
                 'warehouse',
@@ -545,4 +552,185 @@ class OrderService
 
         return Order::PAYMENT_PARTIAL;
     }
+
+    public function getPosDashboardData(array $filters): array
+    {
+        $range = $filters['range'] ?? 'today';
+        $start = $filters['start'] ?? null;
+        $end = $filters['end'] ?? null;
+
+        // Determine date range
+        [$startDate, $endDate, $previousStart, $previousEnd] = $this->calculateDateRanges($range, $start, $end);
+
+        // Current period stats
+        $currentOrders = Order::where('type', 'pos')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+
+        $totalSales = $currentOrders->sum('grand_total');
+        $totalOrders = $currentOrders->count();
+        $totalCustomers = $currentOrders->whereNotNull('customer_id')->unique('customer_id')->count();
+        $averageOrderValue = $totalOrders > 0 ? $totalSales / $totalOrders : 0;
+
+        // Previous period stats for growth calculation
+        $previousOrders = Order::where('type', 'pos')
+            ->whereBetween('created_at', [$previousStart, $previousEnd])
+            ->get();
+
+        $previousSales = $previousOrders->sum('grand_total');
+        $previousOrderCount = $previousOrders->count();
+
+        $salesGrowth = $previousSales > 0 ? (($totalSales - $previousSales) / $previousSales) * 100 : 0;
+        $ordersGrowth = $previousOrderCount > 0 ? (($totalOrders - $previousOrderCount) / $previousOrderCount) * 100 : 0;
+
+        return [
+            'stats' => [
+                'totalSales' => round($totalSales, 2),
+                'totalOrders' => $totalOrders,
+                'totalCustomers' => $totalCustomers,
+                'averageOrderValue' => round($averageOrderValue, 2),
+                'salesGrowth' => round($salesGrowth, 2),
+                'ordersGrowth' => round($ordersGrowth, 2),
+            ],
+            'salesChart' => $this->getSalesChartData($startDate, $endDate),
+            'topProducts' => $this->getTopProducts($startDate, $endDate),
+            'recentOrders' => $this->getRecentOrders($startDate, $endDate),
+            'paymentMethods' => $this->getPaymentMethodsBreakdown($startDate, $endDate),
+        ];
+    }
+
+    private function calculateDateRanges(string $range, ?string $start, ?string $end): array
+    {
+        switch ($range) {
+            case 'today':
+                $startDate = Carbon::today();
+                $endDate = Carbon::today()->endOfDay();
+                $previousStart = Carbon::yesterday();
+                $previousEnd = Carbon::yesterday()->endOfDay();
+                break;
+
+            case 'yesterday':
+                $startDate = Carbon::yesterday();
+                $endDate = Carbon::yesterday()->endOfDay();
+                $previousStart = Carbon::yesterday()->subDay();
+                $previousEnd = Carbon::yesterday()->subDay()->endOfDay();
+                break;
+
+            case 'week':
+                $startDate = Carbon::now()->startOfWeek();
+                $endDate = Carbon::now()->endOfWeek();
+                $previousStart = Carbon::now()->subWeek()->startOfWeek();
+                $previousEnd = Carbon::now()->subWeek()->endOfWeek();
+                break;
+
+            case 'month':
+                $startDate = Carbon::now()->startOfMonth();
+                $endDate = Carbon::now()->endOfMonth();
+                $previousStart = Carbon::now()->subMonth()->startOfMonth();
+                $previousEnd = Carbon::now()->subMonth()->endOfMonth();
+                break;
+
+            case 'custom':
+                $startDate = Carbon::parse($start);
+                $endDate = Carbon::parse($end)->endOfDay();
+                $diff = $startDate->diffInDays($endDate);
+                $previousStart = $startDate->copy()->subDays($diff);
+                $previousEnd = $endDate->copy()->subDays($diff);
+                break;
+
+            default:
+                $startDate = Carbon::today();
+                $endDate = Carbon::today()->endOfDay();
+                $previousStart = Carbon::yesterday();
+                $previousEnd = Carbon::yesterday()->endOfDay();
+        }
+
+        return [$startDate, $endDate, $previousStart, $previousEnd];
+    }
+
+    private function getSalesChartData(Carbon $startDate, Carbon $endDate): array
+    {
+        $salesChart = [];
+        $period = CarbonPeriod::create($startDate, $endDate);
+
+        foreach ($period as $date) {
+            $daySales = Order::where('type', 'pos')
+                ->whereDate('created_at', $date)
+                ->sum('grand_total');
+
+            $dayOrders = Order::where('type', 'pos')
+                ->whereDate('created_at', $date)
+                ->count();
+
+            $salesChart[] = [
+                'date' => $date->format('M d'),
+                'sales' => round($daySales, 2),
+                'orders' => $dayOrders,
+            ];
+        }
+
+        return $salesChart;
+    }
+
+    private function getTopProducts(Carbon $startDate, Carbon $endDate): array
+    {
+        return OrderDetail::whereHas('order', function ($q) use ($startDate, $endDate) {
+            $q->where('type', 'pos')
+                ->whereBetween('created_at', [$startDate, $endDate]);
+        })
+            ->select('product_id', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(total) as revenue'))
+            ->groupBy('product_id')
+            ->orderByDesc('revenue')
+            ->limit(5)
+            ->with('product')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => $item->product->title ?? 'Product',
+                    'quantity' => $item->quantity,
+                    'revenue' => round($item->revenue, 2),
+                ];
+            })
+            ->toArray();
+    }
+
+    private function getRecentOrders(Carbon $startDate, Carbon $endDate): array
+    {
+        return Order::where('type', 'pos')
+            ->with('customer')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'customer_name' => $order->customer->name ?? null,
+                    'grand_total' => $order->grand_total,
+                    'payment_status' => $order->payment_status,
+                    'created_at' => $order->created_at,
+                ];
+            })
+            ->toArray();
+    }
+
+    private function getPaymentMethodsBreakdown(Carbon $startDate, Carbon $endDate): array
+    {
+        return OrderPayment::whereHas('order', function ($q) use ($startDate, $endDate) {
+            $q->where('type', 'pos')
+                ->whereBetween('created_at', [$startDate, $endDate]);
+        })
+            ->select('payment_method as name', DB::raw('SUM(amount) as value'))
+            ->groupBy('payment_method')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'name' => ucfirst(str_replace('_', ' ', $item->name)),
+                    'value' => round($item->value, 2),
+                ];
+            })
+            ->toArray();
+    }
+
+   
 }

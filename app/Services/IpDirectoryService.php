@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
 
 class IpDirectoryService
-{
+{ 
     /**
      * Get all IP directories with optional pagination
      */

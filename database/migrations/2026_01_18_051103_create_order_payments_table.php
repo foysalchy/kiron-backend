@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->decimal('amount', 15, 2);
+            $table->decimal('change_amount', 15, 2)->default(0);
             $table->string('payment_method')->comment('cash, card, bank, mobile_banking, cheque');
             $table->string('reference_no')->nullable();
             $table->text('note')->nullable();

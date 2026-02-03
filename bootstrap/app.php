@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckSuperAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
+            'super_admin' => CheckSuperAdmin::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/*', // Disable CSRF for API routes
