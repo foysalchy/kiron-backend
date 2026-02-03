@@ -61,6 +61,7 @@ class StoreOrderRequest extends BaseCompanyRequest
 
                 'hold_ref' => ['nullable', 'string'],
                 'note' => ['nullable', 'string'],
+                'status' => ['nullable'],
             ]
         );
     }

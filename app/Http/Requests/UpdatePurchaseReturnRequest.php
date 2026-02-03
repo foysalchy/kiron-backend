@@ -33,9 +33,16 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
                 'items' => ['sometimes', 'array', 'min:1'],
                 'items.*.product_id' => ['required_with:items', 'exists:products,id'],
                 'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
+                'items.*.unit_price' => ['required_with:items'],
+                'items.*.discount' => ['nullable', 'numeric', 'min:0'],
+                'items.*.tax' => ['nullable', 'numeric', 'min:0'],
 
+                'other_charges' => ['nullable', 'numeric', 'min:0'],
+                'discount_on_all' => ['nullable', 'numeric', 'min:0'],
+                'coupon_discount' => ['nullable', 'numeric', 'min:0'],
+                'round_off' => ['nullable', 'numeric'],
                 'note' => ['nullable', 'string'],
-                'status' => ['sometimes', 'integer', 'in:0,1,2'],
+                'status' => ['sometimes', 'integer'],
             ]
         );
     }

@@ -92,6 +92,15 @@ class PurchaseReturnController extends Controller
     /**
      * Delete purchase return
      */
+    public function purchaseProducts(int $purchaseId): JsonResponse
+    {
+        $data=$this->purchaseReturnService->purchaseProducts($purchaseId);
+
+        return ResponseHelper::success($data, 'Purchase products successfully');
+    }
+    /**
+     * Delete purchase return
+     */
     public function destroy(int $id): JsonResponse
     {
         $this->purchaseReturnService->deletePurchaseReturn($id);
@@ -108,11 +117,12 @@ class PurchaseReturnController extends Controller
             'status' => [
                 'required',
                 Rule::in([
-                    Status::Pending->value,      // 2
-                    Status::Waiting->value,  // 16
-                    Status::Cancelled->value,  // 10
-                    Status::NotCleared->value,  // 18
-                    Status::Cleared->value,  // 17
+                    Status::Draft->value,     
+                    Status::Completed->value,  
+                    Status::Waiting->value,  
+                    Status::Cancelled->value,  
+                    Status::NotCleared->value, 
+                    Status::Cleared->value,  
                 ]),
             ],
         ]);
