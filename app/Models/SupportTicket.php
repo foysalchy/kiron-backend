@@ -30,14 +30,18 @@ class SupportTicket extends Model
     {
         return $query->where('status', Status::Pending->value);
     }
-    public function scopeOpen($query)
+    public function scopeReplied($query)
     {
-        return $query->where('status', Status::Active->value);
+        return $query->where('status', Status::Replied->value);
+    }
+    public function scopeWaiting($query)
+    {
+        return $query->where('status', Status::Waiting->value);
     }
 
-    public function scopeCleared($query)
+    public function scopeClosed($query)
     {
-        return $query->where('status', Status::Cleared->value);
+        return $query->where('status', Status::Closed->value);
     }
 
     // Accessors
@@ -57,5 +61,9 @@ class SupportTicket extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function replies()
+    {
+        return $this->hasMany(SupportTicketReply::class);
     }
 }

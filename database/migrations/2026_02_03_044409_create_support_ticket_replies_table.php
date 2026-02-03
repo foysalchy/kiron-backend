@@ -11,17 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('support_tickets', function (Blueprint $table) {
+        Schema::create('support_ticket_replies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('support_department_id')->constrained('support_departments')->cascadeOnDelete();
+            $table->foreignId('support_ticket_id')->constrained('support_tickets')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('subject');
-            $table->longText('description');
+            $table->text('comment');
             $table->string('image')->nullable();
-            $table->tinyInteger('status')->default(16);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('support_tickets');
+        Schema::dropIfExists('support_ticket_replies');
     }
 };

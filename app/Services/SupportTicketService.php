@@ -6,6 +6,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\SupportTicket;
+use App\Models\SupportTicketReply;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
@@ -86,7 +87,7 @@ class SupportTicketService
      */
     public function getTicketById(int $id): SupportTicket
     {
-        $ticket = SupportTicket::with('supportDepartment','user')->find($id);
+        $ticket = SupportTicket::with(['supportDepartment', 'user', 'replies.user'])->find($id);
 
         if (!$ticket) {
             throw ApiException::notFound('Support Ticket');
@@ -246,16 +247,61 @@ class SupportTicketService
         DB::beginTransaction();
         try {
             $ticket = $this->getTicketById($id);
-            $ticket->update(['status' => !$ticket->status]);
+            $currentStatus = Status::from($ticket->status);
+            $newStatus = ($currentStatus === Status::Closed) ? Status::Waiting : Status::Closed;
+
+            $ticket->update(['status' => $newStatus->value]);
             LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+
             DB::commit();
             return $ticket;
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             throw ApiException::serverError('Failed to toggle status');
+        }
+    }
+    /**
+     * Store a ticket reply and update status automatically
+     */
+    public function storeReply(array $data): SupportTicketReply
+    {
+        DB::beginTransaction();
+
+        try {
+            if (isset($data['image'])) {
+                $data['image'] = FileUploadHelper::uploadImage(
+                    $data['image'],
+                    'tickets/replies',
+                    'public',
+                    2048
+                );
+            }
+
+            $data['user_id'] = auth()->id();
+            $reply = SupportTicketReply::create($data);
+
+            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
+
+            $newStatus = (auth()->user()->role === 'super_admin')
+                ? Status::Replied
+                : Status::Waiting;
+
+            $ticket->update(['status' => $newStatus->value]);
+
+            LogHelper::updated('support_ticket_reply', $reply->id, $ticket->company_id, 'New reply added');
+
+            DB::commit();
+            Log::info('Ticket reply stored successfully', ['reply_id' => $reply->id, 'ticket_id' => $ticket->id]);
+
+            return $reply->load('user');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if (isset($data['image'])) {
+                FileUploadHelper::delete($data['image']);
+            }
+            Log::error('Ticket reply creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to send reply');
         }
     }
 }

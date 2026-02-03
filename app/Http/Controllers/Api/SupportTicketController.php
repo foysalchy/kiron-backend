@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreSupportTicketReplyRequest;
 use App\Http\Requests\StoreSupportTicketRequest;
 use App\Http\Requests\UpdateSupportTicketRequest;
 use App\Services\SupportTicketService;
@@ -87,12 +88,21 @@ class SupportTicketController extends Controller
     }
 
     /**
-     * Toggle ticket status (Active/Inactive or Open/Closed).
+     * Toggle ticket status (Open/Closed).
      */
     public function toggleStatus(int $id): JsonResponse
     {
         $data = $this->ticketService->toggleStatus($id);
 
         return ResponseHelper::success($data, 'Support ticket status updated successfully');
+    }
+    /**
+     * reply 
+     */
+    public function storeReply(StoreSupportTicketReplyRequest $request): JsonResponse
+    {
+        $data = $this->ticketService->storeReply($request->validated());
+
+        return ResponseHelper::success($data, 'Reply submitted and status updated', 201);
     }
 }
