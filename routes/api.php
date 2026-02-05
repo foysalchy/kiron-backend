@@ -30,6 +30,10 @@ use App\Http\Controllers\Api\IpSettingController;
 use App\Http\Controllers\Api\JobTitleController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
+use App\Http\Controllers\Api\LeadController;
+use App\Http\Controllers\Api\LeadNoteController;
+use App\Http\Controllers\Api\LeadSourceController;
+use App\Http\Controllers\Api\LeadStatusController;
 use App\Http\Controllers\Api\LeaveApplicationController;
 use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MarketController;
@@ -858,5 +862,51 @@ Route::prefix('v1')->group(function () {
         //market tools route
         Route::post('market-tools/update', [MarketController::class, 'update']);
 
+        //lead-sources routes
+        Route::prefix('lead-sources')->group(function () {
+            Route::get('/', [LeadSourceController::class, 'index']);
+            Route::post('/', [LeadSourceController::class, 'store']);
+            Route::get('/{id}', [LeadSourceController::class, 'show']);
+            Route::post('/update/{id}', [LeadSourceController::class, 'update']);
+            Route::delete('/{id}', [LeadSourceController::class, 'destroy']);
+            Route::get('{id}/restore', [LeadSourceController::class, 'restore']);
+            Route::delete('{id}/force', [LeadSourceController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LeadSourceController::class, 'toggleStatus']);
+
+        });
+        //lead-status routes
+        Route::prefix('lead-status')->group(function () {
+            Route::get('/', [LeadStatusController::class, 'index']);
+            Route::post('/', [LeadStatusController::class, 'store']);
+            Route::get('/{id}', [LeadStatusController::class, 'show']);
+            Route::post('/update/{id}', [LeadStatusController::class, 'update']);
+            Route::delete('/{id}', [LeadStatusController::class, 'destroy']);
+            Route::get('{id}/restore', [LeadStatusController::class, 'restore']);
+            Route::delete('{id}/force', [LeadStatusController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LeadStatusController::class, 'toggleStatus']);
+
+        });
+        //leads routes
+        Route::prefix('leads')->group(function () {
+            Route::get('/', [LeadController::class, 'index']);
+            Route::post('/', [LeadController::class, 'store']);
+            Route::get('/{id}', [LeadController::class, 'show']);
+            Route::post('/update/{id}', [LeadController::class, 'update']);
+            Route::delete('/{id}', [LeadController::class, 'destroy']);
+            Route::get('{id}/restore', [LeadController::class, 'restore']);
+            Route::delete('{id}/force', [LeadController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [LeadController::class, 'toggleStatus']);
+
+        });
+        //lead-notes routes
+        Route::prefix('lead-notes')->group(function () {
+            Route::get('/', [LeadNoteController::class, 'index']);
+            Route::post('/', [LeadNoteController::class, 'store']);
+            Route::get('/{id}', [LeadNoteController::class, 'show']);
+            Route::post('/update/{id}', [LeadNoteController::class, 'update']);
+            Route::delete('/{id}', [LeadNoteController::class, 'destroy']);
+            Route::get('{id}/restore', [LeadNoteController::class, 'restore']);
+            Route::delete('{id}/force', [LeadNoteController::class, 'forceDestroy']);
+        });
     });
 });
