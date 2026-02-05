@@ -143,7 +143,7 @@ class LeadNoteService
             Log::error('Lead Note restoration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to restore note');
         }
-    }
+    } 
 
     /**
      * Permanently Delete Note
