@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Purchase, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
+use App\Models\{Product, Purchase, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -72,6 +72,7 @@ class PurchaseReturnService
         $purchaseReturn = PurchaseReturn::with([
             'purchase',
             'supplier',
+            'purchaseReturnPayments',
             'purchaseReturnDetails.product'
         ])->find($id);
 
@@ -81,7 +82,29 @@ class PurchaseReturnService
 
         return $purchaseReturn;
     }
+    public function purchaseProducts(int $purchaseId) 
+    {
+        $purchase = Purchase::with([
+            'purchaseDetails.product:id,title'
+        ])->find($purchaseId);
 
+        if (!$purchase) {
+            throw ApiException::notFound('Purchase');
+        }
+
+        return $purchase->purchaseDetails->map(function ($detail) {
+            return [
+                'id' => $detail->product->id,
+                'title' => $detail->product->title,
+                'unit_cost' => $detail->unit_cost,
+                'unit_price' => $detail->purchase_price,
+                'discount' => $detail->discount,
+                'tax' => $detail->tax,
+                'quantity' => $detail->quantity,
+
+            ];
+        });
+    }
     /**
      * Create a new purchase return
      */
@@ -272,7 +295,7 @@ class PurchaseReturnService
                 'old_status' => $oldStatus,
                 'new_status' => $status
             ]);
-            LogHelper::custom('status_changed', 'purchase_return', $id, $purchaseReturn->company_id,'purchase return no: '. $purchaseReturn->return_no .' new status ' . $getStatus->label());
+            LogHelper::custom('status_changed', 'purchase_return', $id, $purchaseReturn->company_id, 'purchase return no: ' . $purchaseReturn->return_no . ' new status ' . $getStatus->label());
 
             return $purchaseReturn->fresh();
         } catch (ApiException $e) {
@@ -316,7 +339,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Payment added to purchase return', ['purchase_return_id' => $id]);
-            LogHelper::custom('payment_added', 'purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no . ' receive payment '.  $paymentData['amount']);
+            LogHelper::custom('payment_added', 'purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no . ' receive payment ' .  $paymentData['amount']);
 
             return $purchaseReturn->fresh([
                 'purchase',
@@ -345,8 +368,8 @@ class PurchaseReturnService
             $purchaseReturn = $this->getPurchaseReturnById($id);
 
             // Only pending purchase returns can be deleted
-            if (!$purchaseReturn->isPending()) {
-                throw ApiException::badRequest('Only pending purchase returns can be deleted');
+            if (!$purchaseReturn->isDraft()) {
+                throw ApiException::badRequest('Only draft purchase returns can be deleted');
             }
 
             $purchaseReturn->delete();
@@ -354,7 +377,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Purchase return deleted successfully', ['purchase_return_id' => $id]);
-            LogHelper::deleted('purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no);
+            LogHelper::deleted('purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no);
 
             return true;
         } catch (ApiException $e) {
@@ -387,7 +410,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Purchase return restored successfully', ['purchase_return_id' => $id]);
-            LogHelper::custom('restored', 'purchase_return', $id, $purchaseReturn->company_id,$purchaseReturn->return_no);
+            LogHelper::custom('restored', 'purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no);
 
             return $purchaseReturn->load(['purchase', 'supplier', 'purchaseReturnDetails.product']);
         } catch (ApiException $e) {
@@ -414,9 +437,9 @@ class PurchaseReturnService
             if (!$purchaseReturn) {
                 throw ApiException::notFound('Purchase Return');
             }
-              // Only pending returns can be deleted
-            if (!$purchaseReturn->isPending()) {
-                throw ApiException::badRequest('Only pending returns can be deleted');
+            // Only pending returns can be deleted
+            if (!$purchaseReturn->isDraft()) {
+                throw ApiException::badRequest('Only draft returns can be deleted');
             }
 
             // Delete details
@@ -431,7 +454,7 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Purchase return permanently deleted', ['purchase_return_id' => $id]);
-            LogHelper::custom('force_deleted', 'purchase_return', $id, $companyId,$purchaseReturn->return_no);
+            LogHelper::custom('force_deleted', 'purchase_return', $id, $companyId, $purchaseReturn->return_no);
 
             return true;
         } catch (ApiException $e) {

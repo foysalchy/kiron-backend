@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
 use App\Models\{Party, PurchaseDetail, PurchaseReturnDetail};
+use App\Rules\UniqueProductIds;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
@@ -34,7 +35,7 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
                 'return_date' => ['required', 'date'],
                 'reason' => ['nullable', 'string'],
 
-                'items' => ['required', 'array', 'min:1'],
+                'items' => ['required', 'array', 'min:1', new UniqueProductIds],
                 'items.*.product_id' => ['required', 'exists:products,id'],
                 'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.unit_price' => ['required', 'numeric', 'min:0'],

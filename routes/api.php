@@ -371,6 +371,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PurchaseReturnController::class, 'restore']);
             Route::delete('{id}/force', [PurchaseReturnController::class, 'forceDestroy']);
             Route::post('/{id}/add-payment', [PurchaseReturnController::class, 'addPayment']);
+             Route::get('/products/{id}', [PurchaseReturnController::class, 'purchaseProducts']);
         });
         Route::prefix('coupons')->group(function () {
             Route::get('/', [CouponController::class, 'index']);
@@ -390,6 +391,8 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/complete', [PosOrderController::class, 'complete']);
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
+            Route::get('/pos/dashboard', [PosOrderController::class, 'dashboard']);
+
         });
         Route::prefix('sales-order')->group(function () {
             Route::get('/', [SalesOrderController::class, 'index']);

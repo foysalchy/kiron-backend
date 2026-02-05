@@ -34,7 +34,7 @@ return new class extends Migration
             $table->decimal('refund_amount', 15, 2)->default(0)->comment('Total refunded');
 
             // Status
-            $table->tinyInteger('status')->default(0)->comment('0=pending, 1=cleared, 2=not_cleared, 3=waiting, 4=cancelled');
+            $table->tinyInteger('status')->default(13) //draft
             $table->text('note')->nullable();
 
             $table->timestamps();
