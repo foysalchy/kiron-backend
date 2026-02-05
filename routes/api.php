@@ -21,7 +21,9 @@ use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
+use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
@@ -910,6 +912,15 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [LeadNoteController::class, 'destroy']);
             Route::get('{id}/restore', [LeadNoteController::class, 'restore']);
             Route::delete('{id}/force', [LeadNoteController::class, 'forceDestroy']);
+        });
+        Route::prefix('footer-code')->group(function () {
+            Route::get('/', [FooterCodeController::class, 'index']);
+            Route::post('/', [FooterCodeController::class, 'store']);
+        });
+        // Domain Setup Routes
+        Route::prefix('domain-setup')->group(function () {
+            Route::get('/', [DomainSetupController::class, 'index']);
+            Route::post('/', [DomainSetupController::class, 'store']);
         });
     });
 });

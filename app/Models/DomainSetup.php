@@ -6,19 +6,16 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
-class LeadSource extends Model
+class DomainSetup extends Model
 {
-    use SoftDeletes,CompanyScoped;
-
+    use CompanyScoped;
     protected $fillable = [
         'company_id',
-        'name',
+        'custom_domain',
+        'sub_domain',
         'status',
     ];
-    protected $hidden = ['deleted_at'];
     /**
      * Scopes
      */
@@ -36,9 +33,5 @@ class LeadSource extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
-    }
-    public function leads(): HasMany
-    {
-        return $this->hasMany(Lead::class);
     }
 }
