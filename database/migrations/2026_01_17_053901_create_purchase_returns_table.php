@@ -36,6 +36,7 @@ return new class extends Migration
 
             // Status
             $table->tinyInteger('status')->default(Status::Draft->value); //draft
+
             $table->text('note')->nullable();
 
             $table->timestamps();
