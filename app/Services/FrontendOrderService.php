@@ -1,0 +1,357 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\Status;
+use App\Helpers\LogHelper;
+use App\Models\Order;
+use App\Models\OrderDetail;
+use App\Models\Party;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class FrontendOrderService
+{
+    /**
+     * Retrieve orders with all related information
+     * 
+     * @param array $filters
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function getOrders(array $filters = [])
+    {
+        $query = Order::query()
+            ->with([
+                'customer:id,name,phone,address,email',
+                'warehouse:id,name',
+                'company:id,name',
+                'orderDetails.product:id,title,sku_codes,thumbnail',
+                'orderNotes' => function ($query) {
+                    $query->orderBy('created_at', 'desc');
+                },
+                'coupon:id,code,discount_value'
+            ])
+            ->select('orders.*');
+
+        // CompanyScoped trait automatically filters by company_id
+        // No need for joins - use relationships instead
+
+        // Apply filters
+        if (!empty($filters['status'])) {
+            $query->where('orders.status', $filters['status']);
+        }
+
+        if (!empty($filters['payment_status'])) {
+            $query->where('orders.payment_status', $filters['payment_status']);
+        }
+
+        if (!empty($filters['customer_name'])) {
+            $query->whereHas('customer', function ($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['customer_name'] . '%');
+            });
+        }
+
+        if (!empty($filters['customer_phone'])) {
+            $query->whereHas('customer', function ($q) use ($filters) {
+                $q->where('phone', 'like', '%' . $filters['customer_phone'] . '%');
+            });
+        }
+
+        if (!empty($filters['order_no'])) {
+            $query->where('orders.order_no', 'like', '%' . $filters['order_no'] . '%');
+        }
+
+        if (!empty($filters['product_name']) || !empty($filters['product_sku'])) {
+            $query->whereHas('orderDetails.product', function ($q) use ($filters) {
+                if (!empty($filters['product_name'])) {
+                    $q->where('title', 'like', '%' . $filters['product_name'] . '%');
+                }
+                if (!empty($filters['product_sku'])) {
+                    $q->where('sku_codes', 'like', '%' . $filters['product_sku'] . '%');
+                }
+            });
+        }
+
+        if (!empty($filters['order_date'])) {
+            $query->whereDate('orders.order_date', $filters['order_date']);
+        }
+
+        if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+            $query->whereBetween('orders.order_date', [$filters['date_from'], $filters['date_to']]);
+        }
+
+        if (!empty($filters['type'])) {
+            $query->where('orders.type', $filters['type']);
+        }
+
+        if (!empty($filters['warehouse_id'])) {
+            $query->where('orders.warehouse_id', $filters['warehouse_id']);
+        }
+
+        // Search functionality
+        if (!empty($filters['search'])) {
+            $searchTerm = $filters['search'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('orders.order_no', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('orders.reference_no', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('customer', function ($subQ) use ($searchTerm) {
+                        $subQ->where('name', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('phone', 'like', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
+        // Order by latest first
+        $query->orderBy('orders.created_at', 'desc');
+
+        // Paginate results
+        $perPage = $filters['per_page'] ?? 20;
+        $orders = $query->paginate($perPage);
+
+        // Transform the data to include calculated fields
+        $orders->getCollection()->transform(function ($order) {
+            // Get customer total orders count
+            $customerTotalOrders = 1; // Default for walk-in
+            if ($order->customer_id) {
+                $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
+            }
+
+            return [
+                'id' => $order->id,
+                'orderNumber' => $order->order_no,
+                'customerName' => $order->customer?->name ?? 'Walk-in Customer',
+                'customerPhone' => $order->customer?->phone ?? '',
+                'address' => $order->customer?->address ?? '',
+                'paymethod' => $this->getPaymentMethod($order),
+                'totalorder' => $customerTotalOrders,
+                'status' => $this->getStatusLabel($order->status),
+                'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
+                'items' => $order->orderDetails->map(function ($detail) {
+                    return [
+                        'id' => $detail->id,
+                        'title' => $detail->product?->title ?? 'Unknown Product',
+                        'sku' => $detail->product?->sku_codes ?? '',
+                        'price' => (float) $detail->unit_price,
+                        'quantity' => $detail->quantity,
+                        'discount' => (float) $detail->discount,
+                        'tax' => (float) $detail->tax,
+                        'total' => (float) $detail->total,
+                        'image' => $detail->product?->thumbnail ?? null,
+                    ];
+                }),
+                'subtotal' => (float) $order->subtotal,
+                'discount' => (float) ($order->discount_on_all + $order->coupon_discount),
+                'otherCharges' => (float) $order->other_charges,
+                'roundOff' => (float) $order->round_off,
+                'totalPrice' => (float) $order->grand_total,
+                'paidAmount' => (float) $order->payment_amount,
+                'notes' => $order->orderNotes->map(function ($note) {
+                    return [
+                        'id' => $note->id,
+                        'note' => $note->note,
+                        'type' => $note->type,
+                        'created_at' => $note->created_at->format('Y-m-d H:i:s'),
+                        'time_ago' => $note->created_at->diffForHumans(),
+                    ];
+                }),
+                'orderDate' => $order->order_date,
+                'timeAgo' => $order->created_at->diffForHumans(),
+                'warehouse' => $order->warehouse?->name ?? '',
+                'type' => $order->type,
+                'reference_no' => $order->reference_no,
+                'is_walk_in' => (bool) $order->is_walk_in,
+                'courierInfo' => $this->getCourierInfo($order),
+            ];
+        });
+
+        return $orders;
+    }
+
+    /**
+     * Get order by ID with all details
+     */
+    public function getOrderById($orderId)
+    {
+        $order = Order::with([
+            'customer',
+            'warehouse',
+            'company',
+            'orderDetails.product',
+            'orderNotes' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'coupon'
+        ])
+            ->findOrFail($orderId);
+
+        return $this->transformOrderData($order);
+    }
+
+    /**
+     * Get payment method from order
+     */
+    private function getPaymentMethod($order)
+    {
+        // This would need to be implemented based on your payment tracking
+        // For now, returning a default value
+        return $order->orderPayments()->latest()->first()?->payment_method ?? 'Cash';
+    }
+
+    /**
+     * Get status label
+     */
+    private function getStatusLabel($status): string
+    {
+        return Status::tryFrom($status)?->label() ?? 'Unknown';
+    }
+
+    /**
+     * Get payment status label
+     */
+    private function getPaymentStatusLabel($paymentStatus)
+    {
+        $statusLabels = [
+            0 => 'Unpaid',
+            1 => 'Partial',
+            2 => 'Paid',
+        ];
+
+        return $statusLabels[$paymentStatus] ?? 'Unknown';
+    }
+
+    /**
+     * Get courier information (placeholder - implement based on your courier tracking)
+     */
+    private function getCourierInfo($order)
+    {
+
+        return [
+            'name' => 'Steadfast',
+            'status' => 'In-Transit',
+            'trackingNumber' => 'DX123456789BD',
+        ];
+    }
+
+    /**
+     * Transform single order data
+     */
+    private function transformOrderData($order)
+    {
+        // Get customer total orders count
+        $customerTotalOrders = 1; // Default for walk-in
+        if ($order->customer_id) {
+            $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
+        }
+
+        return [
+            'id' => $order->id,
+            'orderNumber' => $order->order_no,
+            'customerName' => $order->customer?->name ?? 'Walk-in Customer',
+            'customerPhone' => $order->customer?->phone ?? '',
+            'address' => $order->customer?->address ?? '',
+            'paymethod' => $this->getPaymentMethod($order),
+            'totalorder' => $customerTotalOrders,
+            'status' => $this->getStatusLabel($order->status),
+            'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
+            'items' => $order->orderDetails->map(function ($detail) {
+                return [
+                    'id' => $detail->id,
+                    'title' => $detail->product?->title ?? 'Unknown Product',
+                    'sku' => $detail->product?->sku_codes ?? '',
+                    'price' => (float) $detail->unit_price,
+                    'quantity' => $detail->quantity,
+                    'discount' => (float) $detail->discount,
+                    'tax' => (float) $detail->tax,
+                    'total' => (float) $detail->total,
+                    'image' => $detail->product?->thumbnail ?? null,
+                ];
+            }),
+            'subtotal' => (float) $order->subtotal,
+            'discount' => (float) ($order->discount_on_all + $order->coupon_discount),
+            'otherCharges' => (float) $order->other_charges,
+            'roundOff' => (float) $order->round_off,
+            'totalPrice' => (float) $order->grand_total,
+            'paidAmount' => (float) $order->payment_amount,
+            'notes' => $order->orderNotes->map(function ($note) {
+                return [
+                    'id' => $note->id,
+                    'note' => $note->note,
+                    'type' => $note->type,
+                    'created_at' => $note->created_at->format('Y-m-d H:i:s'),
+                    'time_ago' => $note->created_at->diffForHumans(),
+                ];
+            }),
+            'orderDate' => $order->order_date,
+            'timeAgo' => $order->created_at->diffForHumans(),
+            'warehouse' => $order->warehouse?->name ?? '',
+            'type' => $order->type,
+            'reference_no' => $order->reference_no,
+            'is_walk_in' => (bool) $order->is_walk_in,
+            'courierInfo' => $this->getCourierInfo($order),
+        ];
+    }
+    public function changeStatus(int $id, $paymentStatus = null, $orderStatus = null): Order
+    {
+        DB::beginTransaction();
+        try {
+            $order = Order::findOrFail($id);
+
+            // Store old values for logging
+
+
+            $paymentStatusMap = [
+                'Unpaid' => 0,
+                'Partial' => 1,
+                'Paid' => 2,
+            ];
+
+            // Update Payment Status if provided
+            if ($paymentStatus !== null && isset($paymentStatusMap[$paymentStatus])) {
+                $oldPaymentStatus = $this->getPaymentStatusLabel($order->payment_status);
+
+                $order->payment_status = $paymentStatusMap[$paymentStatus];
+            }
+
+            // Update Order Status if provided
+            if ($orderStatus !== null) {
+                $oldOrderStatus = $this->getStatusLabel($order->status);
+                $newStatus = $this->getStatusLabel($orderStatus);
+                $order->status = $orderStatus;
+            }
+
+            // Save the order
+            $order->save();
+
+
+            $changes = [];
+            if ($paymentStatus && $oldPaymentStatus !== $paymentStatus) {
+                $changes[] = "Payment: {$oldPaymentStatus} → {$paymentStatus}";
+            }
+            if ($orderStatus && $oldOrderStatus !== $orderStatus) {
+                $changes[] = "Order: {$oldOrderStatus} → {$newStatus}";
+            }
+
+            if (!empty($changes)) {
+                LogHelper::statusChanged(
+                    'orders',
+                    $order->id,
+                    $order->company_id,
+                    implode(', ', $changes)
+                );
+            }
+            DB::commit();
+
+            Log::info('Order status updated', [
+                'order_id' => $id,
+                'changes' => $changes
+            ]);
+
+            return $order;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order status update failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+}
