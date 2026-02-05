@@ -43,6 +43,8 @@ use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
@@ -373,7 +375,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [PurchaseReturnController::class, 'restore']);
             Route::delete('{id}/force', [PurchaseReturnController::class, 'forceDestroy']);
             Route::post('/{id}/add-payment', [PurchaseReturnController::class, 'addPayment']);
-             Route::get('/products/{id}', [PurchaseReturnController::class, 'purchaseProducts']);
+            Route::get('/products/{id}', [PurchaseReturnController::class, 'purchaseProducts']);
         });
         Route::prefix('coupons')->group(function () {
             Route::get('/', [CouponController::class, 'index']);
@@ -383,6 +385,13 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [CouponController::class, 'destroy']);
             Route::patch('/{id}/change-status', [CouponController::class, 'changeStatus']);
             Route::post('/validate', [CouponController::class, 'validate']);
+        });
+        Route::prefix('order-note')->group(function () {
+            Route::get('/', [OrderNoteController::class, 'index']);
+            Route::post('/', [OrderNoteController::class, 'store']);
+            Route::get('/{id}', [OrderNoteController::class, 'show']);
+            Route::post('/update/{id}', [OrderNoteController::class, 'update']);
+            Route::delete('/{id}', [OrderNoteController::class, 'destroy']);
         });
         Route::prefix('pos-order')->group(function () {
             Route::get('/', [PosOrderController::class, 'index']);
@@ -394,7 +403,6 @@ Route::prefix('v1')->group(function () {
             Route::post('{id}/hold', [PosOrderController::class, 'hold']);
             Route::post('{id}/resume', [PosOrderController::class, 'resume']);
             Route::get('/pos/dashboard', [PosOrderController::class, 'dashboard']);
-
         });
         Route::prefix('sales-order')->group(function () {
             Route::get('/', [SalesOrderController::class, 'index']);
@@ -402,6 +410,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}', [SalesOrderController::class, 'show']);
             Route::post('{id}/cancel', [SalesOrderController::class, 'cancel']);
             Route::post('{id}/complete', [SalesOrderController::class, 'complete']);
+        });
+
+        Route::prefix('fetch-orders')->group(function () {
+            Route::get('/', [OrderController::class, 'index']); // Get all orders with filters
+            Route::get('/{id}', [OrderController::class, 'show']); // Get single order
+            Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // Update order status
+
         });
 
         Route::prefix('orders-return')->group(function () {
@@ -766,8 +781,7 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
             Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
-
-            });
+        });
         //courier-methods routes
         Route::prefix('courier-methods')->group(function () {
             Route::get('/', [CourierMethodController::class, 'index']);
@@ -778,7 +792,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CourierMethodController::class, 'restore']);
             Route::delete('{id}/force', [CourierMethodController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CourierMethodController::class, 'toggleStatus']);
-
         });
         //couriers routes
         Route::prefix('couriers')->group(function () {
@@ -790,7 +803,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CourierController::class, 'restore']);
             Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
-
         });
         //sms-settings routes
         Route::prefix('sms-settings')->group(function () {
@@ -802,7 +814,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
             Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
-
         });
         //ip-directories routes
         Route::prefix('ip-directories')->group(function () {
@@ -814,7 +825,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [IpDirectoryController::class, 'restore']);
             Route::delete('{id}/force', [IpDirectoryController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [IpDirectoryController::class, 'toggleStatus']);
-
         });
         //ip-settings routes
         Route::prefix('ip-settings')->group(function () {
@@ -826,7 +836,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [IpSettingController::class, 'restore']);
             Route::delete('{id}/force', [IpSettingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [IpSettingController::class, 'toggleStatus']);
-
         });
         //support-departments routes
         Route::prefix('support-departments')->group(function () {
@@ -841,7 +850,6 @@ Route::prefix('v1')->group(function () {
                 Route::delete('{id}/force', [SupportDepartmentController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [SupportDepartmentController::class, 'toggleStatus']);
             });
-
         });
         //support-tickets routes
         Route::prefix('support-tickets')->group(function () {
@@ -857,8 +865,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('{id}/restore', [SupportTicketController::class, 'restore']);
                 Route::delete('{id}/force', [SupportTicketController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [SupportTicketController::class, 'toggleStatus']);
-        });
-
+            });
         });
         //change-pass routes
         Route::prefix('change-pass')->group(function () {
@@ -866,6 +873,7 @@ Route::prefix('v1')->group(function () {
         });
         //market tools route
         Route::post('market-tools/update', [MarketController::class, 'update']);
+
 
         //lead-sources routes
         Route::prefix('lead-sources')->group(function () {
@@ -922,5 +930,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [DomainSetupController::class, 'index']);
             Route::post('/', [DomainSetupController::class, 'store']);
         });
+
     });
 });
