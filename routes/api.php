@@ -931,13 +931,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [DomainSetupController::class, 'index']);
             Route::post('/', [DomainSetupController::class, 'store']);
         });
-<<<<<<< HEAD
         Route::prefix('email-settings')->group(function () {
             Route::get('/', [EmailSettingController::class, 'index']);
             Route::post('/', [EmailSettingController::class, 'store']);
         });
-=======
-
->>>>>>> origin
     });
 });
