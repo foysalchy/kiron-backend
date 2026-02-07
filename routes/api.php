@@ -20,8 +20,10 @@ use App\Http\Controllers\Api\EmployeeTypeController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
+use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DomainSetupController;
+use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
@@ -928,5 +930,24 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [DomainSetupController::class, 'index']);
             Route::post('/', [DomainSetupController::class, 'store']);
         });
+
+        Route::prefix('email-settings')->group(function () {
+            Route::get('/', [EmailSettingController::class, 'index']);
+            Route::post('/', [EmailSettingController::class, 'store']);
+        });
+        //currencies routes
+        Route::prefix('currencies')->group(function () {
+            Route::get('/', [CurrencyController::class, 'index']);
+            Route::post('/', [CurrencyController::class, 'store']);
+            Route::get('/{id}', [CurrencyController::class, 'show']);
+            Route::post('/update/{id}', [CurrencyController::class, 'update']);
+            Route::delete('/{id}', [CurrencyController::class, 'destroy']);
+            Route::get('{id}/restore', [CurrencyController::class, 'restore']);
+            Route::delete('{id}/force', [CurrencyController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
+
+        });
+
+
     });
 });
