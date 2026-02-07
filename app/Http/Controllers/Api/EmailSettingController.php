@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EmailSettingController extends Controller
-{  
+{
     public function __construct(protected EmailSettingService $emailSettingService)
     {
     }

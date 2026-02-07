@@ -6,18 +6,19 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class EmailSetting extends Model
-{ 
-    use CompanyScoped;
+class Currency extends Model
+{
+    use SoftDeletes,CompanyScoped;
+
     protected $fillable = [
         'company_id',
-        'host_name',
-        'port_number',
-        'auth_user',
-        'auth_password',
+        'name',
+        'symbol',
         'status',
     ];
+    protected $hidden = ['deleted_at']; 
     /**
      * Scopes
      */
