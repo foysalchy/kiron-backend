@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Enums\Status;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes,CompanyScoped;
+    use HasFactory, SoftDeletes, CompanyScoped;
 
     // Order types
     public const TYPE_POS = 'pos';
@@ -130,7 +131,10 @@ class Order extends Model
     {
         return $this->hasMany(OrderPayment::class);
     }
-
+    public function orderNotes(): HasMany
+    {
+        return $this->hasMany(OrderNote::class);
+    }
     /**
      * Type helpers
      */
@@ -184,27 +188,46 @@ class Order extends Model
     {
         return $this->payment_status === self::PAYMENT_PAID;
     }
+    public function scopeStatus($query, $status)
+    {
+        return $query->where('status', $status);
+    }
 
+    /**
+     * Scope a query to only include orders with a given payment status
+     */
+    public function scopePaymentStatus($query, $paymentStatus)
+    {
+        return $query->where('payment_status', $paymentStatus);
+    }
+
+    /**
+     * Scope a query to filter by customer
+     */
+    public function scopeByCustomer($query, $customerId)
+    {
+        return $query->where('customer_id', $customerId);
+    }
     /**
      * Get type label
      */
     public function getTypeLabelAttribute(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             self::TYPE_POS => 'POS Order',
             self::TYPE_SALES => 'Sales Order',
             default => 'Unknown',
         };
     }
 
-   
+
 
     /**
      * Get payment status label
      */
     public function getPaymentStatusLabelAttribute(): string
     {
-        return match($this->payment_status) {
+        return match ($this->payment_status) {
             self::PAYMENT_UNPAID => 'Unpaid',
             self::PAYMENT_PARTIAL => 'Partial',
             self::PAYMENT_PAID => 'Paid',
