@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Services\FrontendOrderService;
+use App\Services\OrderService;
 use Illuminate\Http\{JsonResponse, Request};
 
 class OrderController extends Controller
 {
-    protected $frontendOrderService;
 
-    public function __construct(FrontendOrderService $frontendOrderService)
-    {
-        $this->frontendOrderService = $frontendOrderService;
-    }
+
+    public function __construct(
+        protected FrontendOrderService $frontendOrderService,
+        protected OrderService $orderService,
+    ) {}
 
     /**
      * Get all orders with filters
@@ -91,20 +93,38 @@ class OrderController extends Controller
     }
     /**
      * Update order status
-     * 
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
      */
     public function updateStatus(Request $request, $id): JsonResponse
     {
-        \Log::info($request);
+
         $request->validate([
             'payment_status' => 'nullable',
             'order_status' => 'nullable',
         ]);
 
-        $data = $this->frontendOrderService->changeStatus($id, (int) $request->payment_status, $request->order_status);
+        $data = $this->frontendOrderService->updateStatus($id, (int) $request->payment_status, $request->order_status);
+
+        return ResponseHelper::success($data, 'Status Changed Successfully');
+    }
+    public function changeStatus(Request $request, $id): JsonResponse
+    {
+
+        $request->validate([
+            'status' => 'required',
+        ]);
+
+        $data = $this->orderService->changeStatus($id, $request->status);
+
+        return ResponseHelper::success($data, 'Status Changed Successfully');
+    }
+    /**
+     * Update order 
+     */
+    public function update(UpdateOrderRequest $request, $id)
+    {
+
+
+        $data = $this->orderService->updateOrder($id, $request->validated(), $request->type);
 
         return ResponseHelper::success($data, 'Status Changed Successfully');
     }
