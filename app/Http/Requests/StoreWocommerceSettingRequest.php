@@ -30,7 +30,6 @@ class StoreWocommerceSettingRequest extends BaseCompanyRequest
                 'domain_url'      => ['required', 'url', ''],
                 'consumer_key'    => ['required', 'string', ''],
                 'consumer_secret' => ['required', 'string', ''],
-                'status'          => ['nullable', 'integer'],
             ]
         );
     }

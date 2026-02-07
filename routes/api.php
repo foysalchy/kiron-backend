@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DomainSetupController;
+use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
@@ -921,6 +922,10 @@ Route::prefix('v1')->group(function () {
         Route::prefix('domain-setup')->group(function () {
             Route::get('/', [DomainSetupController::class, 'index']);
             Route::post('/', [DomainSetupController::class, 'store']);
+        });
+        Route::prefix('email-settings')->group(function () {
+            Route::get('/', [EmailSettingController::class, 'index']);
+            Route::post('/', [EmailSettingController::class, 'store']);
         });
     });
 });
