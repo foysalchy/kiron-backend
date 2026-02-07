@@ -33,9 +33,6 @@ class FrontendOrderService
             ])
             ->select('orders.*');
 
-        // CompanyScoped trait automatically filters by company_id
-        // No need for joins - use relationships instead
-
         // Apply filters
         if (!empty($filters['status'])) {
             $query->where('orders.status', $filters['status']);
@@ -125,6 +122,7 @@ class FrontendOrderService
                 'paymethod' => $this->getPaymentMethod($order),
                 'totalorder' => $customerTotalOrders,
                 'status' => $this->getStatusLabel($order->status),
+                'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'items' => $order->orderDetails->map(function ($detail) {
                     return [
@@ -176,7 +174,9 @@ class FrontendOrderService
             'customer',
             'warehouse',
             'company',
+            'actionLogs',
             'orderDetails.product',
+            'orderPayments',
             'orderNotes' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             },
@@ -246,17 +246,23 @@ class FrontendOrderService
         return [
             'id' => $order->id,
             'orderNumber' => $order->order_no,
+            'order_date' => $order->order_date,
+            'reference_no' => $order->reference_no,
+            'warehouse_id' => $order->warehouse_id,
             'customerName' => $order->customer?->name ?? 'Walk-in Customer',
+            'customer_id' => $order->customer?->id,
             'customerPhone' => $order->customer?->phone ?? '',
             'address' => $order->customer?->address ?? '',
             'paymethod' => $this->getPaymentMethod($order),
             'totalorder' => $customerTotalOrders,
             'status' => $this->getStatusLabel($order->status),
+            'order_status' => $order->status,
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
                 return [
                     'id' => $detail->id,
                     'title' => $detail->product?->title ?? 'Unknown Product',
+                    'product_id' => $detail->product_id,
                     'sku' => $detail->product?->sku_codes ?? '',
                     'price' => (float) $detail->unit_price,
                     'quantity' => $detail->quantity,
@@ -281,6 +287,26 @@ class FrontendOrderService
                     'time_ago' => $note->created_at->diffForHumans(),
                 ];
             }),
+            'activities' => $order->actionLogs->map(function ($log) {
+                return [
+                    'id' => $log->id,
+                    'action' => $log->action,
+                    'type' => $log->action_type,
+                    'created_at' => $log->created_at->format('Y-m-d H:i:s'),
+                    'time_ago' => $log->created_at->diffForHumans(),
+                ];
+            }),
+            'payments' => $order->orderPayments->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'amount' => $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'change_amount' => $payment->change_amount,
+                    'reference_no' => $payment->reference_no,
+                    'note' => $payment->note,
+
+                ];
+            }),
             'orderDate' => $order->order_date,
             'timeAgo' => $order->created_at->diffForHumans(),
             'warehouse' => $order->warehouse?->name ?? '',
@@ -290,7 +316,7 @@ class FrontendOrderService
             'courierInfo' => $this->getCourierInfo($order),
         ];
     }
-    public function changeStatus(int $id, $paymentStatus = null, $orderStatus = null): Order
+    public function updateStatus(int $id, $paymentStatus = null, $orderStatus = null): Order
     {
         DB::beginTransaction();
         try {
@@ -327,6 +353,51 @@ class FrontendOrderService
             if ($paymentStatus && $oldPaymentStatus !== $paymentStatus) {
                 $changes[] = "Payment: {$oldPaymentStatus} → {$paymentStatus}";
             }
+            if ($orderStatus && $oldOrderStatus !== $orderStatus) {
+                $changes[] = "Order: {$oldOrderStatus} → {$newStatus}";
+            }
+
+            if (!empty($changes)) {
+                LogHelper::statusChanged(
+                    'orders',
+                    $order->id,
+                    $order->company_id,
+                    implode(', ', $changes)
+                );
+            }
+            DB::commit();
+
+            Log::info('Order status updated', [
+                'order_id' => $id,
+                'changes' => $changes
+            ]);
+
+            return $order;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Order status update failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    public function changeStatus(int $id, $orderStatus): Order
+    {
+        DB::beginTransaction();
+        try {
+            $order = Order::findOrFail($id);
+            // Update Order Status if provided
+            if ($orderStatus !== null) {
+                $oldOrderStatus = $this->getStatusLabel($order->status);
+                $newStatus = $this->getStatusLabel($orderStatus);
+                $order->status = $orderStatus;
+            }
+
+            // Save the order
+            $order->save();
+
+
+            $changes = [];
+
             if ($orderStatus && $oldOrderStatus !== $orderStatus) {
                 $changes[] = "Order: {$oldOrderStatus} → {$newStatus}";
             }

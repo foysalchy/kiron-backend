@@ -126,6 +126,13 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class);
     }
+    public function actionLogs(): HasMany
+    {
+        return $this->hasMany(ActionLog::class, 'action_id')
+            ->where('module', 'orders')
+            ->orderBy('created_at','desc');
+    }
+
 
     public function orderPayments(): HasMany
     {
