@@ -42,7 +42,7 @@ return new class extends Migration
             $table->integer('available_stock')->default(0);
             
             // Pricing
-            $table->decimal('regular_price', 15, 2);
+            $table->decimal('regular_price', 15, 2)->nullable();
             $table->enum('discount_type', ['flat', 'percent'])->nullable();
             $table->decimal('discount', 15, 2)->default(0);
             $table->string('purpose');
