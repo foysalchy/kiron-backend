@@ -73,6 +73,7 @@ use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SmsSettingController;
+use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -953,7 +954,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
 
         });
-
+        Route::post('steadfast-book', [SteadfastOrderController::class, 'store']);
 
     });
 });

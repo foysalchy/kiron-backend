@@ -7,7 +7,7 @@ use App\Models\FirebaseSetting;
 use Illuminate\Support\Facades\{DB,Log};
 
 class FirebaseSettingService
-{
+{ 
     /**
      * Get Firebase settings for the current company
      */

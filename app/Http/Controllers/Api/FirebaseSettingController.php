@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FirebaseSettingController extends Controller
-{
+{ 
     public function __construct(protected FirebaseSettingService $firebaseSettingService)
     {
     }

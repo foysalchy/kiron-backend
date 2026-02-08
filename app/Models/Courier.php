@@ -45,6 +45,6 @@ class Courier extends Model
     }
     public function method(): BelongsTo
     {
-        return $this->belongsTo(CourierMethod::class);
+        return $this->belongsTo(CourierMethod::class,'courier_method_id');
     }
 }
