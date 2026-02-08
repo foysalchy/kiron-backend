@@ -246,7 +246,7 @@ class OrderService
                 );
             }
 
-            LogHelper::created('order', $order->id, $order->company_id, 'total amount ' . $itemTotal);
+            LogHelper::created('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
             DB::commit();
 
             Log::info('Order created successfully', [
@@ -269,6 +269,158 @@ class OrderService
             throw ApiException::serverError('Failed to create order: ' . $e->getMessage());
         }
     }
+    /**
+     * Update Order
+     */
+    public function updateOrder(int $id, array $data, string $type): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($id, $type);
+
+            // Cannot update completed or cancelled orders
+            if ($order->isCompleted()) {
+                throw ApiException::badRequest('Cannot update completed order');
+            }
+
+            if ($order->isCancelled()) {
+                throw ApiException::badRequest('Cannot update cancelled order');
+            }
+
+            $items = $data['items'] ?? [];
+            $couponCode = $data['coupon_code'] ?? null;
+            $payments = $data['payments'] ?? [];
+
+            unset($data['items'], $data['payments'], $data['coupon_code']);
+
+            // Store old order details for stock restoration
+            $oldOrderDetails = $order->orderDetails->toArray();
+            $oldStatus = $order->status;
+            $oldCouponId = $order->coupon_id;
+
+            // If order was not on hold, restore stock first (we'll deduct new stock later)
+            if ($oldStatus !== Status::Hold->value) {
+                $this->restoreOrderStock($order);
+            }
+
+            // Delete old order details and payments
+            $order->orderDetails()->delete();
+            $order->orderPayments()->delete();
+
+            // Calculate new totals
+            if (!empty($items)) {
+                $totals = $this->calculateTotals($items, $data);
+                $data = array_merge($data, $totals);
+            }
+
+            // Handle coupon
+            $data['coupon_discount'] = 0;
+            $data['coupon_id'] = null;
+
+            // Remove old coupon if changed
+            if ($oldCouponId && $oldCouponId != $data['coupon_id']) {
+                // Here you might want to reverse the old coupon usage
+                // Depends on your CouponService implementation
+            }
+
+            if ($couponCode) {
+                $couponResult = $this->couponService->validateCoupon(
+                    $couponCode,
+                    $data['grand_total'],
+                    $data['customer_id'] ?? null
+                );
+
+                $data['coupon_id'] = $couponResult['coupon_id'];
+                $data['coupon_discount'] = $couponResult['discount_amount'];
+                $data['grand_total'] -= $data['coupon_discount'];
+            }
+
+            // Handle payments
+            $totalPaid = 0;
+            if (!empty($payments)) {
+                $totalPaid = array_sum(array_column($payments, 'amount'));
+            }
+
+            $data['payment_amount'] = $totalPaid;
+            $data['payment_status'] = $this->determinePaymentStatus($data['grand_total'], $totalPaid);
+
+            // Update order
+            $order->update($data);
+
+            // Create new order details
+            foreach ($items as $item) {
+                $itemTotal = $this->calculateItemTotal($item);
+
+                OrderDetail::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'] ?? 0,
+                    'tax' => $item['tax'] ?? 0,
+                    'total' => $itemTotal,
+                ]);
+            }
+
+            // Deduct new stock (only if not on hold)
+            if ($order->status !== Status::Hold->value) {
+                foreach ($items as $item) {
+                    $this->deductOrderStock($order, $item);
+                }
+            }
+
+            // Create new payments
+            if (!empty($payments)) {
+                foreach ($payments as $payment) {
+                    OrderPayment::create([
+                        'order_id' => $order->id,
+                        'amount' => $payment['amount'],
+                        'change_amount' => $payment['amount'] - $data['grand_total'],
+                        'payment_method' => $payment['payment_method'],
+                        'reference_no' => $payment['reference_no'] ?? null,
+                        'note' => $payment['note'] ?? null,
+                    ]);
+                }
+            }
+
+            // Apply new coupon usage
+            if ($data['coupon_id']) {
+                $this->couponService->applyCoupon(
+                    $data['coupon_id'],
+                    $order->id,
+                    $data['subtotal'],
+                    $data['coupon_discount'],
+                    $data['customer_id'] ?? null
+                );
+            }
+
+            LogHelper::updated('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
+            DB::commit();
+
+            Log::info('Order updated successfully', [
+                'order_id' => $order->id,
+                'type' => $order->type,
+                'status' => $order->status
+            ]);
+
+            return $order->fresh()->load([
+                'warehouse',
+                'customer',
+                'coupon',
+                'orderDetails.product',
+                'orderPayments'
+            ]);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update order: ' . $e->getMessage());
+        }
+    }
+
 
     /**
      * Cancel order
@@ -348,7 +500,56 @@ class OrderService
             DB::commit();
 
             Log::info('Order completed', ['order_id' => $id]);
-            LogHelper::custom('completed', 'order', $id, $order->company_id);
+            LogHelper::custom('completed', 'orders', $id, $order->company_id);
+
+            return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order completion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to complete order');
+        }
+    }
+    public function changeStatus(int $id, string $status): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order =   $order = Order::with([
+                'orderDetails.product',
+            ])->find($id);
+
+            if ($order->isCompleted()) {
+                throw ApiException::badRequest('Order is already completed');
+            }
+
+            if ($order->isCancelled()) {
+                throw ApiException::badRequest('Cannot change  cancelled order status');
+            }
+
+            $oldStatus = $order->status;
+            $getStatus = Status::from($status);
+            $getOldStatus = Status::from($oldStatus);
+            // If order was on hold, deduct stock now
+            if ($oldStatus === Status::Hold->value) {
+                foreach ($order->orderDetails as $detail) {
+                    $this->deductOrderStock($order, [
+                        'product_id' => $detail->product_id,
+                        'quantity' => $detail->quantity
+                    ]);
+                }
+            }
+
+            $order->update([
+                'status' => $getStatus->value
+            ]);
+            $logStatus = " {$getOldStatus->label()} → {$getStatus->label()}";
+            DB::commit();
+
+            Log::info('Order completed', ['order_id' => $id]);
+            LogHelper::statusChanged('orders', $order->id, $order->company_id, $logStatus);
 
             return $order->fresh();
         } catch (ApiException $e) {
@@ -398,7 +599,7 @@ class OrderService
             DB::commit();
 
             Log::info('Order put on hold', ['order_id' => $id]);
-            LogHelper::custom('on_hold', 'order', $id, $order->company_id);
+            LogHelper::custom('on_hold', 'orders', $id, $order->company_id);
 
             return $order->fresh();
         } catch (ApiException $e) {
@@ -441,7 +642,7 @@ class OrderService
             DB::commit();
 
             Log::info('Order resumed from hold', ['order_id' => $id]);
-            LogHelper::custom('resumed', 'order', $id, $order->company_id);
+            LogHelper::custom('resumed', 'orders', $id, $order->company_id);
 
             return $order->fresh();
         } catch (ApiException $e) {
@@ -731,6 +932,4 @@ class OrderService
             })
             ->toArray();
     }
-
-   
 }

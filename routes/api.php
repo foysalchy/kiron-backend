@@ -416,10 +416,11 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('fetch-orders')->group(function () {
-            Route::get('/', [OrderController::class, 'index']); // Get all orders with filters
-            Route::get('/{id}', [OrderController::class, 'show']); // Get single order
-            Route::put('/{id}/status', [OrderController::class, 'updateStatus']); // Update order status
-
+            Route::get('/', [OrderController::class, 'index']);
+            Route::get('/{id}', [OrderController::class, 'show']);
+            Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
+            Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);
+            Route::put('/{id}/update', [OrderController::class, 'update']);
         });
 
         Route::prefix('orders-return')->group(function () {
@@ -888,7 +889,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [LeadSourceController::class, 'restore']);
             Route::delete('{id}/force', [LeadSourceController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [LeadSourceController::class, 'toggleStatus']);
-
         });
         //lead-status routes
         Route::prefix('lead-status')->group(function () {
@@ -900,7 +900,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [LeadStatusController::class, 'restore']);
             Route::delete('{id}/force', [LeadStatusController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [LeadStatusController::class, 'toggleStatus']);
-
         });
         //leads routes
         Route::prefix('leads')->group(function () {
@@ -912,7 +911,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [LeadController::class, 'restore']);
             Route::delete('{id}/force', [LeadController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [LeadController::class, 'toggleStatus']);
-
         });
         //lead-notes routes
         Route::prefix('lead-notes')->group(function () {
@@ -933,6 +931,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [DomainSetupController::class, 'index']);
             Route::post('/', [DomainSetupController::class, 'store']);
         });
+
         Route::prefix('email-settings')->group(function () {
             Route::get('/', [EmailSettingController::class, 'index']);
             Route::post('/', [EmailSettingController::class, 'store']);
@@ -954,5 +953,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
 
         });
+
+
     });
 });
