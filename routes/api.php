@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\FirebaseSettingController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
@@ -935,6 +936,11 @@ Route::prefix('v1')->group(function () {
         Route::prefix('email-settings')->group(function () {
             Route::get('/', [EmailSettingController::class, 'index']);
             Route::post('/', [EmailSettingController::class, 'store']);
+        });
+        //firebase route
+        Route::prefix('firebase-settings')->group(function () {
+            Route::get('/', [FirebaseSettingController::class, 'index']);
+            Route::post('/', [FirebaseSettingController::class, 'store']);
         });
         //currencies routes
         Route::prefix('currencies')->group(function () {
