@@ -92,7 +92,10 @@ class Product extends Model
     {
         return $this->hasMany(Gallery::class);
     }
-
+    public function variations() : HasMany
+    {
+        return $this->hasMany(ProductVariation::class);
+    }
 
 
 
