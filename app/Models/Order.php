@@ -40,6 +40,7 @@ class Order extends Model
         'grand_total',
         'payment_amount',
         'payment_status',
+        'courier_info',
         'status',
         'note',
         'hold_ref',
@@ -58,6 +59,7 @@ class Order extends Model
         'payment_amount' => 'decimal:2',
         'payment_status' => 'integer',
         'status' => 'integer',
+        'courier_info' => 'array',
     ];
 
     /**

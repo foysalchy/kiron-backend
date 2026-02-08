@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\FirebaseSettingController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
 use App\Http\Controllers\Api\InventoryController;
@@ -72,6 +73,7 @@ use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SmsSettingController;
+use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
@@ -935,6 +937,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [EmailSettingController::class, 'index']);
             Route::post('/', [EmailSettingController::class, 'store']);
         });
+        //firebase route
+        Route::prefix('firebase-settings')->group(function () {
+            Route::get('/', [FirebaseSettingController::class, 'index']);
+            Route::post('/', [FirebaseSettingController::class, 'store']);
+        });
         //currencies routes
         Route::prefix('currencies')->group(function () {
             Route::get('/', [CurrencyController::class, 'index']);
@@ -947,7 +954,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
 
         });
-
+        Route::post('steadfast-book', [SteadfastOrderController::class, 'store']);
 
     });
 });
