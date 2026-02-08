@@ -71,12 +71,8 @@ class StoreProductRequest extends BaseCompanyRequest
                 // Description
                 'short_description' => ['nullable', 'string'],
                 'full_description' => ['nullable', 'string'],
-
-
-
-
                 // Purpose
-                'purpose' => ['nullable'],
+                'purpose' => ['required', 'string', 'max:255'],
             ]
         );
     }
