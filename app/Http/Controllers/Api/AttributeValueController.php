@@ -32,22 +32,7 @@ class AttributeValueController extends Controller
 
         return ResponseHelper::success($data, 'Attributes retrieved successfully');
     }
-    public function getByCompany(Request $request): JsonResponse
-    {
-        $filters = [
-            'company_id' => $request->query('company_id'),
-            'attribute_group_id' => $request->query('attribute_group_id'),
-            'status' => $request->query('status'),
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
 
-        $data = $this->attributeService->getAttributeValueByCompany($filters,$request->user()->company_id, true);
-
-        return ResponseHelper::success($data, 'Attributes retrieved successfully');
-    }
 
     public function store(StoreAttributeRequest $request): JsonResponse
     {

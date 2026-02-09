@@ -660,7 +660,7 @@ class OrderService
      */
     private function deductOrderStock(Order $order, array $item): void
     {
-        $this->productService->removeStockFromWarehouse($item['product_id'], [
+        $stockData = [
             'warehouse_id' => $order->warehouse_id,
             'bin_id' => null,
             'quantity' => $item['quantity'],
@@ -670,7 +670,14 @@ class OrderService
             'reference_type' => $order->type === Order::TYPE_POS ? 'POSOrder' : 'SalesOrder',
             'reference_id' => $order->id,
             'notes' => "Stock deducted for order: {$order->order_no}"
-        ]);
+        ];
+
+        // ✅ Add variation_id if exists
+        if (isset($item['variation_id']) && $item['variation_id']) {
+            $stockData['variation_id'] = $item['variation_id'];
+        }
+
+        $this->productService->removeStockFromWarehouse($item['product_id'], $stockData);
     }
 
     /**
@@ -679,7 +686,7 @@ class OrderService
     private function restoreOrderStock(Order $order): void
     {
         foreach ($order->orderDetails as $detail) {
-            $this->productService->addStockToWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $order->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -689,7 +696,14 @@ class OrderService
                 'reference_type' => 'OrderCancellation',
                 'reference_id' => $order->id,
                 'notes' => "Stock restored from cancelled/held order: {$order->order_no}"
-            ]);
+            ];
+
+            // ✅ Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->addStockToWarehouse($detail->product_id, $stockData);
         }
     }
 
