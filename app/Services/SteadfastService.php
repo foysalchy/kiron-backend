@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Services;
 
 use App\Exceptions\ApiException;
@@ -62,10 +62,70 @@ class SteadfastService
 
         throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     }
-    //multiple order 
-    
+    //multiple order
+    public function bulkSendToSteadfast(array $orderIds)
+    {
+        $courier = Courier::whereHas('method', function ($q) {
+            $q->where('slug', 'steadfast');
+        })->first();
 
-    //this is fixed steadfast key 
+        if (!$courier) {
+            throw ApiException::serverError('Steadfast settings not found.');
+        }
+
+        $orders = Order::whereIn('id', $orderIds)->with('customer')->get();
+        $bulkData = [];
+
+        foreach ($orders as $order) {
+            $bulkData[] = [
+                'invoice'           => (string) $order->id,
+                'recipient_name'    => $order->customer->name ?? 'Customer',
+                'recipient_phone'   => $order->customer->phone,
+                'recipient_address' => $order->customer->address ?? 'N/A',
+                'cod_amount'        => (int) $order->grand_total,
+                'note'              => $order->note ?? '',
+            ];
+        }
+
+        $response = Http::withHeaders([
+            'Api-Key'      => $courier->method_details['api_key'],
+            'Secret-Key'   => $courier->method_details['secret_key'],
+            'Content-Type' => 'application/json'
+        ])->post('https://portal.packzy.com/api/v1/create_order/bulk-order', [
+            'data' => json_encode($bulkData)
+        ]);
+
+        if ($response->successful()) {
+            $apiResponse = $response->json();
+
+            $items = $apiResponse['data'] ?? [];
+
+            foreach ($items as $res) {
+                if (isset($res['status']) && $res['status'] === 'success') {
+
+                    $order = Order::find($res['invoice']);
+
+                    if ($order) {
+                        $order->update([
+                            'courier_info' => [
+                                'courier_name'   => 'Steadfast',
+                                'consignment_id' => $res['consignment_id'] ?? '',
+                                'tracking_code'  => $res['tracking_code'] ?? '',
+                                'status'         => $res['status'] ?? '',
+                                'note'           => $res['note'] ?? '',
+                                'applied_at'     => now()->toDateTimeString(),
+                            ]
+                        ]);
+                    }
+                }
+            }
+            return $apiResponse;
+        }
+
+        throw ApiException::serverError('Steadfast Bulk Booking Failed');
+    }
+
+    //this is fixed steadfast key
     // public function sendToSteadfast(Order $order, array $validated)
     // {
     //     $apiKey = config('services.api_key');
@@ -115,5 +175,5 @@ class SteadfastService
 
     //     throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     // }
-    
+
 }

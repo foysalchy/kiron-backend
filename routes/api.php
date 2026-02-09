@@ -955,6 +955,7 @@ Route::prefix('v1')->group(function () {
 
         });
         Route::post('steadfast-book', [SteadfastOrderController::class, 'store']);
+        Route::post('steadfast/bulk-store', [SteadfastOrderController::class, 'bulkStore']);
 
     });
 });

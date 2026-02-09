@@ -26,4 +26,15 @@ class SteadfastOrderController extends Controller
 
         return ResponseHelper::success($result, 'Order shipped successfully.');
     }
+    public function bulkStore(Request $request)
+    {
+        // dd($request);
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id'
+        ]);
+        $results = $this->service->bulkSendToSteadfast($request->order_ids);
+
+        return ResponseHelper::success($results, 'Bulk orders processed.');
+    }
 }
