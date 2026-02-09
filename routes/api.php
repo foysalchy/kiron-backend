@@ -954,8 +954,15 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
 
         });
-        Route::post('steadfast-book', [SteadfastOrderController::class, 'store']);
-        Route::post('steadfast/bulk-store', [SteadfastOrderController::class, 'bulkStore']);
+        //steadfast routes
+        Route::prefix('steadfast')->group(function () {
+            Route::get('/', [SteadfastOrderController::class, 'index']);
+            Route::post('/', [SteadfastOrderController::class, 'store']);
+            Route::post('/bulk-store', [SteadfastOrderController::class, 'bulkStore']);
+            Route::get('/update-status/{id}', [SteadfastOrderController::class, 'updateStatus']);
+            Route::post('/bulk-update-status', [SteadfastOrderController::class, 'updateBulkStatus']);
+
+        });
 
     });
 });
