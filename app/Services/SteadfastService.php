@@ -1,9 +1,11 @@
-<?php 
+<?php
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\Courier;
 use App\Models\Order;
+use Illuminate\Support\Facades\{DB,Log};
 use Illuminate\Support\Facades\Http;
 
 class SteadfastService
@@ -62,10 +64,165 @@ class SteadfastService
 
         throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     }
-    //multiple order 
-    
+    //multiple order
+    public function bulkSendToSteadfast(array $orderIds)
+    {
+        $courier = Courier::whereHas('method', function ($q) {
+            $q->where('slug', 'steadfast');
+        })->first();
 
-    //this is fixed steadfast key 
+        if (!$courier) {
+            throw ApiException::serverError('Steadfast settings not found.');
+        }
+
+        $orders = Order::whereIn('id', $orderIds)->with('customer')->get();
+        $bulkData = [];
+
+        foreach ($orders as $order) {
+            $bulkData[] = [
+                'invoice'           => (string) $order->id,
+                'recipient_name'    => $order->customer->name ?? 'Customer',
+                'recipient_phone'   => $order->customer->phone,
+                'recipient_address' => $order->customer->address ?? 'N/A',
+                'cod_amount'        => (int) $order->grand_total,
+                'note'              => $order->note ?? '',
+            ];
+        }
+
+        $response = Http::withHeaders([
+            'Api-Key'      => $courier->method_details['api_key'],
+            'Secret-Key'   => $courier->method_details['secret_key'],
+            'Content-Type' => 'application/json'
+        ])->post('https://portal.packzy.com/api/v1/create_order/bulk-order', [
+            'data' => json_encode($bulkData)
+        ]);
+
+        if ($response->successful()) {
+            $apiResponse = $response->json();
+
+            $items = $apiResponse['data'] ?? [];
+
+            foreach ($items as $res) {
+                if (isset($res['status']) && $res['status'] === 'success') {
+
+                    $order = Order::find($res['invoice']);
+
+                    if ($order) {
+                        $order->update([
+                            'courier_info' => [
+                                'courier_name'   => 'Steadfast',
+                                'consignment_id' => $res['consignment_id'] ?? '',
+                                'tracking_code'  => $res['tracking_code'] ?? '',
+                                'status'         => $res['status'] ?? '',
+                                'note'           => $res['note'] ?? '',
+                                'applied_at'     => now()->toDateTimeString(),
+                            ]
+                        ]);
+                    }
+                }
+            }
+            return $apiResponse;
+        }
+
+        throw ApiException::serverError('Steadfast Bulk Booking Failed');
+    }
+    /**
+     * Single Order Status Sync
+     */
+    public function syncStatus(Order $order): array
+    {
+        $courier = Courier::whereHas('method', fn($q) => $q->where('slug', 'steadfast'))->first();
+
+        if (!$courier) {
+            throw new \Exception('Steadfast settings not found.');
+        }
+
+        $config = $courier->method_details;
+
+        $info = $info   = $order->courier_info;
+
+        $trackingCode = $info['tracking_code'] ?? null;
+
+        if (!$trackingCode) {
+            throw new \Exception("Tracking code missing for Order #{$order->order_no}");
+        }
+
+        $url = "https://steadfast.com.bd/api/v1/track_order/tracking_code/" . $trackingCode;
+
+        $response = Http::withHeaders([
+            'Api-Key'    => $config['api_key'],
+            'Secret-Key' => $config['secret_key'],
+            'Accept'     => 'application/json'
+        ])->get($url);
+
+        if ($response->status() === 404) {
+            return [
+                'status' => 404,
+                'message' => 'Order not found in Steadfast yet.',
+                'delivery_status' => $info['status'] ?? 'pending'
+            ];
+        }
+
+        if ($response->successful()) {
+            $res = $response->json();
+
+            if (isset($res['status']) && $res['status'] == 200) {
+                $info['status'] = $res['delivery_status'];
+                $info['updated_at'] = now()->toDateTimeString();
+
+                $order->update(['courier_info' => $info]);
+
+                return [
+                    'status' => 200,
+                    'message' => 'Status updated',
+                    'delivery_status' => $res['delivery_status']
+                ];
+            }
+        }
+
+        throw new \Exception("API Error: " . $response->status());
+    }
+
+    public function bulkSyncStatus(array $orderIds): array
+    {
+        $orders = Order::whereIn('id', $orderIds)->get();
+        $results = ['total' => count($orderIds), 'success' => 0, 'failed' => 0, 'details' => []];
+
+        foreach ($orders as $order) {
+            try {
+                $res = $this->syncStatus($order);
+
+                if (isset($res['status']) && $res['status'] == 200) {
+                    $results['success']++;
+                } else {
+                    $results['failed']++;
+                    $results['details'][] = "Order #{$order->order_no}: " . ($res['message'] ?? 'Unknown issue');
+                }
+            } catch (\Exception $e) {
+                $results['failed']++;
+                $results['details'][] = "Order #{$order->order_no}: Exception - " . $e->getMessage();
+            }
+        }
+        return $results;
+    }
+    public function syncAllPendingOrders(): array
+    {
+        $courier = Courier::whereHas('method', fn($q) => $q->where('slug', 'steadfast'))->first();
+        if (!$courier) throw new \Exception('Steadfast courier not found.');
+
+        $orders = Order::where('courier_info->courier_name', 'Steadfast')
+            ->whereNotIn('courier_info->status', ['delivered', 'cancelled'])
+            ->get();
+
+        if ($orders->isEmpty()) {
+            return ['message' => 'No pending orders to sync.'];
+        }
+
+        $orderIds = $orders->pluck('id')->toArray();
+
+        return $this->bulkSyncStatus($orderIds);
+    }
+        //this is fixed steadfast key
     // public function sendToSteadfast(Order $order, array $validated)
     // {
     //     $apiKey = config('services.api_key');
@@ -115,5 +272,5 @@ class SteadfastService
 
     //     throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     // }
-    
+
 }
