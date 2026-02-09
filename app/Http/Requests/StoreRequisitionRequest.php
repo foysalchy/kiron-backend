@@ -26,7 +26,7 @@ class StoreRequisitionRequest extends BaseCompanyRequest
 
                 'request_date' => ['required', 'date'],
                 'need_date' => ['required', 'date', 'after_or_equal:request_date'],
-                'items' => ['required', 'array', 'min:1', new UniqueProductIds],
+                'items' => ['required', 'array', 'min:1'],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')
@@ -35,6 +35,7 @@ class StoreRequisitionRequest extends BaseCompanyRequest
                 'items.*.unit' => ['required', 'string', 'max:50'],
                 'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.price' => ['nullable', 'numeric', 'min:0'],
+                'items.*.variation_id' => ['nullable'],
 
                 'note' => ['nullable', 'string'],
             ]

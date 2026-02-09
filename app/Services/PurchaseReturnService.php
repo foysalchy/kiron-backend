@@ -82,28 +82,18 @@ class PurchaseReturnService
 
         return $purchaseReturn;
     }
-    public function purchaseProducts(int $purchaseId) 
+    public function purchaseProducts(int $purchaseId)
     {
         $purchase = Purchase::with([
-            'purchaseDetails.product:id,title'
+            'purchaseDetails.product',
+            'purchaseDetails.variation.attributes.attributeValue.attributeGroup'
         ])->find($purchaseId);
 
         if (!$purchase) {
             throw ApiException::notFound('Purchase');
         }
 
-        return $purchase->purchaseDetails->map(function ($detail) {
-            return [
-                'id' => $detail->product->id,
-                'title' => $detail->product->title,
-                'unit_cost' => $detail->unit_cost,
-                'unit_price' => $detail->purchase_price,
-                'discount' => $detail->discount,
-                'tax' => $detail->tax,
-                'quantity' => $detail->quantity,
-
-            ];
-        });
+       return $purchase;
     }
     /**
      * Create a new purchase return

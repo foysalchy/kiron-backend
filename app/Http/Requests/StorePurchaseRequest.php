@@ -51,11 +51,12 @@ class StorePurchaseRequest extends BaseCompanyRequest
                     Rule::exists('products', 'id')
                         ->where('company_id', $companyId),
                 ],
-                'items.*.quantity' => ['required', 'integer', 'min:1', new UniqueProductIds],
+                'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.purchase_price' => ['required', 'numeric', 'min:0'],
                 'items.*.unit_cost' => ['required', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
+                'items.*.variation_id' => ['nullable'],
 
                 // Totals
                 'other_charges' => ['nullable', 'numeric', 'min:0'],

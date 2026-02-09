@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\{FileUploadHelper, LogHelper};
@@ -17,15 +18,20 @@ class ProductService
     public function getAllProducts(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Product::with(['brand', 'galleries', 'variations.attributes.attributeValue.attributeGroup']);
+            $query = Product::with(['brand', 'galleries', 'variations.attributes.attributeValue.attributeGroup',]);
 
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
 
             if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
+
 
             if (isset($filters['type'])) {
                 $query->where('type', $filters['type']);
@@ -75,7 +81,14 @@ class ProductService
      */
     public function getProductById(int $id): Product
     {
-        $product = Product::with(['brand', 'galleries','variations.attributes.attributeValue.attributeGroup'])->find($id);
+        $product = Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeValue.attributeGroup',
+            'variations.stocks.warehouse',
+
+
+        ])->find($id);
 
         if (!$product) {
             throw ApiException::notFound('Product');
@@ -411,7 +424,6 @@ class ProductService
     {
         $variations = $data['variations'] ?? [];
         unset($data['variations']);
-
         if (empty($variations)) {
             return;
         }

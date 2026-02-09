@@ -22,8 +22,9 @@ class HandleProductStockRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'warehouse_id'     => ['required', 'exists:warehouses,id'],
+                'variation_id'     => ['nullable', 'exists:product_variations,id'],
                 'bin_id'           => ['nullable', 'exists:bins,id'],
-                'quantity'         => ['required', 'integer','not_in:0'],
+                'quantity'         => ['required', 'integer', 'not_in:0'],
                 'batch_number'     => ['nullable', 'string', 'max:100'],
                 'serial_numbers'   => ['nullable', 'array'],
                 'serial_numbers.*' => ['string', 'max:100'],
