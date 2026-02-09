@@ -47,7 +47,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 'purchase_date' => ['sometimes', 'required', 'date'],
 
                 // Purchase Details
-                'items' => ['sometimes', 'required', 'array', 'min:1', new UniqueProductIds],
+                'items' => ['sometimes', 'required', 'array', 'min:1'],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')
@@ -58,7 +58,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 'items.*.unit_cost' => ['required', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
-
+                'items.*.variation_id' => ['nullable'],
                 // Totals
                 'other_charges' => ['nullable', 'numeric', 'min:0'],
                 'discount_on_all' => ['nullable', 'numeric', 'min:0'],

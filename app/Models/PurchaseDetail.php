@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseDetail extends Model
 {
-    
+
     protected $fillable = [
         'purchase_id',
         'product_id',
+        'variation_id',
         'quantity',
         'purchase_price',
         'unit_cost',
@@ -36,6 +37,31 @@ class PurchaseDetail extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->select('id','title','thumbnail');
+        return $this->belongsTo(Product::class)->select('id', 'title', 'thumbnail');
+    }
+    public function variation() : BelongsTo
+    {
+        return $this->belongsTo(ProductVariation::class, 'variation_id');
+    }
+
+    /**
+     * Get variation info with attributes
+     */
+    public function getVariationInfoAttribute()
+    {
+        if (!$this->variation_id || !$this->variation) {
+            return null;
+        }
+
+        return [
+            'id' => $this->variation->id,
+            'sku' => $this->variation->sku,
+            'attributes' => $this->variation->attributes->map(function ($attr) {
+                return [
+                    'group' => $attr->attributeGroup->name,
+                    'value' => $attr->attributeValue->name,
+                ];
+            }),
+        ];
     }
 }

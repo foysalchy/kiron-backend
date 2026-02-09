@@ -13,6 +13,7 @@ class PurchaseReturnDetail extends Model
     protected $fillable = [
         'purchase_return_id',
         'product_id',
+        'variation_id',
         'quantity',
         'unit_price',
         'discount',

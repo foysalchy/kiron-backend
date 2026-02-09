@@ -18,7 +18,12 @@ class RequisitionService
     public function getAllRequisitions(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Requisition::with(['user', 'requisitionDetails.product']);
+            $query = Requisition::with([
+                'user',
+                'requisitionDetails.product',
+                'requisitionDetails.variation.attributes.attributeGroup',
+                'requisitionDetails.variation.attributes.attributeValue'
+            ]);
 
             if (isset($filters['user_id'])) {
                 $query->where('user_id', $filters['user_id']);
@@ -66,7 +71,12 @@ class RequisitionService
      */
     public function getRequisitionById(int $id): Requisition
     {
-        $requisition = Requisition::with(['user', 'requisitionDetails.product'])->find($id);
+        $requisition = Requisition::with([
+            'user',
+            'requisitionDetails.product',
+            'requisitionDetails.variation.attributes.attributeGroup',
+            'requisitionDetails.variation.attributes.attributeValue'
+        ])->find($id);
 
         if (!$requisition) {
             throw ApiException::notFound('Requisition');
@@ -103,6 +113,7 @@ class RequisitionService
                 RequisitionDetail::create([
                     'requisition_id' => $requisition->id,
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'unit' => $item['unit'],
                     'quantity' => $item['quantity'],
                     'price' => $item['price'] ?? 0,
@@ -159,6 +170,7 @@ class RequisitionService
                     RequisitionDetail::create([
                         'requisition_id' => $requisition->id,
                         'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'] ?? null,
                         'unit' => $item['unit'],
                         'quantity' => $item['quantity'],
                         'price' => $item['price'] ?? 0,
@@ -264,7 +276,7 @@ class RequisitionService
             }
 
             $requisition->update([
-                'status' =>Status::Approved->value,
+                'status' => Status::Approved->value,
                 'reject_reason' => null,
             ]);
 
@@ -300,7 +312,7 @@ class RequisitionService
             }
 
             $requisition->update([
-                'status' =>Status::Cancelled->value,
+                'status' => Status::Cancelled->value,
                 'reject_reason' => $reason,
             ]);
 

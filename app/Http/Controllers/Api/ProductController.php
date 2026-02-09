@@ -50,6 +50,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
+        \Log::info($request);
         $data = $this->productService->updateProduct($id, $request->validated());
 
         return ResponseHelper::success($data, 'Product updated successfully');
