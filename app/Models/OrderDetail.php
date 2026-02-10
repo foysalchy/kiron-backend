@@ -33,6 +33,31 @@ class OrderDetail extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class)->select('id','title','thumbnail');
+        return $this->belongsTo(Product::class);
+    }
+    public function variation(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariation::class, 'variation_id');
+    }
+
+    /**
+     * Get variation info with attributes
+     */
+    public function getVariationInfoAttribute()
+    {
+        if (!$this->variation_id || !$this->variation) {
+            return null;
+        }
+
+        return [
+            'id' => $this->variation->id,
+            'sku' => $this->variation->sku,
+            'attributes' => $this->variation->attributes->map(function ($attr) {
+                return [
+                    'group' => $attr->attributeGroup->name,
+                    'value' => $attr->attributeValue->name,
+                ];
+            }),
+        ];
     }
 }

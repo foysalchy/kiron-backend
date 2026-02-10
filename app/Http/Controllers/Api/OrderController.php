@@ -45,6 +45,7 @@ class OrderController extends Controller
                 'per_page' => $request->input('per_page', 20),
             ];
 
+
             $orders = $this->frontendOrderService->getOrders($filters);
 
             return response()->json([
@@ -74,7 +75,7 @@ class OrderController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
             $order = $this->frontendOrderService->getOrderById($id);
@@ -90,6 +91,29 @@ class OrderController extends Controller
                 'error' => $e->getMessage(),
             ], 404);
         }
+    }
+    public function customerOrders(int $customerId): JsonResponse
+    {
+        try {
+            $order = $this->frontendOrderService->getCustomerOrder($customerId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $order,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
+    public function getEditOrder(int $id): JsonResponse
+    {
+        $data = $this->frontendOrderService->getEditOrder($id);
+
+        return ResponseHelper::success($data, 'POS order retrieved successfully');
     }
     /**
      * Update order status
