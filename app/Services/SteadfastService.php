@@ -5,6 +5,8 @@ use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Models\Courier;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
 use Illuminate\Support\Facades\Http;
 
@@ -141,19 +143,22 @@ class SteadfastService
 
         $info = $info   = $order->courier_info;
 
-        $trackingCode = $info['tracking_code'] ?? null;
+        $consignmentId = $info['consignment_id'] ?? null;
 
-        if (!$trackingCode) {
+        if (!$consignmentId) {
             throw new \Exception("Tracking code missing for Order #{$order->order_no}");
         }
 
-        $url = "https://steadfast.com.bd/api/v1/track_order/tracking_code/" . $trackingCode;
+        $url = "https://portal.packzy.com/api/v1/status_by_cid/" . $consignmentId;
 
         $response = Http::withHeaders([
             'Api-Key'    => $config['api_key'],
             'Secret-Key' => $config['secret_key'],
             'Accept'     => 'application/json'
         ])->get($url);
+
+        // ($response);
+        // print($response);
 
         if ($response->status() === 404) {
             return [
@@ -198,6 +203,13 @@ class SteadfastService
                     $results['failed']++;
                     $results['details'][] = "Order #{$order->order_no}: " . ($res['message'] ?? 'Unknown issue');
                 }
+                $results['order_details'][] = [
+                    'id' => $order->id,
+                    'order_no' => $order->order_no,
+                    'consignment_id' => $order->courier_info['consignment_id'] ?? 'N/A',
+                    'current_status' => $order->courier_info['status'] ?? 'pending',
+                    'api_message' => $res['message'] ?? 'Sync attempted'
+                ];
             } catch (\Exception $e) {
                 $results['failed']++;
                 $results['details'][] = "Order #{$order->order_no}: Exception - " . $e->getMessage();
@@ -205,22 +217,36 @@ class SteadfastService
         }
         return $results;
     }
-    public function syncAllPendingOrders(): array
+    //get all
+    public function getAllSteadfastOrders(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
-        $courier = Courier::whereHas('method', fn($q) => $q->where('slug', 'steadfast'))->first();
-        if (!$courier) throw new \Exception('Steadfast courier not found.');
+        try {
+            $query = Order::query()
+                ->where('courier_info->courier_name', 'Steadfast');
 
-        $orders = Order::where('courier_info->courier_name', 'Steadfast')
-            ->whereNotIn('courier_info->status', ['delivered', 'cancelled'])
-            ->get();
+            if (!empty($filters['status'])) {
+                $query->where('courier_info->status', $filters['status']);
+            }
 
-        if ($orders->isEmpty()) {
-            return ['message' => 'No pending orders to sync.'];
+            if (!empty($filters['order_no'])) {
+                $query->where('order_no', 'like', "%{$filters['order_no']}%");
+            }
+            if (!empty($filters['consignment_id'])) {
+                $query->where('courier_info->consignment_id', $filters['consignment_id']);
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'id';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
+                : $query->get();
+
+        } catch (\Exception $e) {
+            Log::error('Error fetching Steadfast orders: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch courier orders');
         }
-
-        $orderIds = $orders->pluck('id')->toArray();
-
-        return $this->bulkSyncStatus($orderIds);
     }
         //this is fixed steadfast key
     // public function sendToSteadfast(Order $order, array $validated)
