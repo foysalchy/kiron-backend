@@ -36,6 +36,8 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
                 'items.*.unit_price' => ['required_with:items'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
+                'items.*.variation_id' => ['nullable'],
+
 
                 'other_charges' => ['nullable', 'numeric', 'min:0'],
                 'discount_on_all' => ['nullable', 'numeric', 'min:0'],

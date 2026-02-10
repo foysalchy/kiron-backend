@@ -36,8 +36,6 @@ class OrderService
                 'customer',
                 'coupon',
                 'orderDetails.product',
-                'orderDetails.variation.attributes.attributeGroup',
-                'orderDetails.variation.attributes.attributeValue',
                 'orderPayments'
             ]);
 
@@ -121,8 +119,6 @@ class OrderService
             'customer',
             'coupon',
             'orderDetails.product',
-            'orderDetails.variation.attributes.attributeGroup',
-            'orderDetails.variation.attributes.attributeValue',
             'orderPayments'
         ])->where('type', $type)
             ->where('warehouse_id', $id)
@@ -214,7 +210,6 @@ class OrderService
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
-                    'variation_id' => $item['variation_id'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount' => $item['discount'] ?? 0,
@@ -267,8 +262,6 @@ class OrderService
                 'customer',
                 'coupon',
                 'orderDetails.product',
-                'orderDetails.variation.attributes.attributeGroup',
-                'orderDetails.variation.attributes.attributeValue',
                 'orderPayments'
             ]);
         } catch (\Exception $e) {
@@ -364,7 +357,6 @@ class OrderService
                 OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
-                    'variation_id' => $item['variation_id'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount' => $item['discount'] ?? 0,
@@ -419,8 +411,6 @@ class OrderService
                 'customer',
                 'coupon',
                 'orderDetails.product',
-                'orderDetails.variation.attributes.attributeGroup',
-                'orderDetails.variation.attributes.attributeValue',
                 'orderPayments'
             ]);
         } catch (ApiException $e) {
@@ -502,7 +492,6 @@ class OrderService
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id' => $detail->product_id,
-                        'variation_id' => $detail->variation_id,
                         'quantity' => $detail->quantity
                     ]);
                 }
@@ -532,7 +521,6 @@ class OrderService
         try {
             $order =   $order = Order::with([
                 'orderDetails.product',
-                'orderDetails.variation',
             ])->find($id);
 
             if ($order->isCompleted()) {
@@ -551,7 +539,6 @@ class OrderService
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id' => $detail->product_id,
-                        'variation_id' => $detail->variation_id,
                         'quantity' => $detail->quantity
                     ]);
                 }
@@ -645,7 +632,6 @@ class OrderService
             foreach ($order->orderDetails as $detail) {
                 $this->deductOrderStock($order, [
                     'product_id' => $detail->product_id,
-                    'variation_id' => $detail->variation_id,
                     'quantity' => $detail->quantity
                 ]);
             }
@@ -688,6 +674,7 @@ class OrderService
             'notes' => "Stock deducted for order: {$order->order_no}"
         ];
 
+        // ✅ Add variation_id if exists
         if (isset($item['variation_id']) && $item['variation_id']) {
             $stockData['variation_id'] = $item['variation_id'];
         }
@@ -713,6 +700,7 @@ class OrderService
                 'notes' => "Stock restored from cancelled/held order: {$order->order_no}"
             ];
 
+            // ✅ Add variation_id if exists
             if ($detail->variation_id) {
                 $stockData['variation_id'] = $detail->variation_id;
             }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
+use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -26,22 +27,19 @@ class FrontendOrderService
                 'warehouse:id,name',
                 'company:id,name',
                 'orderDetails.product:id,title,sku_codes,thumbnail',
-                'orderNotes' => function ($query) {
-                    $query->orderBy('created_at', 'desc');
-                },
+                'orderNotes',
                 'coupon:id,code,discount_value'
             ])
             ->select('orders.*');
 
         // Apply filters
-        if (!empty($filters['status'])) {
+        if (isset($filters['status'])) {
             $query->where('orders.status', $filters['status']);
         }
 
-        if (!empty($filters['payment_status'])) {
+        if (isset($filters['payment_status'])) {
             $query->where('orders.payment_status', $filters['payment_status']);
         }
-
         if (!empty($filters['customer_name'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['customer_name'] . '%');
@@ -118,6 +116,7 @@ class FrontendOrderService
                 'orderNumber' => $order->order_no,
                 'customerName' => $order->customer?->name ?? 'Walk-in Customer',
                 'customerPhone' => $order->customer?->phone ?? '',
+                'customer_id' => $order->customer?->id ?? '',
                 'address' => $order->customer?->address ?? '',
                 'paymethod' => $this->getPaymentMethod($order),
                 'totalorder' => $customerTotalOrders,
@@ -176,6 +175,8 @@ class FrontendOrderService
             'company',
             'actionLogs',
             'orderDetails.product',
+            'orderDetails.variation.attributes.attributeGroup',
+            'orderDetails.variation.attributes.attributeValue',
             'orderPayments',
             'orderNotes' => function ($query) {
                 $query->orderBy('created_at', 'desc');
@@ -186,14 +187,38 @@ class FrontendOrderService
 
         return $this->transformOrderData($order);
     }
+    public function getEditOrder(int $id,): Order
+    {
+        $order = Order::with([
+            'warehouse',
+            'customer',
+            'coupon',
+            'orderDetails.product',
+            'orderDetails.variation.attributes.attributeGroup',
+            'orderDetails.variation.attributes.attributeValue',
+            'orderPayments'
+        ])->find($id);
+
+        if (!$order) {
+            throw ApiException::notFound('Order');
+        }
+
+        return $order;
+    }
+
+    public function getCustomerOrder($customerId)
+    {
+        $order = Order::where('customer_id', $customerId)->get();
+
+        return $order;
+    }
 
     /**
      * Get payment method from order
      */
     private function getPaymentMethod($order)
     {
-        // This would need to be implemented based on your payment tracking
-        // For now, returning a default value
+
         return $order->orderPayments()->latest()->first()?->payment_method ?? 'Cash';
     }
 
@@ -259,10 +284,11 @@ class FrontendOrderService
             'order_status' => $order->status,
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
-                return [
+                $item = [
                     'id' => $detail->id,
                     'title' => $detail->product?->title ?? 'Unknown Product',
                     'product_id' => $detail->product_id,
+                    'variation_id' => $detail->variation_id,
                     'sku' => $detail->product?->sku_codes ?? '',
                     'price' => (float) $detail->unit_price,
                     'quantity' => $detail->quantity,
@@ -271,6 +297,32 @@ class FrontendOrderService
                     'total' => (float) $detail->total,
                     'image' => $detail->product?->thumbnail ?? null,
                 ];
+
+                // ✅ Add variation data if exists
+                if ($detail->variation) {
+                    $item['variation'] = [
+                        'id' => $detail->variation->id,
+                        'sku' => $detail->variation->sku,
+                        'attributes' => $detail->variation->attributes->map(function ($attr) {
+                            return [
+                                'id' => $attr->id,
+                                'attribute_group_id' => $attr->attribute_group_id,
+                                'attribute_value_id' => $attr->attribute_value_id,
+                                'group_name' => $attr->attributeGroup?->name ?? '',
+                                'value_name' => $attr->attributeValue?->name ?? '',
+                            ];
+                        }),
+                    ];
+
+                    // Update SKU to use variation SKU if available
+                    if ($detail->variation->sku) {
+                        $item['sku'] = $detail->variation->sku;
+                    }
+                } else {
+                    $item['variation'] = null;
+                }
+
+                return $item;
             }),
             'subtotal' => (float) $order->subtotal,
             'discount' => (float) ($order->discount_on_all + $order->coupon_discount),
@@ -304,7 +356,6 @@ class FrontendOrderService
                     'change_amount' => $payment->change_amount,
                     'reference_no' => $payment->reference_no,
                     'note' => $payment->note,
-
                 ];
             }),
             'orderDate' => $order->order_date,

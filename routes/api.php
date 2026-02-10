@@ -422,6 +422,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
             Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);
             Route::put('/{id}/update', [OrderController::class, 'update']);
+            Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
+            Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
         });
 
         Route::prefix('orders-return')->group(function () {
@@ -952,7 +954,6 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [CurrencyController::class, 'restore']);
             Route::delete('{id}/force', [CurrencyController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CurrencyController::class, 'toggleStatus']);
-
         });
         //steadfast routes
         Route::prefix('steadfast')->group(function () {
@@ -961,8 +962,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/bulk-store', [SteadfastOrderController::class, 'bulkStore']);
             Route::get('/update-status/{id}', [SteadfastOrderController::class, 'updateStatus']);
             Route::post('/bulk-update-status', [SteadfastOrderController::class, 'updateBulkStatus']);
-
         });
-
     });
 });
