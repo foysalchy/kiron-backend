@@ -54,10 +54,15 @@ class SteadfastOrderController extends Controller
         return response()->json(['status' => 200, 'message' => 'Bulk sync completed', 'data' => $data]);
     }
     //get all data
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $result = $this->service->syncAllPendingOrders();
+            $filters = $request->only([
+                'status',
+                'consignment_id',
+                'per_page'
+            ]);
+            $result = $this->service->getAllSteadfastOrders($filters);
             return ResponseHelper::success($result, 'All pending orders synced with Steadfast.');
         } catch (\Exception $e) {
             return ResponseHelper::error($e->getMessage());
