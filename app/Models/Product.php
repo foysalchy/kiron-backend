@@ -30,7 +30,7 @@ class Product extends Model
         'full_description',
         'warehouse_info',
         'type',
-        'sku_codes',
+        'sku_code',
         'stock_status',
         'stock_quantity',
         'available_stock',
@@ -92,7 +92,7 @@ class Product extends Model
     {
         return $this->hasMany(Gallery::class);
     }
-    public function variations() : HasMany
+    public function variations(): HasMany
     {
         return $this->hasMany(ProductVariation::class);
     }

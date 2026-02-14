@@ -637,9 +637,7 @@ class OrderService
         try {
             $order = $this->getOrderById($id, $type);
 
-            if (!$order->isOnHold()) {
-                throw ApiException::badRequest('Order is not on hold');
-            }
+
 
             // Deduct stock when resuming
             foreach ($order->orderDetails as $detail) {
@@ -661,6 +659,48 @@ class OrderService
             LogHelper::custom('resumed', 'orders', $id, $order->company_id);
 
             return $order->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order resume failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to resume order');
+        }
+    }
+    /**
+     * add payment
+     */
+    public function addPayment(int $id, $data): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = Order::findOrFail($id);
+
+            if ($order->isPaid()) {
+                throw ApiException::badRequest('Already paid');
+            }
+            $totalPaid = $order->payment_amount + $data['amount'];
+            $payment_status = $this->determinePaymentStatus($order->grand_total, $totalPaid);
+
+            OrderPayment::create([
+                'order_id' => $order->id,
+                'amount' => $data['amount'],
+                'payment_method' => $data['payment_method'],
+                'reference_no' => $data['reference_no'] ?? null,
+                'note' => $data['note'] ?? null,
+            ]);
+            $order->update([
+                'payment_amount' => $totalPaid,
+                'payment_status' => $payment_status,
+            ]);
+            DB::commit();
+
+            Log::info('Order resumed from hold', ['order_id' => $id]);
+            LogHelper::custom('resumed', 'orders', $id, $order->company_id);
+
+            return $order;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;

@@ -34,7 +34,7 @@ return new class extends Migration
             
             // Product Type
             $table->enum('type', ['single', 'variation'])->default('single');
-            $table->json('sku_codes')->nullable()->comment('Multiple SKU codes');
+            $table->string('sku_code')->nullable();
             
             // Stock
             $table->enum('stock_status', ['in_stock', 'out_of_stock'])->default('in_stock');

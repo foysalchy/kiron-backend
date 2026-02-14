@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\CourierMethod;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Party;
@@ -26,7 +27,7 @@ class FrontendOrderService
                 'customer:id,name,phone,address,email',
                 'warehouse:id,name',
                 'company:id,name',
-                'orderDetails.product:id,title,sku_codes,thumbnail',
+                'orderDetails.product:id,title,sku_code,thumbnail',
                 'orderNotes',
                 'coupon:id,code,discount_value'
             ])
@@ -62,7 +63,7 @@ class FrontendOrderService
                     $q->where('title', 'like', '%' . $filters['product_name'] . '%');
                 }
                 if (!empty($filters['product_sku'])) {
-                    $q->where('sku_codes', 'like', '%' . $filters['product_sku'] . '%');
+                    $q->where('sku_code', 'like', '%' . $filters['product_sku'] . '%');
                 }
             });
         }
@@ -127,7 +128,7 @@ class FrontendOrderService
                     return [
                         'id' => $detail->id,
                         'title' => $detail->product?->title ?? 'Unknown Product',
-                        'sku' => $detail->product?->sku_codes ?? '',
+                        'sku' => $detail->product?->sku_code ?? '',
                         'price' => (float) $detail->unit_price,
                         'quantity' => $detail->quantity,
                         'discount' => (float) $detail->discount,
@@ -249,14 +250,53 @@ class FrontendOrderService
      */
     private function getCourierInfo($order)
     {
+        // If no courier_info stored, return null
+        if (empty($order->courier_info)) {
+            return null;
+        }
+
+        // Decode JSON from courier_info field
+        $info = is_array($order->courier_info)
+            ? $order->courier_info
+            : json_decode($order->courier_info, true);
+
+        if (!$info) {
+            return null;
+        }
+
+        $courierName = $info['courier_name'] ?? null;
+
+        // Map courier status to readable label
+        $statusMap = [
+            'in_review'     => 'In Review',
+            'pending'       => 'Pending',
+            'picked'        => 'Picked',
+            'in_transit'    => 'In Transit',
+            'delivered'     => 'Delivered',
+            'partial_delivery' => 'Partial Delivery',
+            'cancelled'     => 'Cancelled',
+            'hold'          => 'On Hold',
+            'unknown'       => 'Unknown',
+        ];
+
+        $rawStatus = $info['status'] ?? 'unknown';
+        $readableStatus = $statusMap[$rawStatus] ?? ucfirst(str_replace('_', ' ', $rawStatus));
 
         return [
-            'name' => 'Steadfast',
-            'status' => 'In-Transit',
-            'trackingNumber' => 'DX123456789BD',
+            'name'           => $courierName,
+            'status'         => $readableStatus,
+            'raw_status'     => $rawStatus,
+            'trackingCode'   => $info['tracking_code'] ?? null,
+            'consignmentId'  => $info['consignment_id'] ?? null,
+            'note'           => $info['note'] ?? null,
+            'appliedAt'      => $info['applied_at'] ?? null,
         ];
     }
+    private function getCourierMethod()
+    {
 
+        return CourierMethod::select('id', 'name')->get();
+    }
     /**
      * Transform single order data
      */
@@ -289,7 +329,7 @@ class FrontendOrderService
                     'title' => $detail->product?->title ?? 'Unknown Product',
                     'product_id' => $detail->product_id,
                     'variation_id' => $detail->variation_id,
-                    'sku' => $detail->product?->sku_codes ?? '',
+                    'sku' => $detail->product?->sku_code ?? '',
                     'price' => (float) $detail->unit_price,
                     'quantity' => $detail->quantity,
                     'discount' => (float) $detail->discount,
@@ -365,6 +405,7 @@ class FrontendOrderService
             'reference_no' => $order->reference_no,
             'is_walk_in' => (bool) $order->is_walk_in,
             'courierInfo' => $this->getCourierInfo($order),
+            'courierMethod' => $this->getCourierMethod(),
         ];
     }
     public function updateStatus(int $id, $paymentStatus = null, $orderStatus = null): Order
