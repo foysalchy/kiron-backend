@@ -52,6 +52,7 @@ use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PassChangeController;
+use App\Http\Controllers\Api\PathaoController;
 use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PaymentMethodTypeController;
 use App\Http\Controllers\Api\PayRollController;
@@ -963,6 +964,14 @@ Route::prefix('v1')->group(function () {
             Route::post('/bulk-update-status', [SteadfastOrderController::class, 'updateBulkStatus']);
 
         });
-
+        //pathao routes
+        Route::prefix('pathao')->group(function () {
+            Route::get('/', [PathaoController::class, 'index']);
+            Route::post('/', [PathaoController::class, 'store']);
+            Route::post('/bulk-store', [PathaoController::class, 'bulkStore']);
+            Route::get('/update-status/{id}', [PathaoController::class, 'updateStatus']);
+            Route::post('/bulk-update-status', [PathaoController::class, 'updateBulkStatus']);
+            Route::get('/token', [PathaoController::class, 'testPathaoToken']);
+        });
     });
 });
