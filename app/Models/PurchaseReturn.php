@@ -77,11 +77,14 @@ class PurchaseReturn extends Model
     {
         return $this->hasMany(PurchasePaymentReturn::class);
     }
-
+    public function variation(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariation::class, 'variation_id');
+    }
     /**
      * Status helper methods
      */
-        public function isDraft(): bool
+    public function isDraft(): bool
     {
         return $this->status === Status::Draft->value;
     }
@@ -103,16 +106,16 @@ class PurchaseReturn extends Model
 
     public function isCancelled(): bool
     {
-        return $this->status ===Status::Cancelled->value;
+        return $this->status === Status::Cancelled->value;
     }
 
-  
+
 
 
     /**
      * Scopes
      */
-       public function scopePending($query)
+    public function scopePending($query)
     {
         return $query->where('status', Status::Pending->value);
     }
@@ -147,5 +150,28 @@ class PurchaseReturn extends Model
 
         return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
         // Example: RTN-20260117-0001
+    }
+
+
+
+    /**
+     * Get variation info with attributes
+     */
+    public function getVariationInfoAttribute()
+    {
+        if (!$this->variation_id || !$this->variation) {
+            return null;
+        }
+
+        return [
+            'id' => $this->variation->id,
+            'sku' => $this->variation->sku,
+            'attributes' => $this->variation->attributes->map(function ($attr) {
+                return [
+                    'group' => $attr->attributeGroup->name,
+                    'value' => $attr->attributeValue->name,
+                ];
+            }),
+        ];
     }
 }

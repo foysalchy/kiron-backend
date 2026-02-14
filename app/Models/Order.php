@@ -132,7 +132,7 @@ class Order extends Model
     {
         return $this->hasMany(ActionLog::class, 'action_id')
             ->where('module', 'orders')
-            ->orderBy('created_at','desc');
+            ->orderBy('created_at', 'desc');
     }
 
 
@@ -142,7 +142,7 @@ class Order extends Model
     }
     public function orderNotes(): HasMany
     {
-        return $this->hasMany(OrderNote::class);
+        return $this->hasMany(OrderNote::class)->orderBy('created_at', 'asc');
     }
     /**
      * Type helpers

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
@@ -7,7 +8,7 @@ use App\Models\Courier;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 use Illuminate\Support\Facades\Http;
 
 class SteadfastService
@@ -26,7 +27,6 @@ class SteadfastService
         }
 
         $config = $courier->method_details;
-
         $payload = [
             'invoice'           => $order->order_no,
             'recipient_name'    => $order->customer->name ?? 'Customer',
@@ -58,12 +58,15 @@ class SteadfastService
             ]);
 
             return [
-            'status'      => 200,
-            'message'     => "Consignment has been created successfully.",
-            'consignment' => $res
-        ];
+                'status'      => 200,
+                'message'     => "Consignment has been created successfully.",
+                'consignment' => $res
+            ];
         }
-
+        Log::error('Steadfast API Error', [
+            'http_status' => $response->status(),
+            'response'    => $response->body(),
+        ]);
         throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     }
     //multiple order
@@ -125,7 +128,10 @@ class SteadfastService
             }
             return $apiResponse;
         }
-
+        Log::error('Steadfast API Error', [
+            'http_status' => $response->status(),
+            'response'    => $response->body(),
+        ]);
         throw ApiException::serverError('Steadfast Bulk Booking Failed');
     }
     /**
@@ -242,13 +248,12 @@ class SteadfastService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching Steadfast orders: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch courier orders');
         }
     }
-        //this is fixed steadfast key
+    //this is fixed steadfast key
     // public function sendToSteadfast(Order $order, array $validated)
     // {
     //     $apiKey = config('services.api_key');

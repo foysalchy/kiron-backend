@@ -49,8 +49,8 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Product Type
                 'type' => ['sometimes', 'required', Rule::in(['single', 'variation'])],
-                'sku_codes' => ['nullable', 'array'],
-                'sku_codes.*' => ['string', 'max:255'],
+                'sku_code' => ['nullable'],
+
 
                 // Stock
                 'stock_status' => ['sometimes', 'required', Rule::in(['in_stock', 'out_of_stock'])],

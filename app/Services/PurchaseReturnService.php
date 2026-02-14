@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Product, Purchase, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail};
+use App\Models\{Product, Purchase, PurchasePaymentReturn, PurchaseReturn, PurchaseReturnDetail, ProductStockLedger, ProductVariationStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,7 +25,13 @@ class PurchaseReturnService
     public function getAllPurchaseReturns(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = PurchaseReturn::with(['purchase', 'supplier', 'purchaseReturnDetails.product']);
+            $query = PurchaseReturn::with([
+                'purchase',
+                'supplier',
+                'purchaseReturnDetails.product',
+                'purchaseReturnDetails.variation.attributes.attributeGroup',
+                'purchaseReturnDetails.variation.attributes.attributeValue'
+            ]);
 
             if (isset($filters['purchase_id'])) {
                 $query->where('purchase_id', $filters['purchase_id']);
@@ -73,7 +79,9 @@ class PurchaseReturnService
             'purchase',
             'supplier',
             'purchaseReturnPayments',
-            'purchaseReturnDetails.product'
+            'purchaseReturnDetails.product',
+            'purchaseReturnDetails.variation.attributes.attributeGroup',
+            'purchaseReturnDetails.variation.attributes.attributeValue'
         ])->find($id);
 
         if (!$purchaseReturn) {
@@ -82,28 +90,23 @@ class PurchaseReturnService
 
         return $purchaseReturn;
     }
-    public function purchaseProducts(int $purchaseId) 
+
+    /**
+     * Get purchase products with variations
+     */
+    public function purchaseProducts(int $purchaseId)
     {
         $purchase = Purchase::with([
-            'purchaseDetails.product:id,title'
+            'purchaseDetails.product',
+            'purchaseDetails.variation.attributes.attributeGroup',
+            'purchaseDetails.variation.attributes.attributeValue'
         ])->find($purchaseId);
 
         if (!$purchase) {
             throw ApiException::notFound('Purchase');
         }
 
-        return $purchase->purchaseDetails->map(function ($detail) {
-            return [
-                'id' => $detail->product->id,
-                'title' => $detail->product->title,
-                'unit_cost' => $detail->unit_cost,
-                'unit_price' => $detail->purchase_price,
-                'discount' => $detail->discount,
-                'tax' => $detail->tax,
-                'quantity' => $detail->quantity,
-
-            ];
-        });
+        return $purchase;
     }
     /**
      * Create a new purchase return
@@ -146,6 +149,7 @@ class PurchaseReturnService
                 PurchaseReturnDetail::create([
                     'purchase_return_id' => $purchaseReturn->id,
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null, // ✅ Add variation support
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount' => $item['discount'] ?? 0,
@@ -154,7 +158,7 @@ class PurchaseReturnService
                 ]);
             }
 
-            // ✅ Remove returned stock from warehouse (if status is Cleared)
+            // Remove returned stock from warehouse (if status is Cleared)
             if ($purchaseReturn->status === Status::Cleared->value) {
                 $this->removeReturnedStockFromWarehouse($purchaseReturn);
             }
@@ -180,11 +184,7 @@ class PurchaseReturnService
             ]);
             LogHelper::created('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id, 'total quantities ' . $purchaseReturn->total_quantities . ' refund amount ' . $purchaseReturn->refund_amount);
 
-            return $purchaseReturn->load([
-                'purchase',
-                'supplier',
-                'purchaseReturnDetails.product'
-            ]);
+            return $purchaseReturn;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -229,6 +229,7 @@ class PurchaseReturnService
                     PurchaseReturnDetail::create([
                         'purchase_return_id' => $purchaseReturn->id,
                         'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'] ?? null, // ✅ Add variation support
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'discount' => $item['discount'] ?? 0,
@@ -245,11 +246,7 @@ class PurchaseReturnService
             Log::info('Purchase return updated successfully', ['purchase_return_id' => $purchaseReturn->id]);
             LogHelper::updated('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id, 'total quantities ' . $purchaseReturn->total_quantities . ' refund amount ' . $purchaseReturn->refund_amount);
 
-            return $purchaseReturn->fresh([
-                'purchase',
-                'supplier',
-                'purchaseReturnDetails.product'
-            ]);
+            return $purchaseReturn;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -286,7 +283,6 @@ class PurchaseReturnService
             $purchaseReturn->update([
                 'status' => $getStatus->value
             ]);
-
 
             DB::commit();
 
@@ -339,13 +335,9 @@ class PurchaseReturnService
             DB::commit();
 
             Log::info('Payment added to purchase return', ['purchase_return_id' => $id]);
-            LogHelper::custom('payment_added', 'purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no . ' receive payment ' .  $paymentData['amount']);
+            LogHelper::custom('payment_added', 'purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no . ' receive payment ' . $paymentData['amount']);
 
-            return $purchaseReturn->fresh([
-                'purchase',
-                'supplier',
-                'purchaseReturnDetails.product'
-            ]);
+            return $purchaseReturn;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -412,7 +404,7 @@ class PurchaseReturnService
             Log::info('Purchase return restored successfully', ['purchase_return_id' => $id]);
             LogHelper::custom('restored', 'purchase_return', $id, $purchaseReturn->company_id, $purchaseReturn->return_no);
 
-            return $purchaseReturn->load(['purchase', 'supplier', 'purchaseReturnDetails.product']);
+            return $purchaseReturn;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -437,16 +429,27 @@ class PurchaseReturnService
             if (!$purchaseReturn) {
                 throw ApiException::notFound('Purchase Return');
             }
+
             // Only pending returns can be deleted
             if (!$purchaseReturn->isDraft()) {
                 throw ApiException::badRequest('Only draft returns can be deleted');
             }
 
             // Delete details
-            PurchaseReturnDetail::where('purchase_return_id', $id)->delete();
+            PurchaseReturnDetail::where('purchase_return_id', $id)->forceDelete();
 
             // Delete payments
-            PurchasePaymentReturn::where('purchase_return_id', $id)->delete();
+            PurchasePaymentReturn::where('purchase_return_id', $id)->forceDelete();
+
+            // Delete related stock ledgers for single products
+            ProductStockLedger::where('reference_type', 'PurchaseReturn')
+                ->where('reference_id', $id)
+                ->forceDelete();
+
+            // Delete related stock ledgers for variation products
+            ProductVariationStockLedger::where('reference_type', 'PurchaseReturn')
+                ->where('reference_id', $id)
+                ->forceDelete();
 
             $companyId = $purchaseReturn->company_id;
             $purchaseReturn->forceDelete();
@@ -474,11 +477,12 @@ class PurchaseReturnService
 
     /**
      * Remove returned stock from warehouse (Deduct from inventory)
+     * Handles both single and variation products
      */
     private function removeReturnedStockFromWarehouse(PurchaseReturn $purchaseReturn): void
     {
         foreach ($purchaseReturn->purchaseReturnDetails as $detail) {
-            $this->productService->removeStockFromWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $purchaseReturn->purchase->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -488,11 +492,19 @@ class PurchaseReturnService
                 'reference_type' => 'PurchaseReturn',
                 'reference_id' => $purchaseReturn->id,
                 'notes' => "Stock returned to supplier - Purchase: {$purchaseReturn->purchase->reference_no} - Return: {$purchaseReturn->return_no}"
-            ]);
+            ];
+
+            // ✅ Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->removeStockFromWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock removed for returned item', [
                 'purchase_return_id' => $purchaseReturn->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }
@@ -500,11 +512,12 @@ class PurchaseReturnService
 
     /**
      * Add returned stock back to warehouse (Status change from Cleared to other)
+     * Handles both single and variation products
      */
     private function addReturnedStockToWarehouse(PurchaseReturn $purchaseReturn): void
     {
         foreach ($purchaseReturn->purchaseReturnDetails as $detail) {
-            $this->productService->addStockToWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $purchaseReturn->purchase->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -514,11 +527,19 @@ class PurchaseReturnService
                 'reference_type' => 'PurchaseReturnReversal',
                 'reference_id' => $purchaseReturn->id,
                 'notes' => "Stock restored - Return status changed from Cleared: {$purchaseReturn->return_no}"
-            ]);
+            ];
+
+            // ✅ Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->addStockToWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock restored for return status change', [
                 'purchase_return_id' => $purchaseReturn->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }

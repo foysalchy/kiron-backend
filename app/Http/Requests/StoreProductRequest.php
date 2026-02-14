@@ -39,8 +39,7 @@ class StoreProductRequest extends BaseCompanyRequest
 
                 // Product Type
                 'type' => ['required', Rule::in(['single', 'variation'])],
-                'sku_codes' => ['nullable', 'array'],
-                'sku_codes.*' => ['string', 'max:255'],
+                'sku_code' => ['nullable'],
 
                 // Single Product Fields (only validated when type='single')
                 'regular_price' => ['required_if:type,single', 'nullable', 'numeric', 'min:0'],

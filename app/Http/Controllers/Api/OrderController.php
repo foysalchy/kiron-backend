@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\AddPaymentRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Services\FrontendOrderService;
 use App\Services\OrderService;
@@ -45,6 +46,7 @@ class OrderController extends Controller
                 'per_page' => $request->input('per_page', 20),
             ];
 
+
             $orders = $this->frontendOrderService->getOrders($filters);
 
             return response()->json([
@@ -74,7 +76,7 @@ class OrderController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show($id): JsonResponse
+    public function show(int $id): JsonResponse
     {
         try {
             $order = $this->frontendOrderService->getOrderById($id);
@@ -90,6 +92,29 @@ class OrderController extends Controller
                 'error' => $e->getMessage(),
             ], 404);
         }
+    }
+    public function customerOrders(int $customerId): JsonResponse
+    {
+        try {
+            $order = $this->frontendOrderService->getCustomerOrder($customerId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $order,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+                'error' => $e->getMessage(),
+            ], 404);
+        }
+    }
+    public function getEditOrder(int $id): JsonResponse
+    {
+        $data = $this->frontendOrderService->getEditOrder($id);
+
+        return ResponseHelper::success($data, 'POS order retrieved successfully');
     }
     /**
      * Update order status
@@ -127,5 +152,17 @@ class OrderController extends Controller
         $data = $this->orderService->updateOrder($id, $request->validated(), $request->type);
 
         return ResponseHelper::success($data, 'Status Changed Successfully');
+    }
+    public function addPayment(AddPaymentRequest $request, $id)
+    {
+
+
+        $data = $this->orderService->addPayment($id, $request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment added successfully',
+
+        ]);
     }
 }

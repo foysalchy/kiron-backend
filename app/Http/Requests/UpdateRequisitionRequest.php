@@ -26,7 +26,7 @@ class UpdateRequisitionRequest extends UpdateBaseCompanyRequest
             [
                 'request_date' => ['sometimes', 'date'],
                 'need_date' => ['sometimes', 'date', 'after_or_equal:request_date'],
-                'items' => ['sometimes', 'array', 'min:1', new UniqueProductIds],
+                'items' => ['sometimes', 'array', 'min:1'],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')
@@ -35,6 +35,8 @@ class UpdateRequisitionRequest extends UpdateBaseCompanyRequest
                 'items.*.unit' => ['required_with:items', 'string', 'max:50'],
                 'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
                 'items.*.price' => ['nullable', 'numeric', 'min:0'],
+                'items.*.variation_id' => ['nullable'],
+
                 'note' => ['nullable', 'string'],
                 'status' => ['sometimes', 'integer', 'in:0,1,2,3'],
                 'reject_reason' => ['nullable', 'string', 'required_if:status,2'],
@@ -51,7 +53,7 @@ class UpdateRequisitionRequest extends UpdateBaseCompanyRequest
                 'need_date.date' => 'Need by date must be a valid date',
                 'need_date.after_or_equal' => 'Need by date must be equal or after request date',
                 'items.min' => 'At least one item is required',
-                     'items.*.product_id.required' => 'Product is required for each item',
+                'items.*.product_id.required' => 'Product is required for each item',
                 'items.*.product_id.exists' =>
                 'Selected product does not belong to the selected company.',
                 'items.*.unit.required_with' => 'Unit is required',

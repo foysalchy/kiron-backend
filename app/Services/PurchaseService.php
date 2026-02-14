@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger};
+use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger, ProductVariationStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,7 +25,13 @@ class PurchaseService
     public function getAllPurchases(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Purchase::with(['warehouse', 'supplier', 'purchaseDetails.product']);
+            $query = Purchase::with([
+                'warehouse',
+                'supplier',
+                'purchaseDetails.product',
+                'purchaseDetails.variation.attributes.attributeGroup',
+                'purchaseDetails.variation.attributes.attributeValue'
+            ]);
 
             if (isset($filters['warehouse_id'])) {
                 $query->where('warehouse_id', $filters['warehouse_id']);
@@ -73,7 +79,13 @@ class PurchaseService
      */
     public function getPurchaseById(int $id): Purchase
     {
-        $purchase = Purchase::with(['warehouse', 'supplier', 'purchaseDetails.product'])->find($id);
+        $purchase = Purchase::with([
+            'warehouse',
+            'supplier',
+            'purchaseDetails.product',
+            'purchaseDetails.variation.attributes.attributeGroup',
+            'purchaseDetails.variation.attributes.attributeValue'
+        ])->find($id);
 
         if (!$purchase) {
             throw ApiException::notFound('Purchase');
@@ -113,6 +125,7 @@ class PurchaseService
                 PurchaseDetail::create([
                     'purchase_id' => $purchase->id,
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null, // ✅ Add variation support
                     'quantity' => $item['quantity'],
                     'purchase_price' => $item['purchase_price'],
                     'unit_cost' => $item['unit_cost'],
@@ -122,18 +135,17 @@ class PurchaseService
                 ]);
             }
 
-            //  If purchase is completed, add stock to warehouse
+            // If purchase is completed, add stock to warehouse
             if (isset($data['status']) && $data['status'] == Status::Completed->value) {
                 $this->addPurchaseStockToWarehouse($purchase);
             }
-
 
             DB::commit();
 
             Log::info('Purchase created successfully', ['purchase_id' => $purchase->id]);
             LogHelper::created('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);
 
-            return $purchase->load(['warehouse', 'supplier', 'purchaseDetails.product']);
+            return $purchase;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -188,6 +200,7 @@ class PurchaseService
                     PurchaseDetail::create([
                         'purchase_id' => $purchase->id,
                         'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'] ?? null, // ✅ Add variation support
                         'quantity' => $item['quantity'],
                         'purchase_price' => $item['purchase_price'],
                         'unit_cost' => $item['unit_cost'],
@@ -218,7 +231,7 @@ class PurchaseService
             Log::info('Purchase updated successfully', ['purchase_id' => $purchase->id]);
             LogHelper::updated('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);
 
-            return $purchase->fresh(['warehouse', 'supplier', 'purchaseDetails.product']);
+            return $purchase;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -367,7 +380,7 @@ class PurchaseService
             Log::info('Purchase restored successfully', ['purchase_id' => $id]);
             LogHelper::custom('restored', 'purchase', $id, $purchase->company_id);
 
-            return $purchase->load(['purchaseDetails.product']);
+            return $purchase;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -396,8 +409,13 @@ class PurchaseService
             // Delete all purchase details first
             PurchaseDetail::where('purchase_id', $id)->forceDelete();
 
-            // Delete related stock ledgers
+            // Delete related stock ledgers for single products
             ProductStockLedger::where('reference_type', 'Purchase')
+                ->where('reference_id', $id)
+                ->forceDelete();
+
+            // Delete related stock ledgers for variation products
+            ProductVariationStockLedger::where('reference_type', 'Purchase')
                 ->where('reference_id', $id)
                 ->forceDelete();
 
@@ -427,12 +445,12 @@ class PurchaseService
     // ========================================
 
     /**
-     * Add purchase stock to warehouse
+     * Add purchase stock to warehouse (handles both single and variation products)
      */
     private function addPurchaseStockToWarehouse(Purchase $purchase): void
     {
         foreach ($purchase->purchaseDetails as $detail) {
-            $this->productService->addStockToWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $purchase->warehouse_id,
                 'bin_id' => null, // Can be added later if needed
                 'quantity' => $detail->quantity,
@@ -442,11 +460,19 @@ class PurchaseService
                 'reference_type' => 'Purchase',
                 'reference_id' => $purchase->id,
                 'notes' => "Purchase stock added - Reference: {$purchase->reference_no}"
-            ]);
+            ];
+
+            // ✅ Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->addStockToWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock added for purchase item', [
                 'purchase_id' => $purchase->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }
@@ -454,12 +480,12 @@ class PurchaseService
 
     /**
      * Remove purchase stock from warehouse (Reverse)
+     * Handles both single and variation products
      */
     private function removePurchaseStockFromWarehouse(Purchase $purchase): void
     {
-      
         foreach ($purchase->purchaseDetails as $detail) {
-            $this->productService->removeStockFromWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $purchase->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -469,11 +495,19 @@ class PurchaseService
                 'reference_type' => 'PurchaseReversal',
                 'reference_id' => $purchase->id,
                 'notes' => "Purchase stock reversed - Reference: {$purchase->reference_no}"
-            ]);
+            ];
+
+            // ✅ Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->removeStockFromWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock removed for purchase reversal', [
                 'purchase_id' => $purchase->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }

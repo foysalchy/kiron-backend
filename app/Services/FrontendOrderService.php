@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\Status;
+use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\CourierMethod;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Party;
@@ -25,23 +27,20 @@ class FrontendOrderService
                 'customer:id,name,phone,address,email',
                 'warehouse:id,name',
                 'company:id,name',
-                'orderDetails.product:id,title,sku_codes,thumbnail',
-                'orderNotes' => function ($query) {
-                    $query->orderBy('created_at', 'desc');
-                },
+                'orderDetails.product:id,title,sku_code,thumbnail',
+                'orderNotes',
                 'coupon:id,code,discount_value'
             ])
             ->select('orders.*');
 
         // Apply filters
-        if (!empty($filters['status'])) {
+        if (isset($filters['status'])) {
             $query->where('orders.status', $filters['status']);
         }
 
-        if (!empty($filters['payment_status'])) {
+        if (isset($filters['payment_status'])) {
             $query->where('orders.payment_status', $filters['payment_status']);
         }
-
         if (!empty($filters['customer_name'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['customer_name'] . '%');
@@ -64,7 +63,7 @@ class FrontendOrderService
                     $q->where('title', 'like', '%' . $filters['product_name'] . '%');
                 }
                 if (!empty($filters['product_sku'])) {
-                    $q->where('sku_codes', 'like', '%' . $filters['product_sku'] . '%');
+                    $q->where('sku_code', 'like', '%' . $filters['product_sku'] . '%');
                 }
             });
         }
@@ -118,6 +117,7 @@ class FrontendOrderService
                 'orderNumber' => $order->order_no,
                 'customerName' => $order->customer?->name ?? 'Walk-in Customer',
                 'customerPhone' => $order->customer?->phone ?? '',
+                'customer_id' => $order->customer?->id ?? '',
                 'address' => $order->customer?->address ?? '',
                 'paymethod' => $this->getPaymentMethod($order),
                 'totalorder' => $customerTotalOrders,
@@ -128,7 +128,7 @@ class FrontendOrderService
                     return [
                         'id' => $detail->id,
                         'title' => $detail->product?->title ?? 'Unknown Product',
-                        'sku' => $detail->product?->sku_codes ?? '',
+                        'sku' => $detail->product?->sku_code ?? '',
                         'price' => (float) $detail->unit_price,
                         'quantity' => $detail->quantity,
                         'discount' => (float) $detail->discount,
@@ -176,6 +176,8 @@ class FrontendOrderService
             'company',
             'actionLogs',
             'orderDetails.product',
+            'orderDetails.variation.attributes.attributeGroup',
+            'orderDetails.variation.attributes.attributeValue',
             'orderPayments',
             'orderNotes' => function ($query) {
                 $query->orderBy('created_at', 'desc');
@@ -186,14 +188,38 @@ class FrontendOrderService
 
         return $this->transformOrderData($order);
     }
+    public function getEditOrder(int $id,): Order
+    {
+        $order = Order::with([
+            'warehouse',
+            'customer',
+            'coupon',
+            'orderDetails.product',
+            'orderDetails.variation.attributes.attributeGroup',
+            'orderDetails.variation.attributes.attributeValue',
+            'orderPayments'
+        ])->find($id);
+
+        if (!$order) {
+            throw ApiException::notFound('Order');
+        }
+
+        return $order;
+    }
+
+    public function getCustomerOrder($customerId)
+    {
+        $order = Order::where('customer_id', $customerId)->get();
+
+        return $order;
+    }
 
     /**
      * Get payment method from order
      */
     private function getPaymentMethod($order)
     {
-        // This would need to be implemented based on your payment tracking
-        // For now, returning a default value
+
         return $order->orderPayments()->latest()->first()?->payment_method ?? 'Cash';
     }
 
@@ -224,14 +250,53 @@ class FrontendOrderService
      */
     private function getCourierInfo($order)
     {
+        // If no courier_info stored, return null
+        if (empty($order->courier_info)) {
+            return null;
+        }
+
+        // Decode JSON from courier_info field
+        $info = is_array($order->courier_info)
+            ? $order->courier_info
+            : json_decode($order->courier_info, true);
+
+        if (!$info) {
+            return null;
+        }
+
+        $courierName = $info['courier_name'] ?? null;
+
+        // Map courier status to readable label
+        $statusMap = [
+            'in_review'     => 'In Review',
+            'pending'       => 'Pending',
+            'picked'        => 'Picked',
+            'in_transit'    => 'In Transit',
+            'delivered'     => 'Delivered',
+            'partial_delivery' => 'Partial Delivery',
+            'cancelled'     => 'Cancelled',
+            'hold'          => 'On Hold',
+            'unknown'       => 'Unknown',
+        ];
+
+        $rawStatus = $info['status'] ?? 'unknown';
+        $readableStatus = $statusMap[$rawStatus] ?? ucfirst(str_replace('_', ' ', $rawStatus));
 
         return [
-            'name' => 'Steadfast',
-            'status' => 'In-Transit',
-            'trackingNumber' => 'DX123456789BD',
+            'name'           => $courierName,
+            'status'         => $readableStatus,
+            'raw_status'     => $rawStatus,
+            'trackingCode'   => $info['tracking_code'] ?? null,
+            'consignmentId'  => $info['consignment_id'] ?? null,
+            'note'           => $info['note'] ?? null,
+            'appliedAt'      => $info['applied_at'] ?? null,
         ];
     }
+    private function getCourierMethod()
+    {
 
+        return CourierMethod::select('id', 'name')->get();
+    }
     /**
      * Transform single order data
      */
@@ -259,11 +324,12 @@ class FrontendOrderService
             'order_status' => $order->status,
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
-                return [
+                $item = [
                     'id' => $detail->id,
                     'title' => $detail->product?->title ?? 'Unknown Product',
                     'product_id' => $detail->product_id,
-                    'sku' => $detail->product?->sku_codes ?? '',
+                    'variation_id' => $detail->variation_id,
+                    'sku' => $detail->product?->sku_code ?? '',
                     'price' => (float) $detail->unit_price,
                     'quantity' => $detail->quantity,
                     'discount' => (float) $detail->discount,
@@ -271,6 +337,32 @@ class FrontendOrderService
                     'total' => (float) $detail->total,
                     'image' => $detail->product?->thumbnail ?? null,
                 ];
+
+                // ✅ Add variation data if exists
+                if ($detail->variation) {
+                    $item['variation'] = [
+                        'id' => $detail->variation->id,
+                        'sku' => $detail->variation->sku,
+                        'attributes' => $detail->variation->attributes->map(function ($attr) {
+                            return [
+                                'id' => $attr->id,
+                                'attribute_group_id' => $attr->attribute_group_id,
+                                'attribute_value_id' => $attr->attribute_value_id,
+                                'group_name' => $attr->attributeGroup?->name ?? '',
+                                'value_name' => $attr->attributeValue?->name ?? '',
+                            ];
+                        }),
+                    ];
+
+                    // Update SKU to use variation SKU if available
+                    if ($detail->variation->sku) {
+                        $item['sku'] = $detail->variation->sku;
+                    }
+                } else {
+                    $item['variation'] = null;
+                }
+
+                return $item;
             }),
             'subtotal' => (float) $order->subtotal,
             'discount' => (float) ($order->discount_on_all + $order->coupon_discount),
@@ -304,7 +396,6 @@ class FrontendOrderService
                     'change_amount' => $payment->change_amount,
                     'reference_no' => $payment->reference_no,
                     'note' => $payment->note,
-
                 ];
             }),
             'orderDate' => $order->order_date,
@@ -314,6 +405,7 @@ class FrontendOrderService
             'reference_no' => $order->reference_no,
             'is_walk_in' => (bool) $order->is_walk_in,
             'courierInfo' => $this->getCourierInfo($order),
+            'courierMethod' => $this->getCourierMethod(),
         ];
     }
     public function updateStatus(int $id, $paymentStatus = null, $orderStatus = null): Order
