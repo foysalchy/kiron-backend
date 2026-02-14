@@ -18,8 +18,16 @@ class ProductService
     public function getAllProducts(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Product::with(['brand', 'galleries', 'variations.attributes.attributeValue.attributeGroup',]);
-
+            $query = Product::with([
+                'brand',
+                'galleries',
+                'variations' => function ($query) {
+                    $query->orderBy('regular_price', 'asc');
+                },
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+                'variations.stocks.warehouse',
+            ]);
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
@@ -420,279 +428,138 @@ class ProductService
     /**
      * Update variation product
      */
-    private function updateVariationProduct(Product $product, array &$data): void
+    private function updateVariationProduct(Product $product, array $data): void
     {
-        $variations = $data['variations'] ?? [];
-        unset($data['variations']);
-        if (empty($variations)) {
-            return;
-        }
-
-        // Get existing variations
-        $existingVariations = ProductVariation::where('product_id', $product->id)
-            ->with(['attributes', 'stocks'])
+        // Get existing variations with their attributes
+        $existingVariations = $product->variations()
+            ->with('attributes')
             ->get()
             ->keyBy('id');
 
+        $newVariations = $data['variations'] ?? [];
         $processedVariationIds = [];
-        $totalStock = 0;
 
-        foreach ($variations as $variationData) {
-            $variationId = $variationData['id'] ?? null;
+        foreach ($newVariations as $variationData) {
             $attributes = $variationData['attributes'] ?? [];
-            $warehouseInfo = $variationData['warehouse_info'] ?? [];
-            $variationStock = collect($warehouseInfo)->sum('quantity');
-            $totalStock += $variationStock;
 
+            // Generate combination hash for this variation
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
 
-            if ($variationId && isset($existingVariations[$variationId])) {
-                // ✅ Update existing variation
-                $variation = $existingVariations[$variationId];
+            // Check if this combination already exists (by hash, not by ID)
+            $existingVariation = ProductVariation::where('product_id', $product->id)
+                ->where('combination_hash', $combinationHash)
+                ->first();
 
-                $oldStock = $variation->available_stock;
-                $stockDifference = $variationStock - $oldStock;
-
-                $variation->update([
-                    'sku' => $variationData['sku'] ?? $variation->sku,
+            if ($existingVariation) {
+                // UPDATE existing variation
+                $existingVariation->update([
+                    'sku' => $variationData['sku'] ?? null,
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
-                    'stock_quantity' => $variationStock,
-                    'available_stock' => $variationStock,
-                    'stock_status' => $variationStock > 0 ? 'in_stock' : 'out_of_stock',
-                    'combination_hash' => $combinationHash,
+                    'stock_quantity' => $variationData['stock_quantity'] ?? 0,
+                    'available_stock' => $variationData['stock_quantity'] ?? 0,
+                    'stock_status' => $this->determineStockStatus($variationData['stock_quantity'] ?? 0),
                 ]);
 
-                // Update attributes (delete old, create new)
-                ProductVariationAttribute::where('product_variation_id', $variation->id)->delete();
-                foreach ($attributes as $attribute) {
-                    ProductVariationAttribute::create([
-                        'product_variation_id' => $variation->id,
-                        'attribute_group_id' => $attribute['attribute_group_id'],
-                        'attribute_value_id' => $attribute['attribute_value_id'],
-                    ]);
+                // Update warehouse stocks if provided
+                if (isset($variationData['warehouse_info'])) {
+                    $this->updateVariationWarehouseStocks(
+                        $product,
+                        $existingVariation,
+                        $variationData['warehouse_info']
+                    );
                 }
 
-                // Update warehouse stocks
-                $this->updateVariationWarehouseStocks($variation, $warehouseInfo, $stockDifference);
+                $processedVariationIds[] = $existingVariation->id;
 
-                $processedVariationIds[] = $variationId;
+                Log::info('Variation updated', [
+                    'variation_id' => $existingVariation->id,
+                    'combination_hash' => $combinationHash
+                ]);
             } else {
-                // ✅ Create new variation
-                $variation = ProductVariation::create([
+                // CREATE new variation (this combination doesn't exist yet)
+                $newVariation = ProductVariation::create([
                     'product_id' => $product->id,
                     'sku' => $variationData['sku'] ?? null,
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
-                    'stock_quantity' => $variationStock,
-                    'available_stock' => $variationStock,
-                    'stock_status' => $variationStock > 0 ? 'in_stock' : 'out_of_stock',
+                    'stock_quantity' => $variationData['stock_quantity'] ?? 0,
+                    'available_stock' => $variationData['stock_quantity'] ?? 0,
+                    'stock_status' => $this->determineStockStatus($variationData['stock_quantity'] ?? 0),
                     'combination_hash' => $combinationHash,
                 ]);
 
-                // Create attributes
+                // Create variation attributes
                 foreach ($attributes as $attribute) {
                     ProductVariationAttribute::create([
-                        'product_variation_id' => $variation->id,
+                        'product_variation_id' => $newVariation->id,
                         'attribute_group_id' => $attribute['attribute_group_id'],
                         'attribute_value_id' => $attribute['attribute_value_id'],
                     ]);
                 }
 
-                // Create warehouse stocks
-                foreach ($warehouseInfo as $whStock) {
-                    if ($whStock['quantity'] > 0) {
-                        ProductVariationStock::create([
-                            'product_variation_id' => $variation->id,
-                            'warehouse_id' => $whStock['warehouse_id'],
-                            'bin_id' => $whStock['bin_id'] ?? null,
-                            'quantity' => $whStock['quantity'],
-                        ]);
-
-                        // Create stock ledger
-                        $variationDisplay = $this->getVariationDisplayName($variation->id);
-
-                        ProductVariationStockLedger::create([
-                            'product_id' => $product->id,
-                            'variation_id' => $variation->id,
-                            'warehouse_id' => $whStock['warehouse_id'],
-                            'bin_id' => $whStock['bin_id'] ?? null,
-                            'batch_number' => $variation->sku ?? null,
-                            'serial_numbers' => null,
-                            'transaction_type' => 'initial_stock',
-                            'reference_type' => 'ProductVariation',
-                            'reference_id' => $variation->id,
-                            'quantity_before' => 0,
-                            'quantity_change' => $whStock['quantity'],
-                            'quantity_after' => $whStock['quantity'],
-                            'notes' => "Initial stock for new variation: {$variationDisplay}",
-                            'created_by' => Auth::id(),
-                        ]);
-                    }
+                // Create warehouse stocks if provided
+                if (isset($variationData['warehouse_info'])) {
+                    $this->createVariationWarehouseStocks(
+                        $product,
+                        $newVariation,
+                        $variationData['warehouse_info']
+                    );
                 }
 
-                $processedVariationIds[] = $variation->id;
+                $processedVariationIds[] = $newVariation->id;
+
+                Log::info('New variation created', [
+                    'variation_id' => $newVariation->id,
+                    'combination_hash' => $combinationHash
+                ]);
             }
         }
 
-        // ✅ Delete variations that were not in the update request
+        // Delete variations that are no longer in the request
         $variationsToDelete = $existingVariations->filter(function ($variation) use ($processedVariationIds) {
             return !in_array($variation->id, $processedVariationIds);
         });
 
         foreach ($variationsToDelete as $variation) {
-            // Restore stock before deleting
-            if ($variation->available_stock > 0) {
-                $variationDisplay = $this->getVariationDisplayName($variation->id);
+            // Create reversal ledger entries for deleted variations
+            $stocks = ProductVariationStock::where('product_variation_id', $variation->id)->get();
 
-                foreach ($variation->stocks as $stock) {
+            foreach ($stocks as $stock) {
+                if ($stock->quantity > 0) {
                     ProductVariationStockLedger::create([
                         'product_id' => $product->id,
                         'variation_id' => $variation->id,
                         'warehouse_id' => $stock->warehouse_id,
                         'bin_id' => $stock->bin_id,
-                        'batch_number' => $variation->sku ?? null,
+                        'batch_number' => null,
                         'serial_numbers' => null,
                         'transaction_type' => 'adjustment',
-                        'reference_type' => 'VariationDeletion',
+                        'reference_type' => 'VariationDeleted',
                         'reference_id' => $variation->id,
                         'quantity_before' => $stock->quantity,
                         'quantity_change' => -$stock->quantity,
                         'quantity_after' => 0,
-                        'notes' => "Variation deleted: {$variationDisplay}",
+                        'notes' => "Variation deleted: " . $this->getVariationDisplayName($variation->id),
                         'created_by' => Auth::id(),
                     ]);
                 }
             }
 
-            $variation->delete(); // This will cascade delete attributes and stocks
+            // Delete related records
+            $variation->attributes()->delete();
+            $variation->stocks()->delete();
+            $variation->delete();
+
+            Log::info('Variation deleted', ['variation_id' => $variation->id]);
         }
 
-        // Update product total stock
-        $data['stock_quantity'] = $totalStock;
-        $data['available_stock'] = $totalStock;
-        $data['stock_status'] = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
+        // Recalculate total stock from all variations
+        $this->recalculateTotalStockFromVariations($product);
     }
 
-    /**
-     * Update warehouse stocks for a variation
-     */
-    private function updateVariationWarehouseStocks(
-        ProductVariation $variation,
-        array $warehouseInfo,
-        int $stockDifference
-    ): void {
-        // Get existing stocks
-        $existingStocks = ProductVariationStock::where('product_variation_id', $variation->id)
-            ->get()
-            ->keyBy(function ($stock) {
-                return $stock->warehouse_id . '-' . ($stock->bin_id ?? 'null');
-            });
-
-        $processedKeys = [];
-
-        foreach ($warehouseInfo as $whStock) {
-            $key = $whStock['warehouse_id'] . '-' . ($whStock['bin_id'] ?? 'null');
-            $newQuantity = $whStock['quantity'];
-
-            if (isset($existingStocks[$key])) {
-                // Update existing stock
-                $existingStock = $existingStocks[$key];
-                $oldQuantity = $existingStock->quantity;
-                $quantityChange = $newQuantity - $oldQuantity;
-
-                if ($quantityChange != 0) {
-                    $existingStock->quantity = $newQuantity;
-                    $existingStock->save();
-
-                    // Create ledger entry for adjustment
-                    $variationDisplay = $this->getVariationDisplayName($variation->id);
-
-                    ProductVariationStockLedger::create([
-                        'product_id' => $variation->product_id,
-                        'variation_id' => $variation->id,
-                        'warehouse_id' => $whStock['warehouse_id'],
-                        'bin_id' => $whStock['bin_id'] ?? null,
-                        'batch_number' => $variation->sku ?? null,
-                        'serial_numbers' => null,
-                        'transaction_type' => 'adjustment',
-                        'reference_type' => 'ProductUpdate',
-                        'reference_id' => $variation->id,
-                        'quantity_before' => $oldQuantity,
-                        'quantity_change' => $quantityChange,
-                        'quantity_after' => $newQuantity,
-                        'notes' => "Stock adjusted for variation: {$variationDisplay}",
-                        'created_by' => Auth::id(),
-                    ]);
-                }
-            } else {
-                // Create new stock entry
-                if ($newQuantity > 0) {
-                    ProductVariationStock::create([
-                        'product_variation_id' => $variation->id,
-                        'warehouse_id' => $whStock['warehouse_id'],
-                        'bin_id' => $whStock['bin_id'] ?? null,
-                        'quantity' => $newQuantity,
-                    ]);
-
-                    // Create ledger entry
-                    $variationDisplay = $this->getVariationDisplayName($variation->id);
-
-                    ProductVariationStockLedger::create([
-                        'product_id' => $variation->product_id,
-                        'variation_id' => $variation->id,
-                        'warehouse_id' => $whStock['warehouse_id'],
-                        'bin_id' => $whStock['bin_id'] ?? null,
-                        'batch_number' => $variation->sku ?? null,
-                        'serial_numbers' => null,
-                        'transaction_type' => 'adjustment',
-                        'reference_type' => 'ProductUpdate',
-                        'reference_id' => $variation->id,
-                        'quantity_before' => 0,
-                        'quantity_change' => $newQuantity,
-                        'quantity_after' => $newQuantity,
-                        'notes' => "New warehouse stock for variation: {$variationDisplay}",
-                        'created_by' => Auth::id(),
-                    ]);
-                }
-            }
-
-            $processedKeys[] = $key;
-        }
-
-        // Delete warehouse stocks that were removed
-        $stocksToDelete = $existingStocks->filter(function ($stock) use ($processedKeys) {
-            $key = $stock->warehouse_id . '-' . ($stock->bin_id ?? 'null');
-            return !in_array($key, $processedKeys);
-        });
-
-        foreach ($stocksToDelete as $stock) {
-            if ($stock->quantity > 0) {
-                $variationDisplay = $this->getVariationDisplayName($variation->id);
-
-                ProductVariationStockLedger::create([
-                    'product_id' => $variation->product_id,
-                    'variation_id' => $variation->id,
-                    'warehouse_id' => $stock->warehouse_id,
-                    'bin_id' => $stock->bin_id,
-                    'batch_number' => $variation->sku ?? null,
-                    'serial_numbers' => null,
-                    'transaction_type' => 'adjustment',
-                    'reference_type' => 'WarehouseRemoval',
-                    'reference_id' => $variation->id,
-                    'quantity_before' => $stock->quantity,
-                    'quantity_change' => -$stock->quantity,
-                    'quantity_after' => 0,
-                    'notes' => "Warehouse stock removed for variation: {$variationDisplay}",
-                    'created_by' => Auth::id(),
-                ]);
-            }
-
-            $stock->delete();
-        }
-    }
 
     /**
      * Generate unique hash for attribute combination
@@ -1918,5 +1785,152 @@ class ProductService
         $product->stock_quantity = $totalStock;
         $product->stock_status = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
         $product->save();
+    }
+
+    /**
+     * Create warehouse stocks for new variations
+     */
+    private function createVariationWarehouseStocks(Product $product, ProductVariation $variation, array $warehouseInfo): void
+    {
+        foreach ($warehouseInfo as $warehouse) {
+            $warehouseId = $warehouse['warehouse_id'];
+            $binId = $warehouse['bin_id'] ?? null;
+            $quantity = $warehouse['quantity'];
+
+            // Create stock record
+            ProductVariationStock::create([
+                'product_variation_id' => $variation->id,
+                'warehouse_id' => $warehouseId,
+                'bin_id' => $binId,
+                'quantity' => $quantity,
+            ]);
+
+            // Create ledger entry
+            ProductVariationStockLedger::create([
+                'product_id' => $product->id,
+                'variation_id' => $variation->id,
+                'warehouse_id' => $warehouseId,
+                'bin_id' => $binId,
+                'batch_number' => null,
+                'serial_numbers' => null,
+                'transaction_type' => 'initial_stock',
+                'reference_type' => 'ProductCreation',
+                'reference_id' => $product->id,
+                'quantity_before' => 0,
+                'quantity_change' => $quantity,
+                'quantity_after' => $quantity,
+                'notes' => "Initial stock for variation: " . $this->getVariationDisplayName($variation->id),
+                'created_by' => Auth::id(),
+            ]);
+        }
+    }
+    /**
+     * Update variation warehouse stocks with proper ledger tracking
+     */
+    private function updateVariationWarehouseStocks(Product $product, ProductVariation $variation, array $warehouseInfo): void
+    {
+        foreach ($warehouseInfo as $warehouse) {
+            $warehouseId = $warehouse['warehouse_id'];
+            $binId = $warehouse['bin_id'] ?? null;
+            $newQuantity = $warehouse['quantity'];
+
+            // Get existing stock record
+            $existingStock = ProductVariationStock::where('product_variation_id', $variation->id)
+                ->where('warehouse_id', $warehouseId)
+                ->where('bin_id', $binId)
+                ->first();
+
+            if ($existingStock) {
+                // Calculate the difference
+                $oldQuantity = $existingStock->quantity;
+                $difference = $newQuantity - $oldQuantity;
+
+                if ($difference != 0) {
+                    // Update the stock record
+                    $existingStock->update(['quantity' => $newQuantity]);
+
+                    // Create ledger entry
+                    ProductVariationStockLedger::create([
+                        'product_id' => $product->id,
+                        'variation_id' => $variation->id,
+                        'warehouse_id' => $warehouseId,
+                        'bin_id' => $binId,
+                        'batch_number' => null,
+                        'serial_numbers' => null,
+                        'transaction_type' => 'adjustment',
+                        'reference_type' => 'ProductUpdate',
+                        'reference_id' => $product->id,
+                        'quantity_before' => $oldQuantity,
+                        'quantity_change' => $difference,
+                        'quantity_after' => $newQuantity,
+                        'notes' => "Stock adjusted during product update - Variation: " . $this->getVariationDisplayName($variation->id),
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    Log::info('Variation stock updated', [
+                        'variation_id' => $variation->id,
+                        'warehouse_id' => $warehouseId,
+                        'old_quantity' => $oldQuantity,
+                        'new_quantity' => $newQuantity,
+                        'difference' => $difference
+                    ]);
+                }
+            } else {
+                // Create new stock record
+                ProductVariationStock::create([
+                    'product_variation_id' => $variation->id,
+                    'warehouse_id' => $warehouseId,
+                    'bin_id' => $binId,
+                    'quantity' => $newQuantity,
+                ]);
+
+                // Create ledger entry
+                ProductVariationStockLedger::create([
+                    'product_id' => $product->id,
+                    'variation_id' => $variation->id,
+                    'warehouse_id' => $warehouseId,
+                    'bin_id' => $binId,
+                    'batch_number' => null,
+                    'serial_numbers' => null,
+                    'transaction_type' => 'adjustment',
+                    'reference_type' => 'ProductUpdate',
+                    'reference_id' => $product->id,
+                    'quantity_before' => 0,
+                    'quantity_change' => $newQuantity,
+                    'quantity_after' => $newQuantity,
+                    'notes' => "Initial stock added during product update - Variation: " . $this->getVariationDisplayName($variation->id),
+                    'created_by' => Auth::id(),
+                ]);
+
+                Log::info('New variation stock created', [
+                    'variation_id' => $variation->id,
+                    'warehouse_id' => $warehouseId,
+                    'quantity' => $newQuantity
+                ]);
+            }
+
+            // Update variation's total stock quantities
+            $totalStock = ProductVariationStock::where('product_variation_id', $variation->id)
+                ->sum('quantity');
+
+            $variation->update([
+                'stock_quantity' => $totalStock,
+                'available_stock' => $totalStock,
+                'stock_status' => $this->determineStockStatus($totalStock),
+            ]);
+        }
+    }
+    /**
+     * Determine stock status based on quantity
+     */
+    private function determineStockStatus(int $quantity): string
+    {
+        if ($quantity <= 0) {
+            return 'out_of_stock';
+        } elseif ($quantity <= 10) {
+            return 'low_stock';
+        } else {
+            return 'in_stock';
+        }
     }
 }

@@ -422,6 +422,7 @@ Route::prefix('v1')->group(function () {
             Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
             Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);
             Route::put('/{id}/update', [OrderController::class, 'update']);
+            Route::post('/{id}/add-payment', [OrderController::class, 'addPayment']);
             Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
             Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
         });

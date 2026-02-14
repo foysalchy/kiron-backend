@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\AddPaymentRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Services\FrontendOrderService;
 use App\Services\OrderService;
@@ -151,5 +152,17 @@ class OrderController extends Controller
         $data = $this->orderService->updateOrder($id, $request->validated(), $request->type);
 
         return ResponseHelper::success($data, 'Status Changed Successfully');
+    }
+    public function addPayment(AddPaymentRequest $request, $id)
+    {
+
+
+        $data = $this->orderService->addPayment($id, $request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment added successfully',
+
+        ]);
     }
 }
