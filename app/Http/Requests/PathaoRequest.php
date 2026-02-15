@@ -40,7 +40,7 @@ class PathaoRequest extends BaseCompanyRequest
             'item_weight'               => ['required', 'numeric', 'min:0.5', 'max:10'],
             'product_title'             => ['nullable', 'string'], // item_description
             'special_instruction'       => ['nullable', 'string'],
-            'amount_to_collect'         => ['required', 'integer', 'min:0'],
+            'amount_to_collect'         => ['required', 'min:0'],
         ]);
     }
     /**

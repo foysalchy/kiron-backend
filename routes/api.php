@@ -419,6 +419,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('fetch-orders')->group(function () {
+            Route::get('/select/order-list-option', [OrderController::class, 'getSelectListOrder']);
             Route::get('/', [OrderController::class, 'index']);
             Route::get('/{id}', [OrderController::class, 'show']);
             Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
@@ -427,6 +428,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/add-payment', [OrderController::class, 'addPayment']);
             Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
             Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
+            Route::get('/products/{id}', [OrderController::class, 'orderProducts']);
         });
 
         Route::prefix('orders-return')->group(function () {
@@ -437,6 +439,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
             Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
             Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
+            Route::post('/{id}/modify-refund', [OrderReturnController::class, 'modifyRefund']);
 
             Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
             Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
@@ -987,5 +990,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/callback', [BkashController::class, 'callback']);
         });
         
+
     });
 });
