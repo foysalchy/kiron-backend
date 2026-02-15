@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BinController;
+use App\Http\Controllers\Api\BkashController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\BusinessPaymentMethodController;
@@ -981,5 +982,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/zones/{cityId}', [PathaoController::class, 'getZones']);
             Route::get('/areas/{zoneId}', [PathaoController::class, 'getAreas']);
         });
+        //bkash route
+        Route::prefix('bkash')->group(function () {
+            Route::get('/token', [BkashController::class, 'getToken']);
+            Route::post('/refresh', [BkashController::class, 'refreshToken']);
+            Route::post('/create', [BkashController::class, 'createPayment']);
+            Route::get('/callback', [BkashController::class, 'callback']);
+        });
+        
+
     });
 });
