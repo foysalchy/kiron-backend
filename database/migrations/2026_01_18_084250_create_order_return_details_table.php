@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_return_id')->constrained('order_returns')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('restrict');
+            $table->foreignId('variation_id')->nullable()->constrained('product_variations')->onDelete('set null');
 
             $table->integer('quantity');
             $table->decimal('unit_price', 15, 2);
             $table->decimal('discount', 15, 2)->nullable()->default(0);
             $table->decimal('tax', 15, 2)->nullable()->default(0);
             $table->decimal('total', 15, 2);
-                 $table->timestamps();
+            $table->timestamps();
         });
     }
 

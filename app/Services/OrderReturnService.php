@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order, Product};
+use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order, Product, ProductStockLedger, ProductVariationStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -30,6 +30,8 @@ class OrderReturnService
                 'customer',
                 'order',
                 'orderReturnDetails.product',
+                'orderReturnDetails.variation.attributes.attributeGroup',
+                'orderReturnDetails.variation.attributes.attributeValue',
                 'orderReturnPayments'
             ]);
 
@@ -84,6 +86,8 @@ class OrderReturnService
             'customer',
             'order',
             'orderReturnDetails.product',
+            'orderReturnDetails.variation.attributes.attributeGroup',
+            'orderReturnDetails.variation.attributes.attributeValue',
             'orderReturnPayments'
         ])->find($id);
 
@@ -130,13 +134,14 @@ class OrderReturnService
             // Create order return (return_no auto-generated)
             $orderReturn = OrderReturn::create($data);
 
-            // Create return details
+            // Create return details with variation support
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
 
                 OrderReturnDetail::create([
                     'order_return_id' => $orderReturn->id,
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount' => $item['discount'] ?? 0,
@@ -145,7 +150,7 @@ class OrderReturnService
                 ]);
             }
 
-            // ✅ Add returned stock to warehouse (if status is Cleared)
+            // Add returned stock to warehouse (if status is Cleared)
             if ($orderReturn->status === Status::Cleared->value) {
                 $this->addReturnedStockToWarehouse($orderReturn);
             }
@@ -176,6 +181,8 @@ class OrderReturnService
                 'customer',
                 'order',
                 'orderReturnDetails.product',
+                'orderReturnDetails.variation.attributes.attributeGroup',
+                'orderReturnDetails.variation.attributes.attributeValue',
                 'orderReturnPayments'
             ]);
         } catch (\Exception $e) {
@@ -218,6 +225,7 @@ class OrderReturnService
                     OrderReturnDetail::create([
                         'order_return_id' => $orderReturn->id,
                         'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'] ?? null,
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'discount' => $item['discount'] ?? 0,
@@ -239,6 +247,8 @@ class OrderReturnService
                 'customer',
                 'order',
                 'orderReturnDetails.product',
+                'orderReturnDetails.variation.attributes.attributeGroup',
+                'orderReturnDetails.variation.attributes.attributeValue',
             ]);
         } catch (ApiException $e) {
             DB::rollBack();
@@ -285,7 +295,7 @@ class OrderReturnService
                 'old_status' => $oldStatus,
                 'new_status' => $getStatus->label()
             ]);
-            LogHelper::custom('status_changed', 'order_return', $id, $orderReturn->company_id, 'purchase return no: ' . $orderReturn->return_no . ' new status ' . $getStatus->label());
+            LogHelper::custom('status_changed', 'order_return', $id, $orderReturn->company_id, 'order return no: ' . $orderReturn->return_no . ' new status ' . $getStatus->label());
 
             return $orderReturn->fresh();
         } catch (ApiException $e) {
@@ -336,6 +346,8 @@ class OrderReturnService
                 'customer',
                 'order',
                 'orderReturnDetails.product',
+                'orderReturnDetails.variation.attributes.attributeGroup',
+                'orderReturnDetails.variation.attributes.attributeValue',
                 'orderReturnPayments'
             ]);
         } catch (ApiException $e) {
@@ -402,7 +414,7 @@ class OrderReturnService
             DB::commit();
 
             Log::info('Order return restored successfully', ['order_return_id' => $id]);
-            LogHelper::custom('restored', 'order_return', $id, $orderReturn->company_id, $orderReturn->retrun_no);
+            LogHelper::custom('restored', 'order_return', $id, $orderReturn->company_id, $orderReturn->return_no);
 
             return $orderReturn;
         } catch (ApiException $e) {
@@ -434,14 +446,21 @@ class OrderReturnService
                 throw ApiException::badRequest('Only pending returns can be deleted');
             }
 
-
             // Delete details
-            OrderReturnDetail::where('order_return_id', $id)->delete();
+            OrderReturnDetail::where('order_return_id', $id)->forceDelete();
 
             // Delete payments
-            OrderReturnPayment::where('order_return_id', $id)->delete();
+            OrderReturnPayment::where('order_return_id', $id)->forceDelete();
 
+            // Delete related stock ledgers for single products
+            ProductStockLedger::where('reference_type', 'OrderReturn')
+                ->where('reference_id', $id)
+                ->forceDelete();
 
+            // Delete related stock ledgers for variation products
+            ProductVariationStockLedger::where('reference_type', 'OrderReturn')
+                ->where('reference_id', $id)
+                ->forceDelete();
 
             $companyId = $orderReturn->company_id;
             $orderReturn->forceDelete();
@@ -463,15 +482,14 @@ class OrderReturnService
         }
     }
 
-
-
     /**
      * Add returned stock to warehouse
+     * Handles both single and variation products
      */
     private function addReturnedStockToWarehouse(OrderReturn $orderReturn): void
     {
         foreach ($orderReturn->orderReturnDetails as $detail) {
-            $this->productService->addStockToWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $orderReturn->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -481,11 +499,19 @@ class OrderReturnService
                 'reference_type' => 'OrderReturn',
                 'reference_id' => $orderReturn->id,
                 'notes' => "Stock returned from order: {$orderReturn->order->order_no} - Return: {$orderReturn->return_no}"
-            ]);
+            ];
+
+            // Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->addStockToWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock added for returned item', [
                 'order_return_id' => $orderReturn->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }
@@ -493,11 +519,12 @@ class OrderReturnService
 
     /**
      * Remove returned stock from warehouse (Status change from Cleared to other)
+     * Handles both single and variation products
      */
     private function removeReturnedStockFromWarehouse(OrderReturn $orderReturn): void
     {
         foreach ($orderReturn->orderReturnDetails as $detail) {
-            $this->productService->removeStockFromWarehouse($detail->product_id, [
+            $stockData = [
                 'warehouse_id' => $orderReturn->warehouse_id,
                 'bin_id' => null,
                 'quantity' => $detail->quantity,
@@ -507,16 +534,23 @@ class OrderReturnService
                 'reference_type' => 'OrderReturnReversal',
                 'reference_id' => $orderReturn->id,
                 'notes' => "Stock removed - Return status changed from Cleared: {$orderReturn->return_no}"
-            ]);
+            ];
+
+            // Add variation_id if exists
+            if ($detail->variation_id) {
+                $stockData['variation_id'] = $detail->variation_id;
+            }
+
+            $this->productService->removeStockFromWarehouse($detail->product_id, $stockData);
 
             Log::info('Stock removed for return status change', [
                 'order_return_id' => $orderReturn->id,
                 'product_id' => $detail->product_id,
+                'variation_id' => $detail->variation_id,
                 'quantity' => $detail->quantity
             ]);
         }
     }
-
 
     /**
      * Calculate item total

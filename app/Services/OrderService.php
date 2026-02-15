@@ -88,6 +88,16 @@ class OrderService
             throw ApiException::serverError('Failed to fetch orders');
         }
     }
+    public function getSelectListOrder(): Collection
+    {
+        try {
+            $order = Order::orderBy('updated_at', 'desc')->get();
+            return $order;
+        } catch (\Exception $e) {
+            Log::error('Error fetching orders: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch orders');
+        }
+    }
 
     /**
      * Get order by ID
@@ -111,6 +121,23 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Get order Product
+     */
+    public function orderProducts(int $orderId)
+    {
+        $order = Order::with([
+            'orderDetails.product',
+            'orderDetails.variation.attributes.attributeGroup',
+            'orderDetails.variation.attributes.attributeValue',
+        ])->find($orderId);
+
+        if (!$order) {
+            throw ApiException::notFound('Order');
+        }
+
+        return $order;
+    }
     /**
      * Get hold order list
      */
