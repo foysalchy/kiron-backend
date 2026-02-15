@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Courier;
 use App\Models\Order;
-use Illuminate\Support\Facades\{Http,Log,DB};
+use Illuminate\Support\Facades\{Http, Log, DB};
 
 class PathaoService
 {
@@ -90,7 +91,7 @@ class PathaoService
                 ->acceptJson()
                 ->post("{$this->baseUrl}/aladdin/api/v1/orders", $payload);
 
-                // dd($response->body());
+            // dd($response->body());
             if ($response->successful()) {
                 $resData = $response->json('data');
 
@@ -180,7 +181,6 @@ class PathaoService
             }
 
             throw new \Exception("Pathao API Error: " . $response->status());
-
         } catch (\Exception $e) {
             Log::error("Pathao Sync Error: " . $e->getMessage());
             throw $e;

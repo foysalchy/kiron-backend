@@ -418,6 +418,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('fetch-orders')->group(function () {
+            Route::get('/select/order-list-option', [OrderController::class, 'getSelectListOrder']);
             Route::get('/', [OrderController::class, 'index']);
             Route::get('/{id}', [OrderController::class, 'show']);
             Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
@@ -426,6 +427,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/{id}/add-payment', [OrderController::class, 'addPayment']);
             Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
             Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
+            Route::get('/products/{id}', [OrderController::class, 'orderProducts']);
         });
 
         Route::prefix('orders-return')->group(function () {
@@ -975,6 +977,5 @@ Route::prefix('v1')->group(function () {
             Route::post('/bulk-update-status', [PathaoController::class, 'updateBulkStatus']);
             Route::get('/token', [PathaoController::class, 'testPathaoToken']);
         });
-
     });
 });
