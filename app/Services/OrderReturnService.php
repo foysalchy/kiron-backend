@@ -85,6 +85,7 @@ class OrderReturnService
             'warehouse',
             'customer',
             'order',
+            'actionLogs',
             'orderReturnDetails.product',
             'orderReturnDetails.variation.attributes.attributeGroup',
             'orderReturnDetails.variation.attributes.attributeValue',
@@ -125,11 +126,8 @@ class OrderReturnService
             $data = array_merge($data, $totals);
 
             // Calculate refund amount
-            $totalRefund = 0;
-            if (!empty($payments)) {
-                $totalRefund = array_sum(array_column($payments, 'amount'));
-            }
-            $data['refund_amount'] = $totalRefund;
+            $data['refund_amount'] = $totals['grand_total'];
+
 
             // Create order return (return_no auto-generated)
             $orderReturn = OrderReturn::create($data);
@@ -218,6 +216,7 @@ class OrderReturnService
 
                 // Delete old details and create new ones
                 $orderReturn->orderReturnDetails()->delete();
+                $data['refund_amount'] = $totals['grand_total'];
 
                 foreach ($items as $item) {
                     $itemTotal = $this->calculateItemTotal($item);
@@ -332,9 +331,7 @@ class OrderReturnService
                 'note' => $paymentData['note'] ?? null,
             ]);
 
-            // Update refund amount
-            $totalRefund = $orderReturn->orderReturnPayments()->sum('amount') + $paymentData['amount'];
-            $orderReturn->update(['refund_amount' => $totalRefund]);
+
 
             DB::commit();
 
@@ -350,6 +347,45 @@ class OrderReturnService
                 'orderReturnDetails.variation.attributes.attributeValue',
                 'orderReturnPayments'
             ]);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Add payment failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to add payment');
+        }
+    }
+    /**
+     * Add payment to return
+     */
+    public function modifyRefund(int $id, array $amount): OrderReturn
+    {
+        DB::beginTransaction();
+
+        try {
+            $orderReturn = $this->getOrderReturnById($id);
+
+            // Cannot add payment to cancelled return
+            if ($orderReturn->isCancelled()) {
+                throw ApiException::badRequest('Cannot modify refund amount to cancelled return');
+            }
+            if ($orderReturn->isCleared()) {
+                throw ApiException::badRequest('Cannot modify refund amount to cleared return');
+            }
+
+
+            $oldAmount = $orderReturn->refund_amount;
+            $orderReturn->refund_amount = $amount['amount'];
+            $orderReturn->update();
+            LogHelper::custom('modify_refund_amount', 'order_return', $id, $orderReturn->company_id, $orderReturn->return_no . ' modify refund amount ' . $oldAmount . ' to ' .  $amount['amount']);
+
+            DB::commit();
+
+            Log::info('Payment added to return', ['order_return_id' => $id]);
+
+            return $orderReturn;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;

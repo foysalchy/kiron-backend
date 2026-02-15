@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class OrderReturn extends Model
 {
-    use HasFactory, SoftDeletes,CompanyScoped;
+    use HasFactory, SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
@@ -43,7 +43,7 @@ class OrderReturn extends Model
         'round_off' => 'decimal:2',
         'grand_total' => 'decimal:2',
         'refund_amount' => 'decimal:2',
-    
+
     ];
 
     /**
@@ -115,7 +115,12 @@ class OrderReturn extends Model
     {
         return $this->hasMany(OrderReturnPayment::class);
     }
-
+    public function actionLogs(): HasMany
+    {
+        return $this->hasMany(ActionLog::class, 'action_id')
+            ->where('module', 'order_return')
+            ->orderBy('created_at', 'desc');
+    }
     /**
      * Status helpers
      */

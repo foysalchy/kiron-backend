@@ -44,7 +44,7 @@ class UpdateOrderReturnRequest extends UpdateBaseCompanyRequest
                 'round_off' => ['nullable', 'numeric'],
 
                 'note' => ['nullable', 'string'],
-                'status' => ['sometimes', 'integer', 'in:0,1,2,3,4'],
+                'status' => ['sometimes', 'integer'],
             ]
         );
     }

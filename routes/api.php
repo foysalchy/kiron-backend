@@ -438,6 +438,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [OrderReturnController::class, 'destroy']);
             Route::patch('/{id}/change-status', [OrderReturnController::class, 'changeStatus']);
             Route::post('/{id}/add-payment', [OrderReturnController::class, 'addPayment']);
+            Route::post('/{id}/modify-refund', [OrderReturnController::class, 'modifyRefund']);
 
             Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
             Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
