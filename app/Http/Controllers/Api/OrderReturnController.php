@@ -101,6 +101,22 @@ class OrderReturnController extends Controller
 
         return ResponseHelper::success($data, 'Payment added successfully');
     }
+    /**
+     * Add payment to return
+     */
+    public function modifyRefund(Request $request, int $id): JsonResponse
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:0',
+
+        ]);
+
+        $data = $this->orderReturnService->modifyRefund($id, $request->only([
+            'amount'
+        ]));
+
+        return ResponseHelper::success($data, 'Refund amount modify successfully');
+    }
 
     /**
      * Change status
