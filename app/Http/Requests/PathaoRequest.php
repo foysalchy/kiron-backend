@@ -25,7 +25,7 @@ class PathaoRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            
+
             'order_id'                  => ['required', 'exists:orders,id'],
             'recipient_name'            => ['required', 'string', 'min:3', 'max:100'],
             'recipient_phone'           => ['required', 'string', 'size:11'],
@@ -38,8 +38,8 @@ class PathaoRequest extends BaseCompanyRequest
             'item_type'                 => ['required', 'in:1,2'],
             'item_quantity'             => ['required', 'integer', 'min:1'],
             'item_weight'               => ['required', 'numeric', 'min:0.5', 'max:10'],
-            'product_title'             => ['required', 'string', 'max:200'], // item_description
-            'special_instruction'       => ['nullable', 'string', 'max:200'],
+            'product_title'             => ['nullable', 'string'], // item_description
+            'special_instruction'       => ['nullable', 'string'],
             'amount_to_collect'         => ['required', 'integer', 'min:0'],
         ]);
     }

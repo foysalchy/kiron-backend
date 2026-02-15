@@ -238,4 +238,76 @@ class PathaoService
 
         return $query->latest()->paginate($perPage);
     }
+    /**
+     * Get City List
+     */
+    public function getCities(): array
+    {
+        try {
+            $token = $this->getToken();
+            $response = Http::withToken($token)
+                ->acceptJson()
+                ->get("{$this->baseUrl}/aladdin/api/v1/city-list");
+
+            if ($response->successful()) {
+                return $response->json('data') ?? [];
+            }
+            $errorMessage = $response->json('message') ?? 'Failed to fetch cities from Pathao';
+            throw new \Exception($errorMessage);
+        } catch (\Exception $e) {
+            Log::error('Pathao City List Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw ApiException::serverError($e->getMessage());
+        }
+    }
+    /**
+     * Get Zone List by City ID
+     */
+    public function getZones(int $cityId): array
+    {
+        try {
+            $token = $this->getToken();
+
+            $response = Http::withToken($token)
+                ->acceptJson()
+                ->get("{$this->baseUrl}/aladdin/api/v1/cities/{$cityId}/zone-list");
+
+            if ($response->successful()) {
+                return $response->json('data') ?? [];
+            }
+
+            $errorMessage = $response->json('message') ?? 'Failed to fetch zones from Pathao';
+            throw new \Exception($errorMessage);
+
+        } catch (\Exception $e) {
+            Log::error("Pathao Zones Error: " . $e->getMessage());
+            throw ApiException::serverError($e->getMessage());
+        }
+    }
+
+    /**
+     * Get Area List by Zone ID
+     */
+    public function getAreas(int $zoneId): array
+    {
+        try {
+            $token = $this->getToken();
+
+            $response = Http::withToken($token)
+                ->acceptJson()
+                ->get("{$this->baseUrl}/aladdin/api/v1/zones/{$zoneId}/area-list");
+
+            if ($response->successful()) {
+                return $response->json('data') ?? [];
+            }
+
+            $errorMessage = $response->json('message') ?? 'Failed to fetch areas from Pathao';
+            throw new \Exception($errorMessage);
+
+        } catch (\Exception $e) {
+            Log::error("Pathao Areas Error: " . $e->getMessage());
+            throw ApiException::serverError($e->getMessage());
+        }
+    }
 }

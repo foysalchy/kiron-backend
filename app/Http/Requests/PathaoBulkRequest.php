@@ -34,9 +34,12 @@ class PathaoBulkRequest extends BaseCompanyRequest
             'orders.*.item_type'          => ['required', 'in:1,2'],
             'orders.*.item_quantity'      => ['required', 'integer', 'min:1'],
             'orders.*.item_weight'        => ['required', 'numeric', 'min:0.5', 'max:10'],
-            'orders.*.product_title'      => ['required', 'string', 'max:200'],
+            'orders.*.product_title'      => ['nullable', 'string'],
             'orders.*.amount_to_collect'  => ['required', 'integer', 'min:0'],
-            'orders.*.special_instruction'=> ['nullable', 'string', 'max:200'],
+            'orders.*.special_instruction'=> ['nullable', 'string'],
+            'orders.*.city_id'            => ['nullable', 'integer'],
+            'orders.*.zone_id'            => ['nullable', 'integer'],
+            'orders.*.area_id'            => ['nullable', 'integer'],
         ]);
     }
     public function messages(): array

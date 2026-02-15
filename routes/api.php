@@ -974,6 +974,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/update-status/{id}', [PathaoController::class, 'updateStatus']);
             Route::post('/bulk-update-status', [PathaoController::class, 'updateBulkStatus']);
             Route::get('/token', [PathaoController::class, 'testPathaoToken']);
+            Route::get('/cities', [PathaoController::class, 'getCities']);
+            Route::get('/zones/{cityId}', [PathaoController::class, 'getZones']);
+            Route::get('/areas/{zoneId}', [PathaoController::class, 'getAreas']);
         });
 
     });

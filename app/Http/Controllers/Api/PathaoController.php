@@ -72,4 +72,21 @@ class PathaoController extends Controller
 
             return ResponseHelper::success($result, 'Pathao orders retrieved successfully.');
     }
+    public function getCities(): JsonResponse
+    {
+        $cities = $this->pathaoService->getCities();
+        return ResponseHelper::success($cities, 'Cities retrieved successfully.');
+    }
+
+    public function getZones($cityId): JsonResponse
+    {
+        $zones = $this->pathaoService->getZones($cityId);
+        return ResponseHelper::success($zones, 'Zones retrieved successfully.');
+    }
+
+    public function getAreas($zoneId): JsonResponse
+    {
+        $areas = $this->pathaoService->getAreas($zoneId);
+        return ResponseHelper::success($areas, 'Areas retrieved successfully.');
+    }
 }
