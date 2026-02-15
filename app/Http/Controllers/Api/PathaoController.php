@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PathaoController extends Controller
-{
+{ 
     public function __construct(protected PathaoService $pathaoService)
     {
     }
