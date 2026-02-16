@@ -984,12 +984,10 @@ Route::prefix('v1')->group(function () {
         });
         //bkash route
         Route::prefix('bkash')->group(function () {
-            Route::get('/token', [BkashController::class, 'getToken']);
-            Route::post('/refresh', [BkashController::class, 'refreshToken']);
+            Route::get('/token', [BkashController::class, 'grantToken']);
             Route::post('/create', [BkashController::class, 'createPayment']);
-            Route::get('/callback', [BkashController::class, 'callback']);
+            Route::get('/execute', [BkashController::class, 'execute']);
         });
-        
 
     });
 });
