@@ -25,6 +25,10 @@ enum Status: int
   case NotCleared = 18;
   case Replied    = 19;
   case Closed     = 20;
+  case Sent       = 21;
+  case Accepted   = 22;
+  case Rejected   = 23;
+  case Expired    = 24;
 
   public function label(): string
   {
@@ -50,7 +54,10 @@ enum Status: int
       self::NotCleared => 'NotCleared',
       self::Replied    => 'Replied',
       self::Closed     => 'Closed',
-
+      self::Sent       => 'Sent',
+      self::Accepted   => 'Accepted',
+      self::Rejected   => 'Rejected',
+      self::Expired    => 'Expired',
     };
   }
 

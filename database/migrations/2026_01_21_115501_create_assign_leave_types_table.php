@@ -20,7 +20,6 @@ return new class extends Migration
             $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['position_id', 'leave_type_id'], 'pos_leave_unique');
         });
     }
 
