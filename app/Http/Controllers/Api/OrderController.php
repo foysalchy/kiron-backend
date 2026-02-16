@@ -165,13 +165,16 @@ class OrderController extends Controller
 
         ]);
     }
-    public function getSelectListOrder()
+    public function getSelectListOrder(Request $request)
     {
+        $q = $request->query('q'); 
 
-        $data = $this->orderService->getSelectListOrder();
+        $data = $this->orderService->getSelectListOrder($q);
 
-        return ResponseHelper::success($data, 'Order list retrive');
+        return ResponseHelper::success($data, 'Order list retrieved');
     }
+
+
     public function orderProducts(int $orderId)
     {
         $data = $this->orderService->orderProducts($orderId);
