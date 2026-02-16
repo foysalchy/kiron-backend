@@ -165,4 +165,17 @@ class OrderController extends Controller
 
         ]);
     }
+    public function getSelectListOrder()
+    {
+
+        $data = $this->orderService->getSelectListOrder();
+
+        return ResponseHelper::success($data, 'Order list retrive');
+    }
+    public function orderProducts(int $orderId)
+    {
+        $data = $this->orderService->orderProducts($orderId);
+
+        return ResponseHelper::success($data, 'Order product list retrive');
+    }
 }

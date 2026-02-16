@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class BkashService
-{
+{ 
     private $baseUrl;
 
     public function __construct()
