@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{Quotation, QuotationItem, Order};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -306,12 +307,11 @@ class QuotationService
             })->toArray();
 
             $orderPayload = [
-                'customer_id' => $quotation->customer_id,
                 'warehouse_id' => $quotation->warehouse_id,
                 'order_date' => $orderData['order_date'] ?? now()->toDateString(),
                 'reference_no' => $orderData['reference_no'] ?? $quotation->quotation_no,
                 'type' => $orderData['type'] ?? 'sales',
-                'status' => $orderData['status'] ?? 1, // Pending
+                'status' => $orderData['status'] ?? Status::Pending->value, // Pending
                 'items' => $orderItems,
                 'tax_amount' => $quotation->tax_amount,
                 'discount_amount' => $quotation->discount_amount,

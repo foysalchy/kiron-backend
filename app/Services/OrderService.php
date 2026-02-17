@@ -190,7 +190,7 @@ class OrderService
     /**
      * Create order (unified logic)
      */
-    private function createOrder(array $data, bool $isPOS = false): Order
+    public function createOrder(array $data, bool $isPOS = false): Order
     {
         DB::beginTransaction();
 
