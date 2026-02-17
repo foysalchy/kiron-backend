@@ -88,16 +88,22 @@ class OrderService
             throw ApiException::serverError('Failed to fetch orders');
         }
     }
-    public function getSelectListOrder(): Collection
+    public function getSelectListOrder(string $q = null): Collection
     {
         try {
-            $order = Order::orderBy('updated_at', 'desc')->get();
-            return $order;
+            return Order::query()
+                ->when($q, function ($query) use ($q) {
+                    $query->where('order_no', 'like', "%{$q}%");
+                })
+                ->orderBy('updated_at', 'desc')
+                ->limit(20) // only 20 orders
+                ->get(['id', 'order_no', 'grand_total']);
         } catch (\Exception $e) {
             Log::error('Error fetching orders: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch orders');
         }
     }
+
 
     /**
      * Get order by ID
@@ -184,7 +190,7 @@ class OrderService
     /**
      * Create order (unified logic)
      */
-    private function createOrder(array $data, bool $isPOS = false): Order
+    public function createOrder(array $data, bool $isPOS = false): Order
     {
         DB::beginTransaction();
 

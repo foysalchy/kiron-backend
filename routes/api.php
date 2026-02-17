@@ -66,6 +66,7 @@ use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
+use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\RejoinController;
 use App\Http\Controllers\Api\ResignationController;
@@ -443,6 +444,21 @@ Route::prefix('v1')->group(function () {
 
             Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
             Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
+        });
+        Route::prefix('quotations')->group(function () {
+            Route::get('/', [QuotationController::class, 'index']);
+            Route::post('/', [QuotationController::class, 'store']);
+            Route::get('/{id}', [QuotationController::class, 'show']);
+            Route::put('/{id}', [QuotationController::class, 'update']);
+            Route::delete('/{id}', [QuotationController::class, 'destroy']);
+
+            // Status and conversion
+            Route::patch('/{id}/change-status', [QuotationController::class, 'changeStatus']);
+            Route::post('/{id}/convert-to-order', [QuotationController::class, 'convertToOrder']);
+
+            // Soft delete management
+            Route::get('/{id}/restore', [QuotationController::class, 'restore']);
+            Route::delete('/{id}/force', [QuotationController::class, 'forceDestroy']);
         });
         Route::prefix('bin')->group(function () {
             Route::get('/', [BinController::class, 'index']);

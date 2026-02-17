@@ -85,7 +85,7 @@ class SteadfastService
 
         foreach ($orders as $order) {
             $bulkData[] = [
-                'invoice'           => (string) $order->id,
+                'invoice'           => (string) $order->order_no,
                 'recipient_name'    => $order->customer->name ?? 'Customer',
                 'recipient_phone'   => $order->customer->phone,
                 'recipient_address' => $order->customer->address ?? 'N/A',
@@ -102,6 +102,8 @@ class SteadfastService
             'data' => json_encode($bulkData)
         ]);
 
+        \Log::info($response);
+
         if ($response->successful()) {
             $apiResponse = $response->json();
 
@@ -110,7 +112,7 @@ class SteadfastService
             foreach ($items as $res) {
                 if (isset($res['status']) && $res['status'] === 'success') {
 
-                    $order = Order::find($res['invoice']);
+                    $order = Order::where('order_no', $res['invoice'])->first();
 
                     if ($order) {
                         $order->update([
