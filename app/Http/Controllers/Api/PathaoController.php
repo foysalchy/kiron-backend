@@ -12,27 +12,29 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PathaoController extends Controller
-{ 
-    public function __construct(protected PathaoService $pathaoService)
-    {
-    }
+{
+    public function __construct(protected PathaoService $pathaoService) {}
     public function testPathaoToken()
     {
         $token = $this->pathaoService->getToken();
 
-        return ResponseHelper::success($token,'Token Created Successfully...');
+        return ResponseHelper::success($token, 'Token Created Successfully...');
     }
     public function store(PathaoRequest $request): JsonResponse
     {
         $result = $this->pathaoService->createOrder($request->validated());
 
-        return ResponseHelper::success($result,'Order Created Successfully on Pathao...');
+        return ResponseHelper::success($result, 'Order Created Successfully on Pathao...');
     }
-    public function bulkStore(PathaoBulkRequest $request): JsonResponse
+    public function bulkStore(Request $request): JsonResponse
     {
-        $result = $this->pathaoService->createBulkOrder($request->validated()['orders']);
+        $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id'
+        ]);
+        $result = $this->pathaoService->createBulkOrder($request->order_ids);
 
-        return ResponseHelper::success($result,'Bulk Order Created Successfully on Pathao...');
+        return ResponseHelper::success($result, 'Bulk Order Created Successfully on Pathao...');
     }
     /**
      * Sync Single Status
@@ -62,15 +64,15 @@ class PathaoController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-            $filters = $request->only([
-                'status',
-                'consignment_id',
-                'per_page'
-            ]);
+        $filters = $request->only([
+            'status',
+            'consignment_id',
+            'per_page'
+        ]);
 
-            $result = $this->pathaoService->getAllPathaoOrders($filters);
+        $result = $this->pathaoService->getAllPathaoOrders($filters);
 
-            return ResponseHelper::success($result, 'Pathao orders retrieved successfully.');
+        return ResponseHelper::success($result, 'Pathao orders retrieved successfully.');
     }
     public function getCities(): JsonResponse
     {

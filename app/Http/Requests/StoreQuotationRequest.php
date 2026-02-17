@@ -36,6 +36,7 @@ class StoreQuotationRequest extends BaseCompanyRequest
                 // Check customer
                 'name' => ['required', 'string'],
                 'phone' => ['required', 'string'],
+                'email' => ['required', 'string'],
                 'address' => ['required', 'string'],
                 
                 'quotation_date' => ['required', 'date'],
@@ -66,9 +67,7 @@ class StoreQuotationRequest extends BaseCompanyRequest
                 'other_charges' => ['nullable', 'numeric', 'min:0'],
 
 
-                'status' => [
-                    'nullable',
-                ],
+                'status' => ['nullable'],
 
                 // Additional Info
                 'terms_conditions' => ['nullable', 'string'],

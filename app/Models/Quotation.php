@@ -19,6 +19,7 @@ class Quotation extends Model
         'quotation_date',
         'name',
         'phone',
+        'email',
         'address',
         'valid_until',
         'reference_no',
@@ -183,5 +184,11 @@ class Quotation extends Model
     public function scopeNotConverted($query)
     {
         return $query->whereNull('converted_to_order_id');
+    }
+    public function actionLogs(): HasMany
+    {
+        return $this->hasMany(ActionLog::class, 'action_id')
+            ->where('module', 'quotation')
+            ->orderBy('created_at', 'desc');
     }
 }

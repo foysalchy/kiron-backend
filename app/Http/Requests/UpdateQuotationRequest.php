@@ -36,8 +36,9 @@ class UpdateQuotationRequest extends BaseCompanyRequest
                 // Check customer
                 'name' => ['required', 'string'],
                 'phone' => ['required', 'string'],
+                'email' => ['required', 'string'],
                 'address' => ['required', 'string'],
-                
+
                 'quotation_date' => ['sometimes', 'required', 'date'],
                 'valid_until' => ['nullable', 'date', 'after_or_equal:quotation_date'],
                 'reference_no' => ['nullable', 'string', 'max:255'],
