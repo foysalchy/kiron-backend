@@ -19,5 +19,23 @@ class BkashController extends Controller
         $result = $this->bkashService->grantToken();
         return ResponseHelper::success($result, 'Token granted successfully...');
     }
+    public function createPayment(BkashRequest $request): JsonResponse
+    {
+        $result = $this->bkashService->createPayment($request->validated());
+        return ResponseHelper::success($result, 'Payment Created successfully...');
+    }
+    public function execute(Request $request): JsonResponse
+    {
+        $paymentID = $request->query('paymentID');
+        $companyId = $request->get('company_id', 0); 
+
+        if (!$paymentID) {
+            return ResponseHelper::error('Payment ID is required to execute payment');
+        }
+
+        $result = $this->bkashService->execute($paymentID, (int) $companyId);
+        
+        return ResponseHelper::success($result, 'Payment executed successfully');
+    }
 
 }

@@ -25,7 +25,8 @@ class BkashRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'payerReference' => 'required|string|min:11|max:15',
+            'amount'     => ['required', 'numeric',  'min:1'],
+            'payerReference'     => ['sometimes','required', 'string',  'max:15'],
         ]);
     }
     /**
@@ -33,12 +34,9 @@ class BkashRequest extends BaseCompanyRequest
      */
     public function messages(): array
     {
-        return array_merge(
-            $this->companyMessages(),
-            [
-                'payerReference.required'     => 'The payerReference is required',
-            ]
-        );
+        return array_merge($this->companyMessages(), [
+            'amount.required'         => 'Amount is required for payment',
+        ]);
     }
 
     /**
