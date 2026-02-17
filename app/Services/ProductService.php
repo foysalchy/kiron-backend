@@ -444,16 +444,23 @@ class ProductService
 
             // Generate combination hash for this variation
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
-
+            $variationData['image'] = FileUploadHelper::uploadImage(
+                $variationData['image'],
+                'products/variation',
+                'public',
+                2048
+            );
             // Check if this combination already exists (by hash, not by ID)
             $existingVariation = ProductVariation::where('product_id', $product->id)
                 ->where('combination_hash', $combinationHash)
                 ->first();
 
             if ($existingVariation) {
+
                 // UPDATE existing variation
                 $existingVariation->update([
                     'sku' => $variationData['sku'] ?? null,
+                    'image' => $variationData['image'] ?? null,
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
@@ -482,6 +489,7 @@ class ProductService
                 $newVariation = ProductVariation::create([
                     'product_id' => $product->id,
                     'sku' => $variationData['sku'] ?? null,
+                    'image' => $variationData['image'] ?? null,
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,

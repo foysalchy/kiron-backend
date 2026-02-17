@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Quotation, QuotationItem, Order};
+use App\Models\{Quotation, QuotationItem, Order, Party};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{Auth, DB, Log};
+use Illuminate\Support\Facades\{Auth, DB, Hash, Log};
 
 class QuotationService
 {
@@ -86,6 +86,7 @@ class QuotationService
             'items.variation.attributes.attributeValue',
             'convertedOrder',
             'creator',
+            'actionLogs'
         ])->find($id);
 
         if (!$quotation) {
@@ -289,6 +290,7 @@ class QuotationService
                 throw ApiException::badRequest('Quotation has expired');
             }
 
+
             // Prepare order data from quotation
             $orderItems = $quotation->items->map(function ($item) {
                 $itemData = [
@@ -302,11 +304,20 @@ class QuotationService
                 if ($item->variation_id) {
                     $itemData['variation_id'] = $item->variation_id;
                 }
-
                 return $itemData;
             })->toArray();
+            $customer =  Party::create([
+                'company_id' => $quotation->company_id,
+                'name' => $quotation->name,
+                'email' => $quotation->email,
+                'phone' => $quotation->phone,
+                'address' => $quotation->address,
+                'password' => Hash::make('password'),
+                'type' => 2,
 
+            ]);
             $orderPayload = [
+                'customer_id' => $customer->id,
                 'warehouse_id' => $quotation->warehouse_id,
                 'order_date' => $orderData['order_date'] ?? now()->toDateString(),
                 'reference_no' => $orderData['reference_no'] ?? $quotation->quotation_no,
@@ -322,7 +333,6 @@ class QuotationService
             ];
 
             // Create order using OrderService
-            $orderService = app(OrderService::class);
             $order = $this->orderService->createOrder($orderPayload);
 
             // Update quotation with conversion info

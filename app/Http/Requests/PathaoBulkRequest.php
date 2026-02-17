@@ -25,30 +25,37 @@ class PathaoBulkRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'orders'   => ['required', 'array', 'min:1'],
-            'orders.*.order_id'           => ['required', 'exists:orders,id'],
-            'orders.*.recipient_name'     => ['required', 'string', 'min:3', 'max:100'],
-            'orders.*.recipient_phone'    => ['required', 'string', 'size:11'],
-            'orders.*.recipient_address'  => ['required', 'string', 'min:10', 'max:220'],
-            'orders.*.delivery_type'      => ['required', 'in:48,12'],
-            'orders.*.item_type'          => ['required', 'in:1,2'],
-            'orders.*.item_quantity'      => ['required', 'integer', 'min:1'],
-            'orders.*.item_weight'        => ['required', 'numeric', 'min:0.5', 'max:10'],
-            'orders.*.product_title'      => ['nullable', 'string'],
-            'orders.*.amount_to_collect'  => ['required', 'integer', 'min:0'],
-            'orders.*.special_instruction'=> ['nullable', 'string'],
-            'orders.*.city_id'            => ['nullable', 'integer'],
-            'orders.*.zone_id'            => ['nullable', 'integer'],
-            'orders.*.area_id'            => ['nullable', 'integer'],
+            'order_ids'                            => ['required', 'array', 'min:1'],
+            'order_ids.*'                 => ['required', 'exists:orders,id'],
+
+            // Optional — auto-filled from customer if not sent
+            'orders.*.recipient_name'           => ['nullable', 'string', 'min:3', 'max:100'],
+            'orders.*.recipient_phone'          => ['nullable', 'string', 'size:11'],
+            'orders.*.recipient_secondary_phone' => ['nullable', 'string', 'size:11'],
+            'orders.*.recipient_address'        => ['nullable', 'string', 'min:10', 'max:220'],
+
+            'orders.*.city_id'                  => ['nullable', 'integer'],
+            'orders.*.zone_id'                  => ['nullable', 'integer'],
+            'orders.*.area_id'                  => ['nullable', 'integer'],
+
+            'orders.*.delivery_type'            => ['nullable', 'in:48,12'],
+            'orders.*.item_type'                => ['nullable', 'in:1,2'],
+            'orders.*.item_quantity'            => ['nullable', 'integer', 'min:1'],
+            'orders.*.item_weight'              => ['nullable', 'numeric', 'min:0.5', 'max:10'],
+            'orders.*.product_title'            => ['nullable', 'string'],
+            'orders.*.special_instruction'      => ['nullable', 'string'],
+            'orders.*.amount_to_collect'        => ['nullable', 'integer', 'min:0'],
         ]);
     }
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'orders.required'             => 'The orders list is missing.',
-            'orders.*.order_id.exists'    => 'One or more Order IDs are invalid.',
-            'orders.*.recipient_phone.size' => 'Phone number must be 11 digits.',
-            'orders.*.item_weight.min'    => 'Weight must be at least 0.5 kg.',
+            'order_ids.required'                => 'Orders list is required.',
+            'order_ids.min'                     => 'At least one order is required.',
+            'orders.*.order_id.required'     => 'Each item must have an order_id.',
+            'orders.*.order_id.exists'       => 'Order :input not found.',
+            'orders.*.recipient_phone.size'  => 'Phone must be exactly 11 digits.',
+            'orders.*.item_weight.min'       => 'Minimum weight is 0.5 kg.',
         ]);
     }
     protected function failedValidation(Validator $validator)
