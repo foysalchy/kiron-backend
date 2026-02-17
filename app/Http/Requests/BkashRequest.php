@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class BkashRequest extends BaseCompanyRequest
+class BkashRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,19 +24,19 @@ class BkashRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
-        return array_merge($this->companyRules(), [
+        return  [
             'amount'     => ['required', 'numeric',  'min:1'],
             'payerReference'     => ['sometimes','required', 'string',  'max:15'],
-        ]);
+        ];
     }
     /**
      * Custom messages for validation errors.
      */
     public function messages(): array
     {
-        return array_merge($this->companyMessages(), [
+        return  [
             'amount.required'         => 'Amount is required for payment',
-        ]);
+        ];
     }
 
     /**

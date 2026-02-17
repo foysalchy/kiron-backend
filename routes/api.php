@@ -998,11 +998,15 @@ Route::prefix('v1')->group(function () {
             Route::get('/zones/{cityId}', [PathaoController::class, 'getZones']);
             Route::get('/areas/{zoneId}', [PathaoController::class, 'getAreas']);
         });
-        //bkash route
-        Route::prefix('bkash')->group(function () {
-            Route::get('/token', [BkashController::class, 'grantToken']);
-            Route::post('/create', [BkashController::class, 'createPayment']);
-            Route::get('/execute', [BkashController::class, 'execute']);
-        });
+
+
+    });
+    //bkash route
+    Route::prefix('bkash')->group(function () {
+        Route::get('/token', [BkashController::class, 'grantToken']);
+        Route::post('/create', [BkashController::class, 'createPayment']);
+        Route::get('/execute', [BkashController::class, 'execute']);
+        Route::get('/success', [BkashController::class, 'successPayment']);
+        Route::get('/failure', [BkashController::class, 'failurePayment']);
     });
 });

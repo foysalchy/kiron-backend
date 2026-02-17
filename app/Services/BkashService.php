@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\{DB,Log};
 
 class BkashService
-{ 
+{
     private $baseUrl;
 
     public function __construct()
@@ -66,10 +66,15 @@ class BkashService
      */
     public function createPayment(array $data): array
     {
-        // DB::beginTransaction();
-        // try {
+        DB::beginTransaction();
+        try {
             $token = Cache::get('bkash_id_token') ?? $this->grantToken()['id_token'];
 
+            // $companyId = auth()->user()->isSuperAdmin() ? ($data['company_id'] ?? null) : auth()->user()->company_id;
+
+            // if (!$companyId) {
+            //     throw ApiException::serverError('Company context is missing.');
+            // }
             $response = Http::withHeaders($this->getHeaders($token))->post("{$this->baseUrl}/tokenized/checkout/create", [
                 'mode'                  => '0011',
                 'payerReference'        => $data['payerReference'],
@@ -77,16 +82,21 @@ class BkashService
                 'amount'                => $data['amount'],
                 'currency'              => 'BDT',
                 'intent'                => 'sale',
-                'merchantInvoiceNumber' => 'INV-' . time(), 
+                'merchantInvoiceNumber' => 'INV-' . time(),
             ]);
-            // dd($response);
+            //  dd($response);
 
             $result = $response->json();
 
             if ($response->successful() && isset($result['paymentID'])) {
-                // Example: Log the creation attempt in your system logs
-                LogHelper::created('bkash_payment', $result['paymentID'], $data['company_id'] ?? null, "Payment initiated for amount: " . $data['amount']);
-                
+                // LogHelper::created('bkash_payment',(int) $result['paymentID'],(int) $companyId, "Payment initiated for amount: " . $data['amount']);
+
+                $paymentID = $result['paymentID'];
+                $baseUrl = 'http://127.0.0.1:8000/api/v1/bkash';
+
+                $result['successCallbackURL'] = "{$baseUrl}/success?paymentID={$paymentID}&status=success";
+                $result['failureCallbackURL'] = "{$baseUrl}/failure?paymentID={$paymentID}&status=failure";
+                // $result['cancelledCallbackURL'] = "{$baseUrl}/failure?paymentID={$paymentID}&status=cancel";
                 DB::commit();
                 return $result;
             }
@@ -94,17 +104,17 @@ class BkashService
             Log::warning('bKash Payment Creation Denied', ['result' => $result]);
             throw ApiException::serverError($result['statusMessage'] ?? 'Failed to create payment');
 
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     Log::error('bKash Create Payment Exception: ' . $e->getMessage());
-        //     throw ApiException::serverError('Payment creation failed due to server error');
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('bKash Create Payment Exception: ' . $e->getMessage());
+            throw ApiException::serverError('Payment creation failed due to server error');
+        }
     }
 
     /**
-     * Execute Payment 
+     * Execute Payment
      */
-    public function execute(string $paymentID,int $companyId): array
+    public function execute(string $paymentID): array
     {
         DB::beginTransaction();
         try {
@@ -116,10 +126,10 @@ class BkashService
 
             $result = $response->json();
 
-            if ($response->successful() && isset($result['transactionStatus']) && $result['transactionStatus'] === 'Completed') {
-                
-                // Use LogHelper to record the successful update/completion of the payment
-                LogHelper::updated('bkash_payment', $paymentID, $companyId, "Transaction Completed: " . $result['trxID']);
+            if (
+                ($response->successful() && isset($result['transactionStatus']) && $result['transactionStatus'] === 'Completed') ||
+                (isset($result['statusCode']) && in_array($result['statusCode'], ['2117', '2062']))
+            ) {
 
                 DB::commit();
                 return $result;
@@ -130,9 +140,32 @@ class BkashService
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            if (str_contains($e->getMessage(), '2117')) {
+                return ['statusCode' => '0000', 'statusMessage' => 'Success', 'transactionStatus' => 'Completed'];
+            }
+
             Log::error('bKash Execute Exception: ' . $e->getMessage());
             throw ApiException::serverError('Could not complete the transaction');
         }
+    }
+    public function successStatus($data): array
+    {
+        return [
+            'transaction_id' => $data['trxID'] ?? null,
+            'payment_id' => $data['paymentID'],
+            'amount' => $data['amount'],
+            'date' => now()->toDateTimeString(),
+        ];
+    }
+    public function failureStatus(string $status, ?string $paymentID): array
+    {
+        return [
+            'error_status' => $status,
+            'payment_id'   => $paymentID,
+            'message'      => 'User could not complete the payment.',
+            'status'       => 'Failed'
+        ];
     }
 
 
