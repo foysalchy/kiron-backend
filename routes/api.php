@@ -82,6 +82,7 @@ use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\SupportDepartmentController;
 use App\Http\Controllers\Api\SupportTicketController;
+use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
@@ -997,6 +998,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/cities', [PathaoController::class, 'getCities']);
             Route::get('/zones/{cityId}', [PathaoController::class, 'getZones']);
             Route::get('/areas/{zoneId}', [PathaoController::class, 'getAreas']);
+        });
+        //taxrates routes
+        Route::prefix('taxrates')->group(function () {
+            Route::get('/', [TaxRateController::class, 'index']);
+            Route::post('/', [TaxRateController::class, 'store']);
+            Route::get('/{id}', [TaxRateController::class, 'show']);
+            Route::post('/update/{id}', [TaxRateController::class, 'update']);
+            Route::delete('/{id}', [TaxRateController::class, 'destroy']);
+            Route::get('{id}/restore', [TaxRateController::class, 'restore']);
+            Route::delete('{id}/force', [TaxRateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [TaxRateController::class, 'toggleStatus']);
         });
 
 

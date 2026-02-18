@@ -78,6 +78,7 @@ use App\Services\StockMovementRequestService;
 use App\Services\SubCategoryService;
 use App\Services\SupportDepartmentService;
 use App\Services\SupportTicketService;
+use App\Services\TaxRateService;
 use App\Services\TemplateService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
@@ -169,6 +170,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SupportTicketService::class);
         $this->app->bind(TemplateService::class);
         $this->app->bind(WocommerceSettingService::class);
+        $this->app->bind(TaxRateService::class);
     }
 
     /**
