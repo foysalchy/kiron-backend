@@ -1006,7 +1006,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/token', [BkashController::class, 'grantToken']);
         Route::post('/create', [BkashController::class, 'createPayment']);
         Route::get('/execute', [BkashController::class, 'execute']);
-        Route::get('/success', [BkashController::class, 'successPayment']);
-        Route::get('/failure', [BkashController::class, 'failurePayment']);
+        Route::get('/success', [BkashController::class, 'successPayment'])->name('bkash.success');
+        Route::get('/failure', [BkashController::class, 'failurePayment'])->name('bkash.failure');
     });
 });
