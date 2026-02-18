@@ -14,6 +14,12 @@ class MarketController extends Controller
     public function __construct(protected MarketService $marketService)
     {
     }
+    public function index(Request $request): JsonResponse
+    {
+        $data = $this->marketService->getMarketing();
+
+        return ResponseHelper::success($data, 'Marketing settings updated successfully');
+    }
     public function update(UpdateMarketRequest $request): JsonResponse
     {
         $market = $this->marketService->updateMarketTools($request->validated());

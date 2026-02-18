@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Services;
 
 use App\Enums\Status;
@@ -7,11 +8,11 @@ use App\Helpers\LogHelper;
 use App\Models\SmsSetting;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class SmsSettingService
 {
-    
+
     /**
      * Get all SMS settings with optional pagination
      */
@@ -36,7 +37,7 @@ class SmsSettingService
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('event_name', 'like', "%{$search}%")
-                      ->orWhere('message', 'like', "%{$search}%");
+                        ->orWhere('message', 'like', "%{$search}%");
                 });
             }
 
@@ -69,21 +70,35 @@ class SmsSettingService
     /**
      * Create a new SMS setting
      */
-    public function createSmsSetting(array $data): SmsSetting
+    public function saveAllSmsSettings(array $settings, int $companyId)
     {
         DB::beginTransaction();
         try {
-            $setting = SmsSetting::create($data);
-            LogHelper::created('sms_setting', $setting->id, $setting->company_id,$setting->event_name);
+            $result = collect($settings)->map(function ($item) use ($companyId) {
+                $setting = SmsSetting::updateOrCreate(
+                    [
+                        'company_id' => $companyId,
+                        'event_name' => $item['event_name'],
+                    ],
+                    [
+                        'message' => $item['message'],
+                        'status'  => $item['status'],
+                    ]
+                );
+
+                LogHelper::created('sms_setting', $setting->id, $companyId, $setting->event_name);
+
+                return $setting;
+            });
 
             DB::commit();
-            Log::info('SMS setting created successfully', ['setting_id' => $setting->id]);
+            Log::info('SMS settings saved successfully', ['company_id' => $companyId]);
 
-            return $setting;
+            return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('SMS setting creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create SMS setting');
+            Log::error('SMS settings save failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to save SMS settings');
         }
     }
 
@@ -97,7 +112,7 @@ class SmsSettingService
             $setting = $this->getSmsSettingById($id);
             $setting->update($data);
 
-            LogHelper::updated('sms_setting', $setting->id, $setting->company_id,$setting->event_name);
+            LogHelper::updated('sms_setting', $setting->id, $setting->company_id, $setting->event_name);
 
             DB::commit();
             Log::info('SMS setting updated successfully', ['setting_id' => $setting->id]);
@@ -202,7 +217,7 @@ class SmsSettingService
     /**
      * Toggle SMS setting status
      */
-/**
+    /**
      * Toggle SMS setting status (Active/Inactive)
      */
     public function toggleStatus(int $id): SmsSetting
@@ -222,7 +237,10 @@ class SmsSettingService
             ]);
 
             LogHelper::statusChanged(
-                'sms_setting', $setting->id, $setting->company_id,$setting->event_name . ' new status ' . $newStatus->label()
+                'sms_setting',
+                $setting->id,
+                $setting->company_id,
+                $setting->event_name . ' new status ' . $newStatus->label()
             );
 
             DB::commit();

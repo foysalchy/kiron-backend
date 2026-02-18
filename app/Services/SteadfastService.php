@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
+use App\Helpers\LogHelper;
 use App\Models\Courier;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
@@ -70,7 +71,7 @@ class SteadfastService
         throw ApiException::serverError($response->json('message') ?? 'Steadfast booking failed.');
     }
     //multiple order
-    public function bulkSendToSteadfast(array $orderIds)
+    public function bulkSendToSteadfast(array $orderIds): array
     {
         $courier = Courier::whereHas('method', function ($q) {
             $q->where('slug', 'steadfast');
@@ -80,13 +81,96 @@ class SteadfastService
             throw ApiException::serverError('Steadfast settings not found.');
         }
 
-        $orders = Order::whereIn('id', $orderIds)->with('customer')->get();
-        $bulkData = [];
+        $orders = Order::whereIn('id', $orderIds)
+            ->with('customer')
+            ->get()
+            ->keyBy('id'); // key by id for easy lookup later
 
-        foreach ($orders as $order) {
+        // ── Validate each order before sending ────────────────
+        $validOrders  = [];
+        $results = [
+            'total'   => count($orderIds),
+            'success' => 0,
+            'failed'  => 0,
+            'details' => [],
+        ];
+
+        foreach ($orderIds as $orderId) {
+            $order = $orders->get($orderId);
+
+            if (!$order) {
+                $results['failed']++;
+                $results['details'][] = [
+                    'order_id' => $orderId,
+                    'order_no' => null,
+                    'success'  => false,
+                    'message'  => 'Order not found.',
+                ];
+                continue;
+            }
+
+            // ── Already assigned check ─────────────────────
+            if (!empty($order->courier_info) && isset($order->courier_info['consignment_id'])) {
+                $results['failed']++;
+                $results['details'][] = [
+                    'order_id' => $orderId,
+                    'order_no' => $order->order_no,
+                    'success'  => false,
+                    'message'  => "Already assigned to Steadfast. Consignment ID: " . $order->courier_info['consignment_id'],
+                ];
+                continue;
+            }
+
+            // ── Validate required customer fields ──────────
+            $errors = [];
+
+            if (empty($order->customer?->name)) {
+                $errors[] = 'Recipient name is missing.';
+            }
+            if (empty($order->customer?->phone)) {
+                $errors[] = 'Recipient phone is missing.';
+            } elseif (strlen((string) $order->customer->phone) !== 11) {
+                $errors[] = 'Recipient phone must be exactly 11 digits.';
+            }
+            if (empty($order->customer?->address)) {
+                $errors[] = 'Recipient address is missing.';
+            }
+
+            if (!empty($errors)) {
+                $results['failed']++;
+                $results['details'][] = [
+                    'order_id' => $orderId,
+                    'order_no' => $order->order_no,
+                    'success'  => false,
+                    'message'  => 'Validation failed: ' . implode(' ', $errors),
+                    'errors'   => $errors,
+                ];
+
+                LogHelper::updated(
+                    'order',
+                    $order->id,
+                    $order->company_id,
+                    'Steadfast bulk assign validation failed: ' . implode(', ', $errors)
+                );
+
+                continue;
+            }
+
+            // ✅ Order is valid — add to bulk payload
+            $validOrders[$orderId] = $order;
+        }
+
+        // ── If no valid orders, return early ──────────────────
+        if (empty($validOrders)) {
+            return $results;
+        }
+
+        // ── Build Steadfast bulk payload ──────────────────────
+        $bulkData = [];
+        foreach ($validOrders as $orderId => $order) {
             $bulkData[] = [
-                'invoice'           => (string) $order->order_no,
-                'recipient_name'    => $order->customer->name ?? 'Customer',
+                'invoice'           => (string) $orderId,
+                'recipient_name'    => $order->customer->name,
                 'recipient_phone'   => $order->customer->phone,
                 'recipient_address' => $order->customer->address ?? 'N/A',
                 'cod_amount'        => (int) $order->grand_total,
@@ -94,47 +178,86 @@ class SteadfastService
             ];
         }
 
+        // ── Call Steadfast API ────────────────────────────────
         $response = Http::withHeaders([
             'Api-Key'      => $courier->method_details['api_key'],
             'Secret-Key'   => $courier->method_details['secret_key'],
-            'Content-Type' => 'application/json'
+            'Content-Type' => 'application/json',
         ])->post('https://portal.packzy.com/api/v1/create_order/bulk-order', [
-            'data' => json_encode($bulkData)
+            'data' => json_encode($bulkData),
         ]);
 
-        \Log::info($response);
-
-        if ($response->successful()) {
-            $apiResponse = $response->json();
-
-            $items = $apiResponse['data'] ?? [];
-
-            foreach ($items as $res) {
-                if (isset($res['status']) && $res['status'] === 'success') {
-
-                    $order = Order::where('order_no', $res['invoice'])->first();
-
-                    if ($order) {
-                        $order->update([
-                            'courier_info' => [
-                                'courier_name'   => 'Steadfast',
-                                'consignment_id' => $res['consignment_id'] ?? '',
-                                'tracking_code'  => $res['tracking_code'] ?? '',
-                                'status'         => $res['status'] ?? '',
-                                'note'           => $res['note'] ?? '',
-                                'applied_at'     => now()->toDateTimeString(),
-                            ]
-                        ]);
-                    }
-                }
-            }
-            return $apiResponse;
+        if (!$response->successful()) {
+            Log::error('Steadfast Bulk API Error', [
+                'http_status' => $response->status(),
+                'response'    => $response->body(),
+            ]);
+            throw ApiException::serverError('Steadfast Bulk Booking Failed');
         }
-        Log::error('Steadfast API Error', [
-            'http_status' => $response->status(),
-            'response'    => $response->body(),
-        ]);
-        throw ApiException::serverError('Steadfast Bulk Booking Failed');
+
+        // ── Process API response ──────────────────────────────
+        $apiItems = $response->json('data') ?? [];
+
+        // Map invoice (order_id) → api result
+        $apiResultMap = collect($apiItems)->keyBy('invoice');
+
+        foreach ($validOrders as $orderId => $order) {
+            $res = $apiResultMap->get((string) $orderId);
+
+            if ($res && ($res['status'] ?? '') === 'success') {
+                // ✅ Success
+                $order->update([
+                    'courier_info' => [
+                        'courier_name'   => 'Steadfast',
+                        'consignment_id' => $res['consignment_id'] ?? '',
+                        'tracking_code'  => $res['tracking_code']  ?? '',
+                        'status'         => $res['status']          ?? '',
+                        'note'           => $res['note']            ?? '',
+                        'applied_at'     => now()->toDateTimeString(),
+                    ]
+                ]);
+
+                LogHelper::updated('order', $order->id, $order->company_id, 'Assigned to Steadfast Courier');
+
+                $results['success']++;
+                $results['details'][] = [
+                    'order_id' => $orderId,
+                    'order_no' => $order->order_no,
+                    'success'  => true,
+                    'message'  => 'Assigned to Steadfast successfully',
+                    'data'     => [
+                        'consignment_id' => $res['consignment_id'] ?? '',
+                        'tracking_code'  => $res['tracking_code']  ?? '',
+                    ],
+                ];
+
+                Log::info("Steadfast bulk: Order #{$order->order_no} assigned successfully.");
+            } else {
+                // ❌ API returned failure for this order
+                $errMsg = $res['message'] ?? 'Steadfast rejected this order.';
+
+                $results['failed']++;
+                $results['details'][] = [
+                    'order_id' => $orderId,
+                    'order_no' => $order->order_no,
+                    'success'  => false,
+                    'message'  => $errMsg,
+                ];
+
+                LogHelper::updated(
+                    'order',
+                    $order->id,
+                    $order->company_id,
+                    'Steadfast bulk assign failed: ' . $errMsg
+                );
+
+                Log::warning("Steadfast bulk: Order #{$order->order_no} rejected by API.", [
+                    'response' => $res,
+                ]);
+            }
+        }
+
+        return $results;
     }
     /**
      * Single Order Status Sync
@@ -198,31 +321,68 @@ class SteadfastService
 
     public function bulkSyncStatus(array $orderIds): array
     {
-        $orders = Order::whereIn('id', $orderIds)->get();
-        $results = ['total' => count($orderIds), 'success' => 0, 'failed' => 0, 'details' => []];
+        $results = [
+            'total'         => count($orderIds),
+            'success'       => 0,
+            'failed'        => 0,
+            'order_details' => [],
+        ];
 
-        foreach ($orders as $order) {
+        $orders = Order::whereIn('id', $orderIds)
+            ->get()
+            ->keyBy('id');
+
+        foreach ($orderIds as $orderId) {
+            $order = $orders->get($orderId);
+
+            if (!$order) {
+                $results['failed']++;
+                $results['order_details'][] = [
+                    'order_id'       => $orderId,
+                    'order_no'       => null,
+                    'success'        => false,
+                    'synced'         => false,
+                    'current_status' => 'unknown',
+                    'api_message'    => 'Order not found',
+                ];
+                continue;
+            }
+
             try {
-                $res = $this->syncStatus($order);
+                $syncResponse = $this->syncStatus($order);
 
-                if (isset($res['status']) && $res['status'] == 200) {
+                $wasSuccessful = ($syncResponse['status'] ?? 0) === 200;
+
+                if ($wasSuccessful) {
                     $results['success']++;
                 } else {
                     $results['failed']++;
-                    $results['details'][] = "Order #{$order->order_no}: " . ($res['message'] ?? 'Unknown issue');
                 }
+
                 $results['order_details'][] = [
-                    'id' => $order->id,
-                    'order_no' => $order->order_no,
+                    'order_id'       => $order->id,
+                    'order_no'       => $order->order_no,
+                    'success'        => $wasSuccessful,
+                    'synced'         => $wasSuccessful,
+                    'current_status' => $order->fresh()->courier_info['status'] ?? 'unknown',
                     'consignment_id' => $order->courier_info['consignment_id'] ?? 'N/A',
-                    'current_status' => $order->courier_info['status'] ?? 'pending',
-                    'api_message' => $res['message'] ?? 'Sync attempted'
+                    'api_message'    => $syncResponse['message'] ?? ($wasSuccessful ? 'Synced successfully' : 'Sync failed'),
                 ];
             } catch (\Exception $e) {
                 $results['failed']++;
-                $results['details'][] = "Order #{$order->order_no}: Exception - " . $e->getMessage();
+                $results['order_details'][] = [
+                    'order_id'       => $order->id,
+                    'order_no'       => $order->order_no,
+                    'success'        => false,
+                    'synced'         => false,
+                    'current_status' => $order->courier_info['status'] ?? 'unknown',
+                    'api_message'    => $e->getMessage(),
+                ];
+
+                Log::error("Bulk sync failed for Order #{$order->order_no}: " . $e->getMessage());
             }
         }
+
         return $results;
     }
     //get all

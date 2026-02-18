@@ -11,10 +11,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SmsSettingController extends Controller
-{ 
-    public function __construct(protected SmsSettingService $smsSettingService)
-    {
-    }
+{
+    public function __construct(protected SmsSettingService $smsSettingService) {}
     /**
      * Display a listing of the SMS settings.
      */
@@ -39,9 +37,12 @@ class SmsSettingController extends Controller
      */
     public function store(StoreSmsSettingRequest $request): JsonResponse
     {
-        $data = $this->smsSettingService->createSmsSetting($request->validated());
+        $data = $this->smsSettingService->saveAllSmsSettings(
+            $request->validated()['settings'],
+            auth()->user()->company_id  
+        );
 
-        return ResponseHelper::success($data, 'SMS setting created successfully', 201);
+        return ResponseHelper::success($data, 'SMS settings saved successfully', 201);
     }
 
     /**
