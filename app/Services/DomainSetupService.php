@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\DomainSetup;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class DomainSetupService
 {
@@ -20,6 +21,7 @@ class DomainSetupService
                 [],
                 [
                     'custom_domain' => $data['custom_domain'],
+                    'sub_domain' => $data['sub_domain'],
                     'status'        => $data['status'] ?? 1,
                 ]
             );

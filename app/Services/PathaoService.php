@@ -318,23 +318,62 @@ class PathaoService
             'total'   => count($orderIds),
             'success' => 0,
             'failed'  => 0,
-            'details' => []
+            'order_details' => [] // ✅ Changed from 'details' to 'order_details'
         ];
 
-        $orders = Order::whereIn('id', $orderIds)->get();
+        $orders = Order::whereIn('id', $orderIds)
+            ->get()
+            ->keyBy('id');
 
-        foreach ($orders as $order) {
+        foreach ($orderIds as $orderId) {
+            $order = $orders->get($orderId);
+
+            if (!$order) {
+                $results['failed']++;
+                $results['order_details'][] = [
+                    'order_id'       => $orderId,
+                    'order_no'       => null,
+                    'success'        => false,
+                    'synced'         => false,
+                    'current_status' => 'unknown',
+                    'api_message'    => 'Order not found',
+                ];
+                continue;
+            }
+
             try {
                 $syncResponse = $this->syncStatus($order);
-                $results['success']++;
-                $results['details'][] = $syncResponse;
+
+                // Check if sync was successful
+                $wasSuccessful = ($syncResponse['status'] ?? 0) === 200;
+
+                if ($wasSuccessful) {
+                    $results['success']++;
+                } else {
+                    $results['failed']++;
+                }
+
+                $results['order_details'][] = [
+                    'order_id'       => $order->id,
+                    'order_no'       => $order->order_no,
+                    'success'        => $wasSuccessful,
+                    'synced'         => $wasSuccessful,
+                    'current_status' => $order->fresh()->courier_info['status'] ?? 'unknown',
+                    'consignment_id' => $order->courier_info['consignment_id'] ?? 'N/A',
+                    'api_message'    => $syncResponse['message'] ?? ($wasSuccessful ? 'Synced successfully' : 'Sync failed'),
+                ];
             } catch (\Exception $e) {
                 $results['failed']++;
-                $results['details'][] = [
-                    'order_id' => $order->id,
-                    'status'   => 500,
-                    'message'  => $e->getMessage()
+                $results['order_details'][] = [
+                    'order_id'       => $order->id,
+                    'order_no'       => $order->order_no,
+                    'success'        => false,
+                    'synced'         => false,
+                    'current_status' => $order->courier_info['status'] ?? 'unknown',
+                    'api_message'    => $e->getMessage(),
                 ];
+
+                Log::error("Bulk sync failed for Order #{$order->order_no}: " . $e->getMessage());
             }
         }
 

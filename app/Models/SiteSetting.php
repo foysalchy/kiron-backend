@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SiteSetting extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
     protected $fillable = [
         'company_id',
         'shop_name',
@@ -25,7 +25,7 @@ class SiteSetting extends Model
         'status',
     ];
     protected $hidden = ['deleted_at'];
-    
+
     // Scopes
     public function scopeByCompany($query, int $companyId)
     {

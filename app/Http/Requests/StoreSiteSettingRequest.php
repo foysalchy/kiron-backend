@@ -33,7 +33,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'logo'              => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'favicon'           => ['nullable', 'image', 'mimes:png,ico,svg', 'max:512'],
                 'phone'             => ['required', 'string'],
-                'alternative_phone' => ['nullable', 'string'],
+                'alt_phone' => ['nullable', 'string'],
                 'email'             => ['required', 'email'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],

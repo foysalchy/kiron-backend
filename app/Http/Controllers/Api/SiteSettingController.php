@@ -38,6 +38,7 @@ class SiteSettingController extends Controller
      */
     public function store(StoreSiteSettingRequest $request): JsonResponse
     {
+        \Log::info($request);
         $data = $this->siteSettingService->createSiteSetting($request->validated());
 
         return ResponseHelper::success($data, 'Site setting created successfully', 201);
@@ -57,7 +58,9 @@ class SiteSettingController extends Controller
      * Update the specified site setting.
      */
     public function update(UpdateSiteSettingRequest $request, int $id): JsonResponse
+
     {
+        \Log::info($request);
         $data = $this->siteSettingService->updateSiteSetting($id, $request->validated());
 
         return ResponseHelper::success($data, 'Site setting updated successfully');

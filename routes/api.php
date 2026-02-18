@@ -901,7 +901,8 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [PassChangeController::class, 'update']);
         });
         //market tools route
-        Route::post('market-tools/update', [MarketController::class, 'update']);
+        Route::get('/market-tools', [MarketController::class, 'index']);
+        Route::post('/market-tools/update', [MarketController::class, 'update']);
 
 
         //lead-sources routes
@@ -998,8 +999,6 @@ Route::prefix('v1')->group(function () {
             Route::get('/zones/{cityId}', [PathaoController::class, 'getZones']);
             Route::get('/areas/{zoneId}', [PathaoController::class, 'getAreas']);
         });
-
-
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

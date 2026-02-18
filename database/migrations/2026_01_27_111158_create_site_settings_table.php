@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->text('corporate_address')->nullable();
             $table->text('store_address')->nullable();
             $table->text('tags')->nullable()->comment('SEO keywords separated by comma');
-            $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('status')->default(Status::Inactive->value);
             $table->timestamps();
             $table->softDeletes();
         });

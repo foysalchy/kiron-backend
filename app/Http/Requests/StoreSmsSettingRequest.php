@@ -8,7 +8,7 @@ use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreSmsSettingRequest extends BaseCompanyRequest
-{   
+{
     /** 
      * Determine if the user is authorized to make this request.
      */
@@ -16,7 +16,7 @@ class StoreSmsSettingRequest extends BaseCompanyRequest
     {
         return true;
     }
-    
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -27,9 +27,10 @@ class StoreSmsSettingRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'event_name' => ['required', 'string', 'max:255'],
-                'message'    => ['required', 'string'],
-                'status'     => ['nullable', 'integer', 'in:0,1'],
+                'settings'                  => ['required', 'array'],
+                'settings.*.event_name'     => ['required', 'string'],
+                'settings.*.message'        => ['required', 'string'],
+                'settings.*.status'         => ['required', 'integer', 'in:0,1'],
             ]
         );
     }
