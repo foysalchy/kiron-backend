@@ -24,17 +24,20 @@ class BkashController extends Controller
         $result = $this->bkashService->createPayment($request->validated());
         return ResponseHelper::success($result, 'Payment Created successfully...');
     }
-    public function execute(Request $request): JsonResponse
+    public function execute(Request $request)
     {
         $paymentID = $request->query('paymentID');
+        $status = $request->query('status');
 
         if (!$paymentID) {
-            return ResponseHelper::error('Payment ID is required to execute payment');
+            return ResponseHelper::error('Payment ID is required');
         }
 
-        $result = $this->bkashService->execute($paymentID);
+        if ($status === 'success') {
+            return redirect()->route('bkash.success', ['paymentID' => $paymentID]);
+        }
 
-        return ResponseHelper::success($result, 'Payment executed successfully');
+        return redirect()->route('bkash.failure', ['paymentID' => $paymentID, 'status' => $status]);
     }
     public function successPayment(Request $request): JsonResponse
     {

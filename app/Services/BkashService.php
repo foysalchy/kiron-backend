@@ -92,10 +92,10 @@ class BkashService
                 // LogHelper::created('bkash_payment',(int) $result['paymentID'],(int) $companyId, "Payment initiated for amount: " . $data['amount']);
 
                 $paymentID = $result['paymentID'];
-                $baseUrl = 'http://127.0.0.1:8000/api/v1/bkash';
+                $customUrl = 'http://127.0.0.1:8000/api/v1/bkash';
 
-                $result['successCallbackURL'] = "{$baseUrl}/success?paymentID={$paymentID}&status=success";
-                $result['failureCallbackURL'] = "{$baseUrl}/failure?paymentID={$paymentID}&status=failure";
+                $result['successCallbackURL'] = "{$customUrl}/success?paymentID={$paymentID}&status=success";
+                $result['failureCallbackURL'] = "{$customUrl}/failure?paymentID={$paymentID}&status=failure";
                 // $result['cancelledCallbackURL'] = "{$baseUrl}/failure?paymentID={$paymentID}&status=cancel";
                 DB::commit();
                 return $result;
