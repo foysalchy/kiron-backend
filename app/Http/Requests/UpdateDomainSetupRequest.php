@@ -26,6 +26,7 @@ class UpdateDomainSetupRequest extends BaseCompanyRequest
     {
         return array_merge($this->companyRules(), [
             'custom_domain' => ['sometimes', 'required', 'string', 'max:255'],
+            'sub_domain' => ['sometimes', 'required', 'string', 'max:255'],
         ]);
     }
     public function messages(): array

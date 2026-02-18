@@ -102,7 +102,7 @@ class FrontendOrderService
 
         // Paginate results
         $perPage = $filters['per_page'] ?? 20;
-        $orders = $query->paginate($perPage);
+        $orders = $query->whereNot('status',Status::Draft->value)->paginate($perPage);
 
         // Transform the data to include calculated fields
         $orders->getCollection()->transform(function ($order) {

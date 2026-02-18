@@ -1,13 +1,20 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Market;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class MarketService
 {
+
+    public function getMarketing()
+    {
+        return Market::latest()->get();
+    }
+
     /**
      * Update Market Tools (Company ID handled by Global Scope)
      */
