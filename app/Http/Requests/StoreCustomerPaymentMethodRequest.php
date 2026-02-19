@@ -23,8 +23,9 @@ class StoreCustomerPaymentMethodRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'payment_method' => ['required', 'string', 'exists:payment_method_types,payment_method'],
+            'payment_method_id' => ['required', 'exists:payment_method_types,id'],
             'icon'           => ['nullable', 'image', 'max:2048'],
+            'method_details' => ['nullable', 'array'],
             'account_holder' => ['nullable', 'string', 'max:150'],
             'account_number' => ['nullable', 'string', 'max:50'],
             'contact_name'   => ['required', 'string', 'max:150'],
@@ -39,8 +40,7 @@ class StoreCustomerPaymentMethodRequest extends BaseCompanyRequest
     {
         return array_merge($this->companyMessages(), [
             'method_name.required'    => 'The method name (e.g., bKash) is required.',
-            'account_holder.required' => 'Account holder name is required.',
-            'account_number.required' => 'Account or mobile number is required.',
+            'method_details.array'       => 'Method details must be a valid JSON/Array.',
             'contact_name.required'   => 'Contact person name is required.',
             'phone.required'          => 'Contact phone number is required.',
             'icon.image'              => 'The icon must be an image file.',

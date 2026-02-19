@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TaxRate extends Model
@@ -37,5 +38,9 @@ class TaxRate extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function taxGroup(): HasMany
+    {
+        return $this->hasMany(TaxGroup::class);
     }
 }

@@ -82,6 +82,7 @@ use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\SupportDepartmentController;
 use App\Http\Controllers\Api\SupportTicketController;
+use App\Http\Controllers\Api\TaxGroupController;
 use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TypePeriodController;
@@ -1009,7 +1010,16 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [TaxRateController::class, 'destroy']);
             Route::get('{id}/restore', [TaxRateController::class, 'restore']);
             Route::delete('{id}/force', [TaxRateController::class, 'forceDestroy']);
-            Route::patch('/{id}/toggle-status', [TaxRateController::class, 'toggleStatus']);
+        });
+        //taxgroups routes
+        Route::prefix('taxgroups')->group(function () {
+            Route::get('/', [TaxGroupController::class, 'index']);
+            Route::post('/', [TaxGroupController::class, 'store']);
+            Route::get('/{id}', [TaxGroupController::class, 'show']);
+            Route::post('/update/{id}', [TaxGroupController::class, 'update']);
+            Route::delete('/{id}', [TaxGroupController::class, 'destroy']);
+            Route::get('{id}/restore', [TaxGroupController::class, 'restore']);
+            Route::delete('{id}/force', [TaxGroupController::class, 'forceDestroy']);
         });
 
 
