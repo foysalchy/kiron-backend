@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Services;
 
 use App\Enums\Status;
@@ -47,8 +47,8 @@ class CustomerPaymentMethodService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate 
-                ? $query->paginate($filters['per_page'] ?? 15) 
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
         } catch (\Exception $e) {
             Log::error('Error fetching customer payment methods: ' . $e->getMessage());
@@ -78,12 +78,6 @@ class CustomerPaymentMethodService
         DB::beginTransaction();
 
         try {
-            // Mapping method name to payment_method_id
-            if (isset($data['payment_method'])) {
-                $type = PaymentMethodType::where('payment_method', $data['payment_method'])->first();
-                if (!$type) throw ApiException::notFound('Payment Method Type');
-                $data['payment_method_id'] = $type->id;
-            }
 
             if (isset($data['icon'])) {
                 $data['icon'] = FileUploadHelper::uploadImage(
@@ -95,7 +89,7 @@ class CustomerPaymentMethodService
             }
 
             $method = CustomerPaymentMethod::create($data);
-            LogHelper::created('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
+            LogHelper::created('customer_payment_method', $method->id, $method->company_id, $method->contact_name );
 
             DB::commit();
             Log::info('Customer Payment Method created successfully', ['id' => $method->id]);
@@ -129,13 +123,8 @@ class CustomerPaymentMethodService
                 );
             }
 
-            if (isset($data['payment_method'])) {
-                $type = PaymentMethodType::where('payment_method', $data['payment_method'])->first();
-                if ($type) $data['payment_method_id'] = $type->id;
-            }
-
             $method->update($data);
-            LogHelper::updated('customer_payment_method', $method->id, $method->company_id, $method->account_holder);
+            LogHelper::updated('customer_payment_method', $method->id, $method->company_id, $method->contact_name);
 
             DB::commit();
             Log::info('Customer Payment Method updated successfully', ['id' => $method->id]);
@@ -240,9 +229,9 @@ class CustomerPaymentMethodService
             $newStatus = $currentStatus === Status::Active ? Status::Inactive : Status::Active;
 
             $method->update(['status' => $newStatus->value]);
-            
+
             LogHelper::statusChanged('customer_payment_method', $method->id, $method->company_id, $method->account_holder . ' new status '.$newStatus->label());
-            
+
             DB::commit();
             return $method;
         } catch (\Exception $e) {

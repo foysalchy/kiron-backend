@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerPaymentMethod extends Model
-{ 
+{
     use SoftDeletes,CompanyScoped;
         protected $fillable = [
         'company_id',
         'payment_method_id',
         'icon',
+        'method_details',
         'account_holder',
         'account_number',
         'contact_name',
@@ -20,6 +21,9 @@ class CustomerPaymentMethod extends Model
         'status',
     ];
     protected $hidden = ['deleted_at'];
+    protected $casts = [
+        'method_details' => 'array',
+    ];
 
     // Scopes
     public function scopeByCompany($query, int $companyId)
@@ -39,6 +43,10 @@ class CustomerPaymentMethod extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+    public function paymentMethodType()
+    {
+        return $this->belongsTo(PaymentMethodType::class);
     }
     // Accessors
     public function getIconUrlAttribute(): ?string

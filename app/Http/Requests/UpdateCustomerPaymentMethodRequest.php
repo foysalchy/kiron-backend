@@ -23,8 +23,9 @@ class UpdateCustomerPaymentMethodRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'payment_method' => ['sometimes', 'required', 'string', 'exists:payment_method_types,payment_method'],
+            'payment_method_id' => ['sometimes', 'required', 'exists:payment_method_types,id'],
             'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg', 'max:2048'],
+            'method_details' => ['nullable', 'array'],
             'contact_name'   => ['sometimes', 'required', 'string', 'max:255'],
             'phone'          => ['sometimes', 'required', 'string', 'max:20'],
             'account_holder' => ['nullable', 'string', 'max:255'],
