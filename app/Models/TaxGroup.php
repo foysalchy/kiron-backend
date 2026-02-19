@@ -16,12 +16,14 @@ class TaxGroup extends Model
         'company_id',
         'tax_rate_id',
         'name',
+        'total_rate',
         'sub_tax',
         'status',
     ];
     protected $casts = [
-            'sub_tax' => 'array',
-        ];
+        'sub_tax' => 'array',
+        'total_rate' => 'float',
+    ];
     protected $hidden = ['deleted_at'];
 
     /**
@@ -41,5 +43,9 @@ class TaxGroup extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function taxRate(): BelongsTo
+    {
+        return $this->belongsTo(TaxRate::class);
     }
 }
