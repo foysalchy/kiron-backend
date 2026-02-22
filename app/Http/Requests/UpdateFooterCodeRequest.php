@@ -25,7 +25,7 @@ class UpdateFooterCodeRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'code'   => ['sometimes', 'required', 'string'],
+            'code'   => ['sometimes', 'required'],
             'status' => ['sometimes', 'integer', 'in:0,1'],
         ]);
     }

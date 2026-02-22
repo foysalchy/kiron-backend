@@ -1,10 +1,11 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\FooterCode;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class FooterCodeService
 {
@@ -36,7 +37,7 @@ class FooterCodeService
             );
 
             $action = $footerCode->wasRecentlyCreated ? 'created' : 'updated';
-            LogHelper::$action('footer_code', $footerCode->id, $footerCode->company_id, 'Footer scripts updated');
+            LogHelper::$action('header_code', $footerCode->id, $footerCode->company_id, 'Code scripts updated');
 
             Log::info("Footer code {$action} successfully", ['id' => $footerCode->id]);
 
@@ -44,10 +45,8 @@ class FooterCodeService
             return $footerCode->fresh();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Footer code save failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to save footer code');
+            Log::error('Code save failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to save  code');
         }
     }
-
-   
 }
