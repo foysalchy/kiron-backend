@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ip_directories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->string('Ip_address'); 
+            $table->string('ip_address'); 
             $table->tinyInteger('status')->default(0);
             $table->timestamps();
             $table->softDeletes();
