@@ -21,7 +21,21 @@ class DomainSetupController extends Controller
 
     public function store(UpdateDomainSetupRequest $request): JsonResponse
     {
-        $data = $this->domainService->saveDomain($request->validated());
-        return ResponseHelper::success($data, 'Domain settings updated successfully');
+        // dd($request);
+        $result = $this->domainService->saveDomain($request->validated());
+        if (is_string($result)) {
+            return response()->json([
+                'success' => false,
+                'message' => $result,
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Domain settings updated successfully',
+            'data'    => $result,
+        ]);
     }
+
+
 }
