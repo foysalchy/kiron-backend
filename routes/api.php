@@ -103,6 +103,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
         //auth
+        Route::get('auth/login-history', [AuthController::class, 'historyLoginAll']);
         Route::get('auth/profile', [AuthController::class, 'profile']);
         Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
         Route::post('auth/password/update', [AuthController::class, 'updatePassword']);

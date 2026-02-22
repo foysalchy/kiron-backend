@@ -6,13 +6,49 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\{RegisterRequest, UpdateProfileRequest, UpdatePasswordRequest};
 use App\Helpers\{FileUploadHelper, LogHelper};
 use App\Models\User;
+use App\Models\UserLoginHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\{Auth, Hash, DB};
+use Illuminate\Support\Facades\{Auth, Hash, DB, Log};
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * Get login history (Super Admin sees all, Others see only their own)
+     */
+    public function historyLoginAll(Request $request): JsonResponse
+    {
+        try {
+            $user = Auth::user();
+
+            $query = UserLoginHistory::with(['user:id,name,email', 'company:id,name']);
+
+            if ($user->role !== 'super_admin') {
+                $query->where('user_id', $user->id);
+            } else {
+                $query->when($request->company_id, fn($q) => $q->where('company_id', $request->company_id))
+                      ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id));
+            }
+
+            $query->when($request->ip_address, fn($q) => $q->where('ip_address', 'like', "%$request->ip_address%"))
+                  ->when($request->start_date, fn($q) => $q->whereDate('login_at', '>=', $request->start_date))
+                  ->when($request->end_date, fn($q) => $q->whereDate('login_at', '<=', $request->end_date));
+
+            $history = $query->orderBy('login_at', 'desc')
+                             ->paginate($request->per_page ?? 15);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login history retrieved successfully',
+                'data' => $history
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('History Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Failed to load history'], 500);
+        }
+    }
     /**
      * Login - Cookie based authentication
      */
@@ -39,6 +75,14 @@ class AuthController extends Controller
                 'email' => ['Your account is inactive'],
             ]);
         }
+        //login history
+        $history = UserLoginHistory::create([
+            'company_id' => $user->company_id,
+            'user_id'    => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'login_at'   => now(),
+        ]);
 
         // Revoke old tokens (optional but recommended)
         $user->tokens()->delete();
@@ -50,6 +94,7 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Login successful',
             'token' => $token,
+            'login_id' => $history->id,
             'token_type' => 'Bearer',
             'user' => [
                 'id' => $user->id,
@@ -246,6 +291,16 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
+        $lastLogin = UserLoginHistory::where('user_id', $user->id)
+                                    ->whereNull('logout_at')
+                                    ->latest()
+                                    ->first();
+
+        if ($lastLogin) {
+            $lastLogin->update([
+                'logout_at' => now()
+            ]);
+        }
         // Revoke only the current access token
         $user->currentAccessToken()->delete();
 

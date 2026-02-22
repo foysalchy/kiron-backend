@@ -2,39 +2,127 @@
 
 namespace App\Services;
 
-use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\DomainSetup;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{DB, Http, Log};
 
 class DomainSetupService
 {
+    private string $apiToken   = 'iF9aNbBfaKiT3WtsdZSkUiAEoMEnt2Q6aCFlYWUv';
+    private string $zoneId     = 'ac7c72e0460207f900a635fb32ae43cf';
+    private string $ipAddress  = '134.209.65.214';  
+    private string $baseDomain = 'doob.com.bd';
+
     public function getDomain()
     {
         return DomainSetup::first();
     }
-    public function saveDomain(array $data): DomainSetup
+
+    public function saveDomain(array $data)
     {
+        if (!empty($data['custom_domain'])) {
+            $check = $this->zoneCheck($data['custom_domain']);
+            if (!$check) {
+                return "{$data['custom_domain']} is not pointing to our server IP ({$this->ipAddress}).";
+            }
+        }
+
         DB::beginTransaction();
         try {
             $domain = DomainSetup::updateOrCreate(
                 [],
                 [
-                    'custom_domain' => $data['custom_domain'],
-                    'sub_domain' => $data['sub_domain'],
+                    'custom_domain' => $data['custom_domain'] ?? null,
+                    'sub_domain'    => $data['sub_domain'] ?? null,
                     'status'        => $data['status'] ?? 1,
                 ]
             );
+
+            Log::info('Domain saved', ['domain' => $domain]);
+
+            if (!empty($data['sub_domain'])) {
+                $cfResult = $this->createCloudflareDnsRecord($data['sub_domain']);
+                if (!$cfResult['success']) {
+                    DB::rollBack();
+                    Log::error('Cloudflare DNS failed', ['errors' => $cfResult['errors'] ?? []]);
+                    return 'Failed to create Cloudflare DNS record.';
+                }
+            }
 
             $action = $domain->wasRecentlyCreated ? 'created' : 'updated';
             LogHelper::$action('domain_setup', $domain->id, $domain->company_id, 'Domain updated to: ' . $domain->custom_domain);
 
             DB::commit();
             return $domain;
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Domain saving failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to save domain settings');
+            return 'Failed to save domain settings.';
+        }
+    }
+
+    private function createCloudflareDnsRecord(string $subDomain): array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiToken,
+            'Content-Type'  => 'application/json',
+        ])->post("https://api.cloudflare.com/client/v4/zones/{$this->zoneId}/dns_records", [
+            'type'    => 'A',
+            'name'    => "{$subDomain}.{$this->baseDomain}",
+            'content' => $this->ipAddress,
+            'ttl'     => 3600,
+            'proxied' => false,
+        ]);
+
+        $result = $response->json();
+        Log::info('Cloudflare response', ['response' => $result]);
+
+        if (!empty($result['errors'])) {
+            foreach ($result['errors'] as $error) {
+                if ($error['code'] === 81058) {
+                    Log::info('Cloudflare DNS record already exists, skipping.');
+                    return ['success' => true];
+                }
+            }
+        }
+
+        return $result ?? ['success' => false, 'errors' => ['No response from Cloudflare']];
+    }
+
+    private function zoneCheck(string $domain): bool
+    {
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+            ])->get("https://dns.google/resolve", [
+                'name' => $domain,
+                'type' => 'A',
+            ]);
+
+            $result = $response->json();
+
+            Log::info('DNS Check', [
+                'domain'   => $domain,
+                'result'   => $result,
+                'targetIp' => $this->ipAddress,
+            ]);
+
+            if (empty($result['Answer'])) {
+                return false;
+            }
+
+            foreach ($result['Answer'] as $record) {
+                if ($record['type'] === 1 && $record['data'] === $this->ipAddress) {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error('DNS Check failed: ' . $e->getMessage());
+            return false;
         }
     }
 }
