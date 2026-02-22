@@ -33,8 +33,8 @@ class StoreLeadRequest extends BaseCompanyRequest
                 'email'          => ['required', 'email'],
                 'phone'          => ['required', 'string'],
                 'division'       => ['required', 'string'],
-                'district'       => ['nullable', 'string'],
-                'thana'          => ['nullable', 'string'],
+                'district'       => ['required', 'string'],
+                'thana'          => ['required', 'string'],
             ]
         );
     }
