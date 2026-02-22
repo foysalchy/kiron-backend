@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use App\Services\LeadService;
@@ -12,9 +13,7 @@ use Illuminate\Http\Request;
 
 class LeadController extends Controller
 {
-    public function __construct(protected LeadService $leadService)
-    {
-    }
+    public function __construct(protected LeadService $leadService) {}
 
     /**
      * Display a listing of leads.
@@ -66,6 +65,15 @@ class LeadController extends Controller
         return ResponseHelper::success($data, 'Lead updated successfully');
     }
 
+    /**
+     * Soft delete the lead.
+     */
+    public function convertToSeller(StoreCompanyRequest $request, int $id): JsonResponse
+    {
+        $this->leadService->convertToSeller($request->validated(), $id);
+
+        return ResponseHelper::success(null, 'Converted to seller done succsessfully');
+    }
     /**
      * Soft delete the lead.
      */

@@ -1,13 +1,16 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\Company;
 use App\Models\Lead;
+use App\Models\LeadStatus;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class LeadService
 {
@@ -40,8 +43,8 @@ class LeadService
             if (!empty($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('full_name', 'like', "%{$filters['search']}%")
-                    ->orWhere('email', 'like', "%{$filters['search']}%")
-                    ->orWhere('phone', 'like', "%{$filters['search']}%");
+                        ->orWhere('email', 'like', "%{$filters['search']}%")
+                        ->orWhere('phone', 'like', "%{$filters['search']}%");
                 });
             }
 
@@ -52,7 +55,6 @@ class LeadService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching leads with filters: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch leads');
@@ -109,6 +111,34 @@ class LeadService
             DB::rollBack();
             Log::error('Lead update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update Lead');
+        }
+    }
+    public function convertToSeller(array $data, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $lead = $this->getLeadById($id);
+
+            // create company
+            $company = Company::create($data);
+
+            // get status
+            $convertStatus = LeadStatus::where('name', 'Succeffully Converted')->first();
+
+            if (!$convertStatus) {
+                throw new \Exception('Lead status not found');
+            }
+
+            $lead->lead_status_id = $convertStatus->id;
+            $lead->save();
+            LogHelper::custom('convert_to_seller', 'lead', $id, $company->id, $lead->full_name . ' Converted Seller');
+
+            DB::commit();
+            return $lead;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Converted to seller failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to converted seller');
         }
     }
     /**
