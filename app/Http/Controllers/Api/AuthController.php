@@ -28,22 +28,21 @@ class AuthController extends Controller
                 $query->where('user_id', $user->id);
             } else {
                 $query->when($request->company_id, fn($q) => $q->where('company_id', $request->company_id))
-                      ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id));
+                    ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id));
             }
 
             $query->when($request->ip_address, fn($q) => $q->where('ip_address', 'like', "%$request->ip_address%"))
-                  ->when($request->start_date, fn($q) => $q->whereDate('login_at', '>=', $request->start_date))
-                  ->when($request->end_date, fn($q) => $q->whereDate('login_at', '<=', $request->end_date));
+                ->when($request->start_date, fn($q) => $q->whereDate('login_at', '>=', $request->start_date))
+                ->when($request->end_date, fn($q) => $q->whereDate('login_at', '<=', $request->end_date));
 
             $history = $query->orderBy('login_at', 'desc')
-                             ->paginate($request->per_page ?? 15);
+                ->paginate($request->per_page ?? 15);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Login history retrieved successfully',
                 'data' => $history
             ]);
-
         } catch (\Exception $e) {
             Log::error('History Error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Failed to load history'], 500);
@@ -290,11 +289,11 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $user = $request->user();
-
+        \Log::info($request);
         $lastLogin = UserLoginHistory::where('user_id', $user->id)
-                                    ->whereNull('logout_at')
-                                    ->latest()
-                                    ->first();
+            ->whereNull('logout_at')
+            ->latest()
+            ->first();
 
         if ($lastLogin) {
             $lastLogin->update([

@@ -26,8 +26,9 @@ class UpdateTaxGroupRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'name'    => ['sometimes', 'string', 'max:255'],
-            'sub_tax' => ['sometimes', 'array'],
+            'name'           => ['sometimes', 'string', 'max:255'],
+            'tax_rate_ids'   => ['required', 'array', 'min:1'],
+            'tax_rate_ids.*' => ['required', 'integer', 'exists:tax_rates,id'],
         ]);
     }
     /**
@@ -38,9 +39,14 @@ class UpdateTaxGroupRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'name.string'       => 'The tax group name must be a string.',
-                'tax_rate_id.exists' => 'The selected parent tax rate is invalid.',
-                'sub_tax.array'      => 'The sub-tax must be an array format.',
+                'name.string'               => 'The tax group name must be a valid string',
+                'name.max'                  => 'The tax group name must not exceed 255 characters',
+                'tax_rate_ids.required'     => 'At least one tax rate must be selected',
+                'tax_rate_ids.array'        => 'Tax rates must be provided as an array',
+                'tax_rate_ids.min'          => 'At least one tax rate must be selected',
+                'tax_rate_ids.*.required'   => 'Each tax rate ID is required',
+                'tax_rate_ids.*.integer'    => 'Each tax rate ID must be a valid integer',
+                'tax_rate_ids.*.exists'     => 'One or more selected tax rates do not exist',
             ]
         );
     }
