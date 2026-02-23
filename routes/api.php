@@ -1,6 +1,10 @@
 <?php
 
+
+use App\Http\Controllers\Api\AccountGroupController;
+
 use App\Http\Controllers\Api\ActionLogController;
+
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -14,6 +18,7 @@ use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
+use App\Http\Controllers\Api\ChartOfAccountController;
 use App\Http\Controllers\Api\CompanyController;
 
 use App\Http\Controllers\Api\DepartmentController;
@@ -1030,6 +1035,30 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [TaxGroupController::class, 'restore']);
             Route::delete('{id}/force', [TaxGroupController::class, 'forceDestroy']);
         });
+        //account-groups routes
+        Route::prefix('account-groups')->group(function () {
+            Route::get('/', [AccountGroupController::class, 'index']);
+            Route::post('/', [AccountGroupController::class, 'store']);
+            Route::get('/{id}', [AccountGroupController::class, 'show']);
+            Route::post('/update/{id}', [AccountGroupController::class, 'update']);
+            Route::delete('/{id}', [AccountGroupController::class, 'destroy']);
+            Route::get('{id}/restore', [AccountGroupController::class, 'restore']);
+            Route::delete('{id}/force', [AccountGroupController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AccountGroupController::class, 'toggleStatus']);
+        });
+         //account-charts routes
+        Route::prefix('account-charts')->group(function () {
+            Route::get('/', [ChartOfAccountController::class, 'index']);
+            Route::post('/', [ChartOfAccountController::class, 'store']);
+            Route::get('/{id}', [ChartOfAccountController::class, 'show']);
+            Route::post('/update/{id}', [ChartOfAccountController::class, 'update']);
+            Route::delete('/{id}', [ChartOfAccountController::class, 'destroy']);
+            Route::get('{id}/restore', [ChartOfAccountController::class, 'restore']);
+            Route::delete('{id}/force', [ChartOfAccountController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [ChartOfAccountController::class, 'toggleStatus']);
+        });
+
+
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

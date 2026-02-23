@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssignLeaveService;
 use App\Services\AttendanceService;
@@ -13,6 +14,7 @@ use App\Services\BkashService;
 use App\Services\BlogService;
 use App\Services\BrandService;
 use App\Services\CellService;
+use App\Services\ChartOfAccountService;
 use App\Services\CompanyDeletionService;
 use App\Services\CompanyService;
 use App\Services\CouponService;
@@ -171,6 +173,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TemplateService::class);
         $this->app->bind(WocommerceSettingService::class);
         $this->app->bind(TaxRateService::class);
+        $this->app->bind(AccountGroupService::class);
+        $this->app->bind(ChartOfAccountService::class);
     }
 
     /**
