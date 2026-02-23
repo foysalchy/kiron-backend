@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ActionLogController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -116,6 +117,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/stats', [LogActionController::class, 'stats']);
             Route::get('/{module}/{companyId}', [LogActionController::class, 'logByModule']);
             Route::get('/{actionId}', [LogActionController::class, 'logByAction']);
+        });
+
+        Route::prefix('action-logs')->group(function () {
+            Route::get('/',        [ActionLogController::class, 'index']);
+            Route::get('/filters', [ActionLogController::class, 'filters']);
         });
         // company routes
         Route::prefix('companies')->group(function () {
@@ -1019,12 +1025,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [TaxGroupController::class, 'store']);
             Route::get('/{id}', [TaxGroupController::class, 'show']);
             Route::post('/update/{id}', [TaxGroupController::class, 'update']);
+            Route::patch('/{id}/toggle-status', [TaxGroupController::class, 'toggleStatus']);
             Route::delete('/{id}', [TaxGroupController::class, 'destroy']);
             Route::get('{id}/restore', [TaxGroupController::class, 'restore']);
             Route::delete('{id}/force', [TaxGroupController::class, 'forceDestroy']);
         });
-
-
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

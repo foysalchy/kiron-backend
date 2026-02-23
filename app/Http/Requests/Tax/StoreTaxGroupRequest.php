@@ -24,29 +24,27 @@ class StoreTaxGroupRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
-       return array_merge($this->companyRules(), [
-            'tax_rate_id' => ['nullable', 'exists:tax_rates,id'],
-            'name'        => ['required', 'string', 'max:255'],
-            'sub_tax'     => ['required', 'array'],
-            'sub_tax.*'   => ['required', 'string', 'distinct', 'exists:tax_rates,name'],
+        return array_merge($this->companyRules(), [
+            'name'           => ['required', 'string', 'max:255'],
+            'tax_rate_ids'   => ['required', 'array', 'min:1'],
+            'tax_rate_ids.*' => ['required', 'integer', 'exists:tax_rates,id'],
         ]);
     }
-    /**
-     * Custom messages for validation errors.
-     */
+
     public function messages(): array
     {
         return array_merge(
             $this->companyMessages(),
             [
-                'tax_rate_id.required' => 'The parent tax rate is required',
-                'tax_rate_id.exists'   => 'The selected tax rate is invalid',
-                'name.required'        => 'The Tax Group name is required',
-                'sub_tax.required'     => 'At least one sub-tax name is required',
-                'sub_tax.array'        => 'Sub-tax must be a valid array format',
-                'sub_tax.*.required'   => 'Each sub-tax name is required',
-                'sub_tax.*.string'     => 'Each sub-tax name must be a text value',
-                'sub_tax.*.distinct'   => 'Sub-tax names must be unique in this group',
+                'name.required'             => 'The tax group name is required',
+                'name.string'               => 'The tax group name must be a valid string',
+                'name.max'                  => 'The tax group name must not exceed 255 characters',
+                'tax_rate_ids.required'     => 'At least one tax rate must be selected',
+                'tax_rate_ids.array'        => 'Tax rates must be provided as an array',
+                'tax_rate_ids.min'          => 'At least one tax rate must be selected',
+                'tax_rate_ids.*.required'   => 'Each tax rate ID is required',
+                'tax_rate_ids.*.integer'    => 'Each tax rate ID must be a valid integer',
+                'tax_rate_ids.*.exists'     => 'One or more selected tax rates do not exist',
             ]
         );
     }
