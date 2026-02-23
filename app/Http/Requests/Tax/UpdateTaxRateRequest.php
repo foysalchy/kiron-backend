@@ -27,6 +27,7 @@ class UpdateTaxRateRequest extends UpdateBaseCompanyRequest
         return array_merge($this->companyRules(), [
             'name'     => ['sometimes', 'string', 'max:255'],
             'tax_rate' => ['sometimes', 'numeric', 'min:0', 'max:100'],
+            'status' => ['sometimes'],
         ]);
     }
     public function messages(): array
