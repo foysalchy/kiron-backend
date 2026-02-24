@@ -12,8 +12,7 @@ use Illuminate\Http\Request;
 
 class TaxGroupController extends Controller
 {
-    public function __construct(protected TaxGroupService $taxGroupService)
-    {}
+    public function __construct(protected TaxGroupService $taxGroupService) {}
     /**
      * Display a listing of tax rates.
      */
@@ -84,5 +83,14 @@ class TaxGroupController extends Controller
         $this->taxGroupService->forceDeleteTaxGroup($id);
 
         return ResponseHelper::success(null, 'Tax group permanently deleted');
+    }
+    /**
+     * toggle status.
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        $data = $this->taxGroupService->toggleStatus($id);
+
+        return  ResponseHelper::success($data, 'Status updated successfully');
     }
 }
