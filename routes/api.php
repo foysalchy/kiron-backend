@@ -91,6 +91,8 @@ use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TaxGroupController;
 use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\TemplateController;
+use App\Http\Controllers\Api\TransactionExpenseController;
+use App\Http\Controllers\Api\TransactionIncomeController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WocommerceSettingController;
@@ -1056,6 +1058,28 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [ChartOfAccountController::class, 'restore']);
             Route::delete('{id}/force', [ChartOfAccountController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [ChartOfAccountController::class, 'toggleStatus']);
+        });
+         //account-expenses routes
+        Route::prefix('account-expenses')->group(function () {
+            Route::get('/', [TransactionExpenseController::class, 'index']);
+            Route::post('/', [TransactionExpenseController::class, 'store']);
+            Route::get('/{id}', [TransactionExpenseController::class, 'show']);
+            Route::post('/update/{id}', [TransactionExpenseController::class, 'update']);
+            Route::delete('/{id}', [TransactionExpenseController::class, 'destroy']);
+            Route::get('{id}/restore', [TransactionExpenseController::class, 'restore']);
+            Route::delete('{id}/force', [TransactionExpenseController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [TransactionExpenseController::class, 'updateStatus']);
+        });
+         //account-incomes routes
+        Route::prefix('account-incomes')->group(function () {
+            Route::get('/', [TransactionIncomeController::class, 'index']);
+            Route::post('/', [TransactionIncomeController::class, 'store']);
+            Route::get('/{id}', [TransactionIncomeController::class, 'show']);
+            Route::post('/update/{id}', [TransactionIncomeController::class, 'update']);
+            Route::delete('/{id}', [TransactionIncomeController::class, 'destroy']);
+            Route::get('{id}/restore', [TransactionIncomeController::class, 'restore']);
+            Route::delete('{id}/force', [TransactionIncomeController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [TransactionIncomeController::class, 'updateStatus']);
         });
 
 
