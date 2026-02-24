@@ -79,7 +79,7 @@ class BlogService
 
             $blog = Blog::create($data);
 
-            LogHelper::created('blog', $blog->id, $blog->company_id,$blog->title);
+            LogHelper::created('blog', $blog->id, $blog->company_id, $blog->title);
             DB::commit();
 
             Log::info('Blog created successfully', ['blog_id' => $blog->id]);
@@ -109,31 +109,34 @@ class BlogService
         try {
             $blog = $this->getBlogById($id);
 
-            // Handle multiple image replacement
-            if (isset($data['images']) && is_array($data['images'])) {
-                // Delete old images from storage
-                if (!empty($blog->images)) {
-                    foreach ($blog->images as $oldImagePath) {
-                        FileUploadHelper::delete($oldImagePath);
-                    }
-                }
+            $currentImages = $blog->images ?? [];
 
-                // Upload new images
-                $uploadedImages = [];
+            $existingImagesKept = $data['existing_images'] ?? [];
+
+            $imagesToDelete = array_diff($currentImages, $existingImagesKept);
+
+            foreach ($imagesToDelete as $imagePath) {
+                FileUploadHelper::delete($imagePath);
+            }
+
+            $finalImages = $existingImagesKept;
+
+
+            if (isset($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $image) {
-                    $uploadedImages[] = FileUploadHelper::uploadImage(
+                    $finalImages[] = FileUploadHelper::uploadImage(
                         $image,
                         'blogs/images',
                         'public',
                         2048
                     );
                 }
-                $data['images'] = $uploadedImages;
             }
+            $data['images'] = $finalImages;
 
             $blog->update($data);
 
-            LogHelper::updated('blog', $blog->id, $blog->company_id,$blog->title);
+            LogHelper::updated('blog', $blog->id, $blog->company_id, $blog->title);
             DB::commit();
 
             Log::info('Blog updated successfully', ['blog_id' => $blog->id]);
@@ -159,7 +162,7 @@ class BlogService
             $blog = $this->getBlogById($id);
             $blog->delete();
 
-            LogHelper::deleted('blog', $id, $blog->company_id,$blog->title);
+            LogHelper::deleted('blog', $id, $blog->company_id, $blog->title);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -185,7 +188,7 @@ class BlogService
             }
 
             $blog->restore();
-            LogHelper::restored('blog', $blog->id, $blog->company_id,$blog->title);
+            LogHelper::restored('blog', $blog->id, $blog->company_id, $blog->title);
 
             Log::info('Blog restored successfully', ['blog_id' => $id]);
             DB::commit();
@@ -225,7 +228,7 @@ class BlogService
 
             DB::commit();
 
-            LogHelper::forceDeleted('blog', $id, $blog->company_id,$blog->title);
+            LogHelper::forceDeleted('blog', $id, $blog->company_id, $blog->title);
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -254,7 +257,7 @@ class BlogService
                 'status' => $newStatus->value
             ]);
 
-            LogHelper::statusChanged('blog', $blog->id, $blog->company_id,$blog->title .' new status ' .$newStatus->label());
+            LogHelper::statusChanged('blog', $blog->id, $blog->company_id, $blog->title . ' new status ' . $newStatus->label());
 
             DB::commit();
             Log::info('Blog status toggled successfully', ['blog_id' => $id, 'new_status' => $newStatus->label()]);

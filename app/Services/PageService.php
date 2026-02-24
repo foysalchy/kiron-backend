@@ -69,6 +69,7 @@ class PageService
      */
     public function createPage(array $data): Page
     {
+  
         DB::beginTransaction();
         try {
             if (isset($data['image'])) {

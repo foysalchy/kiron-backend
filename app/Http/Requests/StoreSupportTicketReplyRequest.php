@@ -26,7 +26,7 @@ class StoreSupportTicketReplyRequest extends FormRequest
         return [
             'support_ticket_id' => ['required', 'exists:support_tickets,id'],
             'comment'           => ['required', 'string', 'min:2'],
-            'image'             => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'image'             => ['nullable', 'image', 'mimes:jpeg,png,jpg,', 'max:2048'],
         ];
     }
     public function messages(): array
