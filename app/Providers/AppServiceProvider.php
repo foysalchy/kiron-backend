@@ -82,6 +82,8 @@ use App\Services\SupportDepartmentService;
 use App\Services\SupportTicketService;
 use App\Services\TaxRateService;
 use App\Services\TemplateService;
+use App\Services\TransactionExpenseService;
+use App\Services\TransactionIncomeService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
 use Illuminate\Support\ServiceProvider;
@@ -175,6 +177,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TaxRateService::class);
         $this->app->bind(AccountGroupService::class);
         $this->app->bind(ChartOfAccountService::class);
+        $this->app->bind(TransactionIncomeService::class);
+        $this->app->bind(TransactionExpenseService::class);
     }
 
     /**

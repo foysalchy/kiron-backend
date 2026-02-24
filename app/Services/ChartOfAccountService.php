@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
 
 class ChartOfAccountService
-{
+{ 
     /**
      * Get all accounts with optional pagination and filters
      */
