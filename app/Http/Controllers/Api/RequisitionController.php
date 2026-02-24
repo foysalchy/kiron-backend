@@ -34,7 +34,7 @@ class RequisitionController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->requisitionService->getAllRequisitions($filters, false);
+        $data = $this->requisitionService->getAllRequisitions($filters);
 
         return ResponseHelper::success($data, 'Requisitions retrieved successfully');
     }

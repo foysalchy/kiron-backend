@@ -28,7 +28,7 @@ class AttributeValueController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->attributeService->getAllAttributes($filters, true);
+        $data = $this->attributeService->getAllAttributes($filters);
 
         return ResponseHelper::success($data, 'Attributes retrieved successfully');
     }
