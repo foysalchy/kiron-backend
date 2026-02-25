@@ -1,13 +1,15 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\AccountGroup;
+use App\Models\AccountType;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class AccountGroupService
 {
@@ -45,6 +47,13 @@ class AccountGroupService
         }
     }
 
+    /**
+     * Get group by ID
+     */
+    public function accountType()
+    {
+        return AccountType::all();
+    }
     /**
      * Get group by ID
      */

@@ -4,44 +4,38 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rule;
-use function PHPUnit\Framework\returnArgument;
 
-class StorePayRollRequest extends BaseCompanyRequest
+class UpdateKnowledgeBaseRequest extends UpdateBaseCompanyRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $id = $this->route('id'); 
+
         return array_merge(
             $this->companyRules(),
             [
-                'name'         => ['required', 'string', 'max:255'],
-                'payment_type' => ['required', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash'])],
-                'status'       => ['nullable', 'integer', 'in:0,1'],
+                'title'   => ['sometimes', 'required', 'string', 'max:255'],
+                'slug'    => ['nullable', 'string', 'max:255', Rule::unique('knowledge_bases', 'slug')->ignore($id)],
+                'content' => ['sometimes', 'required', 'string'],
             ]
         );
     }
+
     public function messages(): array
     {
         return array_merge(
             $this->companyMessages(),
             [
-                'name.required' => 'Payroll name is required',
-                'payment_type.required' => 'Payment type is required',
+                'title.required'   => 'Title is required.',
+                'content.required' => 'Content is required.',
+                'slug.unique'      => 'This slug is already taken.',
             ]
         );
     }
@@ -52,7 +46,7 @@ class StorePayRollRequest extends BaseCompanyRequest
             response()->json([
                 'success' => false,
                 'message' => 'Validation failed',
-                'errors' => $validator->errors(),
+                'errors'  => $validator->errors(),
             ], 422)
         );
     }
