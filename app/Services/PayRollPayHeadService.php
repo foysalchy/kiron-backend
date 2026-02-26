@@ -7,9 +7,33 @@ use App\Models\PayHead;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PayRollPayHeadService
 {
+    /**
+     * Get all payroll pay heads with calculations based on UI
+     */
+    public function payRollPayHead(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    {
+        try {
+            $query = PayRollPayHead::query()->with('payRoll', 'payHead');
+
+            if (!empty($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
+
+            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortOrder = $filters['sort_order'] ?? 'desc';
+            $query->orderBy($sortBy, $sortOrder);
+
+            return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
+        } catch (\Exception $e) {
+            Log::error('Error fetching payrolls: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch payroll records');
+        }
+    }
     /**
      * Get all payroll pay heads with calculations based on UI
      */
@@ -65,20 +89,13 @@ class PayRollPayHeadService
     {
         DB::beginTransaction();
         try {
-            $payHead = PayHead::where('name', $data['pay_head_name'])->first();
 
-            if (!$payHead) {
-                throw ApiException::notFound('Pay Head with this name');
-            }
-
-            $data['pay_head_id'] = $payHead->id;
-            unset($data['pay_head_name']);
 
             $record = PayRollPayHead::create($data);
-            LogHelper::created('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
+            LogHelper::created('payRollPayHead', $record->id, $record->company_id, $record->type . ' amount ' . $record->amount);
 
             DB::commit();
-            return $record->load('payHead', 'payRoll');
+            return $record;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -110,7 +127,7 @@ class PayRollPayHeadService
             }
 
             $record->update($data);
-            LogHelper::updated('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
+            LogHelper::updated('payRollPayHead', $record->id, $record->company_id, $record->type . ' amount ' . $record->amount);
 
             DB::commit();
             return $record->fresh(['payHead', 'payRoll']);
@@ -133,7 +150,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->delete();
-            LogHelper::deleted('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
+            LogHelper::deleted('payRollPayHead', $record->id, $record->company_id, $record->type . ' amount ' . $record->amount);
 
             DB::commit();
             return true;
@@ -156,7 +173,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->restore();
-            LogHelper::restored('payRollPayHead', $record->id, $record->company_id,$record->type . ' amount '. $record->amount);
+            LogHelper::restored('payRollPayHead', $record->id, $record->company_id, $record->type . ' amount ' . $record->amount);
 
             DB::commit();
             return $record;
@@ -178,7 +195,7 @@ class PayRollPayHeadService
         try {
             $record = $this->getById($id);
             $record->forceDelete();
-            LogHelper::forceDeleted('payRollPayHead', $id, $record->company_id,$record->type . ' amount '. $record->amount);
+            LogHelper::forceDeleted('payRollPayHead', $id, $record->company_id, $record->type . ' amount ' . $record->amount);
 
             DB::commit();
             return true;

@@ -18,7 +18,7 @@ class PayRollService
     public function getAllPayRolls(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = PayRoll::query()->with('periods'); 
+            $query = PayRoll::query()->with('periodType'); 
 
             if (!empty($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");

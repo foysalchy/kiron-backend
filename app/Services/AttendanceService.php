@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\{DB, Log};
 class AttendanceService
 {
     /**
-     * Get all attendance records with stats (Matches Image UI)
+     * Get all attendance records with stats
      */
     public function getAllAttendances(array $filters = [], bool $paginate = true): array
     {
@@ -24,8 +24,7 @@ class AttendanceService
             $query->whereDate('date', $date);
 
             if (!empty($filters['department_id'])) {
-                $query->whereHas('employee', fn($q)
-                => $q->where('department_id', $filters['department_id']));
+                $query->whereHas('employee', fn($q) => $q->where('department_id', $filters['department_id']));
             }
 
             if (isset($filters['status'])) {
@@ -44,8 +43,8 @@ class AttendanceService
                 });
             }
 
-            $statsQuery = clone $query;
-            $allRecords = $statsQuery->get();
+            $statsQuery  = clone $query;
+            $allRecords  = $statsQuery->get();
 
             $stats = [
                 'total_employees' => Employee::count(),
@@ -56,21 +55,19 @@ class AttendanceService
                 'weekend'         => $allRecords->where('status', Attendance::STATUS_WEEKEND)->count(),
             ];
 
-            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortBy    = $filters['sort_by']    ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
             $list = $paginate ? $query->paginate($filters['per_page'] ?? 25) : $query->get();
 
-            return [
-                'stats' => $stats,
-                'list'  => $list
-            ];
+            return ['stats' => $stats, 'list' => $list];
         } catch (\Exception $e) {
             Log::error('Error fetching attendance: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch attendance records');
         }
     }
+
     /**
      * Get Attendance by ID
      */
@@ -81,10 +78,14 @@ class AttendanceService
         if (!$attendance) {
             throw ApiException::notFound('Attendance record');
         }
+
         return $attendance;
     }
+
     /**
-     * Create attendance
+     * Create a single attendance record.
+     * If a record already exists for the same employee + date (even in trash), 
+     * it is force-deleted first so a clean new record is inserted.
      */
     public function createAttendance(array $data): Attendance
     {
@@ -92,10 +93,15 @@ class AttendanceService
         try {
             $employee = Employee::findOrFail($data['employee_id']);
 
-            // Calculate metrics before saving
-            $data = $this->calculateAttendanceMetrics($data, $employee);
+            // Remove any existing record (including soft-deleted) for same employee+date
+            Attendance::withTrashed()
+                ->where('employee_id', $data['employee_id'])
+                ->whereDate('date', $data['date'])
+                ->forceDelete();
 
+            $data       = $this->calculateAttendanceMetrics($data, $employee);
             $attendance = Attendance::create($data);
+
             $message = sprintf(
                 'Employee %s %s marked as %s',
                 $employee->first_name,
@@ -105,7 +111,7 @@ class AttendanceService
 
             LogHelper::created('attendance', $attendance->id, $attendance->company_id, $message);
             DB::commit();
-            Log::info('Attendance created', ['id' => $attendance->id]);
+            Log::info('Attendance created (replaced existing)', ['id' => $attendance->id]);
 
             return $attendance->load('employee');
         } catch (\Exception $e) {
@@ -116,25 +122,83 @@ class AttendanceService
     }
 
     /**
+     * Bulk create attendance records.
+     * For each record, any existing entry (including soft-deleted) for the same
+     * employee + date is force-deleted before the new one is inserted.
+     * Returns ['saved' => int, 'failed' => int, 'errors' => array]
+     */
+    public function bulkCreateAttendance(array $records): array
+    {
+        $saved  = 0;
+        $failed = 0;
+        $errors = [];
+
+        foreach ($records as $index => $data) {
+            DB::beginTransaction();
+            try {
+                $employee = Employee::find($data['employee_id']);
+
+                if (!$employee) {
+                    $failed++;
+                    $errors[$index] = "Employee #{$data['employee_id']} not found";
+                    DB::rollBack();
+                    continue;
+                }
+
+                // Remove any existing record (including soft-deleted) for same employee+date
+                Attendance::withTrashed()
+                    ->where('employee_id', $data['employee_id'])
+                    ->whereDate('date', $data['date'])
+                    ->forceDelete();
+
+                $data       = $this->calculateAttendanceMetrics($data, $employee);
+                $attendance = Attendance::create($data);
+
+                $message = sprintf(
+                    'Employee %s %s marked as %s (bulk)',
+                    $employee->first_name,
+                    $employee->last_name,
+                    $attendance->status_text
+                );
+
+                LogHelper::created('attendance', $attendance->id, $attendance->company_id, $message);
+
+                DB::commit();
+                $saved++;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $failed++;
+                $errors[$index] = $e->getMessage();
+                Log::warning("Bulk attendance failed for index {$index}: " . $e->getMessage());
+            }
+        }
+
+        Log::info("Bulk attendance complete: {$saved} saved, {$failed} failed");
+
+        return compact('saved', 'failed', 'errors');
+    }
+
+    /**
      * Update attendance
      */
     public function updateAttendance(int $id, array $data): Attendance
     {
         DB::beginTransaction();
-
         try {
             $attendance = $this->getAttendanceById($id);
-            $data = $this->calculateAttendanceMetrics($data, $attendance->employee);
+            $data       = $this->calculateAttendanceMetrics($data, $attendance->employee);
             $attendance->update($data);
+
             $message = sprintf(
                 'Employee %s %s marked as %s',
                 $attendance->employee->first_name,
                 $attendance->employee->last_name,
                 $attendance->status_text
             );
-            DB::commit();
 
-            LogHelper::updated('attendance', $id, $attendance->company_id,$message);
+            DB::commit();
+            LogHelper::updated('attendance', $id, $attendance->company_id, $message);
+
             return $attendance->fresh('employee');
         } catch (ApiException $e) {
             DB::rollBack();
@@ -151,18 +215,18 @@ class AttendanceService
      */
     private function calculateAttendanceMetrics(array $data, $employee): array
     {
-        $in = !empty($data['in_time']) ? Carbon::parse($data['in_time']) : null;
+        $in  = !empty($data['in_time'])  ? Carbon::parse($data['in_time'])  : null;
         $out = !empty($data['out_time']) ? Carbon::parse($data['out_time']) : null;
 
         if ($in && !empty($employee->in_time)) {
             $officeIn = Carbon::parse($employee->in_time);
-            $grace = isset($data['grace_time']) ? (int) $data['grace_time'] : 15;
+            $grace    = isset($data['grace_time']) ? (int) $data['grace_time'] : 15;
 
             if ($in->greaterThan($officeIn->copy()->addMinutes($grace))) {
-                $data['is_late'] = true;
+                $data['is_late']   = true;
                 $data['late_time'] = $in->diff($officeIn)->format('%H:%I');
             } else {
-                $data['is_late'] = false;
+                $data['is_late']   = false;
                 $data['late_time'] = null;
             }
         }
@@ -173,21 +237,16 @@ class AttendanceService
             if (!empty($employee->out_time)) {
                 $officeOut = Carbon::parse($employee->out_time);
 
-                if ($out->greaterThan($officeOut)) {
-                    $data['over_time'] = $out->diff($officeOut)->format('%H:%I');
-                } else {
-                    $data['over_time'] = null;
-                }
+                $data['over_time']    = $out->greaterThan($officeOut)
+                    ? $out->diff($officeOut)->format('%H:%I')
+                    : null;
 
-                // Early Out check
                 $data['is_early_out'] = $out->lessThan($officeOut);
             } else {
                 $totalMins = $out->diffInMinutes($in);
-                if ($totalMins > 480) {
-                    $data['over_time'] = $out->diff($in->copy()->addMinutes(480))->format('%H:%I');
-                } else {
-                    $data['over_time'] = null;
-                }
+                $data['over_time'] = $totalMins > 480
+                    ? $out->diff($in->copy()->addMinutes(480))->format('%H:%I')
+                    : null;
             }
         }
 
@@ -195,7 +254,7 @@ class AttendanceService
     }
 
     /**
-     * Delete Attendance soft delete
+     * Soft delete
      */
     public function deleteAttendance(int $id): bool
     {
@@ -218,7 +277,7 @@ class AttendanceService
     }
 
     /**
-     * Restore Attendance
+     * Restore
      */
     public function restoreAttendance(int $id): Attendance
     {
@@ -227,9 +286,8 @@ class AttendanceService
             $attendance = Attendance::withTrashed()->find($id);
             if (!$attendance) throw ApiException::notFound('Attendance');
             $attendance->restore();
-
             DB::commit();
-            Log::info('Attendance restored from trash', ['id' => $id]);
+            Log::info('Attendance restored', ['id' => $id]);
             LogHelper::custom('restored', 'attendance', $id, $attendance->company_id);
             return $attendance;
         } catch (\Throwable $e) {
@@ -240,25 +298,20 @@ class AttendanceService
     }
 
     /**
-     * Permanently Delete
+     * Force delete
      */
     public function forceDeleteAttendance(int $id): bool
     {
         DB::beginTransaction();
         try {
             $attendance = Attendance::withTrashed()->find($id);
-
-            if (!$attendance) {
-                throw ApiException::notFound('Attendance record');
-            }
+            if (!$attendance) throw ApiException::notFound('Attendance record');
 
             $companyId = $attendance->company_id;
             $attendance->forceDelete();
-
             DB::commit();
             Log::info('Attendance permanently deleted', ['id' => $id]);
             LogHelper::custom('force_deleted', 'attendance', $id, $companyId);
-
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
@@ -269,20 +322,18 @@ class AttendanceService
             throw ApiException::serverError('Failed to permanently delete attendance');
         }
     }
+
     /**
-     * Change Status to a specific value
+     * Change status
      */
     public function changeAttendanceStatus(int $id, int $status): Attendance
     {
         DB::beginTransaction();
         try {
             $attendance = $this->getAttendanceById($id);
-
             $attendance->update(['status' => $status]);
-
             DB::commit();
-            LogHelper::custom('status_changed', 'attendance', $id, $attendance->company_id,$attendance->status_text);
-
+            LogHelper::custom('status_changed', 'attendance', $id, $attendance->company_id, $attendance->status_text);
             return $attendance;
         } catch (ApiException $e) {
             DB::rollBack();

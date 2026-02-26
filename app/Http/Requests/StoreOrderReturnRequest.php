@@ -34,6 +34,7 @@ class StoreOrderReturnRequest extends BaseCompanyRequest
                 'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.unit_price' => ['required', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
+                'items.*.tax_group_id' => ['nullable', 'integer'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
                 'items.*.variation_id' => ['nullable'],
 

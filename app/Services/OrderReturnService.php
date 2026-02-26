@@ -143,6 +143,7 @@ class OrderReturnService
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
                     'discount' => $item['discount'] ?? 0,
+                    'tax_group_id' => $item['tax_group_id'] ?? null,
                     'tax' => $item['tax'] ?? 0,
                     'total' => $itemTotal,
                 ]);
@@ -228,6 +229,7 @@ class OrderReturnService
                         'quantity' => $item['quantity'],
                         'unit_price' => $item['unit_price'],
                         'discount' => $item['discount'] ?? 0,
+                        'tax_group_id' => $item['tax_group_id'] ?? null,
                         'tax' => $item['tax'] ?? 0,
                         'total' => $itemTotal,
                     ]);

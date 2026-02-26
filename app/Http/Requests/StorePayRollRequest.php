@@ -31,6 +31,7 @@ class StorePayRollRequest extends BaseCompanyRequest
             [
                 'name'         => ['required', 'string', 'max:255'],
                 'payment_type' => ['required', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash'])],
+                'period_type_id' => ['required', 'exists:period_types,id'],
                 'status'       => ['nullable', 'integer', 'in:0,1'],
             ]
         );

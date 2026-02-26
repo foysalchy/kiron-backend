@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('pay_head_id')->constrained('pay_heads')->cascadeOnDelete();
             $table->string('type')->comment('amount,percentage');
             $table->decimal('amount', 15, 2)->default(0);
+            $table->unique(['pay_roll_id', 'pay_head_id']);
             $table->timestamps();
             $table->softDeletes();
         });
