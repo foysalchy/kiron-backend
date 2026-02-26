@@ -34,6 +34,7 @@ class UpdateOrderReturnRequest extends UpdateBaseCompanyRequest
                 'items.*.quantity' => ['required_with:items', 'integer', 'min:1'],
                 'items.*.unit_price' => ['required_with:items', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
+                'items.*.tax_group_id' => ['nullable', 'integer'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
                 'items.*.variation_id' => ['nullable'],
 

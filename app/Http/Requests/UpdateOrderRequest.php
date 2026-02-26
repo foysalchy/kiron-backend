@@ -40,7 +40,7 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
                     ->where('type', 2)],
                 'is_walk_in' => ['nullable', 'boolean'],
 
-                'items' => ['sometimes', 'array', 'min:1', new UniqueProductIds],
+                'items' => ['sometimes', 'array', 'min:1'],
                 'items.*.product_id' => [
                     'required',
                     Rule::exists('products', 'id')
@@ -49,6 +49,7 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
                 'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.unit_price' => ['required', 'numeric', 'min:0'],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
+                'items.*.tax_group_id' => ['nullable', 'integer'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
                 'items.*.variation_id' => ['nullable'],
 

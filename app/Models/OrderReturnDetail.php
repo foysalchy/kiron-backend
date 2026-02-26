@@ -14,6 +14,7 @@ class OrderReturnDetail extends Model
         'quantity',
         'unit_price',
         'discount',
+        'tax_group_id',
         'tax',
         'total',
     ];
@@ -22,6 +23,7 @@ class OrderReturnDetail extends Model
         'quantity' => 'integer',
         'unit_price' => 'decimal:2',
         'discount' => 'decimal:2',
+        'tax_group_id' => 'integer',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
     ];
@@ -36,7 +38,7 @@ class OrderReturnDetail extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function variation() : BelongsTo
+    public function variation(): BelongsTo
     {
         return $this->belongsTo(ProductVariation::class, 'variation_id');
     }

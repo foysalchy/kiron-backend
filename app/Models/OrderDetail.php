@@ -14,6 +14,7 @@ class OrderDetail extends Model
         'quantity',
         'unit_price',
         'discount',
+        'tax_group_id',
         'tax',
         'total',
     ];

@@ -39,6 +39,29 @@ class AttendanceController extends Controller
 
         return ResponseHelper::success($data, 'Attendance record created successfully', 201);
     }
+
+    public function bulkStore(Request $request): JsonResponse
+    {
+        $request->validate([
+            'records'               => ['required', 'array', 'min:1'],
+            'records.*.employee_id' => ['required', 'integer', 'exists:employees,id'],
+            'records.*.date'        => ['required', 'date'],
+            'records.*.in_time'     => ['nullable', 'date_format:H:i'],
+            'records.*.out_time'    => ['nullable', 'date_format:H:i', 'after:records.*.in_time'],
+            'records.*.grace_time'  => ['nullable', 'integer', 'min:0'],
+            'records.*.status'      => ['required', 'integer', 'in:0,1,2,3,4,5'],
+            'records.*.is_late'     => ['nullable', 'boolean'],
+            'records.*.is_early_out' => ['nullable', 'boolean'],
+        ]);
+
+        $results = $this->attendanceService->bulkCreateAttendance($request->input('records'));
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$results['saved']} record(s) saved, {$results['failed']} failed.",
+            'data'    => $results,
+        ], 201);
+    }
     //show
     public function show(int $id): JsonResponse
     {

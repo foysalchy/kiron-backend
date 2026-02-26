@@ -130,6 +130,7 @@ class PurchaseService
                     'purchase_price' => $item['purchase_price'],
                     'unit_cost' => $item['unit_cost'],
                     'discount' => $item['discount'] ?? 0,
+                    'tax_group_id' => $item['tax_group_id'] ?? null,
                     'tax' => $item['tax'] ?? 0,
                     'total' => $itemTotal,
                 ]);
@@ -159,6 +160,8 @@ class PurchaseService
      */
     public function updatePurchase(int $id, array $data): Purchase
     {
+
+
         DB::beginTransaction();
 
         try {
@@ -200,11 +203,12 @@ class PurchaseService
                     PurchaseDetail::create([
                         'purchase_id' => $purchase->id,
                         'product_id' => $item['product_id'],
-                        'variation_id' => $item['variation_id'] ?? null, // ✅ Add variation support
+                        'variation_id' => $item['variation_id'] ?? null, 
                         'quantity' => $item['quantity'],
                         'purchase_price' => $item['purchase_price'],
                         'unit_cost' => $item['unit_cost'],
                         'discount' => $item['discount'] ?? 0,
+                        'tax_group_id' => $item['tax_group_id'] ?? null,
                         'tax' => $item['tax'] ?? 0,
                         'total' => $itemTotal,
                     ]);
