@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('name');
-            $table->string('payroll_type')->default('Not Assigned');
+            $table->string('period_type_id');
             $table->string('payment_type')->nullable()->comment('cash, bank, card, cheque, bkash');
             $table->tinyInteger('status')->default(1);
             $table->timestamps();

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
 class UpdatePayRollPayHeadRequest extends UpdateBaseCompanyRequest
 {
@@ -24,19 +25,31 @@ class UpdatePayRollPayHeadRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-       return array_merge($this->companyRules(), [
-            'pay_roll_id'   => ['sometimes', 'required', 'exists:pay_rolls,id'],
-            'pay_head_name' => ['sometimes', 'required', 'exists:pay_heads,name'],
-            'type'          => ['sometimes', 'required', 'string'],
-            'amount'        => ['sometimes', 'required', 'numeric', 'min:0'],
+        $id = $this->route('id'); 
+        return array_merge($this->companyRules(), [
+            'pay_roll_id' => ['sometimes', 'required', 'exists:pay_rolls,id'],
+
+            'pay_head_id' => [
+                'sometimes',
+                'required',
+                'exists:pay_heads,id',
+                Rule::unique('pay_roll_pay_heads')
+                    ->where(fn($q) => $q->where('pay_roll_id', $this->pay_roll_id))
+                    ->ignore($id),
+            ],
+
+            'type'   => ['sometimes', 'required', 'string'],
+            'amount' => ['sometimes', 'required', 'numeric', 'min:0'],
         ]);
     }
+
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'amount.numeric'        => 'The amount must be a number.',
-            'pay_roll_id.exists'    => 'Invalid payroll selected.',
-            'pay_head_name.exists'  => 'Invalid pay head name selected.',
+            'amount.numeric'      => 'The amount must be a number.',
+            'pay_roll_id.exists'  => 'Invalid payroll selected.',
+            'pay_head_id.exists'  => 'Invalid pay head selected.',
+            'pay_head_id.unique'  => 'This pay head is already added to this payroll.',
         ]);
     }
 

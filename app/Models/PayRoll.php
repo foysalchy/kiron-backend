@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PayRoll extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
     protected $fillable = [
         'company_id',
         'name',
-        'payroll_type',
+        'period_type_id',
         'payment_type',
     ];
     protected $hidden = ['deleted_at'];
@@ -42,5 +42,9 @@ class PayRoll extends Model
     public function periods(): BelongsToMany
     {
         return $this->belongsToMany(Period::class, 'payroll_periods');
+    }
+    public function periodType(): BelongsTo
+    {
+        return $this->belongsTo(PeriodType::class)->select('id', 'type');
     }
 }

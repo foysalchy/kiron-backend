@@ -25,7 +25,7 @@ class UpdateEmployeeRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-        $employeeId = $this->route('employee');
+        $employeeId = $this->id;
 
         return array_merge(
             $this->companyRules(),

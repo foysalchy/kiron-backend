@@ -29,7 +29,9 @@ class UpdatePayRollRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'name'         => ['sometimes', 'required', 'string', 'max:255'],
-                'payment_type' => ['nullable','string',Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash', 'nagad'])],
+                'payment_type' => ['sometimes', 'string', Rule::in(['cash', 'bank', 'card', 'cheque', 'bkash', 'nagad'])],
+                'period_type_id' => ['sometimes', 'exists:period_types,id'],
+
             ]
         );
     }

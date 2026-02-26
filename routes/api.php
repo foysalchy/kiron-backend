@@ -626,6 +626,7 @@ Route::prefix('v1')->group(function () {
         });
         //attendance routes
         Route::prefix('attendances')->group(function () {
+            Route::post('/bulk',[AttendanceController::class, 'bulkStore']);
             Route::get('/', [AttendanceController::class, 'index']);
             Route::post('/', [AttendanceController::class, 'store']);
             Route::get('/{id}', [AttendanceController::class, 'show']);

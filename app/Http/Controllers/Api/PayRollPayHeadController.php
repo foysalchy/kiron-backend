@@ -21,6 +21,23 @@ class PayRollPayHeadController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $filters = [
+            'status'     => $request->query('status'),
+            'search'     => $request->query('search'),
+            'sort_by'    => $request->query('sort_by', 'created_at'),
+            'sort_order' => $request->query('sort_order', 'desc'),
+            'per_page'   => $request->query('per_page', 15),
+        ];
+
+        $data = $this->service->payRollPayHead($filters, true);
+
+        return ResponseHelper::success($data, 'Payroll payhead retrieved successfully');
+    }
+    /**
+     * Display a listing of assigned pay heads with calculations.
+     */
+    public function payRollSummary(Request $request): JsonResponse
+    {
         $payRollId = $request->query('pay_roll_id');
 
         if (!$payRollId) {
