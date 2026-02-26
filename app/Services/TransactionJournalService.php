@@ -1,0 +1,311 @@
+<?php
+
+namespace App\Services;
+
+use App\Enums\Status;
+use App\Exceptions\ApiException;
+use App\Helpers\FileUploadHelper;
+use App\Helpers\LogHelper;
+use App\Models\TransactionJournal;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\{DB, Log};
+
+class TransactionJournalService
+{
+    /**
+     * Get all journal transactions with filters and totals
+     */
+    public function getAllJournals(array $filters = [], bool $paginate = true)
+    {
+        try {
+            $query = TransactionJournal::with(['accounts.chartOfAccount', 'creator']);
+
+            // Filter by Status
+            if (!empty($filters['status'])) {
+                $statusValues = is_array($filters['status']) ? $filters['status'] : [$filters['status']];
+                if (in_array('Trashed', $statusValues)) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->whereIn('status', $statusValues);
+                }
+            }
+
+            // Apply Date Filters
+            $query = $this->applyDateRange($query, $filters);
+
+            // Search by Reference Number
+            if (isset($filters['search']) && $filters['search'] !== '') {
+                $query->where('reference_number', 'like', "%{$filters['search']}%");
+            }
+
+            // Calculate Footer Sums (Clone query to avoid affecting results)
+            $totalDebitSum = (clone $query)->sum('total_debit');
+
+            $results = $paginate
+                ? $query->latest('date')->paginate($filters['per_page'] ?? 25)
+                : $query->latest('date')->get();
+
+            return [
+                'items' => $results,
+                'summary' => [
+                    'total_debit' => $totalDebitSum,
+                ]
+            ];
+        } catch (\Exception $e) {
+            Log::error('Journal Fetch Error: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch filtered journals');
+        }
+    }
+
+    /**
+     * Helper for date filtering
+     */
+    private function applyDateRange($query, $filters)
+    {
+        $range = $filters['range'] ?? null;
+        $now = Carbon::now();
+
+        if ($range) {
+            switch ($range) {
+                case 'Today': $query->whereDate('date', $now->today()); break;
+                case 'This Week': $query->whereBetween('date', [$now->startOfWeek(), $now->endOfWeek()]); break;
+                case 'This Month': $query->whereMonth('date', $now->month)->whereYear('date', $now->year); break;
+                case 'Last 7 Days': $query->whereBetween('date', [$now->subDays(7), Carbon::now()]); break;
+                case 'Last 30 Days': $query->whereBetween('date', [$now->subDays(30), Carbon::now()]); break;
+                default:
+                    if (strtotime($range)) {
+                        $date = Carbon::parse($range);
+                        $query->whereMonth('date', $date->month)->whereYear('date', $date->year);
+                    }
+                    break;
+            }
+        }
+
+        if (!empty($filters['from_date'])) {
+            $query->whereDate('date', '>=', $filters['from_date']);
+        }
+        if (!empty($filters['to_date'])) {
+            $query->whereDate('date', '<=', $filters['to_date']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get journal by ID
+     */
+    public function getJournalById(int $id): TransactionJournal
+    {
+        $journal = TransactionJournal::with(['accounts.chartOfAccount', 'creator'])->find($id);
+        if (!$journal) {
+            throw ApiException::notFound('Journal record');
+        }
+        return $journal;
+    }
+
+    /**
+     * Create Journal with Items
+     */
+    public function createJournal(array $data): TransactionJournal
+    {
+        DB::beginTransaction();
+        try {
+            $data['created_by'] = auth()->id();
+
+            if (isset($data['file'])) {
+                $data['file'] = FileUploadHelper::upload(
+                    $data['file'],
+                    'journals/attachments',
+                    'public'
+                );
+            }
+
+            // Calculate Totals from items array
+            $totalDebit = collect($data['items'])->sum('debit');
+            $totalCredit = collect($data['items'])->sum('credit');
+
+            // Create Master
+            $journal = TransactionJournal::create(array_merge($data, [
+                'total_debit'  => $totalDebit,
+                'total_credit' => $totalCredit,
+            ]));
+
+            // Create Detail records (accounts)
+            foreach ($data['items'] as $item) {
+                $journal->accounts()->create([
+                    'chart_of_account_id' => $item['chart_of_account_id'],
+                    'debit'               => $item['debit'] ?? 0,
+                    'credit'              => $item['credit'] ?? 0,
+                ]);
+            }
+
+            LogHelper::created('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
+            DB::commit();
+
+            return $journal->load(['accounts.chartOfAccount']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Journal creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create journal entry');
+        }
+    }
+
+    /**
+     * Update Journal and Sync Items
+     */
+
+    public function updateJournal(int $id, array $data): TransactionJournal
+    {
+        DB::beginTransaction();
+        try {
+            $journal = $this->getJournalById($id);
+
+            if (isset($data['file'])) {
+                $data['file'] = FileUploadHelper::replace(
+                    $data['file'],
+                    $journal->file,
+                    'journals/attachments'
+                );
+            }
+
+            if (isset($data['items'])) {
+                foreach ($data['items'] as $item) {
+                    if (!empty($item['id'])) {
+                        $journal->accounts()->where('id', $item['id'])->update([
+                            'chart_of_account_id' => $item['chart_of_account_id'],
+                            'debit'               => $item['debit'] ?? 0,
+                            'credit'              => $item['credit'] ?? 0,
+                        ]);
+                    } else {
+                        $journal->accounts()->create([
+                            'chart_of_account_id' => $item['chart_of_account_id'],
+                            'debit'               => $item['debit'] ?? 0,
+                            'credit'              => $item['credit'] ?? 0,
+                        ]);
+                    }
+                }
+
+                $requestItemIds = collect($data['items'])->pluck('id')->filter()->toArray();
+                if (!empty($requestItemIds)) {
+                    $journal->accounts()->whereNotIn('id', $requestItemIds)->delete();
+                }
+
+                $data['total_debit']  = $journal->accounts()->sum('debit');
+                $data['total_credit'] = $journal->accounts()->sum('credit');
+            }
+
+            $journal->update($data);
+
+            LogHelper::updated('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
+            DB::commit();
+
+            return $journal->fresh(['accounts.chartOfAccount']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Journal update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update journal entry');
+        }
+    }
+
+    /**
+     * Delete Journal (Soft Delete)
+     */
+    public function deleteJournal(int $id): bool
+    {
+        try {
+            $journal = $this->getJournalById($id);
+            $journal->delete();
+            LogHelper::deleted('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Journal deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to delete journal');
+        }
+    }
+
+    /**
+     * Restore Journal
+     */
+    public function restoreJournal(int $id): TransactionJournal
+    {
+        try {
+            $journal = TransactionJournal::withTrashed()->find($id);
+            if (!$journal) throw ApiException::notFound('Journal');
+
+            $journal->restore();
+            LogHelper::restored('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
+            return $journal->load(['accounts.chartOfAccount']);
+        } catch (\Exception $e) {
+            Log::error('Journal restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore journal');
+        }
+    }
+
+    /**
+     * Permanent Delete
+     */
+    public function forceDeleteJournal(int $id): bool
+    {
+        DB::beginTransaction();
+        try {
+            $journal = TransactionJournal::withTrashed()->find($id);
+            if (!$journal) throw ApiException::notFound('Journal');
+
+            if ($journal->file) {
+                FileUploadHelper::delete($journal->file);
+            }
+
+            $journal->accounts()->delete();
+            $journal->forceDelete();
+
+            LogHelper::forceDeleted('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Journal permanent deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete journal');
+        }
+    }
+
+    /**
+     * Update Status & Generate Ref on Approval
+     */
+    public function updateStatus(int $id, string|int $status): TransactionJournal
+    {
+        DB::beginTransaction();
+        try {
+            $journal = $this->getJournalById($id);
+            $newStatus = null;
+
+            if (is_numeric($status)) {
+                $newStatus = Status::tryFrom((int)$status);
+            } else {
+                foreach (Status::cases() as $case) {
+                    if (strtolower($case->name) === strtolower($status)) {
+                        $newStatus = $case;
+                        break;
+                    }
+                }
+            }
+
+            if (!$newStatus) throw ApiException::badRequest("Invalid status provided");
+
+            // Generate JV Number if moving to Approved
+            if ($newStatus === Status::Approved && empty($journal->reference_number)) {
+                $journal->generateReferenceNumber();
+            }
+
+            $journal->update(['status' => $newStatus->value]);
+
+            LogHelper::statusChanged('transaction_journal', $journal->id, $journal->company_id, "Status changed to {$newStatus->name}");
+
+            DB::commit();
+            return $journal->load(['accounts.chartOfAccount']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Journal Status Update Error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+}
