@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\IpDirectoryController;
 use App\Http\Controllers\Api\IpSettingController;
 use App\Http\Controllers\Api\JobTitleController;
+use App\Http\Controllers\Api\KnowledgeBaseController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\LandingPageController;
 use App\Http\Controllers\Api\LeadController;
@@ -912,6 +913,18 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/{id}/toggle-status', [SupportTicketController::class, 'toggleStatus']);
             });
         });
+
+        // Knowledge Base Routes
+        Route::prefix('knowledge-bases')->group(function () {
+            Route::get('/', [KnowledgeBaseController::class, 'index']);
+            Route::post('/', [KnowledgeBaseController::class, 'store']);
+            Route::get('/{id}', [KnowledgeBaseController::class, 'show']);
+            Route::post('/update/{id}', [KnowledgeBaseController::class, 'update']);
+            Route::delete('/{id}', [KnowledgeBaseController::class, 'destroy']);
+            Route::get('/{id}/restore', [KnowledgeBaseController::class, 'restore']);
+            Route::delete('/{id}/force', [KnowledgeBaseController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [KnowledgeBaseController::class, 'toggleStatus']);
+        });
         //change-pass routes
         Route::prefix('change-pass')->group(function () {
             Route::post('/', [PassChangeController::class, 'update']);
@@ -1037,6 +1050,8 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [TaxGroupController::class, 'restore']);
             Route::delete('{id}/force', [TaxGroupController::class, 'forceDestroy']);
         });
+
+        Route::get('/account-types', [AccountGroupController::class, 'accountType']);
         //account-groups routes
         Route::prefix('account-groups')->group(function () {
             Route::get('/', [AccountGroupController::class, 'index']);
@@ -1048,7 +1063,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [AccountGroupController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [AccountGroupController::class, 'toggleStatus']);
         });
-         //account-charts routes
+        //account-charts routes
         Route::prefix('account-charts')->group(function () {
             Route::get('/', [ChartOfAccountController::class, 'index']);
             Route::post('/', [ChartOfAccountController::class, 'store']);
@@ -1059,7 +1074,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [ChartOfAccountController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [ChartOfAccountController::class, 'toggleStatus']);
         });
-         //account-expenses routes
+        //account-expenses routes
         Route::prefix('account-expenses')->group(function () {
             Route::get('/', [TransactionExpenseController::class, 'index']);
             Route::post('/', [TransactionExpenseController::class, 'store']);
@@ -1070,7 +1085,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [TransactionExpenseController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionExpenseController::class, 'updateStatus']);
         });
-         //account-incomes routes
+        //account-incomes routes
         Route::prefix('account-incomes')->group(function () {
             Route::get('/', [TransactionIncomeController::class, 'index']);
             Route::post('/', [TransactionIncomeController::class, 'store']);
@@ -1081,8 +1096,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [TransactionIncomeController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionIncomeController::class, 'updateStatus']);
         });
-
-
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

@@ -20,6 +20,7 @@ return new class extends Migration
             $table->decimal('purchase_price', 15, 2);
             $table->decimal('unit_cost', 15, 2);
             $table->decimal('discount', 15, 2)->nullable()->default(0);
+            $table->decimal('tax_group_id')->nullable();
             $table->decimal('tax', 15, 2)->nullable()->default(0);
             $table->decimal('total', 15, 2);
 

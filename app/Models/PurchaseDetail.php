@@ -16,6 +16,7 @@ class PurchaseDetail extends Model
         'purchase_price',
         'unit_cost',
         'discount',
+        'tax_group_id',
         'tax',
         'total',
     ];
@@ -39,7 +40,7 @@ class PurchaseDetail extends Model
     {
         return $this->belongsTo(Product::class)->select('id', 'title', 'thumbnail');
     }
-    public function variation() : BelongsTo
+    public function variation(): BelongsTo
     {
         return $this->belongsTo(ProductVariation::class, 'variation_id');
     }

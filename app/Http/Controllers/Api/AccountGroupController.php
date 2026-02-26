@@ -31,6 +31,13 @@ class AccountGroupController extends Controller
 
         return ResponseHelper::success($data, 'Account groups retrieved successfully');
     }
+    public function accountType(): JsonResponse
+    {
+
+        $data = $this->accountGroupService->accountType();
+
+        return ResponseHelper::success($data, 'Account groups retrieved successfully');
+    }
 
     /**
      * Store a newly created account group.
