@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transaction_income_categories', function (Blueprint $table) {
+        Schema::create('transaction_journal_accounts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('income_id')->constrained('transaction_incomes')->cascadeOnDelete();
+            $table->foreignId('transaction_journal_id')->constrained('transaction_journals')->cascadeOnDelete();
             $table->foreignId('chart_of_account_id')->constrained('chart_of_accounts')->cascadeOnDelete();;
-            $table->decimal('amount', 15, 2);
+            $table->decimal('debit', 15, 2)->default(0);
+            $table->decimal('credit', 15, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaction_income_categories');
+        Schema::dropIfExists('transaction_journa_accounts');
     }
 };

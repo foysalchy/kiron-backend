@@ -93,6 +93,7 @@ use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TransactionExpenseController;
 use App\Http\Controllers\Api\TransactionIncomeController;
+use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WocommerceSettingController;
@@ -1080,6 +1081,17 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [TransactionIncomeController::class, 'restore']);
             Route::delete('{id}/force', [TransactionIncomeController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionIncomeController::class, 'updateStatus']);
+        });
+         //account-journals routes
+        Route::prefix('account-journals')->group(function () {
+            Route::get('/', [TransactionJournalController::class, 'index']);
+            Route::post('/', [TransactionJournalController::class, 'store']);
+            Route::get('/{id}', [TransactionJournalController::class, 'show']);
+            Route::post('/update/{id}', [TransactionJournalController::class, 'update']);
+            Route::delete('/{id}', [TransactionJournalController::class, 'destroy']);
+            Route::get('{id}/restore', [TransactionJournalController::class, 'restore']);
+            Route::delete('{id}/force', [TransactionJournalController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [TransactionJournalController::class, 'updateStatus']);
         });
 
 
