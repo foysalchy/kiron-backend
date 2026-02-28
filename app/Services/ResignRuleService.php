@@ -47,7 +47,7 @@ class ResignRuleService
             throw ApiException::serverError('Failed to fetch resign rules');
         }
     }
-   /**
+    /**
      * Get Resign Rule by ID
      */
     public function getResignRuleById(int $id): ResignRule

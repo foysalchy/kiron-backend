@@ -32,6 +32,7 @@ class StoreLeaveApplicationRequest extends BaseCompanyRequest
                 'assign_leave_id' => ['nullable', 'exists:assign_leave_types,id'], 
                 'from_date'       => ['required', 'date'],
                 'to_date'         => ['required', 'date', 'after_or_equal:from_date'],
+                'is_half_day'     => ['nullable' ],
                 'reason'          => ['nullable', 'string', 'max:1000'],
                 'documents'       => ['nullable', 'array'], 
                 'documents.*'     => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'], 

@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rejoins', function (Blueprint $table) {
+        Schema::create('bonuses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->date('rejoin_date')->nullable();
-            $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');
-            $table->tinyInteger('status')->default(Status::Pending->value);
+            $table->foreignId('period_id')->constrained('periods')->cascadeOnDelete();
+            $table->string('name')->comment('e.g. Eid-ul-Fitr Bonus 2024');
+            $table->string('type')->default('percentage')->comment('percentage, fixed');
+            $table->decimal('amount', 8, 2)->comment('Can be % like 100, or fixed like 5000');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rejoins');
+        Schema::dropIfExists('bonuses');
     }
 };

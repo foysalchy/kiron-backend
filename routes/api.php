@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BkashController;
 use App\Http\Controllers\Api\BlogController;
+use App\Http\Controllers\Api\BonusController;
 use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EmailSettingController;
+use App\Http\Controllers\Api\EmployeeSalaryController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\FirebaseSettingController;
 use App\Http\Controllers\Api\FooterCodeController;
@@ -65,6 +67,8 @@ use App\Http\Controllers\Api\PayHeadController;
 use App\Http\Controllers\Api\PaymentMethodTypeController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
+use App\Http\Controllers\Api\PayrollSettingController;
+use App\Http\Controllers\Api\PayslipController;
 use App\Http\Controllers\Api\PaySlipManagerController;
 use App\Http\Controllers\Api\PeriodController;
 use App\Http\Controllers\Api\PeriodTypeController;
@@ -629,7 +633,7 @@ Route::prefix('v1')->group(function () {
         });
         //attendance routes
         Route::prefix('attendances')->group(function () {
-            Route::post('/bulk',[AttendanceController::class, 'bulkStore']);
+            Route::post('/bulk', [AttendanceController::class, 'bulkStore']);
             Route::get('/', [AttendanceController::class, 'index']);
             Route::post('/', [AttendanceController::class, 'store']);
             Route::get('/{id}', [AttendanceController::class, 'show']);
@@ -725,6 +729,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [ResignationController::class, 'index']);
             Route::post('/', [ResignationController::class, 'store']);
             Route::get('/{id}', [ResignationController::class, 'show']);
+            Route::post('/update/{id}', [ResignationController::class, 'update']);
             Route::patch('/{id}/toggle-status', [ResignationController::class, 'toggleStatus']);
         });
         //rejoins routes
@@ -732,6 +737,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [RejoinController::class, 'index']);
             Route::post('/', [RejoinController::class, 'store']);
             Route::get('/{id}', [RejoinController::class, 'show']);
+            Route::post('/update/{id}', [RejoinController::class, 'update']);
         });
         //holidays routes
         Route::prefix('holidays')->group(function () {
@@ -770,6 +776,7 @@ Route::prefix('v1')->group(function () {
         //leave-application routes
         Route::prefix('leave-applications')->group(function () {
             Route::get('/', [LeaveApplicationController::class, 'index']);
+
             Route::post('/', [LeaveApplicationController::class, 'store']);
             Route::get('/{id}', [LeaveApplicationController::class, 'show']);
             Route::post('/update/{id}', [LeaveApplicationController::class, 'update']);
@@ -777,6 +784,33 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [LeaveApplicationController::class, 'restore']);
             Route::delete('{id}/force', [LeaveApplicationController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [LeaveApplicationController::class, 'toggleStatus']);
+        });
+        Route::prefix('bonuses')->group(function () {
+            Route::get('/', [BonusController::class, 'index']);
+            Route::post('/', [BonusController::class, 'store']);
+            Route::get('/{id}', [BonusController::class, 'show']);
+            Route::post('/update/{id}', [BonusController::class, 'update']);
+            Route::delete('/{id}', [BonusController::class, 'destroy']);
+            Route::patch('/{id}/toggle-status', [BonusController::class, 'toggleStatus']);
+        });
+        // Payroll Settings Route
+        Route::prefix('payroll-settings')->group(function () {
+            Route::get('/', [PayrollSettingController::class, 'index']);
+            Route::post('/', [PayrollSettingController::class, 'store']); // Acts as Add & Update
+        });
+
+        // Employee Salaries Route
+        Route::prefix('employee-salaries')->group(function () {
+            Route::get('/', [EmployeeSalaryController::class, 'index']);
+            Route::get('/{employeeId}', [EmployeeSalaryController::class, 'show']);
+            Route::post('/{employeeId}', [EmployeeSalaryController::class, 'store']);
+        });
+        Route::get('/leave-balances', [LeaveApplicationController::class, 'leaveBalances']);
+
+        Route::prefix('payslips')->group(function () {
+            Route::post('/generate', [PayslipController::class, 'generate']);
+            Route::get('/', [PayslipController::class, 'index']); // Get all payslips
+            Route::get('/{id}', [PayslipController::class, 'show']); // View specific payslip with items
         });
         //site settings routes
         Route::prefix('site-settings')->group(function () {
@@ -1101,7 +1135,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/update-status', [TransactionIncomeController::class, 'updateStatus']);
         });
 
-         //account-journals routes
+        //account-journals routes
         Route::prefix('account-journals')->group(function () {
             Route::get('/', [TransactionJournalController::class, 'index']);
             Route::post('/', [TransactionJournalController::class, 'store']);
@@ -1112,6 +1146,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [TransactionJournalController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionJournalController::class, 'updateStatus']);
         });
+
          //account-transfers routes
         Route::prefix('account-transfers')->group(function () {
             Route::get('/', [TransactionInternalTransferController::class, 'index']);
@@ -1134,6 +1169,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [RecurringJournalController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [RecurringJournalController::class, 'updateStatus']);
         });
+
 
 
 

@@ -62,4 +62,5 @@ class Position extends Model
     {
         return $this->hasMany(PaySlipManager::class);
     }
+   
 }

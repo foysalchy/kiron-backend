@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rejoins', function (Blueprint $table) {
+        Schema::create('employee_salaries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
-            $table->date('rejoin_date')->nullable();
-            $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');
-            $table->tinyInteger('status')->default(Status::Pending->value);
+            $table->foreignId('pay_head_id')->constrained('pay_heads')->cascadeOnDelete();
+            $table->string('type'); // addition, deduction
+            $table->decimal('amount', 15, 2)->default(0);
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rejoins');
+        Schema::dropIfExists('employee_salaries');
     }
 };

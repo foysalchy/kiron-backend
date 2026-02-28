@@ -50,13 +50,16 @@ class ResignationService
      */
     public function getResignationById(int $id): Resignation
     {
-        $resignation = Resignation::find($id);
+        $record = Resignation::with(['employee'])->find($id);
 
-        if (!$resignation) {
-            throw ApiException::notFound('Resignation');
+        if (!$record) {
+            throw ApiException::notFound('Resignation Record');
         }
 
-        return $resignation;
+        // force accessor to appear in response
+        $record->resign_rules;
+
+        return $record;
     }
     /**
      * Create a new Resignation
@@ -76,7 +79,7 @@ class ResignationService
 
             $resignation = Resignation::create($data);
 
-            LogHelper::created('resignation', $resignation->id, $resignation->company_id,$resignation->type);
+            LogHelper::created('resignation', $resignation->id, $resignation->company_id, $resignation->type);
 
             DB::commit();
             Log::info('Resignation created successfully', ['id' => $resignation->id]);
@@ -91,32 +94,66 @@ class ResignationService
             throw ApiException::serverError('Failed to create resignation');
         }
     }
-
     /**
-     * Toggle Status (Active/Inactive)
+     * Update Resignation (Only allowed if status is Pending)
      */
-    public function toggleStatus(int $id): Resignation
+    public function updateResignation(int $id, array $data): Resignation
     {
         DB::beginTransaction();
+
         try {
             $resignation = $this->getResignationById($id);
-            $currentStatus = Status::from($resignation->status);
 
-            $newStatus = $currentStatus === Status::Active ? Status::Inactive : Status::Active;
+            // 1. Strict Validation: Cannot update if already Approved or Rejected
+            if ($resignation->status != Status::Pending->value) {
+                throw ApiException::badRequest('Only pending resignation/termination records can be updated.');
+            }
 
-            $resignation->update(['status' => $newStatus->value]);
+            // 2. File Upload Handling (Replace old file if new one is provided)
+            if (isset($data['letter']) && $data['letter'] instanceof \Illuminate\Http\UploadedFile) {
+                if ($resignation->letter) {
+                    FileUploadHelper::delete($resignation->letter);
+                }
+                $data['letter'] = FileUploadHelper::uploadImage($data['letter'], 'resignations', 'public', 2048);
+            }
 
-            LogHelper::statusChanged('resignation', $resignation->id, $resignation->company_id, $resignation->type . ' new status ' . $newStatus->label());
+            // 3. Update core data
+            $resignation->update($data);
+
+
+
+            LogHelper::updated('resignation', $resignation->id, $resignation->company_id, "Resignation/Termination record updated.");
+
             DB::commit();
-            Log::info('Resignation status toggled', ['resignation_id' => $id, 'new_status' => $newStatus->value]);
             return $resignation;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Resignation status toggle failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to toggle status');
+            Log::error('Resignation update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update resignation record.');
+        }
+    }
+    /**
+     * Update Status (Pending / Approved / Rejected)
+     */
+    public function updateStatus(int $id, int $newStatusValue): Resignation
+    {
+        DB::beginTransaction();
+        try {
+            $resignation = $this->getResignationById($id);
+
+            $resignation->update(['status' => $newStatusValue]);
+
+            LogHelper::statusChanged('resignation', $resignation->id, $resignation->company_id, "Status changed to: {$newStatusValue}");
+
+            DB::commit();
+            return $resignation;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Resignation status update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to change status');
         }
     }
 }
