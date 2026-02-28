@@ -75,6 +75,7 @@ use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\RackController;
+use App\Http\Controllers\Api\RecurringJournalController;
 use App\Http\Controllers\Api\RejoinController;
 use App\Http\Controllers\Api\ResignationController;
 use App\Http\Controllers\Api\SlideController;
@@ -94,6 +95,7 @@ use App\Http\Controllers\Api\TaxRateController;
 use App\Http\Controllers\Api\TemplateController;
 use App\Http\Controllers\Api\TransactionExpenseController;
 use App\Http\Controllers\Api\TransactionIncomeController;
+use App\Http\Controllers\Api\TransactionInternalTransferController;
 use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
@@ -1109,6 +1111,28 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [TransactionJournalController::class, 'restore']);
             Route::delete('{id}/force', [TransactionJournalController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionJournalController::class, 'updateStatus']);
+        });
+         //account-transfers routes
+        Route::prefix('account-transfers')->group(function () {
+            Route::get('/', [TransactionInternalTransferController::class, 'index']);
+            Route::post('/', [TransactionInternalTransferController::class, 'store']);
+            Route::get('/{id}', [TransactionInternalTransferController::class, 'show']);
+            Route::post('/update/{id}', [TransactionInternalTransferController::class, 'update']);
+            Route::delete('/{id}', [TransactionInternalTransferController::class, 'destroy']);
+            Route::get('{id}/restore', [TransactionInternalTransferController::class, 'restore']);
+            Route::delete('{id}/force', [TransactionInternalTransferController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [TransactionInternalTransferController::class, 'updateStatus']);
+        });
+         //recurring-journals routes
+        Route::prefix('recurring-journals')->group(function () {
+            Route::get('/', [RecurringJournalController::class, 'index']);
+            Route::post('/', [RecurringJournalController::class, 'store']);
+            Route::get('/{id}', [RecurringJournalController::class, 'show']);
+            Route::post('/update/{id}', [RecurringJournalController::class, 'update']);
+            Route::delete('/{id}', [RecurringJournalController::class, 'destroy']);
+            Route::get('{id}/restore', [RecurringJournalController::class, 'restore']);
+            Route::delete('{id}/force', [RecurringJournalController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [RecurringJournalController::class, 'updateStatus']);
         });
 
 

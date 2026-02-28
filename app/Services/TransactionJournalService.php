@@ -153,7 +153,6 @@ class TransactionJournalService
     /**
      * Update Journal and Sync Items
      */
-
     public function updateJournal(int $id, array $data): TransactionJournal
     {
         DB::beginTransaction();
@@ -169,8 +168,16 @@ class TransactionJournalService
             }
 
             if (isset($data['items'])) {
+                $existingItemIds = $journal->accounts->pluck('id')->toArray();
+                $requestItemIds  = collect($data['items'])->pluck('id')->filter()->toArray();
+
+                $itemsToDelete = array_diff($existingItemIds, $requestItemIds);
+                foreach ($itemsToDelete as $itemId) {
+                    $journal->accounts()->where('id', $itemId)->delete();
+                }
+
                 foreach ($data['items'] as $item) {
-                    if (!empty($item['id'])) {
+                    if (!empty($item['id']) && in_array($item['id'], $existingItemIds)) {
                         $journal->accounts()->where('id', $item['id'])->update([
                             'chart_of_account_id' => $item['chart_of_account_id'],
                             'debit'               => $item['debit'] ?? 0,
@@ -185,11 +192,6 @@ class TransactionJournalService
                     }
                 }
 
-                $requestItemIds = collect($data['items'])->pluck('id')->filter()->toArray();
-                if (!empty($requestItemIds)) {
-                    $journal->accounts()->whereNotIn('id', $requestItemIds)->delete();
-                }
-
                 $data['total_debit']  = $journal->accounts()->sum('debit');
                 $data['total_credit'] = $journal->accounts()->sum('credit');
             }
@@ -200,13 +202,16 @@ class TransactionJournalService
             DB::commit();
 
             return $journal->fresh(['accounts.chartOfAccount']);
+
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Journal update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update journal entry');
         }
     }
-
     /**
      * Delete Journal (Soft Delete)
      */

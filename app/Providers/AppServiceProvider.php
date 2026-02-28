@@ -67,6 +67,7 @@ use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
 use App\Services\QuotationService;
 use App\Services\RackService;
+use App\Services\RecurringJournalService;
 use App\Services\RejoinService;
 use App\Services\RequisitionService;
 use App\Services\ResignationService;
@@ -84,6 +85,8 @@ use App\Services\TaxRateService;
 use App\Services\TemplateService;
 use App\Services\TransactionExpenseService;
 use App\Services\TransactionIncomeService;
+use App\Services\TransactionInternalService;
+use App\Services\TransactionJournalService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
 use Illuminate\Support\ServiceProvider;
@@ -179,6 +182,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ChartOfAccountService::class);
         $this->app->bind(TransactionIncomeService::class);
         $this->app->bind(TransactionExpenseService::class);
+        $this->app->bind(TransactionJournalService::class);
+        $this->app->bind(TransactionInternalService::class);
+        $this->app->bind(RecurringJournalService::class);
     }
 
     /**
