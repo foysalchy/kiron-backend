@@ -30,7 +30,7 @@ class UpdateTransactionJournalRequest extends UpdateBaseCompanyRequest
             'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'],
             'status'      => ['sometimes', 'integer'],
 
-            'items'                       => ['sometimes', 'required', 'array', 'min:1'],
+            'items'                       => ['sometimes', 'array', 'min:1'],
             'items.*.id'                  => ['sometimes', 'nullable', 'integer', 'exists:transaction_journal_accounts,id'],
             'items.*.chart_of_account_id' => ['required_with:items', 'exists:chart_of_accounts,id'],
             'items.*.debit'               => ['sometimes', 'nullable', 'numeric', 'min:0'],
@@ -40,29 +40,33 @@ class UpdateTransactionJournalRequest extends UpdateBaseCompanyRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->has('items')) {
-                $items = $this->input('items', []);
+            if (!$this->has('items')) {
+                return;
+            }
 
-                foreach ($items as $index => $item) {
-                    $debit  = (float) ($item['debit'] ?? 0);
-                    $credit = (float) ($item['credit'] ?? 0);
-                    $rowNum = $index + 1;
+            $items       = $this->input('items', []);
+            $totalDebit  = 0;
+            $totalCredit = 0;
 
-                    if ($debit > 0 && $credit > 0) {
-                        $validator->errors()->add("items.$index", "Row $rowNum cannot have both Debit and Credit.");
-                    }
+            foreach ($items as $index => $item) {
+                $debit  = (float) ($item['debit'] ?? 0);
+                $credit = (float) ($item['credit'] ?? 0);
+                $rowNum = $index + 1;
 
-                    if ($debit <= 0 && $credit <= 0) {
-                        $validator->errors()->add("items.$index", "Row $rowNum must have a value in either Debit or Credit.");
-                    }
+                if ($debit > 0 && $credit > 0) {
+                    $validator->errors()->add("items.$index", "Row $rowNum cannot have both Debit and Credit.");
                 }
 
-                $totalDebit  = collect($items)->sum('debit');
-                $totalCredit = collect($items)->sum('credit');
-
-                if (abs($totalDebit - $totalCredit) > 0.001) {
-                    $validator->errors()->add('items', "Journal out of balance. Total Debit ($totalDebit) must equal Total Credit ($totalCredit).");
+                if ($debit <= 0 && $credit <= 0) {
+                    $validator->errors()->add("items.$index", "Row $rowNum must have either a Debit or a Credit value.");
                 }
+
+                $totalDebit  += $debit;
+                $totalCredit += $credit;
+            }
+
+            if (abs($totalDebit - $totalCredit) > 0.001) {
+                $validator->errors()->add('items', "Journal is unbalanced. Total Debit ($totalDebit) must equal Total Credit ($totalCredit).");
             }
         });
     }

@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChartOfAccount extends Model
@@ -28,6 +29,10 @@ class ChartOfAccount extends Model
     public function accountGroup(): BelongsTo
     {
         return $this->belongsTo(AccountGroup::class);
+    }
+    public function recurringJournal(): HasMany
+    {
+        return $this->hasMany(RecurringJournal::class);
     }
 
     //company scope
