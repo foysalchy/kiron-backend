@@ -47,4 +47,9 @@ class PayRoll extends Model
     {
         return $this->belongsTo(PeriodType::class)->select('id', 'type');
     }
+
+    public function payRollPayHeads(): HasMany
+    {
+        return $this->hasMany(PayRollPayHead::class, 'pay_roll_id');
+    }
 }

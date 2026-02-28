@@ -29,13 +29,14 @@ class UpdateLeaveApplicationRequest extends UpdateBaseCompanyRequest
             [
                 'employee_id'     => ['sometimes', 'exists:employees,id'],
                 'leave_type_id'   => ['sometimes', 'exists:leave_types,id'],
-                'assign_leave_id' => ['sometimes', 'exists:assign_leave_types,id'], 
+                'assign_leave_id' => ['sometimes', 'exists:assign_leave_types,id'],
                 'from_date'       => ['sometimes', 'date'],
-                'to_date'         => ['sometimes', 'date', 'after_or_equal:from_date'], 
+                'to_date'         => ['sometimes', 'date', 'after_or_equal:from_date'],
+                'is_half_day'     => ['nullable',],
                 'reason'          => ['nullable', 'string', 'max:1000'],
                 'documents'       => ['nullable', 'array'],
-                'documents.*'     => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'], 
-                'status'          => ['sometimes', 'integer'], 
+                'documents.*'     => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+                'status'          => ['sometimes', 'integer'],
             ]
         );
     }

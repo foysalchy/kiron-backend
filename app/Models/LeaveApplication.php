@@ -17,6 +17,7 @@ class LeaveApplication extends Model
         'assign_leave_id',
         'from_date',
         'to_date',
+        'is_half_day',
         'duration',
         'reason',
         'documents',
@@ -86,8 +87,8 @@ class LeaveApplication extends Model
 
     public function getBalanceSummaryAttribute()
     {
-        $assign = $this->assign_leave; 
-        
+        $assign = $this->assign_leave;
+
         $entitled = $assign ? $assign->total_days : 0;
         $available = $assign ? ($assign->total_days - $assign->used_days) : 0;
 

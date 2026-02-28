@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
@@ -94,6 +95,40 @@ class RejoinService
 
             Log::error('Rejoin creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create rejoin record');
+        }
+    }
+
+    public function updateRejoin(int $id, array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $rejoin = Rejoin::findOrFail($id);
+
+            // File Upload Handling
+            if (isset($data['appointment_letter']) && $data['appointment_letter'] instanceof \Illuminate\Http\UploadedFile) {
+                // Delete old letter if exists
+                if ($rejoin->appointment_letter) {
+                    FileUploadHelper::delete($rejoin->appointment_letter);
+                }
+                // Upload new letter
+                $data['appointment_letter'] = FileUploadHelper::uploadImage(
+                    $data['appointment_letter'],
+                    'rejoins/appointment_letters',
+                    'public',
+                    2048
+                );
+            }
+
+            $rejoin->update($data);
+
+            LogHelper::updated('rejoin', $rejoin->id, $rejoin->company_id, "Employee rejoin record updated.");
+
+            DB::commit();
+            return $rejoin->fresh('employee');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Rejoin update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update rejoin record.');
         }
     }
 }

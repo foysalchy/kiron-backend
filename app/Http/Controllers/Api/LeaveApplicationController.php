@@ -108,5 +108,12 @@ class LeaveApplicationController extends Controller
 
         return ResponseHelper::success($data, 'Leave application status updated successfully');
     }
-    
+    public function leaveBalances(Request $request): JsonResponse
+    {
+        $filters = $request->only(['search', 'department_id', 'employee_id', 'per_page']);
+
+        $balances = $this->leaveApplicationService->getLeaveBalances($filters);
+
+        return ResponseHelper::success($balances, 'Leave balances retrieved successfully');
+    }
 }

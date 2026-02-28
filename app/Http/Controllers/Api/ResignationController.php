@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreResignationRequest;
+use App\Http\Requests\UpdateResignationRequest;
 use App\Services\ResignationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,6 +44,15 @@ class ResignationController extends Controller
 
         return ResponseHelper::created($data, 'Resignation record created successfully');
     }
+    /**
+     * Store a newly created resignation.
+     */
+    public function update(int $id, UpdateResignationRequest $request): JsonResponse
+    {
+        $data = $this->resignationService->updateResignation($id, $request->validated());
+
+        return ResponseHelper::success($data, 'Resignation record updated successfully');
+    }
 
     /**
      * Display the specified resignation.
@@ -56,9 +66,10 @@ class ResignationController extends Controller
     /**
      * Toggle status (Active/Inactive).
      */
-    public function toggleStatus(int $id): JsonResponse
+    public function toggleStatus(int $id, Request $request): JsonResponse
     {
-        $data = $this->resignationService->toggleStatus($id);
+        $newStatusValue = $request->input('status');
+        $data = $this->resignationService->updateStatus($id, $newStatusValue);
 
         return ResponseHelper::success($data, 'Resignation status updated successfully');
     }
