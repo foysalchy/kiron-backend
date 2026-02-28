@@ -31,7 +31,7 @@ class StoreAssignLeaveRequest extends BaseCompanyRequest
                 'leaves'                 => ['required', 'array', 'min:1'],
                 'leaves.*.leave_type_id' => ['required', 'exists:leave_types,id'],
                 'leaves.*.leave_count'   => ['required', 'numeric', 'min:0.5', 'max:365'],
-                'status'                 => ['nullable', 'integer', 'in:0,1'],
+                
             ]
         );
     }

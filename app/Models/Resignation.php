@@ -60,7 +60,14 @@ class Resignation extends Model
     }
     public function getResignRulesAttribute()
     {
-        return ResignRule::whereIn('id', $this->resign_rule_ids ?? [])->get(['id', 'name']);
+        $ids = $this->resign_rule_ids;
+
+        if (empty($ids)) {
+            return collect(); 
+        }
+
+        return ResignRule::whereIn('id', $ids)
+            ->get(['id', 'name']);
     }
     public function getLetterUrlAttribute(): ?string
     {

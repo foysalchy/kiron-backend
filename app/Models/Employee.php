@@ -88,6 +88,10 @@ class Employee extends Model
     {
         return $this->hasMany(GeneratePayslip::class);
     }
+    public function salaries(): HasMany
+    {
+        return $this->hasMany(EmployeeSalary::class);
+    }
     // --- Scopes ---
 
     public function scopeActive($query)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRejoinRequest;
+use App\Http\Requests\UpdateRejoinRequest;
 use App\Services\RejoinService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,15 @@ class RejoinController extends Controller
          $data = $this->rejoinService->createRejoin($request->validated());
 
         return ResponseHelper::success($data, 'Employee rejoined successfully', 201);
+    }
+    /**
+     * Update an existing rejoin record.
+     */
+    public function update(int $id, UpdateRejoinRequest $request): JsonResponse
+    {
+         $data = $this->rejoinService->updateRejoin($id, $request->validated());
+
+        return ResponseHelper::success($data, 'Employee rejoin record updated successfully');
     }
 
     /**

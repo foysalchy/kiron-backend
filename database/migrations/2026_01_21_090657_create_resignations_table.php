@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->text('reason')->nullable();
             $table->text('activities')->nullable()->comment('good or bad');
             $table->boolean('is_applied')->default(false);
-            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
+            $table->tinyInteger('status')->default(Status::Pending->value);
             $table->timestamps();
             $table->softDeletes();
         });
