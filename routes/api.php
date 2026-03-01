@@ -1167,7 +1167,8 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [RecurringJournalController::class, 'destroy']);
             Route::get('{id}/restore', [RecurringJournalController::class, 'restore']);
             Route::delete('{id}/force', [RecurringJournalController::class, 'forceDestroy']);
-            Route::patch('/{id}/update-status', [RecurringJournalController::class, 'updateStatus']);
+            Route::patch('/{id}/update-status', [RecurringJournalController::class, 'updateApprovalStatus']);
+            Route::patch('/{id}/toggle-status', [RecurringJournalController::class, 'toggleStatus']);
         });
 
 
