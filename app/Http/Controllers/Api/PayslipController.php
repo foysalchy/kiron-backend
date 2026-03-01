@@ -31,7 +31,18 @@ class PayslipController extends Controller
 
         return ResponseHelper::success(null, $result['message']);
     }
+    public function previewSummary(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'period_id' => 'required|exists:periods,id',
+            'employee_ids' => 'required|array',
+            'employee_ids.*' => 'exists:employees,id'
+        ]);
 
+        $result = $this->payslipService->previewSummary($data['period_id'], $data['employee_ids']);
+
+        return ResponseHelper::success($result, 'Preview data fetched');
+    }
     /**
      * Get list of generated payslips (for listing page)
      */
