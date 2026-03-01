@@ -26,6 +26,7 @@ class StoreStockMovementRequest extends BaseCompanyRequest
                 'destination_warehouse_id' => 'required|exists:warehouses,id|different:source_warehouse_id',
                 'items' => 'required|array|min:1',
                 'items.*.product_id' => 'required|exists:products,id',
+                'items.*.variation_id' => 'nullable',
                 'items.*.quantity' => 'required|integer|min:1',
                 'items.*.batch_number' => 'nullable|string|max:100',
                 'items.*.source_bin_id' => 'nullable|exists:bins,id',

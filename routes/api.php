@@ -499,7 +499,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/by-area', [BinController::class, 'byArea']);
             Route::get('/by-rack', [BinController::class, 'byRack']);
         });
-        Route::prefix('inventroy')->group(function () {
+        Route::prefix('inventory')->group(function () {
             Route::get('/summary', [InventoryController::class, 'index']);
             Route::get('movements', [InventoryController::class, 'movements']);
 

@@ -29,7 +29,26 @@ class ProductVariationStockLedger extends Model
         'quantity_change' => 'integer',
         'quantity_after' => 'integer',
     ];
+    // Transaction Types
+    const TYPE_PURCHASE = 'purchase';
+    const TYPE_SALE = 'sale';
+    const TYPE_TRANSFER_IN = 'transfer_in';
+    const TYPE_TRANSFER_OUT = 'transfer_out';
+    const TYPE_ADJUSTMENT = 'adjustment';
+    const TYPE_RETURN = 'return';
+    const TYPE_INITIAL_STOCK = 'initial_stock';
+    const TYPE_CORRECTION = 'correction';
 
+    public const TYPES = [
+        self::TYPE_PURCHASE,
+        self::TYPE_SALE,
+        self::TYPE_TRANSFER_IN,
+        self::TYPE_TRANSFER_OUT,
+        self::TYPE_ADJUSTMENT,
+        self::TYPE_RETURN,
+        self::TYPE_INITIAL_STOCK,
+        self::TYPE_CORRECTION,
+    ];
     /**
      * Get current stock for a variation
      */
