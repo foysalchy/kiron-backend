@@ -46,7 +46,7 @@ class TransactionIncomeService
                 $query->where('reference_number', 'like', "%{$filters['search']}%");
             }
 
-            // Calculate Sum 
+            // Calculate Sum
             $totalAmountSum = (clone $query)->sum('total_amount');
 
             $results = $paginate
@@ -145,6 +145,7 @@ class TransactionIncomeService
 
             LogHelper::created('transaction_income', $income->id, $income->company_id, $income->reference_number);
             DB::commit();
+            Log::info('Transaction Income created successfully', ['income_id' => $income->id]);
 
             return $income->load(['incomeTo', 'categories.chartOfAccount']);
         } catch (\Exception $e) {
@@ -186,7 +187,7 @@ class TransactionIncomeService
 
             LogHelper::updated('transaction_income', $income->id, $income->company_id, $income->reference_number);
             DB::commit();
-
+            Log::info('Transaction Income updated successfully', ['income_id' => $income->id]);
             return $income->fresh(['incomeTo', 'categories.chartOfAccount']);
         } catch (ApiException $e) {
             DB::rollBack();
@@ -250,6 +251,7 @@ class TransactionIncomeService
 
             LogHelper::forceDeleted('transaction_income', $income->id, $income->company_id, $income->reference_number);
             DB::commit();
+            Log::info('Transaction Income parmanently deleted successfully', ['income_id' => $income->id]);
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -291,6 +293,7 @@ class TransactionIncomeService
             LogHelper::statusChanged('transaction_income', $income->id, $income->company_id, "Status changed to {$newStatus->name}");
 
             DB::commit();
+            Log::info('Transaction income status updated', ['expense' => $id,'new_status' => $newStatus->label()]);
             return $income->load(['incomeTo', 'categories.chartOfAccount']);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -27,17 +27,16 @@ class StoreRecurringJournalRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'start_date'        => ['required', 'date', 'after_or_equal:today'],
-            'amount'            => ['required', 'numeric', 'min:1'],
-            'repeat_interval'   => ['required', 'integer', 'min:1'],
-            'interval_type'     => ['required', Rule::in(['Day', 'Week', 'Month', 'Year'])],
-
-            'from_account_id'   => ['required', 'exists:chart_of_accounts,id'],
-            'to_account_id'     => ['required','exists:chart_of_accounts,id','different:from_account_id'],
-
-            'description'       => ['nullable', 'string', 'max:1000'],
-            'approval_status'   => ['required', Rule::in([Status::Draft->value, Status::Approved->value])],
-            'operational_status'=> ['required', Rule::in([Status::Active->value, Status::Inactive->value])],
+            'start_date'                => ['required', 'date', 'after_or_equal:today'],
+            'amount'                    => ['required', 'numeric', 'min:1'],
+            'repeat_interval'           => ['required', 'integer', 'min:1'],
+            'interval_type'             => ['required', Rule::in(['Day', 'Week', 'Month', 'Year'])],
+            'from_account_id'           => ['required', 'exists:chart_of_accounts,id'],
+            'to_account_id'             => ['required','exists:chart_of_accounts,id','different:from_account_id'],
+            'description'               => ['required', 'string'],
+            'approval_status'           => ['nullable', Rule::in([Status::Draft->value, Status::Approved->value])],
+            'operational_status'        => ['nullable', Rule::in([Status::Active->value, Status::Inactive->value])],
+            'last_transaction_date'     => ['required', 'date'],
         ]);
     }
     /**

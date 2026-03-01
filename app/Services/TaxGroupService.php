@@ -93,6 +93,7 @@ class TaxGroupService
 
             LogHelper::created('tax_group', $taxGroup->id, $taxGroup->company_id, $taxGroup->name);
             DB::commit();
+            Log::info('Tax group crated successfully', ['group_id' => $taxGroup->id]);
 
             $this->attachTaxRateDetails(collect([$taxGroup]));
 
@@ -123,6 +124,7 @@ class TaxGroupService
 
             LogHelper::updated('tax_group', $taxGroup->id, $taxGroup->company_id ?? null);
             DB::commit();
+            Log::info('Tax group updated successfully', ['group_id' => $taxGroup->id]);
 
             $this->attachTaxRateDetails(collect([$taxGroup]));
 
@@ -154,6 +156,7 @@ class TaxGroupService
 
             LogHelper::statusChanged('tax_group', $taxGroup->id, $taxGroup->company_id, $taxGroup->name . ' new status ' . $newStatus->label());
             DB::commit();
+            Log::info('Tax group status toggled', ['taxGroup_id' => $id,'new_status' => $newStatus->label()]);
 
             return $taxGroup;
         } catch (\Exception $e) {
@@ -175,6 +178,7 @@ class TaxGroupService
 
             LogHelper::deleted('tax_group', $taxGroup->id, $taxGroup->company_id ?? null, $taxGroup->name);
             DB::commit();
+            Log::info('Tax group deleted successfully', ['group_id' => $taxGroup->id]);
 
             return true;
         } catch (ApiException $e) {
@@ -204,6 +208,7 @@ class TaxGroupService
 
             LogHelper::restored('tax_group', $taxGroup->id, $taxGroup->company_id ?? null, $taxGroup->name);
             DB::commit();
+            Log::info('Tax group restore successfully', ['group_id' => $taxGroup->id]);
 
             return $taxGroup;
         } catch (ApiException $e) {
@@ -233,6 +238,7 @@ class TaxGroupService
 
             LogHelper::forceDeleted('tax_group', $id, $taxGroup->company_id ?? null, $taxGroup->name);
             DB::commit();
+            Log::info('Tax group parmanently deleted successfully', ['group_id' => $taxGroup->id]);
 
             return true;
         } catch (ApiException $e) {

@@ -150,6 +150,8 @@ class TransactionInternalService
             LogHelper::created('transaction_transfer', $transfer->id, $transfer->company_id, $transfer->reference_number);
             DB::commit();
 
+            Log::info('Transaction Internal Transfer Created successfully', ['transfer_id' => $transfer->id]);
+
             return $transfer->load(['fromAccount', 'details.transferTo']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -209,6 +211,7 @@ class TransactionInternalService
 
             LogHelper::updated('transaction_transfer', $transfer->id, $transfer->company_id, $transfer->reference_number);
             DB::commit();
+            Log::info('Transaction Internal Transfer Updated successfully', ['transfer_id' => $transfer->id]);
 
             return $transfer->fresh(['fromAccount', 'details.transferTo']);
         } catch (ApiException $e) {
@@ -289,6 +292,8 @@ class TransactionInternalService
             LogHelper::forceDeleted('transaction_internal_transfer', $transfer->id, $transfer->company_id, $transfer->reference_number);
 
             DB::commit();
+
+            Log::info('Transaction Internal Transfer Permanently Deleted Successfully', ['transfer_id' => $transfer->id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
@@ -335,6 +340,7 @@ class TransactionInternalService
             LogHelper::statusChanged('transaction_internal_transfer',$transfer->id,$transfer->company_id,"Status changed to " . $newStatus->name);
 
             DB::commit();
+            Log::info('Transaction internal transfer status updated', ['transfer' => $id,'new_status' => $newStatus->label()]);
             return $transfer->load(['fromAccount', 'details.transferTo']);
         } catch (\Exception $e) {
             DB::rollBack();

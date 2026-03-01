@@ -60,7 +60,7 @@ class TransactionExpenseController extends Controller
     {
         $data = $this->expenseService->updateExpense($id, $request->validated());
 
-        return ResponseHelper::success($data, 'Period Type updated successfully');
+        return ResponseHelper::success($data, 'Expense updated successfully');
     }
     /**
      * Soft delete the transaction expense.

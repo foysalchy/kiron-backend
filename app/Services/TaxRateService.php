@@ -69,9 +69,9 @@ class TaxRateService
             $taxRate = TaxRate::create($data);
 
             LogHelper::created('tax_rate', $taxRate->id, $taxRate->company_id, $taxRate->name);
-            Log::info('Tax Rate created successfully', ['tax_rate_id' => $taxRate->id]);
 
             DB::commit();
+            Log::info('Tax Rate created successfully', ['tax_rate_id' => $taxRate->id]);
             return $taxRate;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -91,9 +91,9 @@ class TaxRateService
             $taxRate->update($data);
 
             LogHelper::updated('tax_rate', $taxRate->id, $taxRate->company_id, $taxRate->name);
-            Log::info('Tax Rate updated successfully', ['tax_rate_id' => $taxRate->id]);
 
             DB::commit();
+            Log::info('Tax Rate updated successfully', ['tax_rate_id' => $taxRate->id]);
             return $taxRate->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
