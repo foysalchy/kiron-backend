@@ -71,6 +71,7 @@ class RecurringJournalService
 
             LogHelper::created('recurring_journal', $journal->id, $journal->company_id, $journal->interval_type);
             DB::commit();
+            Log::info('Recurring journal crated successfully', ['journal_id' => $journal->id]);
 
             return $journal->load(['fromAccount', 'toAccount']);
         } catch (\Exception $e) {
@@ -92,6 +93,7 @@ class RecurringJournalService
 
             LogHelper::updated('recurring_journal', $journal->id, $journal->company_id, $journal->interval_type);
             DB::commit();
+            Log::info('Recurring journal updated successfully', ['journal_id' => $journal->id]);
 
             return $journal->fresh(['fromAccount', 'toAccount']);
         } catch (ApiException $e) {
@@ -164,6 +166,7 @@ class RecurringJournalService
             LogHelper::forceDeleted('recurring_journal', $journal->id, $journal->company_id, $journal->id);
 
             DB::commit();
+            Log::info('Recurring journal permanently successfully', ['journal_id' => $journal->id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
@@ -188,6 +191,7 @@ class RecurringJournalService
             LogHelper::statusChanged('recurring_journal', $journal->id, $journal->company_id, "Approval marked as $status");
 
             DB::commit();
+            Log::info('Recurring journal status updated successfully', ['journal_id' => $journal->id]);
             return $journal->load(['fromAccount', 'toAccount']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -215,6 +219,8 @@ class RecurringJournalService
 
             LogHelper::statusChanged('recurringJournal', $journals->id, $journals->company_id, $journals->interval_type . ' new status ' . $newStatus->label());
             DB::commit();
+
+            Log::info('Recurring journal status toggled', ['journals' => $id,'new_status' => $newStatus->label()]);
 
             return $journals;
         } catch (\Exception $e) {
