@@ -10,7 +10,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB,Log};
 
 class ChartOfAccountService
-{ 
+{
     /**
      * Get all accounts with optional pagination and filters
      */
@@ -92,6 +92,7 @@ class ChartOfAccountService
 
             LogHelper::updated('chart_of_account', $account->id, $account->company_id, $account->name);
             DB::commit();
+            Log::info('Chart of Account updated successfully', ['account_id' => $account->id]);
 
             return $account->fresh(['accountGroup.accountType']);
         } catch (ApiException $e) {
@@ -115,6 +116,7 @@ class ChartOfAccountService
 
             LogHelper::deleted('chart_of_account', $id, $account->company_id, $account->name);
             DB::commit();
+            Log::info('Chart of Account deleted successfully', ['account_id' => $account->id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
@@ -200,6 +202,7 @@ class ChartOfAccountService
 
             LogHelper::statusChanged('chart_of_account', $account->id, $account->company_id, $account->name . ' new status ' . $newStatus->label());
             DB::commit();
+            Log::info('Chart Of Account status toggled', ['account_id' => $id, 'new_status' => $newStatus->label()]);
             return $account;
         } catch (\Exception $e) {
             DB::rollBack();

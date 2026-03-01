@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\AccountGroupController;
 use App\Http\Controllers\Api\ActionLogController;
 
 use App\Http\Controllers\Api\AreaController;
+use App\Http\Controllers\Api\AssetCategoryController;
+use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
@@ -1169,6 +1171,28 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [RecurringJournalController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [RecurringJournalController::class, 'updateApprovalStatus']);
             Route::patch('/{id}/toggle-status', [RecurringJournalController::class, 'toggleStatus']);
+        });
+        //asset-categories routes
+        Route::prefix('asset-categories')->group(function () {
+            Route::get('/', [AssetCategoryController::class, 'index']);
+            Route::post('/', [AssetCategoryController::class, 'store']);
+            Route::get('/{id}', [AssetCategoryController::class, 'show']);
+            Route::post('/update/{id}', [AssetCategoryController::class, 'update']);
+            Route::delete('/{id}', [AssetCategoryController::class, 'destroy']);
+            Route::get('{id}/restore', [AssetCategoryController::class, 'restore']);
+            Route::delete('{id}/force', [AssetCategoryController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AssetCategoryController::class, 'toggleStatus']);
+        });
+        //asset-categories routes
+        Route::prefix('assets')->group(function () {
+            Route::get('/', [AssetController::class, 'index']);
+            Route::post('/', [AssetController::class, 'store']);
+            Route::get('/{id}', [AssetController::class, 'show']);
+            Route::post('/update/{id}', [AssetController::class, 'update']);
+            Route::delete('/{id}', [AssetController::class, 'destroy']);
+            Route::get('{id}/restore', [AssetController::class, 'restore']);
+            Route::delete('{id}/force', [AssetController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AssetController::class, 'toggleStatus']);
         });
 
 
