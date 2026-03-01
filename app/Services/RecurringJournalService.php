@@ -50,7 +50,7 @@ class RecurringJournalService
      */
     public function getJournalById(int $id): RecurringJournal
     {
-        $journal = RecurringJournal::with(['fromAccount', 'toAccount'])->find($id);
+        $journal = RecurringJournal::with(['fromAccount', 'toAccount','creator'])->find($id);
         if (!$journal) {
             throw ApiException::notFound('Recurring Journal');
         }
