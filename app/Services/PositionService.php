@@ -69,20 +69,7 @@ class PositionService
     {
         DB::beginTransaction();
         try {
-           if (isset($data['payroll_name'])) {
-                $payroll = PayRoll::where('name', $data['payroll_name'])->first();
-                if (!$payroll) throw ApiException::notFound('Payroll with this name');
 
-                $data['pay_roll_id'] = $payroll->id;
-                unset($data['payroll_name']);
-            }
-            if (isset($data['supervisor_name'])) {
-                $supervisor = Employee::where('first_name', $data['supervisor_name'])->first();
-                if (!$supervisor) throw ApiException::notFound('Supervisor with this name');
-
-                $data['supervisor_id'] = $supervisor->id;
-                unset($data['supervisor_name']);
-            }
             $record = Position::create($data);
             LogHelper::created('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
@@ -105,29 +92,10 @@ class PositionService
         try {
             $record = $this->getPositionById($id);
 
-            if (isset($data['payroll_name'])) {
-                $payroll = PayRoll::where('name', $data['payroll_name'])
-                    ->where('company_id', $data['company_id'])
-                    ->first();
-                if (!$payroll) throw ApiException::notFound('Payroll with this name');
-
-                $data['pay_roll_id'] = $payroll->id;
-                unset($data['payroll_name']);
-            }
-            if (isset($data['supervisor_name'])) {
-                $supervisor = Employee::where('name', $data['supervisor_name'])
-                    ->where('company_id', $data['company_id'])
-                    ->first();
-                if (!$supervisor) throw ApiException::notFound('Supervisor with this name');
-
-                $data['supervisor_id'] = $supervisor->id;
-                unset($data['supervisor_name']);
-            }
-
             $record->update($data);
             LogHelper::updated('Position', $record->id, $record->company_id, $record->name . ' Head Count ' . $record->head_count);
             DB::commit();
-            return $record->load('payRoll', 'supervisor');
+            return $record;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -223,7 +191,7 @@ class PositionService
             $record->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::updated('Position Status Toggled', $record->id, $record->company_id,$record->name .' new status '.$newStatus->label());
+            LogHelper::updated('Position Status Toggled', $record->id, $record->company_id, $record->name . ' new status ' . $newStatus->label());
             DB::commit();
             return $record->load('payRoll', 'supervisor');
         } catch (ApiException $e) {

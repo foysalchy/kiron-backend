@@ -29,10 +29,10 @@ class UpdatePositionRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'name'            => ['sometimes', 'required', 'string', 'max:255'],
-                'type'            => ['sometimes', 'required', 'string', Rule::in(['shared', 'single'])],
-                'payroll_name'    => ['sometimes', 'required', 'string', 'exists:pay_rolls,name'],
+                'type'            => ['sometimes', 'required', 'string'],
+                'pay_roll_id'    => ['sometimes', 'required',  'exists:pay_rolls,id'],
                 'head_count'      => ['sometimes', 'required', 'integer', 'min:0'],
-                'supervisor_name' => ['nullable', 'string', 'exists:employees,name'],
+                'supervisor_id' => ['nullable', 'exists:employees,id'],
                 'status'          => ['sometimes', 'required', 'integer', 'in:0,1'],
             ]
         );
@@ -46,9 +46,9 @@ class UpdatePositionRequest extends UpdateBaseCompanyRequest
             $this->companyMessages(),
             [
                 'name.required'         => 'Position name cannot be empty.',
-                'payroll_name.required' => 'Please select a payroll.',
-                'payroll_name.exists'   => 'The selected payroll name is invalid.',
-                'supervisor_name.exists' => 'The selected supervisor name does not exist.',
+                'pay_roll_id.required' => 'Please select a payroll.',
+                'pay_roll_id.exists'   => 'The selected payroll is invalid.',
+                'supervisor_id.exists' => 'The selected supervisor does not exist.',
                 'head_count.integer'    => 'Head count must be a valid number.',
             ]
         );

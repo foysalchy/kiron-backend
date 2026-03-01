@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\{Employee, Period, Payslip, PayslipItem, Attendance, Bonus, LeaveApplication, EmployeeSalary, PayrollSetting};
 use App\Enums\Status;
+use App\Exceptions\ApiException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\{DB, Log};
 
@@ -17,10 +18,10 @@ class PayslipService
         $companyId = auth()->user()->company_id;
         $settings = PayrollSetting::where('company_id', $companyId)->first();
 
-        // If settings don't exist, set some defaults so the code doesn't crash
+        // Defaults if not set
         if (!$settings) {
             $settings = (object) [
-                'late_days_for_penalty' => 3,
+                'late_days_for_penalty' => 10, // Standard 3 days
                 'penalty_amount_in_days' => 1.0,
                 'has_overtime_allowance' => false,
                 'overtime_rate_multiplier' => 1.0,
@@ -30,7 +31,7 @@ class PayslipService
 
         $startDate = Carbon::parse($period->start_date);
         $endDate = Carbon::parse($period->end_date);
-        $totalDaysInMonth = $startDate->diffInDays($endDate) + 1; // e.g. 31
+        $totalDaysInMonth = $startDate->diffInDays($endDate) + 1;
 
         DB::beginTransaction();
         try {
@@ -39,7 +40,6 @@ class PayslipService
             foreach ($employeeIds as $empId) {
 
                 // 1. Fetch Employee and their static Salary Structure
-                $employee = Employee::find($empId);
                 $salaryStructure = EmployeeSalary::with('payHead')
                     ->where('employee_id', $empId)
                     ->get();
@@ -61,23 +61,26 @@ class PayslipService
                     }
                 }
 
-                // Per Day Salary (Based on Fixed Gross)
+                // Per Day Salary
                 $perDaySalary = $fixedGross / $totalDaysInMonth;
                 $perHourSalary = $perDaySalary / $settings->standard_working_hours;
 
-                // 3. Fetch Attendance Stats for this period
-                // Assuming status: 1=Present, 0=Absent, 2=Weekend, 3=Late, 4=EarlyOut, 5=Holiday
+                // 3. Fetch Attendance Stats
+                // 1=Present, 0=Absent, 2=Weekend, 3=Late, 4=EarlyOut, 5=Holiday
                 $attendances = Attendance::where('employee_id', $empId)
                     ->whereBetween('date', [$period->start_date, $period->end_date])
                     ->get();
 
-                $presentDays = $attendances->whereIn('status', [1, 3, 4])->count(); // Present, Late, Early Out
+                $presentDays = $attendances->whereIn('status', [1, 3, 4])->count(); // Count Late/Early as Present
                 $absentDays = $attendances->where('status', 0)->count();
+                $weekendDays = $attendances->where('status', 2)->count();
+                $holidayDays = $attendances->where('status', 5)->count();
+
                 $lateDays = $attendances->where('is_late', 1)->count();
 
-                // Fetch Approved Leaves during this period
+                // Fetch Approved Leaves
                 $approvedLeaves = LeaveApplication::where('employee_id', $empId)
-                    ->where('status', Status::Approved->value) // Approved
+                    ->where('status', Status::Approved->value)
                     ->where(function ($q) use ($period) {
                         $q->whereBetween('from_date', [$period->start_date, $period->end_date])
                             ->orWhereBetween('to_date', [$period->start_date, $period->end_date]);
@@ -85,18 +88,16 @@ class PayslipService
                     ->get();
 
                 $totalLeaveDaysTaken = 0;
-                // Currently assuming all approved leaves are Paid Leaves. 
-                // If you have LOP (Loss of Pay) leave types, you would calculate them here.
                 foreach ($approvedLeaves as $leave) {
                     $totalLeaveDaysTaken += $leave->duration;
                 }
 
-                // 4. Calculate Dynamic Deductions & Additions
+                // 4. Dynamic Deductions & Additions
 
-                // A. Absent Deduction
+                // A. Absent Deduction (Weekends/Holidays are NOT deducted)
                 $absentDeductionAmount = $absentDays * $perDaySalary;
 
-                // B. Late Penalty Deduction
+                // B. Late Penalty
                 $latePenaltyAmount = 0;
                 if ($lateDays >= $settings->late_days_for_penalty) {
                     $penaltyOccurrences = floor($lateDays / $settings->late_days_for_penalty);
@@ -106,8 +107,8 @@ class PayslipService
 
                 // C. Overtime Addition
                 $overtimeAllowanceAmount = 0;
+                $totalOtHours = 0;
                 if ($settings->has_overtime_allowance) {
-                    // Assuming you save over_time as "HH:MM:SS". We need to convert it to decimal hours.
                     $totalOtSeconds = 0;
                     foreach ($attendances as $att) {
                         if ($att->over_time) {
@@ -119,58 +120,56 @@ class PayslipService
                     $otRate = $perHourSalary * $settings->overtime_rate_multiplier;
                     $overtimeAllowanceAmount = $totalOtHours * $otRate;
                 }
-                // [NEW] Fetch Active Bonuses for this Period
+
+                // D. Bonus Calculation
                 $activeBonuses = Bonus::where('company_id', $companyId)
                     ->where('period_id', $periodId)
                     ->where('is_active', true)
                     ->get();
 
-                // Calculate Bonus Amount for this Employee
                 $totalBonusAllowance = 0;
-                $bonusItems = []; // To keep track of which bonuses applied
+                $bonusItems = [];
 
                 if ($activeBonuses->isNotEmpty()) {
-                    // We need the employee's basic salary to calculate percentage bonuses
-                    $basicSalaryAmount = 0;
 
-                    // Find the basic salary from their salary structure
+                    // SMART BASIC SALARY FINDER (SaaS Proof)
+                    // 1. Try to find 'basic' or 'base'
                     $basicItem = $salaryStructure->first(function ($sal) {
-                        // Looking for "Basic" or "basic" in the pay head name
-                        return stripos(strtolower($sal->payHead->name), 'basic') !== false;
+                        $name = strtolower($sal->payHead->name);
+                        return str_contains($name, 'basic') || str_contains($name, 'base');
                     });
 
-                    if ($basicItem) {
-                        $basicSalaryAmount = $basicItem->amount;
+                    // 2. If not found, fallback to the largest "addition" amount (which is usually the basic salary)
+                    if (!$basicItem) {
+                        $basicItem = $salaryStructure->where('type', 'addition')->sortByDesc('amount')->first();
                     }
+
+                    $basicSalaryAmount = $basicItem ? $basicItem->amount : 0;
 
                     foreach ($activeBonuses as $bonus) {
                         $calculatedBonus = 0;
                         if ($bonus->type === 'percentage') {
-                            // e.g. 100% of Basic = $basicSalaryAmount * (100/100)
                             $calculatedBonus = $basicSalaryAmount * ($bonus->amount / 100);
                         } else {
-                            // Fixed amount
                             $calculatedBonus = $bonus->amount;
                         }
 
                         $totalBonusAllowance += $calculatedBonus;
-
-                        // Store name and amount so we can insert it as a PayslipItem later
                         $bonusItems[] = [
                             'name' => $bonus->name,
                             'amount' => $calculatedBonus
                         ];
                     }
                 }
+
                 // 5. Final Math
-                $finalGross = $fixedGross + $overtimeAllowanceAmount;
+                $finalGross = $fixedGross + $overtimeAllowanceAmount + $totalBonusAllowance;
                 $finalDeduction = $fixedDeduction + $absentDeductionAmount + $latePenaltyAmount;
                 $netPayable = $finalGross - $finalDeduction;
 
-                // Prevent negative salary
                 if ($netPayable < 0) $netPayable = 0;
 
-                // 6. Delete old payslip for this period if re-generating
+                // 6. Delete old payslip if re-generating
                 $existingPayslip = Payslip::where('employee_id', $empId)->where('period_id', $periodId)->first();
                 if ($existingPayslip) {
                     $existingPayslip->items()->delete();
@@ -183,20 +182,20 @@ class PayslipService
                     'employee_id' => $empId,
                     'period_id' => $periodId,
                     'total_days' => $totalDaysInMonth,
-                    'working_days' => $presentDays + $absentDays + $totalLeaveDaysTaken, // Rough estimate
-                    'present_days' => $presentDays,
+                    'working_days' => $presentDays + $absentDays  + $weekendDays + $holidayDays,
+                    'present_days' => $presentDays - $totalLeaveDaysTaken, // Show actual present days excluding approved leaves
                     'absent_days' => $absentDays,
                     'late_days' => $lateDays,
                     'leave_days' => $totalLeaveDaysTaken,
+                    'weekend_days' => $weekendDays,
+                    'holiday_days' => $holidayDays,
                     'gross_salary' => $finalGross,
                     'total_deductions' => $finalDeduction,
                     'net_payable' => $netPayable,
-                    'status' => 1 // Generated/Unpaid
+                    'status' => 1
                 ]);
 
-                // 8. Save Line Items (The immutable breakdown)
-
-                // Fixed Items
+                // 8. Save Line Items (Immutable breakdown)
                 foreach ($salaryStructure as $sal) {
                     PayslipItem::create([
                         'payslip_id' => $payslip->id,
@@ -206,7 +205,6 @@ class PayslipService
                     ]);
                 }
 
-                // Dynamic Deductions
                 if ($absentDeductionAmount > 0) {
                     PayslipItem::create([
                         'payslip_id' => $payslip->id,
@@ -225,7 +223,6 @@ class PayslipService
                     ]);
                 }
 
-                // Dynamic Additions
                 if ($overtimeAllowanceAmount > 0) {
                     PayslipItem::create([
                         'payslip_id' => $payslip->id,
@@ -233,6 +230,19 @@ class PayslipService
                         'type' => 'addition',
                         'amount' => $overtimeAllowanceAmount
                     ]);
+                }
+
+                if (!empty($bonusItems)) {
+                    foreach ($bonusItems as $bItem) {
+                        if ($bItem['amount'] > 0) {
+                            PayslipItem::create([
+                                'payslip_id' => $payslip->id,
+                                'name' => $bItem['name'],
+                                'type' => 'addition',
+                                'amount' => $bItem['amount']
+                            ]);
+                        }
+                    }
                 }
 
                 $generatedCount++;
@@ -247,6 +257,51 @@ class PayslipService
         }
     }
 
+    /**
+     * Preview summary data for selected period and employees (for confirmation before generation)
+     */
+    public function previewSummary(int $periodId, array $employeeIds): array
+    {
+        $period = Period::find($periodId);
+
+        // Get summary for selected employees
+        $summary = [];
+        $employees = Employee::whereIn('id', $employeeIds)->get();
+
+        foreach ($employees as $emp) {
+            $attendances = Attendance::where('employee_id', $emp->id)
+                ->whereBetween('date', [$period->start_date, $period->end_date])
+                ->get();
+
+            $presentDays = $attendances->whereIn('status', [1, 3, 4])->count();
+            $absentDays = $attendances->where('status', 0)->count();
+            $lateDays = $attendances->where('is_late', 1)->count();
+            $earlyOutDays = $attendances->where('is_early_out', 1)->count();
+            $weekendDays = $attendances->where('status', 2)->count();
+            $holidayDays = $attendances->where('status', 5)->count();
+
+            // Approved leaves
+            $leaveDays = LeaveApplication::where('employee_id', $emp->id)
+                ->where('status', \App\Enums\Status::Approved->value)
+                ->where(function ($q) use ($period) {
+                    $q->whereBetween('from_date', [$period->start_date, $period->end_date])
+                        ->orWhereBetween('to_date', [$period->start_date, $period->end_date]);
+                })->sum('duration');
+
+            $summary[] = [
+                'employee_id' => $emp->id,
+                'name' => $emp->first_name . ' ' . $emp->last_name,
+                'present' => $presentDays - $leaveDays, // Show actual present days excluding approved leaves
+                'absent' => $absentDays,
+                'late' => $lateDays,
+                'early_out' => $earlyOutDays,
+                'weekend' => $weekendDays,
+                'holiday' => $holidayDays,
+                'leaves' => $leaveDays,
+            ];
+        }
+        return ['summary' => $summary];
+    }
     /**
      * Get all generated payslips for listing
      */

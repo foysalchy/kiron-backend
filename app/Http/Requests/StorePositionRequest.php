@@ -29,9 +29,9 @@ class StorePositionRequest extends BaseCompanyRequest
             [
                 'name' => ['required', 'string', 'max:255'],
                 'type' => ['required', 'string', 'max:20'],
-                'payroll_name' => ['required', 'exists:pay_rolls,name'],
+                'pay_roll_id' => ['required', 'exists:pay_rolls,id'],
                 'head_count' => ['required', 'integer', 'min:0'],
-                'supervisor_name' => ['nullable', 'exists:employees,name'],
+                'supervisor_id' => ['nullable', 'exists:employees,id'],
                 'status' => ['nullable', 'integer', 'in:0,1'],
             ]
         );
@@ -41,9 +41,9 @@ class StorePositionRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'payroll_name.required'    => 'Please select a payroll.',
-                'payroll_name.exists'      => 'The selected payroll name is invalid.',
-                'supervisor_name.exists'   => 'The selected supervisor name does not exist.',
+                'pay_roll_id.required'    => 'Please select a payroll.',
+                'pay_roll_id.exists'      => 'The selected payroll is invalid.',
+                'supervisor_id.exists'   => 'The selected supervisor does not exist.',
                 'head_count.required'      => 'Head count is required.',
             ]
         );
@@ -59,5 +59,4 @@ class StorePositionRequest extends BaseCompanyRequest
             ], 422)
         );
     }
-
 }
