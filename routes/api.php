@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\ActionLogController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AssetCategoryController;
 use App\Http\Controllers\Api\AssetController;
+use App\Http\Controllers\Api\AssetDepreciationController;
+use App\Http\Controllers\Api\AssetPurchaseController;
 use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
@@ -1192,7 +1194,29 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [AssetController::class, 'destroy']);
             Route::get('{id}/restore', [AssetController::class, 'restore']);
             Route::delete('{id}/force', [AssetController::class, 'forceDestroy']);
-            Route::patch('/{id}/toggle-status', [AssetController::class, 'toggleStatus']);
+            Route::patch('/{id}/update-status', [AssetController::class, 'updateStatus']);
+        });
+        //asset-purchases routes
+        Route::prefix('asset-purchases')->group(function () {
+            Route::get('/', [AssetPurchaseController::class, 'index']);
+            Route::post('/', [AssetPurchaseController::class, 'store']);
+            Route::get('/{id}', [AssetPurchaseController::class, 'show']);
+            Route::post('/update/{id}', [AssetPurchaseController::class, 'update']);
+            Route::delete('/{id}', [AssetPurchaseController::class, 'destroy']);
+            Route::get('{id}/restore', [AssetPurchaseController::class, 'restore']);
+            Route::delete('{id}/force', [AssetPurchaseController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AssetPurchaseController::class, 'toggleStatus']);
+        });
+        //asset-purchases routes
+        Route::prefix('asset-depreciations')->group(function () {
+            Route::get('/', [AssetDepreciationController::class, 'index']);
+            Route::post('/', [AssetDepreciationController::class, 'store']);
+            Route::get('/{id}', [AssetDepreciationController::class, 'show']);
+            Route::post('/update/{id}', [AssetDepreciationController::class, 'update']);
+            Route::delete('/{id}', [AssetDepreciationController::class, 'destroy']);
+            Route::get('{id}/restore', [AssetDepreciationController::class, 'restore']);
+            Route::delete('{id}/force', [AssetDepreciationController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [AssetDepreciationController::class, 'toggleStatus']);
         });
 
 

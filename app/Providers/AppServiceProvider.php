@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssetCategoryService;
+use App\Services\AssetDepreciationService;
+use App\Services\AssetPurchaseService;
 use App\Services\AssetService;
 use App\Services\AssignLeaveService;
 use App\Services\AttendanceService;
@@ -189,6 +191,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(RecurringJournalService::class);
         $this->app->bind(AssetCategoryService::class);
         $this->app->bind(AssetService::class);
+        $this->app->bind(AssetPurchaseService::class);
+        $this->app->bind(AssetDepreciationService::class);
     }
 
     /**
