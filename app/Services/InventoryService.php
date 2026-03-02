@@ -45,10 +45,21 @@ class InventoryService
             }
 
             if (isset($filters['warehouse_id'])) {
-                $query->whereJsonContains('warehouse_info', [
-                    'warehouse_id' => (string) $filters['warehouse_id']
-                ]);
+                $warehouseId = $filters['warehouse_id'];
+
+                $query->where(function ($q) use ($warehouseId) {
+                    // Check single products: warehouse_info JSON
+                    $q->whereJsonContains('warehouse_info', [
+                        'warehouse_id' => (string) $warehouseId
+                    ])
+                        // OR check variation products: product_variation_stocks table
+                        ->orWhereHas('variations.stocks', function ($stockQuery) use ($warehouseId) {
+                            $stockQuery->where('warehouse_id', $warehouseId)
+                                ->where('quantity', '>', 0);
+                        });
+                });
             }
+
 
             if (isset($filters['date_from'])) {
                 $query->whereDate('created_at', '>=', $filters['date_from']);

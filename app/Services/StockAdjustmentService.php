@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{Product, ProductStockLedger, StockAdjustment, StockAdjustmentItem};
+use App\Models\{Product, ProductVariation, ProductStockLedger, ProductVariationStockLedger, StockAdjustment, StockAdjustmentItem};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,6 +20,7 @@ class StockAdjustmentService
 
     /**
      * Get all stock adjustments with filters
+     * UPDATED: Now includes variation products
      */
     public function getAllAdjustments(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
@@ -27,6 +28,8 @@ class StockAdjustmentService
             $query = StockAdjustment::with([
                 'warehouse',
                 'items.product.brand',
+                'items.variation.attributes.attributeGroup',
+                'items.variation.attributes.attributeValue',
                 'items.bin',
                 'creator'
             ]);
@@ -75,6 +78,8 @@ class StockAdjustmentService
         $adjustment = StockAdjustment::with([
             'warehouse',
             'items.product.brand',
+            'items.variation.attributes.attributeGroup',
+            'items.variation.attributes.attributeValue',
             'items.bin',
             'creator'
         ])->find($id);
@@ -88,6 +93,7 @@ class StockAdjustmentService
 
     /**
      * Create stock adjustment
+     * UPDATED: Now supports both single and variation products
      */
     public function createAdjustment(array $data): StockAdjustment
     {
@@ -106,6 +112,7 @@ class StockAdjustmentService
                 if ($item['quantity_to_adjust'] < 0) {
                     $this->validateStockAvailability(
                         $item['product_id'],
+                        $item['variation_id'] ?? null,
                         $data['warehouse_id'],
                         $item['bin_id'] ?? null,
                         $item['batch_number'] ?? null,
@@ -116,6 +123,7 @@ class StockAdjustmentService
                 // Create adjustment item
                 $adjustment->items()->create([
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'bin_id' => $item['bin_id'] ?? null,
                     'batch_number' => $item['batch_number'] ?? null,
                     'serial_numbers' => $item['serial_numbers'] ?? null,
@@ -123,14 +131,22 @@ class StockAdjustmentService
                 ]);
 
                 // Update product stock using ProductService
-                $this->productService->adjustStock($item['product_id'], [
+                $stockData = [
                     'warehouse_id' => $data['warehouse_id'],
                     'bin_id' => $item['bin_id'] ?? null,
                     'quantity' => $item['quantity_to_adjust'],
                     'transaction_type' => 'adjustment',
                     'reference_type' => 'StockAdjustment',
+                    'reference_id' => $adjustment->id,
                     'notes' => "Stock adjustment: {$adjustment->adjustment_number} - Reason: {$data['adjustment_reason']}"
-                ]);
+                ];
+
+                // Add variation_id if exists
+                if (isset($item['variation_id']) && $item['variation_id']) {
+                    $stockData['variation_id'] = $item['variation_id'];
+                }
+
+                $this->productService->adjustStock($item['product_id'], $stockData);
             }
 
             DB::commit();
@@ -154,6 +170,7 @@ class StockAdjustmentService
 
     /**
      * Update stock adjustment
+     * UPDATED: Now supports variation products
      */
     public function updateAdjustment(int $id, array $data): StockAdjustment
     {
@@ -178,6 +195,7 @@ class StockAdjustmentService
                     if ($item['quantity_to_adjust'] < 0) {
                         $this->validateStockAvailability(
                             $item['product_id'],
+                            $item['variation_id'] ?? null,
                             $data['warehouse_id'],
                             $item['bin_id'] ?? null,
                             $item['batch_number'] ?? null,
@@ -188,6 +206,7 @@ class StockAdjustmentService
                     // Create new item
                     $adjustment->items()->create([
                         'product_id' => $item['product_id'],
+                        'variation_id' => $item['variation_id'] ?? null,
                         'bin_id' => $item['bin_id'] ?? null,
                         'batch_number' => $item['batch_number'] ?? null,
                         'serial_numbers' => $item['serial_numbers'] ?? null,
@@ -195,14 +214,21 @@ class StockAdjustmentService
                     ]);
 
                     // Adjust stock
-                    $this->productService->adjustStock($item['product_id'], [
+                    $stockData = [
                         'warehouse_id' => $data['warehouse_id'],
                         'bin_id' => $item['bin_id'] ?? null,
                         'quantity' => $item['quantity_to_adjust'],
                         'transaction_type' => 'adjustment',
                         'reference_type' => 'StockAdjustment',
+                        'reference_id' => $adjustment->id,
                         'notes' => "Stock adjustment: {$adjustment->adjustment_number} - Reason: {$data['adjustment_reason']}"
-                    ]);
+                    ];
+
+                    if (isset($item['variation_id']) && $item['variation_id']) {
+                        $stockData['variation_id'] = $item['variation_id'];
+                    }
+
+                    $this->productService->adjustStock($item['product_id'], $stockData);
                 }
             }
 
@@ -211,7 +237,7 @@ class StockAdjustmentService
             DB::commit();
 
             Log::info('Stock adjustment updated', ['adjustment_id' => $id]);
-            LogHelper::updated('stock_adjustment', $id,  $adjustment->company_id, "Stock adjustment: {$adjustment->adjustment_number} - Reason: {$data['adjustment_reason']}");
+            LogHelper::updated('stock_adjustment', $id, $adjustment->company_id, "Stock adjustment: {$adjustment->adjustment_number} - Reason: {$data['adjustment_reason']}");
 
             return $this->getAdjustmentById($adjustment->id);
         } catch (ApiException $e) {
@@ -271,19 +297,27 @@ class StockAdjustmentService
 
             // Re-apply the adjustment
             foreach ($adjustment->items as $item) {
-                $this->productService->adjustStock($item->product_id, [
+                $stockData = [
                     'warehouse_id' => $adjustment->warehouse_id,
                     'bin_id' => $item->bin_id,
-                    'quantity' => -$item->quantity_to_adjust, // Reverse
-                    'transaction_type' => 'correction',
-                    'notes' => "Reversal of stock adjustment: {$adjustment->adjustment_number}"
-                ]);
+                    'quantity' => $item->quantity_to_adjust,
+                    'transaction_type' => 'restoration',
+                    'reference_type' => 'StockAdjustment',
+                    'reference_id' => $adjustment->id,
+                    'notes' => "Restoration of stock adjustment: {$adjustment->adjustment_number}"
+                ];
+
+                if ($item->variation_id) {
+                    $stockData['variation_id'] = $item->variation_id;
+                }
+
+                $this->productService->adjustStock($item->product_id, $stockData);
             }
 
             DB::commit();
 
             Log::info('Stock adjustment restored', ['adjustment_id' => $id]);
-            LogHelper::custom('restored', 'stock_adjustment', $id,  $adjustment->company_id,$adjustment->adjustment_number);
+            LogHelper::custom('restored', 'stock_adjustment', $id, $adjustment->company_id, $adjustment->adjustment_number);
 
             return $this->getAdjustmentById($adjustment->id);
         } catch (ApiException $e) {
@@ -298,6 +332,7 @@ class StockAdjustmentService
 
     /**
      * Force delete stock adjustment
+     * UPDATED: Now deletes both single and variation ledger entries
      */
     public function forceDeleteAdjustment(int $id): void
     {
@@ -310,12 +345,15 @@ class StockAdjustmentService
                 throw ApiException::notFound('Stock Adjustment');
             }
 
-
             // Delete items
             StockAdjustmentItem::where('stock_adjustment_id', $id)->forceDelete();
 
-            // Delete related ledger entries
+            // Delete related ledger entries (both single and variation)
             ProductStockLedger::where('reference_type', 'StockAdjustment')
+                ->where('reference_id', $id)
+                ->forceDelete();
+
+            ProductVariationStockLedger::where('reference_type', 'StockAdjustment')
                 ->where('reference_id', $id)
                 ->forceDelete();
 
@@ -324,7 +362,7 @@ class StockAdjustmentService
             DB::commit();
 
             Log::info('Stock adjustment force deleted', ['adjustment_id' => $id]);
-            LogHelper::custom('force_deleted', 'stock_adjustment', $id,  $adjustment->company_id);
+            LogHelper::custom('force_deleted', 'stock_adjustment', $id, $adjustment->company_id);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -337,43 +375,74 @@ class StockAdjustmentService
 
     /**
      * Reverse stock adjustment
+     * UPDATED: Now handles both single and variation products
      */
     private function reverseAdjustment(StockAdjustment $adjustment): void
     {
         foreach ($adjustment->items as $item) {
             // Reverse the adjustment (opposite quantity)
-            $this->productService->adjustStock($item->product_id, [
+            $stockData = [
                 'warehouse_id' => $adjustment->warehouse_id,
                 'bin_id' => $item->bin_id,
                 'quantity' => -$item->quantity_to_adjust, // Reverse
                 'transaction_type' => 'correction',
+                'reference_type' => 'StockAdjustment',
+                'reference_id' => $adjustment->id,
                 'notes' => "Reversal of stock adjustment: {$adjustment->adjustment_number}"
-            ]);
+            ];
+
+            if ($item->variation_id) {
+                $stockData['variation_id'] = $item->variation_id;
+            }
+
+            $this->productService->adjustStock($item->product_id, $stockData);
         }
     }
 
     /**
      * Validate stock availability
+     * UPDATED: Now handles both single and variation products
      */
     private function validateStockAvailability(
         int $productId,
+        ?int $variationId,
         int $warehouseId,
         ?int $binId,
         ?string $batchNumber,
         int $requiredQuantity
     ): void {
-        $availableStock = ProductStockLedger::getCurrentStock(
-            $productId,
-            $warehouseId,
-            $binId,
-            $batchNumber
-        );
-
-        if ($availableStock < $requiredQuantity) {
-            $product = Product::find($productId);
-            throw ApiException::badRequest(
-                "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Required: {$requiredQuantity}"
+        if ($variationId) {
+            // Validate variation stock
+            $availableStock = ProductVariationStockLedger::getCurrentStock(
+                $productId,
+                $variationId,
+                $warehouseId,
+                $binId,
+                $batchNumber
             );
+
+            if ($availableStock < $requiredQuantity) {
+                $product = Product::find($productId);
+                $variation = ProductVariation::find($variationId);
+                throw ApiException::badRequest(
+                    "Insufficient stock for {$product->title} (Variation: {$variation->sku}). Available: {$availableStock}, Required: {$requiredQuantity}"
+                );
+            }
+        } else {
+            // Validate single product stock
+            $availableStock = ProductStockLedger::getCurrentStock(
+                $productId,
+                $warehouseId,
+                $binId,
+                $batchNumber
+            );
+
+            if ($availableStock < $requiredQuantity) {
+                $product = Product::find($productId);
+                throw ApiException::badRequest(
+                    "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Required: {$requiredQuantity}"
+                );
+            }
         }
     }
 }

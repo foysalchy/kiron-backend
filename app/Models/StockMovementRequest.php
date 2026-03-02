@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Carbon\Carbon;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class StockMovementRequest extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
@@ -33,12 +34,6 @@ class StockMovementRequest extends Model
         'rejected_at' => 'datetime',
     ];
 
-    // Status Constants
-    const STATUS_PENDING = 0;
-    const STATUS_APPROVED = 1;
-    const STATUS_REJECTED = 3;
-    const STATUS_TRANSFERRED = 2;
-    const STATUS_CANCELLED = 4;
 
     protected static function boot()
     {
@@ -46,8 +41,7 @@ class StockMovementRequest extends Model
 
         static::creating(function ($model) {
             $model->request_number = self::generateRequestNumber();
-            $model->requested_by =Auth::id();
-  
+            $model->requested_by = Auth::id();
         });
     }
 
@@ -102,37 +96,37 @@ class StockMovementRequest extends Model
     // Status Check Methods
     public function isPending(): bool
     {
-        return $this->status === self::STATUS_PENDING;
+        return $this->status === Status::Pending->value;
     }
 
     public function isApproved(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === Status::Approved->value;
     }
 
     public function isRejected(): bool
     {
-        return $this->status === self::STATUS_REJECTED;
+        return $this->status === Status::Rejected->value;
     }
 
     public function isTransferred(): bool
     {
-        return $this->status === self::STATUS_TRANSFERRED;
+        return $this->status === Status::Transferred->value;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->status === Status::Cancelled->value;
     }
 
     // Scopes
     public function scopePending($query)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('status', Status::Pending->value);
     }
 
     public function scopeApproved($query)
     {
-        return $query->where('status', self::STATUS_APPROVED);
+        return $query->where('status', Status::Approved->value);
     }
 }
