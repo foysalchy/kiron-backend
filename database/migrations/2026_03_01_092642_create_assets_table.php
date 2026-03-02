@@ -16,12 +16,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('asset_category_id')->constrained('asset_categories')->cascadeOnDelete();
-            $table->foreignId('manager_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('image')->nullable();
             $table->string('name');
             $table->string('asset_tag')->unique();
             $table->string('serial_number')->nullable();
-            $table->string('model_number');
+            $table->string('model_number')->nullable();
             $table->string('asset_location');
             $table->longText('description')->nullable();
             $table->tinyInteger('status')->default(Status::Inactive->value)->comment('Active / Inactive / Disposed');

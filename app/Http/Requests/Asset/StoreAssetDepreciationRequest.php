@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests\Asset;
 
-use App\Http\Requests\UpdateBaseCompanyRequest;
+use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 
-class UpdateAssetRequest extends UpdateBaseCompanyRequest
+class StoreAssetDepreciationRequest extends BaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,24 +26,22 @@ class UpdateAssetRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'asset_category_id' => ['sometimes', 'required', 'exists:asset_categories,id'],
-            'manager_id'        => ['nullable', 'exists:users,id'],
-            'image'             => ['nullable', 'image', 'mimes:jpg,png,webp', 'max:2048'],
-            'name'              => ['sometimes', 'required', 'string', 'max:255'],
-            'asset_tag'         => ['sometimes','required'],
-            'serial_number'     => ['nullable', 'string', 'max:255'],
-            'model_number'      => ['nullable', 'string', 'max:255'],
-            'asset_location'    => ['sometimes', 'required', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
-            'status'            => ['sometimes', 'nullable','integer'],
+            'asset_id'           => ['required', 'integer', 'exists:assets,id',Rule::unique('asset_depreciations', 'asset_id')],
+            'method'             => ['required', 'string'],
+            'useful_life'        => ['required', 'integer', 'min:1'],
+            'residual_value'     => ['required', 'numeric', 'min:0'],
+            'start_date'         => ['required', 'date'],
+            'status'             => ['nullable', 'integer'],
         ]);
     }
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'asset_location.required'    => 'Asset location is required.',
+            'asset_id.unique'    => 'This asset already has depreciation information.',
+            'useful_life.min'    => 'Useful life must be at least 1 month.',
         ]);
     }
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Asset extends Model
@@ -47,7 +48,19 @@ class Asset extends Model
     }
     public function category(): BelongsTo
     {
-        return $this->belongsTo(AssetCategory::class);
+        return $this->belongsTo(AssetCategory::class,'asset_category_id');
+    }
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+    public function assetPurchase(): HasMany
+    {
+        return $this->hasMany(AssetPurchase::class);
+    }
+    public function assetDepreciation(): HasMany
+    {
+        return $this->hasMany(AssetDepreciation::class);
     }
     // Accessors
     public function getImageUrlAttribute(): ?string

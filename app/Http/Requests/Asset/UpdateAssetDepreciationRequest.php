@@ -3,11 +3,12 @@
 namespace App\Http\Requests\Asset;
 
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use App\Http\Requests\UpdateCompanyRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateAssetRequest extends UpdateBaseCompanyRequest
+class UpdateAssetDepreciationRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,24 +26,21 @@ class UpdateAssetRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'asset_category_id' => ['sometimes', 'required', 'exists:asset_categories,id'],
-            'manager_id'        => ['nullable', 'exists:users,id'],
-            'image'             => ['nullable', 'image', 'mimes:jpg,png,webp', 'max:2048'],
-            'name'              => ['sometimes', 'required', 'string', 'max:255'],
-            'asset_tag'         => ['sometimes','required'],
-            'serial_number'     => ['nullable', 'string', 'max:255'],
-            'model_number'      => ['nullable', 'string', 'max:255'],
-            'asset_location'    => ['sometimes', 'required', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
-            'status'            => ['sometimes', 'nullable','integer'],
+            'asset_id'           => ['sometimes', 'integer', 'exists:assets,id'],
+            'method'             => ['sometimes', 'string'],
+            'useful_life'        => ['sometimes', 'integer', 'min:1'],
+            'residual_value'     => ['sometimes', 'numeric', 'min:0'],
+            'start_date'         => ['sometimes', 'date'],
+            'status'             => ['sometimes', 'integer'],
         ]);
     }
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'asset_location.required'    => 'Asset location is required.',
+            'asset_id.unique'    => 'This asset already has depreciation information.',
         ]);
     }
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

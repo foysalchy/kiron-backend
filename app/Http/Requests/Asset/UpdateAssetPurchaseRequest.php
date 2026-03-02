@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateAssetRequest extends UpdateBaseCompanyRequest
+class UpdateAssetPurchaseRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,24 +25,21 @@ class UpdateAssetRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'asset_category_id' => ['sometimes', 'required', 'exists:asset_categories,id'],
-            'manager_id'        => ['nullable', 'exists:users,id'],
-            'image'             => ['nullable', 'image', 'mimes:jpg,png,webp', 'max:2048'],
-            'name'              => ['sometimes', 'required', 'string', 'max:255'],
-            'asset_tag'         => ['sometimes','required'],
-            'serial_number'     => ['nullable', 'string', 'max:255'],
-            'model_number'      => ['nullable', 'string', 'max:255'],
-            'asset_location'    => ['sometimes', 'required', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
-            'status'            => ['sometimes', 'nullable','integer'],
+            'asset_id'       => ['sometimes', 'integer', 'exists:assets,id'],
+            'supplier_id'    => ['nullable', 'integer', 'exists:parties,id'],
+            'purchase_date'  => ['sometimes', 'date', 'before_or_equal:today'],
+            'purchase_cost'  => ['sometimes', 'numeric', 'min:0'],
+            'invoice_number' => ['nullable', 'string', 'max:255'],
+            'status'         => ['sometimes', 'integer'],
         ]);
     }
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'asset_location.required'    => 'Asset location is required.',
+            'asset_id.exists' => 'The selected asset is invalid.',
         ]);
     }
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
