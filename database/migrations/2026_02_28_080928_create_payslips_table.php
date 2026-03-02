@@ -21,6 +21,8 @@ return new class extends Migration
             $table->integer('present_days')->default(0);
             $table->integer('absent_days')->default(0);
             $table->integer('late_days')->default(0);
+            $table->integer('weekend_days')->default(0);
+            $table->integer('holiday_days')->default(0);
             $table->decimal('leave_days', 8, 1)->default(0);
             $table->decimal('gross_salary', 15, 2)->default(0);
             $table->decimal('total_deductions', 15, 2)->default(0);

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\{StockMovementRequest, Product, StockMovement};
+use App\Models\{StockMovementRequest, Product, ProductVariation, StockMovement};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,7 +23,9 @@ class StockMovementRequestService
                 'requestedBy',
                 'approvedBy',
                 'rejectedBy',
-                'items.product'
+                'items.product',
+                'items.variation.attributes.attributeGroup',
+                'items.variation.attributes.attributeValue',
             ]);
 
             if (isset($filters['status'])) {
@@ -75,6 +77,8 @@ class StockMovementRequestService
             'sourceWarehouse',
             'destinationWarehouse',
             'items.product.brand',
+            'items.variation.attributes.attributeGroup',
+            'items.variation.attributes.attributeValue',
             'requestedBy',
             'approvedBy',
             'rejectedBy',
@@ -90,6 +94,7 @@ class StockMovementRequestService
 
     /**
      * Create stock movement request
+     * Now supports both single and variation products
      */
     public function createRequest(array $data): StockMovementRequest
     {
@@ -111,6 +116,7 @@ class StockMovementRequestService
             foreach ($items as $item) {
                 $request->items()->create([
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'transfer_quantity' => $item['transfer_quantity'],
                 ]);
             }
@@ -167,6 +173,7 @@ class StockMovementRequestService
             foreach ($items as $item) {
                 $request->items()->create([
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'transfer_quantity' => $item['transfer_quantity'],
                 ]);
             }
@@ -210,7 +217,7 @@ class StockMovementRequestService
             DB::commit();
 
             Log::info('Stock movement request approved', ['request_id' => $id]);
-            LogHelper::custom('approved', 'stock_movement_request', $id,  $request->company_id,'approved');
+            LogHelper::custom('approved', 'stock_movement_request', $id, $request->company_id, 'approved');
 
             return $this->getRequestById($request->id);
         } catch (ApiException $e) {
@@ -247,7 +254,7 @@ class StockMovementRequestService
             DB::commit();
 
             Log::info('Stock movement request rejected', ['request_id' => $id]);
-            LogHelper::custom('rejected', 'stock_movement_request', $id,  $request->company_id,'rejected');
+            LogHelper::custom('rejected', 'stock_movement_request', $id, $request->company_id, 'rejected');
 
             return $this->getRequestById($request->id);
         } catch (ApiException $e) {
@@ -283,7 +290,7 @@ class StockMovementRequestService
             DB::commit();
 
             Log::info('Stock movement request cancelled', ['request_id' => $id]);
-            LogHelper::custom('cancelled', 'stock_movement_request', $id, $request->company_id,'cancelled');
+            LogHelper::custom('cancelled', 'stock_movement_request', $id, $request->company_id, 'cancelled');
 
             return $this->getRequestById($request->id);
         } catch (ApiException $e) {
@@ -314,7 +321,7 @@ class StockMovementRequestService
             DB::commit();
 
             Log::info('Stock movement request deleted', ['request_id' => $id]);
-            LogHelper::deleted('stock_movement_request', $id,  $request->company_id);
+            LogHelper::deleted('stock_movement_request', $id, $request->company_id);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -327,6 +334,7 @@ class StockMovementRequestService
 
     /**
      * Convert approved request to stock movement
+     * Now supports variation products
      */
     public function convertToMovement(int $id, array $movementData): StockMovement
     {
@@ -356,7 +364,7 @@ class StockMovementRequestService
 
             // Convert request items to movement items
             foreach ($request->items as $requestItem) {
-                $data['items'][] = [
+                $itemData = [
                     'product_id' => $requestItem->product_id,
                     'quantity' => $requestItem->transfer_quantity,
                     'batch_number' => $movementData['items'][$requestItem->id]['batch_number'] ?? null,
@@ -364,6 +372,13 @@ class StockMovementRequestService
                     'destination_bin_id' => $movementData['items'][$requestItem->id]['destination_bin_id'] ?? null,
                     'serial_numbers' => $movementData['items'][$requestItem->id]['serial_numbers'] ?? null,
                 ];
+
+                // Add variation_id if exists
+                if ($requestItem->variation_id) {
+                    $itemData['variation_id'] = $requestItem->variation_id;
+                }
+
+                $data['items'][] = $itemData;
             }
 
             // Use InventoryService to create movement
@@ -394,6 +409,7 @@ class StockMovementRequestService
 
     /**
      * Validate stock availability
+     * Now handles both single and variation products
      */
     private function validateStockAvailability(array $items, int $sourceWarehouseId): void
     {
@@ -404,15 +420,41 @@ class StockMovementRequestService
                 throw ApiException::badRequest("Product ID {$item['product_id']} not found");
             }
 
-            $warehouseInfo = collect($product->warehouse_info ?? []);
+            if (isset($item['variation_id']) && $item['variation_id']) {
+                // Validate variation stock
+                $variation = ProductVariation::with('stocks')
+                    ->where('id', $item['variation_id'])
+                    ->where('product_id', $item['product_id'])
+                    ->first();
 
-            $stock = $warehouseInfo->firstWhere('warehouse_id', (string) $sourceWarehouseId);
-            $availableStock = $stock['quantity'] ?? 0;
+                if (!$variation) {
+                    throw ApiException::badRequest(
+                        "Variation ID {$item['variation_id']} does not belong to product: {$product->title}"
+                    );
+                }
 
-            if ($availableStock < $item['transfer_quantity']) {
-                throw ApiException::badRequest(
-                    "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Requested: {$item['transfer_quantity']}"
-                );
+                $variationStock = $variation->stocks()
+                    ->where('warehouse_id', $sourceWarehouseId)
+                    ->first();
+
+                $availableStock = $variationStock ? $variationStock->quantity : 0;
+
+                if ($availableStock < $item['transfer_quantity']) {
+                    throw ApiException::badRequest(
+                        "Insufficient stock for {$product->title} (Variation: {$variation->sku}). Available: {$availableStock}, Requested: {$item['transfer_quantity']}"
+                    );
+                }
+            } else {
+                // Validate single product stock
+                $warehouseInfo = collect($product->warehouse_info ?? []);
+                $stock = $warehouseInfo->firstWhere('warehouse_id', (string) $sourceWarehouseId);
+                $availableStock = $stock['quantity'] ?? 0;
+
+                if ($availableStock < $item['transfer_quantity']) {
+                    throw ApiException::badRequest(
+                        "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Requested: {$item['transfer_quantity']}"
+                    );
+                }
             }
         }
     }

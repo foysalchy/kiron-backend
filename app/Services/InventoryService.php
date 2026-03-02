@@ -10,7 +10,9 @@ use App\Helpers\LogHelper;
 use App\Models\AttributeGroup;
 use App\Models\Bin;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\ProductStockLedger;
+use App\Models\ProductVariationStockLedger;
 use App\Models\StockMovement;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -22,11 +24,16 @@ class InventoryService
 {
     /**
      * Get inventory summary with filters
+     * Now includes both single products and variations
      */
     public function getInventorySummary(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Product::with('brand')->inStock();
+            $query = Product::with([
+                'brand',
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+            ]);
 
             // Apply filters
             if (isset($filters['status'])) {
@@ -83,7 +90,9 @@ class InventoryService
                 'sourceWarehouse',
                 'destinationWarehouse',
                 'createdBy',
-                'items.product'
+                'items.product',
+                'items.variation.attributes.attributeGroup',
+                'items.variation.attributes.attributeValue',
             ]);
 
             if (isset($filters['status'])) {
@@ -135,6 +144,8 @@ class InventoryService
             'sourceWarehouse',
             'destinationWarehouse',
             'items.product.brand',
+            'items.variation.attributes.attributeGroup',
+            'items.variation.attributes.attributeValue',
             'items.sourceBin',
             'items.destinationBin',
             'createdBy',
@@ -150,6 +161,7 @@ class InventoryService
 
     /**
      * Create stock movement
+     * Now supports both single and variation products
      */
     public function createMovement(array $data): StockMovement
     {
@@ -171,6 +183,7 @@ class InventoryService
             foreach ($items as $item) {
                 $movement->items()->create([
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'batch_number' => $item['batch_number'] ?? null,
                     'source_bin_id' => $item['source_bin_id'] ?? null,
                     'destination_bin_id' => $item['destination_bin_id'] ?? null,
@@ -179,7 +192,7 @@ class InventoryService
                 ]);
             }
             $totalQuantity = collect($items)->sum('quantity');
-            LogHelper::created('stock_movement', $movement->id, $movement->company_id, $movement->movement_number .' total quantity ' . $totalQuantity);
+            LogHelper::created('stock_movement', $movement->id, $movement->company_id, $movement->movement_number . ' total quantity ' . $totalQuantity);
 
             DB::commit();
 
@@ -232,6 +245,7 @@ class InventoryService
             foreach ($items as $item) {
                 $movement->items()->create([
                     'product_id' => $item['product_id'],
+                    'variation_id' => $item['variation_id'] ?? null,
                     'batch_number' => $item['batch_number'] ?? null,
                     'source_bin_id' => $item['source_bin_id'] ?? null,
                     'destination_bin_id' => $item['destination_bin_id'] ?? null,
@@ -241,7 +255,7 @@ class InventoryService
             }
             $totalQuantity = collect($items)->sum('quantity');
 
-            LogHelper::updated('stock_movement', $id, $movement->company_id,$movement->movement_number . ' total quantity ' . $totalQuantity);
+            LogHelper::updated('stock_movement', $id, $movement->company_id, $movement->movement_number . ' total quantity ' . $totalQuantity);
             DB::commit();
 
             Log::info('Stock movement updated', ['movement_id' => $id]);
@@ -259,52 +273,93 @@ class InventoryService
 
     /**
      * Approve stock movement
+     * Handles both single and variation products
      */
     public function approveMovement(int $id): StockMovement
     {
         DB::beginTransaction();
 
         try {
-            $movement = StockMovement::with('items.product')->findOrFail($id);
+            $movement = StockMovement::with('items.product', 'items.variation')->findOrFail($id);
 
             if ($movement->status !== Status::Pending->value) {
                 throw ApiException::badRequest('Only pending movements can be approved');
             }
 
             foreach ($movement->items as $item) {
-                // Decrease from source warehouse
-                $this->updateWarehouseStock(
-                    $item->product_id,
-                    $movement->source_warehouse_id,
-                    $item->source_bin_id,
-                    -$item->quantity,
-                    $item->batch_number,
-                    $item->serial_numbers,
-                    $movement,
-                    ProductStockLedger::TYPE_TRANSFER_OUT,
-                );
+                if ($item->variation_id) {
+                    // Handle variation product
+                    // Decrease from source warehouse
+                    $this->updateVariationWarehouseStock(
+                        $item->product_id,
+                        $item->variation_id,
+                        $movement->source_warehouse_id,
+                        $item->source_bin_id,
+                        -$item->quantity,
+                        $item->batch_number,
+                        $item->serial_numbers,
+                        $movement,
+                        ProductVariationStockLedger::TYPE_TRANSFER_OUT,
+                    );
 
-                // Increase in destination warehouse
-                $this->updateWarehouseStock(
-                    $item->product_id,
-                    $movement->destination_warehouse_id,
-                    $item->destination_bin_id,
-                    $item->quantity,
-                    $item->batch_number,
-                    $item->serial_numbers,
-                    $movement,
-                    ProductStockLedger::TYPE_TRANSFER_IN,
-                );
+                    // Increase in destination warehouse
+                    $this->updateVariationWarehouseStock(
+                        $item->product_id,
+                        $item->variation_id,
+                        $movement->destination_warehouse_id,
+                        $item->destination_bin_id,
+                        $item->quantity,
+                        $item->batch_number,
+                        $item->serial_numbers,
+                        $movement,
+                        ProductVariationStockLedger::TYPE_TRANSFER_IN,
+                    );
 
-                // Update product's warehouse_info
-                $this->updateProductWarehouseInfo(
-                    $item->product,
-                    $movement->source_warehouse_id,
-                    $movement->destination_warehouse_id,
-                    $item->source_bin_id,
-                    $item->destination_bin_id,
-                    $item->quantity
-                );
+                    // Update variation's warehouse_stocks
+                    $this->updateVariationWarehouseInfo(
+                        $item->variation,
+                        $movement->source_warehouse_id,
+                        $movement->destination_warehouse_id,
+                        $item->source_bin_id,
+                        $item->destination_bin_id,
+                        $item->quantity
+                    );
+                } else {
+                    // Handle single product
+                    // Decrease from source warehouse
+                    $this->updateWarehouseStock(
+                        $item->product_id,
+                        $movement->source_warehouse_id,
+                        $item->source_bin_id,
+                        -$item->quantity,
+                        $item->batch_number,
+                        $item->serial_numbers,
+                        $movement,
+                        ProductStockLedger::TYPE_TRANSFER_OUT,
+                    );
+
+                    // Increase in destination warehouse
+                    $this->updateWarehouseStock(
+                        $item->product_id,
+                        $movement->destination_warehouse_id,
+                        $item->destination_bin_id,
+                        $item->quantity,
+                        $item->batch_number,
+                        $item->serial_numbers,
+                        $movement,
+                        ProductStockLedger::TYPE_TRANSFER_IN,
+                    );
+
+                    // Update product's warehouse_info
+                    $this->updateProductWarehouseInfo(
+                        $item->product,
+                        $movement->source_warehouse_id,
+                        $movement->destination_warehouse_id,
+                        $item->source_bin_id,
+                        $item->destination_bin_id,
+                        $item->quantity
+                    );
+                }
             }
 
             $movement->update([
@@ -316,7 +371,7 @@ class InventoryService
             DB::commit();
 
             Log::info('Stock movement approved', ['movement_id' => $id]);
-            LogHelper::custom('approved', 'stock_movement', $id, $movement->company_id,$movement->movement_number .' approved');
+            LogHelper::custom('approved', 'stock_movement', $id, $movement->company_id, $movement->movement_number . ' approved');
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -352,7 +407,7 @@ class InventoryService
             DB::commit();
 
             Log::info('Stock movement cancelled', ['movement_id' => $id]);
-            LogHelper::custom('cancelled', 'stock_movement', $id, $movement->company_id, $movement->movement_number .' movement cancelled');
+            LogHelper::custom('cancelled', 'stock_movement', $id, $movement->company_id, $movement->movement_number . ' movement cancelled');
 
             return $this->getMovementById($movement->id);
         } catch (ApiException $e) {
@@ -383,7 +438,7 @@ class InventoryService
             DB::commit();
 
             Log::info('Stock movement deleted', ['movement_id' => $id]);
-            LogHelper::deleted('stock_movement', $id, $movement->company_id, $movement->movement_number .' movement deleted');
+            LogHelper::deleted('stock_movement', $id, $movement->company_id, $movement->movement_number . ' movement deleted');
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -396,23 +451,52 @@ class InventoryService
 
     /**
      * Get products by warehouse
+     * Returns both single products and variations
      */
     public function getProductsByWarehouse(int $warehouseId): Collection
     {
         try {
-            return Product::whereJsonContains('warehouse_info', [
-                'warehouse_id' => (string) $warehouseId
+            $products = Product::with([
+                'brand',
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
             ])
                 ->where('stock_status', 'in_stock')
-                ->with('brand')
-                ->get()
-                ->map(function ($product) use ($warehouseId) {
+                ->get();
+
+            $result = collect();
+
+            foreach ($products as $product) {
+                if ($product->type === 'variation' && $product->variations->isNotEmpty()) {
+                    // Add each variation as separate item
+                    foreach ($product->variations as $variation) {
+                        $variationStock = $variation->stocks()
+                            ->where('warehouse_id', $warehouseId)
+                            ->first();
+
+                        if ($variationStock && $variationStock->quantity > 0) {
+                            $variationItem = clone $product;
+                            $variationItem->variation_id = $variation->id;
+                            $variationItem->variation = $variation;
+                            $variationItem->available_quantity = $variationStock->quantity;
+                            $variationItem->is_variation = true;
+                            $result->push($variationItem);
+                        }
+                    }
+                } else {
+                    // Single product
                     $warehouseInfo = collect($product->warehouse_info ?? [])
                         ->firstWhere('warehouse_id', (string) $warehouseId);
 
-                    $product->available_quantity = $warehouseInfo['quantity'] ?? 0;
-                    return $product;
-                });
+                    if ($warehouseInfo && $warehouseInfo['quantity'] > 0) {
+                        $product->available_quantity = $warehouseInfo['quantity'];
+                        $product->is_variation = false;
+                        $result->push($product);
+                    }
+                }
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error fetching products by warehouse: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch products');
@@ -436,28 +520,50 @@ class InventoryService
 
     /**
      * Validate stock availability
+     * Handles both single and variation products
      */
     private function validateStockAvailability(array $items, int $sourceWarehouseId): void
     {
         foreach ($items as $item) {
-            $availableStock = $this->getCurrentWarehouseStock(
-                $item['product_id'],
-                $sourceWarehouseId,
-                $item['source_bin_id'] ?? null,
-                $item['batch_number'] ?? null
-            );
-
-            if ($availableStock < $item['quantity']) {
-                $product = Product::find($item['product_id']);
-                throw ApiException::badRequest(
-                    "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Required: {$item['quantity']}"
+            if (isset($item['variation_id']) && $item['variation_id']) {
+                // Validate variation stock
+                $availableStock = $this->getCurrentVariationWarehouseStock(
+                    $item['product_id'],
+                    $item['variation_id'],
+                    $sourceWarehouseId,
+                    $item['source_bin_id'] ?? null,
+                    $item['batch_number'] ?? null
                 );
+
+                $variation = ProductVariation::find($item['variation_id']);
+                $product = Product::find($item['product_id']);
+
+                if ($availableStock < $item['quantity']) {
+                    throw ApiException::badRequest(
+                        "Insufficient stock for {$product->title} (Variation: {$variation->sku}). Available: {$availableStock}, Required: {$item['quantity']}"
+                    );
+                }
+            } else {
+                // Validate single product stock
+                $availableStock = $this->getCurrentWarehouseStock(
+                    $item['product_id'],
+                    $sourceWarehouseId,
+                    $item['source_bin_id'] ?? null,
+                    $item['batch_number'] ?? null
+                );
+
+                if ($availableStock < $item['quantity']) {
+                    $product = Product::find($item['product_id']);
+                    throw ApiException::badRequest(
+                        "Insufficient stock for product: {$product->title}. Available: {$availableStock}, Required: {$item['quantity']}"
+                    );
+                }
             }
         }
     }
 
     /**
-     * Update warehouse stock in ledger
+     * Update warehouse stock in ledger (for single products)
      */
     private function updateWarehouseStock(
         int $productId,
@@ -489,7 +595,41 @@ class InventoryService
     }
 
     /**
-     * Get current warehouse stock
+     * Update variation warehouse stock in ledger
+     */
+    private function updateVariationWarehouseStock(
+        int $productId,
+        int $variationId,
+        int $warehouseId,
+        ?int $binId,
+        int $quantityChange,
+        ?string $batchNumber,
+        ?array $serialNumbers,
+        StockMovement $movement,
+        string $type
+    ): void {
+        $currentStock = $this->getCurrentVariationWarehouseStock($productId, $variationId, $warehouseId, $binId, $batchNumber);
+
+        ProductVariationStockLedger::create([
+            'product_id' => $productId,
+            'variation_id' => $variationId,
+            'warehouse_id' => $warehouseId,
+            'bin_id' => $binId,
+            'batch_number' => $batchNumber,
+            'serial_numbers' => $serialNumbers,
+            'transaction_type' => $type,
+            'reference_type' => 'StockMovement',
+            'reference_id' => $movement->id,
+            'quantity_before' => $currentStock,
+            'quantity_change' => $quantityChange,
+            'quantity_after' => $currentStock + $quantityChange,
+            'notes' => "Stock movement: {$movement->movement_number}",
+            'created_by' => Auth::id(),
+        ]);
+    }
+
+    /**
+     * Get current warehouse stock (for single products)
      */
     private function getCurrentWarehouseStock(
         int $productId,
@@ -513,7 +653,33 @@ class InventoryService
     }
 
     /**
-     * Update product's warehouse_info JSON
+     * Get current variation warehouse stock
+     */
+    private function getCurrentVariationWarehouseStock(
+        int $productId,
+        int $variationId,
+        int $warehouseId,
+        ?int $binId = null,
+        ?string $batchNumber = null
+    ): int {
+        $query = ProductVariationStockLedger::where('product_id', $productId)
+            ->where('variation_id', $variationId)
+            ->where('warehouse_id', $warehouseId);
+
+        if ($binId) {
+            $query->where('bin_id', $binId);
+        }
+
+        if ($batchNumber) {
+            $query->where('batch_number', $batchNumber);
+        }
+
+        $ledger = $query->latest()->first();
+        return $ledger ? $ledger->quantity_after : 0;
+    }
+
+    /**
+     * Update product's warehouse_info JSON (for single products)
      */
     private function updateProductWarehouseInfo(
         Product $product,
@@ -587,5 +753,71 @@ class InventoryService
             'available_stock' => $totalStock,
             'stock_status' => $totalStock > 0 ? 'in_stock' : 'out_of_stock'
         ]);
+    }
+
+    /**
+     * Update variation warehouse stocks (for variation products)
+     */
+    private function updateVariationWarehouseInfo(
+        ProductVariation $variation,
+        int $sourceWarehouseId,
+        int $destinationWarehouseId,
+        ?int $sourceBinId,
+        ?int $destinationBinId,
+        int $quantity
+    ): void {
+        // Update source warehouse stock
+        $sourceStock = $variation->stocks()
+            ->where('warehouse_id', $sourceWarehouseId)
+            ->where('bin_id', $sourceBinId)
+            ->first();
+
+        if ($sourceStock) {
+            $newQuantity = max(0, $sourceStock->quantity - $quantity);
+            $sourceStock->update(['quantity' => $newQuantity]);
+
+            // Update stock status
+            $variation->update([
+                'stock_status' => $this->determineStockStatus($newQuantity)
+            ]);
+        }
+
+        // Update destination warehouse stock
+        $destinationStock = $variation->stocks()
+            ->where('warehouse_id', $destinationWarehouseId)
+            ->where('bin_id', $destinationBinId)
+            ->first();
+
+        if ($destinationStock) {
+            $newQuantity = $destinationStock->quantity + $quantity;
+            $destinationStock->update(['quantity' => $newQuantity]);
+        } else {
+            // Create new stock record
+            $variation->stocks()->create([
+                'warehouse_id' => $destinationWarehouseId,
+                'bin_id' => $destinationBinId,
+                'quantity' => $quantity,
+            ]);
+        }
+
+        // Update variation's available_stock (sum across all warehouses)
+        $totalStock = $variation->stocks()->sum('quantity');
+        $variation->update([
+            'available_stock' => $totalStock,
+            'stock_status' => $this->determineStockStatus($totalStock)
+        ]);
+    }
+
+    /**
+     * Determine stock status based on quantity
+     */
+    private function determineStockStatus(int $quantity): string
+    {
+        if ($quantity <= 0) {
+            return 'out_of_stock';
+        } elseif ($quantity <= 10) {
+            return 'low_stock';
+        }
+        return 'in_stock';
     }
 }

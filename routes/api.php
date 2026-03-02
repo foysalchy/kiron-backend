@@ -503,7 +503,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/by-area', [BinController::class, 'byArea']);
             Route::get('/by-rack', [BinController::class, 'byRack']);
         });
-        Route::prefix('inventroy')->group(function () {
+        Route::prefix('inventory')->group(function () {
             Route::get('/summary', [InventoryController::class, 'index']);
             Route::get('movements', [InventoryController::class, 'movements']);
 
@@ -813,8 +813,9 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('payslips')->group(function () {
             Route::post('/generate', [PayslipController::class, 'generate']);
-            Route::get('/', [PayslipController::class, 'index']); // Get all payslips
-            Route::get('/{id}', [PayslipController::class, 'show']); // View specific payslip with items
+            Route::post('/preview', [PayslipController::class, 'previewSummary']);
+            Route::get('/', [PayslipController::class, 'index']); 
+            Route::get('/{id}', [PayslipController::class, 'show']); 
         });
         //site settings routes
         Route::prefix('site-settings')->group(function () {
