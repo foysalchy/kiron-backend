@@ -30,6 +30,8 @@ enum Status: int
   case Rejected   = 23;
   case Expired    = 24;
   case Transferred = 25;
+  case Disposed    = 26;
+
 
   public function label(): string
   {
@@ -60,6 +62,8 @@ enum Status: int
       self::Rejected   => 'Rejected',
       self::Expired    => 'Expired',
       self::Transferred => 'Transferred',
+      self::Disposed   => 'Disposed',
+
     };
   }
 

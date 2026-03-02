@@ -27,15 +27,12 @@ class UpdateRecurringJournalRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'start_date'        => ['sometimes', 'required', 'date', 'after_or_equal:today'],
             'amount'            => ['sometimes', 'required', 'numeric', 'min:1'],
             'repeat_interval'   => ['sometimes', 'required', 'integer', 'min:1'],
             'interval_type'     => ['sometimes', 'required', Rule::in(['Day', 'Week', 'Month', 'Year'])],
-
             'from_account_id'   => ['sometimes', 'required', 'exists:chart_of_accounts,id'],
             'to_account_id'     => ['sometimes','required','exists:chart_of_accounts,id','different:from_account_id' ],
-
-            'description'       => ['nullable', 'string', 'max:1000'],
+            'description'       => ['sometimes', 'string'],
             'approval_status'   => ['sometimes', 'required', Rule::in([Status::Draft->value, Status::Approved->value])],
             'operational_status'=> ['sometimes', 'required', Rule::in([Status::Active->value, Status::Inactive->value])],
         ]);

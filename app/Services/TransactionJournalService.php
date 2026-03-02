@@ -141,6 +141,7 @@ class TransactionJournalService
 
             LogHelper::created('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
             DB::commit();
+            Log::info('Transaction Journal Created Successfully', ['journal_id' => $journal->id]);
 
             return $journal->load(['accounts.chartOfAccount']);
         } catch (\Exception $e) {
@@ -200,6 +201,7 @@ class TransactionJournalService
 
             LogHelper::updated('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
             DB::commit();
+            Log::info('Transaction Journal Updated Successfully', ['journal_id' => $journal->id]);
 
             return $journal->fresh(['accounts.chartOfAccount']);
 
@@ -265,6 +267,7 @@ class TransactionJournalService
 
             LogHelper::forceDeleted('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);
             DB::commit();
+            Log::info('Transaction Journal Permanently Deleted Successfully', ['journal_id' => $journal->id]);
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -306,6 +309,7 @@ class TransactionJournalService
             LogHelper::statusChanged('transaction_journal', $journal->id, $journal->company_id, "Status changed to {$newStatus->name}");
 
             DB::commit();
+            Log::info('Transaction journal status updated', ['journal' => $id,'new_status' => $newStatus->label()]);
             return $journal->load(['accounts.chartOfAccount']);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -149,6 +149,8 @@ class TransactionExpenseService
             LogHelper::created('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
             DB::commit();
 
+            Log::info('Transaction Expense created successfully', ['expense_id' => $expense->id]);
+
             return $expense->load(['expenseFrom', 'categories.chartOfAccount']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -191,6 +193,8 @@ class TransactionExpenseService
 
             LogHelper::updated('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
             DB::commit();
+
+            Log::info('Transaction Expense updated successfully', ['expense_id' => $expense->id]);
 
             return $expense->fresh(['expenseFrom', 'categories.chartOfAccount']);
         } catch (ApiException $e) {
@@ -237,6 +241,7 @@ class TransactionExpenseService
             $expense->restore();
 
             LogHelper::restored('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
+            Log::info('Transaction Expense restored successfully', ['expense_id' => $expense->id]);
             return $expense->load(['expenseFrom', 'categories.chartOfAccount']);
         } catch (ApiException $e) {
             throw $e;
@@ -271,6 +276,7 @@ class TransactionExpenseService
             LogHelper::forceDeleted('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
 
             DB::commit();
+            Log::info('Transaction Expense parmanently deleted successfully', ['expense_id' => $expense->id]);
             return true;
         } catch (ApiException $e) {
             DB::rollBack();
@@ -316,6 +322,7 @@ class TransactionExpenseService
             LogHelper::statusChanged('transaction_expense',$expense->id,$expense->company_id,"Status changed to " . $newStatus->name);
 
             DB::commit();
+            Log::info('Transaction expense status updated', ['expense' => $id,'new_status' => $newStatus->label()]);
             return $expense->load(['expenseFrom', 'categories.chartOfAccount']);
         } catch (\Exception $e) {
             DB::rollBack();
