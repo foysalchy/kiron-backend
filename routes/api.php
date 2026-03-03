@@ -41,6 +41,7 @@ use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\FirebaseSettingController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
+use App\Http\Controllers\Api\InventoryAuditController;
 use App\Http\Controllers\Api\InventoryController;
 use App\Http\Controllers\Api\InventroyController;
 use App\Http\Controllers\Api\IpDirectoryController;
@@ -167,6 +168,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
             Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
             Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
+            Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
         });
         //party routes
         Route::prefix('parties')->group(function () {
@@ -552,6 +554,25 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}', [StockAdjustmentController::class, 'destroy']);
             Route::post('/{id}/restore', [StockAdjustmentController::class, 'restore']);
             Route::delete('/{id}/force', [StockAdjustmentController::class, 'forceDestroy']);
+        });
+        // Inventory Audit Routes
+        Route::prefix('inventory-audits')->group(function () {
+            // List and Create
+            Route::get('/', [InventoryAuditController::class, 'index']);
+            Route::post('/', [InventoryAuditController::class, 'store']);
+
+            // View, Update, Delete
+            Route::get('/{id}', [InventoryAuditController::class, 'show']);
+            Route::put('/{id}', [InventoryAuditController::class, 'update']);
+            Route::delete('/{id}', [InventoryAuditController::class, 'destroy']);
+
+            // Audit Actions
+            Route::post('/{id}/start', [InventoryAuditController::class, 'start']);
+            Route::post('/{id}/complete', [InventoryAuditController::class, 'complete']);
+            Route::post('/{id}/cancel', [InventoryAuditController::class, 'cancel']);
+
+            // Update Item Count
+            Route::patch('/{auditId}/items/{itemId}/count', [InventoryAuditController::class, 'updateItemCount']);
         });
         Route::prefix('requisitions')->group(function () {
             Route::get('/', [RequisitionController::class, 'index']);
