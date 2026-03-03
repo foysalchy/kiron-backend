@@ -24,6 +24,7 @@ class UpdateStockAdjustmentRequest extends UpdateBaseCompanyRequest
                 'notes' => 'nullable|string|max:1000',
                 'items' => 'required|array|min:1',
                 'items.*.product_id' => 'required|exists:products,id',
+                'items.*.variation_id' => 'nullable',
                 'items.*.bin_id' => 'nullable|exists:bins,id',
                 'items.*.batch_number' => 'nullable|string|max:100',
                 'items.*.serial_numbers' => 'nullable|array',

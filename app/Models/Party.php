@@ -38,10 +38,7 @@ class Party extends Model
     ];
 
 
-    protected $appends = [
-        'type_text',
 
-    ];
 
     // Relationships
     public function company(): BelongsTo

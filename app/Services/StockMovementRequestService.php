@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\{StockMovementRequest, Product, ProductVariation, StockMovement};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
@@ -107,7 +108,7 @@ class StockMovementRequestService
             // Validate stock availability
             $this->validateStockAvailability($items, $data['source_warehouse_id']);
 
-            $data['status'] = StockMovementRequest::STATUS_PENDING;
+            $data['status'] = Status::Pending->value;
 
             // Create request
             $request = StockMovementRequest::create($data);
@@ -209,7 +210,7 @@ class StockMovementRequestService
             }
 
             $request->update([
-                'status' => StockMovementRequest::STATUS_APPROVED,
+                'status' => Status::Approved->value,
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
             ]);
@@ -245,7 +246,7 @@ class StockMovementRequestService
             }
 
             $request->update([
-                'status' => StockMovementRequest::STATUS_REJECTED,
+                'status' => Status::Rejected->value,
                 'rejected_by' => Auth::id(),
                 'rejected_at' => now(),
                 'rejection_reason' => $reason,
@@ -285,7 +286,7 @@ class StockMovementRequestService
                 throw ApiException::badRequest('Cannot cancel transferred requests');
             }
 
-            $request->update(['status' => StockMovementRequest::STATUS_CANCELLED]);
+            $request->update(['status' => Status::Cancelled->value]);
 
             DB::commit();
 
@@ -386,7 +387,7 @@ class StockMovementRequestService
             $movement = $inventoryService->createMovement($data);
 
             // Update request status
-            $request->update(['status' => StockMovementRequest::STATUS_TRANSFERRED]);
+            $request->update(['status' => Status::Transferred->value]);
 
             DB::commit();
 

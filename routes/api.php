@@ -90,6 +90,7 @@ use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
+use App\Http\Controllers\Api\SelectOptionController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\SteadfastOrderController;
@@ -107,6 +108,7 @@ use App\Http\Controllers\Api\TransactionInternalTransferController;
 use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\WarehouseController;
+use App\Http\Controllers\Api\WarehouseInventoryController;
 use App\Http\Controllers\Api\WocommerceSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -156,6 +158,15 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [CompanyController::class, 'restore']);
             Route::delete('/{id}/force', [CompanyController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CompanyController::class, 'toggleStatus']);
+        });
+        Route::prefix('options')->group(function () {
+            Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
+            Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
+            Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
+            Route::get('/products', [SelectOptionController::class, 'productOptions']);
+            Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
+            Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
+            Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
         });
         //party routes
         Route::prefix('parties')->group(function () {
@@ -506,7 +517,10 @@ Route::prefix('v1')->group(function () {
         Route::prefix('inventory')->group(function () {
             Route::get('/summary', [InventoryController::class, 'index']);
             Route::get('movements', [InventoryController::class, 'movements']);
-
+            Route::get('/warehouse-dashboard', [WarehouseInventoryController::class, 'dashboard']);
+            Route::get('/warehouses/{id}/stats', [WarehouseInventoryController::class, 'stats']);
+            Route::get('/warehouses/{id}/top-products', [WarehouseInventoryController::class, 'topProducts']);
+            Route::get('/warehouses/{id}/recent-movements', [WarehouseInventoryController::class, 'recentMovements']);
             // CRUD operations
             Route::post('movements', [InventoryController::class, 'store']);
             Route::get('movements/{id}', [InventoryController::class, 'show']);
@@ -814,8 +828,8 @@ Route::prefix('v1')->group(function () {
         Route::prefix('payslips')->group(function () {
             Route::post('/generate', [PayslipController::class, 'generate']);
             Route::post('/preview', [PayslipController::class, 'previewSummary']);
-            Route::get('/', [PayslipController::class, 'index']); 
-            Route::get('/{id}', [PayslipController::class, 'show']); 
+            Route::get('/', [PayslipController::class, 'index']);
+            Route::get('/{id}', [PayslipController::class, 'show']);
         });
         //site settings routes
         Route::prefix('site-settings')->group(function () {
@@ -1152,7 +1166,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/update-status', [TransactionJournalController::class, 'updateStatus']);
         });
 
-         //account-transfers routes
+        //account-transfers routes
         Route::prefix('account-transfers')->group(function () {
             Route::get('/', [TransactionInternalTransferController::class, 'index']);
             Route::post('/', [TransactionInternalTransferController::class, 'store']);
@@ -1163,7 +1177,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [TransactionInternalTransferController::class, 'forceDestroy']);
             Route::patch('/{id}/update-status', [TransactionInternalTransferController::class, 'updateStatus']);
         });
-         //recurring-journals routes
+        //recurring-journals routes
         Route::prefix('recurring-journals')->group(function () {
             Route::get('/', [RecurringJournalController::class, 'index']);
             Route::post('/', [RecurringJournalController::class, 'store']);
@@ -1219,10 +1233,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('{id}/force', [AssetDepreciationController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [AssetDepreciationController::class, 'toggleStatus']);
         });
-
-
-
-
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

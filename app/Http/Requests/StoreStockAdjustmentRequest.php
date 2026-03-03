@@ -23,6 +23,7 @@ class StoreStockAdjustmentRequest extends BaseCompanyRequest
                 'adjustment_reason' => 'required|string|in:damage,loss,found,correction,theft,expired,return',
                 'notes' => 'nullable|string|max:1000',
                 'items' => 'required|array|min:1',
+                'items.*.variation_id' => 'nullable',
                 'items.*.product_id' => 'required|exists:products,id',
                 'items.*.bin_id' => 'nullable|exists:bins,id',
                 'items.*.batch_number' => 'nullable|string|max:100',
