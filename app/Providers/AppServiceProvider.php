@@ -6,6 +6,7 @@ use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssetCategoryService;
 use App\Services\AssetDepreciationService;
+use App\Services\AssetDisposalService;
 use App\Services\AssetPurchaseService;
 use App\Services\AssetService;
 use App\Services\AssignLeaveService;
@@ -27,6 +28,7 @@ use App\Services\CourierService;
 use App\Services\CurrencyService;
 use App\Services\CustomerPaymentMethodService;
 use App\Services\DepartmentService;
+use App\Services\DisposalTypeService;
 use App\Services\DomainSetupService;
 use App\Services\EmailSettingService;
 use App\Services\EmployeeService;
@@ -78,7 +80,9 @@ use App\Services\ResignationService;
 use App\Services\ResignRuleService;
 use App\Services\SiteSettingService;
 use App\Services\SliderService;
+use App\Services\SmsSendService;
 use App\Services\SmsSettingService;
+use App\Services\SmsTemplateService;
 use App\Services\SteadfastService;
 use App\Services\StockAdjustmentService;
 use App\Services\StockMovementRequestService;
@@ -193,6 +197,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AssetService::class);
         $this->app->bind(AssetPurchaseService::class);
         $this->app->bind(AssetDepreciationService::class);
+        $this->app->bind(DisposalTypeService::class);
+        $this->app->bind(AssetDisposalService::class);
+        $this->app->bind(SmsTemplateService::class);
+        $this->app->bind(SmsSendService::class);
     }
 
     /**
