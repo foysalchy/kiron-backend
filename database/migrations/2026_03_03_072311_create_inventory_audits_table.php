@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('inventory_audits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('warehouse_id')->constrained()->cascadeOnDelete();
             $table->string('audit_number')->unique();
-            $table->foreignId('warehouse_id')->constrained('warehouses');
             $table->date('audit_date');
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
+            $table->enum('audit_type', ['full', 'partial', 'cycle'])->default('partial');
+            $table->tinyInteger('status')->default(1);
             $table->text('notes')->nullable();
-            $table->foreignId('created_by')->constrained('users');
-            $table->foreignId('approved_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

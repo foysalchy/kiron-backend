@@ -411,10 +411,11 @@ class StockAdjustmentService
         ?string $batchNumber,
         int $requiredQuantity
     ): void {
+
         if ($variationId) {
             // Validate variation stock
             $availableStock = ProductVariationStockLedger::getCurrentStock(
-                $productId,
+
                 $variationId,
                 $warehouseId,
                 $binId,

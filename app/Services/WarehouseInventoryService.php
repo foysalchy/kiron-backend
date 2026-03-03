@@ -28,12 +28,12 @@ class WarehouseInventoryService
     {
         try {
             $warehouses = Warehouse::with(['company'])->get();
-            
+
             $dashboardData = [];
 
             foreach ($warehouses as $warehouse) {
                 $stats = $this->getWarehouseStats($warehouse->id);
-                
+
                 $dashboardData[] = [
                     'id' => $warehouse->id,
                     'name' => $warehouse->name,
@@ -55,88 +55,82 @@ class WarehouseInventoryService
     /**
      * Get detailed stats for a specific warehouse
      */
-    public function getWarehouseStats(int $warehouseId): array
+public function getWarehouseStats(int $warehouseId): array
     {
         $variationColumn = $this->getVariationColumnName();
 
-        // Get single products stock
-        $singleProducts = Product::where('type', 'single')
-            ->get()
-            ->filter(function ($product) use ($warehouseId) {
-                $stock = collect($product->warehouse_info ?? [])
-                    ->firstWhere('warehouse_id', (string) $warehouseId);
-                return $stock && ($stock['quantity'] ?? 0) > 0;
+  
+        $singleProducts = Product::where('type', 'single')->get()
+            ->map(function ($product) use ($warehouseId) {
+                // Get all bins for this specific warehouse
+                $warehouseStocks = collect($product->warehouse_info ?? [])
+                    ->where('warehouse_id', (string) $warehouseId);
+                
+                // Sum the quantity across all bins in this warehouse
+                $product->warehouse_total_qty = $warehouseStocks->sum('quantity');
+                return $product;
             });
 
-        $singleProductsCount = $singleProducts->count();
-        $singleProductsStock = $singleProducts->sum(function ($product) use ($warehouseId) {
-            $stock = collect($product->warehouse_info ?? [])
-                ->firstWhere('warehouse_id', (string) $warehouseId);
-            return $stock['quantity'] ?? 0;
-        });
+        // In Stock Single Products
+        $inStockSingle = $singleProducts->where('warehouse_total_qty', '>', 0);
+        $singleProductsCount = $inStockSingle->count();
+        $singleProductsStock = $inStockSingle->sum('warehouse_total_qty');
+        
+        // Low Stock Single Products (< 10)
+        $lowStockSingleCount = $inStockSingle->where('warehouse_total_qty', '<', 10)->count();
 
-        // Get variation products stock - FIXED with correct column name
-        $variationStocks = DB::table('product_variation_stocks')
-            ->where('warehouse_id', $warehouseId)
-            ->where('quantity', '>', 0)
-            ->select(
-                DB::raw("COUNT(DISTINCT {$variationColumn}) as variation_count"),
-                DB::raw('SUM(quantity) as total_quantity')
-            )
-            ->first();
-
-        $variationProductsCount = $variationStocks->variation_count ?? 0;
-        $variationProductsStock = $variationStocks->total_quantity ?? 0;
-
-        // Total stats
-        $totalProducts = $singleProductsCount + $variationProductsCount;
-        $totalStock = $singleProductsStock + $variationProductsStock;
-
-        // Low stock items (stock < 10)
-        $lowStockSingle = $singleProducts->filter(function ($product) use ($warehouseId) {
-            $stock = collect($product->warehouse_info ?? [])
-                ->firstWhere('warehouse_id', (string) $warehouseId);
-            $qty = $stock['quantity'] ?? 0;
-            return $qty > 0 && $qty < 10;
+        // Out of Stock Single (Exists in this warehouse record, but qty is 0)
+        $outOfStockSingleCount = $singleProducts->filter(function($p) use ($warehouseId) {
+            $hasRecord = collect($p->warehouse_info ?? [])->contains('warehouse_id', (string) $warehouseId);
+            return $hasRecord && $p->warehouse_total_qty <= 0;
         })->count();
 
-        $lowStockVariation = DB::table('product_variation_stocks')
-            ->where('warehouse_id', $warehouseId)
-            ->where('quantity', '>', 0)
-            ->where('quantity', '<', 10)
-            ->count();
-
-        $lowStockCount = $lowStockSingle + $lowStockVariation;
-
-        // Out of stock
-        $totalSingleProducts = Product::where('type', 'single')->count();
-        $totalVariations = ProductVariation::count();
-        
-        $outOfStockSingle = $totalSingleProducts - $singleProductsCount;
-        $outOfStockVariation = $totalVariations - $variationProductsCount;
-        $outOfStockCount = $outOfStockSingle + $outOfStockVariation;
-
-        // Stock value calculation
-        $singleValue = $singleProducts->sum(function ($product) use ($warehouseId) {
-            $stock = collect($product->warehouse_info ?? [])
-                ->firstWhere('warehouse_id', (string) $warehouseId);
-            $qty = $stock['quantity'] ?? 0;
-            $price = $product->regular_price ?? 0;
-            return $qty * $price;
+        $singleValue = $inStockSingle->sum(function ($product) {
+            return $product->warehouse_total_qty * ($product->regular_price ?? 0);
         });
 
-        // FIXED: Use correct column name for variation value
-        $variationValue = DB::table('product_variation_stocks')
-            ->join('product_variations', "product_variation_stocks.{$variationColumn}", '=', 'product_variations.id')
-            ->where('product_variation_stocks.warehouse_id', $warehouseId)
-            ->where('product_variation_stocks.quantity', '>', 0)
-            ->sum(DB::raw('product_variation_stocks.quantity * product_variations.regular_price'));
 
+    
+        // Group by variation ID to sum quantities across multiple bins
+        $variationStocks = DB::table('product_variation_stocks')
+            ->where('warehouse_id', $warehouseId)
+            ->select($variationColumn, DB::raw('SUM(quantity) as total_qty'))
+            ->groupBy($variationColumn)
+            ->get();
+
+        // In Stock Variations
+        $inStockVariations = $variationStocks->where('total_qty', '>', 0);
+        $variationProductsCount = $inStockVariations->count();
+        $variationProductsStock = $inStockVariations->sum('total_qty');
+
+        // Low Stock Variations (< 10)
+        $lowStockVariationCount = $inStockVariations->where('total_qty', '<', 10)->count();
+
+        // Out of Stock Variations (Exists in this warehouse record, but qty is 0)
+        $outOfStockVariationCount = $variationStocks->where('total_qty', '<=', 0)->count();
+
+        // Calculate Variation Value
+        $inStockVariationIds = $inStockVariations->pluck($variationColumn)->toArray();
+        $variationPrices = DB::table('product_variations')
+            ->whereIn('id', $inStockVariationIds)
+            ->pluck('regular_price', 'id');
+
+        $variationValue = $inStockVariations->sum(function ($stock) use ($variationPrices, $variationColumn) {
+            $price = $variationPrices[$stock->{$variationColumn}] ?? 0;
+            return $stock->total_qty * $price;
+        });
+
+
+        $totalProducts = $singleProductsCount + $variationProductsCount;
+        $totalStock = $singleProductsStock + $variationProductsStock;
+        $lowStockCount = $lowStockSingleCount + $lowStockVariationCount;
+        $outOfStockCount = $outOfStockSingleCount + $outOfStockVariationCount;
         $totalValue = $singleValue + $variationValue;
 
-        // Stock health percentage
-        $stockHealth = $totalProducts > 0 
-            ? round((($totalProducts - $outOfStockCount) / ($totalProducts + $outOfStockCount)) * 100, 1)
+        // Stock health percentage (Healthy items vs Total items)
+        $totalTrackedItems = $totalProducts + $outOfStockCount;
+        $stockHealth = $totalTrackedItems > 0 
+            ? round((($totalProducts) / $totalTrackedItems) * 100, 1)
             : 0;
 
         return [
@@ -156,7 +150,6 @@ class WarehouseInventoryService
             'stock_health' => $stockHealth,
         ];
     }
-
     /**
      * Get top products by stock in a warehouse
      */
@@ -226,7 +219,7 @@ class WarehouseInventoryService
         $movements = DB::table('stock_movements')
             ->where(function ($q) use ($warehouseId) {
                 $q->where('source_warehouse_id', $warehouseId)
-                  ->orWhere('destination_warehouse_id', $warehouseId);
+                    ->orWhere('destination_warehouse_id', $warehouseId);
             })
             ->where('status', Status::Approved->value)
             ->orderBy('approved_at', 'desc')

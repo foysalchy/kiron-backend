@@ -815,6 +815,7 @@ class ProductService
         DB::beginTransaction();
 
         try {
+            
             $product = $this->getProductById($id);
 
             $warehouseId = $data['warehouse_id'];

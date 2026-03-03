@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('discount', 10, 2)->default(0);
             $table->integer('stock_quantity')->default(0);
             $table->integer('available_stock')->default(0);
-            $table->enum('stock_status', ['in_stock', 'out_of_stock'])->default('out_of_stock');
+            $table->string('stock_status')->default('out_of_stock');
             $table->string('combination_hash')->unique(); // For quick lookup
             $table->timestamps();
             $table->softDeletes();
