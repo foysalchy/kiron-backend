@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\AssetCategoryController;
 use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\AssetDepreciationController;
+use App\Http\Controllers\Api\AssetDisposalController;
 use App\Http\Controllers\Api\AssetPurchaseController;
 use App\Http\Controllers\Api\AssignLeaveTypeController;
 use App\Http\Controllers\Api\AttendanceController;
@@ -34,6 +35,7 @@ use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
+use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\EmployeeSalaryController;
@@ -93,7 +95,9 @@ use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SelectOptionController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\SmsSendController;
 use App\Http\Controllers\Api\SmsSettingController;
+use App\Http\Controllers\Api\SmsTemplateController;
 use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
@@ -1253,6 +1257,44 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [AssetDepreciationController::class, 'restore']);
             Route::delete('{id}/force', [AssetDepreciationController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [AssetDepreciationController::class, 'toggleStatus']);
+        });
+        //disposal-types routes
+        Route::prefix('disposal-types')->group(function () {
+            Route::get('/', [DisposalTypeController::class, 'index']);
+            Route::post('/', [DisposalTypeController::class, 'store']);
+            Route::get('/{id}', [DisposalTypeController::class, 'show']);
+            Route::post('/update/{id}', [DisposalTypeController::class, 'update']);
+            Route::delete('/{id}', [DisposalTypeController::class, 'destroy']);
+            Route::get('{id}/restore', [DisposalTypeController::class, 'restore']);
+            Route::delete('{id}/force', [DisposalTypeController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [DisposalTypeController::class, 'toggleStatus']);
+        });
+        //asset-disposals routes
+        Route::prefix('asset-disposals')->group(function () {
+            Route::get('/', [AssetDisposalController::class, 'index']);
+            Route::post('/', [AssetDisposalController::class, 'store']);
+            Route::get('/{id}', [AssetDisposalController::class, 'show']);
+            Route::post('/update/{id}', [AssetDisposalController::class, 'update']);
+            Route::delete('/{id}', [AssetDisposalController::class, 'destroy']);
+            Route::get('{id}/restore', [AssetDisposalController::class, 'restore']);
+            Route::delete('{id}/force', [AssetDisposalController::class, 'forceDestroy']);
+            Route::patch('/{id}/update-status', [AssetDisposalController::class, 'updateStatus']);
+        });
+        //sms-templates routes
+        Route::prefix('sms-templates')->group(function () {
+            Route::get('/', [SmsTemplateController::class, 'index']);
+            Route::post('/', [SmsTemplateController::class, 'store']);
+            Route::get('/{id}', [SmsTemplateController::class, 'show']);
+            Route::post('/update/{id}', [SmsTemplateController::class, 'update']);
+            Route::delete('/{id}', [SmsTemplateController::class, 'destroy']);
+            Route::get('{id}/restore', [SmsTemplateController::class, 'restore']);
+            Route::delete('{id}/force', [SmsTemplateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [SmsTemplateController::class, 'toggleStatus']);
+        });//sms-sends routes
+        Route::prefix('sms-sends')->group(function () {
+            Route::get('/', [SmsSendController::class, 'index']);
+            Route::post('/', [SmsSendController::class, 'store']);
+            Route::get('/{id}', [SmsSendController::class, 'show']);
         });
     });
     //bkash route
