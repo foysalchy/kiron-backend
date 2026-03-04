@@ -172,7 +172,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
             Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
             Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
-            Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
+            Route::get('/users', [SelectOptionController::class, 'userOptions']);
+            Route::get('/asset-categories', [SelectOptionController::class, 'assetCategoryOptions']);
+            Route::get('/assets', [SelectOptionController::class, 'assetOptions']);
+            Route::get('/disposal-types', [SelectOptionController::class, 'disposalTypeOptions']);
+            Route::get('/account-groups', [SelectOptionController::class, 'accountGroupOptions']);
+            Route::get('/account-expenses', [SelectOptionController::class, 'accountExpenseOptions']);
         });
         //party routes
         Route::prefix('parties')->group(function () {

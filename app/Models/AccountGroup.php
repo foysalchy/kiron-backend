@@ -15,7 +15,7 @@ class AccountGroup extends Model
 
     protected $fillable = [
         'company_id',
-        'account_type_id',
+        'account_type',
         'name',
         'description',
         'status',
