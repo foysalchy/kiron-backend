@@ -26,7 +26,7 @@ class StoreAccountGroupRequest extends BaseCompanyRequest
     {
         return array_merge($this->companyRules(),
         [
-            'account_type_id' => ['required', 'exists:account_types,id'],
+            'account_type' => ['required', ],
             'name'            => ['required', 'string', 'max:255'],
             'description'     => ['nullable', 'string'],
             'status'          => ['nullable', 'integer'],
@@ -35,7 +35,7 @@ class StoreAccountGroupRequest extends BaseCompanyRequest
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'account_type_id.exists' => 'The selected account type is invalid.',
+            'account_type.required' => 'The account type is required.',
             'name.required'          => 'The group name is required.',
         ]);
     }
