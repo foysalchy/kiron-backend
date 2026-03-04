@@ -30,7 +30,9 @@ use App\Services\CustomerPaymentMethodService;
 use App\Services\DepartmentService;
 use App\Services\DisposalTypeService;
 use App\Services\DomainSetupService;
+use App\Services\EmailSendService;
 use App\Services\EmailSettingService;
+use App\Services\EmailTemplateService;
 use App\Services\EmployeeService;
 use App\Services\EmployeeTypeService;
 use App\Services\ExtraCategoryService;
@@ -201,6 +203,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AssetDisposalService::class);
         $this->app->bind(SmsTemplateService::class);
         $this->app->bind(SmsSendService::class);
+        $this->app->bind(EmailTemplateService::class);
+        $this->app->bind(EmailSendService::class);
     }
 
     /**

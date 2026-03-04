@@ -37,7 +37,9 @@ use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
+use App\Http\Controllers\Api\EmailSendController;
 use App\Http\Controllers\Api\EmailSettingController;
+use App\Http\Controllers\Api\EmailTemplateController;
 use App\Http\Controllers\Api\EmployeeSalaryController;
 use App\Http\Controllers\Api\ExtraCategoryController;
 use App\Http\Controllers\Api\FirebaseSettingController;
@@ -1295,11 +1297,29 @@ Route::prefix('v1')->group(function () {
             Route::get('{id}/restore', [SmsTemplateController::class, 'restore']);
             Route::delete('{id}/force', [SmsTemplateController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [SmsTemplateController::class, 'toggleStatus']);
-        });//sms-sends routes
+        });
+        //sms-sends routes
         Route::prefix('sms-sends')->group(function () {
             Route::get('/', [SmsSendController::class, 'index']);
             Route::post('/', [SmsSendController::class, 'store']);
             Route::get('/{id}', [SmsSendController::class, 'show']);
+        });
+         //email-templates routes
+        Route::prefix('email-templates')->group(function () {
+            Route::get('/', [EmailTemplateController::class, 'index']);
+            Route::post('/', [EmailTemplateController::class, 'store']);
+            Route::get('/{id}', [EmailTemplateController::class, 'show']);
+            Route::post('/update/{id}', [EmailTemplateController::class, 'update']);
+            Route::delete('/{id}', [EmailTemplateController::class, 'destroy']);
+            Route::get('{id}/restore', [EmailTemplateController::class, 'restore']);
+            Route::delete('{id}/force', [EmailTemplateController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [EmailTemplateController::class, 'toggleStatus']);
+        });
+        //email-sends routes
+        Route::prefix('email-sends')->group(function () {
+            Route::get('/', [EmailSendController::class, 'index']);
+            Route::post('/', [EmailSendController::class, 'store']);
+            Route::get('/{id}', [EmailSendController::class, 'show']);
         });
     });
     //bkash route
