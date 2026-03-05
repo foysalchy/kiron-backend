@@ -9,7 +9,7 @@ use App\Models\TransactionExpense;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{Auth, DB,Log};
 
 class TransactionExpenseService
 {
@@ -109,7 +109,7 @@ class TransactionExpenseService
      */
     public function getExpenseById(int $id): TransactionExpense
     {
-        $expense = TransactionExpense::with(['expenseFrom', 'categories.chartOfAccount','creator'])->find($id);
+        $expense = TransactionExpense::with(['expenseFrom', 'categories.chartOfAccount','creator', 'company'])->find($id);
         if (!$expense) {
             throw ApiException::notFound('Expense');
         }
@@ -122,7 +122,7 @@ class TransactionExpenseService
     {
         DB::beginTransaction();
         try {
-            $data['created_by'] = auth()->id();
+            $data['created_by'] = Auth::id();
             if (isset($data['file'])) {
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],

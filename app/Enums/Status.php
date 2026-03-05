@@ -31,6 +31,11 @@ enum Status: int
   case Expired    = 24;
   case Transferred = 25;
   case Disposed    = 26;
+  case ReadyToShipped = 27;
+  case HandovertoCourier = 28;
+  case InTransit = 29;
+  case ReturntoCourier = 30;
+  case ReturnReceived = 31;
 
 
   public function label(): string
@@ -63,7 +68,11 @@ enum Status: int
       self::Expired    => 'Expired',
       self::Transferred => 'Transferred',
       self::Disposed   => 'Disposed',
-
+      self::ReadyToShipped => 'Ready to Shipped',
+      self::HandovertoCourier => 'Handover to Courier',
+      self::InTransit => 'In Transit',
+      self::ReturntoCourier => 'Return to Courier',
+      self::ReturnReceived => 'Return Received',
     };
   }
 

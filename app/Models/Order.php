@@ -165,9 +165,9 @@ class Order extends Model
         return $this->status === Status::Pending->value;
     }
 
-    public function isCompleted(): bool
+    public function isDelivered(): bool
     {
-        return $this->status === Status::Completed->value;
+        return $this->status === Status::Delivered->value;
     }
 
     public function isCancelled(): bool

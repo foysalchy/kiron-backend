@@ -7,7 +7,7 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\TransactionIncome;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{Auth, DB,Log};
 
 class TransactionIncomeService
 {
@@ -103,7 +103,7 @@ class TransactionIncomeService
      */
     public function getIncomeById(int $id): TransactionIncome
     {
-        $income = TransactionIncome::with(['incomeTo', 'categories.chartOfAccount', 'creator'])->find($id);
+        $income = TransactionIncome::with(['incomeTo', 'categories.chartOfAccount', 'creator','company'])->find($id);
         if (!$income) {
             throw ApiException::notFound('Income record');
         }
@@ -117,7 +117,7 @@ class TransactionIncomeService
     {
         DB::beginTransaction();
         try {
-            $data['created_by'] = auth()->id();
+            $data['created_by'] = Auth::id();
 
             if (isset($data['file'])) {
                 $data['file'] = FileUploadHelper::upload(
