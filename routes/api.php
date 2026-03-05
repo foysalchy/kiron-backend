@@ -170,6 +170,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
             Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
             Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
+            Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
             Route::get('/products', [SelectOptionController::class, 'productOptions']);
             Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
             Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
@@ -180,6 +181,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/disposal-types', [SelectOptionController::class, 'disposalTypeOptions']);
             Route::get('/account-groups', [SelectOptionController::class, 'accountGroupOptions']);
             Route::get('/account-expenses', [SelectOptionController::class, 'accountExpenseOptions']);
+            Route::get('/income-accounts', [SelectOptionController::class, 'incomeAccountOptions']);
+             Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
         });
         //party routes
         Route::prefix('parties')->group(function () {

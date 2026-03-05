@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Party;
 use App\Models\SmsSend;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class SmsSendService
 {
@@ -55,7 +56,6 @@ class SmsSendService
                 LogHelper::created('sms_send', $smsSend->id, $smsSend->company_id, 'SMS sent to ' . count($phoneNumbers) . ' customers');
 
                 return $smsSend;
-
             } catch (\Exception $e) {
                 Log::error("SMS Sending failed: " . $e->getMessage());
                 throw ApiException::serverError('Failed to process SMS request');
@@ -86,7 +86,9 @@ class SmsSendService
     public function getSmsSendById(int $id): SmsSend
     {
         $smsSend = SmsSend::find($id);
+
         if (!$smsSend) throw ApiException::notFound('SMS record');
+        $smsSend->customers = Party::whereIn('id', $smsSend->customer_ids ?? [])->select('id', 'name')->get();
         return $smsSend;
     }
 }

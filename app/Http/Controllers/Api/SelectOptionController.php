@@ -143,9 +143,27 @@ class SelectOptionController extends Controller
             ->pluck('id');
 
         $accounts = ChartOfAccount::whereIn('account_group_id', $groupIds)
-    
+
             ->orderBy('name', 'asc')
             ->get();
+
+        return $accounts;
+    }
+    public function incomeAccountOptions()
+    {
+        $groupIds = AccountGroup::where('account_type', 'Income')
+            ->pluck('id');
+
+        $accounts = ChartOfAccount::whereIn('account_group_id', $groupIds)
+
+            ->orderBy('name', 'asc')
+            ->get();
+
+        return $accounts;
+    }
+    public function accountChartOptions()
+    {
+        $accounts = ChartOfAccount::orderBy('name', 'asc')->get();
 
         return $accounts;
     }

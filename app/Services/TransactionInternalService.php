@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
@@ -7,7 +8,7 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\TransactionTransfer;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{Auth, DB, Log};
 
 class TransactionInternalService
 {
@@ -74,15 +75,33 @@ class TransactionInternalService
 
         if ($range) {
             switch ($range) {
-                case 'Today': $query->whereDate('date', $now->today()); break;
-                case 'This Week': $query->whereBetween('date', [$now->startOfWeek(), $now->endOfWeek()]); break;
-                case 'This Month': $query->whereMonth('date', $now->month)->whereYear('date', $now->year); break;
-                case 'Previous Week': $query->whereBetween('date', [$now->subWeek()->startOfWeek(), $now->endOfWeek()]); break;
-                case 'Last 7 Days': $query->whereBetween('date', [$now->subDays(7), Carbon::now()]); break;
-                case 'Last 15 Days': $query->whereBetween('date', [$now->subDays(15), Carbon::now()]); break;
-                case 'Last 30 Days': $query->whereBetween('date', [$now->subDays(30), Carbon::now()]); break;
-                case 'Last 60 Days': $query->whereBetween('date', [$now->subDays(60), Carbon::now()]); break;
-                case 'Last 90 Days': $query->whereBetween('date', [$now->subDays(90), Carbon::now()]); break;
+                case 'Today':
+                    $query->whereDate('date', $now->today());
+                    break;
+                case 'This Week':
+                    $query->whereBetween('date', [$now->startOfWeek(), $now->endOfWeek()]);
+                    break;
+                case 'This Month':
+                    $query->whereMonth('date', $now->month)->whereYear('date', $now->year);
+                    break;
+                case 'Previous Week':
+                    $query->whereBetween('date', [$now->subWeek()->startOfWeek(), $now->endOfWeek()]);
+                    break;
+                case 'Last 7 Days':
+                    $query->whereBetween('date', [$now->subDays(7), Carbon::now()]);
+                    break;
+                case 'Last 15 Days':
+                    $query->whereBetween('date', [$now->subDays(15), Carbon::now()]);
+                    break;
+                case 'Last 30 Days':
+                    $query->whereBetween('date', [$now->subDays(30), Carbon::now()]);
+                    break;
+                case 'Last 60 Days':
+                    $query->whereBetween('date', [$now->subDays(60), Carbon::now()]);
+                    break;
+                case 'Last 90 Days':
+                    $query->whereBetween('date', [$now->subDays(90), Carbon::now()]);
+                    break;
 
                 default:
                     if (strtotime($range)) {
@@ -108,7 +127,7 @@ class TransactionInternalService
      */
     public function getTransferById(int $id): TransactionTransfer
     {
-        $transfer = TransactionTransfer::with(['fromAccount', 'details.transferTo', 'creator'])->find($id);
+        $transfer = TransactionTransfer::with(['fromAccount', 'details.transferTo', 'creator', 'company'])->find($id);
         if (!$transfer) {
             throw ApiException::notFound('Transfer');
         }
@@ -122,7 +141,7 @@ class TransactionInternalService
     {
         DB::beginTransaction();
         try {
-            $data['created_by'] = auth()->id();
+            $data['created_by'] = Auth::id();
             if (isset($data['file'])) {
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],
@@ -168,7 +187,7 @@ class TransactionInternalService
         DB::beginTransaction();
         try {
             $transfer = $this->getTransferById($id);
-// dd($transfer);
+            // dd($transfer);
             // Handle File Replacement
             if (isset($data['file'])) {
                 $data['file'] = FileUploadHelper::replace(
@@ -337,10 +356,10 @@ class TransactionInternalService
 
             $transfer->update(['status' => $newStatus->value]);
 
-            LogHelper::statusChanged('transaction_internal_transfer',$transfer->id,$transfer->company_id,"Status changed to " . $newStatus->name);
+            LogHelper::statusChanged('transaction_internal_transfer', $transfer->id, $transfer->company_id, "Status changed to " . $newStatus->name);
 
             DB::commit();
-            Log::info('Transaction internal transfer status updated', ['transfer' => $id,'new_status' => $newStatus->label()]);
+            Log::info('Transaction internal transfer status updated', ['transfer' => $id, 'new_status' => $newStatus->label()]);
             return $transfer->load(['fromAccount', 'details.transferTo']);
         } catch (\Exception $e) {
             DB::rollBack();

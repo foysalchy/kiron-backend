@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Exceptions\ApiException;
@@ -6,7 +7,7 @@ use App\Helpers\LogHelper;
 use App\Mail\SendEmail;
 use App\Models\EmailSend;
 use App\Models\Party;
-use Illuminate\Support\Facades\{DB,Log, Mail};
+use Illuminate\Support\Facades\{DB, Log, Mail};
 
 class EmailSendService
 {
@@ -39,35 +40,87 @@ class EmailSendService
                 $customers = Party::whereIn('id', $data['customer_ids'])
                     ->whereNotNull('email')
                     ->where('email', '!=', '')
-                    ->pluck('email')
-                    ->toArray();
+                    ->get(['id', 'email']); // fetch id too for better logging
 
-                if (empty($customers)) {
+                if ($customers->isEmpty()) {
                     throw ApiException::validationError('Selected customers do not have valid email addresses.');
                 }
 
-            // foreach ($customers as $recipient) {
-            //     // Mail::to($recipient)->send(new SendEmail($data['subject'], $data['body']));
-            //     Mail::to($recipient)->queue(new SendEmail($data['subject'], $data['body']));
-            // }
+                $emailSend = EmailSend::create($data);
 
-            $emailSend = EmailSend::create($data);
+                $successCount = 0;
+                $failedRecipients = [];
 
-            // Use $index to space out the emails for Mailtrap
-            foreach ($customers as $index => $recipient) {
-                Mail::to($recipient)->later(
-                    now()->addSeconds($index * 3), // Spreads emails 3 seconds apart
-                    new SendEmail($data['subject'], $data['body'])
+                foreach ($customers as $index => $customer) {
+                    try {
+                        Mail::to($customer->email)->later(
+                            now()->addSeconds($index * 3),
+                            new SendEmail($data['subject'], $data['body'])
+                        );
+
+                        $successCount++;
+
+                        Log::info('Email queued successfully', [
+                            'email_send_id' => $emailSend->id,
+                            'company_id'    => $emailSend->company_id,
+                            'recipient'     => $customer->email,
+                            'customer_id'   => $customer->id,
+                            'delay_seconds' => $index * 3,
+                            'queued_at'     => now()->toDateTimeString(),
+                        ]);
+                    } catch (\Exception $e) {
+                        $failedRecipients[] = [
+                            'customer_id' => $customer->id,
+                            'email'       => $customer->email,
+                            'reason'      => $e->getMessage(),
+                        ];
+
+                        Log::error('Failed to queue email for recipient', [
+                            'email_send_id' => $emailSend->id,
+                            'company_id'    => $emailSend->company_id,
+                            'recipient'     => $customer->email,
+                            'customer_id'   => $customer->id,
+                            'error'         => $e->getMessage(),
+                        ]);
+                    }
+                }
+
+                // Summary log
+                if (!empty($failedRecipients)) {
+                    Log::warning('Email batch completed with some failures', [
+                        'email_send_id'    => $emailSend->id,
+                        'company_id'       => $emailSend->company_id,
+                        'total_recipients' => $customers->count(),
+                        'success_count'    => $successCount,
+                        'failed_count'     => count($failedRecipients),
+                        'failed_recipients' => $failedRecipients,
+                    ]);
+                } else {
+                    Log::info('Email batch queued successfully — all recipients', [
+                        'email_send_id'    => $emailSend->id,
+                        'company_id'       => $emailSend->company_id,
+                        'total_recipients' => $customers->count(),
+                        'success_count'    => $successCount,
+                    ]);
+                }
+
+                LogHelper::created(
+                    'email_send',
+                    $emailSend->id,
+                    $emailSend->company_id,
+                    "Email queued: {$successCount}/{$customers->count()} recipients succeeded"
+                        . (!empty($failedRecipients) ? ' | ' . count($failedRecipients) . ' failed' : '')
                 );
-            }
-
-            LogHelper::created('email_send', $emailSend->id, $emailSend->company_id, 'Email queued with delay for ' . count($customers) . ' recipients');
-
-                LogHelper::created('email_send', $emailSend->id, $emailSend->company_id, 'Email queued for ' . count($customers) . ' recipients');
 
                 return $emailSend;
             } catch (\Exception $e) {
-                Log::error('Email processing failed: ' . $e->getMessage());
+                Log::error('Email processing failed entirely', [
+                    'error'      => $e->getMessage(),
+                    'company_id' => $data['company_id'] ?? null,
+                    'subject'    => $data['subject'] ?? null,
+                    'trace'      => $e->getTraceAsString(),
+                ]);
+
                 throw ApiException::serverError('Failed to process and send emails: ' . $e->getMessage());
             }
         });
@@ -77,6 +130,8 @@ class EmailSendService
     {
         $log = EmailSend::find($id);
         if (!$log) throw ApiException::notFound('Email record');
+        $log->customers = Party::whereIn('id', $log->customer_ids ?? [])->select('id', 'name')->get();
+
         return $log;
     }
 }
