@@ -166,6 +166,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [CompanyController::class, 'restore']);
             Route::delete('/{id}/force', [CompanyController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CompanyController::class, 'toggleStatus']);
+            Route::get('/{id}/profile', [CompanyController::class, 'getProfile']);
         });
         Route::prefix('options')->group(function () {
             Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
