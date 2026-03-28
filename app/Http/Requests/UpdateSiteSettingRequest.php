@@ -35,6 +35,8 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'phone'             => ['sometimes', 'required', 'string', 'max:20'],
                 'alt_phone'   => ['nullable', 'string', 'max:20'],
                 'email'             => ['sometimes', 'required', 'email', 'max:255'],
+                'lang'             => ['nullable'],
+                'currency'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
                 'tags'              => ['nullable', 'string'],

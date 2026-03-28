@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('alt_phone')->nullable();
             $table->string('email')->nullable();
+            $table->string('lang')->nullable();
+            $table->string('currency')->nullable();
             $table->text('corporate_address')->nullable();
             $table->text('store_address')->nullable();
             $table->text('tags')->nullable()->comment('SEO keywords separated by comma');
