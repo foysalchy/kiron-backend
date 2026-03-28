@@ -83,6 +83,7 @@ use App\Http\Controllers\Api\PeriodController;
 use App\Http\Controllers\Api\PeriodTypeController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
+use App\Http\Controllers\Api\PricingController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
@@ -1326,6 +1327,21 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EmailSendController::class, 'store']);
             Route::get('/{id}', [EmailSendController::class, 'show']);
         });
+
+    });
+    //pricing plan
+    Route::middleware(['auth:sanctum', 'super_admin'])->group(function () {
+        Route::prefix('pricing-plan')->group(function () {
+            Route::get('/', [PricingController::class, 'index']);
+            Route::post('/', [PricingController::class, 'store']);
+            Route::get('/{id}', [PricingController::class, 'show']);
+            Route::post('/update/{id}', [PricingController::class, 'update']);
+            Route::delete('/{id}', [PricingController::class, 'destroy']);
+            Route::get('/{id}/restore', [PricingController::class, 'restore']);
+            Route::delete('/{id}/force', [PricingController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [PricingController::class, 'toggleStatus']);
+        });
+
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

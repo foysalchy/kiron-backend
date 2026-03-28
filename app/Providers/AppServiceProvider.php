@@ -70,6 +70,7 @@ use App\Services\PayRollService;
 use App\Services\PaySlipManagerService;
 use App\Services\PeriodService;
 use App\Services\PeriodTypeService;
+use App\Services\PricingService;
 use App\Services\ProductService;
 use App\Services\PurchaseReturnService;
 use App\Services\PurchaseService;
@@ -205,6 +206,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SmsSendService::class);
         $this->app->bind(EmailTemplateService::class);
         $this->app->bind(EmailSendService::class);
+        $this->app->bind(PricingService::class);
     }
 
     /**
