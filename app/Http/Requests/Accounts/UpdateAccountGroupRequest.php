@@ -25,7 +25,7 @@ class UpdateAccountGroupRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'account_type_id' => ['sometimes', 'required', 'exists:account_types,id'],
+            'account_type' => ['sometimes', 'required'],
             'name'            => ['sometimes', 'required', 'string', 'max:255'],
             'description'     => ['nullable', 'string'],
             'status'           => ['sometimes', 'integer'],
@@ -36,7 +36,7 @@ class UpdateAccountGroupRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'account_type_id.exists' => 'The selected account type is invalid.',
+                'account_type.required' => 'The account type is required.',
                 'name.required'          => 'The group name cannot be empty.',
             ]
         );

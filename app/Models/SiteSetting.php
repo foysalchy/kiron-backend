@@ -19,6 +19,8 @@ class SiteSetting extends Model
         'phone',
         'alt_phone',
         'email',
+        'lang',
+        'currency',
         'corporate_address',
         'store_address',
         'tags',

@@ -235,7 +235,7 @@ class OrderService
                 $data['status'] = Status::Pending->value;
             }
             if ($data['payment_status'] === Order::PAYMENT_PAID && $data['status'] !== Status::Hold->value) {
-                $data['status'] = Status::Completed->value;
+                $data['status'] = Status::Delivered->value;
             }
             // Create order
             $order = Order::create($data);
@@ -323,9 +323,9 @@ class OrderService
         try {
             $order = $this->getOrderById($id, $type);
 
-            // Cannot update completed or cancelled orders
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Cannot update completed order');
+            // Cannot update delivered or cancelled orders
+            if ($order->isDelivered()) {
+                throw ApiException::badRequest('Cannot update delivered order');
             }
 
             if ($order->isCancelled()) {
@@ -481,8 +481,8 @@ class OrderService
         try {
             $order = $this->getOrderById($id, $type);
 
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Cannot cancel completed order');
+            if ($order->isDelivered()) {
+                throw ApiException::badRequest('Cannot cancel delivered order');
             }
 
             if ($order->isCancelled()) {
@@ -524,12 +524,12 @@ class OrderService
         try {
             $order = $this->getOrderById($id, $type);
 
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Order is already completed');
+            if ($order->isDelivered()) {
+                throw ApiException::badRequest('Order is already delivered');
             }
 
             if ($order->isCancelled()) {
-                throw ApiException::badRequest('Cannot complete cancelled order');
+                throw ApiException::badRequest('Cannot delivered cancelled order');
             }
 
             $oldStatus = $order->status;
@@ -545,12 +545,12 @@ class OrderService
                 }
             }
 
-            $order->update(['status' => Status::Completed->value]);
+            $order->update(['status' => Status::Delivered->value]);
 
             DB::commit();
 
-            Log::info('Order completed', ['order_id' => $id]);
-            LogHelper::custom('completed', 'orders', $id, $order->company_id);
+            Log::info('Order delivered', ['order_id' => $id]);
+            LogHelper::custom('delivered', 'orders', $id, $order->company_id);
 
             return $order->fresh();
         } catch (ApiException $e) {
@@ -558,8 +558,8 @@ class OrderService
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Order completion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to complete order');
+            Log::error('Order delivery failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to deliver order');
         }
     }
     public function changeStatus(int $id, string $status): Order
@@ -567,29 +567,43 @@ class OrderService
         DB::beginTransaction();
 
         try {
-            $order =   $order = Order::with([
+            $order = Order::with([
                 'orderDetails.product',
                 'orderDetails.variation',
             ])->find($id);
 
-            if ($order->isCompleted()) {
-                throw ApiException::badRequest('Order is already completed');
+            if (!$order) {
+                throw ApiException::notFound('Order not found');
             }
+
+            $getStatus = Status::from($status);
+            $oldStatus = $order->status;
+            $getOldStatus = Status::from($oldStatus);
 
             if ($order->isCancelled()) {
-                throw ApiException::badRequest('Cannot change  cancelled order status');
+                throw ApiException::badRequest('Cannot change cancelled order status');
             }
 
-            $oldStatus = $order->status;
-            $getStatus = Status::from($status);
-            $getOldStatus = Status::from($oldStatus);
-            // If order was on hold, deduct stock now
+       
+            $allowedFromDelivered = [
+                Status::ReturntoCourier,
+                Status::ReturnReceived,
+                Status::Returned,
+            ];
+
+            if ($order->isDelivered() && !in_array($getStatus, $allowedFromDelivered)) {
+                throw ApiException::badRequest(
+                    'Order is already delivered. Only return-related status changes are allowed.'
+                );
+            }
+
+            // Hold থেকে change হলে stock deduct করো
             if ($oldStatus === Status::Hold->value) {
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
-                        'product_id' => $detail->product_id,
+                        'product_id'   => $detail->product_id,
                         'variation_id' => $detail->variation_id,
-                        'quantity' => $detail->quantity
+                        'quantity'     => $detail->quantity,
                     ]);
                 }
             }
@@ -597,10 +611,17 @@ class OrderService
             $order->update([
                 'status' => $getStatus->value
             ]);
-            $logStatus = " {$getOldStatus->label()} → {$getStatus->label()}";
+
+            $logStatus = "{$getOldStatus->label()} → {$getStatus->label()}";
+
             DB::commit();
 
-            Log::info('Order completed', ['order_id' => $id]);
+            Log::info('Order status changed', [
+                'order_id'   => $id,
+                'old_status' => $getOldStatus->label(),
+                'new_status' => $getStatus->label(),
+            ]);
+
             LogHelper::statusChanged('orders', $order->id, $order->company_id, $logStatus);
 
             return $order->fresh();
@@ -609,8 +630,11 @@ class OrderService
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Order completion failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to complete order');
+            Log::error('Order status change failed', [
+                'order_id' => $id,
+                'error'    => $e->getMessage(),
+            ]);
+            throw ApiException::serverError('Failed to change order status');
         }
     }
 
@@ -628,8 +652,8 @@ class OrderService
                 throw ApiException::badRequest('Only POS orders can be put on hold');
             }
 
-            if ($order->isCompleted() || $order->isCancelled()) {
-                throw ApiException::badRequest('Cannot hold completed or cancelled order');
+            if ($order->isDelivered() || $order->isCancelled()) {
+                throw ApiException::badRequest('Cannot hold delivered or cancelled order');
             }
 
             if ($order->isOnHold()) {

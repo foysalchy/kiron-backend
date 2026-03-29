@@ -30,8 +30,6 @@ class StoreTransactionExpenseRequest extends BaseCompanyRequest
             'description'     => ['required', 'string'],
             'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'], //5mb
             'status'          => ['nullable', 'integer'],
-
-            // Validation for the Dynamic Rows (Categories)
             'items'                         => ['required', 'array', 'min:1'],
             'items.*.chart_of_account_id'   => ['required', 'exists:chart_of_accounts,id'],
             'items.*.amount'                => ['required', 'numeric', 'min:1'],

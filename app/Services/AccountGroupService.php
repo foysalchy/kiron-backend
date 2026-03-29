@@ -20,7 +20,7 @@ class AccountGroupService
     public function getAllGroups(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = AccountGroup::with(['accountType']);
+            $query = AccountGroup::query();
 
             // Filter by Status
             if (isset($filters['status'])) {
@@ -59,7 +59,7 @@ class AccountGroupService
      */
     public function getGroupById(int $id): AccountGroup
     {
-        $group = AccountGroup::with(['accountType'])->find($id);
+        $group = AccountGroup::find($id);
         if (!$group) {
             throw ApiException::notFound('Account Group');
         }

@@ -35,6 +35,8 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'phone'             => ['required', 'string'],
                 'alt_phone' => ['nullable', 'string'],
                 'email'             => ['required', 'email'],
+                'lang'             => ['nullable'],
+                'currency'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
                 'tags'              => ['nullable', 'string'], // SEO keywords

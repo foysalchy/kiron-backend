@@ -3,17 +3,17 @@
 namespace App\Http\Requests\Accounts;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\UpdateBaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateTransactionIncomeRequest extends FormRequest
+class UpdateTransactionIncomeRequest extends UpdateBaseCompanyRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**

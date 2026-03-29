@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('account_groups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('account_type_id')->constrained('account_types')->cascadeOnDelete();
+            $table->string('account_type');
             $table->string('name');
             $table->longText('description')->nullable();
             $table->tinyInteger('status')->default(Status::Active->value);

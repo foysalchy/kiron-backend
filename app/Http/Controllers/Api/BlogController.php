@@ -9,7 +9,8 @@ use App\Http\Requests\UpdateBlogRequest;
 use App\Services\BlogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
+use App\Helpers\FileUploadHelper;
+use Illuminate\Support\Facades\Storage;
 class BlogController extends Controller
 {
     public function __construct(
@@ -101,4 +102,22 @@ class BlogController extends Controller
 
         return ResponseHelper::success($data, 'Blog status updated successfully');
     }
+public function uploadImage(Request $request)
+{
+    $request->validate([
+        'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+    ]);
+
+    $path = FileUploadHelper::upload(
+        file: $request->file('image'),
+        folder: 'blogs/content',
+        disk: 'public'
+    );
+
+    $url = asset('storage/' . $path);
+
+    return response()->json([
+        'url' => $url,
+    ]);
+}
 }

@@ -172,11 +172,19 @@ Route::prefix('v1')->group(function () {
             Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
             Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
             Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
+            Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
             Route::get('/products', [SelectOptionController::class, 'productOptions']);
             Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
             Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
             Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
-            Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
+            Route::get('/users', [SelectOptionController::class, 'userOptions']);
+            Route::get('/asset-categories', [SelectOptionController::class, 'assetCategoryOptions']);
+            Route::get('/assets', [SelectOptionController::class, 'assetOptions']);
+            Route::get('/disposal-types', [SelectOptionController::class, 'disposalTypeOptions']);
+            Route::get('/account-groups', [SelectOptionController::class, 'accountGroupOptions']);
+            Route::get('/account-expenses', [SelectOptionController::class, 'accountExpenseOptions']);
+            Route::get('/income-accounts', [SelectOptionController::class, 'incomeAccountOptions']);
+            Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
         });
         //party routes
         Route::prefix('parties')->group(function () {
@@ -401,6 +409,7 @@ Route::prefix('v1')->group(function () {
 
         // Blog Routes
         Route::prefix('blogs')->group(function () {
+
             Route::get('/', [BlogController::class, 'index']);
             Route::post('/', [BlogController::class, 'store']);
             Route::get('/{id}', [BlogController::class, 'show']);
@@ -410,6 +419,7 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
         });
+        Route::post('/upload-image', [BlogController::class, 'uploadImage']);
         Route::prefix('purchases')->group(function () {
             Route::get('/', [PurchaseController::class, 'index']);
             Route::post('/', [PurchaseController::class, 'store']);
@@ -1301,7 +1311,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [SmsSendController::class, 'store']);
             Route::get('/{id}', [SmsSendController::class, 'show']);
         });
-         //email-templates routes
+        //email-templates routes
         Route::prefix('email-templates')->group(function () {
             Route::get('/', [EmailTemplateController::class, 'index']);
             Route::post('/', [EmailTemplateController::class, 'store']);

@@ -28,7 +28,7 @@ class TransactionExpense extends Model
     // Relationships
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Company::class)->select('id', 'name','logo');
     }
     public function categories(): HasMany
     {
