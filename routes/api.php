@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BkashController;
 use App\Http\Controllers\Api\BlogController;
@@ -1327,6 +1328,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/', [EmailSendController::class, 'index']);
             Route::post('/', [EmailSendController::class, 'store']);
             Route::get('/{id}', [EmailSendController::class, 'show']);
+        });
+        //billing
+        Route::prefix('billing')->group(function () {
+            Route::get('/{id}', [BillingController::class, 'billingReports']);
         });
 
     });
