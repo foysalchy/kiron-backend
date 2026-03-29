@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('order_limitation')->default(0);
             $table->integer('user_limitation')->default(0);
             $table->json('features')->nullable();
+            $table->integer('free_trial')->default(0);
             $table->boolean('is_featured')->default(false);
             $table->tinyInteger('status')->default(Status::Inactive->value);
             $table->timestamps();

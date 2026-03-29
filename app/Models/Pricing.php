@@ -20,11 +20,13 @@ class Pricing extends Model
             'order_limitation',
             'user_limitation',
             'features',
+            'is_featured',
+            'free_trial',
             'status',
         ];
     protected $hidden = ['deleted_at'];
     protected $casts = [
-        'features' => 'json',
+        'features' => 'array',
     ];
     // Relationships
 
