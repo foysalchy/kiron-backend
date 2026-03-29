@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BkashController;
 use App\Http\Controllers\Api\BlogController;
@@ -174,6 +175,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [CompanyController::class, 'restore']);
             Route::delete('/{id}/force', [CompanyController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [CompanyController::class, 'toggleStatus']);
+            Route::get('/{id}/profile', [CompanyController::class, 'getProfile']);
         });
         Route::prefix('options')->group(function () {
             Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
@@ -1335,6 +1337,13 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EmailSendController::class, 'store']);
             Route::get('/{id}', [EmailSendController::class, 'show']);
         });
+
+        //billing
+        Route::prefix('billing')->group(function () {
+            Route::get('/{id}', [BillingController::class, 'billingReports']);
+        });
+
+
     });
     //pricing plan
     Route::middleware(['auth:sanctum', 'super_admin'])->group(function () {

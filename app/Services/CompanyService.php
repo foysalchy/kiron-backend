@@ -300,4 +300,46 @@ class CompanyService
             ->orWhere('phone', 'like', "%{$term}%")
             ->get();
     }
+    /**
+     * Get full company profile
+     */
+    public function getCompanyProfileById(int $id, string $period = 'month'): Company
+    {
+        $startDate = match($period) {
+            'week'  => now()->startOfWeek(),
+            'month' => now()->startOfMonth(),
+            'year'  => now()->startOfYear(),
+            default => now()->startOfMonth(),
+        };
+
+        $company = Company::withCount([
+            // Total counts
+            'users',
+            'orders',
+            // New this period
+            'users as new_users_count'   => fn($q) => $q->where('created_at', '>=', $startDate),
+            'orders as new_orders_count' => fn($q) => $q->where('created_at', '>=', $startDate),
+            // User status
+            'users as active_users_count'   => fn($q) => $q->where('status', Status::Active->value),
+            'users as inactive_users_count' => fn($q) => $q->where('status', Status::Inactive->value),
+            // Order status
+            'orders as pending_orders'   => fn($q) => $q->where('status', Status::Pending->value),
+            'orders as completed_orders' => fn($q) => $q->where('status', Status::Completed->value),
+            'orders as cancelled_orders' => fn($q) => $q->where('status', Status::Cancelled->value),
+        ])
+        ->find($id);
+
+        if (!$company) {
+            throw ApiException::notFound('Company not found');
+        }
+
+       // Revenue calculation
+        $company->total_revenue = $company->orders()->sum('grand_total');
+        $company->new_revenue   = $company->orders()
+                                        ->where('created_at', '>=', $startDate)
+                                        ->sum('grand_total');
+
+        return $company;
+    }
+
 }

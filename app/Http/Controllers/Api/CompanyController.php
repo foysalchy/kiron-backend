@@ -18,6 +18,15 @@ class CompanyController extends Controller
         protected CompanyDeletionService $companyDelationService
     ) {}
 
+    /**
+     * Get company profile summary with user and order counts
+     */
+    public function getProfile(int $id): JsonResponse
+    {
+        $company = $this->companyService->getCompanyProfileById($id);
+
+        return ResponseHelper::success($company, 'Company retrieved successfully');
+    }
 
     public function index(Request $request): JsonResponse
     {

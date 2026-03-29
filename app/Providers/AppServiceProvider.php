@@ -14,6 +14,7 @@ use App\Services\AttendanceService;
 use App\Services\AttributeGroupService;
 use App\Services\AttributeService;
 use App\Services\BannerService;
+use App\Services\BillingService;
 use App\Services\BinService;
 use App\Services\BkashService;
 use App\Services\BlogService;
@@ -207,6 +208,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EmailTemplateService::class);
         $this->app->bind(EmailSendService::class);
         $this->app->bind(PricingService::class);
+        $this->app->bind(BillingService::class);
     }
 
     /**
