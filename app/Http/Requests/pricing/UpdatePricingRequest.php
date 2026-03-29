@@ -35,6 +35,8 @@ class UpdatePricingRequest extends FormRequest
             'features' => 'nullable|array',
             'features.*' => 'required|string|max:255',
             'is_featured' => 'boolean',
+            'free_trial' => 'sometimes|integer|min:0',
+
             'status' => ['sometimes', 'required', 'integer'],
         ];
     }

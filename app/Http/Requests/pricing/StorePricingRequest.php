@@ -36,6 +36,7 @@ class StorePricingRequest extends FormRequest
             'features.*' => 'required|string|max:255',
             'is_featured' => 'nullable|boolean',
             'status' => ['required', 'integer'],
+            'free_trial' => 'nullable|integer|min:0',
         ];
     }
 

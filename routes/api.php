@@ -26,7 +26,7 @@ use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\ChartOfAccountController;
 use App\Http\Controllers\Api\CompanyController;
-
+use App\Http\Controllers\Api\CompanyRegistrationController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
@@ -130,7 +130,15 @@ Route::prefix('v1')->group(function () {
 
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
+    Route::prefix('registration')->group(function () {
+        Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
+        Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);
+        Route::post('subscription', [CompanyRegistrationController::class, 'storeSubscription']);
 
+        // OTP actions
+        Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
+        Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
+    });
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
         //auth
         Route::get('auth/login-history', [AuthController::class, 'historyLoginAll']);
@@ -1327,7 +1335,6 @@ Route::prefix('v1')->group(function () {
             Route::post('/', [EmailSendController::class, 'store']);
             Route::get('/{id}', [EmailSendController::class, 'show']);
         });
-
     });
     //pricing plan
     Route::middleware(['auth:sanctum', 'super_admin'])->group(function () {
@@ -1341,7 +1348,6 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [PricingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PricingController::class, 'toggleStatus']);
         });
-
     });
     //bkash route
     Route::prefix('bkash')->group(function () {
