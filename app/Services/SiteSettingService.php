@@ -6,10 +6,12 @@ use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
+use App\Models\Company;
 use App\Models\SiteSetting;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB ,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class SiteSettingService
 {
@@ -43,7 +45,6 @@ class SiteSettingService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Throwable $e) {
             Log::error('Error fetching site settings: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch site settings');
@@ -70,16 +71,22 @@ class SiteSettingService
         try {
             // Handle logo upload
             if (isset($data['logo'])) {
-                $data['logo'] = FileUploadHelper::uploadImage($data['logo'],
-                'settings/logos',
-                'public', 2048);
+                $data['logo'] = FileUploadHelper::uploadImage(
+                    $data['logo'],
+                    'settings/logos',
+                    'public',
+                    2048
+                );
             }
 
             // Handle favicon upload
             if (isset($data['favicon'])) {
-                $data['favicon'] = FileUploadHelper::uploadImage($data['favicon'],
-                'settings/favicons',
-                 'public', 512);
+                $data['favicon'] = FileUploadHelper::uploadImage(
+                    $data['favicon'],
+                    'settings/favicons',
+                    'public',
+                    512
+                );
             }
 
             $setting = SiteSetting::create($data);
@@ -110,8 +117,11 @@ class SiteSettingService
 
             // Handle logo replace
             if (isset($data['logo'])) {
-                $data['logo'] = FileUploadHelper::replace($data['logo'],
-                $setting->logo, 'settings/logos');
+                $data['logo'] = FileUploadHelper::replace(
+                    $data['logo'],
+                    $setting->logo,
+                    'settings/logos'
+                );
             }
 
             // Handle favicon replace
@@ -120,6 +130,15 @@ class SiteSettingService
             }
 
             $setting->update($data);
+            if ($setting->company_id) {
+                Company::where('id', $setting->company_id)
+                    ->where('status', '!=', Status::Active->value)
+                    ->update(['status' => Status::Active->value]);
+
+                User::where('company_id', $setting->company_id)
+                    ->where('status', '!=', Status::Active->value)
+                    ->update(['status' => Status::Active->value]);
+            }
             LogHelper::updated('site_setting', $setting->id, $setting->company_id ?? null);
 
             DB::commit();

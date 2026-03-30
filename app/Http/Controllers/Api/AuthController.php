@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{RegisterRequest, UpdateProfileRequest, UpdatePasswordRequest};
 use App\Helpers\{FileUploadHelper, LogHelper};
@@ -51,6 +52,7 @@ class AuthController extends Controller
     /**
      * Login - Cookie based authentication
      */
+
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -58,7 +60,6 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Attempt authentication (no session)
         if (!Auth::attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['Invalid credentials'],
@@ -67,14 +68,18 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Check if user is active
-        if (!$user->isActive()) {
+        // Define allowed statuses for login (Draft, Pending, Active)
+        $allowedStatuses = [Status::Draft->value, Status::Pending->value, Status::Active->value];
+
+        if (!in_array($user->status, $allowedStatuses)) {
+            $user->tokens()->delete(); // Ensure token is removed
             Auth::logout();
             throw ValidationException::withMessages([
-                'email' => ['Your account is inactive'],
+                'email' => ['Your account is inactive or suspended.'],
             ]);
         }
-        //login history
+
+        // Login history
         $history = UserLoginHistory::create([
             'company_id' => $user->company_id,
             'user_id'    => $user->id,
@@ -83,10 +88,7 @@ class AuthController extends Controller
             'login_at'   => now(),
         ]);
 
-        // Revoke old tokens (optional but recommended)
         $user->tokens()->delete();
-
-        // Create token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -101,6 +103,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'company_id' => $user->company_id,
                 'role' => $user->role,
+                'status' => $user->status, // Add status here so frontend knows
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
             ],

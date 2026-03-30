@@ -8,10 +8,12 @@ use App\Helpers\LogHelper;
 use App\Mail\VerifyOtpEmail;
 use App\Models\Company;
 use App\Models\CompanySubscription;
+use App\Models\DomainSetup;
 use App\Models\EmailVerification;
 use App\Models\Pricing;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Models\UserLoginHistory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +32,7 @@ class CompanyRegistrationService
     /**
      * Step 1: Create company and admin user
      */
+
     public function registerBasic(array $data): array
     {
         DB::beginTransaction();
@@ -39,7 +42,7 @@ class CompanyRegistrationService
                 'email'         => $data['email'],
                 'phone'         => $data['phone'],
                 'business_type' => $data['business_type'] ?? 1,
-                'status'        => Status::Active->value,
+                'status'        => Status::Draft->value,
             ]);
 
             LogHelper::created('company', $company->id, $company->id);
@@ -50,14 +53,41 @@ class CompanyRegistrationService
                 'phone'      => $data['phone'],
                 'password'   => Hash::make($data['password']),
                 'company_id' => $company->id,
-                'status'     => Status::Active->value,
+                'status'     => Status::Draft->value,
             ]);
 
             LogHelper::created('user', $user->id, $company->id);
+
+            // ==========================================
+            // 🟢 NEW: LOGIN THE USER IMMEDIATELY
+            // ==========================================
+            $history = UserLoginHistory::create([
+                'company_id' => $user->company_id,
+                'user_id'    => $user->id,
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'login_at'   => now(),
+            ]);
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+
             DB::commit();
 
+            // Return Token & User data just like standard login
             return [
                 'registration_id' => $company->id,
+                'token'           => $token,
+                'login_id'        => $history->id,
+                'user'            => [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'email'       => $user->email,
+                    'company_id'  => $user->company_id,
+                    'role'        => $user->role,
+                    'status'      => $user->status,
+                    'profile'     => $user->profile,
+                    'profile_url' => $user->profile_url,
+                ],
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -119,7 +149,45 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to process subscription.');
         }
     }
+    public function registerBasicSettings(array $data): void
+    {
+        DB::beginTransaction();
+        try {
+            $company = Company::findOrFail($data['registration_id']);
 
+            // Insert subdomain into DomainSetup
+            DomainSetup::create([
+                'company_id' => $company->id,
+                'sub_domain' => $data['sub_domain'],
+            ]);
+
+            // Update language & currency in SiteSettings
+            SiteSetting::where('company_id', $company->id)
+                ->update([
+                    'lang'     => $data['lang'],
+                    'currency' => $data['currency'],
+                ]);
+
+            // Activate Company
+            $company->update([
+                'status' => Status::Active->value,
+            ]);
+
+            // Activate the Company's primary User
+            User::where('company_id', $company->id)
+                ->update([
+                    'status' => Status::Active->value,
+                ]);
+
+            DB::commit();
+
+            Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Basic settings registration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to save basic settings.');
+        }
+    }
     public function verifyOtp(int $registrationId, string $type, string $otp): void
     {
         $record = EmailVerification::where('company_id', $registrationId)
@@ -134,10 +202,16 @@ class CompanyRegistrationService
 
         $record->update(['verified_at' => Carbon::now()]);
 
-        // Mark the user as verified
         User::where('company_id', $registrationId)
             ->where('email', $record->email)
-            ->update(['email_verified_at' => Carbon::now()]);
+            ->update([
+                'email_verified_at' => Carbon::now(),
+                'status' => Status::Pending->value,
+            ]);
+
+        Company::where('id', $registrationId)->update(['status' => Status::Pending->value]);
+
+        Log::info("Email verified for company_id: {$registrationId} and email: {$record->email}");
     }
 
     public function resendOtp(int $registrationId, string $type): void
@@ -156,7 +230,7 @@ class CompanyRegistrationService
             'otp'        => $newOtp,
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
-      
+
         $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
         Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
     }

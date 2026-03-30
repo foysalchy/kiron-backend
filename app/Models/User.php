@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-
+use App\Enums\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -64,7 +64,11 @@ class User extends Authenticatable
     }
     public function isActive(): bool
     {
-        return $this->status === 1;
+        return $this->status === Status::Active->value;
+    }
+    public function isDraft(): bool
+    {
+        return $this->status === Status::Draft->value;
     }
 
     public function canAccessCompany(int $companyId): bool

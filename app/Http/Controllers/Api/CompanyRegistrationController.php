@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CompanyRegistration\{StoreBasicRegistrationRequest, StoreSubscriptionRequest, VerifyOtpRequest, ResendOtpRequest};
+use App\Http\Requests\CompanyRegistration\{StoreBasicRegistrationRequest, StoreSubscriptionRequest, VerifyOtpRequest, ResendOtpRequest,StoreBasicSettingsRequest};
 use App\Services\CompanyRegistrationService;
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +30,11 @@ class CompanyRegistrationController extends Controller
     {
         $this->registrationService->registerSubscription($request->validated());
         return ResponseHelper::success(null, 'Subscription saved. OTP sent to your email.');
+    }
+    public function storeBasicSettings(StoreBasicSettingsRequest $request): JsonResponse
+    {
+        $this->registrationService->registerBasicSettings($request->validated());
+        return ResponseHelper::success(null, 'Basic settings saved.');
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
