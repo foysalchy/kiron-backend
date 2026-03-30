@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\BkashController;
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\BonusController;
 use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\BulkActionController;
 use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\ChartOfAccountController;
@@ -116,6 +117,7 @@ use App\Http\Controllers\Api\TransactionIncomeController;
 use App\Http\Controllers\Api\TransactionInternalTransferController;
 use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseInventoryController;
 use App\Http\Controllers\Api\WocommerceSettingController;
@@ -151,7 +153,7 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::post('auth/logout-all', [AuthController::class, 'logoutAll']);
         Route::delete('auth/account', [AuthController::class, 'deleteAccount']);
-        
+
         //site settings routes
         Route::middleware('check.user.status:allow_pending')->group(function () {
 
@@ -1353,6 +1355,19 @@ Route::prefix('v1')->group(function () {
             //billing
             Route::prefix('billing')->group(function () {
                 Route::get('/{id}', [BillingController::class, 'billingReports']);
+            });
+            // User Routes
+            Route::prefix('users')->group(function () {
+                Route::get('/', [UserController::class, 'index']);
+                Route::post('/', [UserController::class, 'store']);
+                Route::get('/{id}', [UserController::class, 'show']);
+                Route::post('/update/{id}', [UserController::class, 'update']);
+                Route::delete('/{id}', [UserController::class, 'destroy']);
+                Route::patch('/{id}/toggle-status', [UserController::class, 'toggleStatus']);
+            });
+            Route::prefix('bulk')->group(function () {
+                Route::patch('{resource}/status', [BulkActionController::class, 'updateStatus']);
+                Route::delete('{resource}', [BulkActionController::class, 'bulkDelete']);
             });
         });
     });
