@@ -15,11 +15,13 @@ class SmsSend extends Model
     protected $fillable = [
         'company_id',
         'customer_ids',
+        'supplier_ids',
         'message',
         'status',
     ];
     protected $casts = [
         'customer_ids' => 'array',
+        'supplier_ids' => 'array',
     ];
 
     protected $hidden = ['deleted_at'];

@@ -25,19 +25,41 @@ class EmailSendRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'customer_ids'   => ['required', 'array', 'min:1'],
-            'customer_ids.*' => ['required', 'integer', 'exists:parties,id'],
+            'customer_ids'   => ['nullable', 'array'],
+            'customer_ids.*' => ['integer', 'exists:parties,id'],
+            'supplier_ids'   => ['nullable', 'array'],
+            'supplier_ids.*' => ['integer', 'exists:parties,id'],
             'subject'        => ['required', 'string', 'max:255'],
             'body'           => ['required', 'string'],
             'status'         => ['nullable', 'integer'],
         ]);
     }
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $customers  = $this->input('customer_ids', []);
+            $suppliers  = $this->input('supplier_ids', []);
+            if (empty($customers) && empty($suppliers)) {
+                $validator->errors()->add('customer_ids', 'Select at least one customer or supplier.');
+            }
+        });
+    }
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'customer_ids.required' => 'Please select at least one recipient.',
-            'subject.required'      => 'Email subject is required.',
-            'body.required'         => 'Email content body is required.',
+            'customer_ids.array'        => 'The customer list must be a valid format.',
+            'customer_ids.*.exists'     => 'One or more selected customers do not exist.',
+
+            'supplier_ids.array'        => 'The supplier list must be a valid format.',
+            'supplier_ids.*.exists'     => 'One or more selected suppliers do not exist.',
+
+            'subject.required'          => 'The subject is required.',
+            'subject.max'               => 'The subject cannot exceed 255 characters.',
+
+            'body.required'             => 'The message content is required.',
+            'body.string'               => 'The message must be a valid text.',
+
+            'status.integer'            => 'Status must be a valid number.',
         ]);
     }
 

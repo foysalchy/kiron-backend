@@ -23,7 +23,7 @@ class MiniCategoryController extends Controller
             'sub_category_id' => $request->query('sub_category_id'),
             'status' => $request->query('status'),
             'search' => $request->query('search'),
-              'sort_by' => $request->query('sort_by', 'created_at'),
+            'sort_by' => $request->query('sort_by', 'created_at'),
             'sort_order' => $request->query('sort_order', 'desc'),
             'per_page' => $request->query('per_page', 15),
         ];
@@ -32,7 +32,7 @@ class MiniCategoryController extends Controller
 
         return  ResponseHelper::success($data, 'Mini categories retrieved successfully');
     }
- 
+
 
     public function store(StoreMiniCategoryRequest $request): JsonResponse
     {
@@ -95,8 +95,4 @@ class MiniCategoryController extends Controller
 
         return  ResponseHelper::success($data, 'Mini categories retrieved successfully');
     }
-
-   
-
-   
 }

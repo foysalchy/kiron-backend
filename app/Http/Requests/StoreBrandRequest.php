@@ -3,18 +3,29 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\BaseCompanyRequest;
+use App\Rules\SlugRule;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
 class StoreBrandRequest extends BaseCompanyRequest
 {
+
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()->company_id;
+    }
     public function rules(): array
     {
         return array_merge(
             $this->companyRules(),
             [
                 'name'   => ['required', 'string', 'max:255'],
-                'logo'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'logo'   => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+                'slug' => SlugRule::make(
+                    'brands',
+                    null,
+                    $this->getCompanyId()
+                ),
                 'status' => ['boolean'],
             ]
         );

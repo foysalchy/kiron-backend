@@ -9,6 +9,8 @@ class UpdateExtraCategoryRequest extends BaseCategoryRequest
     {
         return array_merge($this->baseUpdateRules(), [
             'mini_category_id' => ['sometimes', 'required', 'exists:mini_categories,id'],
+            'sub_category_id' => ['sometimes', 'required', 'exists:sub_categories,id'],
+            'mega_category_id' => ['sometimes', 'required', 'exists:mega_categories,id'],
         ]);
     }
 }

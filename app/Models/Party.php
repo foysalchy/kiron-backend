@@ -50,7 +50,14 @@ class Party extends Model
         return $this->hasMany(ActionLog::class, 'action_id', 'id')
             ->where('module', 'party');
     }
-
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class, 'customer_id', 'id');
+    }
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(Purchase::class, 'supplier_id', 'id');
+    }
     // Scopes
     public function scopeSuppliers($query)
     {

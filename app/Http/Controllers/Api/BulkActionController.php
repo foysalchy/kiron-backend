@@ -11,6 +11,10 @@ class BulkActionController extends Controller
         'parties'  => \App\Models\Party::class,
         'users'    => \App\Models\User::class,
         'products' => \App\Models\Product::class,
+        'mega-categories' => \App\Models\MegaCategory::class,
+        'sub-categories' => \App\Models\SubCategory::class,
+        'mini-categories' => \App\Models\MiniCategory::class,
+        'extra-categories' => \App\Models\ExtraCategory::class,
     ];
 
     private function resolveModel(string $resource): string

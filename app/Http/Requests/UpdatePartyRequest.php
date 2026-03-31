@@ -16,18 +16,38 @@ class UpdatePartyRequest extends UpdateBaseCompanyRequest
 
     public function rules(): array
     {
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin()
+            ? $this->input('company_id')
+            : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
                 'type' => ['sometimes', 'required', 'integer', Rule::in([1, 2])],
                 'name' => ['sometimes', 'required', 'string', 'max:255'],
-                'email' => ['nullable', 'email', 'max:255'],
-                'phone' => ['sometimes', 'required', 'string', 'max:20'],
+                'email' => [
+                    'sometimes',
+                    'email',
+                    'max:255',
+                    Rule::unique('parties', 'email')
+                        ->ignore($this->route('id'))
+                        ->where('company_id', $companyId)
+                        ->where('type', $this->input('type')),
+                ],
+                'phone' => [
+                    'sometimes',
+                    'string',
+                    'max:20',
+                    Rule::unique('parties', 'phone')
+                        ->ignore($this->route('id'))
+                        ->where('company_id', $companyId)
+                        ->where('type', $this->input('type')),
+                ],
                 'alternative_phone' => ['nullable', 'string', 'max:20'],
                 'address' => ['nullable', 'string'],
                 'balance' => ['nullable', 'numeric'],
-                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
-                'status' => ['integer'],
+                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+                'status' => ['nullable'],
             ]
         );
     }

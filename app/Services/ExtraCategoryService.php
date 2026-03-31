@@ -16,7 +16,7 @@ class ExtraCategoryService
     public function getAllExtraCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = ExtraCategory::with(['miniCategory.subCategory.megaCategory']);
+            $query = ExtraCategory::with('miniCategory', 'subCategory', 'megaCategory');
 
             if (isset($filters['company_id'])) {
                 $query->where('company_id', $filters['company_id']);
@@ -217,7 +217,7 @@ class ExtraCategoryService
             $category->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::statusChanged('extra_categories', $category->id, $category->company_id,$category->name . ' new status '. $newStatus->label());
+            LogHelper::statusChanged('extra_categories', $category->id, $category->company_id, $category->name . ' new status ' . $newStatus->label());
 
             Log::info('Extra category status toggled', ['id' => $id]);
 

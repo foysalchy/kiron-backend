@@ -16,7 +16,7 @@ class MiniCategoryService
     public function getAllMiniCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = MiniCategory::with(['subCategory.megaCategory']);
+            $query = MiniCategory::with('subCategory', 'megaCategory');
 
 
             if (isset($filters['sub_category_id'])) {

@@ -10,17 +10,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Brand extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
 
     protected $fillable = [
         'company_id',
         'name',
+        'slug',
         'logo',
         'status',
     ];
 
-   
+
     protected $hidden = ['deleted_at'];
 
     // Relationships

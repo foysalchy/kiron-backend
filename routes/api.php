@@ -231,6 +231,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [PartyController::class, 'index']);
                 Route::post('/', [PartyController::class, 'store']);
                 Route::get('/{id}', [PartyController::class, 'show']);
+                Route::get('/{id}/supplier-profile', [PartyController::class, 'supplierProfile']);
                 Route::post('/update/{id}', [PartyController::class, 'update']);
                 Route::delete('/{id}', [PartyController::class, 'destroy']);
                 Route::get('/{id}/restore', [PartyController::class, 'restore']);

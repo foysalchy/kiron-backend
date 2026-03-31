@@ -10,11 +10,13 @@ use Illuminate\Support\Str;
 
 class ExtraCategory extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
         'mini_category_id',
+        'sub_category_id',
+        'mega_category_id',
         'name',
         'slug',
         'image',
@@ -25,25 +27,6 @@ class ExtraCategory extends Model
 
     protected $hidden = ['deleted_at'];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $slug = Str::slug($category->name);
-                $originalSlug = $slug;
-                $count = 1;
-
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = $originalSlug . '-' . $count;
-                    $count++;
-                }
-
-                $category->slug = $slug;
-            }
-        });
-    }
 
     public function company(): BelongsTo
     {
@@ -53,6 +36,14 @@ class ExtraCategory extends Model
     public function miniCategory(): BelongsTo
     {
         return $this->belongsTo(MiniCategory::class);
+    }
+       public function subCategory(): BelongsTo
+    {
+        return $this->belongsTo(SubCategory::class);
+    }
+    public function megaCategory(): BelongsTo
+    {
+        return $this->belongsTo(MegaCategory::class);
     }
 
     public function scopeActive($query)

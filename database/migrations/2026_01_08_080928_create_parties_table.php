@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->decimal('balance', 10, 2)->default(0);
             $table->string('profile')->nullable();
             $table->string('password');
-            $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
             $table->softDeletes();
         });

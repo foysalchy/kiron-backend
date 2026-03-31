@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use App\Exports\PartiesExport;
 use App\Exports\PartiesTemplateExport;
 use App\Imports\PartiesImport;
+
 class PartyService
 {
     /**
@@ -91,7 +92,17 @@ class PartyService
     }
     public function getProfileWithLog(int $id): Party
     {
-        $party = Party::with('logs.user:id,name')->find($id);
+        $party = Party::with([
+            'logs.user:id,name',
+            'orders' => fn($q) => $q->latest()->select([
+                'id',
+                'customer_id',
+                'order_no',
+                'order_date',
+                'status',
+                'grand_total',
+            ]),
+        ])->find($id);
 
         if (!$party) {
             throw ApiException::notFound('Party');
@@ -99,7 +110,28 @@ class PartyService
 
         return $party;
     }
+    public function getSupplierProfile(int $id): Party
+    {
+        $party = Party::with([
+            'logs.user:id,name',
+            'purchases' => fn($q) => $q->latest()->select([
+                'id',
+                'supplier_id',
+                'reference_no',
+                'purchase_date',
+                'status',
+                'total_quantities',
+                'payment_amount',
+                'grand_total',
+            ]),
+        ])->suppliers()->find($id);
 
+        if (!$party) {
+            throw ApiException::notFound('Supplier');
+        }
+
+        return $party;
+    }
     /**
      * Create a new party
      */

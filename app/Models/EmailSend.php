@@ -15,6 +15,7 @@ class EmailSend extends Model
     protected $fillable = [
         'company_id',
         'customer_ids',
+        'supplier_ids',
         'subject',
         'body',
         'status',
@@ -25,6 +26,7 @@ class EmailSend extends Model
      */
     protected $casts = [
         'customer_ids' => 'array',
+        'supplier_ids' => 'array',
     ];
 
     protected $hidden = ['deleted_at'];

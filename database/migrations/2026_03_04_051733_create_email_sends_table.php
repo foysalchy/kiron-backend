@@ -15,7 +15,8 @@ return new class extends Migration
         Schema::create('email_sends', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->json('customer_ids');
+            $table->json('customer_ids')->nullable();
+            $table->json('supplier_ids')->nullable();
             $table->string('subject');
             $table->longText('body');
             $table->tinyInteger('status')->default(Status::Inactive->value);

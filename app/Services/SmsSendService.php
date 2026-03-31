@@ -85,10 +85,15 @@ class SmsSendService
 
     public function getSmsSendById(int $id): SmsSend
     {
-        $smsSend = SmsSend::find($id);
+        $log = SmsSend::find($id);
+        if (!$log) throw ApiException::notFound('SMS record');
 
-        if (!$smsSend) throw ApiException::notFound('SMS record');
-        $smsSend->customers = Party::whereIn('id', $smsSend->customer_ids ?? [])->select('id', 'name')->get();
-        return $smsSend;
+        $allIds = array_merge($log->customer_ids ?? [], $log->supplier_ids ?? []);
+        $parties = Party::whereIn('id', $allIds)->select('id', 'name', 'type')->get();
+
+        $log->customers = $parties->where('type', Party::TYPE_CUSTOMER)->values();
+        $log->suppliers = $parties->where('type', Party::TYPE_SUPPLIER)->values();
+
+        return $log;
     }
 }

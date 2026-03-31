@@ -16,18 +16,37 @@ class StorePartyRequest extends BaseCompanyRequest
 
     public function rules(): array
     {
+
+        $user = $this->user();
+        $companyId = $user->isSuperAdmin()
+            ? $this->input('company_id')
+            : $user->company_id;
         return array_merge(
             $this->companyRules(),
             [
                 'type' => ['required', 'integer', Rule::in([1, 2])],
                 'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'email', 'max:255'],
-                'phone' => ['required', 'string', 'max:20'],
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('parties', 'email')
+                        ->where('company_id', $companyId)
+                        ->where('type', $this->input('type')),
+                ],
+                'phone' => [
+                    'required',
+                    'string',
+                    'max:20',
+                    Rule::unique('parties', 'phone')
+                        ->where('company_id', $companyId)
+                        ->where('type', $this->input('type')),
+                ],
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
                 'alternative_phone' => ['nullable', 'string', 'max:20'],
                 'address' => ['nullable', 'string'],
                 'balance' => ['nullable', 'numeric'],
-                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status' => ['integer'],
             ]
         );
@@ -46,7 +65,9 @@ class StorePartyRequest extends BaseCompanyRequest
                 'password.confirmed' => 'Password confirmation does not match',
                 'email.required' => 'Email is required',
                 'email.email' => 'Please provide a valid email address',
+                'email.unique' => 'This email is already taken.',
                 'phone.required' => 'Phone number is required',
+                'phone.unique' => 'This phone is already taken.',
                 'profile.image' => 'Profile must be an image file',
                 'profile.max' => 'Profile size cannot exceed 2MB',
                 'balance.numeric' => 'Balance must be a number',

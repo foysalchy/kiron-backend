@@ -130,7 +130,12 @@ class EmailSendService
     {
         $log = EmailSend::find($id);
         if (!$log) throw ApiException::notFound('Email record');
-        $log->customers = Party::whereIn('id', $log->customer_ids ?? [])->select('id', 'name')->get();
+
+        $allIds = array_merge($log->customer_ids ?? [], $log->supplier_ids ?? []);
+        $parties = Party::whereIn('id', $allIds)->select('id', 'name', 'type')->get();
+
+        $log->customers = $parties->where('type', Party::TYPE_CUSTOMER)->values();
+        $log->suppliers = $parties->where('type', Party::TYPE_SUPPLIER)->values();
 
         return $log;
     }

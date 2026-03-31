@@ -10,6 +10,7 @@ use App\Exceptions\ApiException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
 class PartyController extends Controller
 {
     public function __construct(
@@ -44,7 +45,7 @@ class PartyController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        $party = $this->partyService->getPartyById($id);
+        $party = $this->partyService->getProfileWithLog($id);
 
         return ResponseHelper::success($party, 'Party retrieved successfully');
     }
@@ -55,7 +56,11 @@ class PartyController extends Controller
         return ResponseHelper::success($party, 'Party retrieved successfully');
     }
 
-
+    public function supplierProfile(int $id): JsonResponse
+    {
+        $supplier = $this->partyService->getSupplierProfile($id);
+        return ResponseHelper::success($supplier, 'Party retrieved successfully');
+    }
     public function update(UpdatePartyRequest $request, int $id): JsonResponse
     {
         $party = $this->partyService->updateParty($id, $request->validated());

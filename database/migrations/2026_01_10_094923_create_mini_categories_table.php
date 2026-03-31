@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('mini_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-            $table->foreignId('sub_category_id')->constrained('sub_categories')->onDelete('cascade');
+            $table->foreignId('mega_category_id')->nullable()->constrained('mega_categories')->onDelete('cascade');
+            $table->foreignId('sub_category_id')->nullable()->constrained('sub_categories')->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('image')->nullable();

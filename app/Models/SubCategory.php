@@ -25,25 +25,6 @@ class SubCategory extends Model
 
     protected $hidden = ['deleted_at'];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($category) {
-            if (empty($category->slug)) {
-                $slug = Str::slug($category->name);
-                $originalSlug = $slug;
-                $count = 1;
-
-                while (static::where('slug', $slug)->exists()) {
-                    $slug = $originalSlug . '-' . $count;
-                    $count++;
-                }
-
-                $category->slug = $slug;
-            }
-        });
-    }
 
     public function company(): BelongsTo
     {
