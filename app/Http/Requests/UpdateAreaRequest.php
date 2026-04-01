@@ -5,33 +5,37 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\UpdateBaseCompanyRequest;
 
 class UpdateAreaRequest extends UpdateBaseCompanyRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
+        $areaId = $this->route('id');
+
         return array_merge(
             $this->companyRules(),
             [
                 'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
-                'name'         => ['sometimes', 'required', 'string', 'max:255'],
+                'name'         => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('areas')->where(function ($query) {
+                        return $query->where('warehouse_id', $this->warehouse_id);
+                    })->ignore($areaId),
+                ],
             ]
         );
     }
+
     public function messages(): array
     {
         return array_merge(
@@ -39,9 +43,11 @@ class UpdateAreaRequest extends UpdateBaseCompanyRequest
             [
                 'warehouse_id.exists' => 'The selected warehouse does not exist.',
                 'name.required'       => 'The name field is mandatory.',
+                'name.unique'         => 'An area with this name already exists in the selected warehouse.',
             ]
         );
     }
+
     public function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
@@ -49,7 +55,7 @@ class UpdateAreaRequest extends UpdateBaseCompanyRequest
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors'  => $validator->errors(),
-            ],422)
+            ], 422)
         );
     }
 }

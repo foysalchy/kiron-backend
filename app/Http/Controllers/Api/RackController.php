@@ -34,12 +34,10 @@ class RackController extends Controller
     {
         $data = $this->rackService->createRack($request->validated());
 
-        $token = $request->bearerToken();
 
         return ResponseHelper::success([
             'rack' => $data,
-            'token'     => $token],
-             'Rack created successfully');
+        ], 'Rack created successfully');
     }
     public function show(int $id): JsonResponse
     {

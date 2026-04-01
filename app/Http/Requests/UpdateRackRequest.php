@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\UpdateBaseCompanyRequest;
 
 class UpdateRackRequest extends UpdateBaseCompanyRequest
@@ -24,15 +25,29 @@ class UpdateRackRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
+        $rackId = $this->route('id');
+
         return array_merge(
             $this->companyRules(),
             [
-                'area_id' => ['sometimes', 'required', 'exists:areas,id'],
-                'name'    => ['sometimes', 'required', 'string', 'max:255'],
-                'status'  => ['sometimes', 'integer', 'in:0,1'],
+                'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
+                'area_id'      => ['sometimes', 'required', 'exists:areas,id'],
+                'name'         => [
+                    'sometimes',
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('racks')->where(function ($query) {
+                        return $query
+                            ->where('warehouse_id', $this->warehouse_id)
+                            ->where('area_id', $this->area_id);
+                    })->ignore($rackId),
+                ],
+                'status'       => ['sometimes', 'integer', 'in:0,1'],
             ]
         );
     }
+
     public function messages(): array
     {
         return array_merge(
@@ -40,10 +55,12 @@ class UpdateRackRequest extends UpdateBaseCompanyRequest
             [
                 'area_id.exists' => 'The selected area does not exist.',
                 'name.required'  => 'The name field is mandatory.',
+                'name.unique'    => 'A rack with this name already exists in the selected area.',
                 'status.in'      => 'Status must be 1 (Active) or 0 (Inactive).',
             ]
         );
     }
+
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(

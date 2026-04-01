@@ -23,7 +23,7 @@ class StoreProductRequest extends BaseCompanyRequest
 
                 // Basic Info
                 'title' => ['required', 'string', 'max:255'],
-                'slug' => ['nullable', 'string', 'max:255', 'unique:products,slug'],
+                'slug' => ['required', 'string', 'max:255', 'unique:products,slug'],
                 'thumbnail' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'video_link' => ['nullable', 'url'],
 
@@ -47,7 +47,7 @@ class StoreProductRequest extends BaseCompanyRequest
                 'discount' => ['nullable', 'numeric', 'min:0'],
                 'warehouse_info' => ['required_if:type,single', 'nullable', 'array'],
                 'warehouse_info.*.warehouse_id' => ['required_with:warehouse_info', 'integer', 'exists:warehouses,id'],
-                'warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:cells,id'],
+                'warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:bins,id'],
                 'warehouse_info.*.quantity' => ['required_with:warehouse_info', 'integer', 'min:0'],
 
                 // Variation Product Fields (only validated when type='variation')
@@ -72,6 +72,10 @@ class StoreProductRequest extends BaseCompanyRequest
                 'full_description' => ['nullable', 'string'],
                 // Purpose
                 'purpose' => ['required', 'string', 'max:255'],
+                'meta_title' => ['nullable', 'string', 'max:255'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable', 'array'],
+                'meta_keywords.*' => ['nullable', 'string',],
             ]
         );
     }

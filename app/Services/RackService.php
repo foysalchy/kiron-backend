@@ -18,11 +18,16 @@ class RackService
     public function getAllRacks(array $filters, bool $paginate = true)
     {
         try {
-            $query = Rack::with(['area']);
+            $query = Rack::with(['warehouse', 'area']);
 
+
+            if (!empty($filters['warehouse_id'])) {
+                $query->where('warehouse_id', $filters['warehouse_id']);
+            }
             if (!empty($filters['area_id'])) {
                 $query->where('area_id', $filters['area_id']);
             }
+
 
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
@@ -55,7 +60,7 @@ class RackService
      */
     public function getRackById(int $id): Rack
     {
-        $rack = Rack::with(['area'])->find($id);
+        $rack = Rack::with(['warehouse', 'area'])->find($id);
         if (!$rack) {
             throw ApiException::notFound('rack');
         }

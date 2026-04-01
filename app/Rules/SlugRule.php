@@ -13,14 +13,14 @@ class SlugRule
     ): array {
         $rule = Rule::unique($table, 'slug');
 
-        // 👉 company  unique
+        //  company  unique
         if ($companyId) {
             $rule->where(function ($query) use ($companyId) {
                 return $query->where('company_id', $companyId);
             });
         }
 
-        // 👉 update case ( ignore)
+        //  update case ( ignore)
         if ($ignoreId) {
             $rule->ignore($ignoreId);
         }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -46,7 +47,10 @@ return new class extends Migration
             $table->enum('discount_type', ['flat', 'percent'])->nullable();
             $table->decimal('discount', 15, 2)->default(0);
             $table->string('purpose');
-            $table->tinyInteger('status')->default(1);
+            $table->text('meta_title')->nullable();
+            $table->longText('meta_description')->nullable();
+            $table->json('meta_keywords')->nullable();
+            $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
             $table->softDeletes();
 

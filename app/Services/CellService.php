@@ -18,7 +18,15 @@ class CellService
     public function getAllCells(array $filters, bool $paginate = true)
     {
         try {
-            $query = Cell::with(['rack']);
+            $query = Cell::with(['rack', 'warehouse', 'area']);
+
+            if (!empty($filters['warehouse_id'])) {
+                $query->where('warehouse_id', $filters['warehouse_id']);
+            }
+
+            if (!empty($filters['area_id'])) {
+                $query->where('area_id', $filters['area_id']);
+            }
 
             if (!empty($filters['rack_id'])) {
                 $query->where('rack_id', $filters['rack_id']);
@@ -55,7 +63,7 @@ class CellService
      */
     public function getCellById(int $id): Cell
     {
-        $cell = Cell::with(['rack'])->find($id);
+        $cell = Cell::with(['rack', 'warehouse', 'area'])->find($id);
         if (!$cell) {
             throw ApiException::notFound('cell');
         }
@@ -70,7 +78,7 @@ class CellService
         DB::beginTransaction();
         try {
             $cell = Cell::create($data);
-            LogHelper::created('cell', $cell->id, $cell->company_id,$cell->name);
+            LogHelper::created('cell', $cell->id, $cell->company_id, $cell->name);
             DB::commit();
             Log::info('Cell created successfully', ['cell_id' => $cell->id]);
 
@@ -94,7 +102,7 @@ class CellService
 
             $cell->update($data);
 
-            LogHelper::updated('cell', $cell->id, $cell->company_id,$cell->name);
+            LogHelper::updated('cell', $cell->id, $cell->company_id, $cell->name);
             DB::commit();
             Log::info('Cell Updated Successfully', ['cell_id' => $cell->id]);
 
@@ -119,7 +127,7 @@ class CellService
 
             $cell->delete();
 
-            LogHelper::deleted('cell', $cell->id, $cell->company_id,$cell->name);
+            LogHelper::deleted('cell', $cell->id, $cell->company_id, $cell->name);
             DB::commit();
             Log::info('Cell deleted successfully', ['cell_id' => $id]);
 
@@ -144,7 +152,7 @@ class CellService
                 throw ApiException::notFound('Cell');
             }
             $cell->restore();
-            LogHelper::restored('cell', $cell->id, $cell->company_id,$cell->name);
+            LogHelper::restored('cell', $cell->id, $cell->company_id, $cell->name);
             return $cell->load(relations: ['rack']);
         } catch (ApiException $e) {
             throw $e;
@@ -164,7 +172,7 @@ class CellService
                 throw ApiException::notFound('Cell');
             }
             $cell->forceDelete();
-            LogHelper::forceDeleted('cell', $id, $cell->company_id,$cell->name);
+            LogHelper::forceDeleted('cell', $id, $cell->company_id, $cell->name);
             return true;
         } catch (ApiException $e) {
             throw $e;
@@ -192,7 +200,7 @@ class CellService
                 'status' => $newStatus->value
             ]);
 
-            LogHelper::statusChanged('cell', $cell->id, $cell->company_id,$cell->name . ' new status '.$newStatus->label());
+            LogHelper::statusChanged('cell', $cell->id, $cell->company_id, $cell->name . ' new status ' . $newStatus->label());
             Log::info('Cell status toggled', ['cell_id' => $id, 'new_status' => $newStatus->label()]);
 
             return $cell->load(['rack']);

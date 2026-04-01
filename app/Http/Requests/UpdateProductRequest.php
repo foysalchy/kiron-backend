@@ -62,7 +62,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'discount' => ['nullable', 'numeric', 'min:0'],
                 'warehouse_info' => ['required_if:type,single', 'nullable', 'array'],
                 'warehouse_info.*.warehouse_id' => ['required_with:warehouse_info', 'integer', 'exists:warehouses,id'],
-                'warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:cells,id'],
+                'warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:bins,id'],
                 'warehouse_info.*.quantity' => ['required_with:warehouse_info', 'integer', 'min:0'],
 
                 // Variation Product Fields (only validated when type='variation')
@@ -79,6 +79,12 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'variations.*.warehouse_info.*.warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
                 'variations.*.warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:bins,id'],
                 'variations.*.warehouse_info.*.quantity' => ['required', 'integer', 'min:0'],
+                // Purpose
+                'purpose' => ['sometimes', 'required', 'string', 'max:255'],
+                'meta_title' => ['nullable', 'string', 'max:255'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable', 'array'],
+                'meta_keywords.*' => ['nullable', 'string', ],
             ]
         );
     }

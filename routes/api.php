@@ -39,6 +39,7 @@ use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
+use App\Http\Controllers\Api\EditorImagesController;
 use App\Http\Controllers\Api\EmailSendController;
 use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\EmailTemplateController;
@@ -203,6 +204,10 @@ Route::prefix('v1')->group(function () {
             });
             Route::prefix('options')->group(function () {
                 Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
+                Route::get('/areas/{warehouseId}', [SelectOptionController::class, 'areaOptions']);
+                Route::get('/racks/{areaId}', [SelectOptionController::class, 'rackOptions']);
+                Route::get('/cells/{rackId}', [SelectOptionController::class, 'cellOptions']);
+                Route::get('/bins/{warehouseId}', [SelectOptionController::class, 'binOptions']);
                 Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
                 Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
                 Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
@@ -453,7 +458,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
             });
-            Route::post('/upload-image', [BlogController::class, 'uploadImage']);
+            Route::post('/upload-image', [EditorImagesController::class, 'uploadImage']);
             Route::prefix('purchases')->group(function () {
                 Route::get('/', [PurchaseController::class, 'index']);
                 Route::post('/', [PurchaseController::class, 'store']);

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('cells', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('warehouse_id')->constrained('warehouses')->cascadeOnDelete();
+            $table->foreignId('area_id')->constrained('areas')->cascadeOnDelete();
             $table->foreignId('rack_id')->constrained('racks')->cascadeOnDelete();
             $table->string('name');
             $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');

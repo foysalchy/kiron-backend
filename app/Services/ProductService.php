@@ -31,6 +31,36 @@ class ProductService
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
+            if (isset($filters['warehouse_id'])) {
+                $warehouseId = $filters['warehouse_id'];
+
+                $query->where(function ($q) use ($warehouseId) {
+
+                    // Single product
+                    $q->where(function ($sub) use ($warehouseId) {
+                        $sub->where('type', 'single')
+                            ->whereRaw("JSON_SEARCH(warehouse_info, 'one', ?) IS NOT NULL", [(string)$warehouseId]);
+                    })
+
+                        // Variation product
+                        ->orWhere(function ($sub) use ($warehouseId) {
+                            $sub->where('type', 'variation')
+                                ->whereHas('variations.stocks', function ($stockQuery) use ($warehouseId) {
+                                    $stockQuery->where('warehouse_id', $warehouseId);
+                                });
+                        });
+                });
+            }
+            if (!empty($filters['mega_category_id'])) {
+
+                $categoryIds = array_map('intval', $filters['mega_category_id']);
+
+                $query->where(function ($q) use ($categoryIds) {
+                    foreach ($categoryIds as $id) {
+                        $q->orWhereJsonContains('mega_category_ids', $id);
+                    }
+                });
+            }
 
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
@@ -51,9 +81,9 @@ class ProductService
 
             if (isset($filters['purpose'])) {
                 if ($filters['purpose'] === 'website') {
-                    $query->where('purpose_website', true);
+                    $query->where('purpose', 'website');
                 } elseif ($filters['purpose'] === 'pos') {
-                    $query->where('purpose_pos', true);
+                    $query->where('purpose', 'pos');
                 }
             }
 
@@ -444,12 +474,15 @@ class ProductService
 
             // Generate combination hash for this variation
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
-            $variationData['image'] = FileUploadHelper::uploadImage(
-                $variationData['image'],
-                'products/variation',
-                'public',
-                2048
-            );
+
+            if (!empty($variationData['image'])) {
+                $variationData['image'] = FileUploadHelper::uploadImage(
+                    $variationData['image'],
+                    'products/variation',
+                    'public',
+                    2048
+                );
+            }
             // Check if this combination already exists (by hash, not by ID)
             $existingVariation = ProductVariation::where('product_id', $product->id)
                 ->where('combination_hash', $combinationHash)
@@ -815,7 +848,7 @@ class ProductService
         DB::beginTransaction();
 
         try {
-            
+
             $product = $this->getProductById($id);
 
             $warehouseId = $data['warehouse_id'];

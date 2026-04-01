@@ -14,6 +14,7 @@ class Rack extends Model
 
     protected $fillable = [
         'company_id',
+        'warehouse_id',
         'area_id',
         'name',
         'status',
@@ -27,6 +28,10 @@ class Rack extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
     public function area(): BelongsTo
     {

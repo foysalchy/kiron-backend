@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Cell extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
+        'warehouse_id',
+        'area_id',
         'rack_id',
         'name',
         'status',
@@ -28,6 +30,14 @@ class Cell extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
     }
     public function rack(): BelongsTo
     {
@@ -43,5 +53,4 @@ class Cell extends Model
     {
         return $query->where('company_id', $companyId);
     }
-
 }

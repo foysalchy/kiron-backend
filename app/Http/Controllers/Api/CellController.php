@@ -12,11 +12,8 @@ use Illuminate\Http\Request;
 
 class CellController extends Controller
 {
-    public function __construct(protected CellService $cellService)
-    {
-
-    }
-    public function index(Request $request):JsonResponse
+    public function __construct(protected CellService $cellService) {}
+    public function index(Request $request): JsonResponse
     {
         $filters = [
             'rack_id' => $request->query('rack_id'),
@@ -27,18 +24,17 @@ class CellController extends Controller
             'per_page'   => $request->query('per_page', 15),
         ];
         $data = $this->cellService->getAllCells($filters);
-        return ResponseHelper::success($data,'Cell retrieved successfully');
+        return ResponseHelper::success($data, 'Cell retrieved successfully');
     }
     public function store(StoreCellRequest $request): JsonResponse
     {
         $data = $this->cellService->createCell($request->validated());
-
-        $token = $request->bearerToken();
-
-        return ResponseHelper::success([
-            'cell' => $data,
-            'token'     => $token],
-             'Cell created successfully');
+        return ResponseHelper::success(
+            [
+                'cell' => $data
+            ],
+            'Cell created successfully'
+        );
     }
     public function show(int $id): JsonResponse
     {

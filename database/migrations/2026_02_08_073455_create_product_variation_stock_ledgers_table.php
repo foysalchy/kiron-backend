@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->foreignId('variation_id')->constrained('product_variations')->onDelete('cascade');
             $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('cascade');
-            $table->foreignId('bin_id')->nullable()->constrained('cells')->onDelete('set null');
+            $table->foreignId('bin_id')->nullable()->constrained('bins')->onDelete('set null');
 
             $table->string('batch_number')->nullable();
             $table->json('serial_numbers')->nullable();

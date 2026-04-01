@@ -96,7 +96,7 @@ class BinService
             $data['status'] = $data['status'] ?? 1;
 
             $bin = Bin::create($data);
-            LogHelper::created('bin', $bin->id, $bin->company_id,$bin->name);
+            LogHelper::created('bin', $bin->id, $bin->company_id, $bin->name);
             DB::commit();
 
             Log::info('Bin created successfully', [
@@ -138,7 +138,7 @@ class BinService
 
             $bin->update($data);
 
-            LogHelper::updated('bin', $id, $bin->company_id,$bin->name);
+            LogHelper::updated('bin', $id, $bin->company_id, $bin->name);
             DB::commit();
 
             Log::info('Bin updated', ['bin_id' => $id]);
@@ -175,9 +175,9 @@ class BinService
             }
 
 
+            LogHelper::deleted('bin', $id, $bin->company_id, $bin->name);
             $bin->delete();
 
-            LogHelper::deleted('bin', $id, $bin->companyId,$bin->name);
             DB::commit();
 
             Log::info('Bin deleted', ['bin_id' => $id]);
@@ -215,7 +215,7 @@ class BinService
                 'status' => $getStatus->value
             ]);
 
-            LogHelper::custom('status_changed', 'bin', $id, $bin->company_id,$bin->name . 'new status' . $getStatus->label());
+            LogHelper::custom('status_changed', 'bin', $id, $bin->company_id, $bin->name . 'new status' . $getStatus->label());
             DB::commit();
 
             Log::info('Bin status changed', [

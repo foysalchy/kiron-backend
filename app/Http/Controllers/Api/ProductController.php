@@ -22,13 +22,14 @@ class ProductController extends Controller
             'status' => $request->query('status'),
             'type' => $request->query('type'),
             'stock_status' => $request->query('stock_status'),
-            'purpose' => $request->query('purpose'), // website or pos
+            'purpose' => $request->query('purpose'),
+            'warehouse_id' => $request->input('warehouse_id'),
+            'mega_category_id' => array_filter((array) $request->input('mega_category_id')),
             'search' => $request->query('search'),
             'sort_by' => $request->query('sort_by', 'created_at'),
             'sort_order' => $request->query('sort_order', 'desc'),
             'per_page' => $request->query('per_page', 15),
         ];
-
         $data = $this->productService->getAllProducts($filters, true);
 
         return ResponseHelper::success($data, 'Products retrieved successfully');
@@ -97,7 +98,7 @@ class ProductController extends Controller
      */
     public function addStock(HandleProductStockRequest $request, int $id): JsonResponse
     {
-    
+
 
         $data = $this->productService->addStockToWarehouse($id, $request->validated());
 
@@ -120,7 +121,7 @@ class ProductController extends Controller
      */
     public function adjustStock(HandleProductStockRequest $request, int $id): JsonResponse
     {
-      
+
         $data = $this->productService->adjustStock($id, $request->validated());
 
         return ResponseHelper::success($data, 'Stock adjusted successfully');

@@ -38,6 +38,9 @@ class Product extends Model
         'discount_type',
         'discount',
         'purpose',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
         'status',
     ];
 
@@ -48,6 +51,7 @@ class Product extends Model
         'extra_category_ids' => IntegerArray::class,
         'warehouse_info' => 'array',
         'sku_codes' => 'array',
+        'meta_keywords' => 'array',
         'stock_quantity' => 'integer',
         'regular_price' => 'decimal:2',
         'discount' => 'decimal:2',
@@ -55,27 +59,7 @@ class Product extends Model
 
     protected $hidden = ['deleted_at'];
 
-    protected static function boot()
-    {
-        parent::boot();
 
-        static::creating(function ($product) {
-            if (empty($product->slug)) {
-                $product->slug = Str::slug($product->title);
-
-                // Ensure unique slug
-                $count = 1;
-                $originalSlug = $product->slug;
-                while (static::where('slug', $product->slug)->exists()) {
-                    $product->slug = $originalSlug . '-' . $count;
-                    $count++;
-                }
-            }
-            if (empty($product->available_stock)) {
-                $product->available_stock = $product->stock_quantity ?? 0;
-            }
-        });
-    }
 
     // Relationships
     public function company(): BelongsTo

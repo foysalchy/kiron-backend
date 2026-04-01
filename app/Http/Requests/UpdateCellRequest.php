@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use App\Http\Requests\UpdateBaseCompanyRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateCellRequest extends UpdateBaseCompanyRequest
 {
@@ -27,8 +28,20 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
+                'warehouse_id' => ['sometimes', 'required', 'exists:warehouses,id'],
+                'area_id' => ['sometimes', 'required', 'exists:areas,id'],
                 'rack_id' => ['sometimes', 'required', 'exists:racks,id'],
-                'name'    => ['sometimes', 'required', 'string', 'max:255'],
+                'name'         => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('cells')->where(function ($query) {
+                        return $query
+                            ->where('warehouse_id', $this->warehouse_id)
+                            ->where('area_id', $this->area_id)
+                            ->where('rack_id', $this->rack_id);
+                    })->ignore($this->route('id')),
+                ],
                 'status'  => ['sometimes', 'required', 'integer', 'in:0,1'],
             ]
         );
@@ -39,6 +52,8 @@ class UpdateCellRequest extends UpdateBaseCompanyRequest
             $this->companyMessages(),
             [
                 'rack_id.exists' => 'The selected rack does not exist.',
+                'name.required'   => 'The cell name is mandatory.',
+                'name.unique'     => 'A cell with this name already exists in the selected rack.',
                 'status.in'      => 'Status must be 1 for Active or 0 for Inactive.',
             ]
         );

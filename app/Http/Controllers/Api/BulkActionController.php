@@ -15,6 +15,11 @@ class BulkActionController extends Controller
         'sub-categories' => \App\Models\SubCategory::class,
         'mini-categories' => \App\Models\MiniCategory::class,
         'extra-categories' => \App\Models\ExtraCategory::class,
+        'warehouses' => \App\Models\Warehouse::class,
+        'areas' => \App\Models\Area::class,
+        'cells' => \App\Models\Cell::class,
+        'racks' => \App\Models\Rack::class,
+        'bins' => \App\Models\Bin::class,
     ];
 
     private function resolveModel(string $resource): string

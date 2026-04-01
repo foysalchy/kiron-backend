@@ -4,15 +4,19 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccountGroup;
+use App\Models\Area;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AttributeGroup;
+use App\Models\Bin;
+use App\Models\Cell;
 use App\Models\ChartOfAccount;
 use App\Models\DisposalType;
 use App\Models\MegaCategory;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Rack;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -24,6 +28,35 @@ class SelectOptionController extends Controller
     public function warehouseOptions()
     {
         return Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
+    }
+    public function areaOptions($warehouseId)
+    {
+        return Area::where('warehouse_id', $warehouseId)
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+
+    public function rackOptions($areaId)
+    {
+        return Rack::where('area_id', $areaId)
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+    public function cellOptions($rackId)
+    {
+        return Cell::where('rack_id', $rackId)
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+    public function binOptions($warehouseId)
+    {
+        return Bin::where('warehouse_id', $warehouseId)
+            ->select('id', 'name', 'bin_code')
+            ->orderBy('name', 'asc')
+            ->get();
     }
     public function supplierOptions()
     {
