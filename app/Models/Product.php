@@ -82,7 +82,10 @@ class Product extends Model
     }
 
 
-
+    public function barcode()
+    {
+        return $this->morphOne(Barcode::class, 'barcodeable');
+    }
 
     // Scopes
     public function scopeActive($query)

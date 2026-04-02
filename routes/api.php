@@ -410,6 +410,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('/{id}/stock/adjust', [ProductController::class, 'adjustStock']);
                 Route::get('/{id}/stock/history', [ProductController::class, 'stockHistory']);
                 Route::get('/{id}/stock/warehouse', [ProductController::class, 'warehouseStock']);
+                Route::post('/{id}/generate-barcode', [ProductController::class, 'generateBarcodes']);
+                Route::post('/bulk/generate-barcodes', [ProductController::class, 'bulkGenerateBarcodes']);
+
             });
 
             // Page Routes

@@ -7,6 +7,9 @@ use App\Http\Requests\{HandleProductStockRequest, StoreProductRequest, UpdatePro
 use App\Services\ProductService;
 use App\Exceptions\ApiException;
 use App\Helpers\ResponseHelper;
+use App\Models\Barcode;
+use App\Models\Product;
+use App\Models\ProductVariation;
 use Illuminate\Http\{JsonResponse, Request};
 
 class ProductController extends Controller
@@ -157,5 +160,111 @@ class ProductController extends Controller
         $data = $this->productService->getCurrentStockByWarehouse($id, $request->warehouse_id);
 
         return ResponseHelper::success($data, 'Warehouse stock retrieved successfully');
+    }
+
+    public function generateBarcodes($productId)
+    {
+        $product = Product::with('variations')->findOrFail($productId);
+
+        $barcodes = [];
+
+        if ($product->variations->count() > 0) {
+
+            foreach ($product->variations as $variation) {
+
+                if ($variation->barcode) {
+                    $barcodes[] = $variation->barcode;
+                    continue;
+                }
+
+                $code = $variation->sku;
+
+                if (!$code) {
+                    do {
+                        $code = mt_rand(1000000000, 9999999999);
+                    } while (
+                        Barcode::where('code', $code)->exists()
+                    );
+                }
+
+                $barcode = $variation->barcode()->create([
+
+                    'code' => $code
+                ]);
+
+                $barcodes[] = $barcode;
+            }
+        } else {
+            // 👉 Case 2: simple product
+
+            if (!$product->barcode) {
+                $code = $product->sku_code;
+
+                if (!$code) {
+                    do {
+                        $code = mt_rand(1000000000, 9999999999);
+                    } while (Barcode::where('code', $code)->exists());
+                }
+
+                $barcode = $product->barcode()->create([
+                    'code' => $code
+                ]);
+
+                $barcodes[] = $barcode;
+            } else {
+                $barcodes[] = $product->barcode;
+            }
+        }
+
+        return response()->json($barcodes);
+    }
+
+    public function bulkGenerateBarcodes(Request $request)
+    {
+        $productIds = $request->input('product_ids', []);
+        $products = Product::with('variations', 'barcode', 'variations.barcode')
+            ->whereIn('id', $productIds)
+            ->get();
+
+        $generated = 0;
+        $skipped = 0;
+
+        foreach ($products as $product) {
+            if ($product->variations->count() > 0) {
+                foreach ($product->variations as $variation) {
+                    if ($variation->barcode) {
+                        $skipped++;
+                        continue;
+                    }
+                    $code = $variation->sku;
+                    if (!$code) {
+                        do {
+                            $code = mt_rand(1000000000, 9999999999);
+                        } while (Barcode::where('code', $code)->exists());
+                    }
+                    $variation->barcode()->create(['code' => $code]);
+                    $generated++;
+                }
+            } else {
+                if ($product->barcode) {
+                    $skipped++;
+                    continue;
+                }
+                $code = $product->sku_code;
+                if (!$code) {
+                    do {
+                        $code = mt_rand(1000000000, 9999999999);
+                    } while (Barcode::where('code', $code)->exists());
+                }
+                $product->barcode()->create(['code' => $code]);
+                $generated++;
+            }
+        }
+
+        return response()->json([
+            'generated' => $generated,
+            'skipped'   => $skipped,
+            'message'   => "{$generated} barcode(s) generated, {$skipped} skipped.",
+        ]);
     }
 }

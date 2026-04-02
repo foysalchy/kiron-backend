@@ -55,7 +55,10 @@ class ProductVariation extends Model
     {
         return $this->hasMany(ProductVariationStock::class);
     }
-
+    public function barcode()
+    {
+        return $this->morphOne(Barcode::class, 'barcodeable');
+    }
     /**
      * Calculate final price after discount
      */

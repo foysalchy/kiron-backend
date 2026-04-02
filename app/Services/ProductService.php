@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger};
+use App\Models\{Bin, Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger, Warehouse};
 use App\Exceptions\ApiException;
 use App\Helpers\{FileUploadHelper, LogHelper};
 use Illuminate\Database\Eloquent\Collection;
@@ -21,12 +21,18 @@ class ProductService
             $query = Product::with([
                 'brand',
                 'galleries',
+                'barcode',
                 'variations' => function ($query) {
                     $query->orderBy('regular_price', 'asc');
                 },
+                'variations.barcode',
                 'variations.attributes.attributeGroup',
                 'variations.attributes.attributeValue',
                 'variations.stocks.warehouse',
+                'variations.stocks.warehouse',
+                'variations.stocks.bin.area',
+                'variations.stocks.bin.rack',
+                'variations.stocks.bin.cell',
             ]);
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
@@ -100,13 +106,59 @@ class ProductService
 
             if ($paginate) {
                 $result = $query->paginate($filters['per_page'] ?? 15);
-                Product::loadCategoriesForCollection($result->getCollection());
-                return $result;
+                $items = $result->getCollection();
             } else {
                 $result = $query->get();
-                Product::loadCategoriesForCollection($result);
-                return $result;
+                $items = $result;
             }
+
+            Product::loadCategoriesForCollection($items);
+
+            // ==========================================
+            // Single Product 
+            // ==========================================
+            $warehouseIds = [];
+            $binIds = [];
+
+         
+            foreach ($items as $item) {
+                if ($item->type === 'single' && is_array($item->warehouse_info)) {
+                    foreach ($item->warehouse_info as $info) {
+                        if (!empty($info['warehouse_id'])) $warehouseIds[] = $info['warehouse_id'];
+                        if (!empty($info['bin_id'])) $binIds[] = $info['bin_id'];
+                    }
+                }
+            }
+
+            $warehouses = Warehouse::whereIn('id', array_unique($warehouseIds))->pluck('name', 'id');
+            $bins = Bin::with(['area', 'rack', 'cell'])->whereIn('id', array_unique($binIds))->get()->keyBy('id');
+
+
+            foreach ($items as $item) {
+                if ($item->type === 'single' && is_array($item->warehouse_info)) {
+                    $parsedInfo = array_map(function ($info) use ($warehouses, $bins) {
+                        $info['warehouse_name'] = $warehouses[$info['warehouse_id'] ?? null] ?? 'Unknown Warehouse';
+
+                        if (!empty($info['bin_id']) && isset($bins[$info['bin_id']])) {
+                            $bin = $bins[$info['bin_id']];
+                            $info['bin_details'] = [
+                                'name' => $bin->name ?? '',
+                                'area' => $bin->area->name ?? '',
+                                'rack' => $bin->rack->name ?? '',
+                                'cell' => $bin->cell->name ?? '',
+                            ];
+                        } else {
+                            $info['bin_details'] = null; 
+                        }
+                        return $info;
+                    }, $item->warehouse_info);
+
+            
+                    $item->setAttribute('parsed_warehouse_info', $parsedInfo);
+                }
+            }
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error fetching products: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch products');
@@ -493,7 +545,7 @@ class ProductService
                 // UPDATE existing variation
                 $existingVariation->update([
                     'sku' => $variationData['sku'] ?? null,
-                    'image' => $variationData['image'] ?? null,
+                    'image' => $variationData['image'] ?? $existingVariation->image,
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,

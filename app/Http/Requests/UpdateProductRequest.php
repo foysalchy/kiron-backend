@@ -49,7 +49,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Product Type
                 'type' => ['sometimes', 'required', Rule::in(['single', 'variation'])],
-                'sku_code' => ['nullable'],
+
 
 
                 // Stock
@@ -70,7 +70,6 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'variations.*.attributes' => ['required_with:variations', 'array', 'min:1'],
                 'variations.*.attributes.*.attribute_group_id' => ['required', 'exists:attribute_groups,id'],
                 'variations.*.attributes.*.attribute_value_id' => ['required', 'exists:attribute_values,id'],
-                'variations.*.sku' => ['nullable', 'string', 'max:255'],
                 'variations.*.image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'variations.*.regular_price' => ['required', 'numeric', 'min:0'],
                 'variations.*.discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
@@ -84,7 +83,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
                 'meta_keywords' => ['nullable', 'array'],
-                'meta_keywords.*' => ['nullable', 'string', ],
+                'meta_keywords.*' => ['nullable', 'string',],
             ]
         );
     }
