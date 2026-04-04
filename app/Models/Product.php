@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\IntegerArray;
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -86,11 +87,17 @@ class Product extends Model
     {
         return $this->morphOne(Barcode::class, 'barcodeable');
     }
+    // app/Models/Product.php ফাইলে যোগ করুন
+
+    public function orderDetails(): HasMany
+    {
+        return $this->hasMany(OrderDetail::class);
+    }
 
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 1);
+        return $query->where('status', Status::Active->value);
     }
 
     public function scopeByCompany($query, int $companyId)
@@ -125,7 +132,7 @@ class Product extends Model
         return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
     }
 
-    public function getSalePriceAttribute(): float
+    public function getSalePriceAttribute()
     {
         if (!$this->discount || $this->discount <= 0) {
             return $this->regular_price;

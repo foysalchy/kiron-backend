@@ -14,6 +14,7 @@ class DomainSetup extends Model
         'company_id',
         'custom_domain',
         'sub_domain',
+        'template_name',
         'status',
     ];
     /**

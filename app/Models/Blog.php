@@ -29,6 +29,7 @@ class Blog extends Model
     ];
     protected $casts = [
         'images' => 'array',
+        'meta_keywords' => 'array',
     ];
 
 

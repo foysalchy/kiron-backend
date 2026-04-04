@@ -1,433 +1,135 @@
 @extends('template1.layouts.front')
 
 @section('content')
+    <!-- 1. Hero & Search -->
     <section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 py-16 md:py-24">
         <div class="container mx-auto px-4 text-center text-white">
             <h1 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">আমাদের ব্লগ</h1>
             <p class="text-lg md:text-xl mb-8 opacity-90">ফ্যাশন, স্টাইল এবং শপিংয়ের সর্বশেষ তথ্য ও টিপস</p>
 
-            <div class="max-w-2xl mx-auto relative">
+            <form action="{{ url()->current() }}" method="GET" class="max-w-2xl mx-auto relative">
+                @if(request('tag')) <input type="hidden" name="tag" value="{{ request('tag') }}"> @endif
                 <span class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400">
                     <i class="fas fa-search"></i>
                 </span>
-                <input type="text" placeholder="ব্লগ খুঁজুন..."
-                    class="w-full pl-12 pr-6 py-2 rounded-lg text-gray-800 bg-white shadow-2xl outline-none focus:ring-2 focus:ring-white/50 transition-all">
-            </div>
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="ব্লগ খুঁজুন..."
+                    class="w-full pl-12 pr-6 py-4 rounded-xl text-gray-800 bg-white shadow-2xl outline-none focus:ring-4 focus:ring-white/20 transition-all">
+            </form>
         </div>
     </section>
 
     <!-- 2. Category Tabs -->
-    <section class="container mx-auto py-6">
+    <section class="container mx-auto py-8 px-4">
         <div class="flex flex-wrap justify-center gap-3">
-            <button class="px-6 py-2 rounded-md bg-[#1D2128] text-white text-sm">সব</button>
-            <button
-                class="px-6 py-2 rounded-md bg-white border border-gray-200 text-gray-700 text-sm hover:border-gray-400 transition-all">ফ্যাশন</button>
-            <button
-                class="px-6 py-2 rounded-md bg-white border border-gray-200 text-gray-700 text-sm hover:border-gray-400 transition-all">শপিং
-                গাইড</button>
-            <button
-                class="px-6 py-2 rounded-md bg-white border border-gray-200 text-gray-700 text-sm hover:border-gray-400 transition-all">যত্ন
-                ও রক্ষণাবেক্ষণ</button>
-            <button
-                class="px-6 py-2 rounded-md bg-white border border-gray-200 text-gray-700 text-sm hover:border-gray-400 transition-all">বিশেষ
-                অনুষ্ঠান</button>
-            <button
-                class="px-6 py-2 rounded-md bg-white border border-gray-200 text-gray-700 text-sm hover:border-gray-400 transition-all">স্টাইল
-                টিপস</button>
+            @php
+                $currentTag = request('tag');
+                $tags = ['ফ্যাশন', 'শপিং গাইড', 'যত্ন ও রক্ষণাবেক্ষণ', 'বিশেষ অনুষ্ঠান', 'স্টাইল টিপস'];
+            @endphp
+
+            <a href="{{ url()->current() }}"
+               class="px-6 py-2 rounded-md text-sm font-bold transition-all {{ empty($currentTag) ? 'bg-[#1D2128] text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400' }}">
+               সব
+            </a>
+
+            @foreach($tags as $tag)
+                <a href="{{ url()->current() . '?tag=' . $tag }}"
+                   class="px-6 py-2 rounded-md text-sm font-bold transition-all {{ $currentTag == $tag ? 'bg-[#1D2128] text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400' }}">
+                   {{ $tag }}
+                </a>
+            @endforeach
         </div>
     </section>
 
     <!-- 3. Blog Grid -->
-    <section class="container mx-auto py-6">
+    <section class="container mx-auto py-6 px-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            <!-- Blog Card Template (Repeat this for other cards) -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <!-- Thumbnail Placeholder -->
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center overflow-hidden">
-                    <!-- Circular Icon Pattern background like image -->
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center">
-                            <div class="w-48 h-48 border border-gray-400 rounded-full flex items-center justify-center">
-                                <div class="w-32 h-32 border border-gray-400 rounded-full"></div>
+            @forelse($blogs as $blog)
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+
+                    <!-- Image / Placeholder Area (Matching 2nd Image) -->
+                    <div class="relative h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
+                        @if($blog->thumbnail_url)
+                            <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        @else
+                            <!-- The Circular Pattern Background from your 2nd image -->
+                            <div class="absolute inset-0 opacity-10 flex items-center justify-center">
+                                <div class="w-64 h-64 border border-gray-300 rounded-full flex items-center justify-center">
+                                    <div class="w-48 h-48 border border-gray-300 rounded-full flex items-center justify-center">
+                                        <div class="w-32 h-32 border border-gray-300 rounded-full"></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <!-- Badge -->
-                    <span
-                        class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm">ফ্যাশন</span>
-                </div>
+                            <i class="fa-regular fa-image text-gray-300 text-5xl relative z-10"></i>
+                        @endif
 
-                <!-- Card Content -->
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">
-                        ফ্যাশন ট্রেন্ড ২০২৪: এই বছরের সেরা স্টাইল
-                    </h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">
-                        এই বছরের সবচেয়ে জনপ্রিয় ফ্যাশন ট্রেন্ড এবং স্টাইল টিপস যা আপনাকে আকর্ষণীয় করে তুলবে।
-                    </p>
-
-                    <!-- Meta Info -->
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user text-xs"></i> সারা খান</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar text-xs"></i>
-                                ২০২৪-০১-১৫</span>
-                        </div>
-                        <span class="text-blue-600">৫ মিনিট</span>
-                    </div>
-
-                    <!-- Tags -->
-                    <div class="flex flex-wrap gap-2 mb-6 font-semibold text-gray-700">
-                        <span class="bg-gray-100  text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg> ট্রেন্ড
-                        </span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg> স্টাইল
-                        </span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg> ফ্যাশন
+                        <!-- Category Badge -->
+                        @php
+                            $badgeText = is_array($blog->meta_keywords) ? ($blog->meta_keywords[0] ?? 'ব্লগ') : ($blog->meta_keywords ?? 'ব্লগ');
+                        @endphp
+                        <span class="absolute top-4 left-4 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-20">
+                            {{ $badgeText }}
                         </span>
                     </div>
 
-                    <!-- Button -->
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">
-                        বিস্তারিত পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i>
-                    </a>
-                </div>
-            </div>
+                    <!-- Card Content -->
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            {{ $blog->title }}
+                        </h3>
+                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">
+                            {{ $blog->short ?? \Illuminate\Support\Str::limit(strip_tags($blog->body), 100) }}
+                        </p>
 
-            <!-- Blog Card 2 -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center"></div>
-                    </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <span class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">শপিং
-                        গাইড</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">অনলাইন শপিংয়ের সেরা টিপস</h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">নিরাপদ এবং স্মার্ট অনলাইন শপিংয়ের জন্য প্রয়োজনীয় টিপস
-                        এবং কৌশল।</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> রহিম উদ্দিন</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ২০২৪-০১-১০</span>
+                        <!-- Metadata (Author, Date, Read Time) -->
+                        <div class="flex items-center justify-between text-[13px] text-gray-400 mb-5 font-medium border-b border-gray-50 pb-4">
+                            <div class="flex items-center gap-4">
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-xs"></i> এডমিন</span>
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-xs"></i> {{ $blog->created_at->format('Y-m-d') }}</span>
+                            </div>
+                            <span class="text-blue-600 font-semibold">
+                                {{ round(str_word_count(strip_tags($blog->body)) / 200) + 1 }} মিনিট
+                            </span>
                         </div>
-                        <span class="text-blue-600">৭ মিনিট</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-6 font-semibold text-gray-700">
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg> অনলাইন শপিং</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg> টিপস</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            নিরাপত্তা</span>
 
-                    </div>
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">বিস্তারিত
-                        পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i></a>
-                </div>
-            </div>
+                        <!-- Tags Section with Tag Icon -->
+                        <div class="flex flex-wrap gap-3 mb-6">
+                            @php
+                                $keywords = is_array($blog->meta_keywords) ? $blog->meta_keywords : explode(',', $blog->meta_keywords);
+                            @endphp
+                            @if(!empty($keywords))
+                                @foreach(array_slice($keywords, 0, 3) as $keyword)
+                                    @if(trim($keyword))
+                                    <span class="text-[12px] text-gray-500 flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
+                                        <i class="fa-solid fa-tag text-[10px] text-gray-300"></i> {{ trim($keyword) }}
+                                    </span>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </div>
 
-            <!-- Blog Card 3 -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center"></div>
+                        <!-- Read More Button -->
+                        <a href="{{ url('blog/' . $blog->slug) }}"
+                            class="block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all duration-300 text-sm">
+                            বিস্তারিত পড়ুন <i class="fas fa-arrow-right ml-2 text-[10px]"></i>
+                        </a>
                     </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <span
-                        class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">যত্ন
-                        ও রক্ষণাবেক্ষণ</span>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">গ্রীষ্মকালীন পোশাকের যত্ন</h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">গরমের দিনে পোশাকের যত্ন নেওয়ার সহজ উপায় এবং কার্যকর
-                        পদ্ধতি।</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> ফাতেমা আক্তার</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ২০২৪-০১-০৫</span>
-                        </div>
-                        <span class="text-blue-600">৪ মিনিট</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-6 text-gray-700 font-semibold">
-                        <span class="bg-gray-100  text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            পোশাক</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            যত্ন</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            গ্রীষ্মকাল</span>
-                    </div>
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">বিস্তারিত
-                        পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i></a>
+            @empty
+                <div class="col-span-full text-center py-20 bg-white rounded-2xl border border-dashed">
+                    <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" class="w-24 h-24 mx-auto opacity-10 mb-4">
+                    <h2 class="text-xl font-bold text-gray-400">এই ক্যাটাগরিতে কোনো ব্লগ পাওয়া যায়নি।</h2>
                 </div>
-            </div>
-            <!-- Blog Card 4 -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center"></div>
-                    </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <span
-                        class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">বিশেষ
-                        অনুষ্ঠান</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">বিয়ের পোশাক নির্বাচনের গাইড</h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">বিয়ের জন্য নিখুঁত পোশাক নির্বাচনের সম্পূর্ণ গাইড
-                        এবং পরামর্শ।</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> নাসির আহমেদ</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ২০২৩-১২-২৮</span>
-                        </div>
-                        <span class="text-blue-600">৮ মিনিট</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-6 text-gray-700 font-semibold">
-                        <span class="bg-gray-100  text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            বিয়ে</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            পোশাক</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            গাইড</span>
-                    </div>
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">বিস্তারিত
-                        পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i></a>
-                </div>
-            </div>
-            <!-- Blog Card 5 -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center"></div>
-                    </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <span
-                        class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">ফ্যাশন</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">শীতকালীন ফ্যাশন এসেনশিয়ালস</h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">শীতের জন্য অপরিহার্য পোশাক এবং এক্সেসরিজ যা আপনার
-                        ওয়ারড্রোবে থাকা উচিত।</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> তানিয়া রহমান</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ২০২৩-১২-২০</span>
-                        </div>
-                        <span class="text-blue-600">৬ মিনিট</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-6 text-gray-700 font-semibold">
-                        <span class="bg-gray-100  text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            শীত</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            ফ্যাশন</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            এসেনশিয়ালস</span>
-                    </div>
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">বিস্তারিত
-                        পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i></a>
-                </div>
-            </div>
-            <!-- Blog Card 6 -->
-            <div
-                class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div class="relative bg-gray-100 h-60 flex items-center justify-center">
-                    <div class="absolute inset-0 opacity-10 flex items-center justify-center">
-                        <div class="w-64 h-64 border border-gray-400 rounded-full flex items-center justify-center"></div>
-                    </div>
-                    <i class="fa-regular fa-image text-gray-300 text-4xl relative z-10"></i>
-                    <span
-                        class="absolute top-4 left-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">স্টাইল
-                        টিপস</span>
-                </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3 leading-snug">কালার কম্বিনেশনের শিল্প</h3>
-                    <p class="text-gray-500 text-sm mb-5 line-clamp-2">পোশাকে রঙের সমন্বয় করার শিল্প এবং আকর্ষণীয় লুক
-                        তৈরির কৌশল।</p>
-                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 pb-4">
-                        <div class="flex items-center gap-4">
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-user"></i> আলিয়া খান</span>
-                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ২০২৩-১২-১৫</span>
-                        </div>
-                        <span class="text-blue-600">৫ মিনিট</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mb-6 text-gray-700 font-semibold">
-                        <span class="bg-gray-100  text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            রঙ</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            কম্বিনেশন</span>
-                        <span class="bg-gray-100 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1">
-                                <path
-                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                </path>
-                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                            </svg>
-                            স্টাইল</span>
-                    </div>
-                    <a href="#"
-                        class="block w-full text-center bg-[#1D2128] hover:bg-black text-white font-bold py-3 rounded-md transition-colors text-sm">বিস্তারিত
-                        পড়ুন <i class="fas fa-arrow-right ml-2 text-[11px]"></i></a>
-                </div>
-            </div>
+            @endforelse
 
         </div>
 
-        <!-- Load More Button -->
-        <div class="mt-16 text-center">
-            <button
-                class="px-10 py-3 bg-white border border-gray-200 text-gray-800 font-bold rounded-md shadow-xs hover:bg-gray-50 transition-all text-sm">
-                আরো ব্লগ লোড করুন
-            </button>
+        <!-- Pagination (Designed to match the "Show Results" bar) -->
+        <div class="mt-12 flex flex-col items-center gap-4">
+            <p class="text-sm text-gray-500">Showing {{ $blogs->firstItem() }} to {{ $blogs->lastItem() }} of {{ $blogs->total() }} results</p>
+            <div class="flex justify-center">
+                {{ $blogs->links() }}
+            </div>
         </div>
     </section>
 @endsection
