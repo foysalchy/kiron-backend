@@ -117,7 +117,7 @@
 
                         <!-- Actions -->
                         <div class="space-y-4">
-                            <a href="./checkout.html"
+                            <a href="{{url('/checkout')}}"
                                 class="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-md ">
                                 চেকআউট করুন
                             </a>

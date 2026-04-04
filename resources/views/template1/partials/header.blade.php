@@ -22,7 +22,7 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-8">
 
         <!-- Logo -->
-        <a href="{{ url('/home') }}" class="flex items-center gap-3 flex-shrink-0">
+        <a href="{{ url('/') }}" class="flex items-center gap-3 flex-shrink-0">
             <div class="bg-[#FF6A00] w-10 h-12 flex items-center justify-center rounded-lg shadow-sm">
                 <span class="text-white text-2xl font-bold">O</span>
             </div>
@@ -85,11 +85,22 @@
                 </div>
             </div>
 
-            <!-- Cart -->
+            {{-- <!-- Cart -->
             <a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors">
                 <i class="fa-solid fa-cart-shopping text-xl"></i>
                 <span class="hidden lg:block font-semibold text-sm">Cart</span>
-            </a>
+            </a> --}}
+            <!-- Cart -->
+<a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
+    <div class="relative">
+        <i class="fa-solid fa-cart-shopping text-xl"></i>
+        <!-- Count Badge -->
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+            0
+        </span>
+    </div>
+    <span class="hidden lg:block font-semibold text-sm">Cart</span>
+</a>
 
             <!-- Mobile Menu Toggle -->
             <button class="lg:hidden text-2xl">
@@ -113,7 +124,10 @@
         </div>
     </div>
 </header>
+
+@push('scripts')
 <script>
+    // account dropdown
     function toggleAccount() {
         const dropdown = document.getElementById('account-dropdown');
         dropdown.classList.toggle('hidden');
@@ -125,4 +139,72 @@
             dropdown.classList.add('hidden');
         }
     });
+    // --- Cart Logic ---
+
+    // 1. Initialize cart from LocalStorage (persists across page refreshes)
+    let cart = JSON.parse(localStorage.getItem('orenmart_cart')) || [];
+
+    // 2. Function to update the badge in the UI
+    function updateCartDisplay() {
+        const countElements = document.querySelectorAll('#cart-count');
+        countElements.forEach(el => {
+            el.innerText = cart.length;
+            // Hide badge if cart is empty (optional)
+            el.style.display = cart.length > 0 ? 'flex' : 'none';
+        });
+    }
+
+    // 3. The Add to Cart function
+    function addToCart(productId) {
+        // Add item to our array
+        cart.push(productId);
+
+        // Save to localStorage
+        localStorage.setItem('orenmart_cart', JSON.stringify(cart));
+
+        // Update the UI
+        updateCartDisplay();
+
+        // Optional: Show a mini-notification instead of a big alert
+        console.log("Product " + productId + " added to cart.");
+
+        // If you want to redirect to cart page after adding (optional):
+        // window.location.href = "{{ url('/carts') }}";
+    }
+
+    // --- Filter Toggle Logic ---
+    function toggleAllFilters() {
+        const panel = document.getElementById('all-filters-panel');
+        const arrow = document.getElementById('all-filters-arrow');
+        const isHidden = panel.classList.contains('hidden');
+
+        if (isHidden) {
+            panel.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            panel.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // --- Account Dropdown Logic ---
+    function toggleAccount() {
+        const dropdown = document.getElementById('account-dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    // Run on Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+        updateCartDisplay();
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('account-menu');
+            const dropdown = document.getElementById('account-dropdown');
+            if (menu && !menu.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+    });
 </script>
+@endpush
