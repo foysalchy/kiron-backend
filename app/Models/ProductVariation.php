@@ -55,6 +55,10 @@ class ProductVariation extends Model
     {
         return $this->hasMany(ProductVariationStock::class);
     }
+    public function galleries(): HasMany
+    {
+        return $this->hasMany(VariationGallery::class, 'variation_id');
+    }
     public function barcode()
     {
         return $this->morphOne(Barcode::class, 'barcodeable');

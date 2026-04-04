@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Bin, Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger, Warehouse};
+use App\Models\{Bin, Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger, VariationGallery, Warehouse};
 use App\Exceptions\ApiException;
 use App\Helpers\{FileUploadHelper, LogHelper};
 use Illuminate\Database\Eloquent\Collection;
@@ -33,7 +33,9 @@ class ProductService
                 'variations.stocks.bin.area',
                 'variations.stocks.bin.rack',
                 'variations.stocks.bin.cell',
+
             ]);
+
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);
             }
@@ -120,7 +122,7 @@ class ProductService
             $warehouseIds = [];
             $binIds = [];
 
-         
+
             foreach ($items as $item) {
                 if ($item->type === 'single' && is_array($item->warehouse_info)) {
                     foreach ($item->warehouse_info as $info) {
@@ -148,12 +150,12 @@ class ProductService
                                 'cell' => $bin->cell->name ?? '',
                             ];
                         } else {
-                            $info['bin_details'] = null; 
+                            $info['bin_details'] = null;
                         }
                         return $info;
                     }, $item->warehouse_info);
 
-            
+
                     $item->setAttribute('parsed_warehouse_info', $parsedInfo);
                 }
             }
@@ -176,7 +178,7 @@ class ProductService
             'galleries',
             'variations.attributes.attributeValue.attributeGroup',
             'variations.stocks.warehouse',
-
+            'variations.galleries',
 
         ])->find($id);
 
@@ -339,13 +341,18 @@ class ProductService
         foreach ($variations as $variationData) {
             $attributes = $variationData['attributes'] ?? [];
             $warehouseInfo = $variationData['warehouse_info'] ?? [];
+            $galleryImages = $variationData['gallery_images'] ?? [];
+            unset($variationData['gallery_images']);
 
-            $variationData['image'] = FileUploadHelper::uploadImage(
-                $variationData['image'],
-                'products/variation',
-                'public',
-                2048
-            );
+            if (!empty($variationData['image'])) {
+                $variationData['image'] = FileUploadHelper::uploadImage(
+                    $variationData['image'],
+                    'products/variation',
+                    'public',
+                    2048
+                );
+            }
+
             // Calculate stock for this variation
             $variationStock = collect($warehouseInfo)->sum('quantity');
             $totalStock += $variationStock;
@@ -366,7 +373,9 @@ class ProductService
                 'stock_status' => $variationStock > 0 ? 'in_stock' : 'out_of_stock',
                 'combination_hash' => $combinationHash,
             ]);
-
+            if (!empty($galleryImages)) {
+                $this->createVariationGalleries($variation->id, $galleryImages);
+            }
             // Create variation attributes
             foreach ($attributes as $attribute) {
                 ProductVariationAttribute::create([
@@ -512,9 +521,9 @@ class ProductService
      */
     private function updateVariationProduct(Product $product, array $data): void
     {
-        // Get existing variations with their attributes
+        // Get existing variations with their attributes and galleries
         $existingVariations = $product->variations()
-            ->with('attributes')
+            ->with(['attributes', 'galleries']) // ✅ Eager load galleries here
             ->get()
             ->keyBy('id');
 
@@ -523,6 +532,10 @@ class ProductService
 
         foreach ($newVariations as $variationData) {
             $attributes = $variationData['attributes'] ?? [];
+
+            // ✅ Extract gallery data
+            $galleryImages = $variationData['gallery_images'] ?? [];
+            $deleteGalleryIds = $variationData['deleted_gallery_ids'] ?? [];
 
             // Generate combination hash for this variation
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
@@ -561,6 +574,17 @@ class ProductService
                         $existingVariation,
                         $variationData['warehouse_info']
                     );
+                }
+
+                // ✅ 1. Delete requested existing galleries
+                if (!empty($deleteGalleryIds)) {
+                    $this->deleteVariationGalleries($deleteGalleryIds);
+                }
+
+
+                // ✅ 2. Add new galleries for existing variation
+                if (!empty($galleryImages)) {
+                    $this->createVariationGalleries($existingVariation->id, $galleryImages);
                 }
 
                 $processedVariationIds[] = $existingVariation->id;
@@ -602,6 +626,11 @@ class ProductService
                     );
                 }
 
+                // ✅ 3. Create galleries for the new variation
+                if (!empty($galleryImages)) {
+                    $this->createVariationGalleries($newVariation->id, $galleryImages);
+                }
+
                 $processedVariationIds[] = $newVariation->id;
 
                 Log::info('New variation created', [
@@ -641,7 +670,10 @@ class ProductService
                 }
             }
 
+
+
             // Delete related records
+            $variation->galleries()->delete(); // ✅ Delete galleries from database
             $variation->attributes()->delete();
             $variation->stocks()->delete();
             $variation->delete();
@@ -870,6 +902,22 @@ class ProductService
             ]);
         }
     }
+    private function createVariationGalleries(int $variationId, array $images, array $titles = []): void
+    {
+        foreach ($images as $index => $image) {
+            $imagePath = FileUploadHelper::uploadImage(
+                $image,
+                'products/galleries',
+                'public',
+                2048
+            );
+
+            VariationGallery::create([
+                'variation_id' => $variationId,
+                'image' => $imagePath
+            ]);
+        }
+    }
 
     /**
      * Delete galleries by IDs
@@ -877,6 +925,15 @@ class ProductService
     private function deleteGalleries(array $galleryIds): void
     {
         $galleries = Gallery::whereIn('id', $galleryIds)->get();
+
+        foreach ($galleries as $gallery) {
+            FileUploadHelper::delete($gallery->image);
+            $gallery->delete();
+        }
+    }
+    private function deleteVariationGalleries(array $galleryIds): void
+    {
+        $galleries = VariationGallery::whereIn('id', $galleryIds)->get();
 
         foreach ($galleries as $gallery) {
             FileUploadHelper::delete($gallery->image);

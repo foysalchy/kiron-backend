@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Models\PayRollPayHead;
 use App\Models\PayHead;
 use App\Exceptions\ApiException;
@@ -19,6 +20,14 @@ class PayRollPayHeadService
     {
         try {
             $query = PayRollPayHead::query()->with('payRoll', 'payHead');
+ // Filter by Status
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
+            }
 
             if (!empty($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");

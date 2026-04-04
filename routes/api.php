@@ -412,7 +412,6 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}/stock/warehouse', [ProductController::class, 'warehouseStock']);
                 Route::post('/{id}/generate-barcode', [ProductController::class, 'generateBarcodes']);
                 Route::post('/bulk/generate-barcodes', [ProductController::class, 'bulkGenerateBarcodes']);
-
             });
 
             // Page Routes
@@ -1376,7 +1375,9 @@ Route::prefix('v1')->group(function () {
             });
             Route::prefix('bulk')->group(function () {
                 Route::patch('{resource}/status', [BulkActionController::class, 'updateStatus']);
-                Route::delete('{resource}', [BulkActionController::class, 'bulkDelete']);
+                Route::delete('{resource}/delete', [BulkActionController::class, 'bulkDelete']);
+                Route::delete('{resource}/force-delete', [BulkActionController::class, 'bulkForceDelete']);
+                Route::patch('{resource}/restore',      [BulkActionController::class, 'bulkRestore']);
             });
         });
     });

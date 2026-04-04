@@ -64,15 +64,17 @@ class StoreProductRequest extends BaseCompanyRequest
                 'variations.*.attributes'                        => ['required_with:variations', 'array', 'min:1'],
                 'variations.*.attributes.*.attribute_group_id'  => ['required', 'exists:attribute_groups,id'],
                 'variations.*.attributes.*.attribute_value_id'  => ['required', 'exists:attribute_values,id'],
-                'variations.*.sku'                               => [
-                    'nullable',
-                    'string',
-                    'max:255',
-                    Rule::unique('product_variations', 'sku')->where(function ($query) use ($companyId) {
-                        return $query->where('company_id', $companyId);
-                    }),
-                ],
+                // 'variations.*.sku'                               => [
+                //     'nullable',
+                //     'string',
+                //     'max:255',
+                //     Rule::unique('product_variations', 'sku')->where(function ($query) use ($companyId) {
+                //         return $query->where('company_id', $companyId);
+                //     }),
+                // ],
                 'variations.*.image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'variations.*.gallery_images' => ['nullable', 'array'],
+                'variations.*.gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'variations.*.regular_price'  => ['required', 'numeric', 'min:0'],
                 'variations.*.discount_type'  => ['nullable', Rule::in(['flat', 'percent'])],
                 'variations.*.discount'       => ['nullable', 'numeric', 'min:0'],
