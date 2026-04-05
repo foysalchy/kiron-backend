@@ -67,7 +67,7 @@
                         @php
                             $badgeText = is_array($blog->meta_keywords) ? ($blog->meta_keywords[0] ?? 'ব্লগ') : ($blog->meta_keywords ?? 'ব্লগ');
                         @endphp
-                        <span class="absolute top-4 left-4 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-20">
+                        <span class="absolute top-4 left-4 bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md z-20">
                             {{ $badgeText }}
                         </span>
                     </div>
@@ -77,17 +77,17 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
                             {{ $blog->title }}
                         </h3>
-                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">
+                        <p class="text-gray-700 text-sm mb-6 line-clamp-2">
                             {{ $blog->short ?? \Illuminate\Support\Str::limit(strip_tags($blog->body), 100) }}
                         </p>
 
                         <!-- Metadata (Author, Date, Read Time) -->
-                        <div class="flex items-center justify-between text-[13px] text-gray-400 mb-5 font-medium border-b border-gray-50 pb-4">
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-5 font-medium border-b border-gray-50 pb-4">
                             <div class="flex items-center gap-4">
-                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-xs"></i> এডমিন</span>
-                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-xs"></i> {{ $blog->created_at->format('Y-m-d') }}</span>
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-sm"></i> এডমিন</span>
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-sm"></i> {{ $blog->created_at->format('Y-m-d') }}</span>
                             </div>
-                            <span class="text-blue-600 font-semibold">
+                            <span class="text-blue-600 font-medium">
                                 {{ round(str_word_count(strip_tags($blog->body)) / 200) + 1 }} মিনিট
                             </span>
                         </div>
@@ -100,8 +100,9 @@
                             @if(!empty($keywords))
                                 @foreach(array_slice($keywords, 0, 3) as $keyword)
                                     @if(trim($keyword))
-                                    <span class="text-[12px] text-gray-500 flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
-                                        <i class="fa-solid fa-tag text-[10px] text-gray-300"></i> {{ trim($keyword) }}
+                                    <span class="text-sm text-gray-700 flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>
+                                         {{ trim($keyword) }}
                                     </span>
                                     @endif
                                 @endforeach
