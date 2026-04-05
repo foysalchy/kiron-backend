@@ -22,43 +22,49 @@
             <div class="lg:col-span-2 bg-white rounded-lg border border-gray-200 shadow-xs p-6 ">
                 <h2 class="text-lg md:text-2xl font-black text-gray-900 mb-8">আমাদের কাছে বার্তা পাঠান</h2>
 
-                <form class="space-y-6">
+                @if(session('success'))
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form action="{{ route('contact.send') }}" method="POST" class="space-y-6">
+                    @csrf 
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">নাম *</label>
-                            <input type="text" placeholder="আপনার নাম লিখুন" required
-                                class="w-full h-10 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#FF6A00] outline-none transition-all">
+                            <input type="text" name="name" value="{{ old('name') }}" placeholder="আপনার নাম লিখুন" required
+                                class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">ইমেইল *</label>
-                            <input type="email" placeholder="আপনার ইমেইল লিখুন" required
-                                class="w-full h-10 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#FF6A00] outline-none transition-all">
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="আপনার ইমেইল লিখুন" required
+                                class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">ফোন নম্বর *</label>
-                            <input type="tel" placeholder="আপনার ফোন নম্বর" required
-                                class="w-full h-10 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#FF6A00] outline-none transition-all">
+                            <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="আপনার ফোন নম্বর" required
+                                class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">বিষয়</label>
-                            <input type="text" placeholder="বার্তার বিষয়"
-                                class="w-full h-10 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#FF6A00] outline-none transition-all">
+                            <input type="text" name="subject" value="{{ old('subject') }}" placeholder="বার্তার বিষয়"
+                                class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">বার্তা *</label>
-                        <textarea placeholder="আপনার বার্তা লিখুন..." rows="5" required
-                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#FF6A00] outline-none transition-all"></textarea>
+                        <textarea name="message" placeholder="আপনার বার্তা লিখুন..." rows="5" required
+                            class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">{{ old('message') }}</textarea>
                     </div>
 
-                    <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white text-sm font-black py-3 rounded-lg shadow-lg shadow-orange-100 flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-                        <i class="fas fa-paper-plane"></i>
-                        বার্তা পাঠান
+                    <button type="submit" class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-lg transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i> বার্তা পাঠান
                     </button>
                 </form>
             </div>
@@ -83,12 +89,12 @@
                             </div>
                             <div>
                                 <p class="text-gray-900">ফোন</p>
-                                <p class="text-gray-700">+৮৮০ ১৭১২-৩৪৫৬৭৮</p>
-                                <p class="text-gray-700">+৮৮০ ১৯১২-৩৪৫৬১৯</p>
+                                <p class="text-gray-700">{{ $setup->phone }}</p>
+                                <p class="text-gray-700">{{ $setup->alt_phone }}</p>
                             </div>
                         </div>
 
-                        <div class="h-[1px] bg-gray-50"></div>
+                        <div class="h-[1px] bg-gray-200"></div>
 
                         <!-- ইমেইল -->
                         <div class="flex items-start gap-4">
@@ -102,12 +108,11 @@
                             </div>
                             <div>
                                 <p class="text-gray-900">ইমেইল</p>
-                                <p class="text-gray-700">info@yourstore.com</p>
-                                <p class="text-gray-700">support@yourstore.com</p>
+                                <p class="text-gray-700">{{ $setup->email }}</p>
                             </div>
                         </div>
 
-                        <div class="h-[1px] bg-gray-50"></div>
+                        <div class="h-[1px] bg-gray-200"></div>
 
                         <!-- ঠিকানা -->
                         <div class="flex items-start gap-4">
@@ -123,8 +128,7 @@
                             </div>
                             <div>
                                 <p class=" text-gray-900">ঠিকানা</p>
-                                <p class="text-gray-700">১২৩, গুলশান এভিনিউ <br>
-                                    গুলশান-২, ঢাকা-১২১২ <br> বাংলাদেশ</p>
+                                <p class="text-gray-700">{!! nl2br(e($setup->store_address)) ?? 'ঠিকানা পাওয়া যায়নি' !!}</p>
                             </div>
                         </div>
                         <!-- ঠিকানা -->

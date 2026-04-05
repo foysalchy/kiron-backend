@@ -18,25 +18,39 @@
         </div>
     </section>
 
-    <!-- 2. Category Tabs -->
     <section class="container mx-auto py-8 px-4">
-        <div class="flex flex-wrap justify-center gap-3">
-            @php
-                $currentTag = request('tag');
-                $tags = ['ফ্যাশন', 'শপিং গাইড', 'যত্ন ও রক্ষণাবেক্ষণ', 'বিশেষ অনুষ্ঠান', 'স্টাইল টিপস'];
-            @endphp
+        <div class="max-w-5xl mx-auto relative">
 
-            <a href="{{ url()->current() }}"
-               class="px-6 py-2 rounded-md text-sm font-bold transition-all {{ empty($currentTag) ? 'bg-[#1D2128] text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400' }}">
-               সব
-            </a>
+            <!-- Left Fade -->
+            <div class="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+            <div class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
 
-            @foreach($tags as $tag)
-                <a href="{{ url()->current() . '?tag=' . $tag }}"
-                   class="px-6 py-2 rounded-md text-sm font-bold transition-all {{ $currentTag == $tag ? 'bg-[#1D2128] text-white shadow-lg' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-400' }}">
-                   {{ $tag }}
+            @php $currentTag = request('tag'); @endphp
+
+            <div id="tag-scroll" class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-4"
+                style="flex-wrap: nowrap;">
+
+                {{-- সব বাটন --}}
+                <a href="{{ url()->current() }}"
+                class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
+                {{ empty($currentTag)
+                        ? 'bg-[#1D2128] text-white border-[#1D2128] shadow-md'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
+                সব
                 </a>
-            @endforeach
+
+                {{-- Dynamic Tags --}}
+                @foreach($availableTags as $tag)
+                    <a href="{{ url()->current() . '?tag=' . urlencode($tag) }}"
+                    class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
+                    {{ $currentTag == $tag
+                            ? 'bg-[#1D2128] text-white border-[#1D2128] shadow-md'
+                            : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
+                    {{ $tag }}
+                    </a>
+                @endforeach
+
+            </div>
         </div>
     </section>
 
@@ -45,9 +59,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
             @forelse($blogs as $blog)
-                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+                <div class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
 
-                    <!-- Image / Placeholder Area (Matching 2nd Image) -->
                     <div class="relative h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
                         @if($blog->thumbnail_url)
                             <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
@@ -67,7 +80,7 @@
                         @php
                             $badgeText = is_array($blog->meta_keywords) ? ($blog->meta_keywords[0] ?? 'ব্লগ') : ($blog->meta_keywords ?? 'ব্লগ');
                         @endphp
-                        <span class="absolute top-4 left-4 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md z-20">
+                        <span class="absolute top-4 left-4 bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md z-20">
                             {{ $badgeText }}
                         </span>
                     </div>
@@ -77,18 +90,18 @@
                         <h3 class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
                             {{ $blog->title }}
                         </h3>
-                        <p class="text-gray-500 text-sm mb-6 line-clamp-2">
+                        <p class="text-gray-700 text-sm mb-6 line-clamp-2">
                             {{ $blog->short ?? \Illuminate\Support\Str::limit(strip_tags($blog->body), 100) }}
                         </p>
 
                         <!-- Metadata (Author, Date, Read Time) -->
-                        <div class="flex items-center justify-between text-[13px] text-gray-400 mb-5 font-medium border-b border-gray-50 pb-4">
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-5 font-medium pb-4">
                             <div class="flex items-center gap-4">
-                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-xs"></i> এডমিন</span>
-                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-xs"></i> {{ $blog->created_at->format('Y-m-d') }}</span>
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-sm"></i>  {{ $blog->user->name ?? 'অ্যাডমিন' }} </span>
+                                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-sm"></i> {{ $blog->created_at->format('Y-m-d') }}</span>
                             </div>
-                            <span class="text-blue-600 font-semibold">
-                                {{ round(str_word_count(strip_tags($blog->body)) / 200) + 1 }} মিনিট
+                            <span class="text-blue-600 font-bold">
+                                {{ $blog->reading_time }} মিনিট
                             </span>
                         </div>
 
@@ -100,8 +113,9 @@
                             @if(!empty($keywords))
                                 @foreach(array_slice($keywords, 0, 3) as $keyword)
                                     @if(trim($keyword))
-                                    <span class="text-[12px] text-gray-500 flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
-                                        <i class="fa-solid fa-tag text-[10px] text-gray-300"></i> {{ trim($keyword) }}
+                                    <span class="text-xs text-gray-700 font-semibold flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tag h-3 w-3 mr-1"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>
+                                         {{ trim($keyword) }}
                                     </span>
                                     @endif
                                 @endforeach
@@ -109,14 +123,14 @@
                         </div>
 
                         <!-- Read More Button -->
-                        <a href="{{ url('blog/' . $blog->slug) }}"
-                            class="block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition-all duration-300 text-sm">
-                            বিস্তারিত পড়ুন <i class="fas fa-arrow-right ml-2 text-[10px]"></i>
+                        <a href="{{ route('blog.details', ['slug' => $blog->slug]) }}"
+                            class="block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300 text-sm">
+                            বিস্তারিত পড়ুন <i class="fas fa-arrow-right ml-2 text-xs"></i>
                         </a>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full text-center py-20 bg-white rounded-2xl border border-dashed">
+                <div class="col-span-full text-center py-20 bg-white rounded-lg border border-dashed">
                     <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" class="w-24 h-24 mx-auto opacity-10 mb-4">
                     <h2 class="text-xl font-bold text-gray-400">এই ক্যাটাগরিতে কোনো ব্লগ পাওয়া যায়নি।</h2>
                 </div>
@@ -133,3 +147,5 @@
         </div>
     </section>
 @endsection
+
+

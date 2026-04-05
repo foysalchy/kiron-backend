@@ -61,27 +61,30 @@
                 <!-- Column 1: Brand Info -->
                 <div>
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="bg-[#FF6A00] w-10 h-10 flex items-center justify-center rounded-lg">
-                            <span class="text-white text-xl font-semibold">O</span>
-                        </div>
-                        <span class="text-xl font-bold tracking-tight">OrenMart</span>
+                        @if($setup && $setup->logo)
+                            <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-10 w-auto object-contain">
+                        @else
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg">
+                                <span class="text-white text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
+                            </div>
+                        @endif
+                        <span class="text-xl font-bold tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
                     </div>
-                    <p class="text-gray-400 text-[16px] leading-relaxed mb-6">
-                        Your trusted partner for automotive accessories and car care products. Quality products at
-                        affordable prices.
+                       <p class="text-gray-400 text-[16px] leading-relaxed mb-6">
+                        {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
                     </p>
-                    <ul class="space-y-3 text-[16px]">
-                        <li class="flex items-start gap-3 text-gray-400">
-                            <i class="fas fa-map-marker-alt text-[#FF6A00] mt-1"></i>
-                            <span>123 Main Street, Dhaka, Bangladesh</span>
+                    <ul class="space-y-3 text-md">
+                        <li class="flex items-start gap-3 text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin h-4 w-4 text-orange-500"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>{{ $setup->corporate_address ?? 'Dhaka, Bangladesh' }}</span>
                         </li>
-                        <li class="flex items-center gap-3 text-gray-400">
-                            <i class="fas fa-phone-alt text-[#FF6A00]"></i>
-                            <span>+880 1234-567890</span>
+                        <li class="flex items-center gap-3 text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone h-4 w-4 text-orange-500"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            {{ $setup->phone }}
                         </li>
-                        <li class="flex items-center gap-3 text-gray-400">
-                            <i class="fas fa-envelope text-[#FF6A00]"></i>
-                            <span>support@orenmart.com</span>
+                        <li class="flex items-center gap-3 text-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail h-4 w-4 text-orange-500"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                            {{ $setup->email }}
                         </li>
                     </ul>
                 </div>
@@ -89,7 +92,7 @@
                 <!-- Column 2: Quick Links -->
                 <div>
                     <h4 class="text-lg font-bold mb-6">Quick Links</h4>
-                    <ul class="space-y-3 text-[16px]">
+                    <ul class="space-y-3 text-md">
                         <li><a href="{{ url('/about') }}"
                                 class="text-gray-400 hover:text-[#FF6A00] transition-colors">About Us</a></li>
                         <li><a href="{{ url('/contact') }}"
@@ -108,7 +111,7 @@
                 <!-- Column 3: Categories -->
                 <div>
                     <h4 class="text-lg font-bold mb-6">Categories</h4>
-                    <ul class="space-y-3 text-[16px]">
+                    <ul class="space-y-3 text-md">
                         <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Car
                                 Interior</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Car
@@ -127,7 +130,7 @@
                 <!-- Column 4: Newsletter -->
                 <div>
                     <h4 class="text-lg font-bold mb-6">Newsletter</h4>
-                    <p class="text-gray-400 text-[16px] mb-6">Subscribe to get updates on new products and exclusive
+                    <p class="text-gray-400 text-md mb-6">Subscribe to get updates on new products and exclusive
                         offers.</p>
                     <div class="flex mb-6">
                         <input type="email" placeholder="Enter your email"
@@ -155,7 +158,7 @@
         <div class="border-t border-gray-800 py-6">
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex flex-wrap justify-center gap-6 text-[14px] text-gray-400">
-                    <p>© 2024 OrenMart. All rights reserved.</p>
+                    <p>© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
                     <a href="{{ url('/privacy') }}" class="hover:text-white">Privacy Policy</a>
                     <a href="{{ url('/terms') }}" class="hover:text-white">Terms of Service</a>
                 </div>

@@ -5,10 +5,12 @@
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center gap-6">
                 <span class="flex items-center gap-2">
-                    <i class="fas fa-phone-alt text-xs"></i> +1 (555) 123-4567
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone h-4 w-4"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    {{ $setup->phone }}
                 </span>
                 <span class="flex items-center gap-2">
-                    <i class="fas fa-envelope text-xs"></i> support@orenmart.com
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail h-4 w-4"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                     {{ $setup->email }}
                 </span>
             </div>
             <div class="flex items-center gap-6">
@@ -23,10 +25,16 @@
 
         <!-- Logo -->
         <a href="{{ url('/') }}" class="flex items-center gap-3 flex-shrink-0">
-            <div class="bg-[#FF6A00] w-10 h-12 flex items-center justify-center rounded-lg shadow-sm">
-                <span class="text-white text-2xl font-bold">O</span>
-            </div>
-            <span class="text-2xl font-extrabold text-[#1D2128] tracking-tight">OrenMart</span>
+           @if($setup && $setup->logo)
+                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-12 w-auto object-contain">
+            @else
+                <div class="bg-[#FF6A00] w-10 h-12 flex items-center justify-center rounded-lg shadow-sm">
+                    <span class="text-white text-2xl font-bold">
+                        {{ substr($setup->shop_name ?? 'O', 0, 1) }}
+                    </span>
+                </div>
+            @endif
+            <span class="text-2xl font-extrabold text-[#1D2128] tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
         </a>
 
         <!-- Search Bar -->
@@ -85,22 +93,17 @@
                 </div>
             </div>
 
-            {{-- <!-- Cart -->
-            <a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors">
-                <i class="fa-solid fa-cart-shopping text-xl"></i>
-                <span class="hidden lg:block font-semibold text-sm">Cart</span>
-            </a> --}}
             <!-- Cart -->
-<a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
-    <div class="relative">
-        <i class="fa-solid fa-cart-shopping text-xl"></i>
-        <!-- Count Badge -->
-        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-            0
-        </span>
-    </div>
-    <span class="hidden lg:block font-semibold text-sm">Cart</span>
-</a>
+            <a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
+                <div class="relative">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <!-- Count Badge -->
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                        0
+                    </span>
+                </div>
+                <span class="hidden lg:block font-semibold text-sm">Cart</span>
+            </a>
 
             <!-- Mobile Menu Toggle -->
             <button class="lg:hidden text-2xl">
@@ -113,14 +116,14 @@
     <div class="border-t border-gray-100 hidden md:block">
         <div class="container mx-auto px-4 flex items-center space-x-8 py-3">
 
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/car-interior">Car Interior</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/car-exterior">Car Exterior</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/electronics">Electronics</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Oil & Care</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Performance</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Safety</a>
+            @foreach($headerCategories as $cat)
+                <a class="text-sm font-medium hover:text-[#FF6A00]"
+                href="{{ url('/category/' . $cat->slug) }}">
+                {{ $cat->name }}
+                </a>
+            @endforeach
             <a class="text-sm font-medium hover:text-[#FF6A00]" href="{{ url('/brands') }}">Brands</a>
-            <a class="text-sm font-medium text-red-500 hover:text-red-600" href="/flash-sale">Flash Sale</a>
+        <a class="text-sm font-medium text-red-500 hover:text-red-600" href="{{ url('/flash-sale') }}">Flash Sale</a>
         </div>
     </div>
 </header>

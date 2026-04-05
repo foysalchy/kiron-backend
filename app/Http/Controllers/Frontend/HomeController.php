@@ -12,28 +12,29 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $setup    = getCurrentCompany();
-        $template = $setup->template_name;
+        $company  = getCurrentCompany();
+        $template = $company->template_name;
 
         $categories = MegaCategory::with('subCategories')
-        ->where('company_id', $setup->id)
-        ->get();
+            ->where('company_id', $company->company_id ?? $company->id)
+            ->get();
 
         $newArrivals = Product::with(['brand'])
-        ->active()
-        ->latest()
-        ->take(10)
-        ->get();
+            ->active()
+            ->latest()
+            ->take(10)
+            ->get();
+
         $brands = Brand::active()->latest()->take(10)->get();
 
         $popularProducts = Product::with(['brand','variations'])
-        ->active()
-        ->withSum('orderDetails as total_sales', 'quantity')
-        ->orderByDesc('total_sales')
-        ->take(12)
-        ->get();
+            ->active()
+            ->withSum('orderDetails as total_sales', 'quantity')
+            ->orderByDesc('total_sales')
+            ->take(12)
+            ->get();
 
-        return view($template . '.frontend.home', compact('setup','categories','newArrivals','brands','popularProducts'));
+        return view($template . '.frontend.home', compact('categories','newArrivals','brands','popularProducts'));
     }
     public function about()
     {
