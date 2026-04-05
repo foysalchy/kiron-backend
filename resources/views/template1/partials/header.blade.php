@@ -93,22 +93,17 @@
                 </div>
             </div>
 
-            {{-- <!-- Cart -->
-            <a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors">
-                <i class="fa-solid fa-cart-shopping text-xl"></i>
-                <span class="hidden lg:block font-semibold text-sm">Cart</span>
-            </a> --}}
             <!-- Cart -->
-<a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
-    <div class="relative">
-        <i class="fa-solid fa-cart-shopping text-xl"></i>
-        <!-- Count Badge -->
-        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-            0
-        </span>
-    </div>
-    <span class="hidden lg:block font-semibold text-sm">Cart</span>
-</a>
+            <a href="{{ url('/carts') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
+                <div class="relative">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <!-- Count Badge -->
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                        0
+                    </span>
+                </div>
+                <span class="hidden lg:block font-semibold text-sm">Cart</span>
+            </a>
 
             <!-- Mobile Menu Toggle -->
             <button class="lg:hidden text-2xl">
@@ -121,14 +116,14 @@
     <div class="border-t border-gray-100 hidden md:block">
         <div class="container mx-auto px-4 flex items-center space-x-8 py-3">
 
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/car-interior">Car Interior</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/car-exterior">Car Exterior</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/electronics">Electronics</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Oil & Care</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Performance</a>
-            <a class="text-sm font-medium hover:text-[#FF6A00]" href="/category/oil-care">Safety</a>
+            @foreach($headerCategories as $cat)
+                <a class="text-sm font-medium hover:text-[#FF6A00]"
+                href="{{ url('/category/' . $cat->slug) }}">
+                {{ $cat->name }}
+                </a>
+            @endforeach
             <a class="text-sm font-medium hover:text-[#FF6A00]" href="{{ url('/brands') }}">Brands</a>
-            <a class="text-sm font-medium text-red-500 hover:text-red-600" href="/flash-sale">Flash Sale</a>
+        <a class="text-sm font-medium text-red-500 hover:text-red-600" href="{{ url('/flash-sale') }}">Flash Sale</a>
         </div>
     </div>
 </header>

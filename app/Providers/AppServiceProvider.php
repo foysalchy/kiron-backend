@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\MegaCategory;
 use App\Models\SiteSetting;
 use App\Services\AccountGroupService;
 use App\Services\AreaService;
@@ -224,6 +225,14 @@ class AppServiceProvider extends ServiceProvider
             if ($currentStore) {
                 $setup = SiteSetting::where('company_id', $currentStore->company_id)->first();
                 View::share('setup', $setup);
+
+                $headerCategories = MegaCategory::where('company_id', $currentStore->company_id ?? $currentStore->id)
+                ->where('status', 1)
+                ->latest()
+                ->take(5)
+                ->get();
+
+                View::share('headerCategories', $headerCategories);
             }
         }
     }

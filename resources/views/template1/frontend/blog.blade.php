@@ -61,7 +61,6 @@
             @forelse($blogs as $blog)
                 <div class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
 
-                    <!-- Image / Placeholder Area (Matching 2nd Image) -->
                     <div class="relative h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
                         @if($blog->thumbnail_url)
                             <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">

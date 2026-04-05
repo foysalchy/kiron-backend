@@ -28,19 +28,17 @@
                         @php
                             $keywords = is_array($blog->meta_keywords) ? $blog->meta_keywords : explode(',', $blog->meta_keywords);
                         @endphp
-                        <div class="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                        <div class="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
                             {{ $keywords[0] ?? 'ব্লগ' }}
                         </div>
                     </div>
 
                     <div class="p-6 md:p-10">
 
-                        <!-- Title: ডাইনামিক -->
                         <h1 class="text-2xl md:text-3xl font-black text-gray-900 mb-6 leading-tight">
                             {{ $blog->title }}
                         </h1>
 
-                        <!-- Meta: ডাইনামিক -->
                         <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8 pb-6">
                             <div class="flex items-center gap-2">
                                 <i class="fa-regular fa-user text-blue-500"></i>
@@ -55,7 +53,6 @@
                             </span>
                         </div>
 
-                        <!-- Tags: ডাইনামিক -->
                         <div class="flex flex-wrap gap-2 mb-8">
                             @foreach($keywords as $tag)
                                 @if(trim($tag))
@@ -173,15 +170,13 @@
                 </div>
             </div>
 
-            <!-- ডান: সাইডবার -->
             <div class="space-y-8">
 
-                <!-- সম্পর্কিত পোস্ট: ডাইনামিক -->
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs">
                     <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">সম্পর্কিত পোস্ট</h3>
                     <div class="space-y-5">
                        @foreach($relatedPosts as $rp)
-                        <a href="{{ route('blog.details', ['store' => request()->route('store'), 'slug' => $rp->slug]) }}" class="flex gap-4 group">
+                        <a href="{{ route('blog.details', ['slug' => $rp->slug]) }}" class="flex gap-4 group">
                             <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                                 @if(!empty($rp->images) && isset($rp->images[0]))
                                     <img src="{{ asset('storage/' . $rp->images[0]) }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
@@ -200,7 +195,6 @@
                     </div>
                 </div>
 
-                <!-- নিউজলেটার: ডিজাইন ঠিক রাখা হয়েছে -->
                 <div class="rounded-lg border border-gray-200 p-8 shadow-xs text-gray-600">
                     <h3 class="text-lg font-black mb-4">নিউজলেটার সাবস্ক্রাইব করুন</h3>
                     <p class="text-gray-600 text-sm mb-6 leading-relaxed">সর্বশেষ ফ্যাশন ট্রেন্ড এবং টিপস পেতে আমাদের নিউজলেটার সাবস্ক্রাইব করুন।</p>
@@ -212,7 +206,6 @@
                     </div>
                 </div>
 
-                <!-- জনপ্রিয় ট্যাগ: ডাইনামিক -->
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs">
                     <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">জনপ্রিয় ট্যাগ</h3>
                     <div class="flex flex-wrap gap-2">

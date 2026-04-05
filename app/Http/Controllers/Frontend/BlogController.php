@@ -46,7 +46,6 @@ class BlogController extends Controller
         $company = getCurrentCompany();
         $template = $company->template_name;
 
-        // স্লাগ থেকে স্পেস এবং ড্যাশ উভয় ভার্সন তৈরি করা
         $slugWithDash = str_replace(['%20', ' '], '-', $slug);
         $slugWithSpace = str_replace(['%20', '-'], ' ', $slug);
 
@@ -56,17 +55,16 @@ class BlogController extends Controller
                     ->orWhere('slug', $slugWithDash)
                     ->orWhere('slug', $slugWithSpace);
             })
-            ->where('company_id', $company->company_id ?? $company->id) // এই সাবডোমেনের ব্লগ কি না চেক
+            ->where('company_id', $company->company_id ?? $company->id)
             ->active()
             ->firstOrFail();
 
-        // সম্পর্কিত পোস্ট (একই কোম্পানির হতে হবে)
         $relatedPosts = Blog::active()
             ->where('company_id', $company->company_id ?? $company->id)
             ->where('id', '!=', $blog->id)
             ->latest()->take(3)->get();
 
-        // পপুলার ট্যাগ (একই কোম্পানির হতে হবে)
+
         $popularTags = Blog::active()
             ->where('company_id', $company->company_id ?? $company->id)
             ->whereNotNull('meta_keywords')

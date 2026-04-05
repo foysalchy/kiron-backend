@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Frontend\BlogController;
+use App\Http\Controllers\Frontend\ContctController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\SupportController;
+use App\Http\Controllers\Frontend\TermController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +14,13 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/blogs', [BlogController::class, 'index']);
     Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
+
+    Route::get('/contact', [ContctController::class, 'index'])->name('contact.index');
+    Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
+
+    Route::get('/support', [SupportController::class, 'index'])->name('support.index');
+    Route::get('/terms', [TermController::class, 'index'])->name('term.index');
+    Route::get('/privacy', [TermController::class, 'privacy'])->name('privacy.index');
 
     Route::get('/about', function () {
         return view('template1.frontend.about');
@@ -28,18 +38,13 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/checkout', function () {
         return view('template1.frontend.checkout');
     });
-    Route::get('/contact', function () {
-        return view('template1.frontend.contact');
-    });
     Route::get('/invoice', function () {
         return view('template1.frontend.invoice');
     });
     Route::get('/order-details', function () {
         return view('template1.frontend.order-details');
     });
-    Route::get('/privacy', function () {
-        return view('template1.frontend.privacy');
-    });
+
     Route::get('/product-details', function () {
         return view('template1.frontend.product-details');
     });
@@ -49,12 +54,8 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/shop', function () {
         return view('template1.frontend.shop');
     });
-    Route::get('/support', function () {
-        return view('template1.frontend.support');
-    });
-    Route::get('/terms', function () {
-        return view('template1.frontend.terms');
-    });
+
+
     Route::get('/wishlist', function () {
         return view('template1.frontend.wishlist');
     });

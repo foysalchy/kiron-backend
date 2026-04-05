@@ -144,9 +144,9 @@
                 <p class="text-gray-600 text-md leading-relaxed mb-5">If you have any questions about this Privacy Policy or
                     our data practices, please contact us:</p>
                 <div class="space-y-2.5 text-md text-gray-700">
-                    <p><span class="font-bold">Email:</span> privacy@orenmart.com</p>
-                    <p><span class="font-bold">Phone:</span> +880 1234-567890</p>
-                    <p><span class="font-bold">Address:</span> 123 Commerce Street, Dhaka, Bangladesh</p>
+                    <p><span class="font-bold">Email:</span> {{$setup->email ?? ''}}</p>
+                    <p><span class="font-bold">Phone:</span>{{ $setup->phone ?? 'নম্বর পাওয়া যায়নি' }}</p>
+                    <p><span class="font-bold">Address:</span> {{ $setup->corporate_address ?? '' }}</p>
                 </div>
             </div>
 

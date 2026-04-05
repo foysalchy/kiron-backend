@@ -45,7 +45,7 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2">ফোন সাপোর্ট</h3>
-                <p class="text-md text-gray-600 mb-2">+৮৮০ ১৭১২-৩৪৫৬৭৮</p>
+                <p class="text-md text-gray-600 mb-2">{{ $setup->phone ?? 'নম্বর পাওয়া যায়নি' }}</p>
                 <span
                     class="inline-flex items-center rounded-full px-4 py-1.5 text-xs font-bold bg-green-100 text-green-700 uppercase tracking-wider">
                     ২৪/৭ উপলব্ধ
@@ -84,7 +84,7 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-bold text-gray-900 mb-2">ইমেইল সাপোর্ট</h3>
-                <p class="text-md text-gray-600 mb-2">support@yourstore.com</p>
+                <p class="text-md text-gray-600 mb-2">{{ $setup->email ?? 'ইমেইল পাওয়া যায়নি' }}</p>
                 <span
                     class="inline-flex items-center rounded-full px-4 py-1.5 text-xs font-bold bg-orange-100 text-[#FF6A00] uppercase tracking-wider">
                     ২৪ ঘণ্টায় উত্তর
@@ -342,7 +342,7 @@
                 <!-- Left Column: Phone Support -->
                 <div class="space-y-1">
                     <h4 class="font-bold text-orange-700 mb-2">ফোন সাপোর্ট:</h4>
-                    <div class="text-orange-700 text-[15px] space-y-1">
+                    <div class="text-orange-700 text-md space-y-1">
                         <p>রবি - বৃহস্পতি: ৯:00 - ২১:00</p>
                         <p>শুক্রবার: ১৪:00 - ২১:00</p>
                         <p>শনিবার: ৯:00 - ২১:00</p>
@@ -353,13 +353,13 @@
                 <div class="space-y-5">
                     <div class="space-y-1">
                         <h4 class="font-bold text-orange-700 mb-2">লাইভ চ্যাট:</h4>
-                        <div class="text-orange-700 text-[15px] space-y-1">
+                        <div class="text-orange-700 text-md space-y-1">
                             <p>সপ্তাহের সব দিন</p>
                             <p>২৪ ঘণ্টা উপলব্ধ</p>
                         </div>
                     </div>
                     <div>
-                        <p class="text-orange-700 text-[15px]">
+                        <p class="text-orange-700 text-md">
                             <span class="font-bold text-orange-700">ইমেইল:</span> যেকোনো সময়
                         </p>
                     </div>

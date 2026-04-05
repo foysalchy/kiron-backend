@@ -371,9 +371,9 @@
                         <p class="text-gray-600 font-medium">এই শর্তাবলী সম্পর্কে কোনো প্রশ্ন থাকলে আমাদের সাথে যোগাযোগ
                             করুন:</p>
                         <div class="space-y-2 text-gray-700">
-                            <p><span class="font-bold">ইমেইল:</span> legal@orenmart.com</p>
-                            <p><span class="font-bold">ফোন:</span> +৮৮০ ১৭১২-৩৪৫৬৭৮</p>
-                            <p><span class="font-bold">ঠিকানা:</span> ১২৩ বিজনেস এভিনিউ, ঢাকা ১২০০, বাংলাদেশ</p>
+                            <p><span class="font-bold">ইমেইল:</span> {{$setup->email ?? ''}}</p>
+                            <p><span class="font-bold">ফোন:</span> {{ $setup->phone ?? 'নম্বর পাওয়া যায়নি' }}</p>
+                            <p><span class="font-bold">ঠিকানা:</span> {{ $setup->corporate_address ?? '' }}</p>
                         </div>
                     </div>
                 </section>
