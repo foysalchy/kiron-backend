@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\SiteSetting;
 use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssetCategoryService;
@@ -101,6 +102,7 @@ use App\Services\TransactionInternalService;
 use App\Services\TransactionJournalService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -216,6 +218,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+         if (!app()->runningInConsole()) {
+            $currentStore = getCurrentCompany();
+
+            if ($currentStore) {
+                $setup = SiteSetting::where('company_id', $currentStore->company_id)->first();
+                View::share('setup', $setup);
+            }
+        }
     }
 }

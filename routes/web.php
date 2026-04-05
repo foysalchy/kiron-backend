@@ -10,6 +10,8 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
 
     Route::get('/', [HomeController::class, 'index']);
     Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
+
     Route::get('/about', function () {
         return view('template1.frontend.about');
     });

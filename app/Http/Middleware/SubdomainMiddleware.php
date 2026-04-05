@@ -20,6 +20,7 @@ class SubdomainMiddleware
 
         if ($subdomain !== 'localhost' && $subdomain !== 'www') {
             // Force Laravel to recognize subdomain route
+            \Illuminate\Support\Facades\URL::defaults(['store' => $subdomain]);
             return $next($request);
         }
         return redirect('/home');

@@ -14,6 +14,7 @@ class Blog extends Model
 
 
     protected $fillable = [
+        'user_id',
         'company_id',
         'title',
         'slug',
@@ -40,6 +41,10 @@ class Blog extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     // Scopes
     public function scopeActive($query)
@@ -59,5 +64,16 @@ class Blog extends Model
             return asset('storage/' . $this->images[0]);
         }
         return null;
+    }
+    //read time
+    public function getReadingTimeAttribute()
+    {
+        $fullContent = $this->body . ' ' . $this->body_2 . ' ' . $this->body_3;
+
+        $text = strip_tags($fullContent);
+        $wordCount = preg_match_all('/\p{L}+/u', $text, $matches);
+        $minutes = ceil($wordCount / 200);
+
+        return $minutes > 0 ? $minutes : 1;
     }
 }

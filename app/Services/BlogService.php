@@ -63,6 +63,7 @@ class BlogService
         DB::beginTransaction();
 
         try {
+            $data['user_id'] = auth()->id();
             // Handle multiple image uploads for JSON column
             if (isset($data['images']) && is_array($data['images'])) {
                 $uploadedImages = [];
