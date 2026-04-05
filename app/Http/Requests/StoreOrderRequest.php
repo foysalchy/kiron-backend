@@ -35,7 +35,9 @@ class StoreOrderRequest extends BaseCompanyRequest
                     ->where('company_id', $companyId)
                     ->where('type', 2)],
                 'is_walk_in' => ['nullable', 'boolean'],
-
+                'walk_in_customer'        => ['nullable', 'array'],
+                'walk_in_customer.name'   => ['nullable', 'string', 'max:255'],
+                'walk_in_customer.phone'  => ['nullable', 'string', 'max:20'],
                 'items' => ['required', 'array', 'min:1'],
                 'items.*.product_id' => [
                     'required',
@@ -44,6 +46,7 @@ class StoreOrderRequest extends BaseCompanyRequest
                 ],
                 'items.*.quantity' => ['required', 'integer', 'min:1'],
                 'items.*.unit_price' => ['required', 'numeric', 'min:0'],
+                'items.*.bin_id' => ['nullable', 'integer', Rule::exists('bins', 'id')->where('company_id', $companyId)],
                 'items.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'items.*.tax_group_id' => ['nullable', 'integer'],
                 'items.*.tax' => ['nullable', 'numeric', 'min:0'],
@@ -68,50 +71,7 @@ class StoreOrderRequest extends BaseCompanyRequest
         );
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
 
-            // 1️⃣ Either customer_id or is_walk_in must be provided
-            if (!$this->customer_id && !$this->is_walk_in) {
-                $validator->errors()->add(
-                    'customer_id',
-                    'Either customer or walk-in flag is required'
-                );
-            }
-
-            // 2️⃣ Stock quantity validation
-            if ($this->has('items') && is_array($this->items)) {
-
-                $user = $this->user();
-                $companyId = $user->isSuperAdmin()
-                    ? $this->input('company_id')
-                    : $user->company_id;
-
-                foreach ($this->items as $index => $item) {
-
-                    if (!isset($item['product_id'], $item['quantity'])) {
-                        continue;
-                    }
-
-                    $product = Product::where('id', $item['product_id'])
-                        ->where('company_id', $companyId)
-                        ->first();
-
-                    if (! $product) {
-                        continue; // product exists rule already handles this
-                    }
-
-                    if ($item['quantity'] > $product->available_stock) {
-                        $validator->errors()->add(
-                            "items.$index.quantity",
-                            "Requested quantity ({$item['quantity']}) exceeds available stock ({$product->available_stock})."
-                        );
-                    }
-                }
-            }
-        });
-    }
 
 
     public function messages(): array

@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Order, OrderDetail, OrderPayment, Product};
+use App\Models\{Order, OrderDetail, OrderPayment, Party, Product};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{DB, Hash, Log};
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
@@ -175,6 +175,30 @@ class OrderService
     public function createPOSOrder(array $data): Order
     {
         $data['type'] = Order::TYPE_POS;
+        if ($data['is_walk_in'] && !empty($data['walk_in_customer'])) {
+            $phone = $data['walk_in_customer']['phone'] ?? null;
+            $name  = $data['walk_in_customer']['name']  ?? 'Walk-in Customer';
+
+            // Check if customer already exists by phone
+            $customer = null;
+            if ($phone) {
+                $customer = Party::where('type',Party::TYPE_CUSTOMER)->where('phone', $phone)
+                    ->first();
+            }
+
+            // Create if not found
+            if (!$customer) {
+                $customer = Party::create([
+                    'type' => Party::TYPE_CUSTOMER,
+                    'name' => $name,
+                    'phone' => $phone,
+                    'password' => Hash::make('password'),
+                ]);
+            }
+
+            // Attach to order
+            $data['customer_id'] = $customer->id;
+        }
         return $this->createOrder($data, true);
     }
 
@@ -239,7 +263,6 @@ class OrderService
             }
             // Create order
             $order = Order::create($data);
-
             // Create order details and deduct stock
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
@@ -301,6 +324,7 @@ class OrderService
                 'warehouse',
                 'customer',
                 'coupon',
+                'company',
                 'orderDetails.product',
                 'orderDetails.variation.attributes.attributeGroup',
                 'orderDetails.variation.attributes.attributeValue',
@@ -584,7 +608,7 @@ class OrderService
                 throw ApiException::badRequest('Cannot change cancelled order status');
             }
 
-       
+
             $allowedFromDelivered = [
                 Status::ReturntoCourier,
                 Status::ReturnReceived,
@@ -710,7 +734,7 @@ class OrderService
             }
 
             $order->update([
-                'status' => Status::Pending->value,
+                'status' => Status::Resumed->value,
                 'hold_ref' => null,
             ]);
 
@@ -779,7 +803,7 @@ class OrderService
     {
         $stockData = [
             'warehouse_id' => $order->warehouse_id,
-            'bin_id' => null,
+            'bin_id' => $item['bin_id'] ?? null,
             'quantity' => $item['quantity'],
             'batch_number' => null,
             'serial_numbers' => null,

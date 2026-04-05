@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->tinyInteger('type')->comment('1=Supplier, 2=Customer');
             $table->string('name');
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('phone', 20);
             $table->string('alternative_phone', 20)->nullable();
             $table->text('address')->nullable();

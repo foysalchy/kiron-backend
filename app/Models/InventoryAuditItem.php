@@ -121,20 +121,22 @@ class InventoryAuditItem extends Model
     /**
      * Get product display name with variation
      */
-    public function getProductDisplayNameAttribute(): string
+public function getProductDisplayNameAttribute(): string
     {
-        $name = $this->product->title ?? 'Unknown Product';
+        $name = $this->product?->title ?? 'Unknown Product';
 
         if ($this->variation_id && $this->variation) {
-            $attrs = collect($this->variation->attributes) // ensure it's always a Collection
+            $attrs = collect($this->variation->attributes)
                 ->map(function ($attr) {
-                    $group = $attr->attributeGroup->name
-                        ?? $attr->attributeValue->attributeGroup->name
+                    $group = $attr->attributeGroup?->name
+                        ?? $attr->attributeValue?->attributeGroup?->name
                         ?? '';
-                    $value = $attr->attributeValue->value ?? '';
+                    // value অথবা name যেটাই থাকুক null safe করে দিলাম
+                    $value = $attr->attributeValue?->value ?? $attr->attributeValue?->name ?? '';
+                    
                     return $group && $value ? "{$group}: {$value}" : null;
                 })
-                ->filter() // remove null/empty
+                ->filter() 
                 ->join(', ');
 
             if ($attrs) {
@@ -144,7 +146,7 @@ class InventoryAuditItem extends Model
             if ($this->variation->sku) {
                 $name .= " - SKU: {$this->variation->sku}";
             }
-        } elseif ($this->product->sku) {
+        } elseif ($this->product?->sku) {
             $name .= " - SKU: {$this->product->sku}";
         }
 
@@ -163,10 +165,10 @@ class InventoryAuditItem extends Model
         return [
             'id' => $this->variation->id,
             'sku' => $this->variation->sku,
-            'attributes' => $this->variation->attributes->map(function ($attr) {
+            'attributes' => collect($this->variation->attributes)->map(function ($attr) {
                 return [
-                    'group' => $attr->attributeGroup->name ?? $attr->attributeValue->attributeGroup->name ?? '',
-                    'value' => $attr->attributeValue->name,
+                    'group' => $attr->attributeGroup?->name ?? $attr->attributeValue?->attributeGroup?->name ?? '',
+                    'value' => $attr->attributeValue?->name ?? '', 
                 ];
             }),
         ];

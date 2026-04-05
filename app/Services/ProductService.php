@@ -514,8 +514,46 @@ class ProductService
         $data['available_stock'] = $totalStock;
         $data['stock_status'] = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
         $data['warehouse_info'] = $warehouseInfo;
-    }
 
+        // ── Stock Ledger Update ──────────────────────────────────────
+        if (!empty($warehouseInfo)) {
+            foreach ($warehouseInfo as $warehouseStock) {
+                $newQty = (int) ($warehouseStock['quantity'] ?? 0);
+                $warehouseId = $warehouseStock['warehouse_id'];
+                $binId = $warehouseStock['bin_id'] ?? null;
+
+                // Get previous quantity from last ledger entry for this warehouse
+                $lastLedger = ProductStockLedger::where('product_id', $product->id)
+                    ->where('warehouse_id', $warehouseId)
+                    ->latest()
+                    ->first();
+
+                $qtyBefore = $lastLedger ? $lastLedger->quantity_after : 0;
+
+                // Only create ledger entry if quantity actually changed
+                if ($qtyBefore === $newQty) {
+                    continue;
+                }
+
+                ProductStockLedger::create([
+                    'product_id'       => $product->id,
+                    'variation_id'     => null,
+                    'warehouse_id'     => $warehouseId,
+                    'bin_id'           => $binId,
+                    'batch_number'     => null,
+                    'serial_numbers'   => null,
+                    'transaction_type' => 'adjustment',
+                    'reference_type'   => 'Product',
+                    'reference_id'     => $product->id,
+                    'quantity_before'  => $qtyBefore,
+                    'quantity_change'  => $newQty - $qtyBefore, // negative if reduced
+                    'quantity_after'   => $newQty,
+                    'notes'            => 'Stock adjusted on product update',
+                    'created_by'       => Auth::id(),
+                ]);
+            }
+        }
+    }
     /**
      * Update variation product
      */

@@ -137,6 +137,81 @@ class SelectOptionController extends Controller
             return $product->available_stock > 0;
         })->values();
     }
+    public function getProductByWarehouseAndBin($warehouseId, $binId)
+    {
+        $products = Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeGroup',
+            'variations.attributes.attributeValue',
+            // Eager load stock only for the specific warehouse AND bin
+            'variations.stocks' => function ($q) use ($warehouseId, $binId) {
+                $q->where('warehouse_id', $warehouseId)
+                    ->where('bin_id', $binId);
+            },
+            'variations.stocks.warehouse',
+            'variations.stocks.bin', 
+        ])
+            ->where(function ($q) use ($warehouseId, $binId) {
+                // For Single Products: Check JSON contains both warehouse_id and bin_id
+                $q->whereJsonContains('warehouse_info', [
+                    'warehouse_id' => (string) $warehouseId,
+                    'bin_id' => (string) $binId
+                ])
+                    // For Variation Products: Check relation with both warehouse_id and bin_id
+                    ->orWhereHas('variations.stocks', function ($stockQuery) use ($warehouseId, $binId) {
+                        $stockQuery->where('warehouse_id', $warehouseId)
+                            ->where('bin_id', $binId)
+                            ->where('quantity', '>', 0);
+                    });
+            })
+            ->orderBy('title', 'asc')
+            ->get();
+
+        $mappedProducts = $products->map(function ($product) use ($warehouseId, $binId) {
+            $binTotalStock = 0;
+
+            // Single Product Mapping
+            if ($product->type === 'single' && is_array($product->warehouse_info)) {
+                $filteredWarehouseInfo = collect($product->warehouse_info)
+                    ->filter(function ($item) use ($warehouseId, $binId) {
+                        return (string) $item['warehouse_id'] === (string) $warehouseId
+                            && (string) ($item['bin_id'] ?? '') === (string) $binId;
+                    })
+                    ->values();
+
+                $binTotalStock = $filteredWarehouseInfo->sum('quantity');
+                $product->warehouse_info = $filteredWarehouseInfo->toArray();
+            }
+
+            // Variation Product Mapping
+            if ($product->type === 'variation') {
+                $product->variations->map(function ($variation) {
+                    // Since stocks are already eager-loaded with bin_id condition, 
+                    // this will only sum the stock for this specific bin
+                    $variationStock = $variation->stocks->sum('quantity');
+
+                    $variation->available_stock = $variationStock;
+                    $variation->stock_quantity = $variationStock;
+
+                    return $variation;
+                });
+
+                $binTotalStock = $product->variations->sum('available_stock');
+            }
+
+            // Set final stock at product level for this specific bin
+            $product->available_stock = $binTotalStock;
+            $product->stock_quantity = $binTotalStock;
+
+            return $product;
+        });
+
+        // Remove products/variations that have 0 stock in this bin
+        return $mappedProducts->filter(function ($product) {
+            return $product->available_stock > 0;
+        })->values();
+    }
     public function userOptions()
     {
         return auth()->user()->company->users()->select('id', 'name')->orderBy('name', 'asc')->get();
