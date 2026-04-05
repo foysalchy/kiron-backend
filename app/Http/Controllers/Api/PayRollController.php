@@ -14,7 +14,7 @@ class PayRollController extends Controller
 {
     public function __construct(
         protected PayRollService $payRollService
-    ){}
+    ) {}
     /**
      * Display a listing of payrolls.
      */
@@ -22,6 +22,7 @@ class PayRollController extends Controller
     {
         $filters = [
             'search'     => $request->query('search'),
+            'status'     => $request->query('status'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
             'sort_order' => $request->query('sort_order', 'desc'),
             'per_page'   => $request->query('per_page', 15),
@@ -105,6 +106,4 @@ class PayRollController extends Controller
 
         return ResponseHelper::success(null, 'Payroll permanently deleted');
     }
-
-
 }

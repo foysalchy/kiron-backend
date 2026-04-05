@@ -42,6 +42,6 @@ class ProductVariationStock extends Model
      */
     public function bin(): BelongsTo
     {
-        return $this->belongsTo(Cell::class, 'bin_id');
+        return $this->belongsTo(Bin::class, 'bin_id');
     }
 }
