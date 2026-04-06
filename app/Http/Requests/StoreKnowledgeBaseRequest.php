@@ -21,6 +21,7 @@ class StoreKnowledgeBaseRequest extends BaseCompanyRequest
                 'title'   => ['required', 'string', 'max:255'],
                 'slug'    => ['nullable', 'string', 'max:255', 'unique:knowledge_bases,slug'],
                 'content' => ['required', 'string'],
+                'category' => ['nullable', 'string'],
             ]
         );
     }
