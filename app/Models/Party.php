@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
-class Party extends Model
+class Party extends Authenticatable
 {
-    use HasFactory, SoftDeletes, CompanyScoped;
+    use HasFactory, SoftDeletes, CompanyScoped,Notifiable;
 
     // Type constants
     const TYPE_SUPPLIER = 1;
@@ -35,6 +37,8 @@ class Party extends Model
 
     protected $hidden = [
         'deleted_at',
+        'remember_token',
+        'password',
     ];
 
 

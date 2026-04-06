@@ -16,6 +16,7 @@ class KnowledgeBase extends Model
         'company_id',
         'title',
         'slug',
+        'category',
         'content',
         'status',
     ];

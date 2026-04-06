@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\Frontend\AboutController;
+use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\BlogController;
+use App\Http\Controllers\Frontend\BrandController;
 use App\Http\Controllers\Frontend\ContctController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
 use App\Http\Middleware\SubdomainMiddleware;
@@ -19,19 +23,25 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
 
     Route::get('/support', [SupportController::class, 'index'])->name('support.index');
+    Route::post('/support/send', [SupportController::class, 'storeMessage'])->name('support.send');
     Route::get('/terms', [TermController::class, 'index'])->name('term.index');
     Route::get('/privacy', [TermController::class, 'privacy'])->name('privacy.index');
 
-    Route::get('/about', function () {
-        return view('template1.frontend.about');
-    });
-    Route::get('/apply-seller', function () {
-        return view('template1.frontend.apply-seller');
+    Route::get('/brands',[BrandController::class,'index'])->name('brand.index');
+    Route::get('/about',[AboutController::class,'index'])->name('about.index');
+
+    Route::get('/register', [AuthController::class,'register'])->name('user.register');
+    Route::post('/register', [AuthController::class,'storeRegister'])->name('user.register.store');
+    Route::get('/login', [AuthController::class,'login'])->name('user.login');
+    Route::post('/login', [AuthController::class, 'storeLogin'])->name('user.login.store');
+    Route::middleware(['auth:customer'])->group(function () {
+        Route::get('/profile', [AuthController::class,'profile'])->name('user.profile');
+        Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('user.profile.update');
+        Route::post('/password/update', [AuthController::class, 'updatePassword'])->name('user.password.update');
+        Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('user.dashboard');
+        Route::post('/logout', [AuthController::class, 'logout'])->name('user.logout');
     });
 
-    Route::get('/brands', function () {
-        return view('template1.frontend.brand');
-    });
     Route::get('/carts', function () {
         return view('template1.frontend.cart');
     });
@@ -59,16 +69,5 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/wishlist', function () {
         return view('template1.frontend.wishlist');
     });
-    Route::get('/login', function () {
-        return view('template1.frontend.user.login');
-    });
-    Route::get('/register', function () {
-        return view('template1.frontend.user.register');
-    });
-    Route::get('/profile', function () {
-        return view('template1.frontend.user.profile');
-    });
-    Route::get('/dashboard', function () {
-        return view('template1.frontend.user.dashboard');
-    });
+
 });

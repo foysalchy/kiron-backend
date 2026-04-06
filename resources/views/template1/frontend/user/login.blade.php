@@ -13,7 +13,9 @@
 
             <!-- Login Form -->
             <div class="p-6">
-                <form class="space-y-4">
+                {{-- ব্যাকএন্ড রাউটে কানেক্ট করা হয়েছে --}}
+                <form action="{{ route('user.login.store') }}" method="POST" class="space-y-4">
+                    @csrf
 
                     <!-- Email Field -->
                     <div class="space-y-2">
@@ -22,9 +24,13 @@
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                 <i class="far fa-envelope text-sm"></i>
                             </span>
-                            <input type="email" placeholder="user@example.com" required
-                                class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="user@example.com" required
+                                class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
                         </div>
+                        {{-- এরর মেসেজ (যেমন: পাসওয়ার্ড ভুল বা অ্যাকাউন্ট ব্লক) --}}
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- Password Field -->
@@ -34,25 +40,25 @@
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                 <i class="fas fa-lock text-sm"></i>
                             </span>
-                            <input type="password" placeholder="••••••••" required
+                            <input type="password" name="password" id="password" placeholder="••••••••" required
                                 class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+
                             <!-- Toggle Visibility Button -->
-                            <button type="button"
+                            <button type="button" onclick="togglePassword()"
                                 class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
-                                <i class="far fa-eye text-[14px]"></i>
+                                <i id="eye-icon" class="far fa-eye text-[14px]"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Forgot Password Link -->
                     <div class="text-left">
-                        <a href="#" class="text-[#FF6A00] text-sm font-medium hover:underline">পাসওয়ার্ড ভুলে
-                            গেছেন?</a>
+                        <a href="#" class="text-[#FF6A00] text-sm font-medium hover:underline">পাসওয়ার্ড ভুলে গেছেন?</a>
                     </div>
 
                     <!-- Login Button -->
                     <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-medium py-2 rounded-lg shadow-xs text-md shadow-orange-100 transition-all active:scale-[0.98]">
+                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
                         লগইন করুন
                     </button>
 
@@ -64,8 +70,26 @@
                         </p>
                     </div>
                 </form>
-
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.replace('far', 'fas');
+            eyeIcon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.replace('fas', 'far');
+            eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+</script>
+@endpush
