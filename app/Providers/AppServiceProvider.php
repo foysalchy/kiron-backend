@@ -219,7 +219,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-         if (!app()->runningInConsole()) {
+        if (!app()->runningInConsole()) {
+            if (request()->is('api/*')) {
+                return;
+            }
+
+
             $currentStore = getCurrentCompany();
 
             if ($currentStore) {
@@ -227,10 +232,10 @@ class AppServiceProvider extends ServiceProvider
                 View::share('setup', $setup);
 
                 $headerCategories = MegaCategory::where('company_id', $currentStore->company_id ?? $currentStore->id)
-                ->where('status', 1)
-                ->latest()
-                ->take(5)
-                ->get();
+                    ->where('status', 1)
+                    ->latest()
+                    ->take(5)
+                    ->get();
 
                 View::share('headerCategories', $headerCategories);
             }

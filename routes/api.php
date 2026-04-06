@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CurrencyController;
+use App\Http\Controllers\Api\CustomerGroupController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
@@ -1379,6 +1380,19 @@ Route::prefix('v1')->group(function () {
                 Route::delete('{resource}/delete', [BulkActionController::class, 'bulkDelete']);
                 Route::delete('{resource}/force-delete', [BulkActionController::class, 'bulkForceDelete']);
                 Route::patch('{resource}/restore',      [BulkActionController::class, 'bulkRestore']);
+            });
+
+            // Customer Groups Routes
+            Route::prefix('customer-groups')->controller(CustomerGroupController::class)->group(function () {
+
+                Route::get('criteria', 'fetchCustomersByCriteria');
+                // Standard Routes
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('{id}', 'show');
+                Route::delete('{id}/customers/{customerId}', 'removeCustomer');
+                Route::patch('{id}/toggle-status', 'toggleStatus');
+                Route::delete('{id}', 'destroy');
             });
         });
     });
