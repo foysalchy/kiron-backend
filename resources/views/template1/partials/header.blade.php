@@ -74,14 +74,12 @@
                     class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors select-none">
 
                     @auth
-                        <!-- লগইন অবস্থায় প্রোফাইল ইমেজ -->
                         <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
                             <img src="{{ auth()->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                                 alt="User Profile"
                                 class="w-full h-full object-cover">
                         </div>
                     @else
-                        <!-- গেস্ট অবস্থায় ইউজার আইকন -->
                         <i class="fa-regular fa-user text-xl"></i>
                     @endauth
 
@@ -171,7 +169,7 @@
 
             @foreach($headerCategories as $cat)
                 <a class="text-sm font-medium hover:text-[#FF6A00]"
-                href="{{ url('/category/' . $cat->slug) }}">
+                href="{{ route('category.products', $cat->slug) }}">
                 {{ $cat->name }}
                 </a>
             @endforeach

@@ -150,13 +150,25 @@ class AuthController extends Controller
     {
         $company = getCurrentCompany();
         $template = $company->template_name;
+
         $user = Auth::guard('customer')->user();
 
-        $totalOrders = $user->orders()->count() ?? 0;
-        $totalSpent = $user->orders()->sum('grand_total') ?? 0;
-        $wishlistCount = 0;
-        $recentOrders = $user->orders()->latest()->take(5)->get();
+        $allOrders = $user->orders()->with('orderItems.product')->latest()->get();
+        $recentOrders = $allOrders->take(5);
 
-        return view($template . '.frontend.user.dashboard', compact('user', 'totalOrders', 'totalSpent', 'wishlistCount', 'recentOrders'));
+
+        $totalOrders = $allOrders->count();
+        $totalSpent = $allOrders->where('status', 'delivered')->sum('grand_total');
+        $wishlistCount = 0;
+
+        return view($template . '.frontend.user.dashboard', compact(
+            'user',
+            'totalOrders',
+            'totalSpent',
+            'wishlistCount',
+            'recentOrders',
+            'allOrders',
+
+        ));
     }
 }

@@ -136,7 +136,7 @@
                     </div>
                 </div>
 
-                <!-- 2. SECTION: ALL MY ORDERS (Initially Hidden) -->
+                <!-- 2. SECTION: ALL MY ORDERS  -->
                 <div id="orders-section" class="dashboard-content hidden space-y-6">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
@@ -145,194 +145,66 @@
                             </h2>
                         </div>
                         <div class="p-6 space-y-8">
-                            <!-- Detailed Order Card 1 -->
-                            <div class="border border-gray-200 rounded-lg p-6 space-y-6">
-                                <!-- Top Row: Order Info (Left) and Status/Price (Right) -->
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <!-- Left Side: Order ID & Date -->
-                                    <div>
-                                        <h4 class="font-semibold text-md text-gray-900">
-                                            ORD-001
-                                        </h4>
-                                        <p class="text-sm text-gray-700 font-medium">
-                                            অর্ডার তারিখ: ২০২৪-০১-১৫
-                                        </p>
-                                    </div>
-
-                                    <!-- Right Side: Status Badge & Price (Pushed to Right) -->
-                                    <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                                        <span
-                                            class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-circle-check-big h-4 w-4 text-green-500">
-                                                <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                                                <path d="m9 11 3 3L22 4"></path>
-                                            </svg>
-                                            ডেলিভার হয়েছে
-                                        </span>
-                                        <p class="text-lg font-bold text-gray-900 leading-none">
-                                            ৳1250
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Items Grid (Same as before) -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <!-- Item 1 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                G63 Speaker Lamp
+                            @forelse($allOrders as $order)
+                                <div class="border border-gray-200 rounded-lg p-6 space-y-6">
+                                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-md text-gray-900">#{{ $order->order_number }}</h4>
+                                            <p class="text-sm text-gray-700 font-medium">
+                                                অর্ডার তারিখ: {{ $order->created_at->format('d M, Y') }}
                                             </p>
-                                            <p class="text-gray-500 font-medium">৳690</p>
                                         </div>
-                                    </div>
-                                    <!-- Item 2 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                Car Seat Cover
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳450</p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- Actions (Same as before) -->
-                                <div class="flex gap-3">
-                                    <a href="./order-details.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        বিস্তারিত
-                                    </a>
-                                    <a href="./invoice.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-download h-4 w-4 mr-1">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" x2="12" y1="15" y2="3"></line>
-                                        </svg>
-                                        ইনভয়েস
-                                    </a>
-                                </div>
-                            </div>
-                            <!-- Detailed Order Card 1 -->
-                            <div class="border border-gray-200 rounded-lg p-6 space-y-6">
-                                <!-- Top Row: Order Info (Left) and Status/Price (Right) -->
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <!-- Left Side: Order ID & Date -->
-                                    <div>
-                                        <h4 class="font-semibold text-md text-gray-900">
-                                            ORD-001
-                                        </h4>
-                                        <p class="text-sm text-gray-700 font-medium">
-                                            অর্ডার তারিখ: ২০২৪-০১-১৫
-                                        </p>
+                                        <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
+                                            @php
+                                                $statusClasses = [
+                                                    'pending' => 'bg-orange-100 text-orange-700',
+                                                    'processing' => 'bg-blue-100 text-blue-700',
+                                                    'delivered' => 'bg-green-100 text-green-700',
+                                                    'cancelled' => 'bg-red-100 text-red-700',
+                                                ];
+                                                $currentClass = $statusClasses[strtolower($order->status)] ?? 'bg-gray-100 text-gray-700';
+                                            @endphp
+                                            <span class="px-3 py-1 {{ $currentClass }} text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+                                            <p class="text-lg font-bold text-gray-900 leading-none">৳{{ number_format($order->grand_total) }}</p>
+                                        </div>
                                     </div>
 
-                                    <!-- Right Side: Status Badge & Price (Pushed to Right) -->
-                                    <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                                        <span
-                                            class="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-package h-4 w-4 text-orange-500">
-                                                <path
-                                                    d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z">
-                                                </path>
-                                                <path d="M12 22V12"></path>
-                                                <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
-                                                <path d="m7.5 4.27 9 5.15"></path>
-                                            </svg>
-                                            প্রসেসিং
-                                        </span>
-                                        <p class="text-lg font-bold text-gray-900 leading-none">
-                                            ৳1250
-                                        </p>
+                                    <!-- Items inside this order -->
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        @foreach($order->orderItems as $item)
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
+                                                    @if($item->product && $item->product->image_url)
+                                                        <img src="{{ $item->product->image_url }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        <i class="fas fa-image text-gray-200"></i>
+                                                    @endif
+                                                </div>
+                                                <div class="text-sm">
+                                                    <p class="text-gray-800 leading-tight">{{ $item->product->name ?? 'Product Deleted' }}</p>
+                                                    <p class="text-gray-500 font-medium">৳{{ number_format($item->price) }} x {{ $item->quantity }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                </div>
 
-                                <!-- Items Grid (Same as before) -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <!-- Item 1 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                G63 Speaker Lamp
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳690</p>
-                                        </div>
-                                    </div>
-                                    <!-- Item 2 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                Car Seat Cover
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳450</p>
-                                        </div>
+                                    <div class="flex gap-3">
+                                        <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                            <i class="fas fa-eye"></i> বিস্তারিত
+                                        </a>
+                                        <a href="{{ route('user.order.invoice', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                            <i class="fas fa-download"></i> ইনভয়েস
+                                        </a>
                                     </div>
                                 </div>
-
-                                <!-- Actions (Same as before) -->
-                                <div class="flex gap-3">
-                                    <a href="./order-details.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        বিস্তারিত
-                                    </a>
-                                    <a href="./invoice.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-download h-4 w-4 mr-1">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" x2="12" y1="15" y2="3"></line>
-                                        </svg>
-                                        ইনভয়েস
-                                    </a>
+                            @empty
+                                <div class="text-center py-10">
+                                    <p class="text-gray-500">আপনার কোনো অর্ডার পাওয়া যায়নি।</p>
                                 </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

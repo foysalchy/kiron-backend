@@ -4,8 +4,10 @@ use App\Http\Controllers\Frontend\AboutController;
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\Frontend\BrandController;
+use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\ContctController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
@@ -41,6 +43,11 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
         Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('user.dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('user.logout');
     });
+    Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
+    Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
+    Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+    Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
     Route::get('/carts', function () {
         return view('template1.frontend.cart');
@@ -55,15 +62,13 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
         return view('template1.frontend.order-details');
     });
 
-    Route::get('/product-details', function () {
-        return view('template1.frontend.product-details');
-    });
+
     Route::get('/product-track', function () {
         return view('template1.frontend.product-track');
     });
-    Route::get('/shop', function () {
-        return view('template1.frontend.shop');
-    });
+    // Route::get('/shop', function () {
+    //     return view('template1.frontend.shop');
+    // });
 
 
     Route::get('/wishlist', function () {
