@@ -165,7 +165,30 @@ class Product extends Model
     {
         return $this->stock_status === 'in_stock' && $this->stock_quantity > 0;
     }
+ public function getGroupsAttribute(): array
+    {
+        $groups = [];
 
+        foreach ($this->variations as $variation) {
+            foreach ($variation->attributes as $attr) {
+                $group = $attr->group;
+                $value = $attr->value;
+
+                if (!isset($groups[$group])) {
+                    $groups[$group] = [
+                        'name'   => $group,
+                        'values' => [],
+                    ];
+                }
+
+                if (!in_array($value, $groups[$group]['values'])) {
+                    $groups[$group]['values'][] = $value;
+                }
+            }
+        }
+
+        return array_values($groups);
+    }
 
     public static function loadCategoriesForCollection($products): Collection
     {

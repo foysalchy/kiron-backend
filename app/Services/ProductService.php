@@ -26,6 +26,7 @@ class ProductService
                     $query->orderBy('regular_price', 'asc');
                 },
                 'variations.barcode',
+                
                 'variations.attributes.attributeGroup',
                 'variations.attributes.attributeValue',
                 'variations.stocks.warehouse',

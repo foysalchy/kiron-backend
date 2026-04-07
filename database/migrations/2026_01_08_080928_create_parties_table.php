@@ -20,6 +20,10 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone', 20);
             $table->string('alternative_phone', 20)->nullable();
+            $table->string('gender')->nullable();
+            $table->string('division')->nullable();
+            $table->string('district')->nullable();
+            $table->string('thana')->nullable();
             $table->text('address')->nullable();
             $table->decimal('balance', 10, 2)->default(0);
             $table->string('profile')->nullable();

@@ -89,6 +89,7 @@ use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\PricingController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ProductGroupController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\QuotationController;
@@ -1391,6 +1392,18 @@ Route::prefix('v1')->group(function () {
                 Route::post('/', 'store');
                 Route::get('{id}', 'show');
                 Route::delete('{id}/customers/{customerId}', 'removeCustomer');
+                Route::patch('{id}/toggle-status', 'toggleStatus');
+                Route::delete('{id}', 'destroy');
+            });
+            // Product Groups Routes
+            Route::prefix('product-groups')->controller(ProductGroupController::class)->group(function () {
+
+                Route::get('criteria', 'fetchProductsByCriteria');
+                // Standard Routes
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('{id}', 'show');
+                Route::delete('{id}/products/{productId}', 'removeProduct');
                 Route::patch('{id}/toggle-status', 'toggleStatus');
                 Route::delete('{id}', 'destroy');
             });
