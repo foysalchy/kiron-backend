@@ -22,7 +22,7 @@
                                             <img src="{{ asset('storage/' . $category->image) ?? 'https://via.placeholder.com/150' }}"
                                                 class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                                 alt="{{ $category->name }}">
-                                            <span class="text-[14px] font-bold text-gray-800">{{ $category->name }}</span>
+                                            <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>
 
                                         </div>
                                         <i id="icon-cat-{{ $category->id }}"
@@ -48,7 +48,7 @@
                                     <img src="{{ $category->image ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
                                         class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                         alt="{{ $category->name }}">
-                                    <span class="text-[14px] font-bold text-gray-800">{{ $category->name }}</span>
+                                    <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>
                                 </a>
                             @endif
                         @endforeach
@@ -159,7 +159,7 @@
                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                     alt="{{ $category->name }}">
                             </div>
-                            <span class="text-[14px] font-semibold text-gray-800 text-center truncate w-full px-1">
+                            <span class="text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
                                 {{ $category->name }}
                             </span>
                         </a>
@@ -170,7 +170,7 @@
     </section>
     <!-- NEW ARRIVALS SECTION -->
     <section class="py-6 container mx-auto">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 relative">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 relative">
 
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
@@ -202,11 +202,10 @@
                     <!-- NEW ARRIVALS -->
                     @foreach ($newArrivals as $product)
                         <div
-                            class="flex-shrink-0 w-[240px] flex flex-col group/card bg-white border border-gray-100 rounded-xl p-3 hover:shadow-md transition-all">
-                            <!-- ইমেজ এবং টাইটেল লিঙ্ক -->
+                            class="flex-shrink-0 w-[240px] flex flex-col group/card bg-white border border-gray-100 rounded-lg p-3 hover:shadow-md transition-all">
                             <a href="{{ url('product/' . $product->slug) }}" class="block">
                                 <div
-                                    class="w-full aspect-square overflow-hidden rounded-lg border border-gray-100 mb-3 bg-[#f9f9f9]">
+                                    class="w-full aspect-square overflow-hidden rounded-lg border border-gray-50 mb-3 bg-[#f9f9f9]">
                                     <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
                                         onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                         class="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
@@ -214,38 +213,35 @@
                                 </div>
 
                                 <h3
-                                    class="text-[14px] leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2 px-1">
+                                    class="text-md leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2 px-1">
                                     {{ $product->title }}
                                 </h3>
                             </a>
 
-                            <!-- প্রাইস এবং অ্যাড টু কার্ট বাটন (একই লাইনে) -->
                             <div class="flex items-center justify-between gap-1 px-1 mt-auto">
-                                <div class="flex flex-col">
-                                    @if ($product->type === 'single')
-                                        <span
-                                            class="text-[18px] font-bold text-[#f15a24]">৳{{ number_format($product->sale_price, 0) }}</span>
-                                        @if ($product->discount > 0)
-                                            <span
-                                                class="text-[11px] text-gray-400 line-through">৳{{ number_format($product->regular_price, 0) }}</span>
-                                        @endif
-                                    @else
-                                        @php $firstVar = $product->variations->first(); @endphp
-                                        @if ($firstVar)
-                                            <span
-                                                class="text-[18px] font-bold text-[#f15a24]">৳{{ number_format($firstVar->regular_price - ($firstVar->discount_type == 'flat' ? $firstVar->discount : ($firstVar->regular_price * $firstVar->discount) / 100), 0) }}+</span>
+                                <div class="">
+                                    @if ($product->display_price_data->sale_price > 0)
+                                        <span class="text-lg font-bold text-[#f15a24]">
+                                            ৳{{ number_format($product->display_price_data->sale_price, 0) }}{{ $product->display_price_data->is_variation ? '+' : '' }}
+                                        </span>
+
+                                        {{-- ডিসকাউন্ট থাকলে রেগুলার প্রাইস দেখাবে --}}
+                                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
+                                            <span class="text-xs text-gray-400 line-through">
+                                                ৳{{ number_format($product->display_price_data->regular_price, 0) }}
+                                            </span>
                                         @endif
                                     @endif
                                 </div>
 
                                 @if ($product->type === 'single')
                                     <button onclick="addSingleToCart({{ $product->id }})"
-                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
+                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FF6A00] transition-all shrink-0">
                                         Add to Cart
                                     </button>
                                 @else
                                     <button onclick="openVariationModal({{ $product->id }})"
-                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
+                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FF6A00] transition-all shrink-0">
                                         Add to Cart
                                     </button>
                                 @endif
@@ -301,7 +297,7 @@
 
             <!-- Header -->
             <div class="flex items-center mb-8">
-                <h2 class="text-[17px] font-bold text-black uppercase tracking-tight">Popular Brands</h2>
+                <h2 class="text-lg font-bold text-black uppercase tracking-tight">Popular Brands</h2>
             </div>
 
             <!-- Brands Slider -->
@@ -351,54 +347,77 @@
 
             <!-- Header -->
             <div class="mb-6">
-                <h2 class="text-[18px] font-bold text-black uppercase tracking-tight">You May Like</h2>
+                <h2 class="text-lg font-bold text-black uppercase tracking-tight">You May Like</h2>
             </div>
 
             <!-- Product Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
                 @foreach ($popularProducts as $product)
-                    <a href="{{ url('product/' . $product->slug) }}" class="group flex flex-col cursor-pointer">
+                    <div class="group flex flex-col cursor-pointer">
 
-                        <div
-                            class="relative w-full aspect-square overflow-hidden rounded-lg border border-gray-100 mb-3 bg-[#f9f9f9]">
-                            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                alt="{{ $product->title }}">
+                        <!-- Image & Title Link -->
+                        <a href="{{ url('product/' . $product->slug) }}" class="block">
+                            <div class="relative w-full aspect-square overflow-hidden rounded-lg border border-gray-100 mb-3 bg-[#f9f9f9]">
+                                <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    alt="{{ $product->title }}">
 
-                            @if ($product->total_sales > 0)
-                                <div
-                                    class="absolute top-2 left-2 bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                                    {{ $product->total_sales }} Sold
-                                </div>
-                            @endif
-                        </div>
-
-                        <h3 class="text-[14px] leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2">
-                            {{ $product->title }}
-                        </h3>
-
-                        <div class="flex flex-col mt-auto gap-1">
-                            <div class="flex items-center gap-2">
-                                <span
-                                    class="text-[17px] font-bold text-[#f15a24]">৳{{ number_format($product->sale_price, 0) }}</span>
-
-                                @if ($product->discount > 0)
-                                    <span
-                                        class="text-[13px] text-gray-400 line-through">৳{{ number_format($product->regular_price, 0) }}</span>
+                                @if ($product->total_sales > 0)
+                                    <div class="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm">
+                                        {{ $product->total_sales }} Sold
+                                    </div>
                                 @endif
                             </div>
 
+                            <h3 class="text-md leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2">
+                                {{ $product->title }}
+                            </h3>
+                        </a>
+
+                        <div class="flex flex-col mt-auto gap-1">
+
+                            <div>
+                                 @if ($product->display_price_data->sale_price > 0)
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[17px] font-bold text-[#f15a24]">
+                                            ৳{{ number_format($product->display_price_data->sale_price, 0) }}{{ $product->display_price_data->is_variation ? '+' : '' }}
+                                        </span>
+
+                                        {{-- ডিসকাউন্ট থাকলে রেগুলার প্রাইস দেখাবে --}}
+                                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
+                                            <span class="text-[13px] text-gray-400 line-through">
+                                                ৳{{ number_format($product->display_price_data->regular_price, 0) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Brand --}}
                             @if ($product->brand)
                                 <div class="mt-1">
-                                    <span
-                                        class="bg-[#f15a24] text-white text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-sm inline-block uppercase">
+                                    <span class="bg-[#f15a24] text-white text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-sm inline-block uppercase">
                                         {{ $product->brand->name }}
                                     </span>
                                 </div>
                             @endif
+
+                            <div class="mt-3">
+                                @if ($product->type === 'single')
+                                    <button onclick="addSingleToCart({{ $product->id }})"
+                                        class="w-full bg-[#1D2128] text-white py-1.5 rounded-md text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
+                                        Add to Cart
+                                    </button>
+                                @else
+                                    <button onclick="openVariationModal({{ $product->id }})"
+                                        class="w-full bg-[#1D2128] text-white py-1.5 rounded-md text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
+                                        Add to Cart
+                                    </button>
+                                @endif
+                            </div>
                         </div>
-                    </a>
+                    </div>
                 @endforeach
 
             </div>
@@ -498,87 +517,99 @@
             setInterval(slideVertical, 5000);
         }
     </script>
+//for card add
     <script>
-    function addSingleToCart(id) {
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch("{{ route('cart.add') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': token
-            },
-            body: JSON.stringify({ id: id, qty: 1 })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success') {
-                document.getElementById('cart-count').innerText = data.cart_count;
-                alert(data.message);
+        // open variation-modal
+        function openVariationModal(id) {
+            const modal = document.getElementById('variation-modal');
+            const contentArea = document.getElementById('modal-content-area');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            contentArea.innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
+
+            fetch("/product-variation/" + id)
+                .then(res => res.text())
+                .then(html => {
+                    contentArea.innerHTML = html;
+                });
+        }
+
+        // close modal
+        function closeModal() {
+            const modal = document.getElementById('variation-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // qty increased and
+        function changeQty(val) {
+            let qtyInput = document.getElementById('modal-qty');
+            if(qtyInput) {
+                let newVal = parseInt(qtyInput.value) + val;
+                if(newVal >= 1) qtyInput.value = newVal;
             }
-        }).catch(err => alert("Error adding to cart"));
-    }
-
-    function openVariationModal(id) {
-        const modal = document.getElementById('variation-modal');
-        const contentArea = document.getElementById('modal-content-area');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        contentArea.innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
-
-        fetch("/product-variation/" + id)
-            .then(res => res.text())
-            .then(html => {
-                contentArea.innerHTML = html;
-            });
-    }
-
-    function closeModal() {
-        const modal = document.getElementById('variation-modal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-
-
-    function changeQty(val) {
-        let qtyInput = document.getElementById('modal-qty');
-        if(qtyInput) {
-            let newVal = parseInt(qtyInput.value) + val;
-            if(newVal >= 1) qtyInput.value = newVal;
-        }
-    }
-
-    // ৪. ভেরিয়েশন প্রোডাক্ট ফাইনাল অ্যাড
-    function processAddVariation() {
-        const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-        const qtyInput = document.getElementById('modal-qty');
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-
-        if(!selectedVariant) {
-            alert("দয়া করে একটি অপশন সিলেক্ট করুন।");
-            return;
         }
 
-        fetch("{{ route('cart.add') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': token
-            },
-            body: JSON.stringify({
-                variation_id: selectedVariant.value,
-                qty: qtyInput ? qtyInput.value : 1
+        //
+        function processAddVariation() {
+            const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+            const qtyInput = document.getElementById('modal-qty');
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            if(!selectedVariant) {
+                toastr.warning("দয়া করে একটি অপশন সিলেক্ট করুন।");
+                return;
+            }
+
+            fetch("{{ route('cart.add') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    variation_id: selectedVariant.value,
+                    qty: qtyInput ? qtyInput.value : 1
+                })
             })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.status === 'success') {
-                document.getElementById('cart-count').innerText = data.cart_count;
-                closeModal();
-                alert(data.message);
-            }
-        });
-    }
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                    closeModal();
+                    // alert এর বদলে toastr
+                    toastr.success(data.message);
+                } else {
+                    toastr.error(data.message);
+                }
+            });
+        }
+
+        // add single product
+        function addSingleToCart(id) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            fetch("{{ route('cart.add') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({ id: id, qty: 1 })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                    toastr.success(data.message);
+                }
+            }).catch(err => toastr.error("পণ্য যোগ করা সম্ভব হয়নি।"));
+        }
     </script>
+
 @endpush

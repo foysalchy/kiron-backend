@@ -243,4 +243,28 @@ class Product extends Model
 
         return $products;
     }
+    // price variation setup
+    public function getDisplayPriceDataAttribute()
+    {
+        $salePrice = 0;
+        $regularPrice = 0;
+        $isVariation = ($this->type !== 'single');
+
+        if ($this->type === 'single') {
+            $salePrice = $this->sale_price;
+            $regularPrice = $this->regular_price;
+        } else {
+            $firstVar = $this->variations->first();
+            if ($firstVar) {
+                $salePrice = $firstVar->final_price;
+                $regularPrice = $firstVar->regular_price;
+            }
+        }
+        return (object) [
+            'sale_price'    => (float) $salePrice,
+            'regular_price' => (float) $regularPrice,
+            'is_variation'  => $isVariation
+        ];
+    }
+
 }
