@@ -69,6 +69,7 @@ class productGroupService
     public function removeCustomerFromGroup(int $groupId, int $customerId): ProductGroup
     {
         $group = ProductGroup::findOrFail($groupId);
+        
 
         $currentIds = $group->customer_ids ?? [];
 
@@ -99,6 +100,14 @@ class productGroupService
     }
 
     public function deleteGroup(int $id): bool
+    {
+        $group = ProductGroup::findOrFail($id);
+        $group->delete();
+        LogHelper::deleted('customer_group', $group->id, $group->company_id, $group->name);
+        return true;
+    }
+
+    public function deleteGroup2(int $id): bool
     {
         $group = ProductGroup::findOrFail($id);
         $group->delete();
