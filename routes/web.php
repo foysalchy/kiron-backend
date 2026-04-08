@@ -7,6 +7,7 @@ use App\Http\Controllers\Frontend\BrandController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\ContctController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
@@ -47,14 +48,14 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
     Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
     Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
+    Route::get('/carts', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::get('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/coupon/apply', [CartController::class, 'applyCoupon'])->name('coupon.apply');
+    Route::get('/coupon/remove', [CartController::class, 'removeCoupon'])->name('coupon.remove');
 
-    Route::get('/carts', function () {
-        return view('template1.frontend.cart');
-    });
-    Route::get('/checkout', function () {
-        return view('template1.frontend.checkout');
-    });
+    Route::get('/checkout', [OrderController::class,'index'])->name('checkout.index');
     Route::get('/invoice', function () {
         return view('template1.frontend.invoice');
     });

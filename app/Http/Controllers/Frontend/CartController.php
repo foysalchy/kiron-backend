@@ -3,30 +3,102 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\ProductVariation;
+use App\Services\CouponService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function add($store, Request $request)
+    public function __construct(protected CouponService $couponService)
+    {
+
+    }
+    public function index($store)
+    {
+        $company = getCurrentCompany();
+        $template = $company->template_name;
+
+        $cartContent = Cart::content();
+        $subtotal = (float) str_replace(',', '', Cart::subtotal());
+
+        $discount = 0;
+
+        if (session()->has('coupon')) {
+            try {
+                $couponSession = session()->get('coupon');
+                $customerId = auth('customer')->id();
+
+                $result = $this->couponService->validateCoupon(
+                    $couponSession['coupon_code'],
+                    $subtotal,
+                    $customerId
+                );
+
+                $discount = $result['discount_amount'];
+            } catch (\Exception $e) {
+                session()->forget('coupon');
+            }
+        }
+
+        $shipping = $subtotal >= 2000 ? 0 : 60;
+        $total = ($subtotal - $discount) + $shipping;
+
+        return view($template . '.frontend.cart', compact(
+            'cartContent', 'subtotal', 'discount', 'shipping', 'total'
+        ));
+    }
+
+    public function applyCoupon($store, Request $request)
     {
         try {
-            $qty = $request->qty ?? 1;
+            $subtotal = (float) str_replace(',', '', Cart::subtotal());
+            $customerId = auth('customer')->id();
+
+            $result = $this->couponService->validateCoupon(
+                $request->coupon_code,
+                $subtotal,
+                $customerId
+            );
+
+            session()->put('coupon', $result);
+
+            return back()->with('success', 'অভিনন্দন! কুপনটি সফলভাবে যুক্ত হয়েছে।');
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    public function removeCoupon($store)
+    {
+        session()->forget('coupon');
+        return back()->with('success', 'কুপনটি সরানো হয়েছে।');
+    }
+    // product add to cart
+    public function add($store,Request $request)
+    {
+        try {
+            $qty = (int) ($request->qty ?? 1);
 
             if ($request->filled('variation_id')) {
                 $variation = ProductVariation::with('product')->findOrFail($request->variation_id);
+                $thumb = $variation->image
+                    ? asset('storage/' . $variation->image)
+                    : $variation->product->thumbnail_url;
                 Cart::add([
-                    'id'      => 'var_' . $variation->id, // এখানে ID টি ইউনিক করে দিন
+                    'id'      => 'var_' . $variation->id,
                     'name'    => $variation->product->title,
                     'qty'     => $qty,
                     'price'   => $variation->final_price,
                     'weight'  => 0,
                     'options' => [
                         'variation_id' => $variation->id,
-                        'thumbnail'    => $variation->image ?? $variation->product->thumbnail_url,
-                        'variant'      => $variation->display_name
+                        'thumbnail'    => $thumb,
+                        'variant'      => $variation->display_name,
+                        'regular_price' => $variation->regular_price
                     ]
                 ]);
 
@@ -40,7 +112,8 @@ class CartController extends Controller
                     'price'   => $product->sale_price,
                     'weight'  => 0,
                     'options' => [
-                        'thumbnail' => $product->thumbnail_url
+                        'thumbnail' => $product->thumbnail_url,
+                        'regular_price' => $product->regular_price
                     ]
                 ]);
             }
@@ -58,4 +131,17 @@ class CartController extends Controller
             ], 500);
         }
     }
+    //update cart
+    public function update($store, Request $request)
+    {
+        Cart::update($request->rowId, $request->qty);
+        return back()->with('success', 'কার্ট আপডেট হয়েছে');
+    }
+
+    public function remove($store, $rowId)
+    {
+        Cart::remove($rowId);
+        return back()->with('success', 'পণ্যটি আপনার কার্ট থেকে সফলভাবে সরানো হয়েছে!');
+    }
+
 }

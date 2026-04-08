@@ -149,8 +149,8 @@
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>
                     <!-- Count Badge -->
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-                        0
+                    <span class="cart-count-nav absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                        {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                     </span>
                 </div>
                 <span class="hidden lg:block font-semibold text-sm">Cart</span>
@@ -193,38 +193,7 @@
             dropdown.classList.add('hidden');
         }
     });
-    // --- Cart Logic ---
 
-    // 1. Initialize cart from LocalStorage (persists across page refreshes)
-    let cart = JSON.parse(localStorage.getItem('orenmart_cart')) || [];
-
-    // 2. Function to update the badge in the UI
-    function updateCartDisplay() {
-        const countElements = document.querySelectorAll('#cart-count');
-        countElements.forEach(el => {
-            el.innerText = cart.length;
-            // Hide badge if cart is empty (optional)
-            el.style.display = cart.length > 0 ? 'flex' : 'none';
-        });
-    }
-
-    // 3. The Add to Cart function
-    function addToCart(productId) {
-        // Add item to our array
-        cart.push(productId);
-
-        // Save to localStorage
-        localStorage.setItem('orenmart_cart', JSON.stringify(cart));
-
-        // Update the UI
-        updateCartDisplay();
-
-        // Optional: Show a mini-notification instead of a big alert
-        console.log("Product " + productId + " added to cart.");
-
-        // If you want to redirect to cart page after adding (optional):
-        // window.location.href = "{{ url('/carts') }}";
-    }
 
     // --- Filter Toggle Logic ---
     function toggleAllFilters() {

@@ -61,6 +61,24 @@
 
 
     @stack('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000"
+        };
+
+        @if(Session::has('success'))
+            toastr.success("{{ Session::get('success') }}");
+        @endif
+
+        @if(Session::has('error'))
+            toastr.error("{{ Session::get('error') }}");
+        @endif
+    });
+</script>
 </body>
 
 </html>

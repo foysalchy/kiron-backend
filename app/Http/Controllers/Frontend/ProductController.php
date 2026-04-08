@@ -96,8 +96,7 @@ class ProductController extends Controller
 
         if ($request->filled('attributes')) {
             foreach ($request->attributes as $groupId => $ids) {
-                $ids = array_filter((array)$ids); // খালি ভ্যালু রিমুভ করবে
-
+                $ids = array_filter((array)$ids);
                 if (!empty($ids)) {
                     $query->whereHas('variations.attributes', function($q) use ($ids) {
                         $q->whereIn('attribute_value_id', $ids);
@@ -108,11 +107,14 @@ class ProductController extends Controller
 
         if ($request->sort == 'price_low') {
             $query->orderBy('regular_price', 'asc');
-        } elseif ($request->sort == 'price_high') {
+        }
+        elseif ($request->sort == 'price_high') {
             $query->orderBy('regular_price', 'desc');
-        } elseif ($request->sort == 'newest') {
+        }
+        elseif ($request->sort == 'newest') {
             $query->latest();
-        } else {
+        }
+        else {
             $query->latest();
         }
     }
