@@ -36,6 +36,7 @@ class Product extends Model
         'stock_quantity',
         'available_stock',
         'regular_price',
+        'purchase_price',
         'discount_type',
         'discount',
         'purpose',

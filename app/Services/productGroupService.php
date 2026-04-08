@@ -85,7 +85,7 @@ class productGroupService
     public function removeCustomerFromGroup(int $groupId, int $customerId): ProductGroup
     {
         $group = ProductGroup::findOrFail($groupId);
-        
+
 
         $currentIds = $group->customer_ids ?? [];
 
@@ -148,10 +148,52 @@ class productGroupService
             if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
             if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
             if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
-            // date থাকলে Period override করো
             if (!empty($params['date_from']) || !empty($params['date_to'])) {
                 unset($filterDetails['Period']);
             }
+        }
+        if ($group->filter_type === 'low_selling_products') {
+            $filterDetails['Max Qty Threshold'] = ($params['threshold'] ?? 2) . ' units';
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
+        }
+
+        if ($group->filter_type === 'frequently_reordered') {
+            $filterDetails['Min Order Count'] = ($params['min_reorder_count'] ?? 2) . ' orders';
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
+        }
+        if ($group->filter_type === 'high_profit_products') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']  = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']    = $params['date_to'];
+            if (!empty($params['min_profit_amount'])) $filterDetails['Min Profit Amount'] = $params['min_profit_amount'];
+            if (!empty($params['limit']))      $filterDetails['Limit']      = $params['limit'];
+        }
+
+        if ($group->filter_type === 'high_profit_margin_products') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']  = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']    = $params['date_to'];
+            if (!empty($params['min_margin'])) $filterDetails['Min Margin'] = $params['min_margin'] . '%';
+            if (!empty($params['limit']))      $filterDetails['Limit']      = $params['limit'];
+        }
+
+        if ($group->filter_type === 'low_profit_margin_products') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']  = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']    = $params['date_to'];
+            if (!empty($params['max_margin'])) $filterDetails['Max Margin'] = $params['max_margin'] . '%';
+            if (!empty($params['limit']))      $filterDetails['Limit']      = $params['limit'];
+        }
+        if ($group->filter_type === 'high_discount_products') {
+            if (!empty($params['min_discount'])) $filterDetails['Min Discount'] = $params['min_discount'] . '%';
+            if (!empty($params['limit']))        $filterDetails['Limit']        = $params['limit'];
+        }
+
+        if ($group->filter_type === 'full_price_sold_products') {
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
         }
         return [
             'group'          => $group,
@@ -224,7 +266,400 @@ class productGroupService
                     ];
                 });
             }
+            if ($type === 'low_selling_products') {
+                $threshold = !empty($params['threshold']) ? (int) $params['threshold'] : 2;
 
+                $orderConditions = function ($q) use ($params) {
+                    $q->where('status', '!=', Status::Cancelled->value);
+                    if (!empty($params['date_from'])) {
+                        $q->whereDate('order_date', '>=', $params['date_from']);
+                    }
+                    if (!empty($params['date_to'])) {
+                        $q->whereDate('order_date', '<=', $params['date_to']);
+                    }
+                };
+
+                $query = Product::query()
+                    ->select('id', 'title', 'thumbnail')
+                    ->withCount(['orderDetails as total_qty_sold' => function ($q) use ($orderConditions) {
+                        $q->whereHas('order', $orderConditions);
+                    }])
+                    ->having('total_qty_sold', '>', 0)
+                    ->having('total_qty_sold', '<=', $threshold)
+                    ->orderBy('total_qty_sold', 'asc');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'     => $product->id,
+                        'total_qty_sold' => $product->total_qty_sold,
+                        'product'        => $product,
+                    ];
+                });
+            }
+
+            if ($type === 'frequently_reordered') {
+                $threshold = !empty($params['min_reorder_count']) ? (int) $params['min_reorder_count'] : 2;
+
+                $orderConditions = function ($q) use ($params) {
+                    $q->where('status', '!=', Status::Cancelled->value);
+                    if (!empty($params['date_from'])) {
+                        $q->whereDate('order_date', '>=', $params['date_from']);
+                    }
+                    if (!empty($params['date_to'])) {
+                        $q->whereDate('order_date', '<=', $params['date_to']);
+                    }
+                };
+
+                $query = Product::query()
+                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->withCount(['orderDetails as total_order_count' => function ($q) use ($orderConditions) {
+                        $q->whereHas('order', $orderConditions);
+                    }])
+                    ->having('total_order_count', '>=', $threshold)
+                    ->orderByDesc('total_order_count');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'        => $product->id,
+                        'total_qty_sold'    => $product->total_order_count,
+                        'total_order_count' => $product->total_order_count,
+                        'product'           => $product,
+                    ];
+                });
+            }
+            if ($type === 'high_profit_products') {
+                $dateCondition = "";
+                $bindings = [Status::Cancelled->value];
+
+                if (!empty($params['date_from'])) {
+                    $dateCondition .= " AND o.order_date >= ?";
+                    $bindings[] = $params['date_from'];
+                }
+                if (!empty($params['date_to'])) {
+                    $dateCondition .= " AND o.order_date <= ?";
+                    $bindings[] = $params['date_to'];
+                }
+
+                $query = Product::query()
+                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+
+                    // ✅ Cost Priority:
+                    // 1. Latest completed purchase price
+                    // 2. products.purchase_price বা variation.purchase_price (variation_id থাকলে)
+                    // 3. regular_price - 100
+                    ->selectRaw("
+    COALESCE(
+        NULLIF((
+            SELECT pd.purchase_price 
+            FROM purchase_details pd 
+            JOIN purchases p ON p.id = pd.purchase_id 
+            WHERE pd.product_id = products.id 
+              AND p.status = ?
+            ORDER BY p.purchase_date DESC, p.id DESC 
+            LIMIT 1
+        ), 0),
+
+        NULLIF((
+            SELECT pv.purchase_price 
+            FROM product_variations pv 
+            WHERE pv.product_id = products.id 
+              AND pv.deleted_at IS NULL
+            ORDER BY pv.id ASC 
+            LIMIT 1
+        ), 0),
+
+ 
+        NULLIF(
+            CASE 
+                WHEN products.type = 'single' 
+                    THEN products.regular_price - 100
+                ELSE (
+                    SELECT pv.regular_price - 100
+                    FROM product_variations pv 
+                    WHERE pv.product_id = products.id 
+                      AND pv.deleted_at IS NULL
+                    ORDER BY pv.id ASC 
+                    LIMIT 1
+                )
+            END
+        , 0)
+
+    ) as latest_cost
+", [Status::Completed->value])
+                    // Total Qty Sold
+                    ->selectRaw("
+            IFNULL((
+                SELECT SUM(od.quantity) 
+                FROM order_details od 
+                JOIN orders o ON o.id = od.order_id 
+                WHERE od.product_id = products.id 
+                  AND o.status != ?
+                  $dateCondition
+            ), 0) as total_qty_sold
+        ", $bindings)
+
+                    // ✅ Total Revenue — od.total ব্যবহার (discount + tax সব included)
+                    ->selectRaw("
+            IFNULL((
+                SELECT SUM(od.total) 
+                FROM order_details od 
+                JOIN orders o ON o.id = od.order_id 
+                WHERE od.product_id = products.id 
+                  AND o.status != ?
+                  $dateCondition
+            ), 0) as total_revenue
+        ", $bindings)
+
+                    ->havingRaw('(total_revenue - (total_qty_sold * latest_cost)) > 0');
+
+                if (!empty($params['min_profit_amount'])) {
+                    $query->havingRaw('(total_revenue - (total_qty_sold * latest_cost)) >= ?', [(float) $params['min_profit_amount']]);
+                }
+
+                $query->orderByRaw('(total_revenue - (total_qty_sold * latest_cost)) DESC');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    $profit = $product->total_revenue - ($product->total_qty_sold * $product->latest_cost);
+                    return (object)[
+                        'product_id'     => $product->id,
+                        'total_qty_sold' => $product->total_qty_sold,
+                        'total_revenue'  => $product->total_revenue,
+                        'total_profit'   => $profit,
+                        'latest_cost'    => $product->latest_cost,
+                        'product'        => $product,
+                    ];
+                });
+            }
+            // ==========================================
+            //  HIGH PROFIT MARGIN PRODUCTS
+            // ==========================================
+            if ($type === 'high_profit_margin_products') {
+                $dateCondition = "";
+                $bindings = [Status::Cancelled->value];
+
+                if (!empty($params['date_from'])) {
+                    $dateCondition .= " AND o.order_date >= ?";
+                    $bindings[] = $params['date_from'];
+                }
+                if (!empty($params['date_to'])) {
+                    $dateCondition .= " AND o.order_date <= ?";
+                    $bindings[] = $params['date_to'];
+                }
+
+                $query = Product::query()
+                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->selectRaw("
+            COALESCE(
+                NULLIF((SELECT pd.purchase_price FROM purchase_details pd JOIN purchases p ON p.id = pd.purchase_id WHERE pd.product_id = products.id AND p.status = ? ORDER BY p.purchase_date DESC, p.id DESC LIMIT 1), 0),
+                NULLIF((SELECT pv.purchase_price FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL ORDER BY pv.id ASC LIMIT 1), 0),
+                NULLIF(CASE WHEN products.type = 'single' THEN products.regular_price - 100 ELSE (SELECT pv.regular_price - 100 FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL ORDER BY pv.id ASC LIMIT 1) END, 0)
+            ) as latest_cost
+        ", [Status::Completed->value])
+                    ->selectRaw("IFNULL((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON o.id = od.order_id WHERE od.product_id = products.id AND o.status != ? $dateCondition), 0) as total_qty_sold", $bindings)
+                    ->selectRaw("IFNULL((SELECT SUM(od.total) FROM order_details od JOIN orders o ON o.id = od.order_id WHERE od.product_id = products.id AND o.status != ? $dateCondition), 0) as total_revenue", $bindings);
+
+                //  Margin Calculation Logic
+                $query->havingRaw('total_revenue > 0'); // Prevent division by zero
+
+                if (!empty($params['min_margin'])) {
+                    $query->havingRaw('(((total_revenue - (total_qty_sold * latest_cost)) / total_revenue) * 100) >= ?', [(float) $params['min_margin']]);
+                } else {
+                    $query->havingRaw('(((total_revenue - (total_qty_sold * latest_cost)) / total_revenue) * 100) > 0'); // Default positive margin
+                }
+
+                $query->orderByRaw('(((total_revenue - (total_qty_sold * latest_cost)) / total_revenue) * 100) DESC');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    $cost = $product->total_qty_sold * $product->latest_cost;
+                    $profit = $product->total_revenue - $cost;
+                    $margin = $product->total_revenue > 0 ? ($profit / $product->total_revenue) * 100 : 0;
+
+                    return (object)[
+                        'product_id'     => $product->id,
+                        'total_qty_sold' => $product->total_qty_sold,
+                        'total_profit'   => round($profit, 2),
+                        'margin_percent' => round($margin, 2),
+                        'product'        => $product,
+                    ];
+                });
+            }
+
+            // ==========================================
+            //  LOW PROFIT MARGIN PRODUCTS
+            // ==========================================
+            if ($type === 'low_profit_margin_products') {
+                $dateCondition = "";
+                $bindings = [Status::Cancelled->value];
+
+                if (!empty($params['date_from'])) {
+                    $dateCondition .= " AND o.order_date >= ?";
+                    $bindings[] = $params['date_from'];
+                }
+                if (!empty($params['date_to'])) {
+                    $dateCondition .= " AND o.order_date <= ?";
+                    $bindings[] = $params['date_to'];
+                }
+
+                $query = Product::query()
+                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->selectRaw("
+            COALESCE(
+                NULLIF((SELECT pd.purchase_price FROM purchase_details pd JOIN purchases p ON p.id = pd.purchase_id WHERE pd.product_id = products.id AND p.status = ? ORDER BY p.purchase_date DESC, p.id DESC LIMIT 1), 0),
+                NULLIF((SELECT pv.purchase_price FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL ORDER BY pv.id ASC LIMIT 1), 0),
+                NULLIF(CASE WHEN products.type = 'single' THEN products.regular_price - 100 ELSE (SELECT pv.regular_price - 100 FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL ORDER BY pv.id ASC LIMIT 1) END, 0)
+            ) as latest_cost
+        ", [Status::Completed->value])
+                    ->selectRaw("IFNULL((SELECT SUM(od.quantity) FROM order_details od JOIN orders o ON o.id = od.order_id WHERE od.product_id = products.id AND o.status != ? $dateCondition), 0) as total_qty_sold", $bindings)
+                    ->selectRaw("IFNULL((SELECT SUM(od.total) FROM order_details od JOIN orders o ON o.id = od.order_id WHERE od.product_id = products.id AND o.status != ? $dateCondition), 0) as total_revenue", $bindings);
+
+                // ✅ Low Margin Logic
+                $query->havingRaw('total_revenue > 0'); // Prevent division by zero
+
+                if (!empty($params['max_margin'])) {
+                    $query->havingRaw('(((total_revenue - (total_qty_sold * latest_cost)) / total_revenue) * 100) <= ?', [(float) $params['max_margin']]);
+                }
+
+                $query->orderByRaw('(((total_revenue - (total_qty_sold * latest_cost)) / total_revenue) * 100) ASC'); // সবচেয়ে কম মার্জিন আগে আসবে
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    $cost = $product->total_qty_sold * $product->latest_cost;
+                    $profit = $product->total_revenue - $cost;
+                    $margin = $product->total_revenue > 0 ? ($profit / $product->total_revenue) * 100 : 0;
+
+                    return (object)[
+                        'product_id'     => $product->id,
+                        'total_qty_sold' => $product->total_qty_sold,
+                        'total_profit'   => round($profit, 2),
+                        'margin_percent' => round($margin, 2),
+                        'product'        => $product,
+                    ];
+                });
+            }
+
+            // ==========================================
+            //  HIGH DISCOUNT PRODUCTS
+            // ==========================================
+            if ($type === 'high_discount_products') {
+                $query = Product::query()
+                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->selectRaw("
+            COALESCE(
+                CASE WHEN products.type = 'single' THEN
+                    CASE WHEN products.discount_type = 'percent' THEN products.discount
+                         WHEN products.discount_type = 'flat' AND products.regular_price > 0 THEN (products.discount / products.regular_price) * 100
+                         ELSE 0 END
+                ELSE
+                    (SELECT MAX(
+                        CASE WHEN pv.discount_type = 'percent' THEN pv.discount
+                             WHEN pv.discount_type = 'flat' AND pv.regular_price > 0 THEN (pv.discount / pv.regular_price) * 100
+                             ELSE 0 END
+                    ) FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL)
+                END, 0) as max_discount_percent
+        ");
+
+                $query->havingRaw('max_discount_percent > 0');
+
+                if (!empty($params['min_discount'])) {
+                    $query->havingRaw('max_discount_percent >= ?', [(float) $params['min_discount']]);
+                }
+
+
+                $query->orderByRaw('max_discount_percent DESC');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'discount_percent' => round($product->max_discount_percent, 2),
+                        'product'          => $product,
+                    ];
+                });
+            }
+
+            // ==========================================
+            //  FULL PRICE SOLD PRODUCTS (No Discount & Has Sales)
+            // ==========================================
+            if ($type === 'full_price_sold_products') {
+                $dateCondition = "";
+                $bindings = [Status::Cancelled->value];
+
+                if (!empty($params['date_from'])) {
+                    $dateCondition .= " AND o.order_date >= ?";
+                    $bindings[] = $params['date_from'];
+                }
+                if (!empty($params['date_to'])) {
+                    $dateCondition .= " AND o.order_date <= ?";
+                    $bindings[] = $params['date_to'];
+                }
+
+                $query = Product::query()
+                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->selectRaw("
+            COALESCE(
+                CASE WHEN products.type = 'single' THEN
+                    CASE WHEN products.discount_type = 'percent' THEN products.discount
+                         WHEN products.discount_type = 'flat' AND products.regular_price > 0 THEN (products.discount / products.regular_price) * 100
+                         ELSE 0 END
+                ELSE
+                    (SELECT MAX(
+                        CASE WHEN pv.discount_type = 'percent' THEN pv.discount
+                             WHEN pv.discount_type = 'flat' AND pv.regular_price > 0 THEN (pv.discount / pv.regular_price) * 100
+                             ELSE 0 END
+                    ) FROM product_variations pv WHERE pv.product_id = products.id AND pv.deleted_at IS NULL)
+                END, 0) as max_discount_percent
+        ")
+                    ->selectRaw("
+            IFNULL((
+                SELECT SUM(od.quantity) 
+                FROM order_details od 
+                JOIN orders o ON o.id = od.order_id 
+                WHERE od.product_id = products.id 
+                  AND o.status != ?
+                  $dateCondition
+            ), 0) as total_qty_sold
+        ", $bindings);
+
+                $query->havingRaw('max_discount_percent = 0')
+                    ->havingRaw('total_qty_sold > 0');
+
+                $query->orderBy('total_qty_sold', 'DESC');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'total_qty_sold'   => $product->total_qty_sold,
+                        'discount_percent' => 0,
+                        'product'          => $product,
+                    ];
+                });
+            }
             throw ApiException::serverError('Invalid product group filter type');
         } catch (\Exception $e) {
             Log::error('Product group criteria error: ' . $e->getMessage());

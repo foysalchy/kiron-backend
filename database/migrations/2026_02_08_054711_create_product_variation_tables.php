@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('sku')->nullable()->unique();
             $table->decimal('regular_price', 10, 2);
+            $table->decimal('purchase_price', 10, 2);
             $table->enum('discount_type', ['flat', 'percent'])->default('flat');
             $table->decimal('discount', 10, 2)->default(0);
             $table->integer('stock_quantity')->default(0);

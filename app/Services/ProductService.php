@@ -324,6 +324,7 @@ class ProductService
 
         // For variation products, don't store pricing at product level
         $data['regular_price'] = null;
+        $data['purchase_price'] = null;
         $data['discount_type'] = null;
         $data['discount'] = null;
         $data['warehouse_info'] = null; // Don't use JSON for variations
@@ -367,6 +368,7 @@ class ProductService
                 'image' => $variationData['image'] ?? null,
                 'sku' => $variationData['sku'] ?? null,
                 'regular_price' => $variationData['regular_price'],
+                'purchase_price' => $variationData['purchase_price'],
                 'discount_type' => $variationData['discount_type'] ?? 'flat',
                 'discount' => $variationData['discount'] ?? 0,
                 'stock_quantity' => $variationStock,
@@ -599,6 +601,7 @@ class ProductService
                     'sku' => $variationData['sku'] ?? null,
                     'image' => $variationData['image'] ?? $existingVariation->image,
                     'regular_price' => $variationData['regular_price'],
+                    'purchase_price' => $variationData['purchase_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
                     'stock_quantity' => $variationData['stock_quantity'] ?? 0,

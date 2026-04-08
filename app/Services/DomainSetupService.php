@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\LogHelper;
+use App\Models\Domain;
 use App\Models\DomainSetup;
 use Illuminate\Support\Facades\{DB, Http, Log};
 
@@ -10,12 +11,20 @@ class DomainSetupService
 {
     private string $apiToken   = 'iF9aNbBfaKiT3WtsdZSkUiAEoMEnt2Q6aCFlYWUv';
     private string $zoneId     = 'ac7c72e0460207f900a635fb32ae43cf';
-    private string $ipAddress  = '134.209.65.214';  
+    private string $ipAddress  = '134.209.65.214';
     private string $baseDomain = 'doob.com.bd';
 
     public function getDomain()
     {
         return DomainSetup::first();
+    }
+    public function multiDomain()
+    {
+        return Domain::all();
+    }
+    public function deleteDomain($id)
+    {
+        return Domain::find($id)->delete();
     }
 
     public function saveDomain(array $data)
@@ -54,11 +63,53 @@ class DomainSetupService
 
             DB::commit();
             return $domain;
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Domain saving failed: ' . $e->getMessage());
             return 'Failed to save domain settings.';
+        }
+    }
+    public function saveMultiDomain(array $data)
+    {
+        if (!empty($data['domain'])) {
+            $check = $this->zoneCheck($data['domain']);
+            if (!$check) {
+                return [
+                    'success' => false,
+                    'message' => "{$data['domain']} is not pointing to our server IP ({$this->ipAddress}).",
+                ];
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+          
+
+            $domain = Domain::create($data);
+
+            LogHelper::created(
+                'domain',
+                $domain->id,
+                $domain->company_id, 
+                'Domain created: ' . $domain->domain             
+            );
+
+            DB::commit();
+
+            Log::info('Domain saved', ['domain' => $domain]);
+
+            return [
+                'success' => true,
+                'data'    => $domain,
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Domain saving failed: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Failed to save domain settings.',
+            ];
         }
     }
 
@@ -119,7 +170,6 @@ class DomainSetupService
             }
 
             return false;
-
         } catch (\Exception $e) {
             Log::error('DNS Check failed: ' . $e->getMessage());
             return false;

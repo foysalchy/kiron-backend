@@ -17,6 +17,7 @@ class ProductVariation extends Model
         'sku',
         'image',
         'regular_price',
+        'purchase_price',
         'discount_type',
         'discount',
         'stock_quantity',

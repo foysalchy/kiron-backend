@@ -1117,6 +1117,9 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [DomainSetupController::class, 'index']);
                 Route::post('/', [DomainSetupController::class, 'store']);
             });
+            Route::get('/domains', [DomainSetupController::class, 'domains']);
+            Route::post('/domains', [DomainSetupController::class, 'multiDomain']);
+            Route::delete('/domains/{id}', [DomainSetupController::class, 'deleteDomain']);
 
             Route::prefix('email-settings')->group(function () {
                 Route::get('/', [EmailSettingController::class, 'index']);
