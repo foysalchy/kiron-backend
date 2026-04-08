@@ -61,6 +61,22 @@ class productGroupService
             throw ApiException::serverError('Failed to create customer group');
         }
     }
+    public function createGroup2(array $data): ProductGroup
+    {
+        DB::beginTransaction();
+        try {
+
+            $group = ProductGroup::create($data);
+            LogHelper::created('customer_group', $group->id, $group->company_id, $group->name);
+
+            DB::commit();
+            return $group;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Customer Group creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create customer group');
+        }
+    }
 
 
     /**
@@ -100,14 +116,6 @@ class productGroupService
     }
 
     public function deleteGroup(int $id): bool
-    {
-        $group = ProductGroup::findOrFail($id);
-        $group->delete();
-        LogHelper::deleted('customer_group', $group->id, $group->company_id, $group->name);
-        return true;
-    }
-
-    public function deleteGroup2(int $id): bool
     {
         $group = ProductGroup::findOrFail($id);
         $group->delete();
