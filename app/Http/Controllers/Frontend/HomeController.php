@@ -19,11 +19,12 @@ class HomeController extends Controller
             ->where('company_id', $company->company_id ?? $company->id)
             ->get();
 
-        $newArrivals = Product::with(['brand'])
-            ->active()
-            ->latest()
-            ->take(10)
-            ->get();
+        $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
+        ->where('company_id', $company->company_id ?? $company->id)
+        ->active()
+        ->latest()
+        ->take(10)
+        ->get();
 
         $brands = Brand::active()->latest()->take(10)->get();
 

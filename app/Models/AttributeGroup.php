@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AttributeGroup extends Model
@@ -28,7 +29,11 @@ class AttributeGroup extends Model
     {
         return $this->belongsTo(Company::class);
     }
- 
+
+    public function values(): HasMany
+    {
+        return $this->hasMany(AttributeValue::class, 'attribute_group_id');
+    }
     // Scopes
     public function scopeActive($query)
     {
@@ -44,5 +49,6 @@ class AttributeGroup extends Model
     {
         return $query->where('category', $cat);
     }
+
 
 }
