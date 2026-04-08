@@ -14,7 +14,8 @@
 
                 <!-- Form -->
                 <div class="p-8">
-                    <form class="space-y-5">
+                    <form action="{{ route('user.register.store') }}" method="POST" class="space-y-5">
+                        @csrf
 
                         <!-- Full Name -->
                         <div class="space-y-2">
@@ -23,9 +24,10 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="far fa-user text-sm"></i>
                                 </span>
-                                <input type="text" placeholder="আপনার পূর্ণ নাম" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                <input type="text" name="name" value="{{ old('name') }}" placeholder="আপনার পূর্ণ নাম" required
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
                             </div>
+                            @error('name') <span class="text-red-500 text-xs ml-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Email Address -->
@@ -35,9 +37,10 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="far fa-envelope text-sm"></i>
                                 </span>
-                                <input type="email" placeholder="user@example.com" required
-                                    class="w-full pl-11 pr-4 py-2 rounded-lg border bg-blue-100 border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                <input type="email" name="email" value="{{ old('email') }}" placeholder="user@example.com" required
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
                             </div>
+                            @error('email') <span class="text-red-500 text-xs ml-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Mobile Number -->
@@ -47,9 +50,10 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-phone-alt text-sm"></i>
                                 </span>
-                                <input type="tel" placeholder="আপনার মোবাইল নম্বর" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="আপনার মোবাইল নম্বর" required
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
                             </div>
+                            @error('phone') <span class="text-red-500 text-xs ml-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Address -->
@@ -59,9 +63,10 @@
                                 <span class="absolute left-4 top-4 text-gray-400">
                                     <i class="fas fa-map-marker-alt text-sm"></i>
                                 </span>
-                                <textarea placeholder="আপনার সম্পূর্ণ ঠিকানা" rows="3" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm"></textarea>
+                                <textarea name="address" placeholder="আপনার সম্পূর্ণ ঠিকানা" rows="3" required
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('address') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">{{ old('address') }}</textarea>
                             </div>
+                            @error('address') <span class="text-red-500 text-xs ml-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Password -->
@@ -71,13 +76,14 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-lock text-sm"></i>
                                 </span>
-                                <input type="password" placeholder="••••••••" required
-                                    class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
-                                <button type="button"
+                                <input type="password" name="password" id="password" placeholder="••••••••" required
+                                    class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                <button type="button" onclick="togglePassword('password', this)"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
                                     <i class="far fa-eye text-[14px]"></i>
                                 </button>
                             </div>
+                            @error('password') <span class="text-red-500 text-xs ml-1">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Confirm Password -->
@@ -87,9 +93,10 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-lock text-sm"></i>
                                 </span>
-                                <input type="password" placeholder="পাসওয়ার্ড আবার লিখুন" required
+                                {{-- পাসওয়ার্ড কনফার্মেশনের জন্য নাম অবশ্যই password_confirmation হতে হবে --}}
+                                <input type="password" name="password_confirmation" id="password_confirmation" placeholder="পাসওয়ার্ড আবার লিখুন" required
                                     class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
-                                <button type="button"
+                                <button type="button" onclick="togglePassword('password_confirmation', this)"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
                                     <i class="far fa-eye text-sm"></i>
                                 </button>
@@ -98,7 +105,7 @@
 
                         <!-- Terms & Conditions -->
                         <div class="flex items-start gap-3 py-2">
-                            <input type="checkbox" id="terms" required
+                            <input type="checkbox" name="terms" id="terms" required
                                 class="mt-1 w-4 h-4 accent-[#FF6A00] cursor-pointer">
                             <label for="terms" class="text-sm font-medium text-gray-600 cursor-pointer">
                                 আমি <a href="#" class="text-[#FF6A00] hover:underline">নিয়ম ও শর্তাবলী</a> এবং <a
@@ -108,14 +115,14 @@
 
                         <!-- Submit Button -->
                         <button type="submit"
-                            class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-2 text-md font-medium rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
                             নিবন্ধন করুন
                         </button>
 
                         <!-- Login Link -->
                         <div class="text-center pt-4 text-sm">
                             <p class="text-gray-500 font-medium">
-                                ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="{{url('/login')}}"
+                                ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="{{ route('user.login') }}"
                                     class="text-[#FF6A00] font-medium hover:underline ml-1">লগইন করুন</a>
                             </p>
                         </div>
@@ -126,3 +133,21 @@
         </div>
     </section>
 @endsection
+
+@push('scripts')
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('far', 'fa-eye');
+            icon.classList.add('fas', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fas', 'fa-eye-slash');
+            icon.classList.add('far', 'fa-eye');
+        }
+    }
+</script>
+@endpush

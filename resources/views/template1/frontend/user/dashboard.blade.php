@@ -5,10 +5,13 @@
         <!-- Dashboard Header -->
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-2xl font-black text-[#1D2128]">আমার ড্যাশবোর্ড</h1>
-            <button
-                class="px-5 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
-                লগআউট
-            </button>
+            <form action="{{ route('user.logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="px-5 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
+                    লগআউট
+                </button>
+            </form>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -17,13 +20,16 @@
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6 text-center">
                     <!-- Avatar -->
                     <div class="flex justify-center mb-4">
-                        <div
-                            class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
-                            <i class="fas fa-user text-3xl text-gray-300"></i>
+                        <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
+                            @if($user->profile)
+                                <img src="{{ $user->profile_url }}" class="w-full h-full object-cover">
+                            @else
+                                <i class="fas fa-user text-3xl text-gray-300"></i>
+                            @endif
                         </div>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900">John Doe</h3>
-                    <p class="text-sm text-gray-500 font-medium">user@example.com</p>
+                    <h3 class="text-lg font-bold text-gray-900">{{ $user->name }}</h3>
+                    <p class="text-sm text-gray-500 font-medium">{{ $user->email }}</p>
 
                     <!-- Sidebar Menu -->
                     <nav class="mt-8 space-y-2" id="dashboard-nav">
@@ -54,38 +60,32 @@
 
             <!-- Right Side Content Area -->
             <div class="lg:col-span-3">
+                @if(session('success'))
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg shadow-xs flex items-center gap-3">
+                        <i class="fas fa-check-circle text-lg"></i>
+                        <span class="font-bold">{{ session('success') }}</span>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg shadow-xs flex items-center gap-3">
+                        <i class="fas fa-exclamation-circle text-lg"></i>
+                        <span class="font-bold">{{ session('error') }}</span>
+                    </div>
+                @endif
                 <!-- 1. SECTION: OVERVIEW (Default) -->
                 <div id="overview-section" class="dashboard-content space-y-6">
                     <!-- Stats Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div
-                            class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">
-                                    মোট অর্ডার
-                                </p>
-                                <h4 class="text-2xl font-semibold text-gray-900">3</h4>
-                            </div>
-                            <div class="w-12 h-12 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-shopping-bag h-8 w-8 text-orange-500">
-                                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                                    <path d="M3 6h18"></path>
-                                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                                </svg>
-                            </div>
+                        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            <div><p class="text-sm font-medium text-gray-700 mb-1">মোট অর্ডার</p>
+                                <h4 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h4></div>
+                            <i class="fas fa-shopping-bag h-8 w-8 text-orange-500 text-2xl"></i>
                         </div>
-                        <div
-                            class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">
-                                    মোট খরচ
-                                </p>
-                                <h4 class="text-2xl font-semibold text-gray-900">৳3720</h4>
-                            </div>
-                            <div class="w-12 h-12 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            <div><p class="text-sm font-medium text-gray-700 mb-1">মোট খরচ</p>
+                                <h4 class="text-2xl font-semibold text-gray-900">৳{{ number_format($totalSpent ?? 0) }}</h4></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-package h-8 w-8 text-green-500">
                                     <path
@@ -95,25 +95,17 @@
                                     <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
                                     <path d="m7.5 4.27 9 5.15"></path>
                                 </svg>
-                            </div>
                         </div>
-                        <div
-                            class="bg-white p-6 rounded-2xl border border-gray-200 shadow-xs flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">
-                                    উইশলিস্ট
-                                </p>
-                                <h4 class="text-2xl font-semibold text-gray-900">3</h4>
-                            </div>
-                            <div class="w-12 h-12 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                        <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            <div><p class="text-sm font-medium text-gray-700 mb-1">উইশলিস্ট</p>
+                                <h4 class="text-2xl font-semibold text-gray-900">{{ $wishlistCount ?? 0 }}</h4></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-heart h-8 w-8 text-red-500">
                                     <path
                                         d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z">
                                     </path>
                                 </svg>
-                            </div>
                         </div>
                     </div>
 
@@ -125,125 +117,26 @@
                             </h2>
                         </div>
                         <div class="p-6 space-y-4">
-                            <div
-                                class="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-all gap-4">
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-900">ORD-001</p>
-                                    <p class="text-sm text-gray-500 font-medium">
-                                        ২০২৪-০১-১৫
-                                    </p>
+                            @forelse($recentOrders ?? [] as $order)
+                                <div class="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all gap-4">
+                                    <div class="text-left">
+                                        <p class="font-medium text-gray-900">{{ $order->order_number }}</p>
+                                        <p class="text-sm text-gray-500">{{ $order->created_at->format('Y-m-d') }}</p>
+                                    </div>
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full uppercase">{{ $order->status }}</span>
+                                    <div class="flex items-center gap-6">
+                                        <p class="font-semibold text-gray-900">৳{{ number_format($order->grand_total) }}</p>
+                                        <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a>
+                                    </div>
                                 </div>
-                                <span
-                                    class="px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full flex items-center gap-1.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="lucide lucide-circle-check-big h-4 w-4 text-green-500">
-                                        <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                                        <path d="m9 11 3 3L22 4"></path>
-                                    </svg>
-                                    ডেলিভার হয়েছে</span>
-                                <div class="flex items-center gap-6">
-                                    <p class="font-semibold text-gray-900">৳1250</p>
-                                    <a href="{{url('order-details')}}"
-                                        class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:text-[#FF6A00] flex items-center gap-2 transition-all">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        দেখুন
-                                    </a>
-                                </div>
-                            </div>
-                            <div
-                                class="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-all gap-4">
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-900">ORD-002</p>
-                                    <p class="text-sm text-gray-500 font-medium">
-                                        ২০২৪-০১-২০
-                                    </p>
-                                </div>
-                                <span
-                                    class="px-3 py-1 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full flex items-center gap-1.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="lucide lucide-package h-4 w-4 text-orange-500">
-                                        <path
-                                            d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z">
-                                        </path>
-                                        <path d="M12 22V12"></path>
-                                        <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
-                                        <path d="m7.5 4.27 9 5.15"></path>
-                                    </svg>
-                                    প্রসেসিং</span>
-                                <div class="flex items-center gap-6">
-                                    <p class="font-semibold text-gray-900">৳1250</p>
-                                    <a href="{{url('order-details')}}"
-                                        class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:text-[#FF6A00] flex items-center gap-2 transition-all">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        দেখুন
-                                    </a>
-                                </div>
-                            </div>
-                            <div
-                                class="flex flex-col md:flex-row items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50/50 transition-all gap-4">
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-900">ORD-001</p>
-                                    <p class="text-sm text-gray-500 font-medium">
-                                        ২০২৪-০১-১৫
-                                    </p>
-                                </div>
-                                <span
-                                    class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full flex items-center gap-1.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                        stroke-linecap="round" stroke-linejoin="round"
-                                        class="lucide lucide-truck h-4 w-4 text-blue-500">
-                                        <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
-                                        <path d="M15 18H9"></path>
-                                        <path
-                                            d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14">
-                                        </path>
-                                        <circle cx="17" cy="18" r="2"></circle>
-                                        <circle cx="7" cy="18" r="2"></circle>
-                                    </svg>
-                                    শিপ করা হয়েছে</span>
-                                <div class="flex items-center gap-6">
-                                    <p class="font-semibold text-gray-900">৳1250</p>
-                                    <a href="{{url('order-details')}}"
-                                        class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:text-[#FF6A00] flex items-center gap-2 transition-all">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        দেখুন
-                                    </a>
-                                </div>
-                            </div>
+                            @empty
+                                <p class="text-center text-gray-500 py-6">আপনার কোনো অর্ডার নেই।</p>
+                            @endforelse
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. SECTION: ALL MY ORDERS (Initially Hidden) -->
+                <!-- 2. SECTION: ALL MY ORDERS  -->
                 <div id="orders-section" class="dashboard-content hidden space-y-6">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
@@ -252,194 +145,66 @@
                             </h2>
                         </div>
                         <div class="p-6 space-y-8">
-                            <!-- Detailed Order Card 1 -->
-                            <div class="border border-gray-200 rounded-lg p-6 space-y-6">
-                                <!-- Top Row: Order Info (Left) and Status/Price (Right) -->
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <!-- Left Side: Order ID & Date -->
-                                    <div>
-                                        <h4 class="font-semibold text-md text-gray-900">
-                                            ORD-001
-                                        </h4>
-                                        <p class="text-sm text-gray-700 font-medium">
-                                            অর্ডার তারিখ: ২০২৪-০১-১৫
-                                        </p>
-                                    </div>
-
-                                    <!-- Right Side: Status Badge & Price (Pushed to Right) -->
-                                    <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                                        <span
-                                            class="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-circle-check-big h-4 w-4 text-green-500">
-                                                <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                                                <path d="m9 11 3 3L22 4"></path>
-                                            </svg>
-                                            ডেলিভার হয়েছে
-                                        </span>
-                                        <p class="text-lg font-bold text-gray-900 leading-none">
-                                            ৳1250
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Items Grid (Same as before) -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <!-- Item 1 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                G63 Speaker Lamp
+                            @forelse($allOrders as $order)
+                                <div class="border border-gray-200 rounded-lg p-6 space-y-6">
+                                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                        <div>
+                                            <h4 class="font-semibold text-md text-gray-900">#{{ $order->order_number }}</h4>
+                                            <p class="text-sm text-gray-700 font-medium">
+                                                অর্ডার তারিখ: {{ $order->created_at->format('d M, Y') }}
                                             </p>
-                                            <p class="text-gray-500 font-medium">৳690</p>
                                         </div>
-                                    </div>
-                                    <!-- Item 2 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                Car Seat Cover
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳450</p>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <!-- Actions (Same as before) -->
-                                <div class="flex gap-3">
-                                    <a href="./order-details.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        বিস্তারিত
-                                    </a>
-                                    <a href="./invoice.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-download h-4 w-4 mr-1">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" x2="12" y1="15" y2="3"></line>
-                                        </svg>
-                                        ইনভয়েস
-                                    </a>
-                                </div>
-                            </div>
-                            <!-- Detailed Order Card 1 -->
-                            <div class="border border-gray-200 rounded-lg p-6 space-y-6">
-                                <!-- Top Row: Order Info (Left) and Status/Price (Right) -->
-                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <!-- Left Side: Order ID & Date -->
-                                    <div>
-                                        <h4 class="font-semibold text-md text-gray-900">
-                                            ORD-001
-                                        </h4>
-                                        <p class="text-sm text-gray-700 font-medium">
-                                            অর্ডার তারিখ: ২০২৪-০১-১৫
-                                        </p>
+                                        <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
+                                            @php
+                                                $statusClasses = [
+                                                    'pending' => 'bg-orange-100 text-orange-700',
+                                                    'processing' => 'bg-blue-100 text-blue-700',
+                                                    'delivered' => 'bg-green-100 text-green-700',
+                                                    'cancelled' => 'bg-red-100 text-red-700',
+                                                ];
+                                                $currentClass = $statusClasses[strtolower($order->status)] ?? 'bg-gray-100 text-gray-700';
+                                            @endphp
+                                            <span class="px-3 py-1 {{ $currentClass }} text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
+                                                {{ ucfirst($order->status) }}
+                                            </span>
+                                            <p class="text-lg font-bold text-gray-900 leading-none">৳{{ number_format($order->grand_total) }}</p>
+                                        </div>
                                     </div>
 
-                                    <!-- Right Side: Status Badge & Price (Pushed to Right) -->
-                                    <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                                        <span
-                                            class="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-package h-4 w-4 text-orange-500">
-                                                <path
-                                                    d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z">
-                                                </path>
-                                                <path d="M12 22V12"></path>
-                                                <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
-                                                <path d="m7.5 4.27 9 5.15"></path>
-                                            </svg>
-                                            প্রসেসিং
-                                        </span>
-                                        <p class="text-lg font-bold text-gray-900 leading-none">
-                                            ৳1250
-                                        </p>
+                                    <!-- Items inside this order -->
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        @foreach($order->orderItems as $item)
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
+                                                    @if($item->product && $item->product->image_url)
+                                                        <img src="{{ $item->product->image_url }}" class="w-full h-full object-cover">
+                                                    @else
+                                                        <i class="fas fa-image text-gray-200"></i>
+                                                    @endif
+                                                </div>
+                                                <div class="text-sm">
+                                                    <p class="text-gray-800 leading-tight">{{ $item->product->name ?? 'Product Deleted' }}</p>
+                                                    <p class="text-gray-500 font-medium">৳{{ number_format($item->price) }} x {{ $item->quantity }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                     </div>
-                                </div>
 
-                                <!-- Items Grid (Same as before) -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <!-- Item 1 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                G63 Speaker Lamp
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳690</p>
-                                        </div>
-                                    </div>
-                                    <!-- Item 2 -->
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100">
-                                            <i class="fas fa-image text-gray-200"></i>
-                                        </div>
-                                        <div class="text-sm">
-                                            <p class="text-gray-800 leading-tight">
-                                                Car Seat Cover
-                                            </p>
-                                            <p class="text-gray-500 font-medium">৳450</p>
-                                        </div>
+                                    <div class="flex gap-3">
+                                        <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                            <i class="fas fa-eye"></i> বিস্তারিত
+                                        </a>
+                                        <a href="{{ route('user.order.invoice', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                            <i class="fas fa-download"></i> ইনভয়েস
+                                        </a>
                                     </div>
                                 </div>
-
-                                <!-- Actions (Same as before) -->
-                                <div class="flex gap-3">
-                                    <a href="./order-details.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-eye h-4 w-4 mr-1">
-                                            <path
-                                                d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0">
-                                            </path>
-                                            <circle cx="12" cy="12" r="3"></circle>
-                                        </svg>
-                                        বিস্তারিত
-                                    </a>
-                                    <a href="./invoice.html"
-                                        class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-download h-4 w-4 mr-1">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="7 10 12 15 17 10"></polyline>
-                                            <line x1="12" x2="12" y1="15" y2="3"></line>
-                                        </svg>
-                                        ইনভয়েস
-                                    </a>
+                            @empty
+                                <div class="text-center py-10">
+                                    <p class="text-gray-500">আপনার কোনো অর্ডার পাওয়া যায়নি।</p>
                                 </div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -567,119 +332,57 @@
 
                 <!-- 4. SECTION: PROFILE EDIT (Initially Hidden) -->
                 <div id="edit-section" class="dashboard-content hidden space-y-6">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
-                        <div class="p-6">
-                            <h2 class="text-2xl font-bold text-gray-900">প্রোফাইল তথ্য</h2>
-                        </div>
-
-                        <div class="p-6 pt-0">
-                            <form action="#" class="space-y-6">
-                                <!-- Grid Layout -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <!-- Name Field -->
-                                    <div class="space-y-2">
-                                        <label class="text-sm text-gray-700">নাম</label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i class="far fa-user text-sm"></i>
-                                            </span>
-                                            <input type="text" value="John Doe"
-                                                class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-50 bg-gray-50/50 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all">
-                                        </div>
-                                    </div>
-
-                                    <!-- Email Field -->
-                                    <div class="space-y-2">
-                                        <label class="text-sm text-gray-700">ইমেইল</label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i class="far fa-envelope text-sm"></i>
-                                            </span>
-                                            <input type="email" value="user@example.com"
-                                                class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-50 bg-gray-50/50 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all">
-                                        </div>
-                                    </div>
-
-                                    <!-- Phone Field -->
-                                    <div class="space-y-2">
-                                        <label class="text-sm text-gray-700">ফোন</label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i class="fas fa-phone-alt text-sm"></i>
-                                            </span>
-                                            <input type="tel" placeholder="যোগ করা হয়নি"
-                                                class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-50 bg-gray-50/50 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all">
-                                        </div>
-                                    </div>
-
-                                    <!-- Address Field -->
-                                    <div class="space-y-2">
-                                        <label class="text-sm text-gray-700">ঠিকানা</label>
-                                        <div class="relative">
-                                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                                <i class="fas fa-map-marker-alt text-sm"></i>
-                                            </span>
-                                            <input type="text" placeholder="যোগ করা হয়নি"
-                                                class="w-full pl-11 pr-4 py-3 rounded-lg border border-gray-50 bg-gray-50/50 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all">
-                                        </div>
-                                    </div>
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">প্রোফাইল আপডেট করুন</h2>
+                        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="text-sm text-gray-700">নাম</label>
+                                    <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
                                 </div>
-
-                                <!-- Update Button -->
-                                <div class="pt-4">
-                                    <button type="submit"
-                                        class="flex items-center gap-2 bg-[#FF6A00] hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">
-                                        <i class="far fa-edit"></i>
-                                        প্রোফাইল আপডেট করুন
-                                    </button>
+                                <div>
+                                    <label class="text-sm text-gray-700">ইমেইল</label>
+                                    <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
                                 </div>
-                            </form>
-                        </div>
+                                <div>
+                                    <label class="text-sm text-gray-700">ফোন</label>
+                                    <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-700">ঠিকানা</label>
+                                    <input type="text" name="address" value="{{ old('address', $user->address) }}" class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="text-sm text-gray-700">প্রোফাইল ইমেজ</label>
+                                    <input type="file" name="profile" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
+                                </div>
+                            </div>
+                            <button type="submit" class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition-all shadow-sm">প্রোফাইল আপডেট করুন</button>
+                        </form>
                     </div>
                 </div>
 
                 <!-- 5. SECTION: PASSWORD CHANGE (Initially Hidden) -->
                 <div id="password-section" class="dashboard-content hidden space-y-6">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
-                        <!-- Card Header -->
-                        <div class="p-6">
-                            <h2 class="text-2xl font-bold text-gray-900">পাসওয়ার্ড পরিবর্তন করুন</h2>
-                        </div>
-
-                        <div class="p-6 pt-0">
-                            <form action="#" class="space-y-5 max-w-2xl">
-
-                                <!-- Current Password -->
-                                <div class="space-y-2">
-                                    <label class="text-sm text-gray-800">বর্তমান পাসওয়ার্ড</label>
-                                    <input type="password" placeholder="বর্তমান পাসওয়ার্ড লিখুন"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all placeholder:text-gray-400">
-                                </div>
-
-                                <!-- New Password -->
-                                <div class="space-y-2">
-                                    <label class="text-sm text-gray-800">নতুন পাসওয়ার্ড</label>
-                                    <input type="password" placeholder="নতুন পাসওয়ার্ড লিখুন"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all placeholder:text-gray-400">
-                                </div>
-
-                                <!-- Confirm New Password -->
-                                <div class="space-y-2">
-                                    <label class="text-sm text-gray-800">নতুন পাসওয়ার্ড নিশ্চিত করুন</label>
-                                    <input type="password" placeholder="নতুন পাসওয়ার্ড আবার লিখুন"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 text-gray-800 text-sm outline-none focus:border-[#FF6A00] transition-all placeholder:text-gray-400">
-                                </div>
-
-                                <!-- Submit Button -->
-                                <div class="pt-2">
-                                    <button type="submit"
-                                        class="bg-[#FF6A00] hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">
-                                        পাসওয়ার্ড আপডেট করুন
-                                    </button>
-                                </div>
-
-                            </form>
-                        </div>
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">পাসওয়ার্ড পরিবর্তন করুন</h2>
+                        <form action="{{ route('user.password.update') }}" method="POST" class="space-y-5 max-w-2xl">
+                            @csrf
+                            <div>
+                                <label class="text-sm text-gray-800">বর্তমান পাসওয়ার্ড</label>
+                                <input type="password" name="current_password" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-800">নতুন পাসওয়ার্ড</label>
+                                <input type="password" name="password" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-800">পাসওয়ার্ড নিশ্চিত করুন</label>
+                                <input type="password" name="password_confirmation" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
+                            </div>
+                            <button type="submit" class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">আপডেট করুন</button>
+                        </form>
                     </div>
                 </div>
 
@@ -706,5 +409,16 @@
             element.classList.add("bg-[#1D2128]", "text-white");
             element.classList.remove("text-gray-600", "hover:bg-orange-50");
         }
+    </script>
+    <script>
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.bg-green-50, .bg-red-50');
+
+            alerts.forEach(function(alert) {
+                alert.style.transition = "opacity 0.5s ease";
+                alert.style.opacity = "0";
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 4000);
     </script>
 @endpush

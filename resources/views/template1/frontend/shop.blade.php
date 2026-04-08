@@ -6,9 +6,16 @@
         <!-- Main Card Container -->
         <div class="archiveTopInfo">
 
-            <!-- Breadcrumb (Desktop only - hideOnPhone) -->
+            <!-- Breadcrumb -->
             <nav class="hidden md:flex items-center gap-2 mb-6 text-md font-medium text-gray-500">
-                <a href="/" class="hover:text-[#f15a24] transition-colors">Home</a>
+                <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
+
+                <!-- Chevron Icon -->
+                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                </svg>
+                <a href="{{ url('/shop') }}" class="text-gray-500 hover:text-[#f15a24] transition-colors">Category</a>
 
                 <!-- Chevron Icon -->
                 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
@@ -16,20 +23,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                 </svg>
 
-                <a href="/summer-essentials" class=" hover:text-[#f15a24] transition-colors">
-                    Summer Essential
-                </a>
+                <span class="text-[#f15a24]">{{ $category->name ?? 'Shop' }}</span>
             </nav>
 
             <!-- Page Title -->
             <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                Summer Essential
+                {{ $category->name ?? 'All Products' }}
             </h2>
 
-            <!-- Short Description / Subtitle -->
-            <p class="text-md text-gray-500 font-medium">
-                Summer Essential
-            </p>
 
         </div>
 
@@ -38,260 +39,126 @@
     <section class="py-6 container mx-auto">
 
         <div class="flex flex-col lg:flex-row gap-6">
-            <!-- ══════════════════════════════════════
-                        SIDEBAR
-                    ══════════════════════════════════════ -->
+            <!-- ══════════════════════════ SIDEBAR ═════════════════════════════ -->
             <aside class="w-full lg:w-[220px] shrink-0">
-                <div
-                    class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
+                <form action="{{ url()->current() }}" method="GET" id="sidebar-filter-form">
+                    <!-- সর্টিং ভ্যালু ধরে রাখার জন্য হিডেন ইনপুট -->
+                    <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
 
-                    <!-- ① Filter By Price — ALWAYS VISIBLE -->
-                    <div class="p-4">
-                        <h3 class="text-sm font-bold text-gray-800 mb-4">Filter By Price</h3>
+                    <div class="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
 
-                        <div class="relative h-1.5 bg-gray-100 rounded-full mb-6 mx-1">
-                            <div class="absolute h-full bg-[#f15a24] rounded-full" style="left:0%;right:0%;"></div>
-                            <div
-                                class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 left-0 cursor-pointer shadow-sm">
+                        <!-- ① Filter By Price -->
+                        <div class="p-4 border-b border-gray-50">
+                            <h3 class="text-sm font-bold text-gray-800 mb-4">Filter By Price</h3>
+
+                            <div class="relative h-1.5 bg-gray-100 rounded-full mb-6 mx-1">
+                                <div class="absolute h-full bg-[#f15a24] rounded-full" style="left:0%;right:0%;"></div>
+                                <div class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 left-0 cursor-pointer shadow-sm"></div>
+                                <div class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 right-0 cursor-pointer shadow-sm"></div>
                             </div>
-                            <div
-                                class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 right-0 cursor-pointer shadow-sm">
+
+                            <div class="flex items-center gap-2 mb-4">
+                                <input type="number" name="min_price" value="{{ request('min_price', 0) }}"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]">
+                                <input type="number" name="max_price" value="{{ request('max_price', 5000) }}"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]">
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <button type="submit"
+                                    class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-[12px] font-bold hover:bg-orange-600 transition-colors uppercase">
+                                    Filter
+                                </button>
+                                <span class="text-[11px] text-gray-500 font-medium">৳{{ request('min_price', 0) }} — ৳{{ request('max_price', 5000) }}</span>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 mb-4">
-                            <input type="number" value="0"
-                                class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]
-                                    [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:opacity-100">
-                            <input type="number" value="3000"
-                                class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]
-                                    [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:appearance-auto [&::-webkit-inner-spin-button]:opacity-100">
-                        </div>
+                        <!-- ② Filter By Brand header — Toggle Button -->
+                        <button type="button" onclick="toggleAllFilters()"
+                            class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50">
+                            <span class="text-sm font-bold text-gray-800">More Filters</span>
+                            <svg id="all-filters-arrow" class="w-4 h-4 text-gray-400 transition-transform duration-300"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
 
-                        <div class="flex items-center justify-between">
-                            <button
-                                class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-[12px] font-bold hover:bg-orange-600 transition-colors uppercase">
-                                Filter
-                            </button>
-                            <span class="text-[11px] text-gray-500 font-medium">Price: ৳0 — ৳3000</span>
-                        </div>
+                        <!-- ③ ALL FILTERS PANEL (Initially Hidden) -->
+                        <div id="all-filters-panel" class="{{ request()->has('brand') || request()->has('attributes') ? '' : 'hidden' }}">
+
+                            <!-- Brand List -->
+                            <div class="px-4 pt-2 pb-3 border-b border-gray-50">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Brands</h3>
+                                <div class="flex flex-col gap-0 text-gray-800 font-medium">
+                                    @foreach($brands as $brand)
+                                    @php $isSelectedBrand = in_array($brand->id, (array)request('brand')); @endphp
+                                    <label class="flex items-center justify-between py-1.5 cursor-pointer group">
+                                        <span class="text-sm group-hover:text-[#f15a24] {{ $isSelectedBrand ? 'text-[#f15a24]' : '' }}">
+                                            {{ $brand->name }}
+                                        </span>
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" name="brand[]" value="{{ $brand->id }}" onchange="this.form.submit()"
+                                                {{ $isSelectedBrand ? 'checked' : '' }}
+                                                class="absolute opacity-0 w-4 h-4 cursor-pointer z-10">
+                                            <div class="w-4 h-4 border {{ $isSelectedBrand ? 'border-[#f15a24] bg-[#f15a24]/10' : 'border-gray-300' }} rounded-full group-hover:border-[#f15a24] shrink-0 flex items-center justify-center">
+                                                @if($isSelectedBrand)
+                                                    <div class="w-1.5 h-1.5 bg-[#f15a24] rounded-full"></div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Attributes (Color, Size, Style) -->
+                            @foreach($attributeGroups as $group)
+                            <div class="px-4 pt-3 pb-3 border-b border-gray-50">
+                                <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By {{ $group->name }}</h3>
+                                <div class="flex flex-col gap-2 text-gray-800 font-medium">
+                                    @foreach($group->values as $value)
+                                    <label class="flex items-center gap-2 cursor-pointer group">
+                                        <input type="checkbox" name="attributes[{{ $group->id }}][]" value="{{ $value->id }}"
+                                            onchange="this.form.submit()"
+                                            {{ (isset(request('attributes')[$group->id]) && in_array($value->id, request('attributes')[$group->id])) ? 'checked' : '' }}
+                                            class="w-3.5 h-3.5 accent-[#f15a24]">
+                                        <span class="text-sm group-hover:text-[#f15a24]">{{ $value->name }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endforeach
+
+                            <!-- Clear Button -->
+                            <div class="p-4">
+                                <a href="{{ url()->current() }}" class="text-[11px] text-red-500 font-bold hover:underline uppercase">Clear All Filters</a>
+                            </div>
+
+                        </div><!-- /#all-filters-panel -->
                     </div>
-
-                    <!-- ② Filter By Brand header — TOGGLE BUTTON HERE -->
-                    <button onclick="toggleAllFilters()"
-                        class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
-                        <span class="text-sm font-bold text-gray-800">Filter By Brand</span>
-                        <svg id="all-filters-arrow" class="w-4 h-4 text-gray-400 transition-transform duration-300"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <!-- ③ ALL FILTERS PANEL — hidden by default -->
-                    <div id="all-filters-panel" class="hidden">
-
-                        <!-- Brand List -->
-                        <div class="px-4 pt-2 pb-3 ">
-                            <div class="flex flex-col gap-0 text-gray-800 font-medium">
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Toyota</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Honda</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Sultu</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Gucci</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Lounuv</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">hoco</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">HGKJ</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">LIU HJG</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Bushineco</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Super V</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Viper</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Xunniu</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Nexpow</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">Godrej</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                                <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                    <span class="text-sm group-hover:text-[#f15a24]">TRD</span>
-                                    <div
-                                        class="w-4 h-4 border border-gray-300 rounded-full group-hover:border-[#f15a24] shrink-0">
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Filter By Colors -->
-                        <div class="px-4 pt-3 pb-3">
-                            <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By Colors</h3>
-                            <div class="flex flex-col gap-2 text-gray-800 font-medium">
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Beige</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Black</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Green</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Red</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Silver</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Navy
-                                        Blue</span></label>
-                            </div>
-                        </div>
-
-                        <!-- Filter By Size -->
-                        <div class="px-4 pt-3 pb-3">
-                            <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By Size</h3>
-                            <div class="flex flex-col gap-2 text-gray-800 font-medium">
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">36 Inch</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">4 Pcs
-                                        Set</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">47 Inch</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">5 pcs
-                                        Set</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">500ML</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Flat</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Front Door
-                                        Glass</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Rear Door
-                                        Glass</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Rear
-                                        Windshield</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Round</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">30 Inch</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Steel Body
-                                        Duster</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Extra
-                                        Large</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Large
-                                        SUV</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Small
-                                        Sedan</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Medium
-                                        SUV</span></label>
-                            </div>
-                        </div>
-
-                        <!-- Filter By Style -->
-                        <div class="px-4 pt-3 pb-4">
-                            <h3 class="text-sm font-bold text-gray-800 mb-3">Filter By Style</h3>
-                            <div class="flex flex-col gap-2 text-gray-800 font-medium">
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Round
-                                        Design</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">USB
-                                        Cable</span></label>
-                                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox"
-                                        class="w-3.5 h-3.5 accent-[#f15a24]"><span class="text-sm">Rotatable
-                                        Handle</span></label>
-                            </div>
-                        </div>
-
-                    </div><!-- /#all-filters-panel -->
-
-                </div>
+                </form>
             </aside>
 
             <!-- ══════════════════════════════════════
                         MAIN CONTENT
                     ══════════════════════════════════════ -->
-            <main class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <main class="flex-1 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
 
                 <!-- Shop Header -->
                 <div class="px-5 py-3.5 flex items-center justify-between">
-                    <h2 class="text-lg font-bold text-gray-900">Summer Essential</h2>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                        {{ $category ? $category->name : 'আমাদের সব পণ্য' }}
+                    </h2>
                     <div class="relative">
-                        <select
-                            class="appearance-none bg-white border border-gray-200 text-gray-600 text-[13px] rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
-                            <option selected>Default</option>
-                            <option>Price: Low to High</option>
-                            <option>Price: High to Low</option>
-                            <option>Newest First</option>
-                        </select>
+                        <form action="" method="GET" id="sortForm">
+                            <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                                class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
+                                <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default Sorting</option>
+                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First</option>
+                            </select>
+                        </form>
                         <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
                             <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -301,545 +168,91 @@
                     </div>
                 </div>
 
-                <!-- Product Grid — 5 columns -->
-                <div class="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-2">
+                <!-- Product Grid  -->
+                <div class="p-4 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
-                    <!-- Single Product Card -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
+                     @forelse($products as $product)
+                        <div class="group relative flex flex-col p-4 bg-white border border-gray-200 rounded-lg hover:shadow-xl transition-all duration-300">
 
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/f612deb4-7d5c-401e-8b82-d9d7458b5c49.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
+                            <!-- Image Section -->
+                            <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
+                                <img src="{{ $product->thumbnail_url }}"
+                                    class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                                    alt="{{ $product->title }}">
 
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
+                                @if($product->discount > 0)
+                                    <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                        -{{ $product->discount_type == 'percent' ? (int)$product->discount . '%' : '৳' . (int)$product->discount }}
+                                    </div>
+                                @endif
 
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                                <!-- HOVER ICONS -->
+                                <div class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
+                                    <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
+                                        class="w-9 h-9 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye h-4 w-4"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                    </a>
+                                    <button onclick="addToCart({{ $product->id }})"
+                                        class="w-9 h-9 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart h-4 w-4"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                                    </button>
                                 </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
                             </div>
 
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
+                            <!-- Product Info -->
+                            <div class="flex flex-col flex-1">
+                                <h3 class="text-md font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
+                                    {{ $product->title }}
+                                </h3>
+                                <div class="flex items-center gap-1 mb-2">
+                                    <div class="flex text-yellow-400 text-[11px]">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star text-gray-200"></i> <!-- ৪ স্টার পূর্ণ, ১ স্টার খালি বুঝাতে -->
+                                    </div>
+                                    <span class="text-[11px] text-gray-400 font-bold">(25)</span>
                                 </div>
 
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
+                                <!-- Price Row -->
+                                <div class="mt-auto flex items-center justify-between gap-2">
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-md font-bold text-[#FF6A00]">
+                                            ৳{{ number_format($product->sale_price) }}
+                                        </span>
+
+                                        @if($product->regular_price > $product->sale_price)
+                                            <span class="text-sm text-gray-400 line-through">
+                                                ৳{{ number_format($product->regular_price) }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <button onclick="addToCart({{ $product->id }})"
+                                        class="bg-[#1D2128] text-white px-3 py-2 rounded-lg text-sm font-bold hover:bg-[#FF6A00] transition-colors shrink-0">
+                                        Add to Cart
+                                    </button>
+                                </div>
                             </div>
                         </div>
+                    @empty
+                        <div class="col-span-full py-20 text-center">
+                            <i class="fas fa-box-open text-5xl text-gray-200 mb-4"></i>
+                            <p class="text-gray-500 font-medium">No products found in this category.</p>
+                        </div>
+                    @endforelse
+
+
+                </div>
+                <div class="mt-12 flex flex-col items-center gap-4 border-t border-gray-100 pt-8 pb-8">
+                    <p class="text-sm text-gray-500 font-medium">
+                        Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of {{ $products->total() }} products
+                    </p>
+
+                    <div class="flex justify-center">
+                        {{ $products->appends(request()->query())->links() }}
                     </div>
-                    <!-- Card 2 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 3 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/b55d14e8-ae33-47e3-8b23-7296ac1ba55c.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 4 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 5 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 6 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 7 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Card 8 -->
-                    <div
-                        class="group relative flex flex-col p-3 bg-white border border-gray-100 rounded-xl hover:shadow-xl transition-all duration-300">
-
-                        <!-- 1. Image Section with Hover Overlay -->
-                        <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3">
-                            <!-- Product Image -->
-                            <img src="https://orenmart.sgp1.digitaloceanspaces.com/product/519084f4-5bf8-4d77-a607-f75d64beeb1a.jpg"
-                                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                alt="Product">
-
-                            <!-- Discount Badge (Optional) -->
-                            <div
-                                class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
-                                -18%
-                            </div>
-
-                            <!-- HOVER ICONS (Eye & Cart) -->
-                            <div
-                                class="absolute inset-0 bg-black/10 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-[1px]">
-                                <!-- Eye Icon (Details Page) -->
-                                <a href="{{url('product-details')}}"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="View Details">
-                                    <i class="fas fa-eye text-sm"></i>
-                                </a>
-                                <!-- Cart Icon (Add to Cart Action) -->
-                                <button onclick="addToCart(980)"
-                                    class="w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-[#FF6A00] hover:text-white transition-all shadow-md"
-                                    title="Add to Cart">
-                                    <i class="fas fa-shopping-cart text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 2. Product Info Section -->
-                        <div class="flex flex-col flex-1">
-                            <h3
-                                class="text-[13px] font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[36px] group-hover:text-[#FF6A00] transition-colors">
-                                Soft Car Emoji Pillow 2pcs - Fun Pack
-                            </h3>
-
-                            <!-- Rating Stars -->
-                            <div class="flex items-center gap-1 mb-2">
-                                <div class="flex text-yellow-400 text-[10px]">
-                                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                        class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
-                                </div>
-                                <span class="text-[10px] text-gray-400 font-bold">(25)</span>
-                            </div>
-
-                            <!-- Price and Add to Cart Button Row -->
-                            <div class="mt-auto flex items-center justify-between gap-2">
-                                <div class="flex flex-col">
-                                    <span class="text-[15px] font-black text-[#FF6A00]">৳৯৮০</span>
-                                    <span class="text-[11px] text-gray-400 line-through font-bold">৳১২০০</span>
-                                </div>
-
-                                <!-- Bottom Add to Cart Button -->
-                                <button onclick="addToCart(980)"
-                                    class="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-[#FF6A00] transition-colors">
-                                    Add to Cart
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-
                 </div>
             </main>
 

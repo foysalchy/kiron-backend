@@ -68,28 +68,79 @@
                 <span class="hidden lg:block font-semibold text-sm">Wishlist</span>
             </a>
 
-            <!-- Account -->
+            <!-- Account Section -->
             <div class="relative cursor-pointer" id="account-menu">
                 <div onclick="toggleAccount()"
                     class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors select-none">
-                    <i class="fa-regular fa-user text-xl"></i>
-                    <span class="hidden lg:block font-semibold text-[15px]">Account</span>
+
+                    @auth
+                        <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
+                            <img src="{{ auth()->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                                alt="User Profile"
+                                class="w-full h-full object-cover">
+                        </div>
+                    @else
+                        <i class="fa-regular fa-user text-xl"></i>
+                    @endauth
+
+                    <span class="hidden lg:block font-semibold text-md">Account</span>
                     <i class="fas fa-chevron-down text-xs mt-1 text-gray-400"></i>
                 </div>
 
                 <!-- Dropdown -->
                 <div id="account-dropdown"
-                    class="hidden absolute right-0 top-[calc(100%+10px)] w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
-                    <a href="{{ url('/login') }}"
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
-                        <i class="fa-solid fa-right-to-bracket text-gray-400 text-sm"></i>
-                        Login
-                    </a>
-                    <a href="{{ url('/register') }}"
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
-                        <i class="fa-solid fa-user-plus text-gray-400 text-sm"></i>
-                        Register
-                    </a>
+                    class="hidden absolute right-0 top-[calc(100%+10px)] w-56 bg-white rounded-lg shadow-xs border border-gray-100 z-50 overflow-hidden">
+
+                    @auth
+                        <div class="px-5 py-4 border-b border-gray-50">
+                            <p class="text-md font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                            <p class="text-sm font-medium text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                        </div>
+
+                        <!-- মেনু লিঙ্কসমূহ -->
+                        <div class="py-2">
+                            <a href="{{ route('user.profile') }}"
+                                class="flex items-center gap-3 px-5 py-2.5 text-md font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings h-4 w-4 mr-2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                My Account
+                            </a>
+                            <a href="{{ route('user.dashboard') }}?section=orders"
+                                class="flex items-center gap-3 px-5 py-2.5 text-md font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package h-4 w-4 mr-2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"></path><path d="M12 22V12"></path><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path><path d="m7.5 4.27 9 5.15"></path></svg>
+                                Dashboard
+                            </a>
+                            <a href="{{ url('/wishlist') }}"
+                                class="flex items-center gap-3 px-5 py-2.5 text-md font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart h-4 w-4 mr-2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                                Wishlist
+                            </a>
+                        </div>
+
+                        <!-- লগআউট সেকশন -->
+                        <div class="border-t border-gray-100 py-1">
+                            <form action="{{ route('user.logout') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full flex items-center gap-3 px-5 py-2.5 text-md font-medium text-red-500 hover:bg-red-50 transition-colors">
+                                    <i class="fa-solid fa-right-from-bracket w-4"></i>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div class="py-2">
+                            <a href="{{ url('/login') }}"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                <i class="fa-solid fa-right-to-bracket text-gray-400 text-sm"></i>
+                                Login
+                            </a>
+                            <a href="{{ url('/register') }}"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                <i class="fa-solid fa-user-plus text-gray-400 text-sm"></i>
+                                Register
+                            </a>
+                        </div>
+                    @endauth
                 </div>
             </div>
 
@@ -118,7 +169,7 @@
 
             @foreach($headerCategories as $cat)
                 <a class="text-sm font-medium hover:text-[#FF6A00]"
-                href="{{ url('/category/' . $cat->slug) }}">
+                href="{{ route('category.products', $cat->slug) }}">
                 {{ $cat->name }}
                 </a>
             @endforeach

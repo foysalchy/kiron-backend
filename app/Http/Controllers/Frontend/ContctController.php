@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
+use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
 
 class ContctController extends Controller
@@ -14,9 +15,11 @@ class ContctController extends Controller
         $company = getCurrentCompany();
         $template = $company->template_name;
 
+        $faqs = KnowledgeBase::where('company_id', $company->id)
+                ->active()
+                ->get();
 
-
-        return view($template . '.frontend.contact');
+        return view($template . '.frontend.contact',compact('faqs'));
     }
     public function send(Request $request)
     {

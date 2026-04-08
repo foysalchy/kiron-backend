@@ -16,7 +16,7 @@ class UpdateKnowledgeBaseRequest extends UpdateBaseCompanyRequest
 
     public function rules(): array
     {
-        $id = $this->route('id'); 
+        $id = $this->route('id');
 
         return array_merge(
             $this->companyRules(),
@@ -24,6 +24,7 @@ class UpdateKnowledgeBaseRequest extends UpdateBaseCompanyRequest
                 'title'   => ['sometimes', 'required', 'string', 'max:255'],
                 'slug'    => ['nullable', 'string', 'max:255', Rule::unique('knowledge_bases', 'slug')->ignore($id)],
                 'content' => ['sometimes', 'required', 'string'],
+                'category' => ['sometimes', 'required', 'string'],
             ]
         );
     }

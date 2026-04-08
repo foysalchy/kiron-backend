@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Brand extends Model
@@ -28,6 +29,10 @@ class Brand extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 
     // Scopes

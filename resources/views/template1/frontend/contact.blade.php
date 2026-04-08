@@ -29,7 +29,7 @@
                 @endif
 
                 <form action="{{ route('contact.send') }}" method="POST" class="space-y-6">
-                    @csrf 
+                    @csrf
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -153,8 +153,7 @@
 
                 <!-- হোয়াটসঅ্যাপ কার্ড -->
                 <div class="bg-[#EFFFF6] rounded-lg border border-green-200 p-8 text-center group">
-                    <div
-                        class="w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100 group-hover:scale-110 transition-transform">
+                    <div class="w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round"
@@ -164,7 +163,12 @@
                     </div>
                     <h3 class="text-lg font-black text-gray-900 mb-2">হোয়াটসঅ্যাপে যোগাযোগ</h3>
                     <p class="text-gray-600 text-md mb-6">তাৎক্ষণিক সাহায্যের জন্য</p>
-                    <a href="https://wa.me/your-number"
+
+                    @php
+                        $whatsappNumber = preg_replace('/[^0-9]/', '', $setup->phone);
+                    @endphp
+
+                    <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank"
                         class="inline-flex items-center justify-center gap-3 bg-[#16A34A] hover:bg-[#128C7E] text-white font-bold p-4 rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-[0.98]">
                         <!-- WhatsApp Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -208,9 +212,9 @@
             </div>
         </div>
     </section>
-    <!-- FAQ SECTION (Exact Image Match with Toggle Functionality) -->
+    <!-- FAQ SECTION -->
     <section class="container py-6 mx-auto font-['Outfit']">
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="bg-white rounded-lg border border-gray-200 shadow-xs">
 
             <!-- Title -->
             <div class="py-10 text-center">
@@ -220,78 +224,24 @@
             <!-- FAQ Items Container -->
             <div class="px-6 pb-12 space-y-4 mx-auto">
 
-                <!-- Item 1 -->
-                <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
-                    <button onclick="toggleFAQ(this)"
-                        class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                        <span class="text-md font-medium text-gray-800">অর্ডার করার পর কতদিনে পণ্য পৌঁছাবে?</span>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
-                    </button>
-                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                        <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                            সাধারণত অর্ডার কনফার্ম করার পর ঢাকার ভেতরে ২৪-৪৮ ঘণ্টা এবং ঢাকার বাইরে ৩-৫ কার্যদিবসের মধ্যে
-                            ডেলিভারি করা হয়।
+                @forelse($faqs as $faq)
+                    <!-- Dynamic Item -->
+                    <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
+                        <button onclick="toggleFAQ(this)"
+                            class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
+                            <span class="text-md font-medium text-gray-800">{{ $faq->title }}</span>
+                            <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                        </button>
+                        <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
+                            <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
+                                {{-- যদি কন্টেন্টে HTML থাকে তবে {!! $faq->content !!} ব্যবহার করুন --}}
+                                {!! nl2br(e($faq->content)) !!}
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
-                    <button onclick="toggleFAQ(this)"
-                        class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                        <span class="text-md font-medium text-gray-800">পেমেন্ট কিভাবে করব?</span>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
-                    </button>
-                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                        <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                            আপনি ক্যাশ অন ডেলিভারি, বিকাশ, নগদ, রকেট অথবা ব্যাংক ট্রান্সফারের মাধ্যমে পেমেন্ট করতে পারবেন।
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 3 -->
-                <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
-                    <button onclick="toggleFAQ(this)"
-                        class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                        <span class="text-md font-medium text-gray-800">পণ্য ফেরত দেওয়া যাবে কি?</span>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
-                    </button>
-                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                        <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                            হ্যাঁ, যদি পণ্যে কোনো ত্রুটি থাকে তবে ৭ দিনের মধ্যে আমাদের রিটার্ন পলিসি অনুযায়ী পণ্য ফেরত দিতে
-                            পারবেন।
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 4 -->
-                <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
-                    <button onclick="toggleFAQ(this)"
-                        class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                        <span class="text-md font-medium text-gray-800">ওয়ারেন্টি কতদিনের?</span>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
-                    </button>
-                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                        <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                            আমাদের প্রতিটি ইলেকট্রনিক পণ্যের সাথে নির্দিষ্ট মেয়াদের সার্ভিস ওয়ারেন্টি প্রদান করা হয়।
-                            বিস্তারিত পণ্যের বিবরণীতে দেখুন।
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 5 -->
-                <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
-                    <button onclick="toggleFAQ(this)"
-                        class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                        <span class="text-md font-medium text-gray-800">হোম ডেলিভারি চার্জ কত?</span>
-                        <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
-                    </button>
-                    <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                        <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                            ঢাকার ভেতরে ডেলিভারি চার্জ ৬০ টাকা এবং ঢাকার বাইরে ১২০ টাকা। তবে ১০০০ টাকার বেশি অর্ডারে ফ্রি
-                            ডেলিভারি পাওয়া যাবে।
-                        </div>
-                    </div>
-                </div>
+                @empty
+                    <p class="text-center text-gray-500">কোনো তথ্য পাওয়া যায়নি।</p>
+                @endforelse
 
             </div>
         </div>

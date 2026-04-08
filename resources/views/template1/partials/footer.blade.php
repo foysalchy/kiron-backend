@@ -103,8 +103,7 @@
                                 class="text-gray-400 hover:text-[#FF6A00] transition-colors">Help & Support</a></li>
                         <li><a href="{{ url('/blogs') }}"
                                 class="text-gray-400 hover:text-[#FF6A00] transition-colors">Blog</a></li>
-                        <li><a href="{{ url('/apply-seller') }}"
-                                class="text-gray-400 hover:text-[#FF6A00] transition-colors">Become a Seller</a></li>
+
                     </ul>
                 </div>
 
@@ -112,18 +111,14 @@
                 <div>
                     <h4 class="text-lg font-bold mb-6">Categories</h4>
                     <ul class="space-y-3 text-md">
-                        <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Car
-                                Interior</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Car
-                                Exterior</a></li>
-                        <li><a href="#"
-                                class="text-gray-400 hover:text-[#FF6A00] transition-colors">Electronics</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Oil &
-                                Care</a></li>
-                        <li><a href="#"
-                                class="text-gray-400 hover:text-[#FF6A00] transition-colors">Performance</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Safety</a>
-                        </li>
+                        @foreach($headerCategories as $cat)
+                            <li>
+                                <a href="{{ url('/category/' . $cat->slug) }}"
+                                class="text-gray-400 hover:text-[#FF6A00] transition-colors">
+                                    {{ $cat->name }}
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
 
