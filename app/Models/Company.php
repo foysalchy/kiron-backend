@@ -20,13 +20,17 @@ class Company extends Model
         'logo',
         'address',
         'business_type',
+        'invoice_template',
         'status',
     ];
 
-
+protected $casts = [
+        'invoice_template' => 'array', 
+    ];
 
     protected $hidden = [
         'deleted_at',
+        
     ];
     public function users()
     {

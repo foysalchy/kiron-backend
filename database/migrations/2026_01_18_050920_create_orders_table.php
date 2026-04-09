@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('type')->comment('pos, sales');
             $table->string('order_no')->unique();
             $table->string('reference_no')->nullable();
+            $table->json('shipping_address')->nullable();
             $table->date('order_date');
             $table->boolean('is_walk_in')->default(false);
 

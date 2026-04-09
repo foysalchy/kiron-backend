@@ -90,7 +90,7 @@ class AuthController extends Controller
 
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
-
+        $user->load('company');
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
@@ -106,6 +106,8 @@ class AuthController extends Controller
                 'status' => $user->status, // Add status here so frontend knows
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
+                'company' => $user->company,
+
             ],
         ]);
     }

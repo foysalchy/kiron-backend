@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateSiteSettingRequest;
 use App\Services\SiteSettingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SiteSettingController extends Controller
 {
@@ -59,7 +60,7 @@ class SiteSettingController extends Controller
     public function update(UpdateSiteSettingRequest $request, int $id): JsonResponse
 
     {
-  
+
         $data = $this->siteSettingService->updateSiteSetting($id, $request->validated());
 
         return ResponseHelper::success($data, 'Site setting updated successfully');
@@ -102,5 +103,47 @@ class SiteSettingController extends Controller
         $data = $this->siteSettingService->toggleStatus($id);
 
         return ResponseHelper::success($data, 'Site status updated successfully');
+    }
+
+    public function updateInvoiceTemplate(Request $request)
+    {
+        $request->validate([
+            'template_id'     => 'required',
+            'primary_color'   => 'nullable|string',
+            'secondary_color' => 'nullable|string',
+        ]);
+
+        try {
+            $user = auth()->user();
+            $company = $user->company;
+
+            if (!$company) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Company not found for this user.'
+                ], 404);
+            }
+
+            $company->update([
+                'invoice_template' => [
+                    'id'              => $request->template_id,
+                    'primary_color'   => $request->primary_color,
+                    'secondary_color' => $request->secondary_color,
+                ]
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Invoice settings updated successfully!',
+                'data'    => $company
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Invoice Template Update Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update invoice settings.'
+            ], 500);
+        }
     }
 }

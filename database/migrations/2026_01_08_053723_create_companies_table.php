@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('alternative_phone', 20)->nullable();
             $table->string('logo')->nullable();
             $table->text('address')->nullable();
+            $table->json('invoice_template')->nullable();
             $table->tinyInteger('business_type')->default(1);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();

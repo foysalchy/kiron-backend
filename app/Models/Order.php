@@ -29,6 +29,7 @@ class Order extends Model
         'type',
         'order_no',
         'reference_no',
+        'shipping_address',
         'order_date',
         'is_walk_in',
         'total_quantities',
@@ -60,6 +61,7 @@ class Order extends Model
         'payment_status' => 'integer',
         'status' => 'integer',
         'courier_info' => 'array',
+        'shipping_address' => 'array',
     ];
 
     /**

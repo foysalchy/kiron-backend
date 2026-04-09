@@ -65,7 +65,10 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
                 'payments.*.payment_method' => ['required_with:payments', 'string', 'in:cash,bank,card,cheque,mobile_banking'],
                 'payments.*.reference_no' => ['nullable', 'string'],
                 'payments.*.note' => ['nullable', 'string'],
-
+                'shipping_address' => 'nullable|array',
+                'shipping_address.name' => 'nullable|string',
+                'shipping_address.phone' => 'nullable|string',
+                'shipping_address.address' => 'nullable|string',
                 'hold_ref' => ['nullable', 'string'],
                 'note' => ['nullable', 'string'],
                 'status' => ['nullable'],
