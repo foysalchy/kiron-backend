@@ -129,7 +129,7 @@ class ProductController extends Controller
         $product = Product::where('slug', $slug)
                     ->where('company_id', $company->id)
                     ->active()
-                    ->with(['galleries', 'variations', 'brand'])
+                    ->with(['variations', 'brand'])
                     ->firstOrFail();
 
         $relatedProducts = Product::where('company_id', $company->id)

@@ -126,7 +126,8 @@
                                     <span class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full uppercase">{{ $order->status }}</span>
                                     <div class="flex items-center gap-6">
                                         <p class="font-semibold text-gray-900">৳{{ number_format($order->grand_total) }}</p>
-                                        <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a>
+                                        <a href="" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a>
+                                        {{-- <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a> --}}
                                     </div>
                                 </div>
                             @empty
@@ -174,7 +175,7 @@
 
                                     <!-- Items inside this order -->
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        @foreach($order->orderItems as $item)
+                                        @foreach($order->orderDetails as $item)
                                             <div class="flex items-center gap-3">
                                                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
                                                     @if($item->product && $item->product->image_url)
@@ -192,10 +193,10 @@
                                     </div>
 
                                     <div class="flex gap-3">
-                                        <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                        <a href="" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-eye"></i> বিস্তারিত
                                         </a>
-                                        <a href="{{ route('user.order.invoice', $order->id) }}" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                        <a href="/" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-download"></i> ইনভয়েস
                                         </a>
                                     </div>

@@ -153,7 +153,7 @@ class AuthController extends Controller
 
         $user = Auth::guard('customer')->user();
 
-        $allOrders = $user->orders()->with('orderItems.product')->latest()->get();
+        $allOrders = $user->orders()->with('orderDetails.product')->latest()->get();
         $recentOrders = $allOrders->take(5);
 
 

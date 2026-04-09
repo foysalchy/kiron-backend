@@ -54,8 +54,12 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/coupon/apply', [CartController::class, 'applyCoupon'])->name('coupon.apply');
     Route::get('/coupon/remove', [CartController::class, 'removeCoupon'])->name('coupon.remove');
+    Route::post('/cart/shipping', [CartController::class, 'updateShipping'])->name('cart.shipping');
 
     Route::get('/checkout', [OrderController::class,'index'])->name('checkout.index');
+    Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('order.store');
+    Route::post('/order/partial-save', [OrderController::class, 'partialSave'])->name('order.partial');
+
     Route::get('/invoice', function () {
         return view('template1.frontend.invoice');
     });
@@ -67,9 +71,6 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/product-track', function () {
         return view('template1.frontend.product-track');
     });
-    // Route::get('/shop', function () {
-    //     return view('template1.frontend.shop');
-    // });
 
 
     Route::get('/wishlist', function () {

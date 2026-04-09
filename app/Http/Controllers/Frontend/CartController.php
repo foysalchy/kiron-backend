@@ -24,6 +24,11 @@ class CartController extends Controller
         $cartContent = Cart::content();
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
+        //delivvery charge default=60
+        $shipping = session()->get('shipping_cost', 60);
+        $shipping_area = session()->get('shipping_area', 'inside');
+
+        //coupon discount
         $discount = 0;
 
         if (session()->has('coupon')) {
@@ -43,12 +48,27 @@ class CartController extends Controller
             }
         }
 
-        $shipping = $subtotal >= 2000 ? 0 : 60;
-        $total = ($subtotal - $discount) + $shipping;
+         $total = ($subtotal - $discount) + $shipping;
 
-        return view($template . '.frontend.cart', compact(
-            'cartContent', 'subtotal', 'discount', 'shipping', 'total'
+        return view($template . '.frontend.cart',
+        compact(
+            'cartContent',
+            'subtotal',
+            'discount',
+            'shipping',
+            'total',
+            'shipping_area'
         ));
+    }
+    //shipping area method
+    public function updateShipping($store, Request $request)
+    {
+        $cost = ($request->area == 'outside') ? 120 : 60;
+
+        session()->put('shipping_area', $request->area);
+        session()->put('shipping_cost', $cost);
+
+        return back()->with('success', 'ডেলিভারি এরিয়া আপডেট করা হয়েছে।');
     }
 
     public function applyCoupon($store, Request $request)

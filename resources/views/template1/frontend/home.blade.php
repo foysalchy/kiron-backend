@@ -201,52 +201,7 @@
 
                     <!-- NEW ARRIVALS -->
                     @foreach ($newArrivals as $product)
-                        <div
-                            class="flex-shrink-0 w-[240px] flex flex-col group/card bg-white border border-gray-100 rounded-lg p-3 hover:shadow-md transition-all">
-                            <a href="{{ url('product/' . $product->slug) }}" class="block">
-                                <div
-                                    class="w-full aspect-square overflow-hidden rounded-lg border border-gray-50 mb-3 bg-[#f9f9f9]">
-                                    <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                        onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                        class="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-500"
-                                        alt="{{ $product->title }}">
-                                </div>
-
-                                <h3
-                                    class="text-md leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2 px-1">
-                                    {{ $product->title }}
-                                </h3>
-                            </a>
-
-                            <div class="flex items-center justify-between gap-1 px-1 mt-auto">
-                                <div class="">
-                                    @if ($product->display_price_data->sale_price > 0)
-                                        <span class="text-lg font-bold text-[#f15a24]">
-                                            ৳{{ number_format($product->display_price_data->sale_price, 0) }}{{ $product->display_price_data->is_variation ? '+' : '' }}
-                                        </span>
-
-                                        {{-- ডিসকাউন্ট থাকলে রেগুলার প্রাইস দেখাবে --}}
-                                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                                            <span class="text-xs text-gray-400 line-through">
-                                                ৳{{ number_format($product->display_price_data->regular_price, 0) }}
-                                            </span>
-                                        @endif
-                                    @endif
-                                </div>
-
-                                @if ($product->type === 'single')
-                                    <button onclick="addSingleToCart({{ $product->id }})"
-                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FF6A00] transition-all shrink-0">
-                                        Add to Cart
-                                    </button>
-                                @else
-                                    <button onclick="openVariationModal({{ $product->id }})"
-                                        class="bg-[#1D2128] text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[#FF6A00] transition-all shrink-0">
-                                        Add to Cart
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
+                        <x-template1.product-card :product="$product" />
                     @endforeach
 
                 </div><!-- /#na-track -->
@@ -351,73 +306,9 @@
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">
                 @foreach ($popularProducts as $product)
-                    <div class="group flex flex-col cursor-pointer">
-
-                        <!-- Image & Title Link -->
-                        <a href="{{ url('product/' . $product->slug) }}" class="block">
-                            <div class="relative w-full aspect-square overflow-hidden rounded-lg border border-gray-100 mb-3 bg-[#f9f9f9]">
-                                <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                    alt="{{ $product->title }}">
-
-                                @if ($product->total_sales > 0)
-                                    <div class="absolute top-2 left-2 bg-black/70 text-white text-xs font-bold px-2 py-0.5 rounded shadow-sm">
-                                        {{ $product->total_sales }} Sold
-                                    </div>
-                                @endif
-                            </div>
-
-                            <h3 class="text-md leading-[1.4] text-gray-600 font-medium line-clamp-2 h-[40px] mb-2">
-                                {{ $product->title }}
-                            </h3>
-                        </a>
-
-                        <div class="flex flex-col mt-auto gap-1">
-
-                            <div>
-                                 @if ($product->display_price_data->sale_price > 0)
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[17px] font-bold text-[#f15a24]">
-                                            ৳{{ number_format($product->display_price_data->sale_price, 0) }}{{ $product->display_price_data->is_variation ? '+' : '' }}
-                                        </span>
-
-                                        {{-- ডিসকাউন্ট থাকলে রেগুলার প্রাইস দেখাবে --}}
-                                        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                                            <span class="text-[13px] text-gray-400 line-through">
-                                                ৳{{ number_format($product->display_price_data->regular_price, 0) }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                @endif
-                            </div>
-
-                            {{-- Brand --}}
-                            @if ($product->brand)
-                                <div class="mt-1">
-                                    <span class="bg-[#f15a24] text-white text-[11px] font-bold px-2 py-0.5 rounded-xs shadow-sm inline-block uppercase">
-                                        {{ $product->brand->name }}
-                                    </span>
-                                </div>
-                            @endif
-
-                            <div class="mt-3">
-                                @if ($product->type === 'single')
-                                    <button onclick="addSingleToCart({{ $product->id }})"
-                                        class="w-full bg-[#1D2128] text-white py-1.5 rounded-md text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
-                                        Add to Cart
-                                    </button>
-                                @else
-                                    <button onclick="openVariationModal({{ $product->id }})"
-                                        class="w-full bg-[#1D2128] text-white py-1.5 rounded-md text-[12px] font-bold hover:bg-[#FF6A00] transition-all shrink-0">
-                                        Add to Cart
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                   <x-template1.product-card :product="$product" />
                 @endforeach
 
             </div>

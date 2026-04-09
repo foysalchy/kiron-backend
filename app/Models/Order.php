@@ -164,6 +164,10 @@ class Order extends Model
     {
         return $this->status === Status::Pending->value;
     }
+    public function isDraft(): bool
+    {
+        return $this->status === Status::Draft->value;
+    }
 
     public function isDelivered(): bool
     {

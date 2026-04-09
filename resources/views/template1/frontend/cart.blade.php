@@ -80,15 +80,36 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6 sticky top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">অর্ডার সামারি</h2>
 
-                        <!-- Coupon Section -->
+                        <!-- selection shipping area -->
+                        <div class="mb-6">
+                            <label class="text-sm font-bold text-gray-600 block mb-3">শিপিং এরিয়া সিলেক্ট করুন</label>
+                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
+                                @csrf
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        <input type="radio" name="area" value="inside" onchange="this.form.submit()"
+                                            {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                        <span class="text-sm font-bold text-gray-700">ঢাকার ভেতরে (৳৬০)</span>
+                                    </label>
+
+                                    <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        <input type="radio" name="area" value="outside" onchange="this.form.submit()"
+                                            {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                        <span class="text-sm font-bold text-gray-700">ঢাকার বাইরে (৳১২০)</span>
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf
                             <label class="text-sm font-bold text-gray-600 block mb-2">কুপন কোড</label>
                             <div class="flex gap-2">
                                 <input type="text" name="coupon_code" placeholder="কুপন কোড লিখুন"
-                                       value="{{ session()->has('coupon_code') ? session('coupon_code')['coupon_code'] : '' }}"
-                                       class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
-                                       {{ session()->has('coupon') ? 'readonly' : '' }}>
+                                    value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
+                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
+                                    {{ session()->has('coupon') ? 'readonly' : '' }}>
 
                                 @if(session()->has('coupon'))
                                     <a href="{{ route('coupon.remove') }}" class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
@@ -102,13 +123,13 @@
                             </div>
                         </form>
 
-                        <div class="space-y-4 border-t border-gray-50 pt-6 mb-6">
+                        <!-- calcualtion -->
+                        <div class="space-y-4 border-t border-gray-100 pt-6 mb-6">
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>সাবটোটাল:</span>
                                 <span>৳{{ number_format($subtotal, 0) }}</span>
                             </div>
 
-                            {{-- discount --}}
                             @if($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
                                     <span>ডিসকাউন্ট ({{ session('coupon')['coupon_code'] }}):</span>
@@ -120,19 +141,9 @@
                                 <span>ডেলিভারি চার্জ:</span>
                                 <span>৳{{ number_format($shipping, 0) }}</span>
                             </div>
-
-                            <!-- Shipping Progress Message -->
-                            <div class="flex items-center gap-2 text-sm font-bold text-orange-600">
-                                <i class="fas fa-truck"></i>
-                                @if($subtotal >= 1000)
-                                    <span>অভিনন্দন! আপনি ফ্রি ডেলিভারি পাচ্ছেন।</span>
-                                @else
-                                    <span>আরো ৳{{ number_format(1000 - $subtotal, 0) }} কিনলে ফ্রি ডেলিভারি!</span>
-                                @endif
-                            </div>
                         </div>
 
-                                        <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
+                        <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
                             <span class="text-lg font-black text-gray-800">মোট:</span>
                             <span class="text-2xl font-black text-[#FF6A00]">৳{{ number_format($total, 0) }}</span>
                         </div>
@@ -143,7 +154,7 @@
                             চেকআউট করুন
                         </a>
 
-                        <p class="text-center text-gray-500 text-sm font-medium flex items-center justify-center gap-2 mb-8">
+                        <p class="text-center text-gray-500 text-sm font-medium flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck h-4 w-4"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
                              ২-৩ দিনে ডেলিভারি
                         </p>

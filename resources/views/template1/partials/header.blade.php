@@ -73,9 +73,9 @@
                 <div onclick="toggleAccount()"
                     class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors select-none">
 
-                    @auth
+                    @auth('customer')
                         <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-                            <img src="{{ auth()->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                            <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                                 alt="User Profile"
                                 class="w-full h-full object-cover">
                         </div>
@@ -91,10 +91,10 @@
                 <div id="account-dropdown"
                     class="hidden absolute right-0 top-[calc(100%+10px)] w-56 bg-white rounded-lg shadow-xs border border-gray-100 z-50 overflow-hidden">
 
-                    @auth
+                    @auth('customer')
                         <div class="px-5 py-4 border-b border-gray-50">
-                            <p class="text-md font-medium text-gray-900 truncate">{{ auth()->user()->name }}</p>
-                            <p class="text-sm font-medium text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                            <p class="text-md font-medium text-gray-900 truncate">{{ auth('customer')->user()->name }}</p>
+                            <p class="text-sm font-medium text-gray-500 truncate">{{ auth('customer')->user()->email }}</p>
                         </div>
 
                         <!-- মেনু লিঙ্কসমূহ -->

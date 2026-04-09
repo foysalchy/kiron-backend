@@ -42,4 +42,8 @@ class Warehouse extends Model
     {
         return $query->where('company_id', $companyId);
     }
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(ProductVariationStock::class);
+    }
 }
