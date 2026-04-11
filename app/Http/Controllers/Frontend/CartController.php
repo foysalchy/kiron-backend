@@ -12,10 +12,7 @@ use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    public function __construct(protected CouponService $couponService)
-    {
-
-    }
+    public function __construct(protected CouponService $couponService) {}
     public function index($store)
     {
         $company = getCurrentCompany();
@@ -48,17 +45,19 @@ class CartController extends Controller
             }
         }
 
-         $total = ($subtotal - $discount) + $shipping;
+        $total = ($subtotal - $discount) + $shipping;
 
-        return view($template . '.frontend.cart',
-        compact(
-            'cartContent',
-            'subtotal',
-            'discount',
-            'shipping',
-            'total',
-            'shipping_area'
-        ));
+        return view(
+            $template . '.frontend.cart',
+            compact(
+                'cartContent',
+                'subtotal',
+                'discount',
+                'shipping',
+                'total',
+                'shipping_area'
+            )
+        );
     }
     //shipping area method
     public function updateShipping($store, Request $request)
@@ -67,6 +66,35 @@ class CartController extends Controller
 
         session()->put('shipping_area', $request->area);
         session()->put('shipping_cost', $cost);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $subtotal = (float) str_replace(',', '', Cart::subtotal());
+
+            // 
+            $discount = 0;
+            if (session()->has('coupon')) {
+                try {
+                    $couponSession = session()->get('coupon');
+                    $result = $this->couponService->validateCoupon(
+                        $couponSession['coupon_code'],
+                        $subtotal,
+                        auth('customer')->id()
+                    );
+                    $discount = $result['discount_amount'];
+                } catch (\Exception $e) {
+                    session()->forget('coupon');
+                }
+            }
+
+            $total = ($subtotal - $discount) + $cost;
+
+            return response()->json([
+                'success' => true,
+                'shipping_cost' => $cost,
+                'grand_total' => number_format($total),
+                'message' => 'ডেলিভারি চার্জ আপডেট করা হয়েছে।'
+            ]);
+        }
 
         return back()->with('success', 'ডেলিভারি এরিয়া আপডেট করা হয়েছে।');
     }
@@ -86,7 +114,6 @@ class CartController extends Controller
             session()->put('coupon', $result);
 
             return back()->with('success', 'অভিনন্দন! কুপনটি সফলভাবে যুক্ত হয়েছে।');
-
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -98,7 +125,7 @@ class CartController extends Controller
         return back()->with('success', 'কুপনটি সরানো হয়েছে।');
     }
     // product add to cart
-    public function add($store,Request $request)
+    public function add($store, Request $request)
     {
         try {
             $qty = (int) ($request->qty ?? 1);
@@ -121,7 +148,6 @@ class CartController extends Controller
                         'regular_price' => $variation->regular_price
                     ]
                 ]);
-
             } else {
                 $product = Product::findOrFail($request->id);
 
@@ -143,7 +169,6 @@ class CartController extends Controller
                 'cart_count' => Cart::count(),
                 'message'    => 'সফলভাবে কার্টে যোগ করা হয়েছে!'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
@@ -163,5 +188,4 @@ class CartController extends Controller
         Cart::remove($rowId);
         return back()->with('success', 'পণ্যটি আপনার কার্ট থেকে সফলভাবে সরানো হয়েছে!');
     }
-
 }

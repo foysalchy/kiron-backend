@@ -122,23 +122,51 @@ class ProductController extends Controller
     public function productDetails($store, $slug)
     {
         $company = getCurrentCompany();
-        if (!$company) abort(401);
-
         $template = $company->template_name;
 
-        $product = Product::where('slug', $slug)
-                    ->where('company_id', $company->id)
-                    ->active()
-                    ->with(['variations', 'brand'])
-                    ->firstOrFail();
+        // ১. variations.galleries সহ সব রিলেশন লোড করা
+        $product = Product::with([
+            'variations.attributes.attributeGroup',
+            'variations.attributes.attributeValue',
+            'variations.galleries', // ভ্যারিয়েশন গ্যালারি লোড
+            'galleries',
+            'brand'
+        ])->where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
 
-        $relatedProducts = Product::where('company_id', $company->id)
-                            ->active()
-                            ->where('id', '!=', $product->id)
-                            ->latest()
-                            ->take(8)
-                            ->get();
 
-        return view($template . '.frontend.productDetails', compact('product', 'relatedProducts'));
+
+        Product::loadCategoriesForCollection(collect([$product]));
+
+        $attributeGroups = [];
+        $formattedVariations = [];
+
+        if ($product->type === 'variation') {
+            foreach ($product->variations as $variation) {
+                $attrs = [];
+                foreach ($variation->attributes as $attr) {
+                    $groupName = $attr->attributeGroup?->name ?? 'Unknown';
+                    if (!in_array($groupName, $attributeGroups)) $attributeGroups[] = $groupName;
+                    $attrs[$groupName] = ['id' => $attr->attributeValue?->id, 'name' => $attr->attributeValue?->name ?? 'Unknown'];
+                }
+
+                // ২. ভ্যারিয়েশনের নিজস্ব গ্যালারি ইমেজগুলো নেওয়া
+                $varGalleries = $variation->galleries->map(function($g) {
+                    return asset('storage/' . $g->image);
+                })->toArray();
+
+                $formattedVariations[] = [
+                    'id' => $variation->id,
+                    'price' => $variation->final_price,
+                    'attributes' => $attrs,
+                    'main_image' => $variation->image ? asset('storage/'.$variation->image) : $product->thumbnail_url,
+                    'galleries' => $varGalleries // গ্যালারি ডাটা পাঠানো হচ্ছে
+                ];
+            }
+        }
+//  \Log::info($formattedVariations);
+        $relatedProducts = Product::where('company_id', $company->id)->active()
+                            ->where('id', '!=', $product->id)->latest()->take(8)->get();
+
+        return view($template . '.frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
     }
 }

@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectTo(function ($request) {
+            $host = $request->getHost();
+            $store = explode('.', $host)[0];
+            return route('user.login', ['store' => $store]);
+        });
+
 
         $middleware->statefulApi();
         $middleware->api(prepend: [
