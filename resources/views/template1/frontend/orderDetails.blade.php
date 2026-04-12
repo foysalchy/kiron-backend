@@ -3,91 +3,81 @@
 @section('content')
     <section class="container mx-auto py-6">
         <!-- Header Actions -->
-        <div class="flex flex-col md:flex-row items-center justify-between mb-2 gap-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
             <div class="flex items-center gap-4">
-                <a href="{{url('dashboard')}}"
-                    class="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-arrow-left"></i> ড্যাশবোর্ড
+                <a href="{{ route('user.dashboard') }}?section=orders"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-arrow-left text-[10px]"></i> Dashboard
                 </a>
-                <h1 class="text-2xl font-black text-[#1D2128]">অর্ডার বিস্তারিত</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-end">
-                <span class="px-4 py-1 bg-green-500 text-white text-xs font-bold rounded-full mb-1">ডেলিভার সম্পন্ন</span>
-                <p class="text-sm text-gray-500 font-medium">অর্ডার তারিখ: ১৮/১/২০২৪</p>
+                @php
+                    $statusClasses = [
+                        'pending' => 'bg-orange-500',
+                        'delivered' => 'bg-green-500',
+                        'cancelled' => 'bg-red-500',
+                    ];
+                @endphp
+                <span
+                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'bg-blue-500' }} text-white text-md font-bold rounded-lg mb-1">
+                    {{ App\Enums\Status::from($order->status)->label() }}
+                </span>
+                <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
         </div>
-        <p class="text-md text-gray-500 mb-8">অর্ডার নম্বর: ORD-2024-001</p>
+        <p class="text-md text-gray-500 mb-8">Order Number: #{{ $order->order_no }}</p>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
             <!-- Left Column (Products & Tracking) -->
             <div class="lg:col-span-2 space-y-6">
 
-                <!-- Ordered Products Section -->
-                <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden p-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-6">অর্ডারকৃত পণ্যসমূহ</h3>
+                <!-- Ordered Products Card -->
+                <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
 
                     <div class="space-y-4">
-                        <!-- Product Item 1 -->
-                        <div
-                            class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white">
-                            <div
-                                class="w-24 h-24 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 shrink-0">
-                                <i class="fas fa-image text-3xl text-gray-200"></i>
+                        @foreach($order->orderDetails as $item)
+                        <div class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
+                            <div class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
+                                <img src="{{ $item->product->thumbnail_url ?? asset('images/placeholder.jpg') }}" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 text-center sm:text-left">
-                                <h4 class="text-lg font-base text-gray-900 mb-1">G63 Speaker Lamp - Multi-Function Bluetooth
-                                    Speaker</h4>
-                                <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
-                                    <span
-                                        class="px-2 py-0.5 text-xs font-semibold border border-gray-200 rounded-full text-gray-800 rounded">নীল</span>
-                                    <span
-                                        class="px-2 py-0.5 text-xs font-semibold border border-gray-200 rounded-full text-gray-800 rounded">মাঝারি</span>
-                                </div>
-                                <p class="text-xs text-gray-500 font-base mb-2 uppercase">SKU: G63-SL-001-BL-MD</p>
-                                <p class=" text-gray-900">
-                                    <span class="text-sm ">৳690 × 2</span>
-                                    <span class="text-md font-semibold text-[#FF6A00] ml-2">৳1380</span>
-                                </p>
-                            </div>
-                            <button
-                                class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-sm hover:bg-orange-50 transition-all flex items-center gap-2">
-                                <i class="far fa-star"></i> রিভিউ দিন
-                            </button>
-                        </div>
+                                <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">{{ $item->product->title }}</h4>
 
-                        <!-- Product Item 2 -->
-                        <div
-                            class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white">
-                            <div
-                                class="w-24 h-24 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 shrink-0">
-                                <i class="fas fa-image text-3xl text-gray-200"></i>
-                            </div>
-                            <div class="flex-1 text-center sm:text-left">
-                                <h4 class="text-lg font-base text-gray-900 mb-1">Wireless Headphones</h4>
+                                @if($item->variation)
                                 <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
-                                    <span
-                                        class="px-2 py-0.5 text-xs font-semibold border border-gray-200 rounded-full text-gray-800 rounded">কালো</span>
-                                    <span
-                                        class="px-2 py-0.5 text-xs font-semibold border border-gray-200 rounded-full text-gray-800 rounded">স্ট্যান্ডার্ড</span>
+                                    @foreach($item->variation->attributes as $attr)
+                                        <span class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded text-gray-600 uppercase">{{ $attr->attributeValue->name }}</span>
+                                    @endforeach
                                 </div>
-                                <p class="text-xs text-gray-500 font-base mb-2 uppercase">SKU: WH-001-BK-ST</p>
-                                <p class=" text-gray-900">
-                                    <span class="text-sm ">৳690 × 2</span>
-                                    <span class="text-md font-semibold text-[#FF6A00] ml-2">৳1380</span>
+                                <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-tighter">SKU: {{ $item->variation->sku ?? 'N/A' }}</p>
+                                @endif
+
+                                <p class="text-gray-900 font-medium">
+                                    <span class="text-sm">৳{{ number_format($item->unit_price) }} × {{ $item->quantity }}</span>
+                                    <span class="text-lg font-bold text-[#FF6A00] ml-3">৳{{ number_format($item->total) }}</span>
                                 </p>
                             </div>
-                            <button disabled
-                                class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-xs font-bold flex items-center gap-2 cursor-not-allowed">
-                                <i class="fas fa-star"></i> রিভিউ দেওয়া হয়েছে
-                            </button>
+
+                            @if($order->status == 'delivered')
+                                <button class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2">
+                                    <i class="far fa-star"></i> Write Review
+                                </button>
+                            @else
+                                <button disabled class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-[10px] font-bold flex items-center gap-2 cursor-not-allowed">
+                                    <i class="fas fa-lock"></i> Locked
+                                </button>
+                            @endif
                         </div>
+                        @endforeach
                     </div>
                 </div>
 
                 <!-- Order Tracking Section -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden p-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">অর্ডার ট্র্যাকিং</h3>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h3>
 
                     <!-- Vertical Timeline -->
                     <div class="relative pl-8 space-y-8  before:bg-green-500">
@@ -168,7 +158,7 @@
 
                 <!-- Customer Information -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">কাস্টমার তথ্য</h3>
+                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h3>
                     <div class="space-y-4">
                         <div class="flex items-start ">
                             <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
@@ -182,8 +172,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-gray-900 text-md">মোহাম্মদ রহিম</p>
-                                <p class="text-sm text-gray-500 leading-relaxed font-medium">১২৩ ধানমন্ডি, ঢাকা-১২০৫</p>
+                                <p class="text-gray-900 text-md">{{ $order->customer->name }}</p>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium">{{ $order->customer->address }}</p>
                             </div>
                         </div>
                         <div class="flex items-center ">
@@ -197,36 +187,42 @@
                                     </path>
                                 </svg>
                             </div>
-                            <p class="text-gray-900 text-md">+8801712345678</p>
+                            <p class="text-gray-900 text-md">{{ $order->customer->phone }}</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Payment Summary -->
-                <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">পেমেন্ট সামারি</h3>
-                    <div class="space-y-3">
-                        <div class="flex justify-between text-md text-gray-700 font-medium">
-                            <span>সাবটোটাল:</span>
-                            <span class="text-gray-900">৳2580</span>
+                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment Summary</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-md text-gray-600 font-medium">
+                            <span>Subtotal:</span>
+                            <span class="text-gray-900 font-bold">৳{{ number_format($order->subtotal) }}</span>
                         </div>
-                        <div class="flex justify-between text-md text-gray-700 font-medium">
-                            <span>ডেলিভারি চার্জ:</span>
-                            <span class="text-gray-900">৳60</span>
+                        <div class="flex justify-between text-md text-gray-600 font-medium">
+                            <span>Shipping Charge:</span>
+                            <span class="text-gray-900 font-bold">৳{{ number_format($order->other_charges) }}</span>
                         </div>
-                        <div class="pt-3 border-t border-gray-200 flex justify-between items-center text-lg font-semibold">
-                            <span class="text-gray-900">মোট:</span>
-                            <span class="text-gray-900">৳2640</span>
+                        @if($order->coupon_discount > 0)
+                        <div class="flex justify-between text-md text-green-600 font-medium">
+                            <span>Discount:</span>
+                            <span class="font-bold">- ৳{{ number_format($order->coupon_discount) }}</span>
                         </div>
-                        <p class="text-sm text-gray-700 mt-2">পেমেন্ট পদ্ধতি: Cash on Delivery</p>
+                        @endif
+                        <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-gray-800 font-black">Total:</span>
+                            <span class="text-xl font-black text-[#FF6A00]">৳{{ number_format($order->grand_total) }}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method: {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">অ্যাকশন</h3>
+                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h3>
                     <div class="space-y-3">
-                        <a href="./invoice.html"
+                        <a href="{{ route('invoice.download', $order->id) }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -235,16 +231,16 @@
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" x2="12" y1="15" y2="3"></line>
                             </svg>
-                            ইনভয়েস ডাউনলোড
+                            Invoice Download
                         </a>
-                        <a href="./support.html"
+                        <a href="{{ route('support.index') }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-message-square h-4 w-4 mr-2">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                             </svg>
-                            সাপোর্ট যোগাযোগ
+                            Support
                         </a>
                         <button
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
@@ -258,7 +254,7 @@
                                 <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
                                 <path d="m7.5 4.27 9 5.15"></path>
                             </svg>
-                            রিটার্ন রিকোয়েস্ট
+                            Return Request
                         </button>
                     </div>
                 </div>

@@ -61,13 +61,9 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/checkout', [OrderController::class,'index'])->name('checkout.index');
     Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('order.store');
     Route::post('/order/partial-save', [OrderController::class, 'partialSave'])->name('order.partial');
-
-    Route::get('/invoice', function () {
-        return view('template1.frontend.invoice');
-    });
-    Route::get('/order-details', function () {
-        return view('template1.frontend.order-details');
-    });
+    Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
+    Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
+    Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
 
 
     Route::get('/product-track', function () {
