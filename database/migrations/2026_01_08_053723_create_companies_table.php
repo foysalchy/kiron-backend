@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone', 20);
             $table->string('alternative_phone', 20)->nullable();
+            $table->json('invoice_template')->nullable();
             $table->string('logo')->nullable();
             $table->text('address')->nullable();
             $table->tinyInteger('business_type')->default(1);

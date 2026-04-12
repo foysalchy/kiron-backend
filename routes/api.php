@@ -172,7 +172,7 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-
+        Route::post('/settings/update-invoice-template', [SiteSettingController::class, 'updateInvoiceTemplate']);
         //user status check middleware
         Route::middleware('check.user.status')->group(function () {
 

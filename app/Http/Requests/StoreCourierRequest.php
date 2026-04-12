@@ -24,12 +24,11 @@ class StoreCourierRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
-        $companyId = $this->input('company_id') ?? $this->user()->company_id;
 
         return array_merge(
             $this->companyRules(),
             [
-                'name' => ['required', ],
+                'name' => ['required',],
                 'method_details'    => ['nullable', 'array'],
                 'contact_name'      => ['nullable', 'string', 'max:255'],
                 'phone'             => ['nullable', 'string', 'max:20'],

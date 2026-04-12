@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests;
 
 use App\Http\Requests\UpdateBaseCompanyRequest;
@@ -23,7 +24,7 @@ class UpdateCustomerPaymentMethodRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'payment_method_id' => ['sometimes', 'required', 'exists:payment_method_types,id'],
+            'name' => ['sometimes', 'required'],
             'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg', 'max:2048'],
             'method_details' => ['nullable', 'array'],
             'contact_name'   => ['sometimes', 'required', 'string', 'max:255'],

@@ -29,8 +29,8 @@ class CourierService
             }
 
             // Filter by Courier Method
-            if (!empty($filters['courier_method_id'])) {
-                $query->where('courier_method_id', $filters['courier_method_id']);
+            if (!empty($filters['name'])) {
+                $query->where('name', $filters['name']);
             }
 
             // Search by contact name, phone or location

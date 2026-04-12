@@ -23,7 +23,7 @@ class StoreCustomerPaymentMethodRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'payment_method_id' => ['required', 'exists:payment_method_types,id'],
+            'name' => ['required'],
             'icon'           => ['nullable', 'image', 'max:2048'],
             'method_details' => ['nullable', 'array'],
             'account_holder' => ['nullable', 'string', 'max:150'],

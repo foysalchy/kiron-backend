@@ -30,9 +30,9 @@ class UpdateLeadRequest extends UpdateBaseCompanyRequest
                 'lead_source_id' => ['sometimes', 'exists:lead_sources,id'],
                 'lead_status_id' => ['sometimes', 'exists:lead_statuses,id'],
                 'full_name'      => ['sometimes', 'string', 'max:255'],
-                'email'          => ['sometimes', 'email', 'max:255'],
+                'email'          => ['nullable', 'email', 'max:255'],
                 'phone'          => ['sometimes', 'string'],
-                'division'       => ['sometimes', 'string'],
+                'division'       => ['nullable', 'string'],
                 'district'       => ['nullable', 'string'],
                 'thana'          => ['nullable', 'string'],
             ]

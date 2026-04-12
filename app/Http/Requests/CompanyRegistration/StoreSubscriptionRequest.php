@@ -17,7 +17,7 @@ class StoreSubscriptionRequest extends FormRequest
             'registration_id' => ['required', 'integer', 'exists:companies,id'],
             'pricing_id'      => ['required', 'integer', 'exists:pricings,id'],
             'billing_cycle'   => ['required', 'in:monthly,yearly'],
-            'payment_method'  => ['required', 'in:card,bank,mobile'],
+            'payment_method'  => ['required'],
         ];
     }
 }

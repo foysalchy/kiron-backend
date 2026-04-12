@@ -18,11 +18,13 @@ class PathaoService
      */
     private function getConfig()
     {
-        $courier = Courier::whereHas('method', fn($q) => $q->where('slug', 'pathao'))->first();
-        if (!$courier) throw ApiException::serverError('Pathao settings missing.');
-        return is_string($courier->method_details)
-            ? json_decode($courier->method_details, true)
-            : $courier->method_details;
+        $courier = Courier::where('name', 'pathao')->first();
+
+        if (!$courier) {
+            throw ApiException::serverError('Pathao settings missing.');
+        }
+
+        return $courier->method_details;
     }
 
     /**

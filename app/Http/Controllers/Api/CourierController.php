@@ -20,7 +20,7 @@ class CourierController extends Controller
     {
         $filters = [
             'status'            => $request->query('status'),
-            'courier_method_id' => $request->query('courier_method_id'),
+            'name' => $request->query('name'),
             'search'            => $request->query('search'),
             'sort_by'           => $request->query('sort_by', 'created_at'),
             'sort_order'        => $request->query('sort_order', 'desc'),

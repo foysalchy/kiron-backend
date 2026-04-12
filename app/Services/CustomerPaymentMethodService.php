@@ -29,8 +29,8 @@ class CustomerPaymentMethodService
                 }
             }
 
-            if (!empty($filters['customer_id'])) {
-                $query->where('customer_id', $filters['customer_id']);
+            if (!empty($filters['name'])) {
+                $query->where('name', $filters['name']);
             }
 
             if (!empty($filters['search'])) {

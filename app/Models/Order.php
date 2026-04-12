@@ -38,6 +38,7 @@ class Order extends Model
         'coupon_discount',
         'round_off',
         'grand_total',
+        'shipping_address',
         'payment_amount',
         'payment_status',
         'courier_info',
@@ -60,6 +61,7 @@ class Order extends Model
         'payment_status' => 'integer',
         'status' => 'integer',
         'courier_info' => 'array',
+        'shipping_address' => 'array',
     ];
 
     /**

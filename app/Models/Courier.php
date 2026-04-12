@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Courier extends Model 
-{ 
-    use SoftDeletes,CompanyScoped;
+class Courier extends Model
+{
+    use SoftDeletes, CompanyScoped;
     protected $fillable = [
         'company_id',
         'name',
@@ -20,10 +20,15 @@ class Courier extends Model
         'status'
     ];
     protected $casts = [
-        'method_details' => 'array', 
+        'method_details' => 'array',
     ];
     protected $hidden = ['deleted_at'];
+    // app/Models/Courier.php
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+    }
     // Scopes
     public function scopeByCompany($query, int $companyId)
     {
@@ -45,6 +50,6 @@ class Courier extends Model
     }
     public function method(): BelongsTo
     {
-        return $this->belongsTo(CourierMethod::class,'courier_method_id');
+        return $this->belongsTo(CourierMethod::class, 'courier_method_id');
     }
 }

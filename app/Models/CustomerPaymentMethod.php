@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerPaymentMethod extends Model
 {
-    use SoftDeletes,CompanyScoped;
-        protected $fillable = [
+    use SoftDeletes, CompanyScoped;
+    protected $fillable = [
         'company_id',
-        'payment_method_id',
+        'name',
         'icon',
         'method_details',
         'account_holder',
@@ -24,7 +24,10 @@ class CustomerPaymentMethod extends Model
     protected $casts = [
         'method_details' => 'array',
     ];
-
+    public function setNameAttribute($value)
+    {
+        $this->attributes['name'] = strtolower($value);
+    }
     // Scopes
     public function scopeByCompany($query, int $companyId)
     {

@@ -17,10 +17,14 @@ class SteadfastService
     //single order and key from database
     public function sendToSteadfast(Order $order, array $validated)
     {
-        $courier = Courier::whereHas('method', function ($q) {
-            $q->where('slug', 'steadfast');
-        })->first();
+     
+        $courier = Courier::where('name', 'steadfast')->first();
 
+        if (!$courier) {
+            throw ApiException::serverError('Pathao settings missing.');
+        }
+
+        Log::info($courier);
         // dd($courier);
 
         if (!$courier) {

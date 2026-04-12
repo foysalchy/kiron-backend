@@ -30,11 +30,11 @@ class StoreLeadRequest extends BaseCompanyRequest
                 'lead_source_id' => ['required', 'exists:lead_sources,id'],
                 'lead_status_id' => ['required', 'exists:lead_statuses,id'],
                 'full_name'      => ['required', 'string', 'max:255'],
-                'email'          => ['required', 'email'],
+                'email'          => ['nullable', 'email'],
                 'phone'          => ['required', 'string'],
-                'division'       => ['required', 'string'],
-                'district'       => ['required', 'string'],
-                'thana'          => ['required', 'string'],
+                'division'       => ['nullable', 'string'],
+                'district'       => ['nullable', 'string'],
+                'thana'          => ['nullable', 'string'],
             ]
         );
     }
