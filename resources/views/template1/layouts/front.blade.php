@@ -57,28 +57,37 @@
 
     <!-- FOOTER -->
     @include('template1.partials.footer')
+    <!-- Global Variation Modal  -->
+    <div id="variation-modal"
+        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
+            <button onclick="closeModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl border-none bg-transparent cursor-pointer">&times;</button>
 
+            <div id="modal-content-area"></div>
+        </div>
+    </div>
 
 
     @stack('scripts')
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        toastr.options = {
-            "closeButton": true,
-            "progressBar": true,
-            "positionClass": "toast-top-right",
-            "timeOut": "3000"
-        };
+        document.addEventListener('DOMContentLoaded', function() {
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
 
-        @if(Session::has('success'))
-            toastr.success("{{ Session::get('success') }}");
-        @endif
+            @if (Session::has('success'))
+                toastr.success("{{ Session::get('success') }}");
+            @endif
 
-        @if(Session::has('error'))
-            toastr.error("{{ Session::get('error') }}");
-        @endif
-    });
-</script>
+            @if (Session::has('error'))
+                toastr.error("{{ Session::get('error') }}");
+            @endif
+        });
+    </script>
 </body>
 
 </html>

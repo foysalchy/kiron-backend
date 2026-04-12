@@ -12,6 +12,7 @@ use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
+use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -43,7 +44,8 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
         Route::post('/password/update', [AuthController::class, 'updatePassword'])->name('user.password.update');
         Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('user.dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('user.logout');
-    });
+        });
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
     Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
     Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
@@ -72,9 +74,5 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
         return view('template1.frontend.product-track');
     });
 
-
-    Route::get('/wishlist', function () {
-        return view('template1.frontend.wishlist');
-    });
 
 });

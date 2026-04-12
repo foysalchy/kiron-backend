@@ -21,20 +21,23 @@
                         <div class="p-6 space-y-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">আপনার নাম <span class="text-red-500">*</span></label>
+                                    <label class="text-sm font-medium text-gray-700">আপনার নাম <span
+                                            class="text-red-500">*</span></label>
                                     <input type="text" name="name" placeholder="আপনার পূর্ণ নাম লিখুন" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">ফোন নম্বর <span class="text-red-500">*</span></label>
+                                    <label class="text-sm font-medium text-gray-700">ফোন নম্বর <span
+                                            class="text-red-500">*</span></label>
                                     <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">আপনার ঠিকানা <span class="text-red-500">*</span></label>
+                                <label class="text-sm font-medium text-gray-700">আপনার ঠিকানা <span
+                                        class="text-red-500">*</span></label>
                                 <textarea name="address" placeholder="আপনার ঠিকানা" rows="3" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
@@ -159,11 +162,13 @@
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">ডেলিভারি চার্জ:</span>
-                                <span class="text-md font-bold text-gray-900">৳{{ number_format($shipping) }}</span>
+                                <span class="text-md font-bold text-gray-900">৳<span
+                                        id="shipping-display">{{ number_format($shipping) }}</span></span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">পরিশোধ করতে হবে:</span>
-                                <span class="text-xl font-bold text-[#FF6A00]">৳{{ number_format($total) }}</span>
+                                <span class="text-xl font-bold text-[#FF6A00]">৳<span
+                                        id="total-display">{{ number_format($total) }}</span></span>
                             </div>
                         </div>
 
@@ -186,60 +191,82 @@
 @endsection
 
 @push('scripts')
-@push('scripts')
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const phoneInput = document.querySelector('input[name="phone"]');
-        const nameInput = document.querySelector('input[name="name"]');
-        const addressInput = document.querySelector('textarea[name="address"]');
+    @push('scripts')
+        @push('scripts')
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const phoneInput = document.querySelector('input[name="phone"]');
+                    const nameInput = document.querySelector('input[name="name"]');
+                    const addressInput = document.querySelector('textarea[name="address"]');
 
-        function saveDraft() {
-            let phone = phoneInput.value;
-            let name = nameInput.value;
-            let address = addressInput.value;
+                    function saveDraft() {
+                        let phone = phoneInput.value;
+                        let name = nameInput.value;
+                        let address = addressInput.value;
 
-            if (phone.length >= 11) {
-                const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                        if (phone.length >= 11) {
+                            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                fetch("{{ route('order.partial') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({
-                        phone: phone,
-                        name: name,
-                        address: address
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("Success: Draft order created.");
-                    } else {
-                        console.log("Error: " + (data.error || "Draft failed"));
+                            fetch("{{ route('order.partial') }}", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
+                                        'X-CSRF-TOKEN': token
+                                    },
+                                    body: JSON.stringify({
+                                        phone: phone,
+                                        name: name,
+                                        address: address
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log("Success: Draft order created.");
+                                    } else {
+                                        console.log("Error: " + (data.error || "Draft failed"));
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
+                        }
                     }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        }
 
-        phoneInput.addEventListener('blur', saveDraft);
+                    phoneInput.addEventListener('blur', saveDraft);
 
-        @auth('customer')
-            saveDraft();
-        @endauth
-    });
-</script>
-@endpush
-@endpush
-    <script>
-        function updateCheckoutShipping(value) {
-            document.getElementById('shipping-area-input').value = value;
-            document.getElementById('shipping-update-form').submit();
-        }
-    </script>
-@endpush
+                    @auth('customer')
+                        saveDraft();
+                    @endauth
+                });
+            </script>
+            <script>
+                function updateCheckoutShipping(value) {
+                    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    fetch("{{ route('cart.shipping') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': token,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                area: value
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.getElementById('shipping-display').innerText = data.shipping_cost;
+
+                                document.getElementById('total-display').innerText = data.grand_total;
+
+                                toastr.success(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+            </script>
+        @endpush

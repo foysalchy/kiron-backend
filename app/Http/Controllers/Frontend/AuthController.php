@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Party;
 use App\Models\User;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -97,7 +98,7 @@ class AuthController extends Controller
         $template = $company->template_name;
         $user = auth('customer')->user();
 
-        return view($template . '.frontend.user.profile',compact('user'));
+        return view($template . '.frontend.user.profile', compact('user'));
     }
     // update your profile
     public function updateProfile(Request $request)
@@ -156,10 +157,14 @@ class AuthController extends Controller
         $allOrders = $user->orders()->with('orderDetails.product')->latest()->get();
         $recentOrders = $allOrders->take(5);
 
+        $wishlistItems = Wishlist::where('company_id', $company->id)
+            ->with(['product.variations', 'product.brand'])
+            ->latest()
+            ->get();
 
         $totalOrders = $allOrders->count();
         $totalSpent = $allOrders->where('status', 'delivered')->sum('grand_total');
-        $wishlistCount = 0;
+        $wishlistCount = $wishlistItems->count();
 
         return view($template . '.frontend.user.dashboard', compact(
             'user',
@@ -168,6 +173,7 @@ class AuthController extends Controller
             'wishlistCount',
             'recentOrders',
             'allOrders',
+            'wishlistItems',
 
         ));
     }

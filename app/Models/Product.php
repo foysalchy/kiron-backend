@@ -52,7 +52,7 @@ class Product extends Model
         'mini_category_ids' => IntegerArray::class,
         'extra_category_ids' => IntegerArray::class,
         'warehouse_info' => 'array',
-        'sku_codes' => 'array',
+        'sku_code' => 'array',
         'meta_keywords' => 'array',
         'stock_quantity' => 'integer',
         'regular_price' => 'decimal:2',
