@@ -24,23 +24,19 @@ class UpdateSupportDepartmentRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
-        return array_merge(
-            $this->companyRules(),
+        return
             [
-                'name' => ['sometimes','required','string','max:255'],
+                'name' => ['sometimes', 'required', 'string', 'max:255'],
                 'status' => ['sometimes', 'integer'],
-            ]
-        );
+            ];
     }
     public function messages(): array
     {
-        return array_merge(
-            $this->companyMessages(),
+        return
             [
                 'name.required' => 'Department name cannot be empty.',
                 'name.unique'   => 'This department name already exists for this company.',
-            ]
-        );
+            ];
     }
 
     protected function failedValidation(Validator $validator)

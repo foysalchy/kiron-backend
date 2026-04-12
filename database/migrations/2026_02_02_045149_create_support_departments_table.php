@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('support_departments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('name'); 
             $table->tinyInteger('status')->default(1);
             $table->timestamps();

@@ -17,7 +17,11 @@ class StoreSubscriptionRequest extends FormRequest
             'registration_id' => ['required', 'integer', 'exists:companies,id'],
             'pricing_id'      => ['required', 'integer', 'exists:pricings,id'],
             'billing_cycle'   => ['required', 'in:monthly,yearly'],
-            'payment_method'  => ['required'],
+            'payment_method'  => 'required|in:card,bank,mobile,manual',
+            'transaction_id'      => 'required_if:payment_method,manual,bank|nullable|string|max:255',
+            'number'              => 'required_if:payment_method,manual,bank|nullable|string|max:255',
+            'account_holder_name' => 'required_if:payment_method,manual,bank|nullable|string|max:255',
+            'document'            => 'required_if:payment_method,manual,bank|nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ];
     }
 }

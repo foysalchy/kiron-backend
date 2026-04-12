@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +20,7 @@ return new class extends Migration
             $table->string('subject');
             $table->longText('description');
             $table->string('image')->nullable();
-            $table->tinyInteger('status')->default(16);
+            $table->tinyInteger('status')->default(Status::Pending->value);
             $table->timestamps();
             $table->softDeletes();
         });

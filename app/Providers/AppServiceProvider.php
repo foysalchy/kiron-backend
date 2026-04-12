@@ -15,7 +15,6 @@ use App\Services\AssignLeaveService;
 use App\Services\AttendanceService;
 use App\Services\AttributeGroupService;
 use App\Services\AttributeService;
-use App\Services\BannerService;
 use App\Services\BillingService;
 use App\Services\BinService;
 use App\Services\BkashService;
@@ -129,7 +128,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AreaService::class);
         $this->app->bind(AssignLeaveService::class);
         $this->app->bind(AttendanceService::class);
-        $this->app->bind(BannerService::class);
         $this->app->bind(BinService::class);
         $this->app->bind(BkashService::class);
         $this->app->bind(BlogService::class);

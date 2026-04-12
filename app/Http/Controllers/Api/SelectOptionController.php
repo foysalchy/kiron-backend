@@ -17,6 +17,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Rack;
+use App\Models\SupportDepartment;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -274,5 +275,11 @@ class SelectOptionController extends Controller
         $accounts = ChartOfAccount::orderBy('name', 'asc')->get();
 
         return $accounts;
+    }
+    public function supportDepartmentOptions()
+    {
+        $departments = SupportDepartment::orderBy('name', 'asc')->get();
+
+        return $departments;
     }
 }

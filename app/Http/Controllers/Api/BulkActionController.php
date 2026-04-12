@@ -26,7 +26,6 @@ class BulkActionController extends Controller
         'sliders'          => \App\Models\Slider::class,
         'pages'            => \App\Models\Page::class,
         'blogs'            => \App\Models\Blog::class,
-        'banners'          => \App\Models\Banner::class,
         'coupons'          => \App\Models\Coupon::class,
         'taxgroups'        => \App\Models\TaxGroup::class,
         'taxrates'         => \App\Models\TaxRate::class,

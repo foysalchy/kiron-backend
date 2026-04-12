@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Enums\Status;
@@ -9,7 +10,7 @@ use App\Models\SupportTicket;
 use App\Models\SupportTicketReply;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB,Log};
+use Illuminate\Support\Facades\{DB, Log};
 
 class SupportTicketService
 {
@@ -19,7 +20,7 @@ class SupportTicketService
     public function getAllTickets(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = SupportTicket::with(['supportDepartment', 'user']);
+            $query = SupportTicket::with(['supportDepartment', 'company', 'user']);
 
             if (!empty($filters['date_filter'])) {
                 $fromDate = null;
@@ -114,7 +115,7 @@ class SupportTicketService
             }
             $data['user_id'] = auth()->id();
             $ticket = SupportTicket::create($data);
-            LogHelper::created('support_ticket', $ticket->id, $ticket->company_id,$ticket->subject);
+            LogHelper::created('support_ticket', $ticket->id, $ticket->company_id, $ticket->subject);
 
             DB::commit();
             Log::info('Ticket created successfully', ['ticket_id' => $ticket->id]);
@@ -149,7 +150,7 @@ class SupportTicketService
             }
 
             $ticket->update($data);
-            LogHelper::updated('support_ticket', $ticket->id, $ticket->company_id,$ticket->subject);
+            LogHelper::updated('support_ticket', $ticket->id, $ticket->company_id, $ticket->subject);
 
             DB::commit();
             Log::info('Ticket updated successfully', ['ticket_id' => $ticket->id]);
@@ -177,7 +178,7 @@ class SupportTicketService
         try {
             $ticket = $this->getTicketById($id);
             $ticket->delete();
-            LogHelper::deleted('support_ticket', $ticket->id, $ticket->company_id,$ticket->subject);
+            LogHelper::deleted('support_ticket', $ticket->id, $ticket->company_id, $ticket->subject);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -294,7 +295,6 @@ class SupportTicketService
             Log::info('Ticket reply stored successfully', ['reply_id' => $reply->id, 'ticket_id' => $ticket->id]);
 
             return $reply->load('user');
-
         } catch (\Exception $e) {
             DB::rollBack();
             if (isset($data['image'])) {

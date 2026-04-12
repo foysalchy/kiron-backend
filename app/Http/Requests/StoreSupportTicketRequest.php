@@ -29,7 +29,7 @@ class StoreSupportTicketRequest extends BaseCompanyRequest
             [
                 'support_department_id' => ['required','exists:support_departments,id'],
                 'subject' => ['required','string','max:255'],
-                'description' => ['required','string','min:10'],
+                'description' => ['required','string'],
                 'image' => ['nullable','image','mimes:jpeg,png,jpg,gif','max:2048' ],
             ]
         );

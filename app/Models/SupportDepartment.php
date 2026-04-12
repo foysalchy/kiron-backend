@@ -11,14 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SupportDepartment extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes;
     protected $fillable = [
-        'company_id',
         'name',
         'status'
     ];
 
-     protected $hidden = ['deleted_at'];
+    protected $hidden = ['deleted_at'];
 
     /**
      * Scopes

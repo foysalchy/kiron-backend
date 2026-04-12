@@ -115,7 +115,7 @@ class CompanyRegistrationService
             $trialEnds = $pricing->free_trial > 0 ? $now->copy()->addDays($pricing->free_trial) : null;
             $endsAt    = $billing === 'yearly' ? $now->copy()->addYear() : $now->copy()->addMonth();
 
-            CompanySubscription::create([
+            $subscription =      CompanySubscription::create([
                 'company_id'     => $company->id,
                 'pricing_id'     => $pricing->id,
                 'billing_cycle'  => $billing,
@@ -127,6 +127,31 @@ class CompanyRegistrationService
                 'ends_at'        => $endsAt,
                 'status'         => Status::Active->value,
             ]);
+            if (in_array($data['payment_method'], ['manual', 'bank'])) {
+                $documentPath = null;
+
+                if (isset($data['document']) && $data['document'] instanceof \Illuminate\Http\UploadedFile) {
+                    $documentPath = $data['document']->store('payment_documents', 'public');
+                }
+
+                DB::table('subscription_payments')->insert([
+                    'subscription_id' => $subscription->id,
+                    'company_id'      => $company->id,
+                    'payment_method'  => $data['payment_method'],
+                    'amount'          => $amountPaid,
+                    'transaction_id'  => $data['transaction_id'] ?? null,
+                    'sender_number'   => $data['number'] ?? null,
+                    'account_number'  => null,
+                    'bank_name'       => null,
+                    'status'          => 'pending',
+                    'meta'            => json_encode([
+                        'account_holder_name' => $data['account_holder_name'] ?? null,
+                        'document_path'       => $documentPath
+                    ]),
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            }
 
             SiteSetting::create([
                 'company_id' => $company->id,

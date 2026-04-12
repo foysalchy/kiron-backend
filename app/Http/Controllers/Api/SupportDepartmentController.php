@@ -12,8 +12,7 @@ use Illuminate\Http\Request;
 
 class SupportDepartmentController extends Controller
 {
-    public function __construct(protected SupportDepartmentService $departmentService) 
-    {}
+    public function __construct(protected SupportDepartmentService $departmentService) {}
 
     public function index(Request $request): JsonResponse
     {

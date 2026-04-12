@@ -16,7 +16,6 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AttributeGroupController;
 use App\Http\Controllers\Api\AttributeValueController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\BinController;
 use App\Http\Controllers\Api\BkashController;
@@ -226,6 +225,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/account-expenses', [SelectOptionController::class, 'accountExpenseOptions']);
                 Route::get('/income-accounts', [SelectOptionController::class, 'incomeAccountOptions']);
                 Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
+                Route::get('/support-departments', [SelectOptionController::class, 'supportDepartmentOptions']);
             });
             //party routes
             Route::prefix('parties')->group(function () {
@@ -439,17 +439,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}/force', [SlideController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [SlideController::class, 'toggleStatus']);
             });
-            // Banner Routes
-            Route::prefix('banners')->group(function () {
-                Route::get('/', [BannerController::class, 'index']);
-                Route::post('/', [BannerController::class, 'store']);
-                Route::get('/{id}', [BannerController::class, 'show']);
-                Route::post('/update/{id}', [BannerController::class, 'update']);
-                Route::delete('/{id}', [BannerController::class, 'destroy']);
-                Route::get('/{id}/restore', [BannerController::class, 'restore']);
-                Route::delete('/{id}/force', [BannerController::class, 'forceDestroy']);
-                Route::patch('/{id}/toggle-status', [BannerController::class, 'toggleStatus']);
-            });
+
 
             // Blog Routes
             Route::prefix('blogs')->group(function () {

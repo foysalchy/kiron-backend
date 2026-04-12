@@ -61,7 +61,6 @@ class SupportDepartmentService
         DB::beginTransaction();
         try {
             $department = SupportDepartment::create($data);
-            LogHelper::created('support_departments', $department->id, $department->company_id, $department->name);
             DB::commit();
             Log::info('Department created successfully', ['id' => $department->id]);
             return $department;
@@ -77,9 +76,6 @@ class SupportDepartmentService
         try {
             $department = $this->getDepartmentById($id);
             $department->update($data);
-            
-            LogHelper::updated('support_departments', $department->id, $department->company_id, $department->name);
-            
             DB::commit();
             return $department->fresh();
         } catch (\Exception $e) {

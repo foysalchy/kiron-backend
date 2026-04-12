@@ -24,13 +24,11 @@ class StoreSupportDepartmentRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
-        return array_merge(
-            $this->companyRules(),
+        return
             [
-                'name' => ['required','string','max:255'],
-                'status' => ['nullable','integer'],
-            ]
-        );
+                'name' => ['required', 'string', 'max:255'],
+                'status' => ['nullable', 'integer'],
+            ];
     }
     /**
      * Custom messages for validation errors in English.
