@@ -64,17 +64,17 @@
                             @endforeach
                         </div>
 
-                       <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-6 mb-12">
-                            {!! nl2br($blog->body) !!}
+                      <div class="prose prose-orange max-w-none"> {{-- আপনার থিমের সাথে মিল রেখে prose-orange বা prose-slate দিতে পারেন --}}
+    {!! $blog->body !!}
 
-                            @if($blog->body_2)
-                                <div class="mt-6">{!! nl2br($blog->body_2) !!}</div>
-                            @endif
+    @if($blog->body_2)
+        <div class="mt-6">{!! $blog->body_2 !!}</div>
+    @endif
 
-                            @if($blog->body_3)
-                                <div class="mt-6">{!! nl2br($blog->body_3) !!}</div>
-                            @endif
-                        </div>
+    @if($blog->body_3)
+        <div class="mt-6">{!! $blog->body_3 !!}</div>
+    @endif
+</div>
 
                         <div class="h-[1px] w-full bg-gray-200 my-10"></div>
 

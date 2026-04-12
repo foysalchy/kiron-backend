@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Enums\Status;
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Party;
 use App\Models\User;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -110,21 +112,35 @@ class AuthController extends Controller
             'email'   => 'required|email|unique:parties,email,' . $user->id,
             'phone'   => 'required|string|max:20',
             'address' => 'nullable|string',
-            'profile' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'profile' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only('name', 'email', 'phone', 'address');
+        DB::beginTransaction();
 
-        if ($request->hasFile('profile')) {
-            if ($user->profile) {
-                Storage::disk('public')->delete($user->profile);
+        try {
+            $data = $request->only('name', 'email', 'phone', 'address');
+
+            if ($request->hasFile('profile')) {
+                $data['profile'] = FileUploadHelper::replace(
+                    $request->file('profile'),
+                    $user->profile,
+                    'customers/profiles'
+                );
             }
-            $data['profile'] = $request->file('profile')->store('customers/profiles', 'public');
+
+            $user->update($data);
+
+            DB::commit();
+            return back()->with('success', 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            if (isset($data['profile'])) {
+                FileUploadHelper::delete($data['profile']);
+            }
+
+            return back()->with('error', 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে: ' . $e->getMessage());
         }
-
-        $user->update($data);
-
-        return back()->with('success', 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
     }
 
     // update your password

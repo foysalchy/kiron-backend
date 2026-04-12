@@ -75,8 +75,22 @@
             </div>
 
             <!-- Wishlist -->
-            <a href="{{ url('/wishlist') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors">
-                <i class="fa-regular fa-heart text-xl"></i>
+            <a href="{{ route('user.dashboard') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative">
+                <div class="relative">
+                    <i class="fa-regular fa-heart text-xl"></i>
+
+                    @auth('customer')
+                        @php
+                            $initialWishCount = \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count();
+                        @endphp
+                    @else
+                        @php $initialWishCount = 0; @endphp
+                    @endauth
+
+                    <span id="wishlist-count-nav" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $initialWishCount > 0 ? '' : 'hidden' }}">
+                        {{ $initialWishCount }}
+                    </span>
+                </div>
                 <span class="hidden lg:block font-semibold text-sm">Wishlist</span>
             </a>
 
@@ -125,7 +139,7 @@
                                 </svg>
                                 Dashboard
                             </a>
-                            
+
                         </div>
 
                         <!-- লগআউট সেকশন -->

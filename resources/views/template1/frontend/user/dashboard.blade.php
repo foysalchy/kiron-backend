@@ -4,7 +4,7 @@
     <section class="container py-6 mx-auto px-4 lg:px-0">
         <!-- Dashboard Header -->
         <div class="flex items-center justify-between mb-8">
-            <h1 class="text-2xl font-black text-[#1D2128]">আমার ড্যাশবোর্ড</h1>
+            <h1 class="text-2xl font-black text-[#1D2128]">Dashboard</h1>
             <form action="{{ route('user.logout') }}" method="POST">
                 @csrf
                 <button type="submit"
@@ -36,24 +36,23 @@
                     <nav class="mt-8 space-y-2" id="dashboard-nav">
                         <button onclick="showSection('overview', this)"
                             class="nav-link w-full flex items-center gap-3 px-4 py-3 bg-[#1D2128] text-white rounded-xl text-sm font-semibold transition-all">
-                            <i class="far fa-user w-5 text-center"></i> ওভারভিউ
+                            <i class="far fa-user w-5 text-center"></i> Overview
                         </button>
                         <button onclick="showSection('orders', this)"
                             class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
-                            <i class="fas fa-shopping-bag w-5 text-center"></i> আমার
-                            অর্ডার
+                            <i class="fas fa-shopping-bag w-5 text-center"></i> My Order
                         </button>
                         <button onclick="showSection('wishlist', this)"
                             class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
-                            <i class="far fa-heart w-5 text-center"></i> উইশলিস্ট
+                            <i class="far fa-heart w-5 text-center"></i> Wishlist
                         </button>
                         <button onclick="showSection('edit', this)"
                             class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
-                            <i class="far fa-edit w-5 text-center"></i> প্রোফাইল এডিট
+                            <i class="far fa-edit w-5 text-center"></i> Profile update
                         </button>
                         <button onclick="showSection('password', this)"
                             class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
-                            <i class="fas fa-lock w-5 text-center"></i> পাসওয়ার্ড পরিবর্তন
+                            <i class="fas fa-lock w-5 text-center"></i> Password Change
                         </button>
                     </nav>
                 </div>
@@ -83,7 +82,7 @@
                         <div
                             class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">মোট অর্ডার</p>
+                                <p class="text-sm font-medium text-gray-700 mb-1">Total Order</p>
                                 <h4 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h4>
                             </div>
                             <i class="fas fa-shopping-bag h-8 w-8 text-orange-500 text-2xl"></i>
@@ -91,7 +90,7 @@
                         <div
                             class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">মোট খরচ</p>
+                                <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
                                 <h4 class="text-2xl font-semibold text-gray-900">৳{{ number_format($totalSpent ?? 0) }}</h4>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -108,7 +107,7 @@
                         <div
                             class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-700 mb-1">উইশলিস্ট</p>
+                                <p class="text-sm font-medium text-gray-700 mb-1">Wishlist</p>
                                 <h4 class="text-2xl font-semibold text-gray-900">{{ $wishlistCount ?? 0 }}</h4>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -125,7 +124,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
                             <h2 class="text-xl md:text-2xl font-bold text-gray-900">
-                                সাম্প্রতিক অর্ডার
+                                Recent Order
                             </h2>
                         </div>
                         <div class="p-6 space-y-4">
@@ -219,7 +218,7 @@
                                     </div>
 
                                     <div class="flex gap-3">
-                                        <a href=""
+                                        <a href="{{ route('user.order.details', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-eye"></i> বিস্তারিত
                                         </a>
@@ -272,46 +271,67 @@
                     </div>
                 </div>
 
-                <!-- 4. SECTION: PROFILE EDIT (Initially Hidden) -->
-                <div id="edit-section" class="dashboard-content hidden space-y-6">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">প্রোফাইল আপডেট করুন</h2>
-                        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data"
-                            class="space-y-6">
-                            @csrf
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="text-sm text-gray-700">নাম</label>
-                                    <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                                </div>
-                                <div>
-                                    <label class="text-sm text-gray-700">ইমেইল</label>
-                                    <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                                </div>
-                                <div>
-                                    <label class="text-sm text-gray-700">ফোন</label>
-                                    <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                                </div>
-                                <div>
-                                    <label class="text-sm text-gray-700">ঠিকানা</label>
-                                    <input type="text" name="address" value="{{ old('address', $user->address) }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="text-sm text-gray-700">প্রোফাইল ইমেজ</label>
-                                    <input type="file" name="profile"
-                                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
-                                </div>
-                            </div>
-                            <button type="submit"
-                                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-orange-600 transition-all shadow-sm">প্রোফাইল
-                                আপডেট করুন</button>
-                        </form>
+              <!-- 4. SECTION: PROFILE EDIT -->
+<div id="edit-section" class="dashboard-content hidden space-y-6">
+    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">প্রোফাইল আপডেট করুন</h2>
+
+        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            @csrf
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- নাম -->
+                <div>
+                    <label class="text-sm font-bold text-gray-700">নাম</label>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                           class="w-full px-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- ইমেইল -->
+                <div>
+                    <label class="text-sm font-bold text-gray-700">ইমেইল</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                           class="w-full px-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- ফোন -->
+                <div>
+                    <label class="text-sm font-bold text-gray-700">ফোন</label>
+                    <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
+                           class="w-full px-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                    @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- ঠিকানা -->
+                <div>
+                    <label class="text-sm font-bold text-gray-700">ঠিকানা</label>
+                    <input type="text" name="address" value="{{ old('address', $user->address) }}"
+                           class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                </div>
+
+                <!-- প্রোফাইল ইমেজ এবং প্রিভিউ -->
+                <div class="md:col-span-2 flex items-center gap-6">
+                    <div class="shrink-0">
+                        <img id="image-preview" src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                             class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm">
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-sm font-bold text-gray-700">প্রোফাইল ইমেজ পরিবর্তন করুন</label>
+                        <input type="file" name="profile" id="profile-input" onchange="previewImage(this)"
+                               class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
+                        @error('profile') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
+            </div>
+
+            <button type="submit"
+                class="bg-[#FF6A00] text-white px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
+                তথ্য সংরক্ষণ করুন
+            </button>
+        </form>
+    </div>
+</div>
 
                 <!-- 5. SECTION: PASSWORD CHANGE (Initially Hidden) -->
                 <div id="password-section" class="dashboard-content hidden space-y-6">
@@ -376,4 +396,15 @@
             });
         }, 4000);
     </script>
+    <script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 @endpush

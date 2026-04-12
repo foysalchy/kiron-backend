@@ -16,10 +16,10 @@ class ContctController extends Controller
         $template = $company->template_name;
 
         $faqs = KnowledgeBase::where('company_id', $company->id)
-                ->active()
-                ->get();
+            ->active()
+            ->get();
 
-        return view($template . '.frontend.contact',compact('faqs'));
+        return view($template . '.frontend.contact', compact('faqs'));
     }
     public function send(Request $request)
     {
@@ -30,10 +30,10 @@ class ContctController extends Controller
             'subject' => 'nullable|string|max:255',
             'message' => 'required|string',
         ], [
-            'name.required'    => 'আপনার নাম লিখুন',
-            'email.required'   => 'আপনার ইমেইল এড্রেস লিখুন',
-            'phone.required'   => 'আপনার ফোন নম্বর লিখুন',
-            'message.required' => 'আপনার বার্তাটি লিখুন',
+            'name.required'    => 'Please enter your name',
+            'email.required'   => 'Please enter your email address',
+            'phone.required'   => 'Please enter your phone number',
+            'message.required' => 'Please write your message',
         ]);
 
         $company = getCurrentCompany();
