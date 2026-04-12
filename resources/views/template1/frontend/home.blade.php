@@ -200,8 +200,10 @@
                     style="-ms-overflow-style:none; scrollbar-width:none;">
 
                     <!-- NEW ARRIVALS -->
-                    @foreach ($newArrivals as $product)
-                        <x-template1.product-card :product="$product" />
+                     @foreach ($newArrivals as $product)
+                        <div class="flex-shrink-0 w-[240px] h-auto">
+                            <x-template1.product-card :product="$product" />
+                        </div>
                     @endforeach
 
                 </div><!-- /#na-track -->
@@ -324,17 +326,7 @@
         </div>
     </section>
 
-    <!-- Variation Modal -->
-    <div id="variation-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative">
-            <button onclick="closeModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl">&times;</button>
-            <div id="modal-content-area">
 
-            </div>
-        </div>
-    </div>
 @endsection
 @push('scripts')
     <script>
@@ -406,100 +398,6 @@
                 verticalSlider.style.transform = `translateY(-${vertIdx * 100}%)`;
             }
             setInterval(slideVertical, 5000);
-        }
-    </script>
-//for card add
-    <script>
-        // open variation-modal
-        function openVariationModal(id) {
-            const modal = document.getElementById('variation-modal');
-            const contentArea = document.getElementById('modal-content-area');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            contentArea.innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
-
-            fetch("/product-variation/" + id)
-                .then(res => res.text())
-                .then(html => {
-                    contentArea.innerHTML = html;
-                });
-        }
-
-        // close modal
-        function closeModal() {
-            const modal = document.getElementById('variation-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        // qty increased and
-        function changeQty(val) {
-            let qtyInput = document.getElementById('modal-qty');
-            if(qtyInput) {
-                let newVal = parseInt(qtyInput.value) + val;
-                if(newVal >= 1) qtyInput.value = newVal;
-            }
-        }
-
-        //
-        function processAddVariation() {
-            const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-            const qtyInput = document.getElementById('modal-qty');
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-
-            if(!selectedVariant) {
-                toastr.warning("দয়া করে একটি অপশন সিলেক্ট করুন।");
-                return;
-            }
-
-            fetch("{{ route('cart.add') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({
-                    variation_id: selectedVariant.value,
-                    qty: qtyInput ? qtyInput.value : 1
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(el => {
-                        el.innerText = data.cart_count;
-                    });
-                    closeModal();
-                    // alert এর বদলে toastr
-                    toastr.success(data.message);
-                } else {
-                    toastr.error(data.message);
-                }
-            });
-        }
-
-        // add single product
-        function addSingleToCart(id) {
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            fetch("{{ route('cart.add') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({ id: id, qty: 1 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(el => {
-                        el.innerText = data.cart_count;
-                    });
-                    toastr.success(data.message);
-                }
-            }).catch(err => toastr.error("পণ্য যোগ করা সম্ভব হয়নি।"));
         }
     </script>
 
