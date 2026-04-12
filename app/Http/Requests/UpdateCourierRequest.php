@@ -25,7 +25,7 @@ class UpdateCourierRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'courier_method_id' => ['sometimes', 'required', 'exists:courier_methods,id'],
+            'name' => ['sometimes', 'required', ],
             'method_details'    => ['nullable', 'array'],
             'contact_name'      => ['sometimes', 'required', 'string', 'max:255'],
             'phone'             => ['sometimes', 'required', 'string', 'max:20'],

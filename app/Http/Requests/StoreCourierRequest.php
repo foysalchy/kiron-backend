@@ -8,7 +8,7 @@ use App\Http\Requests\BaseCompanyRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreCourierRequest extends BaseCompanyRequest
-{ 
+{
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -24,10 +24,12 @@ class StoreCourierRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
+        $companyId = $this->input('company_id') ?? $this->user()->company_id;
+
         return array_merge(
             $this->companyRules(),
             [
-                'courier_method_id' => ['required', 'exists:courier_methods,id'],
+                'name' => ['required', ],
                 'method_details'    => ['nullable', 'array'],
                 'contact_name'      => ['nullable', 'string', 'max:255'],
                 'phone'             => ['nullable', 'string', 'max:20'],

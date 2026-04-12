@@ -12,7 +12,7 @@ class Courier extends Model
     use SoftDeletes,CompanyScoped;
     protected $fillable = [
         'company_id',
-        'courier_method_id',
+        'name',
         'method_details',
         'contact_name',
         'phone',

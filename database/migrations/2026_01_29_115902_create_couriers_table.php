@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('couriers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('courier_method_id')->constrained('courier_methods')->cascadeOnDelete();
+            $table->string('name');
             $table->json('method_details')->nullable();
             $table->string('contact_name')->nullable();
             $table->string('phone')->nullable();
