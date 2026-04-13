@@ -39,6 +39,12 @@ class LandingPageController extends Controller
         return ResponseHelper::success($data, 'Landing page created successfully', 201);
     }
 
+    public function landingProducts(int $id): JsonResponse
+    {
+        $data = $this->landingPageService->getLandingProductById($id);
+
+        return ResponseHelper::success($data, 'Landing page retrieved successfully');
+    }
     public function show(int $id): JsonResponse
     {
         $data = $this->landingPageService->getLandingPageById($id);

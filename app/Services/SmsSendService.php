@@ -16,12 +16,46 @@ class SmsSendService
     public function getAllSmsSends(array $filters)
     {
         try {
-            return SmsSend::query()
+            $logs = SmsSend::query()
                 ->when(!empty($filters['search']), function ($q) use ($filters) {
                     $q->where('message', 'like', "%{$filters['search']}%");
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate($filters['per_page'] ?? 15);
+
+            $allIds = [];
+
+            foreach ($logs as $log) {
+                $allIds = array_merge(
+                    $allIds,
+                    $log->customer_ids ?? [],
+                    $log->supplier_ids ?? []
+                );
+            }
+
+            $allIds = array_unique($allIds);
+
+            $parties = Party::whereIn('id', $allIds)
+                ->select('id', 'name', 'type')
+                ->get()
+                ->groupBy('id');
+
+            foreach ($logs as $log) {
+                $customerIds = $log->customer_ids ?? [];
+                $supplierIds = $log->supplier_ids ?? [];
+
+                $log->customers = collect($customerIds)
+                    ->map(fn($id) => $parties[$id][0] ?? null)
+                    ->filter()
+                    ->values();
+
+                $log->suppliers = collect($supplierIds)
+                    ->map(fn($id) => $parties[$id][0] ?? null)
+                    ->filter()
+                    ->values();
+            }
+
+            return $logs;
         } catch (\Exception $e) {
             Log::error("Error fetching SMS logs: " . $e->getMessage());
             throw ApiException::serverError('Failed to fetch SMS logs');

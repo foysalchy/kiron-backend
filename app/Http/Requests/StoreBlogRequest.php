@@ -41,7 +41,7 @@ class StoreBlogRequest extends BaseCompanyRequest
                 // SEO Metadata
                 'meta_title'       => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
-                'meta_keywords'    => ['nullable', 'string', 'max:255'],
+                'meta_keywords'    => ['nullable', 'array'],
 
                 'status'           => ['nullable', 'integer', 'in:0,1'],
             ]

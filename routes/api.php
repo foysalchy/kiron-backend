@@ -667,6 +667,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}/force', [LandingPageController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [LandingPageController::class, 'toggleStatus']);
             });
+            Route::get('/landing/products/{id}', [LandingPageController::class, 'landingProducts']);
             // job title Routes
             Route::prefix('jobs')->group(function () {
                 Route::get('/', [JobTitleController::class, 'index']);

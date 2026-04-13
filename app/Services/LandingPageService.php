@@ -7,6 +7,7 @@ use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\LandingPage;
+use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -68,6 +69,19 @@ class LandingPageService
         }
 
         return $landingPage;
+    }
+    public function getLandingProductById(int $id)
+    {
+        $product = Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeValue.attributeGroup',
+            'variations.stocks.warehouse',
+            'variations.galleries',
+
+        ])->limit(5)->get();
+
+        return $product;
     }
 
     /**
@@ -304,7 +318,7 @@ class LandingPageService
                 'new_status' => $newStatus->label()
             ]);
 
-            return $landingPage->load([ 'template']);
+            return $landingPage->load(['template']);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

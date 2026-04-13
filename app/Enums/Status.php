@@ -75,7 +75,36 @@ enum Status: int
       self::ReturnReceived => 'Return Received',
     };
   }
+  public const ORDER_FLOW = [
+    self::Pending,
+    self::Processing,
+    self::Confirmed,
+    self::ReadyToShipped,
+    self::Shipped,
+    self::HandovertoCourier,
+    self::InTransit,
+    self::Delivered,
+    self::ReturntoCourier,
+    self::ReturnReceived,
+    self::Cancelled,
+  ];
 
+  public static function getOrderProgress(int $currentStatus): array
+  {
+    $flow = self::ORDER_FLOW;
+
+    $result = [];
+
+    foreach ($flow as $status) {
+      $result[] = [
+        'status' => $status,
+        'is_completed' => $status->value <= $currentStatus,
+        'is_current' => $status->value === $currentStatus,
+      ];
+    }
+
+    return $result;
+  }
   public function slug(): string
   {
     return strtolower($this->name);

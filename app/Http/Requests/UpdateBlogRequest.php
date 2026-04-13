@@ -45,7 +45,7 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
                 // SEO Metadata
                 'meta_title'       => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
-                'meta_keywords'    => ['nullable', 'string', 'max:255'],
+                'meta_keywords'    => ['nullable', 'array'],
                 'status'           => ['sometimes', 'integer', 'in:0,1'],
             ]
         );

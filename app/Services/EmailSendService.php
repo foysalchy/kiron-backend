@@ -17,18 +17,54 @@ class EmailSendService
     public function getAllEmailLogs(array $filters)
     {
         try {
-            return EmailSend::query()
+            $logs = EmailSend::query()
                 ->when(!empty($filters['search']), function ($q) use ($filters) {
                     $q->where('subject', 'like', "%{$filters['search']}%");
                 })
                 ->orderBy('created_at', 'desc')
                 ->paginate($filters['per_page'] ?? 15);
+
+            // 🔥 Collect all party IDs from all logs
+            $allIds = [];
+
+            foreach ($logs as $log) {
+                $allIds = array_merge(
+                    $allIds,
+                    $log->customer_ids ?? [],
+                    $log->supplier_ids ?? []
+                );
+            }
+
+            $allIds = array_unique($allIds);
+
+            // 🔥 Get all parties in one query
+            $parties = Party::whereIn('id', $allIds)
+                ->select('id', 'name', 'type')
+                ->get()
+                ->groupBy('id');
+
+            // 🔥 Map customers & suppliers to each log
+            foreach ($logs as $log) {
+                $customerIds = $log->customer_ids ?? [];
+                $supplierIds = $log->supplier_ids ?? [];
+
+                $log->customers = collect($customerIds)
+                    ->map(fn($id) => $parties[$id][0] ?? null)
+                    ->filter()
+                    ->values();
+
+                $log->suppliers = collect($supplierIds)
+                    ->map(fn($id) => $parties[$id][0] ?? null)
+                    ->filter()
+                    ->values();
+            }
+
+            return $logs;
         } catch (\Exception $e) {
             Log::error('Error fetching Email logs: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch Email logs');
         }
     }
-
     /**
      * Store record and Send Email
      */
