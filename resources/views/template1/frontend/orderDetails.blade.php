@@ -38,39 +38,49 @@
                     <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
 
                     <div class="space-y-4">
-                        @foreach($order->orderDetails as $item)
-                        <div class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
-                            <div class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
-                                <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="flex-1 text-center sm:text-left">
-                                <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">{{ $item->product->title }}</h4>
-
-                                @if($item->variation)
-                                <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
-                                    @foreach($item->variation->attributes as $attr)
-                                        <span class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded text-gray-600 uppercase">{{ $attr->attributeValue->name }}</span>
-                                    @endforeach
+                        @foreach ($order->orderDetails as $item)
+                            <div
+                                class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
+                                <div
+                                    class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
+                                    <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                        class="w-full h-full object-cover">
                                 </div>
-                                <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-tighter">SKU: {{ $item->variation->sku ?? 'N/A' }}</p>
+                                <div class="flex-1 text-center sm:text-left">
+                                    <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
+                                        {{ $item->product->title ?? '' }}</h4>
+
+                                    @if ($item->variation)
+                                        <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
+                                            @foreach ($item->variation->attributes as $attr)
+                                                <span
+                                                    class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded text-gray-600 uppercase">{{ $attr->attributeValue->name }}</span>
+                                            @endforeach
+                                        </div>
+                                        <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-tighter">SKU:
+                                            {{ $item->variation->sku ?? 'N/A' }}</p>
+                                    @endif
+
+                                    <p class="text-gray-900 font-medium">
+                                        <span class="text-sm">{{ $setup->currency }} {{ number_format($item->unit_price) }}
+                                            × {{ $item->quantity }}</span>
+                                        <span class="text-lg font-bold text-[#FF6A00] ml-3">{{ $setup->currency }}
+                                            {{ number_format($item->total) }}</span>
+                                    </p>
+                                </div>
+
+                                @if ($order->status == 'delivered')
+                                    <button
+                                        class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2">
+                                        <i class="far fa-star"></i> Write Review
+                                    </button>
+                                @else
+                                    <button disabled
+                                        class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-[10px] font-bold flex items-center gap-2 cursor-not-allowed">
+                                        <i class="fas fa-lock"></i> Locked
+                                    </button>
                                 @endif
-
-                                <p class="text-gray-900 font-medium">
-                                    <span class="text-sm">{{ $setup->currency }} {{ number_format($item->unit_price) }} × {{ $item->quantity }}</span>
-                                    <span class="text-lg font-bold text-[#FF6A00] ml-3">{{ $setup->currency }} {{ number_format($item->total) }}</span>
-                                </p>
                             </div>
-
-                            @if($order->status == 'delivered')
-                                <button class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2">
-                                    <i class="far fa-star"></i> Write Review
-                                </button>
-                            @else
-                                <button disabled class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-[10px] font-bold flex items-center gap-2 cursor-not-allowed">
-                                    <i class="fas fa-lock"></i> Locked
-                                </button>
-                            @endif
-                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -80,76 +90,133 @@
                     <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h3>
 
                     <!-- Vertical Timeline -->
-                    <div class="relative pl-8 space-y-8  before:bg-green-500">
-                        <!-- Step 1 -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
+                    {{-- The 'before' class creates the vertical line connecting the dots --}}
+                    <div
+                        class="relative pl-8 space-y-8 before:content-[''] before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
+
+                        @php
+                            $currentStatusValue = $order->status;
+                            $flow = \App\Enums\Status::ORDER_FLOW;
+
+                            // Find the index of the current status in the flow
+                            $currentIndex = 0;
+                            foreach ($flow as $index => $status) {
+                                if ($status->value === $currentStatusValue) {
+                                    $currentIndex = $index;
+                                    break;
+                                }
+                            }
+
+                            // Special case: If order is cancelled, we only show steps up to the cancellation point or just the flow
+                            $isCancelled = $currentStatusValue === \App\Enums\Status::Cancelled->value;
+                        @endphp
+
+                        @foreach ($flow as $index => $status)
+                            {{-- Skip Return/Cancel steps if they haven't happened yet to keep the UI clean --}}
+                            @if (
+                                ($status == \App\Enums\Status::Cancelled ||
+                                    $status == \App\Enums\Status::ReturntoCourier ||
+                                    $status == \App\Enums\Status::ReturnReceived) &&
+                                    $index > $currentIndex)
+                                @continue
+                            @endif
+
+                            @php
+                                $isCompleted = $index <= $currentIndex;
+                                $isCurrent = $index === $currentIndex;
+                            @endphp
+
+                            <div class="relative">
+                                <!-- Dot -->
+                                <div
+                                    class="absolute -left-8 top-2 w-4 h-4 rounded-full border-2 border-white z-10
+                    {{ $isCurrent ? 'bg-orange-500 shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
+                                    @if ($isCompleted && !$isCurrent)
+                                        <i
+                                            class="fas fa-check text-[8px] text-white flex items-center justify-center h-full"></i>
+                                    @endif
+                                </div>
+
+                                <!-- Label -->
+                                <p
+                                    class="font-bold text-md leading-none mb-1
+                    {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
+                                    {{ $status->label() }}
+                                </p>
+
+                                <!-- Date/Time -->
+                                <p class="text-sm text-gray-500 font-medium">
+                                    @if ($index === 0)
+                                        {{-- Always show creation date for the first step --}}
+                                        {{ $order->created_at->format('M d, Y h:i A') }}
+                                    @elseif($isCurrent)
+                                        {{-- Show update date for the current active step --}}
+                                        {{ $order->updated_at->format('M d, Y h:i A') }}
+                                    @else
+                                        <span class="opacity-0">--</span> {{-- Keep spacing even if no date --}}
+                                    @endif
+                                </p>
                             </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Order Placed</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-15 10:30 AM</p>
-                        </div>
-                        <!-- Step 2 -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
-                            </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Order Confirmed</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-15 11:00 AM</p>
-                        </div>
-                        <!-- Step 3 -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
-                            </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Processing</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-15 02:00 PM</p>
-                        </div>
-                        <!-- Step 4 -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
-                            </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Shipped</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-16 09:00 AM</p>
-                        </div>
-                        <!-- Step 5 -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
-                            </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Out for Delivery</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-18 08:00 AM</p>
-                        </div>
-                        <!-- Step 6 (Final) -->
-                        <div class="relative">
-                            <div
-                                class="absolute -left-8 top-2 w-4 h-4 rounded-full bg-green-500 flex items-center justify-center z-10">
-                            </div>
-                            <p class="font-medium text-md text-green-700 leading-none mb-1">Delivered</p>
-                            <p class="text-sm text-gray-600 font-base">2024-01-18 03:30 PM</p>
-                        </div>
+                        @endforeach
                     </div>
 
-                    <!-- Courier Box -->
-                    <div
-                        class="mt-10 p-4 bg-blue-50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
-                        <div>
-                            <h5 class="text-blue-800 text-md mb-1">Courier Tracking</h5>
-                            <p class="text-sm text-blue-700">Sundarban Courier - SA123456789BD</p>
+                    <!-- Courier Box (Dynamic) -->
+                    @if ($order->courier_info && isset($order->courier_info['consignment_id']))
+                        @php
+                            $courierName = strtolower($order->courier_info['courier_name'] ?? '');
+                            $consignmentId = $order->courier_info['consignment_id'];
+                            $customerPhone = $order->customer->phone ?? '';
+
+                            $trackingUrl = '#';
+
+                            // pathao
+                            if (str_contains($courierName, 'pathao')) {
+                                $trackingUrl = "https://merchant.pathao.com/tracking?consignment_id={$consignmentId}&phone={$customerPhone}";
+                            }
+                            // carrybee
+                            elseif (str_contains($courierName, 'carrybee')) {
+                                $trackingUrl = "https://merchant.carrybee.com/order-track/{$consignmentId}";
+                            }
+                            // steadfast
+                            elseif (str_contains($courierName, 'steadfast')) {
+                                $trackingUrl = "https://steadfast.com.bd/t/{$consignmentId}";
+                            }
+                            // redx
+                            elseif (str_contains($courierName, 'redx')) {
+                                $trackingUrl = "https://redx.com.bd/track/{$consignmentId}";
+                            }
+                            elseif (isset($order->courier_info['url'])) {
+                                $trackingUrl = $order->courier_info['url'];
+                            }
+                        @endphp
+
+                        <div
+                            class="mt-10 p-5 bg-blue-50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-50">
+                                    <i class="fas fa-truck-moving text-xl"></i>
+                                </div>
+                                <div>
+                                    <h5 class="text-blue-900 font-bold text-sm mb-0.5">Courier Tracking</h5>
+                                    <p class="text-sm text-blue-700 font-semibold uppercase">
+                                        {{ $order->courier_info['courier_name'] ?? 'Courier' }}
+                                    </p>
+                                    <p class="text-xs text-blue-500 font-medium">
+                                        Tracking ID: <span class="font-mono">{{ $consignmentId }}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            @if ($trackingUrl !== '#')
+                                <a href="{{ $trackingUrl }}" target="_blank"
+                                    class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                                    <i class="fas fa-external-link-alt text-xs"></i>
+                                    Track Now
+                                </a>
+                            @endif
                         </div>
-                        <button
-                            class="w-full md:w-auto px-6 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-external-link h-4 w-4 mr-2">
-                                <path d="M15 3h6v6"></path>
-                                <path d="M10 14 21 3"></path>
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            </svg>
-                            Tracking
-                        </button>
-                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -173,15 +240,15 @@
                             </div>
                             <div>
                                 <p class="text-gray-900 text-md">{{ $order->customer->name }}</p>
-                                <p class="text-sm text-gray-500 leading-relaxed font-medium">{{ $order->customer->address }}</p>
+                                <p class="text-sm text-gray-500 leading-relaxed font-medium">
+                                    {{ $order->customer->address }}</p>
                             </div>
                         </div>
                         <div class="flex items-center ">
                             <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-phone h-4 w-4 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-phone h-4 w-4 text-gray-500">
                                     <path
                                         d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                     </path>
@@ -193,28 +260,34 @@
                 </div>
 
                 <!-- Payment Summary -->
-                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment Summary</h3>
+                <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
+                        Summary</h3>
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
-                            <span class="text-gray-900 font-bold">{{ $setup->currency }} {{ number_format($order->subtotal) }}</span>
+                            <span class="text-gray-900 font-bold">{{ $setup->currency }}
+                                {{ number_format($order->subtotal) }}</span>
                         </div>
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Shipping Charge:</span>
-                            <span class="text-gray-900 font-bold">{{ $setup->currency }} {{ number_format($order->other_charges) }}</span>
+                            <span class="text-gray-900 font-bold">{{ $setup->currency }}
+                                {{ number_format($order->other_charges) }}</span>
                         </div>
-                        @if($order->coupon_discount > 0)
-                        <div class="flex justify-between text-md text-green-600 font-medium">
-                            <span>Discount:</span>
-                            <span class="font-bold">- {{ $setup->currency }} {{ number_format($order->coupon_discount) }}</span>
-                        </div>
+                        @if ($order->coupon_discount > 0)
+                            <div class="flex justify-between text-md text-green-600 font-medium">
+                                <span>Discount:</span>
+                                <span class="font-bold">- {{ $setup->currency }}
+                                    {{ number_format($order->coupon_discount) }}</span>
+                            </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[#FF6A00]">{{ $setup->currency }} {{ number_format($order->grand_total) }}</span>
+                            <span class="text-xl font-black text-[#FF6A00]">{{ $setup->currency }}
+                                {{ number_format($order->grand_total) }}</span>
                         </div>
-                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method: {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
+                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
+                            {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>
                 </div>
 
