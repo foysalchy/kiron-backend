@@ -50,6 +50,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
     Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
     Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
+    Route::get('/flash-sale', [ProductController::class, 'flashSale'])->name('flash.sale');
     Route::get('/carts', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
@@ -64,11 +65,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
     Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
     Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
-
-
-    Route::get('/product-track', function () {
-        return view('template1.frontend.product-track');
-    });
+    Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
 
 
 });

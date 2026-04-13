@@ -42,7 +42,7 @@
                 <div class="p-6 md:p-8">
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
                         <span id="discount-badge"
-                            class="inline-block bg-[#FFCF00] text-black text-[13px] font-bold px-3 py-1 rounded-full mb-4">
+                            class="inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
                             {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
                             OFF
                         </span>

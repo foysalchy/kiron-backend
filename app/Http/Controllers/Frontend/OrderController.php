@@ -217,4 +217,22 @@ class OrderController extends Controller
 
         return view($template . '.frontend.invoice', compact('order'));
     }
+    public function trackOrder(Request $request)
+    {
+        $company = getCurrentCompany();
+        $template = $company->template_name;
+        $order = null;
+
+        if ($request->filled('order_no')) {
+            $order = Order::where('company_id', $company->id)
+                ->where('order_no', $request->order_no)
+                ->first();
+
+            if (!$order) {
+                return back()->with('error', 'Order not found with the provided order number.');
+            }
+        }
+
+        return view($template . '.frontend.product-track', compact('order'));
+    }
 }

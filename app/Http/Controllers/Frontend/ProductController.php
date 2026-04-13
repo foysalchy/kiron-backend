@@ -91,11 +91,9 @@ class ProductController extends Controller
         if ($request->filled('max_price')) {
             $query->where('regular_price', '<=', $request->max_price);
         }
-
         if ($request->filled('brand')) {
             $query->whereIn('brand_id', (array)$request->brand);
         }
-
         if ($request->filled('attributes')) {
             foreach ($request->attributes as $groupId => $ids) {
                 $ids = array_filter((array)$ids);
@@ -122,7 +120,17 @@ class ProductController extends Controller
         } elseif ($request->sort == 'newest') {
             $query->latest();
         } else {
-            $query->latest();
+            if (request()->routeIs('flash.sale')) {
+                $query->orderByRaw('
+                (CASE
+                    WHEN discount_type = "percent" THEN (regular_price * discount / 100)
+                    WHEN discount_type = "flat" THEN discount
+                    ELSE 0
+                END) DESC
+            ');
+            } else {
+                $query->latest();
+            }
         }
     }
 
@@ -186,5 +194,33 @@ class ProductController extends Controller
             ->where('id', '!=', $product->id)->latest()->take(8)->get();
 
         return view($template . '.frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
+    }
+    public function flashSale(Request $request, $store)
+    {
+        $company = getCurrentCompany();
+        $template = $company->template_name;
+
+        // Filter products that have a discount > 0
+        $query = Product::where('company_id', $company->id)
+            ->where('discount', '>', 0)
+            ->active();
+
+        $this->applyFiltersAndSorting($query, $request);
+
+        $products = $query->paginate(12);
+        $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
+
+        $brands = Brand::where('company_id', $company->id)->get();
+
+        $attributeGroups = AttributeGroup::where('company_id', $company->id)
+            ->whereIn('name', ['Size', 'Color', 'Style'])
+            ->with('values')
+            ->active()
+            ->get();
+
+        // Pass a virtual category object for the title
+        $category = (object) ['name' => 'Flash Sale Items'];
+
+        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category'));
     }
 }
