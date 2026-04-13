@@ -62,7 +62,7 @@ class LandingPageService
      */
     public function getLandingPageById(int $id): LandingPage
     {
-        $landingPage = LandingPage::with(['template'])->find($id);
+        $landingPage = LandingPage::with(['product','template'])->find($id);
 
         if (!$landingPage) {
             throw ApiException::notFound('Landing Page');

@@ -87,6 +87,7 @@ use App\Http\Controllers\Api\PeriodTypeController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\PricingController;
+use App\Http\Controllers\Api\PricingPackageController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductGroupController;
 use App\Http\Controllers\Api\PurchaseController;
@@ -1414,6 +1415,16 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/restore', [PricingController::class, 'restore']);
             Route::delete('/{id}/force', [PricingController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PricingController::class, 'toggleStatus']);
+        });
+        Route::prefix('pricing-packages')->group(function () {
+            Route::get('/', [PricingPackageController::class, 'index']);
+            Route::post('/', [PricingPackageController::class, 'store']);
+            Route::get('/{id}', [PricingPackageController::class, 'show']);
+            Route::post('/update/{id}', [PricingPackageController::class, 'update']);
+            Route::delete('/{id}', [PricingPackageController::class, 'destroy']);
+            Route::get('/{id}/restore', [PricingPackageController::class, 'restore']);
+            Route::delete('/{id}/force', [PricingPackageController::class, 'forceDestroy']);
+            Route::patch('/{id}/toggle-status', [PricingPackageController::class, 'toggleStatus']);
         });
     });
     //bkash route

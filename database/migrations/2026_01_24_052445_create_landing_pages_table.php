@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
             $table->foreignId('template_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('name');
-            $table->string('title');
+            $table->string('name')->nullable();
+            $table->string('title')->nullable();
             $table->text('short_description')->nullable();
             $table->string('thumbnail')->nullable();
             $table->string('video')->nullable();
