@@ -30,7 +30,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:parties,email', // টেবিল নাম parties
+            'email'    => 'required|email|unique:parties,email', // parties
             'phone'    => 'required|string|max:20|unique:parties,phone',
             'address'  => 'required|string',
             'password' => 'required|string|min:8|confirmed',
@@ -51,7 +51,7 @@ class AuthController extends Controller
 
         Auth::guard('customer')->login($user);
 
-        return redirect()->route('user.dashboard')->with('success', 'নিবন্ধন সফল হয়েছে।');
+        return redirect()->route('user.dashboard')->with('success', 'Registration was successful. Welcome to our store!');
     }
 
     public function login()
@@ -77,11 +77,11 @@ class AuthController extends Controller
 
         if (Auth::guard('customer')->attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
-            return redirect()->intended(route('user.dashboard'))->with('success', 'লগইন সফল হয়েছে।');
+            return redirect()->intended(route('user.dashboard'))->with('success', 'Login successful. Welcome back!');
         }
 
         throw ValidationException::withMessages([
-            'email' => ['ইমেইল বা পাসওয়ার্ড সঠিক নয়।'],
+            'email' => ['Email or password is incorrect.'],
         ]);
     }
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'লগআউট সফল হয়েছে।');
+        return redirect('/login')->with('success', 'Logout was successful.');
     }
     public function profile()
     {
@@ -131,7 +131,7 @@ class AuthController extends Controller
             $user->update($data);
 
             DB::commit();
-            return back()->with('success', 'আপনার প্রোফাইল সফলভাবে আপডেট করা হয়েছে!');
+            return back()->with('success', 'Your profile has been updated successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -139,7 +139,7 @@ class AuthController extends Controller
                 FileUploadHelper::delete($data['profile']);
             }
 
-            return back()->with('error', 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে: ' . $e->getMessage());
+            return back()->with('error', 'There was a problem updating your profile: ' . $e->getMessage());
         }
     }
 
@@ -154,14 +154,14 @@ class AuthController extends Controller
         $user = Auth::guard('customer')->user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'বর্তমান পাসওয়ার্ডটি সঠিক নয়।');
+            return back()->with('error', 'The current password is incorrect.');
         }
 
         $user->update([
             'password' => Hash::make($request->password)
         ]);
 
-        return back()->with('success', 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!');
+        return back()->with('success', 'Password has been changed successfully!');
     }
     public function dashboard()
     {

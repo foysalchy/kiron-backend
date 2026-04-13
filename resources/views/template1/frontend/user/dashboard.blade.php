@@ -9,7 +9,7 @@
                 @csrf
                 <button type="submit"
                     class="px-5 py-2 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-all">
-                    লগআউট
+                    Logout
                 </button>
             </form>
         </div>
@@ -91,7 +91,8 @@
                             class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
-                                <h4 class="text-2xl font-semibold text-gray-900">৳{{ number_format($totalSpent ?? 0) }}</h4>
+                                <h4 class="text-2xl font-semibold text-gray-900">{{ $setup->currency }}
+                                    {{ number_format($totalSpent ?? 0) }}</h4>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -138,15 +139,15 @@
                                     <span
                                         class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full uppercase">{{ $order->status }}</span>
                                     <div class="flex items-center gap-6">
-                                        <p class="font-semibold text-gray-900">৳{{ number_format($order->grand_total) }}
+                                        <p class="font-semibold text-gray-900">{{ $setup->currency }}
+                                            {{ number_format($order->grand_total) }}
                                         </p>
-                                        <a href=""
-                                            class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a>
-                                        {{-- <a href="{{ route('user.order.details', $order->id) }}" class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">দেখুন</a> --}}
+                                        <a href="{{ route('user.order.details', $order->id) }}"
+                                            class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">View</a>
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-center text-gray-500 py-6">আপনার কোনো অর্ডার নেই।</p>
+                                <p class="text-center text-gray-500 py-6">You have no orders!!!</p>
                             @endforelse
                         </div>
                     </div>
@@ -157,7 +158,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
                             <h2 class="text-xl md:text-2xl font-bold text-gray-900">
-                                আমার সব অর্ডার
+                                My Orders
                             </h2>
                         </div>
                         <div class="p-6 space-y-8">
@@ -169,7 +170,7 @@
                                             <h4 class="font-semibold text-md text-gray-900">#{{ $order->order_number }}
                                             </h4>
                                             <p class="text-sm text-gray-700 font-medium">
-                                                অর্ডার তারিখ: {{ $order->created_at->format('d M, Y') }}
+                                                Order Date: {{ $order->created_at->format('d M, Y') }}
                                             </p>
                                         </div>
 
@@ -190,7 +191,7 @@
                                                 {{ ucfirst($order->status) }}
                                             </span>
                                             <p class="text-lg font-bold text-gray-900 leading-none">
-                                                ৳{{ number_format($order->grand_total) }}</p>
+                                                {{ $setup->currency }} {{ number_format($order->grand_total) }}</p>
                                         </div>
                                     </div>
 
@@ -200,18 +201,21 @@
                                             <div class="flex items-center gap-3">
                                                 <div
                                                     class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
-                                                    @if ($item->product && $item->product->image_url)
-                                                        <img src="{{ $item->product->image_url }}"
+                                                    @if ($item->product && $item->product->thumbnail)
+                                                        <img src="{{ $item->product->thumbnail_url }}"
+                                                            onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                                             class="w-full h-full object-cover">
                                                     @else
-                                                        <i class="fas fa-image text-gray-200"></i>
+                                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}"
+                                                            class="w-full h-full object-cover">
                                                     @endif
                                                 </div>
                                                 <div class="text-sm">
                                                     <p class="text-gray-800 leading-tight">
                                                         {{ $item->product->name ?? 'Product Deleted' }}</p>
                                                     <p class="text-gray-500 font-medium">
-                                                        ৳{{ number_format($item->price) }} x {{ $item->quantity }}</p>
+                                                        {{ $setup->currency }} {{ number_format($item->price) }} x
+                                                        {{ $item->quantity }}</p>
                                                 </div>
                                             </div>
                                         @endforeach
@@ -220,17 +224,17 @@
                                     <div class="flex gap-3">
                                         <a href="{{ route('user.order.details', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                            <i class="fas fa-eye"></i> বিস্তারিত
+                                            <i class="fas fa-eye"></i> View Details
                                         </a>
-                                        <a href="/"
+                                        <a href="{{ route('order.invoice', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                            <i class="fas fa-download"></i> ইনভয়েস
+                                            <i class="fas fa-download"></i> Invoice
                                         </a>
                                     </div>
                                 </div>
                             @empty
                                 <div class="text-center py-10">
-                                    <p class="text-gray-500">আপনার কোনো অর্ডার পাওয়া যায়নি।</p>
+                                    <p class="text-gray-500">No Orders Found</p>
                                 </div>
                             @endforelse
                         </div>
@@ -242,7 +246,7 @@
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <!-- Header -->
                         <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-900">আমার উইশলিস্ট</h2>
+                            <h2 class="text-xl font-bold text-gray-900">My Wishlist</h2>
                         </div>
 
                         <div class="p-6">
@@ -261,102 +265,112 @@
                                         class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <i class="far fa-heart text-3xl text-gray-300"></i>
                                     </div>
-                                    <h2 class="text-xl font-bold text-gray-800">আপনার উইশলিস্টে কোনো পণ্য নেই।</h2>
+                                    <h2 class="text-xl font-bold text-gray-800">Your wishlist is currently empty.</h2>
                                     <a href="{{ route('shop.index') }}"
                                         class="inline-block mt-8 bg-[#FF6A00] text-white px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">শপিং
-                                        শুরু করুন</a>
+                                        Start Shopping</a>
                                 </div>
                             @endif
                         </div>
                     </div>
                 </div>
 
-              <!-- 4. SECTION: PROFILE EDIT -->
-<div id="edit-section" class="dashboard-content hidden space-y-6">
-    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">প্রোফাইল আপডেট করুন</h2>
+                <!-- 4. SECTION: PROFILE EDIT -->
+                <div id="edit-section" class="dashboard-content hidden space-y-6">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Update Your Profile</h2>
 
-        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-            @csrf
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- নাম -->
-                <div>
-                    <label class="text-sm font-bold text-gray-700">নাম</label>
-                    <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                           class="w-full px-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                    @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+                        <form action="{{ route('user.profile.update') }}" method="POST" enctype="multipart/form-data"
+                            class="space-y-6">
+                            @csrf
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- নাম -->
+                                <div>
+                                    <label class="text-sm font-bold text-gray-700">Name</label>
+                                    <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                                        class="w-full px-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                    @error('name')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                <!-- ইমেইল -->
-                <div>
-                    <label class="text-sm font-bold text-gray-700">ইমেইল</label>
-                    <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                           class="w-full px-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                    @error('email') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+                                <!-- ইমেইল -->
+                                <div>
+                                    <label class="text-sm font-bold text-gray-700">Email</label>
+                                    <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                                        class="w-full px-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                    @error('email')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                <!-- ফোন -->
-                <div>
-                    <label class="text-sm font-bold text-gray-700">ফোন</label>
-                    <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
-                           class="w-full px-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                    @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                </div>
+                                <!-- ফোন -->
+                                <div>
+                                    <label class="text-sm font-bold text-gray-700">Phone</label>
+                                    <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
+                                        class="w-full px-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                    @error('phone')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
 
-                <!-- ঠিকানা -->
-                <div>
-                    <label class="text-sm font-bold text-gray-700">ঠিকানা</label>
-                    <input type="text" name="address" value="{{ old('address', $user->address) }}"
-                           class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
-                </div>
+                                <!-- ঠিকানা -->
+                                <div>
+                                    <label class="text-sm font-bold text-gray-700">Address</label>
+                                    <input type="text" name="address" value="{{ old('address', $user->address) }}"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                </div>
 
-                <!-- প্রোফাইল ইমেজ এবং প্রিভিউ -->
-                <div class="md:col-span-2 flex items-center gap-6">
-                    <div class="shrink-0">
-                        <img id="image-preview" src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
-                             class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm">
+                                <!-- প্রোফাইল ইমেজ এবং প্রিভিউ -->
+                                <div class="md:col-span-2 flex items-center gap-6">
+                                    <div class="shrink-0">
+                                        <img id="image-preview"
+                                            src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                                            class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm">
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="text-sm font-bold text-gray-700">Change Profile Picture</label>
+                                        <input type="file" name="profile" id="profile-input"
+                                            onchange="previewImage(this)"
+                                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
+                                        @error('profile')
+                                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                class="bg-[#FF6A00] text-white px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
+                                Save information
+                            </button>
+                        </form>
                     </div>
-                    <div class="flex-1">
-                        <label class="text-sm font-bold text-gray-700">প্রোফাইল ইমেজ পরিবর্তন করুন</label>
-                        <input type="file" name="profile" id="profile-input" onchange="previewImage(this)"
-                               class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
-                        @error('profile') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                    </div>
                 </div>
-            </div>
-
-            <button type="submit"
-                class="bg-[#FF6A00] text-white px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
-                তথ্য সংরক্ষণ করুন
-            </button>
-        </form>
-    </div>
-</div>
 
                 <!-- 5. SECTION: PASSWORD CHANGE (Initially Hidden) -->
                 <div id="password-section" class="dashboard-content hidden space-y-6">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                        <h2 class="text-2xl font-bold text-gray-900 mb-6">পাসওয়ার্ড পরিবর্তন করুন</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Change Your Password</h2>
                         <form action="{{ route('user.password.update') }}" method="POST" class="space-y-5 max-w-2xl">
                             @csrf
                             <div>
-                                <label class="text-sm text-gray-800">বর্তমান পাসওয়ার্ড</label>
+                                <label class="text-sm text-gray-800">Current Password</label>
                                 <input type="password" name="current_password" required
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
                             </div>
                             <div>
-                                <label class="text-sm text-gray-800">নতুন পাসওয়ার্ড</label>
+                                <label class="text-sm text-gray-800">New Password</label>
                                 <input type="password" name="password" required
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
                             </div>
                             <div>
-                                <label class="text-sm text-gray-800">পাসওয়ার্ড নিশ্চিত করুন</label>
+                                <label class="text-sm text-gray-800">Confirm Your Password</label>
                                 <input type="password" name="password_confirmation" required
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
                             </div>
                             <button type="submit"
-                                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">আপডেট
-                                করুন</button>
+                                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
                         </form>
                     </div>
                 </div>
@@ -397,14 +411,14 @@
         }, 4000);
     </script>
     <script>
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('image-preview').src = e.target.result;
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
             }
-            reader.readAsDataURL(input.files[0]);
         }
-    }
-</script>
+    </script>
 @endpush

@@ -99,6 +99,11 @@ class OrderController extends Controller
                     'unit_price'   => (float) $item->price,
                 ];
             }
+            $shippingAddress = [
+                'name'    => $data['name'] ?? $customer->name,
+                'phone'   => $data['phone'] ?? $customer->phone,
+                'address' => $data['address'] ?? $customer->address ?? 'N/A',
+            ];
 
             $orderData = [
                 'company_id'    => $company->id,
@@ -109,6 +114,7 @@ class OrderController extends Controller
                 'order_date'    => now(),
                 'coupon_code'   => session('coupon')['coupon_code'] ?? null,
                 'other_charges' => session()->get('shipping_cost', 60),
+                'shipping_address' => $shippingAddress,
             ];
 
             // Cleanup old drafts
@@ -157,7 +163,13 @@ class OrderController extends Controller
         // 4. Confirm the Order
         try {
             DB::beginTransaction();
-            Party::where('id', $order->customer_id)->update(['name' => $request->name, 'address' => $request->address]);
+            $finalAddress = [
+                'name'    => $request->name,
+                'phone'   => $request->phone,
+                'address' => $request->address,
+            ];
+            $order->update(['shipping_address' => $finalAddress]);
+            $order->customer->update(['name' => $request->name, 'address' => $request->address]);
 
             // This will deduct stock from the Exact Warehouse assigned in the draft
             $this->orderService->changeStatus($order->id, Status::Pending->value);
@@ -165,7 +177,7 @@ class OrderController extends Controller
             DB::commit();
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
-            return redirect()->route('order.invoice', $order->id)->with('success', 'আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।');
+            return redirect()->route('order.invoice', $order->id)->with('success', 'Your order has been successfully placed.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Final Confirmation Error: ' . $e->getMessage());
@@ -177,14 +189,20 @@ class OrderController extends Controller
         $template = $company->template_name;
 
         $order = Order::where('company_id', $company->id)
-            ->where('customer_id', auth('customer')->id())
             ->with([
                 'customer',
                 'orderDetails.product',
                 'orderDetails.variation.attributes.attributeValue',
                 'orderDetails.variation.attributes.attributeGroup'
             ])
-            ->findOrFail($id);
+            ->find($id);
+
+        if (!$order) {
+            abort(404);
+        }
+        if (auth('customer')->check() && $order->customer_id !== auth('customer')->id()) {
+            abort(403, 'এই অর্ডারটি দেখার অনুমতি আপনার নেই।');
+        }
 
         return view($template . '.frontend.orderDetails', compact('order'));
     }

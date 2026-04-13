@@ -92,11 +92,11 @@ class CartController extends Controller
                 'success' => true,
                 'shipping_cost' => $cost,
                 'grand_total' => number_format($total),
-                'message' => 'ডেলিভারি চার্জ আপডেট করা হয়েছে।'
+                'message' => 'Delivery charge has been updated.'
             ]);
         }
 
-        return back()->with('success', 'ডেলিভারি এরিয়া আপডেট করা হয়েছে।');
+        return back()->with('success', 'Shipping area has been updated.');
     }
 
     public function applyCoupon($store, Request $request)
@@ -113,7 +113,7 @@ class CartController extends Controller
 
             session()->put('coupon', $result);
 
-            return back()->with('success', 'অভিনন্দন! কুপনটি সফলভাবে যুক্ত হয়েছে।');
+            return back()->with('success', 'Congratulations! The coupon has been applied successfully.');
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -122,7 +122,7 @@ class CartController extends Controller
     public function removeCoupon($store)
     {
         session()->forget('coupon');
-        return back()->with('success', 'কুপনটি সরানো হয়েছে।');
+        return back()->with('success', 'The coupon has been removed.');
     }
     // product add to cart
     public function add($store, Request $request)
@@ -167,12 +167,12 @@ class CartController extends Controller
             return response()->json([
                 'status'     => 'success',
                 'cart_count' => Cart::count(),
-                'message'    => 'সফলভাবে কার্টে যোগ করা হয়েছে!'
+                'message'    => 'Successfully added to cart!'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'দুঃখিত, সমস্যা হয়েছে: ' . $e->getMessage()
+                'message' => 'Sorry, there was an issue: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -180,12 +180,12 @@ class CartController extends Controller
     public function update($store, Request $request)
     {
         Cart::update($request->rowId, $request->qty);
-        return back()->with('success', 'কার্ট আপডেট হয়েছে');
+        return back()->with('success', 'Cart has been updated.');
     }
 
     public function remove($store, $rowId)
     {
         Cart::remove($rowId);
-        return back()->with('success', 'পণ্যটি আপনার কার্ট থেকে সফলভাবে সরানো হয়েছে!');
+        return back()->with('success', 'The item has been successfully removed from your cart!');
     }
 }

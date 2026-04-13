@@ -7,6 +7,7 @@ use App\Models\AttributeGroup;
 use App\Models\Brand;
 use App\Models\MegaCategory;
 use App\Models\Product;
+use App\Models\ProductView;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -17,7 +18,7 @@ class ProductController extends Controller
         $template = $company->template_name;
 
         $product = Product::with(['variations.attributes.attributeValue', 'variations.attributes.attributeGroup'])
-        ->findOrFail($id);
+            ->findOrFail($id);
 
         return view($template . '.partials.variation_modal_content', compact('product'));
     }
@@ -29,6 +30,7 @@ class ProductController extends Controller
         $query = Product::with('variations')->where('company_id', $company->id);
 
         // dd($query);
+
 
         $this->applyFiltersAndSorting($query, $request);
 
@@ -60,8 +62,8 @@ class ProductController extends Controller
         $category = MegaCategory::where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
 
         $query = Product::where('company_id', $company->id)
-                    ->active()
-                    ->whereJsonContains('mega_category_ids', (int)$category->id);
+            ->active()
+            ->whereJsonContains('mega_category_ids', (int)$category->id);
 
         $this->applyFiltersAndSorting($query, $request);
 
@@ -98,23 +100,28 @@ class ProductController extends Controller
             foreach ($request->attributes as $groupId => $ids) {
                 $ids = array_filter((array)$ids);
                 if (!empty($ids)) {
-                    $query->whereHas('variations.attributes', function($q) use ($ids) {
+                    $query->whereHas('variations.attributes', function ($q) use ($ids) {
                         $q->whereIn('attribute_value_id', $ids);
                     });
                 }
             }
         }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('short_description', 'like', "%{$search}%")
+                    ->orWhere('sku_code', 'like', "%{$search}%");
+            });
+        }
 
         if ($request->sort == 'price_low') {
             $query->orderBy('regular_price', 'asc');
-        }
-        elseif ($request->sort == 'price_high') {
+        } elseif ($request->sort == 'price_high') {
             $query->orderBy('regular_price', 'desc');
-        }
-        elseif ($request->sort == 'newest') {
+        } elseif ($request->sort == 'newest') {
             $query->latest();
-        }
-        else {
+        } else {
             $query->latest();
         }
     }
@@ -124,16 +131,28 @@ class ProductController extends Controller
         $company = getCurrentCompany();
         $template = $company->template_name;
 
-        // ১. variations.galleries সহ সব রিলেশন লোড করা
         $product = Product::with([
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
-            'variations.galleries', // ভ্যারিয়েশন গ্যালারি লোড
+            'variations.galleries',
             'galleries',
             'brand'
         ])->where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
 
 
+        $viewKey = 'viewed_product_' . $product->id;
+
+        if (!session()->has($viewKey)) {
+            ProductView::create([
+                'company_id'  => $company->id,
+                'product_id'  => $product->id,
+                'customer_id' => auth('customer')->id(),
+                'ip_address'  => request()->ip(),
+                'user_agent'  => request()->userAgent(),
+            ]);
+
+            session()->put($viewKey, true);
+        }
 
         Product::loadCategoriesForCollection(collect([$product]));
 
@@ -149,8 +168,7 @@ class ProductController extends Controller
                     $attrs[$groupName] = ['id' => $attr->attributeValue?->id, 'name' => $attr->attributeValue?->name ?? 'Unknown'];
                 }
 
-                // ২. ভ্যারিয়েশনের নিজস্ব গ্যালারি ইমেজগুলো নেওয়া
-                $varGalleries = $variation->galleries->map(function($g) {
+                $varGalleries = $variation->galleries->map(function ($g) {
                     return asset('storage/' . $g->image);
                 })->toArray();
 
@@ -158,14 +176,14 @@ class ProductController extends Controller
                     'id' => $variation->id,
                     'price' => $variation->final_price,
                     'attributes' => $attrs,
-                    'main_image' => $variation->image ? asset('storage/'.$variation->image) : $product->thumbnail_url,
-                    'galleries' => $varGalleries // গ্যালারি ডাটা পাঠানো হচ্ছে
+                    'main_image' => $variation->image ? asset('storage/' . $variation->image) : $product->thumbnail_url,
+                    'galleries' => $varGalleries
                 ];
             }
         }
-//  \Log::info($formattedVariations);
+        //  \Log::info($formattedVariations);
         $relatedProducts = Product::where('company_id', $company->id)->active()
-                            ->where('id', '!=', $product->id)->latest()->take(8)->get();
+            ->where('id', '!=', $product->id)->latest()->take(8)->get();
 
         return view($template . '.frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
     }

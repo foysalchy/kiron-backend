@@ -194,9 +194,9 @@
                                     </td>
                                     <td class="py-6 text-center text-gray-700 font-bold">{{ $item->quantity }}</td>
                                     <td class="py-6 text-right text-gray-700">
-                                        ৳{{ number_format($item->unit_price, 0) }}</td>
+                                        {{ $setup->currency }} {{ number_format($item->unit_price, 0) }}</td>
                                     <td class="py-6 text-right font-bold text-gray-900">
-                                        ৳{{ number_format($item->total, 0) }}</td>
+                                        {{ $setup->currency }} {{ number_format($item->total, 0) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -208,23 +208,23 @@
                     <div class="w-full max-w-[300px] space-y-3 font-medium">
                         <div class="flex justify-between text-gray-500">
                             <span>Subtotal:</span>
-                            <span class="text-gray-900">৳{{ number_format($order->subtotal, 0) }}</span>
+                            <span class="text-gray-900">{{ $setup->currency}} {{ number_format($order->subtotal, 0) }}</span>
                         </div>
                         <div class="flex justify-between text-gray-500">
                             <span>Delivery Charge:</span>
-                            <span class="text-gray-900">৳{{ number_format($order->other_charges, 0) }}</span>
+                            <span class="text-gray-900">{{ $setup->currency }} {{ number_format($order->other_charges, 0) }}</span>
                         </div>
                         @if ($order->coupon_discount > 0)
                             <div class="flex justify-between text-green-600">
                                 <span>Coupon Discount:</span>
-                                <span>- ৳{{ number_format($order->coupon_discount, 0) }}</span>
+                                <span>- {{ $setup->currency }} {{ number_format($order->coupon_discount, 0) }}</span>
                             </div>
                         @endif
                         <div class="h-px bg-gray-100 my-2"></div>
                         <div class="flex justify-between items-center pt-2">
                             <span class="text-lg font-bold text-gray-900">Total Paid:</span>
                             <span
-                                class="text-2xl font-bold text-[#FF6A00]">৳{{ number_format($order->grand_total, 0) }}</span>
+                                class="text-2xl font-bold text-[#FF6A00]">{{ $setup->currency }} {{ number_format($order->grand_total, 0) }}</span>
                         </div>
                     </div>
                 </div>

@@ -6,11 +6,11 @@
             <!-- Top Header -->
             <div class="flex items-center justify-between mb-8">
                 <h1 class="text-2xl font-bold text-gray-800">
-                    শপিং কার্ট ({{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} টি পণ্য)
+                     Shopping Cart ({{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} Items)
                 </h1>
                 <a href="{{ route('shop.index') }}"
                     class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all">
-                    ← শপিং চালিয়ে যান
+                    ← Continue Shopping
                 </a>
             </div>
 
@@ -20,7 +20,7 @@
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-5">
-                            <h2 class="text-xl font-bold text-gray-800">কার্টের পণ্যসমূহ</h2>
+                            <h2 class="text-xl font-bold text-gray-800">Cart Items</h2>
                         </div>
 
                         <div class="p-5 space-y-6">
@@ -37,18 +37,18 @@
                                     <div class="flex-1">
                                         <h3 class="font-bold text-gray-800 text-lg leading-tight mb-1">{{ $item->name }}</h3>
                                         <div class="flex items-center gap-2 mb-2">
-                                            <span class="bg-orange-50 text-[#FF6A00] text-[10px] font-bold px-2 py-0.5 rounded uppercase">
+                                            <span class="bg-orange-50 text-[#FF6A00] text-xs font-bold px-2 py-0.5 rounded uppercase">
                                                 {{ $item->options->variant ?? 'Product' }}
                                             </span>
                                         </div>
                                         <div class="flex items-baseline gap-2">
                                             <p class="font-bold text-gray-700 text-lg">
-                                                ৳{{ number_format($item->price, 0) }}
+                                                {{ $setup->currency }} {{ number_format($item->price, 0) }}
                                             </p>
 
                                             @if(isset($item->options['regular_price']) && (float)$item->options['regular_price'] > (float)$item->price)
                                                 <span class="text-sm text-gray-400 line-through font-normal pl-1">
-                                                    ৳{{ number_format($item->options['regular_price'], 0) }}
+                                                    {{ $setup->currency }} {{ number_format($item->options['regular_price'], 0) }}
                                                 </span>
                                             @endif
                                         </div>
@@ -63,7 +63,7 @@
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-center md:items-end gap-4 min-w-[100px]">
-                                        <p class="font-black text-xl text-[#FF6A00]">৳{{ number_format($item->subtotal, 0) }}</p>
+                                        <p class="font-black text-xl text-[#FF6A00]">{{ $setup->currency }} {{ number_format($item->subtotal, 0) }}</p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
                                         class="text-red-400 hover:text-red-600 transition-colors">
                                             <i class="far fa-trash-alt text-lg"></i>
@@ -78,24 +78,24 @@
                 <!-- RIGHT: Summary -->
                 <div class="lg:col-span-1">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6 sticky top-24">
-                        <h2 class="text-xl font-bold text-gray-800 mb-6">অর্ডার সামারি</h2>
+                        <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
                         <!-- selection shipping area -->
                         <div class="mb-6">
-                            <label class="text-sm font-bold text-gray-600 block mb-3">শিপিং এরিয়া সিলেক্ট করুন</label>
+                            <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
                             <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
                                 @csrf
                                 <div class="space-y-2">
                                     <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="inside" onchange="this.form.submit()"
                                             {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#FF6A00]">
-                                        <span class="text-sm font-bold text-gray-700">ঢাকার ভেতরে (৳৬০)</span>
+                                        <span class="text-sm font-bold text-gray-700">Inside Dhaka ({{$setup->currency}} 60)</span>
                                     </label>
 
                                     <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="outside" onchange="this.form.submit()"
                                             {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#FF6A00]">
-                                        <span class="text-sm font-bold text-gray-700">ঢাকার বাইরে (৳১২০)</span>
+                                        <span class="text-sm font-bold text-gray-700">outside Dhaka ({{$setup->currency}} 120)</span>
                                     </label>
                                 </div>
                             </form>
@@ -104,9 +104,9 @@
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf
-                            <label class="text-sm font-bold text-gray-600 block mb-2">কুপন কোড</label>
+                            <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
                             <div class="flex gap-2">
-                                <input type="text" name="coupon_code" placeholder="কুপন কোড লিখুন"
+                                <input type="text" name="coupon_code" placeholder="Enter Coupon Code"
                                     value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
                                     class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
@@ -126,52 +126,52 @@
                         <!-- calcualtion -->
                         <div class="space-y-4 border-t border-gray-100 pt-6 mb-6">
                             <div class="flex justify-between font-bold text-gray-600">
-                                <span>সাবটোটাল:</span>
-                                <span>৳{{ number_format($subtotal, 0) }}</span>
+                                <span>Subtotal:</span>
+                                <span>{{ $setup->currency }} {{ number_format($subtotal, 0) }}</span>
                             </div>
 
                             @if($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
-                                    <span>ডিসকাউন্ট ({{ session('coupon')['coupon_code'] }}):</span>
-                                    <span>- ৳{{ number_format($discount, 0) }}</span>
+                                    <span>Discount ({{ session('coupon')['coupon_code'] }}):</span>
+                                    <span>- {{ $setup->currency }} {{ number_format($discount, 0) }}</span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between font-bold text-gray-600">
-                                <span>ডেলিভারি চার্জ:</span>
-                                <span>৳{{ number_format($shipping, 0) }}</span>
+                                <span>Delivery Charge:</span>
+                                <span>{{ $setup->currency }} {{ number_format($shipping, 0) }}</span>
                             </div>
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg font-black text-gray-800">মোট:</span>
-                            <span class="text-2xl font-black text-[#FF6A00]">৳{{ number_format($total, 0) }}</span>
+                            <span class="text-lg font-black text-gray-800">Total:</span>
+                            <span class="text-2xl font-black text-[#FF6A00]">{{ $setup->currency }} {{ number_format($total, 0) }}</span>
                         </div>
 
                         <!-- Checkout Button -->
                         <a href="{{ url('/checkout') }}"
                         class="block w-full text-center bg-[#FF6A00] hover:bg-[#e65f00] text-white py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
-                            চেকআউট করুন
+                            Checkout
                         </a>
 
                         <p class="text-center text-gray-500 text-sm font-medium flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck h-4 w-4"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
-                             ২-৩ দিনে ডেলিভারি
+                             Delivery time in 2-3 days
                         </p>
 
                         <!-- Trust Badges -->
                         <div class="grid grid-cols-2 gap-y-4 gap-x-2 border-t border-gray-50 pt-8">
                             <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> নিরাপদ পেমেন্ট
+                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Secure Payment
                             </div>
                             <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-blue-400 rounded-full"></span> ফ্রি রিটার্ন
+                                <span class="w-2 h-2 bg-blue-400 rounded-full"></span> Free Return
                             </div>
                             <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-orange-400 rounded-full"></span> ২৪/৭ সাপোর্ট
+                                <span class="w-2 h-2 bg-orange-400 rounded-full"></span> 24/7 Support
                             </div>
                             <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-purple-400 rounded-full"></span> গুণগত মান
+                                <span class="w-2 h-2 bg-purple-400 rounded-full"></span> Quality
                             </div>
                         </div>
                     </div>
@@ -183,8 +183,8 @@
                 <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <i class="fas fa-shopping-basket text-3xl text-gray-200"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">আপনার কার্টটি বর্তমানে খালি!</h2>
-                <a href="{{ route('shop.index') }}" class="inline-block mt-8 bg-[#FF6A00] text-white px-10 py-3 rounded-xl font-bold">কেনাকাটা শুরু করুন</a>
+                <h2 class="text-2xl font-bold text-gray-800">Your cart is currently empty!</h2>
+                <a href="{{ route('shop.index') }}" class="inline-block mt-8 bg-[#FF6A00] text-white px-10 py-3 rounded-xl font-bold">Start shopping</a>
             </div>
         @endif
     </section>

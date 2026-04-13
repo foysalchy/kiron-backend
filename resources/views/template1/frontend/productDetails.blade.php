@@ -44,7 +44,7 @@
                         <span id="discount-badge"
                             class="inline-block bg-[#FFCF00] text-black text-[13px] font-bold px-3 py-1 rounded-full mb-4">
                             {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}%
-                            ছাড়
+                            OFF
                         </span>
                     @endif
 
@@ -64,10 +64,10 @@
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
                             <span id="regular-price"
-                                class="text-gray-400 text-lg line-through">৳{{ number_format($product->display_price_data->regular_price) }}</span>
+                                class="text-gray-400 text-lg line-through">{{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}</span>
                         @endif
                         <span id="sale-price"
-                            class="text-3xl font-black text-[#00A651]">৳{{ number_format($product->display_price_data->sale_price) }}</span>
+                            class="text-3xl font-black text-[#00A651]">{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}</span>
                     </div>
 
                     <!-- Dynamic Variations Container -->
@@ -86,7 +86,7 @@
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         <span class="text-sm {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $product->available_stock > 0 ? $product->available_stock . ' টি স্টকে আছে' : 'স্টক আউট' }}
+                            {{ $product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock' }}
                         </span>
                     </div>
 
@@ -144,8 +144,7 @@
                                 <circle cx="17" cy="18" r="2"></circle>
                                 <circle cx="7" cy="18" r="2"></circle>
                             </svg>
-                            ৫০০০ টাকার
-                            উপর অর্ডার করলে ফ্রি ডেলিভারি
+                            Free delivery on orders over {{ $setup->currency }} 5,000
                         </div>
                         <div class="text-[#3B82F6] flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -155,8 +154,7 @@
                                     d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z">
                                 </path>
                             </svg>
-                            স্টক শেষ
-                            হওয়ার আগেই অর্ডার করুন!
+                            Order before stock runs out!
                         </div>
                         <div class="text-[#9333EA] flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -165,7 +163,7 @@
                                 <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                                 <path d="M3 3v5h5"></path>
                             </svg>
-                            প্রোডাক্ট হাতে পেয়ে মূল্য পরিশোধ করুন!</div>
+                            Pay when you receive the product!</div>
                         <div class="text-[#F15A24] flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -174,8 +172,7 @@
                                     d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
                                 </path>
                             </svg>
-                            ৭২ ঘণ্টার মধ্যে সারা
-                            বাংলাদেশ এ হোম ডেলিভারি</div>
+                            Home delivery across Bangladesh within 72 hours</div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-4 mb-6">
@@ -213,7 +210,7 @@
                         </div>
                     </div>
 
-                    <div class="text-center mb-4 text-gray-700">সরাসরি অর্ডার করতে কল অথবা হোয়াটসঅ্যাপ করুন</div>
+                    <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
                     <div class="grid grid-cols-2 gap-3">
 
@@ -226,7 +223,7 @@
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                 </path>
                             </svg>
-                            কল করুন
+                            Call Now
                         </a>
 
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text=Assalamu Alaikum, I want to order: {{ $product->title }}"
@@ -237,7 +234,7 @@
                                 stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
                                 <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
                             </svg>
-                            হোয়াটসঅ্যাপ
+                            WhatsApp
                         </a>
                     </div>
                 </div>
@@ -249,39 +246,39 @@
             <!-- Tab Buttons -->
             <div class="flex items-center justify-center border-b border-gray-100 bg-[#F9FAFB]" id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">বিবরণ</button>
+                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
                 <button onclick="switchTab('specification')" id="tab-btn-specification"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">স্পেসিফিকেশন</button>
+                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
 
                 <button onclick="switchTab('review')" id="tab-btn-review"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">রিভিউ
+                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Reviews
                     (42)</button>
             </div>
 
             <!-- Tab Content Area -->
             <div class="p-6 md:p-10">
 
-                <!-- Section: বিবরণ  -->
+                <!-- Section: Description  -->
                 <div id="tab-content-description" class="tab-content block">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">পণ্যের বিবরণ</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
                     <div class="text-gray-600 leading-relaxed prose prose-orange max-w-none">
-                        {!! $product->full_description ?? 'এই পণ্যের কোনো বিস্তারিত বিবরণ নেই।' !!}
+                        {!! $product->full_description ?? 'No detailed description available for this product.' !!}
                     </div>
                 </div>
 
-                <!-- Section: স্পেসিফিকেশন  -->
+                <!-- Section: Specification  -->
                 <div id="tab-content-specification" class="tab-content hidden">
-                    <h3 class="text-xl font-bold text-gray-900 mb-8">পণ্যের স্পেসিফিকেশন</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">ব্র্যান্ড:</span>
+                            <span class="font-medium text-gray-500">Brand:</span>
                             <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
                         </div>
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">এসকেইউ (SKU):</span>
+                            <span class="font-medium text-gray-500">SKU:</span>
                             <span class="font-mono font-bold">
                                 @if (is_array($product->sku_code))
                                     {{ implode(', ', $product->sku_code) }}
@@ -292,15 +289,15 @@
                         </div>
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">উপলব্ধতা:</span>
+                            <span class="font-medium text-gray-500">Availability:</span>
                             <span
                                 class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $product->available_stock > 0 ? 'ইন স্টক' : 'স্টক আউট' }}
+                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
                             </span>
                         </div>
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">ক্যাটাগরি:</span>
+                            <span class="font-medium text-gray-500">Category:</span>
                             <span class="font-bold">{{ $product->mega_categories->first()->name ?? 'N/A' }}</span>
                         </div>
 
@@ -334,7 +331,7 @@
 
                 <!-- Section: Review -->
                 <div id="tab-content-review" class="tab-content hidden">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">কাস্টমার রিভিউ</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
 
                     <!-- Review Summary Card -->
                     <div class="bg-gray-50/50 rounded-xl p-6 mb-10 border border-gray-100">
@@ -343,7 +340,7 @@
                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                 class="fas fa-star"></i><i class="fas fa-star-half-alt text-gray-300"></i>
                         </div>
-                        <div class="text-sm text-gray-800 font-medium">42 রিভিউ</div>
+                        <div class="text-sm text-gray-800 font-medium">42 Reviews</div>
                     </div>
 
                     <!-- Individual Reviews List -->
@@ -355,29 +352,28 @@
                                 <!-- Avatar -->
                                 <div
                                     class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    রহ</div>
+                                    RH</div>
 
                                 <div class="flex-1">
                                     <!-- Name, Stars and Date on Same Line -->
                                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-800">রহিম উদ্দিন</h4>
+                                        <h4 class="text-md text-gray-800">Rahim Uddin</h4>
                                         <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="fas fa-star"></i>
                                         </div>
-                                        <span class="text-sm text-gray-500">২ দিন আগে</span>
+                                        <span class="text-sm text-gray-500">2 days ago</span>
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">অসাধারণ পণ্য! সাউন্ড কোয়ালিটি
-                                        খুবই ভালো এবং লাইট খুব সুন্দর। দাম অনুযায়ী খুবই ভালো পণ্য। সবার কাছে রিকমেন্ড করব।
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Great product! The sound quality is excellent and the light is very nice. Excellent value for money. I would recommend it to everyone.
                                     </p>
 
                                     <!-- Variant Tag -->
                                     <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">নীল
-                                        - মাঝারি</span>
+                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Blue
+                                        - Medium</span>
                                 </div>
                             </div>
                         </div>
@@ -388,28 +384,27 @@
                                 <!-- Avatar -->
                                 <div
                                     class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    ফা</div>
+                                    F</div>
 
                                 <div class="flex-1">
                                     <!-- Name, Stars and Date -->
                                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-900">ফাতেমা খাতুন</h4>
+                                        <h4 class="text-md text-gray-900">Fatema Khatun</h4>
                                         <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="far fa-star text-gray-300"></i>
                                         </div>
-                                        <span class="text-sm text-gray-500">১ সপ্তাহ আগে</span>
+                                        <span class="text-sm text-gray-500">1 week ago</span>
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">ভালো পণ্য। তবে ব্যাটারি লাইফ
-                                        আরেকটু বেশি হলে ভালো হতো। তবুও সন্তুষ্ট।</p>
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life could have been a bit longer. Still satisfied.</p>
 
                                     <!-- Variant Tag -->
                                     <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">লাল
-                                        - ছোট</span>
+                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Red
+                                        - Small</span>
                                 </div>
                             </div>
                         </div>
@@ -419,28 +414,27 @@
                                 <!-- Avatar -->
                                 <div
                                     class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    ফা</div>
+                                    F</div>
 
                                 <div class="flex-1">
                                     <!-- Name, Stars and Date -->
                                     <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-900">ফাতেমা খাতুন</h4>
+                                        <h4 class="text-md text-gray-900">Fatema Khatun</h4>
                                         <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                             <i class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="fas fa-star"></i><i class="fas fa-star"></i><i
                                                 class="far fa-star text-gray-300"></i>
                                         </div>
-                                        <span class="text-sm text-gray-500">১ সপ্তাহ আগে</span>
+                                        <span class="text-sm text-gray-500">1 week ago</span>
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">ভালো পণ্য। তবে ব্যাটারি লাইফ
-                                        আরেকটু বেশি হলে ভালো হতো। তবুও সন্তুষ্ট।</p>
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life could have been a bit longer. Still satisfied.</p>
 
                                     <!-- Variant Tag -->
                                     <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">লাল
-                                        - ছোট</span>
+                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Red
+                                        - Small</span>
                                 </div>
                             </div>
                         </div>
@@ -508,7 +502,7 @@
                 });
 
                 let groupHtml =
-                    `<div class="mb-4"><h3 class="text-sm font-bold text-gray-700 mb-2">${groupName} নির্বাচন করুন:</h3><div class="flex flex-wrap gap-2">`;
+                    `<div class="mb-4"><h3 class="text-sm font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const activeClass = (userSelections[groupName] == valId) ?
                         'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
@@ -547,7 +541,7 @@
                     thumbContainer.innerHTML = galleryHtml;
                 }
 
-                document.getElementById('sale-price').innerText = '৳' + final.price.toLocaleString();
+                document.getElementById('sale-price').innerText = '{{ $setup->currency }} ' + final.price.toLocaleString();
                 document.getElementById('selected-variation-id').value = final.id;
             } else {
                 // back main galleries
@@ -556,7 +550,7 @@
                     changeImage("{{ $product->thumbnail_url }}");
                 }
                 document.getElementById('sale-price').innerText =
-                    '৳{{ number_format($product->display_price_data->sale_price ?? 0) }}';
+                    '{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price ?? 0) }}';
                 document.getElementById('selected-variation-id').value = '';
             }
         }
@@ -581,7 +575,7 @@
             } else {
                 let varId = document.getElementById('selected-variation-id').value;
                 if (!varId) {
-                    toastr.warning('দয়া করে সব অপশন (রঙ/সাইজ) সিলেক্ট করুন');
+                    toastr.warning('Please select all options (color/size)');
                     return;
                 }
                 postData.variation_id = varId;
@@ -609,7 +603,7 @@
                     } else {
                         toastr.error(data.message);
                     }
-                }).catch(err => toastr.error("সার্ভারে সমস্যা হয়েছে।"));
+                }).catch(err => toastr.error("Server error occurred."));
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -633,7 +627,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'unauthorized') {
-                        toastr.info(data.message); 
+                        toastr.info(data.message);
                     } else if (data.status === 'added') {
                         toastr.success(data.message);
                     } else if (data.status === 'removed') {
@@ -642,7 +636,7 @@
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    toastr.error("সার্ভারে সমস্যা হয়েছে বা আপনার সেশন শেষ হয়েছে।");
+                    toastr.error("Server error occurred or your session has expired.");
                 });
         }
     </script>

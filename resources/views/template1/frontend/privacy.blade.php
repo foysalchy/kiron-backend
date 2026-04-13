@@ -145,7 +145,7 @@
                     our data practices, please contact us:</p>
                 <div class="space-y-2.5 text-md text-gray-700">
                     <p><span class="font-bold">Email:</span> {{$setup->email ?? ''}}</p>
-                    <p><span class="font-bold">Phone:</span>{{ $setup->phone ?? 'নম্বর পাওয়া যায়নি' }}</p>
+                    <p><span class="font-bold">Phone:</span>{{ $setup->phone ?? 'Phone Not Available' }}</p>
                     <p><span class="font-bold">Address:</span> {{ $setup->corporate_address ?? '' }}</p>
                 </div>
             </div>

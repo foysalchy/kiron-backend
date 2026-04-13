@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Blog extends Model
 {
-        use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
 
     protected $fillable = [
