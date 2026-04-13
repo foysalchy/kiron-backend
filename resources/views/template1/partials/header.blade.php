@@ -50,44 +50,50 @@
         </a>
 
         <!-- Search Bar -->
-        <div class="hidden md:flex flex-1 max-w-2xl relative">
+
+        <form action="{{ route('shop.index') }}" method="GET" class="hidden md:flex flex-1 max-w-2xl relative">
             <div class="flex w-full items-center bg-white border border-gray-200 rounded-md p-1 shadow-xs">
 
-                <input type="text" placeholder="Search for products..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-4 py-2.5 text-sm text-gray-600 outline-none placeholder:text-gray-400">
 
-                <button
+                <button type="submit"
                     class="bg-[#FF6A00] text-white h-10 w-12 flex items-center justify-center rounded-md hover:bg-orange-600 transition-all shrink-0">
                     <i class="fas fa-search text-lg px-4"></i>
                 </button>
             </div>
-        </div>
+        </form>
 
         <!-- Right Side Icons & Links -->
         <div class="flex items-center gap-4 lg:gap-7 text-[#1D2128]">
 
             <!-- Bangla Links (As seen in image) -->
             <div class="hidden xl:flex items-center gap-6 text-sm font-semibold text-gray-500">
-                <a href="{{ url('/product-track') }}" class="hover:text-[#FF6A00] transition-colors">অর্ডার ট্র্যাক
-                    করুন</a>
-                <a href="{{ url('/contact') }}" class="hover:text-[#FF6A00] transition-colors">যোগাযোগ</a>
-                <a href="{{ url('/blogs') }}" class="hover:text-[#FF6A00] transition-colors">ব্লগ</a>
+                <a href="{{ url('/product-track') }}" class="hover:text-[#FF6A00] transition-colors">Order Truck
+                </a>
+                <a href="{{ url('/contact') }}" class="hover:text-[#FF6A00] transition-colors">Contact</a>
+                <a href="{{ url('/blogs') }}" class="hover:text-[#FF6A00] transition-colors">Blog</a>
             </div>
 
             <!-- Wishlist -->
-            <a href="{{ route('user.dashboard') }}" class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative">
+            <a href="{{ route('user.dashboard') }}"
+                class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl"></i>
 
                     @auth('customer')
                         @php
-                            $initialWishCount = \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count();
+                            $initialWishCount = \App\Models\Wishlist::where(
+                                'customer_id',
+                                auth('customer')->id(),
+                            )->count();
                         @endphp
                     @else
                         @php $initialWishCount = 0; @endphp
                     @endauth
 
-                    <span id="wishlist-count-nav" class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $initialWishCount > 0 ? '' : 'hidden' }}">
+                    <span id="wishlist-count-nav"
+                        class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $initialWishCount > 0 ? '' : 'hidden' }}">
                         {{ $initialWishCount }}
                     </span>
                 </div>
@@ -122,7 +128,7 @@
                             <p class="text-sm font-medium text-gray-500 truncate">{{ auth('customer')->user()->email }}</p>
                         </div>
 
-                        <!-- মেনু লিঙ্কসমূহ -->
+                        <!-- Menu link -->
                         <div class="py-2">
 
                             <a href="{{ route('user.dashboard') }}?section=orders"
@@ -142,7 +148,7 @@
 
                         </div>
 
-                        <!-- লগআউট সেকশন -->
+                        <!-- Logout Section -->
                         <div class="border-t border-gray-100 py-1">
                             <form action="{{ route('user.logout') }}" method="POST">
                                 @csrf

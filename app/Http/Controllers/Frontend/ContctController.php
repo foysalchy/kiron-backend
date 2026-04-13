@@ -49,6 +49,6 @@ class ContctController extends Controller
             'is_read'    => 0,
         ]);
 
-        return back()->with('success', 'আপনার বার্তাটি আমাদের কাছে পৌঁছেছে। ধন্যবাদ!');
+        return back()->with('success', 'Your message has been received. Thank you!');
     }
 }

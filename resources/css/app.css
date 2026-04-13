@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'toastr/build/toastr.min.css';
+@plugin "@tailwindcss/typography";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -11,7 +12,7 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 #toast-container {
-    top: 100px !important; 
+    top: 100px !important;
     right: 20px !important;
 }
 #toast-container > .toast-success {

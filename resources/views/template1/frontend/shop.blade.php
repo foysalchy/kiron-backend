@@ -42,7 +42,6 @@
             <!-- ══════════════════════════ SIDEBAR ═════════════════════════════ -->
             <aside class="w-full lg:w-[220px] shrink-0">
                 <form action="{{ url()->current() }}" method="GET" id="sidebar-filter-form">
-                    <!-- সর্টিং ভ্যালু ধরে রাখার জন্য হিডেন ইনপুট -->
                     <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
 
                     <div
@@ -64,18 +63,18 @@
 
                             <div class="flex items-center gap-2 mb-4">
                                 <input type="number" name="min_price" value="{{ request('min_price', 0) }}"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]">
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
                                 <input type="number" name="max_price" value="{{ request('max_price', 5000) }}"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-[12px] outline-none focus:border-[#f15a24]">
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
                             </div>
 
                             <div class="flex items-center justify-between">
                                 <button type="submit"
-                                    class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-[12px] font-bold hover:bg-orange-600 transition-colors uppercase">
+                                    class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
                                     Filter
                                 </button>
-                                <span class="text-[11px] text-gray-500 font-medium">৳{{ request('min_price', 0) }} —
-                                    ৳{{ request('max_price', 5000) }}</span>
+                                <span class="text-xs text-gray-500 font-medium">{{ $setup->currency }} {{ request('min_price', 0) }} —
+                                    {{ $setup->currency }} {{ request('max_price', 5000) }}</span>
                             </div>
                         </div>
 
@@ -141,7 +140,7 @@
                             <!-- Clear Button -->
                             <div class="p-4">
                                 <a href="{{ url()->current() }}"
-                                    class="text-[11px] text-red-500 font-bold hover:underline uppercase">Clear All
+                                    class="text-xs text-red-500 font-bold hover:underline uppercase">Clear All
                                     Filters</a>
                             </div>
 
@@ -158,7 +157,7 @@
                 <!-- Shop Header -->
                 <div class="px-5 py-3.5 flex items-center justify-between">
                     <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                        {{ $category ? $category->name : 'আমাদের সব পণ্য' }}
+                        {{ $category ? $category->name : 'All Products' }}
                     </h2>
                     <div class="relative">
                         <form action="" method="GET" id="sortForm">
@@ -214,27 +213,4 @@
     </section>
 
 @endsection
-@push('scripts')
-    <script>
-        function addToCart(price) {
-            alert("পণ্যটি কার্টে যোগ করা হয়েছে! দাম: ৳" + price);
 
-            window.location.href = "./cart.html";
-        }
-
-        function toggleAllFilters() {
-            const panel = document.getElementById('all-filters-panel');
-            const arrow = document.getElementById('all-filters-arrow');
-            const isHidden = panel.classList.contains('hidden');
-
-            if (isHidden) {
-                panel.classList.remove('hidden');
-                arrow.style.transform = 'rotate(180deg)';
-            } else {
-                panel.classList.add('hidden');
-                arrow.style.transform = 'rotate(0deg)';
-            }
-        }
-    </script>
-
-@endpush

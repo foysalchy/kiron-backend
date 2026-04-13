@@ -7,8 +7,8 @@
 
             <!-- Card Header -->
             <div class="p-6 text-center border-b border-gray-50">
-                <h1 class="text-2xl font-black text-gray-900 mb-2">লগইন করুন</h1>
-                <p class="text-gray-700 font-medium">আপনার অ্যাকাউন্টে প্রবেশ করুন</p>
+                <h1 class="text-2xl font-black text-gray-900 mb-2">Login</h1>
+                <p class="text-gray-700 font-medium">Login to Your Account</p>
             </div>
 
             <!-- Login Form -->
@@ -19,7 +19,7 @@
 
                     <!-- Email Field -->
                     <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 ml-1">ইমেইল ঠিকানা</label>
+                        <label class="text-sm font-medium text-gray-700 ml-1">Email Address</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                 <i class="far fa-envelope text-sm"></i>
@@ -35,7 +35,7 @@
 
                     <!-- Password Field -->
                     <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 ml-1">পাসওয়ার্ড</label>
+                        <label class="text-sm font-medium text-gray-700 ml-1">Password</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                 <i class="fas fa-lock text-sm"></i>
@@ -53,20 +53,20 @@
 
                     <!-- Forgot Password Link -->
                     <div class="text-left">
-                        <a href="#" class="text-[#FF6A00] text-sm font-medium hover:underline">পাসওয়ার্ড ভুলে গেছেন?</a>
+                        <a href="#" class="text-[#FF6A00] text-sm font-medium hover:underline">Forgot Your Password?</a>
                     </div>
 
                     <!-- Login Button -->
                     <button type="submit"
                         class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
-                        লগইন করুন
+                        Login
                     </button>
 
                     <!-- Registration Link -->
                     <div class="text-center pt-2">
                         <p class="text-gray-500 font-medium">
-                            অ্যাকাউন্ট নেই? <a href="{{url('/register')}}"
-                                class="text-[#FF6A00] font-medium hover:underline ml-1">নিবন্ধন করুন</a>
+                           Don't have an account?<a href="{{url('/register')}}"
+                                class="text-[#FF6A00] font-medium hover:underline ml-1">Register</a>
                         </p>
                     </div>
                 </form>

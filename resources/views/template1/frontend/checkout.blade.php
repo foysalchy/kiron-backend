@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="container mx-auto py-6 px-4">
-        <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">চেকআউট</h1>
+        <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST">
             @csrf
@@ -15,30 +15,30 @@
                     <div class="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
                             <h2 class="text-2xl font-semibold text-gray-800 leading-tight">
-                                অর্ডারটি কনফার্ম করতে আপনার নাম, ঠিকানা, মোবাইল নম্বর, নিয়ে অর্ডার কনফার্ম বাটনে ক্লিক করুন
+                                To confirm your order, enter your name, address, phone number and click confirm
                             </h2>
                         </div>
                         <div class="p-6 space-y-5">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">আপনার নাম <span
+                                    <label class="text-sm font-medium text-gray-700">Your Name <span
                                             class="text-red-500">*</span></label>
-                                    <input type="text" name="name" placeholder="আপনার পূর্ণ নাম লিখুন" required
+                                    <input type="text" name="name" placeholder="Enter your full name" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-sm font-medium text-gray-700">ফোন নম্বর <span
+                                    <label class="text-sm font-medium text-gray-700">Phone Number <span
                                             class="text-red-500">*</span></label>
-                                    <input type="tel" name="phone" placeholder="আপনার মোবাইল নম্বর" required
+                                    <input type="tel" name="phone" placeholder="Your mobile number" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
                                 </div>
                             </div>
                             <div class="space-y-2">
-                                <label class="text-sm font-medium text-gray-700">আপনার ঠিকানা <span
+                                <label class="text-sm font-medium text-gray-700">Your Address <span
                                         class="text-red-500">*</span></label>
-                                <textarea name="address" placeholder="আপনার ঠিকানা" rows="3" required
+                                <textarea name="address" placeholder="Your address" rows="3" required
                                     class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
@@ -61,7 +61,7 @@
                     <!-- 2. Payment Method Card -->
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-800">পেমেন্ট মেথড নির্বাচন করুন</h2>
+                            <h2 class="text-xl font-bold text-gray-800">Select Payment Method</h2>
                         </div>
                         <div class="space-y-3 p-6">
                             <!-- Cash on Delivery -->
@@ -73,7 +73,7 @@
                                     class="w-7 h-7 bg-gray-100 rounded flex items-center justify-center border border-gray-50">
                                     <i class="fas fa-truck text-xs text-gray-400"></i>
                                 </div>
-                                <span class="text-[15px] font-medium text-gray-900">ক্যাশ অন ডেলিভারি</span>
+                                <span class="text-[15px] font-medium text-gray-900">Cash on Delivery</span>
                             </label>
 
                             <!-- bKash -->
@@ -97,22 +97,22 @@
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         <div class="mb-8">
-                            <h2 class="text-2xl font-semibold leading-none tracking-tight mb-6">ডেলিভারি মেথড নির্বাচন করুন
+                            <h2 class="text-2xl font-semibold leading-none tracking-tight mb-6">Select Delivery Method
                             </h2>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="delivery_area" value="inside"
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">ঢাকার ভেতরে
-                                        (৳৬০)</span>
+                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">Inside Dhaka
+                                        (৳60)</span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="delivery_area" value="outside"
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">ঢাকার বাইরে
-                                        (৳১২০)</span>
+                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">Outside Dhaka
+                                        (৳120)</span>
                                 </label>
                             </div>
                         </div>
@@ -124,7 +124,8 @@
                                     <!-- Actual Product Image -->
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail }}" class="w-full h-full object-cover">
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                            class="w-full h-full object-cover">
                                     </div>
 
                                     <div class="flex-1">
@@ -149,24 +150,24 @@
                         <!-- 3. Cost Breakdown -->
                         <div class="space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center text-gray-700">
-                                <span class="text-md font-medium">সাবটোটাল:</span>
+                                <span class="text-md font-medium">Subtotal:</span>
                                 <span class="text-md font-bold text-gray-900">৳{{ number_format($subtotal) }}</span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between items-center text-green-600">
-                                    <span class="text-md font-medium">ডিসকাউন্ট:</span>
+                                    <span class="text-md font-medium">Discount:</span>
                                     <span class="text-md font-bold">- ৳{{ number_format($discount) }}</span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between items-center text-gray-700">
-                                <span class="text-md font-medium">ডেলিভারি চার্জ:</span>
+                                <span class="text-md font-medium">Delivery Charge:</span>
                                 <span class="text-md font-bold text-gray-900">৳<span
                                         id="shipping-display">{{ number_format($shipping) }}</span></span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                                <span class="text-lg font-black text-gray-900">পরিশোধ করতে হবে:</span>
+                                <span class="text-lg font-black text-gray-900">Total to Pay:</span>
                                 <span class="text-xl font-bold text-[#FF6A00]">৳<span
                                         id="total-display">{{ number_format($total) }}</span></span>
                             </div>
@@ -174,8 +175,8 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full bg-[#EF4444] hover:bg-red-600 text-white font-bold py-4 text-sm rounded-xl mt-8 shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
-                            অর্ডার কনফার্ম করুন
+                            class="w-full bg-[#EF4444] hover:bg-red-600 text-white font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
+                            Confirm Order
                         </button>
                     </div>
                 </div>

@@ -6,11 +6,11 @@
         <div class="text-center">
             <!-- Main Heading -->
             <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-4">
-                যোগাযোগ করুন
+                Contact Us
             </h1>
             <!-- Description -->
             <p class="text-md md:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed font-medium">
-                আমাদের সাথে যোগাযোগ করুন। আমরা আপনার সেবায় ২৪/৭ প্রস্তুত।
+                Get in touch with us. We are available to serve you 24/7.
             </p>
 
         </div>
@@ -20,9 +20,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 items-start">
 
             <div class="lg:col-span-2 bg-white rounded-lg border border-gray-200 shadow-xs p-6 ">
-                <h2 class="text-lg md:text-2xl font-black text-gray-900 mb-8">আমাদের কাছে বার্তা পাঠান</h2>
+                <h2 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Send Us a Message</h2>
 
-                @if(session('success'))
+                @if (session('success'))
                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                         {{ session('success') }}
                     </div>
@@ -33,38 +33,42 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">নাম *</label>
-                            <input type="text" name="name" value="{{ old('name') }}" placeholder="আপনার নাম লিখুন" required
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Name *</label>
+                            <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name.."
+                                required
                                 class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">ইমেইল *</label>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="আপনার ইমেইল লিখুন" required
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Email *</label>
+                            <input type="email" name="email" value="{{ old('email') }}"
+                                placeholder="Enter Your Email.." required
                                 class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">ফোন নম্বর *</label>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="আপনার ফোন নম্বর" required
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone No *</label>
+                            <input type="tel" name="phone" value="{{ old('phone') }}"
+                                placeholder="Enter Your Phone .." required
                                 class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">বিষয়</label>
-                            <input type="text" name="subject" value="{{ old('subject') }}" placeholder="বার্তার বিষয়"
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Subject</label>
+                            <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Enter subject.."
                                 class="w-full h-10 px-3 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">বার্তা *</label>
-                        <textarea name="message" placeholder="আপনার বার্তা লিখুন..." rows="5" required
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Message *</label>
+                        <textarea name="message" placeholder="Enter Your Message..." rows="5" required
                             class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:border-[#FF6A00] outline-none">{{ old('message') }}</textarea>
                     </div>
 
-                    <button type="submit" class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-lg transition-all">
-                        <i class="fas fa-paper-plane mr-2"></i> বার্তা পাঠান
+                    <button type="submit"
+                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-lg transition-all">
+                        <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
             </div>
@@ -73,7 +77,7 @@
 
                 <!-- যোগাযোগের তথ্য  -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
-                    <h3 class="text-2xl font-black text-gray-900 mb-8">যোগাযোগের তথ্য</h3>
+                    <h3 class="text-2xl font-black text-gray-900 mb-8">Contact Information</h3>
 
                     <div class="space-y-6">
                         <!-- ফোন -->
@@ -88,7 +92,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-gray-900">ফোন</p>
+                                <p class="text-gray-900">Phone</p>
                                 <p class="text-gray-700">{{ $setup->phone }}</p>
                                 <p class="text-gray-700">{{ $setup->alt_phone }}</p>
                             </div>
@@ -107,7 +111,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-gray-900">ইমেইল</p>
+                                <p class="text-gray-900">Email</p>
                                 <p class="text-gray-700">{{ $setup->email }}</p>
                             </div>
                         </div>
@@ -127,24 +131,26 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class=" text-gray-900">ঠিকানা</p>
+                                <p class=" text-gray-900">Address</p>
                                 <p class="text-gray-700">{!! nl2br(e($setup->store_address)) ?? 'ঠিকানা পাওয়া যায়নি' !!}</p>
                             </div>
                         </div>
                         <!-- ঠিকানা -->
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 text-[#FF6A00] rounded-xl flex items-center justify-center shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-clock h-5 w-5 mt-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-clock h-5 w-5 mt-1">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
                             </div>
                             <div>
-                                <p class=" text-gray-900">কার্যসময়</p>
-                                <p class="text-gray-700"><span>সকাল ৯টা - রাত ৯টা</span><br>
-                                    <span>সপ্তাহের ৭ দিন</span>
+                                <p class="text-gray-900 font-bold">Working Hours</p>
+                                <p class="text-gray-700">
+                                    <span>9:00 AM - 9:00 PM</span><br>
+                                    <span>7 Days a week</span>
                                 </p>
                             </div>
                         </div>
@@ -153,7 +159,8 @@
 
                 <!-- হোয়াটসঅ্যাপ কার্ড -->
                 <div class="bg-[#EFFFF6] rounded-lg border border-green-200 p-8 text-center group">
-                    <div class="w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100 group-hover:scale-110 transition-transform">
+                    <div
+                        class="w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100 group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round"
@@ -161,8 +168,8 @@
                             <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-black text-gray-900 mb-2">হোয়াটসঅ্যাপে যোগাযোগ</h3>
-                    <p class="text-gray-600 text-md mb-6">তাৎক্ষণিক সাহায্যের জন্য</p>
+                    <h3 class="text-lg font-black text-gray-900 mb-2">Contact via WhatsApp</h3>
+                    <p class="text-gray-600 text-md mb-6">For immediate support</p>
 
                     @php
                         $whatsappNumber = preg_replace('/[^0-9]/', '', $setup->phone);
@@ -177,13 +184,13 @@
                             <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
                         </svg>
                         <!-- Button Text -->
-                        <span class="text-sm">হোয়াটসঅ্যাপ করুন</span>
+                        <span class="text-sm">WhatsApp</span>
                     </a>
                 </div>
 
                 <!-- সোশ্যাল মিডিয়া -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 font-['Outfit']">
-                    <h3 class="text-lg md:text-2xl font-black text-gray-900 mb-8">সোশ্যাল মিডিয়া</h3>
+                    <h3 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Social Media</h3>
 
                     <div class="flex flex-wrap gap-3">
                         <!-- Facebook -->
@@ -218,7 +225,7 @@
 
             <!-- Title -->
             <div class="py-10 text-center">
-                <h2 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">প্রায়শই জিজ্ঞাসিত প্রশ্ন</h2>
+                <h2 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Frequently Asked Questions</h2>
             </div>
 
             <!-- FAQ Items Container -->
@@ -240,7 +247,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-center text-gray-500">কোনো তথ্য পাওয়া যায়নি।</p>
+                    <p class="text-center text-gray-500">No information found.</p>
                 @endforelse
 
             </div>
@@ -252,7 +259,7 @@
 
             <!-- Title -->
             <h3 class="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                আমাদের অবস্থান
+                Our location
             </h3>
 
             <!-- Map Container -->
@@ -269,7 +276,7 @@
                     <a href="https://maps.app.goo.gl/9uT5Qx5Y8hX6q8yX9" target="_blank"
                         class="bg-white text-gray-800 px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 hover:bg-[#FF6A00] hover:text-white transition-all">
                         <i class="fas fa-external-link-alt"></i>
-                        গুগল ম্যাপে বড় করে দেখুন
+                        View Zoom on Google Maps
                     </a>
                 </div>
             </div>

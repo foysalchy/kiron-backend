@@ -19,7 +19,7 @@
                                         class="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-all group">
                                         <div class="flex items-center gap-3">
                                             <!-- ইমেজ পাথ আপনার ডাটাবেজ অনুযায়ী চেক করে নিবেন -->
-                                            <img src="{{ asset('storage/' . $category->image) ?? 'https://via.placeholder.com/150' }}"
+                                            <img src="{{ asset('storage/' . $category->image) ?? asset('./images/template1/frontend/default.webp') }}"
                                                 class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                                 alt="{{ $category->name }}">
                                             <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>

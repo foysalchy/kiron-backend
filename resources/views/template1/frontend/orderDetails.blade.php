@@ -41,7 +41,7 @@
                         @foreach($order->orderDetails as $item)
                         <div class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
                             <div class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
-                                <img src="{{ $item->product->thumbnail_url ?? asset('images/placeholder.jpg') }}" class="w-full h-full object-cover">
+                                <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 text-center sm:text-left">
                                 <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">{{ $item->product->title }}</h4>
@@ -56,8 +56,8 @@
                                 @endif
 
                                 <p class="text-gray-900 font-medium">
-                                    <span class="text-sm">৳{{ number_format($item->unit_price) }} × {{ $item->quantity }}</span>
-                                    <span class="text-lg font-bold text-[#FF6A00] ml-3">৳{{ number_format($item->total) }}</span>
+                                    <span class="text-sm">{{ $setup->currency }} {{ number_format($item->unit_price) }} × {{ $item->quantity }}</span>
+                                    <span class="text-lg font-bold text-[#FF6A00] ml-3">{{ $setup->currency }} {{ number_format($item->total) }}</span>
                                 </p>
                             </div>
 
@@ -135,7 +135,7 @@
                     <div
                         class="mt-10 p-4 bg-blue-50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
                         <div>
-                            <h5 class="text-blue-800 text-md mb-1">কুরিয়ার ট্র্যাকিং</h5>
+                            <h5 class="text-blue-800 text-md mb-1">Courier Tracking</h5>
                             <p class="text-sm text-blue-700">Sundarban Courier - SA123456789BD</p>
                         </div>
                         <button
@@ -147,7 +147,7 @@
                                 <path d="M10 14 21 3"></path>
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                             </svg>
-                            ট্র্যাক করুন
+                            Tracking
                         </button>
                     </div>
                 </div>
@@ -198,21 +198,21 @@
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
-                            <span class="text-gray-900 font-bold">৳{{ number_format($order->subtotal) }}</span>
+                            <span class="text-gray-900 font-bold">{{ $setup->currency }} {{ number_format($order->subtotal) }}</span>
                         </div>
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Shipping Charge:</span>
-                            <span class="text-gray-900 font-bold">৳{{ number_format($order->other_charges) }}</span>
+                            <span class="text-gray-900 font-bold">{{ $setup->currency }} {{ number_format($order->other_charges) }}</span>
                         </div>
                         @if($order->coupon_discount > 0)
                         <div class="flex justify-between text-md text-green-600 font-medium">
                             <span>Discount:</span>
-                            <span class="font-bold">- ৳{{ number_format($order->coupon_discount) }}</span>
+                            <span class="font-bold">- {{ $setup->currency }} {{ number_format($order->coupon_discount) }}</span>
                         </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[#FF6A00]">৳{{ number_format($order->grand_total) }}</span>
+                            <span class="text-xl font-black text-[#FF6A00]">{{ $setup->currency }} {{ number_format($order->grand_total) }}</span>
                         </div>
                         <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method: {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>

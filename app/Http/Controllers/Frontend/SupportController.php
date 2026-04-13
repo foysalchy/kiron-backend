@@ -59,6 +59,6 @@ class SupportController extends Controller
             'is_read'    => 0,
         ]);
 
-        return back()->with('success', 'আপনার প্রশ্নটি সফলভাবে পাঠানো হয়েছে।');
+        return back()->with('success', 'Your question has been submitted successfully.');
     }
 }

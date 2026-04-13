@@ -13,7 +13,7 @@ class WishlistController extends Controller
         if (!auth('customer')->check()) {
             return response()->json([
                 'status' => 'unauthorized',
-                'message' => 'উইশলিস্টে যোগ করতে আগে লগইন করুন।'
+                'message' => 'Please log in before adding items to your wishlist.'
             ]);
         }
 
@@ -29,7 +29,7 @@ class WishlistController extends Controller
         if ($exists) {
             $exists->delete();
             $res_status = 'removed';
-            $message = 'পণ্যটি উইশলিস্ট থেকে সরানো হয়েছে।';
+            $message = 'The item has been removed from the wishlist.';
         } else {
             Wishlist::create([
                 'company_id'  => $company->id,
@@ -37,7 +37,7 @@ class WishlistController extends Controller
                 'product_id'  => $productId,
             ]);
             $res_status = 'added';
-            $message = 'পণ্যটি উইশলিস্টে যোগ করা হয়েছে।';
+            $message = 'The item has been added to the wishlist.';
         }
 
         $wishCount = Wishlist::where('customer_id', $customerId)->count();

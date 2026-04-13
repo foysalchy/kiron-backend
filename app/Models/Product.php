@@ -88,11 +88,14 @@ class Product extends Model
     {
         return $this->morphOne(Barcode::class, 'barcodeable');
     }
-    // app/Models/Product.php ফাইলে যোগ করুন
 
     public function orderDetails(): HasMany
     {
         return $this->hasMany(OrderDetail::class);
+    }
+    public function views(): HasMany
+    {
+        return $this->hasMany(ProductView::class);
     }
 
     // Scopes
@@ -166,7 +169,7 @@ class Product extends Model
     {
         return $this->stock_status === 'in_stock' && $this->stock_quantity > 0;
     }
- public function getGroupsAttribute(): array
+    public function getGroupsAttribute(): array
     {
         $groups = [];
 
@@ -266,5 +269,4 @@ class Product extends Model
             'is_variation'  => $isVariation
         ];
     }
-
 }
