@@ -24,6 +24,7 @@ class SiteSetting extends Model
         'corporate_address',
         'store_address',
         'tags',
+        'copy_right',
         'status',
     ];
     protected $hidden = ['deleted_at'];

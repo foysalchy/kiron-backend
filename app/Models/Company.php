@@ -21,6 +21,7 @@ class Company extends Model
         'address',
         'business_type',
         'invoice_template',
+        'theme_template',
         'status',
     ];
 
@@ -31,6 +32,7 @@ class Company extends Model
     ];
     protected $casts = [
         'invoice_template' => 'array',
+        'theme_template' => 'array',
     ];
     public function users()
     {

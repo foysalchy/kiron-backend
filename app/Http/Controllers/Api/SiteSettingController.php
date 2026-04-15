@@ -145,4 +145,49 @@ class SiteSettingController extends Controller
             ], 500);
         }
     }
+    public function updateThemeTemplate(Request $request)
+    {
+        $request->validate([
+            'theme_id'     => 'required',
+            'primary_color'   => 'nullable|string',
+            'secondary_color' => 'nullable|string',
+            'primary_text_color' => 'nullable|string',
+            'secondary_text_color' => 'nullable|string',
+        ]);
+
+        try {
+            $user = auth()->user();
+            $company = $user->company;
+
+            if (!$company) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Company not found for this user.'
+                ], 404);
+            }
+
+            $company->update([
+                'theme_template' => [
+                    'id'              => $request->theme_id,
+                    'primary_color'   => $request->primary_color,
+                    'secondary_color' => $request->secondary_color,
+                    'primary_text_color' => $request->primary_text_color,
+                    'secondary_text_color' => $request->secondary_text_color,
+                ]
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Theme  settings updated successfully!',
+                'data'    => $company
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Invoice Template Update Error: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update invoice settings.'
+            ], 500);
+        }
+    }
 }

@@ -106,6 +106,7 @@ use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SmsSendController;
 use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\SmsTemplateController;
+use App\Http\Controllers\Api\SocialSettingController;
 use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
@@ -173,6 +174,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::post('/settings/update-invoice-template', [SiteSettingController::class, 'updateInvoiceTemplate']);
+        Route::post('/settings/update-theme-template', [SiteSettingController::class, 'updateThemeTemplate']);
         //user status check middleware
         Route::middleware('check.user.status')->group(function () {
 
@@ -453,6 +455,17 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}/restore', [BlogController::class, 'restore']);
                 Route::delete('/{id}/force', [BlogController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [BlogController::class, 'toggleStatus']);
+            });
+            Route::prefix('social-settings')->group(function () {
+
+                Route::get('/', [SocialSettingController::class, 'index']);
+                Route::post('/', [SocialSettingController::class, 'store']);
+                Route::get('/{id}', [SocialSettingController::class, 'show']);
+                Route::post('/update/{id}', [SocialSettingController::class, 'update']);
+                Route::delete('/{id}', [SocialSettingController::class, 'destroy']);
+                Route::get('/{id}/restore', [SocialSettingController::class, 'restore']);
+                Route::delete('/{id}/force', [SocialSettingController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [SocialSettingController::class, 'toggleStatus']);
             });
             Route::post('/upload-image', [EditorImagesController::class, 'uploadImage']);
             Route::prefix('purchases')->group(function () {

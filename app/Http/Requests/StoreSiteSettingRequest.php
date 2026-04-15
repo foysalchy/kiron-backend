@@ -39,6 +39,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'currency'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
+                'copy_right'     => ['nullable', 'string'],
                 'tags'              => ['nullable', 'string'], // SEO keywords
             ]
         );
