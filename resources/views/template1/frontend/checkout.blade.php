@@ -43,18 +43,14 @@
                             </div>
 
                             <!-- Checkboxes -->
-                            <div class="space-y-3 pt-2">
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" checked class="w-4 h-4 accent-black rounded-full">
-                                    <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Billing
-                                        address</span>
-                                </label>
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" name="create_account" class="w-4 h-4 accent-[#FF6A00]">
-                                    <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Create an
-                                        account?</span>
-                                </label>
-                            </div>
+@guest('customer')
+<div class="space-y-3 pt-2">
+    <label class="flex items-center gap-3 cursor-pointer group">
+        <input type="checkbox" name="create_account" class="w-4 h-4 accent-[#FF6A00]">
+        <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Create an account?</span>
+    </label>
+</div>
+@endguest
                         </div>
                     </div>
 

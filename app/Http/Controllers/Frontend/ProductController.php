@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AttributeGroup;
 use App\Models\Brand;
 use App\Models\MegaCategory;
+use App\Models\MiniCategory;
 use App\Models\Product;
 use App\Models\ProductView;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -59,7 +61,20 @@ class ProductController extends Controller
 
         $template = $company->template_name;
 
-        $category = MegaCategory::where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
+        $category = MegaCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+        $column = 'mega_category_ids';
+
+
+        if (!$category) {
+            $category = SubCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+            $column = 'sub_category_ids';
+        }
+        if (!$category) {
+            $category = MiniCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+            $column = 'mini_category_ids';
+        }
+
+        if (!$category) abort(401);
 
         $query = Product::where('company_id', $company->id)
             ->active()

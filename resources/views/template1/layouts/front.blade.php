@@ -17,6 +17,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        :root {
+            --primary-bg-color: oklch(93.6% 0.032 17.717);
+            --primary-text-color: oklch(93.6% 0.032 17.717);
+            --secondary-bg-color: oklch(93.6% 0.032 17.717);
+            --secondary-bg-text: oklch(93.6% 0.032 17.717);
+        }
+
+        .primary-bg {
+            background-color: var(--primary-bg-color);
+        }
+
+        .primary-text {
+            color: var(--primary-text-color);
+        }
+
+        .secondary-bg {
+            background-color: var(--secondary-bg-color);
+        }
+
+        .secondary-text {
+            color: var(--secondary-bg-text);
+        }
+
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
@@ -51,7 +74,7 @@
     @include('template1.partials.header')
 
     <!-- Page Content Area -->
-    <main class="bg-white py-6 md:py-10">
+    <main class="bg-white  ">
         @yield('content')
     </main>
 
@@ -86,6 +109,10 @@
             @if (Session::has('error'))
                 toastr.error("{{ Session::get('error') }}");
             @endif
+
+             @if (Session::has('warning'))
+                toastr.warning("{{ Session::get('warning') }}");
+                @endif
         });
     </script>
 </body>

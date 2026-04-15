@@ -15,7 +15,7 @@ class HomeController extends Controller
         $company  = getCurrentCompany();
         $template = $company->template_name;
 
-        $categories = MegaCategory::with('subCategories')
+        $categories = MegaCategory::with('subCategories.miniCategories')
             ->where('company_id', $company->company_id ?? $company->id)
             ->get();
 

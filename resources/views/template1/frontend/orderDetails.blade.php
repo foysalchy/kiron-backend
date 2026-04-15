@@ -58,7 +58,7 @@
                                             @endforeach
                                         </div>
                                         <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-tighter">SKU:
-                                            {{ $item->variation->sku ?? 'N/A' }}</p>
+                                            {{ $item->variation->sku_code ?? 'N/A' }}</p>
                                     @endif
 
                                     <p class="text-gray-900 font-medium">
