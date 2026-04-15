@@ -107,8 +107,7 @@
                     <div>
                         <div class="flex items-center gap-3 mb-5">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url }}" crossorigin="anonymous"
-                                    class="h-12 w-auto object-contain">
+                                <img src="{{ $setup->logo_url }}" crossorigin="anonymous" class="h-12 w-auto object-contain">
                             @else
                                 <div class="bg-[#FF6A00] w-12 h-12 flex items-center justify-center rounded-xl">
                                     <span

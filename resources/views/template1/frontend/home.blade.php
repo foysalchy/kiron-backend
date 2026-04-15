@@ -6,60 +6,64 @@
         <!-- Main 3-Column Layout -->
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-auto lg:h-[480px]">
 
-            <!-- 1. LEFT SIDEBAR: Scrollable Categories (260px wide) -->
-            <div class="hidden lg:block w-[260px] shrink-0">
-                <div class="bg-white rounded-2xl shadow-sm h-full overflow-y-auto custom-scrollbar">
-                    <div class="p-2 space-y-1">
+            <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
+            <div class="relative w-[250px] bg-white shadow-xs rounded-lg border border-gray-200 p-4 hidden lg:block">
 
-                        @foreach ($categories as $category)
+                @foreach ($categories as $category)
+                    <div class="group">
+                        <a href="{{ url('category/' . $category->slug) }}"
+                            class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
+                            <div class="flex items-center gap-3">
+                                <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
+                                    class="w-8 h-8 rounded-full object-cover border border-gray-100"
+                                    alt="{{ $category->name }}">
+                                <span class="text-[14px] font-bold text-gray-800">{{ $category->name }}</span>
+                            </div>
                             @if ($category->subCategories->count() > 0)
-                                <!-- CATEGORY WITH DROPDOWN -->
-                                <div class="category-item">
-                                    <button onclick="toggleDropdown('cat-{{ $category->id }}')"
-                                        class="w-full flex items-center justify-between p-3 hover:bg-gray-50 rounded-xl transition-all group">
-                                        <div class="flex items-center gap-3">
-                                            <!-- ইমেজ পাথ আপনার ডাটাবেজ অনুযায়ী চেক করে নিবেন -->
-                                            <img src="{{ asset('storage/' . $category->image) ?? asset('./images/template1/frontend/default.webp') }}"
-                                                class="w-8 h-8 rounded-full object-cover border border-gray-100"
-                                                alt="{{ $category->name }}">
-                                            <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>
-
-                                        </div>
-                                        <i id="icon-cat-{{ $category->id }}"
-                                            class="fas fa-chevron-down text-[10px] text-gray-400 transition-transform duration-300"></i>
-                                    </button>
-
-                                    <div id="menu-cat-{{ $category->id }}"
-                                        class="overflow-hidden transition-all duration-300 max-h-0">
-                                        <div class="flex flex-col pb-2">
-                                            @foreach ($category->subCategories as $subCategory)
-                                                <a href="{{ url('category/' . $subCategory->slug) }}"
-                                                    class="py-2 pl-14 text-[13px] text-gray-600 hover:text-[#FF6A00] transition-colors">
-                                                    {{ $subCategory->name }}
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <!-- ITEM WITHOUT DROPDOWN -->
-                                <a href="{{ url('category/' . $category->slug) }}"
-                                    class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-all">
-                                    <img src="{{ $category->image ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
-                                        class="w-8 h-8 rounded-full object-cover border border-gray-100"
-                                        alt="{{ $category->name }}">
-                                    <span class="text-sm font-bold text-gray-800">{{ $category->name }}</span>
-                                </a>
+                                <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
                             @endif
-                        @endforeach
+                        </a>
 
+                        <!-- subcategory panel -->
+                        @if ($category->subCategories->count() > 0)
+                            <div
+                                class="absolute left-full top-0 w-[240px] h-full min-h-max bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 transition-all duration-300">
+
+                                @foreach ($category->subCategories as $subCategory)
+                                    <!-- sub category -->
+                                    <div class="group/sub">
+                                        <a href="{{ url('category/' . $subCategory->slug) }}"
+                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-[13px] font-semibold text-gray-700 hover:text-[#FF6A00] transition-colors">
+                                            <span>{{ $subCategory->name }}</span>
+                                            @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
+                                                <i class="fas fa-chevron-right text-[9px]"></i>
+                                            @endif
+                                        </a>
+
+                                        <!-- mini category pannel -->
+                                        @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
+                                            <div
+                                                class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
+                                                @foreach ($subCategory->miniCategories as $miniCategory)
+                                                    <a href="{{ url('category/' . $miniCategory->slug) }}"
+                                                        class="block px-4 py-2 text-sm text-gray-600 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                                        {{ $miniCategory->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
-                </div>
+                @endforeach
+
             </div>
 
             <!-- 2. CENTER: Main Horizontal Auto-Slider -->
             <div class="flex-1 min-w-0 h-[300px] md:h-[400px] lg:h-full">
-                <div class="relative h-full w-full rounded-2xl overflow-hidden shadow-sm bg-white">
+                <div class="relative h-full w-full rounded-lg overflow-hidden shadow-xs border border-gray-200 bg-white">
                     <div id="main-slider" class="flex transition-transform duration-700 ease-in-out h-full w-full">
                         <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero1.jpg') }}"
                                 class="w-full h-full object-cover"></div>
@@ -88,34 +92,34 @@
 
             <!-- 3. RIGHT SIDEBAR: Vertical Banner Slider -->
             <div class="hidden lg:block w-[260px] shrink-0">
-                <div class="relative h-full rounded-2xl overflow-hidden bg-white">
-                    <!-- Vertical Slider Container (৫টি ইমেজ) -->
+                <div class="relative h-full rounded-lg border border-gray-200 overflow-hidden bg-white">
+                    <!-- Vertical Slider Container -->
                     <div id="vertical-slider"
                         class="flex flex-col transition-transform duration-700 ease-in-out h-full w-full">
                         <!-- Banner 1 -->
                         <div class="min-h-full w-full">
                             <img src="{{ asset('images/template1/frontend/hero-right1.jpg') }}"
-                                class="w-full h-full object-cover rounded-2xl">
+                                class="w-full h-full object-cover rounded-lg">
                         </div>
                         <!-- Banner 2 -->
                         <div class="min-h-full w-full">
                             <img src="{{ asset('images/template1/frontend/hero-right2.jpg') }}"
-                                class="w-full h-full object-cover rounded-2xl">
+                                class="w-full h-full object-cover rounded-lg">
                         </div>
                         <!-- Banner 3 -->
                         <div class="min-h-full w-full">
                             <img src="{{ asset('images/template1/frontend/hero-right3.jpg') }}"
-                                class="w-full h-full object-cover rounded-2xl">
+                                class="w-full h-full object-cover rounded-lg">
                         </div>
                         <!-- Banner 4 -->
                         <div class="min-h-full w-full">
                             <img src="{{ asset('images/template1/frontend/hero-right4.jpg') }}"
-                                class="w-full h-full object-cover rounded-2xl">
+                                class="w-full h-full object-cover rounded-lg">
                         </div>
                         <!-- Banner 5 -->
                         <div class="min-h-full w-full">
                             <img src="{{ asset('images/template1/frontend/hero-right65.jpg') }}"
-                                class="w-full h-full object-cover rounded-2xl">
+                                class="w-full h-full object-cover rounded-lg">
                         </div>
                     </div>
                 </div>
@@ -127,7 +131,7 @@
     <!-- TOP CATEGORIES SECTION -->
     <section class="py-6 container mx-auto">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
 
             <!-- Section Heading -->
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
@@ -170,7 +174,7 @@
     </section>
     <!-- NEW ARRIVALS SECTION -->
     <section class="py-6 container mx-auto">
-        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
 
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
@@ -184,7 +188,7 @@
             </div>
 
             <!-- Carousel Wrapper -->
-            <div class="relative group">
+            <div class="relative">
 
                 <!-- Left Arrow -->
                 <button onclick="scrollNA(-280)"
@@ -200,7 +204,7 @@
                     style="-ms-overflow-style:none; scrollbar-width:none;">
 
                     <!-- NEW ARRIVALS -->
-                     @foreach ($newArrivals as $product)
+                    @foreach ($newArrivals as $product)
                         <div class="flex-shrink-0 w-[240px] h-auto">
                             <x-template1.product-card :product="$product" />
                         </div>
@@ -230,7 +234,7 @@
 
             <!-- Left Banner -->
             <div
-                class="flex-1 overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
                 <img src="https://orenmart.sgp1.digitaloceanspaces.com/banner/da1e494c-e05c-4725-b0cf-c90e56ccba1f.jpg"
                     alt="Promo Banner 1" loading="lazy"
                     class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
@@ -238,7 +242,7 @@
 
             <!-- Right Banner -->
             <div
-                class="flex-1 overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
                 <img src="https://orenmart.sgp1.digitaloceanspaces.com/banner/2e43fa93-a2ca-4371-bd4f-b6b4d4dca46e.jpg"
                     alt="Promo Banner 2" loading="lazy"
                     class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
@@ -310,7 +314,7 @@
             <!-- Product Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-5">
                 @foreach ($popularProducts as $product)
-                   <x-template1.product-card :product="$product" />
+                    <x-template1.product-card :product="$product" />
                 @endforeach
 
             </div>
@@ -325,8 +329,6 @@
 
         </div>
     </section>
-
-
 @endsection
 @push('scripts')
     <script>
@@ -400,5 +402,4 @@
             setInterval(slideVertical, 5000);
         }
     </script>
-
 @endpush

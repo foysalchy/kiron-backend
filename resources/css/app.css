@@ -11,6 +11,7 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
 #toast-container {
     top: 100px !important;
     right: 20px !important;
@@ -24,6 +25,11 @@
     background-color: #e11d48 !important;
     opacity: 1;
 }
+#toast-container > .toast-warning,
+#toast-container > .toast-info {
+    background-color: #f59e0b !important; 
+    opacity: 1 !important;
+}
 
 #toast-container > .toast .toast-progress {
     background-color: #ffffff;
@@ -34,4 +40,7 @@
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
     font-size: 14px;
+}
+button:hover{
+cursor: pointer;
 }
