@@ -17,7 +17,7 @@
                                 <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
                                     class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                     alt="{{ $category->name }}">
-                                <span class="text-[14px] font-bold text-gray-800">{{ $category->name }}</span>
+                                <span class="text-md text-gray-800">{{ $category->name }}</span>
                             </div>
                             @if ($category->subCategories->count() > 0)
                                 <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
@@ -33,7 +33,7 @@
                                     <!-- sub category -->
                                     <div class="group/sub">
                                         <a href="{{ url('category/' . $subCategory->slug) }}"
-                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-[13px] font-semibold text-gray-700 hover:text-[#FF6A00] transition-colors">
+                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[#FF6A00] transition-colors">
                                             <span>{{ $subCategory->name }}</span>
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
                                                 <i class="fas fa-chevron-right text-[9px]"></i>

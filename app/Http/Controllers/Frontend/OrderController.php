@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
-use App\Models\{Order, Party, ProductVariation, Warehouse};
+use App\Models\{CustomerPaymentMethod, Order, Party, ProductVariation, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -22,6 +22,9 @@ class OrderController extends Controller
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
+        $paymentMethods = CustomerPaymentMethod::where('company_id', $company->id)
+        ->where('status', Status::Active->value)
+        ->get();
 
         // Auto-create draft for logged in users
         if (auth('customer')->check()) {
@@ -45,7 +48,8 @@ class OrderController extends Controller
             'discount',
             'shipping',
             'total',
-            'shipping_area'
+            'shipping_area',
+            'paymentMethods',
         ));
     }
 
@@ -85,7 +89,7 @@ class OrderController extends Controller
 
             $customer = auth('customer')->check() ? auth('customer')->user() : Party::updateOrCreate(
                 ['company_id' => $company->id, 'phone' => $data['phone'], 'type' => Party::TYPE_CUSTOMER],
-                ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => true]
+                ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
             );
 
             $items = [];

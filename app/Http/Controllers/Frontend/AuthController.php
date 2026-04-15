@@ -46,7 +46,7 @@ class AuthController extends Controller
             'phone'      => $request->phone,
             'address'    => $request->address,
             'password'   => Hash::make($request->password),
-            'status'     => true,
+            'status'     => Status::Active->value,
         ]);
 
         Auth::guard('customer')->login($user);
@@ -76,6 +76,14 @@ class AuthController extends Controller
         ];
 
         if (Auth::guard('customer')->attempt($credentials, $request->remember)) {
+
+            $user = Auth::guard('customer')->user();
+
+            if ($user->status == Status::Pending->value) {
+                $user->status = Status::Active->value;
+                $user->save();
+            }
+
             $request->session()->regenerate();
             return redirect()->intended(route('user.dashboard'))->with('success', 'Login successful. Welcome back!');
         }

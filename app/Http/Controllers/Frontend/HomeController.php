@@ -25,6 +25,7 @@ class HomeController extends Controller
         ->latest()
         ->take(10)
         ->get();
+        // \Log::info($newArrivals);
 
         $brands = Brand::active()->latest()->take(10)->get();
 

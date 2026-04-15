@@ -76,7 +76,7 @@
 
         <button
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="bg-[#1D2128] text-white px-2.5 py-1.5 rounded-lg text-sm font-semibold hover:bg-[#FF6A00] transition-all shrink-0 cursor-pointer whitespace-nowrap">
+            class="bg-[#1D2128] text-white px-2.5 py-1.5 rounded-lg text-sm hover:bg-[#FF6A00] transition-all shrink-0 cursor-pointer whitespace-nowrap">
             Add to Cart
         </button>
     </div>
@@ -157,7 +157,7 @@
                     .then(data => {
                         if (data.status === 'success') {
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                            closeModal(); // মোডাল বন্ধ হবে
+                            closeModal();
                             toastr.success(data.message);
                         }
                     });
