@@ -13,14 +13,17 @@ class ProductGroup extends Model
     protected $fillable = [
         'company_id',
         'name',
+        'slug',
         'filter_type',
         'filter_parameters',
         'product_ids',
+        'is_frontend',
         'status',
     ];
 
     protected $casts = [
         'filter_parameters' => 'array',
         'product_ids'       => 'array',
+        'is_frontend'       => 'boolean',
     ];
 }

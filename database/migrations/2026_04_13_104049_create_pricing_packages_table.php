@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -31,8 +32,10 @@ return new class extends Migration
             // Features (checkbox)
             $table->json('features')->nullable();
             $table->json('multiple_input')->nullable();
+            $table->tinyInteger('status')->default(Status::Active->value);
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -45,6 +45,7 @@ class BulkActionController extends Controller
         'assign-leaves'    => \App\Models\AssignLeaveType::class,
         'pay-rolls'        => \App\Models\PayRoll::class,
         'positions'        => \App\Models\Position::class,
+        'pricing-packages'        => \App\Models\PricingPackage::class,
     ];
 
     /**

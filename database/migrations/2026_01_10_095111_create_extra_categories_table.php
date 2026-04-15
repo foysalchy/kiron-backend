@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->nullable();
             $table->string('image')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('description')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
             $table->softDeletes();

@@ -114,6 +114,19 @@ class productGroupService
             throw ApiException::serverError('Failed to toggle status');
         }
     }
+    public function toggleFrontend(int $id): ProductGroup
+    {
+        try {
+            $group = ProductGroup::findOrFail($id);
+            $group->update(['is_frontend' => !$group->is_frontend]);
+            LogHelper::statusChanged('customer_group', $group->id, $group->company_id, $group->name . 'status update ');
+
+            return $group;
+        } catch (\Exception $e) {
+            Log::error('Customer group status toggle failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle status');
+        }
+    }
 
     public function deleteGroup(int $id): bool
     {

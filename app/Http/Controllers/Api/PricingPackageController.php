@@ -2,39 +2,114 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Models\PricingPackage;
 use App\Http\Requests\PricingPackageRequest;
 use App\Services\PricingPackageService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PricingPackageController extends Controller
 {
-    public function index()
+    public function __construct(protected PricingPackageService $pricingPackageService) {}
+
+    /**
+     * Display a listing of the pricing packages.
+     */
+    public function index(Request $request): JsonResponse
     {
-        $packages = PricingPackage::with('tiers')->latest()->paginate(15);
-        return response()->json(['data' => $packages]);
+        $filters = $request->all();
+        $data = $this->pricingPackageService->getAllPricingPackages($filters);
+
+        return ResponseHelper::success($data, 'Pricing packages retrieved successfully');
     }
 
-    public function store(PricingPackageRequest $request, PricingPackageService $service)
+    /**
+     * Store a newly created pricing package.
+     */
+    public function store(PricingPackageRequest $request): JsonResponse
     {
-        $package = $service->store($request->validated());
-        return response()->json(['message' => 'Package created successfully', 'data' => $package]);
+        $package = $this->pricingPackageService->createPricingPackage($request->validated());
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package created successfully.',
+            'data'    => $package,
+        ], 201);
     }
 
-    public function show(PricingPackage $pricingPackage)
+    /**
+     * Display the specified pricing package.
+     */
+    public function show(int $id): JsonResponse
     {
-        return response()->json(['data' => $pricingPackage->load('tiers')]);
+        $package = $this->pricingPackageService->getPricingPackageById($id);
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package retrieved successfully.',
+            'data'    => $package,
+        ]);
     }
 
-    public function update(PricingPackageRequest $request, PricingPackage $pricingPackage, PricingPackageService $service)
+    /**
+     * Update the specified pricing package.
+     */
+    public function update(PricingPackageRequest $request, int $id): JsonResponse
     {
-        $package = $service->update($pricingPackage, $request->validated());
-        return response()->json(['message' => 'Package updated successfully', 'data' => $package]);
+        $package = $this->pricingPackageService->updatePricingPackage($id, $request->validated());
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package updated successfully.',
+            'data'    => $package,
+        ]);
     }
 
-    public function destroy(PricingPackage $pricingPackage)
+    /**
+     * Remove the specified pricing package (Soft Delete).
+     */
+    public function destroy(int $id): JsonResponse
     {
-        $pricingPackage->delete();
-        return response()->json(['message' => 'Package deleted successfully']);
+        $this->pricingPackageService->deletePricingPackage($id);
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package moved to trash successfully.',
+        ]);
+    }
+
+    /**
+     * Restore a soft-deleted pricing package.
+     */
+    public function restore(int $id): JsonResponse
+    {
+        $package = $this->pricingPackageService->restorePricingPackage($id);
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package restored successfully.',
+            'data'    => $package,
+        ]);
+    }
+
+    /**
+     * Permanently delete a pricing package.
+     */
+    public function forceDestroy(int $id): JsonResponse
+    {
+        $this->pricingPackageService->forceDeletePricingPackage($id);
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package permanently deleted.',
+        ]);
+    }
+
+    /**
+     * Toggle pricing package status (Active/Inactive).
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        $package = $this->pricingPackageService->toggleStatus($id);
+
+        return ResponseHelper::success([
+            'message' => 'Pricing package status updated successfully.',
+            'data'    => $package,
+        ]);
     }
 }

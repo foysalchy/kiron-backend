@@ -18,6 +18,8 @@ class Slider extends Model
         'subtitle',
         'description',
         'image',
+        'url',
+        'placement',
         'status',
     ];
 

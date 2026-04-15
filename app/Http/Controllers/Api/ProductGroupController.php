@@ -50,6 +50,11 @@ class ProductGroupController extends Controller
         $data = $this->groupService->toggleStatus($id);
         return ResponseHelper::success($data, 'Group status updated successfully');
     }
+    public function toggleFrontend(int $id): JsonResponse
+    {
+        $data = $this->groupService->toggleFrontend($id);
+        return ResponseHelper::success($data, 'Group status updated successfully');
+    }
 
     public function destroy(int $id): JsonResponse
     {

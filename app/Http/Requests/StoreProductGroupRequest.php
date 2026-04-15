@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseCompanyRequest;
+use App\Rules\SlugRule;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreProductGroupRequest extends BaseCompanyRequest
@@ -14,10 +15,22 @@ class StoreProductGroupRequest extends BaseCompanyRequest
         return true;
     }
 
+    protected function getCompanyId()
+    {
+        return $this->input('company_id') ?? $this->user()->company_id;
+    }
+
     public function rules(): array
     {
+        $companyId = $this->getCompanyId();
+
         return array_merge($this->companyRules(), [
             'name' => 'required|string|max:255',
+            'slug' => SlugRule::make(
+                'product_groups',
+                null,
+                $companyId
+            ),
             'filter_type' => 'required',
             'filter_parameters' => 'nullable|array',
             'product_ids' => 'required|array|min:1',

@@ -20,6 +20,8 @@ class ExtraCategory extends Model
         'name',
         'slug',
         'image',
+        'meta_description',
+        'description',
         'status',
     ];
 
@@ -37,7 +39,7 @@ class ExtraCategory extends Model
     {
         return $this->belongsTo(MiniCategory::class);
     }
-       public function subCategory(): BelongsTo
+    public function subCategory(): BelongsTo
     {
         return $this->belongsTo(SubCategory::class);
     }

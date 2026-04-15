@@ -91,7 +91,7 @@ class MegaCategoryService
     public function updateMegaCategory(int $id, array $data): MegaCategory
     {
         DB::beginTransaction();
-
+Log::info($data);
         try {
             $category = $this->getMegaCategoryById($id);
 

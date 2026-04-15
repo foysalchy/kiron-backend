@@ -20,6 +20,8 @@ class MiniCategory extends Model
         'name',
         'slug',
         'image',
+        'meta_description',
+        'description',
         'status',
     ];
 

@@ -16,10 +16,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('name');
+            $table->string('slug');
             $table->string('filter_type');
             $table->json('filter_parameters')->nullable();
             $table->json('product_ids')->nullable();
             $table->tinyInteger('status')->default(Status::Active->value);
+            $table->boolean('is_frontend')->default(0);
             $table->timestamps();
             $table->softDeletes();
         });

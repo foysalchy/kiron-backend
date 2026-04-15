@@ -1400,6 +1400,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('{id}', 'show');
                 Route::delete('{id}/products/{productId}', 'removeProduct');
                 Route::patch('{id}/toggle-status', 'toggleStatus');
+                Route::patch('{id}/toggle-frontend', 'toggleFrontend');
                 Route::delete('{id}', 'destroy');
             });
         });

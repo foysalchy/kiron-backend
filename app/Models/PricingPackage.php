@@ -4,11 +4,11 @@ namespace App\Models;
 
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PricingPackage extends Model
 {
-
-    use CompanyScoped;
+    use SoftDeletes;
     protected $guarded = ['id'];
 
     protected $casts = [

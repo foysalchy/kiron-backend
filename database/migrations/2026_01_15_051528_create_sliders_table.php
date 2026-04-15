@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +19,9 @@ return new class extends Migration
             $table->string('subtitle')->nullable();
             $table->string('description')->nullable();
             $table->string('image');
-            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
+            $table->string('url')->nullable();
+            $table->string('placement');
+            $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
             $table->softDeletes();
         });
