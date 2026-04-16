@@ -45,8 +45,7 @@
                     </span>
                 </div>
             @endif
-            <span
-                class="text-2xl font-extrabold text-[#1D2128] tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
+            {{-- <span class="text-2xl font-extrabold text-[#1D2128] tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span> --}}
         </a>
 
         <!-- Search Bar -->

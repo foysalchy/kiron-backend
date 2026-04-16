@@ -6,10 +6,13 @@
         </div>
         <div class="flex-1">
             <h4 class="font-bold text-gray-800 text-md leading-tight">{{ $product->title }}</h4>
-
-            <!-- price of first variation product -->
             @php $firstVar = $product->variations->first(); @endphp
-            <p class="text-[#FF6A00] font-black text-xl mt-1" id="modal-price">
+            <!-- unit price -->
+            <p class="text-gray-500 text-sm mt-1">
+                Unit Price: <span id="modal-unit-price">৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}</span>
+            </p>
+            <!-- total price -->
+            <p class="text-[#FF6A00] font-semibold text-xl mt-0.5" id="modal-total-price-display">
                 ৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}
             </p>
         </div>
@@ -21,21 +24,22 @@
         <div class="grid grid-cols-1 gap-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
             @foreach($product->variations as $variation)
                 <label class="relative block">
-                    <!--  onchange  -->
+                    <!-- data-price  onchange updateModalTotal()  -->
                     <input type="radio" name="selected_variant" value="{{ $variation->id }}"
-                           onchange="document.getElementById('modal-price').innerText = '৳' + '{{ number_format($variation->final_price) }}'"
+                           data-price="{{ $variation->final_price }}"
+                           onchange="updateModalTotal()"
                            class="peer hidden" {{ $loop->first ? 'checked' : '' }}>
 
                     <div class="flex justify-between items-center border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-[#FF6A00] peer-checked:bg-orange-50 transition-all">
                         <span class="text-sm font-bold text-gray-700">{{ $variation->display_name }}</span>
-                        <span class="text-[#FF6A00] font-bold">৳{{ number_format($variation->final_price) }}</span>
+                        <span class="text-[#FF6A00] ">৳{{ number_format($variation->final_price) }}</span>
                     </div>
                 </label>
             @endforeach
         </div>
     </div>
 
-    <!-- add to card button-->
+    <!-- add to cart button-->
     <div class="flex items-center gap-4 border-t pt-5">
         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
             <button type="button" onclick="changeQty(-1)" class="px-3 py-2 bg-gray-50 hover:bg-gray-100 font-bold">-</button>

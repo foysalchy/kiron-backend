@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AttributeGroup;
 use App\Models\Brand;
@@ -32,7 +33,7 @@ class ProductController extends Controller
         $query = Product::with('variations')->where('company_id', $company->id);
 
         // dd($query);
-
+$maxPriceLimit = $this->getMaxPriceLimit($company->id);
 
         $this->applyFiltersAndSorting($query, $request);
 
@@ -48,7 +49,7 @@ class ProductController extends Controller
             ->get()
             ->unique('name');
 
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups'))->with([
+        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups','maxPriceLimit'))->with([
             'category' => null,
             'allProducts' => $products
         ]);
@@ -81,6 +82,7 @@ class ProductController extends Controller
             ->whereJsonContains('mega_category_ids', (int)$category->id);
 
         $this->applyFiltersAndSorting($query, $request);
+        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
 
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
@@ -93,61 +95,79 @@ class ProductController extends Controller
             ->active()
             ->get()
             ->unique('name');
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category'))->with([
+        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }
 
-    private function applyFiltersAndSorting($query, $request)
-    {
-        if ($request->filled('min_price')) {
-            $query->where('regular_price', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('regular_price', '<=', $request->max_price);
-        }
-        if ($request->filled('brand')) {
-            $query->whereIn('brand_id', (array)$request->brand);
-        }
-        if ($request->filled('attributes')) {
-            foreach ($request->attributes as $groupId => $ids) {
-                $ids = array_filter((array)$ids);
-                if (!empty($ids)) {
-                    $query->whereHas('variations.attributes', function ($q) use ($ids) {
-                        $q->whereIn('attribute_value_id', $ids);
-                    });
-                }
-            }
-        }
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('short_description', 'like', "%{$search}%")
-                    ->orWhere('sku_code', 'like', "%{$search}%");
-            });
-        }
+   // ১. ডাটাবেস থেকে সর্বোচ্চ দাম বের করার ডাইনামিক ফাংশন
+private function getMaxPriceLimit($companyId)
+{
+    $maxProductPrice = Product::where('company_id', $companyId)->max('regular_price');
+    $maxVarPrice = \App\Models\ProductVariation::whereHas('product', function($q) use ($companyId) {
+        $q->where('company_id', $companyId);
+    })->max('regular_price');
 
-        if ($request->sort == 'price_low') {
-            $query->orderBy('regular_price', 'asc');
-        } elseif ($request->sort == 'price_high') {
-            $query->orderBy('regular_price', 'desc');
-        } elseif ($request->sort == 'newest') {
-            $query->latest();
-        } else {
-            if (request()->routeIs('flash.sale')) {
-                $query->orderByRaw('
-                (CASE
-                    WHEN discount_type = "percent" THEN (regular_price * discount / 100)
-                    WHEN discount_type = "flat" THEN discount
-                    ELSE 0
-                END) DESC
-            ');
-            } else {
-                $query->latest();
+    return max((float)$maxProductPrice, (float)$maxVarPrice) ?: 1000;
+}
+
+// ২. ফিল্টার ফাংশন (Variation Price Support সহ আপডেট করা হয়েছে)
+private function applyFiltersAndSorting($query, $request)
+{
+    if ($request->filled('min_price')) {
+        $min = $request->min_price;
+        $query->where(function($q) use ($min) {
+            $q->where('regular_price', '>=', $min)
+              ->orWhereHas('variations', function($sq) use ($min) {
+                  $sq->where('regular_price', '>=', $min);
+              });
+        });
+    }
+
+    if ($request->filled('max_price')) {
+        $max = $request->max_price;
+        $query->where(function($q) use ($max) {
+            $q->where(function($sub) use ($max) {
+                $sub->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
+            })
+            ->orWhereHas('variations', function($sq) use ($max) {
+                $sq->where('regular_price', '<=', $max);
+            });
+        });
+    }
+
+    if ($request->filled('brand') && !request()->routeIs('brand.products')) {
+        $query->whereIn('brand_id', (array)$request->brand);
+    }
+
+    if ($request->filled('attributes')) {
+        foreach ($request->attributes as $groupId => $ids) {
+            $ids = array_filter((array)$ids);
+            if (!empty($ids)) {
+                $query->whereHas('variations.attributes', function ($q) use ($ids) {
+                    $q->whereIn('attribute_value_id', $ids);
+                });
             }
         }
     }
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+                ->orWhere('sku_code', 'like', "%{$search}%");
+        });
+    }
+
+    // সর্টিং লজিক...
+    if ($request->sort == 'price_low') {
+        $query->orderBy('regular_price', 'asc');
+    } elseif ($request->sort == 'price_high') {
+        $query->orderBy('regular_price', 'desc');
+    } else {
+        $query->latest();
+    }
+}
 
     public function productDetails($store, $slug)
     {
@@ -220,6 +240,8 @@ class ProductController extends Controller
             ->where('discount', '>', 0)
             ->active();
 
+        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
+
         $this->applyFiltersAndSorting($query, $request);
 
         $products = $query->paginate(12);
@@ -236,6 +258,41 @@ class ProductController extends Controller
         // Pass a virtual category object for the title
         $category = (object) ['name' => 'Flash Sale Items'];
 
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category'));
+        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'));
+    }
+
+
+    public function brandProducts(Request $request, $store, $slug)
+    {
+        $company = getCurrentCompany();
+        if (!$company) abort(401);
+
+        $template = $company->template_name;
+
+        $brand = Brand::where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
+
+        $query = Product::with('variations')
+            ->where('company_id', $company->id)
+            ->where('status', Status::Active->value)
+            ->where('brand_id', $brand->id);
+        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
+
+        $this->applyFiltersAndSorting($query, $request);
+
+        $products = $query->paginate(12);
+        $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
+
+        $brands = Brand::where('company_id', $company->id)->get();
+
+        $attributeGroups = AttributeGroup::where('company_id', $company->id)
+            ->whereIn('name', ['Size', 'Color', 'Style'])
+            ->with('values')
+            ->get();
+
+        $category = $brand;
+
+        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'))->with([
+            'allProducts' => $products
+        ]);
     }
 }

@@ -1,6 +1,14 @@
 @extends('template1.layouts.front')
 
 @section('content')
+    @php
+        $isWishlisted = false;
+        if (auth('customer')->check()) {
+            $isWishlisted = \App\Models\Wishlist::where('customer_id', auth('customer')->id())
+                ->where('product_id', $product->id)
+                ->exists();
+        }
+    @endphp
     <section class="container mx-auto px-4">
 
         <!-- 1. Breadcrumb -->
@@ -63,11 +71,11 @@
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price"
-                                class="text-gray-400 text-lg line-through">{{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}</span>
+                            <span id="regular-price" class="text-gray-400 text-lg line-through">{{ $setup->currency }}
+                                {{ number_format($product->display_price_data->regular_price) }}</span>
                         @endif
-                        <span id="sale-price"
-                            class="text-3xl font-black text-[#00A651]">{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}</span>
+                        <span id="sale-price" class="text-3xl font-black text-[#00A651]">{{ $setup->currency }}
+                            {{ number_format($product->display_price_data->sale_price) }}</span>
                     </div>
 
                     <!-- Dynamic Variations Container -->
@@ -117,18 +125,19 @@
                         </button>
 
                         <!-- Wishlist  -->
-                        <button onclick="toggleWishlist({{ $product->id }})"
+                        <button type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 bg-white border-2 border-gray-100 hover:border-red-200 hover:text-red-500 text-gray-600 h-12 rounded-lg font-bold flex items-center justify-center gap-2 cursor-pointer transition-all group shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="lucide lucide-heart text-red-500 group-hover:fill-red-500 transition-all">
+                            <svg id="wish-icon-{{ $product->id }}" xmlns="http://www.w3.org/2000/svg" width="18"
+                                height="18" viewBox="0 0 24 24" fill="{{ $isWishlisted ? '#ef4444' : 'none' }}"
+                                stroke="{{ $isWishlisted ? '#ef4444' : 'currentColor' }}" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" class="transition-colors duration-300">
                                 <path
                                     d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z">
                                 </path>
                             </svg>
                             <span class="text-md whitespace-nowrap">Wishlist</span>
                         </button>
+
                     </div>
 
                     <!-- Trust Icons -->
@@ -226,9 +235,9 @@
                             Call Now
                         </a>
 
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text=Assalamu Alaikum, I want to order: {{ $product->title }}"
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                             target="_blank"
-                            class="bg-[#25D366] hover:bg-green-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                            class="bg-[#25D366] hover:bg-green-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
@@ -367,7 +376,9 @@
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Great product! The sound quality is excellent and the light is very nice. Excellent value for money. I would recommend it to everyone.
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Great product! The sound quality
+                                        is excellent and the light is very nice. Excellent value for money. I would
+                                        recommend it to everyone.
                                     </p>
 
                                     <!-- Variant Tag -->
@@ -399,7 +410,8 @@
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life could have been a bit longer. Still satisfied.</p>
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life
+                                        could have been a bit longer. Still satisfied.</p>
 
                                     <!-- Variant Tag -->
                                     <span
@@ -429,7 +441,8 @@
                                     </div>
 
                                     <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life could have been a bit longer. Still satisfied.</p>
+                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life
+                                        could have been a bit longer. Still satisfied.</p>
 
                                     <!-- Variant Tag -->
                                     <span
@@ -609,15 +622,13 @@
         document.addEventListener("DOMContentLoaded", () => {
             if (attributeGroups.length > 0) renderAttributes();
         });
-        //for Wishlist
-        function toggleWishlist(productId) {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+        function toggleWishlist(productId) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
             fetch("{{ route('wishlist.toggle') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
                     body: JSON.stringify({
@@ -627,16 +638,22 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'unauthorized') {
-                        toastr.info(data.message);
-                    } else if (data.status === 'added') {
-                        toastr.success(data.message);
-                    } else if (data.status === 'removed') {
-                        toastr.info(data.message);
+                        toastr.warning(data.message);
+                    } else {
+                        // update all icons with same product id in the page
+                        const icons = document.querySelectorAll(`[id="wish-icon-${productId}"]`);
+                        icons.forEach(icon => {
+                            if (data.status === 'added') {
+                                icon.setAttribute('fill', '#ef4444');
+                                icon.setAttribute('stroke', '#ef4444');
+                            } else {
+                                icon.setAttribute('fill', 'none');
+                                icon.setAttribute('stroke', 'currentColor');
+                            }
+                        });
+                        if (data.status === 'added') toastr.success(data.message);
+                        else toastr.info(data.message);
                     }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    toastr.error("Server error occurred or your session has expired.");
                 });
         }
     </script>

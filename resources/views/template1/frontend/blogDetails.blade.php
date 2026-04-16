@@ -22,7 +22,8 @@
                         @else
                             <div
                                 class="w-full h-64 md:h-[450px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                <i class="fa-regular fa-image text-6xl"></i>
+                                <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $blog->title }}"
+                                class="w-full h-64 md:h-[450px] object-cover">
                             </div>
                         @endif
 

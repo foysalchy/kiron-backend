@@ -7,7 +7,7 @@
             ->where('product_id', $product->id)
             ->exists();
     }
-    // ডিসকাউন্ট ক্যালকুলেশন
+    // Discount percentage calculation
     $sale_price = $product->display_price_data->sale_price;
     $regular_price = $product->display_price_data->regular_price;
     $discount_percentage = 0;
@@ -17,7 +17,7 @@
 @endphp
 
 <div
-    class="group relative flex flex-col p-3 bg-white border border-gray-200 rounded-2xl hover:shadow-lg transition-all duration-300 h-full">
+    class="group relative flex flex-col p-3 bg-white border border-gray-200 rounded-2xl hover:shadow-xs transition-all duration-300 h-full">
 
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0">
@@ -47,7 +47,7 @@
     <div class="flex flex-col flex-grow px-1">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block">
             <h3
-                class="text-[15px] font-semibold leading-tight text-gray-800 line-clamp-2 mb-2 min-h-[40px] hover:text-blue-600 transition-colors">
+                class="text-md font-semibold leading-tight text-gray-800 line-clamp-2 mb-2 min-h-[40px] hover:text-blue-600 transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
@@ -70,7 +70,7 @@
         <!-- Order Now Button -->
         <button
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
-            class="flex-grow bg-black text-white py-2.5 rounded-xl font-bold text-[15px] hover:bg-gray-800 transition-colors cursor-pointer">
+            class="flex-grow bg-black text-white py-2.5 rounded-xl font-bold text-md hover:bg-gray-800 transition-colors cursor-pointer">
             Oreder Now
         </button>
 
@@ -87,80 +87,4 @@
     </div>
 </div>
 
-@once
-    @push('scripts')
-        <script>
-            // এই ফাংশনে redirectToCheckout প্যারামিটার যোগ করা হয়েছে
-            function addSingleToCart(id, redirectToCheckout = false) {
-                const token = document.querySelector('meta[name="csrf-token"]').content;
-                fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify({
-                            id: id,
-                            qty: 1
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            // নেভিবার কার্ট আপডেট
-                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
 
-                            if (redirectToCheckout) {
-                                // যদি 'অর্ডার করুন' বাটনে ক্লিক হয়, তবে চেকআউট পেজে নিয়ে যাবে
-                                window.location.href = "{{ route('checkout.index') }}";
-                            } else {
-                                // যদি শুধু কার্ট আইকনে ক্লিক হয়, তবে মেসেজ দেখাবে
-                                toastr.success(data.message);
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Error:', err);
-                        toastr.error('কিছু একটা ভুল হয়েছে।');
-                    });
-            }
-
-            // মোডাল ওপেন ফাংশন আগের মতই আছে
-            function openVariationModal(id) {
-                const modal = document.getElementById('variation-modal');
-                const contentArea = document.getElementById('modal-content-area');
-                if (!modal) return;
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                contentArea.innerHTML =
-                    '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
-
-                fetch("/product-variation/" + id)
-                    .then(res => res.text())
-                    .then(html => {
-                        contentArea.innerHTML = html;
-                    });
-            }
-
-            function toggleWishlist(productId) {
-                const token = document.querySelector('meta[name="csrf-token"]').content;
-                fetch("{{ route('wishlist.toggle') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify({
-                            product_id: productId
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        toastr.info(data.message);
-                        if (window.location.pathname.includes('wishlist')) location.reload();
-                    });
-            }
-        </script>
-    @endpush
-@endonce
