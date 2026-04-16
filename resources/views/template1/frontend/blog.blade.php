@@ -66,19 +66,17 @@
 
             @forelse($blogs as $blog)
                 <div
-                    class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+                    class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
                     <div class="relative h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
                         @if ($blog->thumbnail_url)
                             <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         @else
-                            <img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                alt="Default Image"
+                            <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="Default Image"
                                 class="w-full h-full object-cover">
                         @endif
 
-                        <!-- Category Badge -->
                         @php
                             $badgeText = is_array($blog->meta_keywords)
                                 ? $blog->meta_keywords[0] ?? 'Blog'
@@ -100,7 +98,7 @@
                             {{ $blog->short ?? \Illuminate\Support\Str::limit(strip_tags($blog->body), 100) }}
                         </p>
 
-                        <!-- Metadata (Author, Date, Read Time) -->
+                        <!-- Metadata -->
                         <div class="flex items-center justify-between text-sm text-gray-500 mb-5 font-medium pb-4">
                             <div class="flex items-center gap-4">
                                 <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-sm"></i>
@@ -113,8 +111,8 @@
                             </span>
                         </div>
 
-                        <!-- Tags Section with Tag Icon -->
-                        <div class="flex flex-wrap gap-3 mb-6">
+                        <!-- Tags Section -->
+                        <div class="flex flex-wrap gap-3 mb-6 relative z-20"> <!-- এখানে z-20 দেওয়া হয়েছে -->
                             @php
                                 $keywords = is_array($blog->meta_keywords)
                                     ? $blog->meta_keywords
@@ -125,15 +123,7 @@
                                     @if (trim($keyword))
                                         <span
                                             class="text-xs text-gray-700 font-semibold flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-full">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                stroke-linecap="round" stroke-linejoin="round"
-                                                class="lucide lucide-tag h-3 w-3 mr-1">
-                                                <path
-                                                    d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                                </path>
-                                                <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                                            </svg>
+                                            <i class="fas fa-tag h-3 w-3 mr-1"></i>
                                             {{ trim($keyword) }}
                                         </span>
                                     @endif
@@ -141,9 +131,10 @@
                             @endif
                         </div>
 
-                        <!-- Read More Button -->
+                        <!-- Read More Button (Main Link) -->
+                        <!-- এখানে after:absolute after:inset-0 যোগ করা হয়েছে যা পুরো কার্ডকে লিংক বানিয়ে দিবে -->
                         <a href="{{ route('blog.details', ['slug' => $blog->slug]) }}"
-                            class="block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300 text-sm">
+                            class="after:absolute after:inset-0 after:z-10 block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300 text-sm">
                             Read More <i class="fas fa-arrow-right ml-2 text-xs"></i>
                         </a>
                     </div>

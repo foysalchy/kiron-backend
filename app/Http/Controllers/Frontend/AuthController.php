@@ -154,22 +154,32 @@ class AuthController extends Controller
     // update your password
     public function updatePassword(Request $request)
     {
+
         $request->validate([
             'current_password' => 'required',
             'password' => 'required|min:8|confirmed',
+        ], [
+            'password.confirmed' => 'New password and confirm password do not match.',
+            'password.min' => 'Password must be at least 8 characters.',
         ]);
 
         $user = Auth::guard('customer')->user();
 
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'The current password is incorrect.');
+            return back()->with([
+                'error' => 'current password is incorrect.',
+                'active_tab' => 'password'
+            ]);
         }
 
         $user->update([
             'password' => Hash::make($request->password)
         ]);
 
-        return back()->with('success', 'Password has been changed successfully!');
+        return back()->with([
+            'success' => 'Password updated successfully.',
+            'active_tab' => 'password'
+        ]);
     }
     public function dashboard()
     {

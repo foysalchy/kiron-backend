@@ -19,4 +19,5 @@ class BrandController extends Controller
             ->get();
         return view($template . '.frontend.brand',compact('brands'));
     }
+    
 }

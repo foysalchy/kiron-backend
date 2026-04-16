@@ -15,7 +15,10 @@
                     xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                 </svg>
-                <a href="{{ url('/shop') }}" class="text-gray-500 hover:text-[#f15a24] transition-colors">Category</a>
+
+                <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[#f15a24] transition-colors">
+                    {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+                </a>
 
                 <!-- Chevron Icon -->
                 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
@@ -26,10 +29,23 @@
                 <span class="text-[#f15a24]">{{ $category->name ?? 'Shop' }}</span>
             </nav>
 
-            <!-- Page Title -->
-            <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
-                {{ $category->name ?? 'All Products' }}
-            </h2>
+            <!-- Description Section -->
+            @if (isset($category->description) && $category->description)
+                {{-- isset  --}}
+                <div class="mb-6">
+                    @if (request()->routeIs('brand.products'))
+                        {{-- brand description --}}
+                        <div class="text-sm text-gray-600 leading-relaxed border-l-4 border-orange-500 pl-4 italic">
+                            {!! $category->description !!}
+                        </div>
+                    @else
+                        {{-- category description --}}
+                        <div class="text-sm text-gray-600 leading-relaxed">
+                            {!! $category->description !!}
+                        </div>
+                    @endif
+                </div>
+            @endif
 
 
         </div>
@@ -51,20 +67,29 @@
                         <div class="p-4 border-b border-gray-50">
                             <h3 class="text-sm font-bold text-gray-800 mb-4">Filter By Price</h3>
 
-                            <div class="relative h-1.5 bg-gray-100 rounded-full mb-6 mx-1">
-                                <div class="absolute h-full bg-[#f15a24] rounded-full" style="left:0%;right:0%;"></div>
-                                <div
-                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 left-0 cursor-pointer shadow-sm">
-                                </div>
-                                <div
-                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 right-0 cursor-pointer shadow-sm">
-                                </div>
+                            <!-- Slider Container -->
+                            <div id="price-slider" class="relative h-1.5 bg-gray-100 rounded-full mb-6 mx-2 cursor-pointer">
+                                <!-- Orange Progress Bar -->
+                                <div id="slider-range" class="absolute h-full bg-[#f15a24] rounded-full"
+                                    style="left:0%; right:0%;"></div>
+
+                                <!-- Left Handle -->
+                                <div id="handle-min"
+                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
+                                    style="left:0%;"></div>
+
+                                <!-- Right Handle -->
+                                <div id="handle-max"
+                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
+                                    style="left:100%; transform: translateX(-100%);"></div>
                             </div>
 
+                            <!-- Inputs -->
                             <div class="flex items-center gap-2 mb-4">
-                                <input type="number" name="min_price" value="{{ request('min_price', 0) }}"
+                                <input type="number" id="min_price" name="min_price" value="{{ request('min_price', 0) }}"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
-                                <input type="number" name="max_price" value="{{ request('max_price', 5000) }}"
+                                <input type="number" id="max_price" name="max_price"
+                                    value="{{ request('max_price', (int) $maxPriceLimit) }}"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
                             </div>
 
@@ -73,8 +98,11 @@
                                     class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
                                     Filter
                                 </button>
-                                <span class="text-xs text-gray-500 font-medium">{{ $setup->currency }} {{ request('min_price', 0) }} —
-                                    {{ $setup->currency }} {{ request('max_price', 5000) }}</span>
+                                <span class="text-[10px] text-gray-500 font-medium">
+                                    {{ $setup->currency }} <span id="display-min">{{ request('min_price', 0) }}</span> —
+                                    {{ $setup->currency }} <span
+                                        id="display-max">{{ request('max_price', (int) $maxPriceLimit) }}</span>
+                                </span>
                             </div>
                         </div>
 
@@ -130,7 +158,8 @@
                                                     value="{{ $value->id }}" onchange="this.form.submit()"
                                                     {{ isset(request('attributes')[$group->id]) && in_array($value->id, request('attributes')[$group->id]) ? 'checked' : '' }}
                                                     class="w-3.5 h-3.5 accent-[#f15a24]">
-                                                <span class="text-sm group-hover:text-[#f15a24]">{{ $value->name }}</span>
+                                                <span
+                                                    class="text-sm group-hover:text-[#f15a24]">{{ $value->name }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -150,8 +179,8 @@
             </aside>
 
             <!-- ══════════════════════════════════════
-                                            MAIN CONTENT
-                                        ══════════════════════════════════════ -->
+                                                        MAIN CONTENT
+                                                    ══════════════════════════════════════ -->
             <main class="flex-1 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
 
                 <!-- Shop Header -->
@@ -211,6 +240,84 @@
         </div>
 
     </section>
-
 @endsection
+@push('scripts')
+    <script>
+        const slider = document.getElementById('price-slider');
+        const range = document.getElementById('slider-range');
+        const handleMin = document.getElementById('handle-min');
+        const handleMax = document.getElementById('handle-max');
+        const inputMin = document.getElementById('min_price');
+        const inputMax = document.getElementById('max_price');
+        const displayMin = document.getElementById('display-min');
+        const displayMax = document.getElementById('display-max');
 
+        const maxLimit = {{ (int) $maxPriceLimit }};
+
+        function updateSlider() {
+            let minVal = parseInt(inputMin.value) || 0;
+            let maxVal = parseInt(inputMax.value) || maxLimit;
+
+            if (minVal < 0) minVal = 0;
+            if (maxVal > maxLimit) maxVal = maxLimit;
+            if (minVal > maxVal) minVal = maxVal;
+
+            const minPercent = (minVal / maxLimit) * 100;
+            const maxPercent = (maxVal / maxLimit) * 100;
+
+            handleMin.style.left = minPercent + '%';
+            handleMax.style.left = maxPercent + '%';
+
+            range.style.left = minPercent + '%';
+            range.style.right = (100 - maxPercent) + '%';
+
+            displayMin.innerText = minVal;
+            displayMax.innerText = maxVal;
+        }
+
+        function initDraggable(handle, type) {
+            handle.onmousedown = function(event) {
+                document.onmousemove = function(event) {
+                    let rect = slider.getBoundingClientRect();
+                    let offsetX = event.clientX - rect.left;
+                    let percent = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
+                    let value = Math.round((percent / 100) * maxLimit);
+
+                    if (type === 'min') {
+                        if (value < parseInt(inputMax.value)) inputMin.value = value;
+                    } else {
+                        if (value > parseInt(inputMin.value)) inputMax.value = value;
+                    }
+                    updateSlider();
+                };
+                document.onmouseup = function() {
+                    document.onmousemove = null;
+                    document.onmouseup = null;
+                };
+            };
+
+            // For Touch devices
+            handle.ontouchmove = function(event) {
+                let rect = slider.getBoundingClientRect();
+                let offsetX = event.touches[0].clientX - rect.left;
+                let percent = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
+                let value = Math.round((percent / 100) * maxLimit);
+
+                if (type === 'min') {
+                    if (value < parseInt(inputMax.value)) inputMin.value = value;
+                } else {
+                    if (value > parseInt(inputMin.value)) inputMax.value = value;
+                }
+                updateSlider();
+            };
+        }
+
+        initDraggable(handleMin, 'min');
+        initDraggable(handleMax, 'max');
+
+        inputMin.oninput = updateSlider;
+        inputMax.oninput = updateSlider;
+
+        window.onload = updateSlider;
+    </script>
+@endpush

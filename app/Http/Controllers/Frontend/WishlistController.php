@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,17 @@ class WishlistController extends Controller
         $company = getCurrentCompany();
         $productId = $request->product_id;
         $customerId = auth('customer')->id();
+
+        $product = Product::where('id', $productId)
+                ->where('company_id', $company->id)
+                ->first();
+
+    if (!$product) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Product not found.'
+        ]);
+    }
 
         $exists = Wishlist::where('company_id', $company->id)
             ->where('customer_id', $customerId)

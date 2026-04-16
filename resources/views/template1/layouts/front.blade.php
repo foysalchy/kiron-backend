@@ -87,6 +87,7 @@
             <button onclick="closeModal()"
                 class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl border-none bg-transparent cursor-pointer">&times;</button>
 
+                
             <div id="modal-content-area"></div>
         </div>
     </div>

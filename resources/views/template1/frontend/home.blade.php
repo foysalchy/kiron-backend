@@ -227,6 +227,50 @@
 
         </div>
     </section>
+    <!-- PRODUCT GROUPS SECTION -->
+    @foreach ($productGroups as $group)
+        <section class="py-6 container mx-auto">
+            <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold text-black uppercase tracking-tight">{{ $group->name }}</h2>
+                    <a href="{{ url('/shop?group=' . $group->slug) }}">
+                        <button
+                            class="bg-[#FF6A00] hover:bg-[#d44d1f] text-white text-sm font-bold px-5 py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
+                    </a>
+                </div>
+
+                <!-- Carousel Wrapper -->
+                <div class="relative">
+                    <!-- Left Arrow -->
+                    <button onclick="scrollGroup('track-{{ $group->id }}', -280)"
+                        class="cursor-pointer absolute left-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <!-- Track: ID -->
+                    <div id="track-{{ $group->id }}"
+                        class="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-4"
+                        style="-ms-overflow-style:none; scrollbar-width:none;">
+                        @foreach ($group->products as $product)
+                            <div class="flex-shrink-0 w-[240px] h-auto">
+                                <x-template1.product-card :product="$product" />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Right Arrow -->
+                    <button onclick="scrollGroup('track-{{ $group->id }}', 280)"
+                        class="cursor-pointer absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    @endforeach
 
     <!-- DUAL BANNER SECTION -->
     <section class="py-6 container mx-auto">
@@ -252,52 +296,54 @@
     </section>
 
     <!-- POPULAR BRANDS SECTION -->
+    <!-- POPULAR BRANDS SECTION (Category Style) -->
     <section class="py-6 container mx-auto">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 relative">
 
-            <!-- Header -->
-            <div class="flex items-center mb-8">
-                <h2 class="text-lg font-bold text-black uppercase tracking-tight">Popular Brands</h2>
-            </div>
+            <!-- Section Heading -->
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
+                Popular Brands
+            </h2>
 
-            <!-- Brands Slider -->
+            <!-- Carousel Wrapper -->
             <div class="relative group">
 
-                <!-- Left Arrow -->
-                <button onclick="scrollBrands(-400)"
-                    class="cursor-pointer absolute left-1 top-[38%] -translate-y-1/2 z-20 w-8 h-8 bg-white border border-gray-200 rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
+                <!-- Navigation Buttons -->
+                <button onclick="scrollBrands(-200)"
+                    class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                 </button>
 
-                <!-- Brand Track: Gap increased to 8 for more spacing -->
-                <div id="brand-track" class="flex overflow-x-auto scroll-smooth no-scrollbar py-2 gap-8">
+                <button onclick="scrollBrands(200)"
+                    class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
+                </button>
+
+                <!-- Brands Scroll Area -->
+                <div id="brand-track" class="flex items-start gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                     @foreach ($brands as $brand)
-                        <a href="{{ url('brand/' . $brand->slug) }}"
-                            class="flex-shrink-0 w-[calc(11.11%-28px)] min-w-[100px] flex flex-col items-center group/brand">
-                            <div
-                                class="w-28 h-28 md:w-32 md:h-32 aspect-square rounded-full border border-gray-100 p-5 flex items-center justify-center bg-white transition-all duration-300 hover:border-gray-300">
-                                <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                    alt="{{ $brand->name }}" class="w-full max-h-full object-contain rounded-full">
-                            </div>
-                            <h4 class="mt-4 text-md font-semibold text-gray-800 text-center">{{ $brand->name }}</h4>
-                        </a>
+                        @if (!empty($brand->slug))
+                            <a href="{{ route('brand.products', ['slug' => $brand->slug]) }}"
+                                class="flex flex-col items-center min-w-[105px] group">
+
+                                <!-- Circular Image Wrapper -->
+                                <div
+                                    class="w-24 h-24 rounded-full overflow-hidden mb-3 border border-gray-100 bg-white flex items-center justify-center p-2">
+                                    <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('./images/template1/frontend/default.webp') }}';"
+                                        class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                                        alt="{{ $brand->name }}">
+                                </div>
+
+                                <!-- Brand Name -->
+                                <span class="text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
+                                    {{ $brand->name }}
+                                </span>
+                            </a>
+                        @endif
                     @endforeach
-
-                </div><!-- /#brand-track -->
-
-                <!-- Right Arrow -->
-                <button onclick="scrollBrands(400)"
-                    class="cursor-pointer absolute right-1 top-[38%] -translate-y-1/2 z-20 w-8 h-8 bg-white border border-gray-200 rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-all text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                </button>
-
+                </div>
             </div>
         </div>
     </section>
@@ -400,6 +446,16 @@
                 verticalSlider.style.transform = `translateY(-${vertIdx * 100}%)`;
             }
             setInterval(slideVertical, 5000);
+        }
+
+        function scrollGroup(trackId, distance) {
+            const track = document.getElementById(trackId);
+            if (track) {
+                track.scrollBy({
+                    left: distance,
+                    behavior: 'smooth'
+                });
+            }
         }
     </script>
 @endpush
