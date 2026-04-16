@@ -22,6 +22,8 @@ class UpdateBrandRequest extends UpdateBaseCompanyRequest
 
                 'name' => ['sometimes', 'required', 'string', 'max:255'],
                 'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'meta_description' => ['nullable', 'string'],
+                'description' => ['nullable', 'string'],
                 'status' => ['boolean'],
             ]
         );
@@ -33,10 +35,11 @@ class UpdateBrandRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
 
-            'name.required' => 'Brand name is required',
-            'logo.image' => 'Logo must be an image file',
-            'logo.max' => 'Logo size cannot exceed 2MB',
-        ]);
+                'name.required' => 'Brand name is required',
+                'logo.image' => 'Logo must be an image file',
+                'logo.max' => 'Logo size cannot exceed 2MB',
+            ]
+        );
     }
 
     protected function failedValidation(Validator $validator)

@@ -91,7 +91,7 @@ class MegaCategoryService
     public function updateMegaCategory(int $id, array $data): MegaCategory
     {
         DB::beginTransaction();
-Log::info($data);
+        Log::info($data);
         try {
             $category = $this->getMegaCategoryById($id);
 
@@ -211,7 +211,7 @@ Log::info($data);
             $category->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::statusChanged('mega_category', $category->id, $category->company_id,$category->name .' new status '.$newStatus->label());
+            LogHelper::statusChanged('mega_category', $category->id, $category->company_id, $category->name . ' new status ' . $newStatus->label());
 
             Log::info('Mega category status toggled', ['id' => $id]);
 

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->json('customer_ids');
+            $table->json('supplier_ids');
+            $table->json('custom_numbers');
             $table->text('message');
             $table->tinyInteger('status')->default(Status::Inactive->value);
             $table->timestamps();

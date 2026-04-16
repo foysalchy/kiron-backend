@@ -61,7 +61,6 @@ class LandingPageController extends Controller
 
     public function update(UpdateLandingPageRequest $request, int $id): JsonResponse
     {
-        \Log::info($request);
         $data = $this->landingPageService->updateLandingPage($id, $request->validated());
 
         return ResponseHelper::success($data, 'Landing page updated successfully');

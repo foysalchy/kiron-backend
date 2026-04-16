@@ -11,6 +11,7 @@ use App\Models\AttributeGroup;
 use App\Models\Bin;
 use App\Models\Cell;
 use App\Models\ChartOfAccount;
+use App\Models\CustomerGroup;
 use App\Models\DisposalType;
 use App\Models\MegaCategory;
 use App\Models\Party;
@@ -281,5 +282,11 @@ class SelectOptionController extends Controller
         $departments = SupportDepartment::orderBy('name', 'asc')->get();
 
         return $departments;
+    }
+    public function customerGroups()
+    {
+        $groups = CustomerGroup::orderBy('name', 'asc')->get();
+
+        return $groups;
     }
 }

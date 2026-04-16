@@ -72,24 +72,63 @@ class EmailSendService
     {
         return DB::transaction(function () use ($data) {
             try {
-                // 1. Fetch customer emails
-                $customers = Party::whereIn('id', $data['customer_ids'])
-                    ->whereNotNull('email')
-                    ->where('email', '!=', '')
-                    ->get(['id', 'email']); // fetch id too for better logging
+                // Merge customer_ids and supplier_ids uniquely
+                $partyIds = array_unique(array_merge(
+                    $data['customer_ids'] ?? [],
+                    $data['supplier_ids'] ?? []
+                ));
 
-                if ($customers->isEmpty()) {
-                    throw ApiException::validationError('Selected customers do not have valid email addresses.');
+                $customEmails = $data['custom_emails'] ?? [];
+                $recipients = [];
+
+                // 1. Fetch System parties (Customers & Suppliers)
+                if (!empty($partyIds)) {
+                    $parties = Party::whereIn('id', $partyIds)
+                        ->whereNotNull('email')
+                        ->where('email', '!=', '')
+                        ->get(['id', 'email']);
+
+                    foreach ($parties as $party) {
+                        $recipients[] = [
+                            'id' => $party->id,
+                            'email' => $party->email,
+                            'type' => 'system_party'
+                        ];
+                    }
                 }
 
+                // 2. Format Custom Emails 
+                foreach ($customEmails as $email) {
+                    // Validate email format just to be safe
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        // Make sure we don't duplicate an email that is already in system_parties
+                        $alreadyExists = collect($recipients)->contains('email', $email);
+                        if (!$alreadyExists) {
+                            $recipients[] = [
+                                'id' => null,
+                                'email' => $email,
+                                'type' => 'custom'
+                            ];
+                        }
+                    }
+                }
+
+                // If absolutely no emails were found, throw validation error
+                if (empty($recipients)) {
+                    throw ApiException::validationError('No valid email addresses found among the selected recipients.');
+                }
+
+                // Create record in EmailSend table
+                // Ensure 'custom_emails' is in $fillable and $casts -> 'array'
                 $emailSend = EmailSend::create($data);
 
                 $successCount = 0;
                 $failedRecipients = [];
 
-                foreach ($customers as $index => $customer) {
+                // 3. Queue emails
+                foreach ($recipients as $index => $recipient) {
                     try {
-                        Mail::to($customer->email)->later(
+                        Mail::to($recipient['email'])->later(
                             now()->addSeconds($index * 3),
                             new SendEmail($data['subject'], $data['body'])
                         );
@@ -99,23 +138,24 @@ class EmailSendService
                         Log::info('Email queued successfully', [
                             'email_send_id' => $emailSend->id,
                             'company_id'    => $emailSend->company_id,
-                            'recipient'     => $customer->email,
-                            'customer_id'   => $customer->id,
+                            'recipient'     => $recipient['email'],
+                            'customer_id'   => $recipient['id'], // will be null for custom emails
+                            'type'          => $recipient['type'],
                             'delay_seconds' => $index * 3,
                             'queued_at'     => now()->toDateTimeString(),
                         ]);
                     } catch (\Exception $e) {
                         $failedRecipients[] = [
-                            'customer_id' => $customer->id,
-                            'email'       => $customer->email,
+                            'customer_id' => $recipient['id'],
+                            'email'       => $recipient['email'],
                             'reason'      => $e->getMessage(),
                         ];
 
                         Log::error('Failed to queue email for recipient', [
                             'email_send_id' => $emailSend->id,
                             'company_id'    => $emailSend->company_id,
-                            'recipient'     => $customer->email,
-                            'customer_id'   => $customer->id,
+                            'recipient'     => $recipient['email'],
+                            'customer_id'   => $recipient['id'],
                             'error'         => $e->getMessage(),
                         ]);
                     }
@@ -126,7 +166,7 @@ class EmailSendService
                     Log::warning('Email batch completed with some failures', [
                         'email_send_id'    => $emailSend->id,
                         'company_id'       => $emailSend->company_id,
-                        'total_recipients' => $customers->count(),
+                        'total_recipients' => count($recipients),
                         'success_count'    => $successCount,
                         'failed_count'     => count($failedRecipients),
                         'failed_recipients' => $failedRecipients,
@@ -135,16 +175,17 @@ class EmailSendService
                     Log::info('Email batch queued successfully — all recipients', [
                         'email_send_id'    => $emailSend->id,
                         'company_id'       => $emailSend->company_id,
-                        'total_recipients' => $customers->count(),
+                        'total_recipients' => count($recipients),
                         'success_count'    => $successCount,
                     ]);
                 }
 
+                // Call your LogHelper
                 LogHelper::created(
                     'email_send',
                     $emailSend->id,
                     $emailSend->company_id,
-                    "Email queued: {$successCount}/{$customers->count()} recipients succeeded"
+                    "Email queued: {$successCount}/" . count($recipients) . " recipients succeeded"
                         . (!empty($failedRecipients) ? ' | ' . count($failedRecipients) . ' failed' : '')
                 );
 

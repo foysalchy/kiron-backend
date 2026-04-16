@@ -208,6 +208,32 @@ class productGroupService
             if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
             if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
         }
+        if ($group->filter_type === 'most_wishlisted') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']        = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']          = $params['date_to'];
+            if (!empty($params['min_count']))  $filterDetails['Min Wishlist Count'] = $params['min_count'];
+            if (!empty($params['limit']))      $filterDetails['Limit']            = $params['limit'];
+        }
+
+        if ($group->filter_type === 'frequently_viewed') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']      = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']        = $params['date_to'];
+            if (!empty($params['min_count']))  $filterDetails['Min View Count'] = $params['min_count'];
+            if (!empty($params['limit']))      $filterDetails['Limit']          = $params['limit'];
+        }
+        if ($group->filter_type === 'high_view_low_order') {
+            $filterDetails['Max Conversion Rate'] = ($params['conversion_rate'] ?? 5) . '%';
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
+        }
+
+        if ($group->filter_type === 'high_wishlist_low_order') {
+            $filterDetails['Max Conversion Rate'] = ($params['conversion_rate'] ?? 5) . '%';
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
+        }
         return [
             'group'          => $group,
             'products'       => $products,
@@ -669,6 +695,215 @@ class productGroupService
                         'product_id'       => $product->id,
                         'total_qty_sold'   => $product->total_qty_sold,
                         'discount_percent' => 0,
+                        'product'          => $product,
+                    ];
+                });
+            }
+
+            if ($type === 'most_wishlisted') {
+                $query = Product::query()
+                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->withCount(['wishlists as total_wishlist_count' => function ($q) use ($params) {
+                        if (!empty($params['date_from'])) {
+                            $q->whereDate('created_at', '>=', $params['date_from']);
+                        }
+                        if (!empty($params['date_to'])) {
+                            $q->whereDate('created_at', '<=', $params['date_to']);
+                        }
+                    }])
+                    ->having('total_wishlist_count', '>', 0)
+                    ->orderByDesc('total_wishlist_count');
+
+                if (!empty($params['min_count'])) {
+                    $query->having('total_wishlist_count', '>=', (int) $params['min_count']);
+                }
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'           => $product->id,
+                        'total_wishlist_count' => $product->total_wishlist_count,
+                        'product'              => $product,
+                    ];
+                });
+            }
+
+            if ($type === 'frequently_viewed') {
+                $query = Product::query()
+                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->withCount(['productViews as total_view_count' => function ($q) use ($params) {
+                        if (!empty($params['date_from'])) {
+                            $q->whereDate('created_at', '>=', $params['date_from']);
+                        }
+                        if (!empty($params['date_to'])) {
+                            $q->whereDate('created_at', '<=', $params['date_to']);
+                        }
+                    }])
+                    ->having('total_view_count', '>', 0)
+                    ->orderByDesc('total_view_count');
+
+                if (!empty($params['min_count'])) {
+                    $query->having('total_view_count', '>=', (int) $params['min_count']);
+                }
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'total_view_count' => $product->total_view_count,
+                        'product'          => $product,
+                    ];
+                });
+            }
+            if ($type === 'high_view_low_order') {
+                $conversionThreshold = !empty($params['conversion_rate']) ? (float) $params['conversion_rate'] : 5.0;
+
+                $dateFrom = $params['date_from'] ?? null;
+                $dateTo   = $params['date_to']   ?? null;
+
+                $query = Product::query()
+                    ->select([
+                        'products.id',
+                        'products.title',
+                        'products.thumbnail',
+                        'products.regular_price',
+                        'products.stock_quantity',
+                        'products.stock_status',
+                        DB::raw('(
+                SELECT COUNT(pv.id)
+                FROM product_views pv
+                WHERE pv.product_id = products.id
+                ' . ($dateFrom ? "AND DATE(pv.created_at) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(pv.created_at) <= '$dateTo'"   : '') . '
+            ) as total_views'),
+                        DB::raw('(
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                  AND o.type = "sales"
+                WHERE od.product_id = products.id
+                AND o.status != ' . Status::Cancelled->value . '
+                AND o.deleted_at IS NULL
+                ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+            ) as total_orders'),
+                        DB::raw('(
+    SELECT ROUND(
+        COALESCE((
+            SELECT COUNT(DISTINCT o.id)   -- ✅ quantity নয়, unique order count
+            FROM order_details od
+            JOIN orders o ON od.order_id = o.id
+            WHERE od.product_id = products.id
+            AND o.status != ' . Status::Cancelled->value . '
+            AND o.deleted_at IS NULL
+            ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+            ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+        ), 0) /
+        NULLIF((
+            SELECT COUNT(pv2.id)
+            FROM product_views pv2
+            WHERE pv2.product_id = products.id
+            ' . ($dateFrom ? "AND DATE(pv2.created_at) >= '$dateFrom'" : '') . '
+            ' . ($dateTo   ? "AND DATE(pv2.created_at) <= '$dateTo'"   : '') . '
+        ), 0) * 100, 2
+    )
+) as conversion_rate'),
+
+                    ])
+                    ->having('total_views', '>', 0)
+                    ->having('total_orders', '>', 0)
+                    ->having(DB::raw('COALESCE(conversion_rate, 0)'), '<', $conversionThreshold)
+                    ->orderBy('total_views', 'desc')
+                    ->orderBy('total_orders', 'asc');
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'      => $product->id,
+                        'total_views'     => $product->total_views,
+                        'total_orders'    => $product->total_orders,
+                        'conversion_rate' => $product->conversion_rate,
+                        'product'         => $product,
+                    ];
+                });
+            }
+
+            if ($type === 'high_wishlist_low_order') {
+                $conversionThreshold = !empty($params['conversion_rate']) ? (float) $params['conversion_rate'] : 5.0;
+
+                $dateFrom = $params['date_from'] ?? null;
+                $dateTo   = $params['date_to']   ?? null;
+
+                $query = Product::query()
+                    ->select([
+                        'products.id',
+                        'products.title',
+                        'products.thumbnail',
+                        'products.regular_price',
+                        'products.stock_quantity',
+                        'products.stock_status',
+                        DB::raw('(
+                SELECT COUNT(w.id)
+                FROM wishlists w
+                WHERE w.product_id = products.id
+                ' . ($dateFrom ? "AND DATE(w.created_at) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(w.created_at) <= '$dateTo'"   : '') . '
+            ) as total_wishlists'),
+                        DB::raw('(
+                SELECT COALESCE(SUM(od.quantity), 0)
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                   AND o.type = "sales"
+                WHERE od.product_id = products.id
+                AND o.status != ' . Status::Cancelled->value . '
+                AND o.deleted_at IS NULL
+                ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+            ) as total_orders'),
+                        DB::raw('(
+                SELECT ROUND(
+                    COALESCE(SUM(od.quantity), 0) /
+                    NULLIF((
+                        SELECT COUNT(w2.id)
+                        FROM wishlists w2
+                        WHERE w2.product_id = products.id
+                        ' . ($dateFrom ? "AND DATE(w2.created_at) >= '$dateFrom'" : '') . '
+                        ' . ($dateTo   ? "AND DATE(w2.created_at) <= '$dateTo'"   : '') . '
+                    ), 0) * 100, 2
+                )
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                WHERE od.product_id = products.id
+                AND o.status != ' . Status::Cancelled->value . '
+                AND o.deleted_at IS NULL
+                ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+            ) as conversion_rate'),
+                    ])
+                    ->having('total_wishlists', '>', 0)
+                    ->having('total_orders', '>', 0)
+                    ->having(DB::raw('COALESCE(conversion_rate, 0)'), '<', $conversionThreshold)
+                    ->orderBy('total_wishlists', 'desc')
+                    ->orderBy('total_orders', 'asc');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'total_wishlists'  => $product->total_wishlists,
+                        'total_orders'     => $product->total_orders,
+                        'conversion_rate'  => $product->conversion_rate ?? 0,
                         'product'          => $product,
                     ];
                 });

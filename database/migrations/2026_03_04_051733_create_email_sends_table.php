@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->json('customer_ids')->nullable();
             $table->json('supplier_ids')->nullable();
+            $table->json('custom_emails')->nullable();
             $table->string('subject');
             $table->longText('body');
             $table->tinyInteger('status')->default(Status::Inactive->value);

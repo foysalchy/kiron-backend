@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\Status;
+use App\Traits\CompanyScoped;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class ContentSetting extends Model
+{
+    use CompanyScoped;
+    protected $fillable = [
+        'company_id',
+        'page_type',
+        'icon_url',
+        'icon_file',
+        'title',
+        'subtitle',
+        'text_content',
+        'sort_order',
+        'status',
+    ];
+
+    protected $casts = [
+        'sort_order' => 'integer',
+        'status'     => Status::class,
+    ];
+
+    /* ── Page type constants ── */
+    const PAGE_PRODUCT  = 'product_page';
+    const PAGE_CHECKOUT = 'checkout_page';
+    const PAGE_ALL      = 'all_page';
+    const PAGE_CART     = 'cart_page';
+
+    const PAGE_TYPES = [
+        self::PAGE_PRODUCT,
+        self::PAGE_CHECKOUT,
+        self::PAGE_ALL,
+        self::PAGE_CART,
+    ];
+
+    /* ── Relations ── */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /* ── Scopes ── */
+    public function scopeActive($query)
+    {
+        return $query->where('status', Status::Active);
+    }
+
+    public function scopeForCompany($query, int $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
+
+    public function scopeByPage($query, string $pageType)
+    {
+        return $query->where('page_type', $pageType);
+    }
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order')->orderBy('id');
+    }
+}

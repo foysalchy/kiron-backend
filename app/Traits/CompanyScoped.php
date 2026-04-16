@@ -30,6 +30,7 @@ trait CompanyScoped
 
         // Apply global scope for filtering
         static::addGlobalScope('company', function (Builder $builder) {
+            
             if (Auth::check()) {
                 $user = Auth::user();
 
@@ -48,8 +49,6 @@ trait CompanyScoped
     {
         // Option 1: Check role column
         return $user->role === 'super_admin';
-
-
     }
 
     /**

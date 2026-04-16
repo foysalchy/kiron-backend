@@ -19,7 +19,7 @@ class LandingPageService
     public function getAllLandingPages(array $filters = [], bool $paginate = true)
     {
         try {
-            $query = LandingPage::with(['template']);
+            $query = LandingPage::query();
 
             // Apply filters
             if (isset($filters['status'])) {
@@ -62,7 +62,7 @@ class LandingPageService
      */
     public function getLandingPageById(int $id): LandingPage
     {
-        $landingPage = LandingPage::with(['product','template'])->find($id);
+        $landingPage = LandingPage::with(['product'])->find($id);
 
         if (!$landingPage) {
             throw ApiException::notFound('Landing Page');
@@ -89,8 +89,7 @@ class LandingPageService
      */
     public function getLandingPageBySlug(string $slug): LandingPage
     {
-        $landingPage = LandingPage::with(['template'])
-            ->where('slug', $slug)
+        $landingPage = LandingPage::where('slug', $slug)
             ->first();
 
         if (!$landingPage) {
@@ -134,7 +133,7 @@ class LandingPageService
             DB::commit();
             Log::info('Landing page created successfully', ['landing_page_id' => $landingPage->id]);
 
-            return $landingPage->load(['template']);
+            return $landingPage;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -185,7 +184,7 @@ class LandingPageService
             DB::commit();
             Log::info('Landing page updated successfully', ['landing_page_id' => $landingPage->id]);
 
-            return $landingPage->load(['template']);
+            return $landingPage;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -243,7 +242,7 @@ class LandingPageService
             LogHelper::restored('landing_page', $landingPage->id, $landingPage->company_id, $landingPage->name);
             Log::info('Landing page restored successfully', ['landing_page_id' => $id]);
 
-            return $landingPage->load(['template']);
+            return $landingPage;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -318,7 +317,7 @@ class LandingPageService
                 'new_status' => $newStatus->label()
             ]);
 
-            return $landingPage->load(['template']);
+            return $landingPage;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

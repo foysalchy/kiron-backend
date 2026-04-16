@@ -16,6 +16,7 @@ class EmailSend extends Model
         'company_id',
         'customer_ids',
         'supplier_ids',
+        'custom_emails',
         'subject',
         'body',
         'status',
@@ -27,6 +28,7 @@ class EmailSend extends Model
     protected $casts = [
         'customer_ids' => 'array',
         'supplier_ids' => 'array',
+        'custom_emails' => 'array',
     ];
 
     protected $hidden = ['deleted_at'];

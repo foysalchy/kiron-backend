@@ -16,17 +16,19 @@ class SmsSend extends Model
         'company_id',
         'customer_ids',
         'supplier_ids',
+        'custom_numbers',
         'message',
         'status',
     ];
     protected $casts = [
         'customer_ids' => 'array',
         'supplier_ids' => 'array',
+        'custom_numbers' => 'array',
     ];
 
     protected $hidden = ['deleted_at'];
 
-     //company scope
+    //company scope
     public function scopeInactive($query)
     {
         return $query->where('status', Status::Inactive->value);

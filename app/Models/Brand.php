@@ -19,6 +19,8 @@ class Brand extends Model
         'name',
         'slug',
         'logo',
+        'meta_description',
+        'description',
         'status',
     ];
 

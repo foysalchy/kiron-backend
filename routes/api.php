@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\ChartOfAccountController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\CompanyRegistrationController;
+use App\Http\Controllers\Api\ContentSettingController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
@@ -229,6 +230,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/income-accounts', [SelectOptionController::class, 'incomeAccountOptions']);
                 Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
                 Route::get('/support-departments', [SelectOptionController::class, 'supportDepartmentOptions']);
+                Route::get('/customer-groups', [SelectOptionController::class, 'customerGroups']);
             });
             //party routes
             Route::prefix('parties')->group(function () {
@@ -653,21 +655,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('{id}/restore', [RequisitionController::class, 'restore']);
                 Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
             });
-            // Templates Routes
-            Route::prefix('templates')->group(function () {
-                Route::get('/', [TemplateController::class, 'index']);
-                Route::post('/', [TemplateController::class, 'store']);
-                Route::get('/{id}', [TemplateController::class, 'show']);
-                Route::get('/slug/{slug}', [TemplateController::class, 'showBySlug']);
-                Route::post('/update/{id}', [TemplateController::class, 'update']);
-                Route::patch('/{id}', [TemplateController::class, 'update']);
-                Route::delete('/{id}', [TemplateController::class, 'destroy']);
-
-                // Additional actions
-                Route::get('/{id}/restore', [TemplateController::class, 'restore']);
-                Route::delete('/{id}/force', [TemplateController::class, 'forceDestroy']);
-                Route::patch('/{id}/toggle-status', [TemplateController::class, 'toggleStatus']);
-            });
+  
+  
             // Landing Pages Routes
             Route::prefix('landing-pages')->group(function () {
                 Route::get('/', [LandingPageController::class, 'index']);
@@ -1389,6 +1378,15 @@ Route::prefix('v1')->group(function () {
                 Route::delete('{resource}/delete', [BulkActionController::class, 'bulkDelete']);
                 Route::delete('{resource}/force-delete', [BulkActionController::class, 'bulkForceDelete']);
                 Route::patch('{resource}/restore',      [BulkActionController::class, 'bulkRestore']);
+            });
+            Route::prefix('content-settings')->group(function () {
+                Route::get('/',                         [ContentSettingController::class, 'index']);
+                Route::get('/{id}',                     [ContentSettingController::class, 'show']);
+                Route::post('/',                        [ContentSettingController::class, 'store']);
+                Route::post('/update/{id}',                     [ContentSettingController::class, 'update']);
+                Route::delete('/{id}',                  [ContentSettingController::class, 'destroy']);
+                Route::patch('/{id}/toggle-status',     [ContentSettingController::class, 'toggleStatus']);
+                Route::patch('/reorder',                [ContentSettingController::class, 'reorder']);
             });
 
             // Customer Groups Routes

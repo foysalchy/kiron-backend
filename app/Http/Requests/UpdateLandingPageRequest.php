@@ -16,29 +16,22 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'template_id' => ['nullable', 'exists:templates,id'],
                 'product_id' => ['nullable', 'exists:products,id'],
-                'name' => ['sometimes', 'required', 'string', 'max:255'],
-                'title' => ['sometimes', 'required', 'string', 'max:255'],
+                'name' => ['nullable', 'string', 'max:255'],
+                'title' => ['nullable', 'string', 'max:255'],
                 'short_description' => ['nullable', 'string', 'max:500'],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
                 'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv', 'max:51200'],
                 'description' => ['nullable', 'string'],
-                'pricing' => ['nullable', 'numeric', 'min:0', 'max:999999.99'],
-                'slug' => [
-                    'nullable',
-                    'string',
-                    'max:255',
-                    Rule::unique('landing_pages', 'slug')->ignore($landingPageId),
-                    'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'
-                ],
+                'pricing' => ['nullable', 'string'],
+                'slug' => ['nullable', 'string', 'max:255', 'unique:landing_pages,slug', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
                 'header_code' => ['nullable', 'string'],
                 'phone_number' => ['nullable', 'string', 'max:20'],
                 'instruction' => ['nullable', 'string'],
                 'instruction_title' => ['nullable', 'string', 'max:255'],
-                'status' => ['boolean'],
+                'status' => ['nullable'],
             ]
         );
     }

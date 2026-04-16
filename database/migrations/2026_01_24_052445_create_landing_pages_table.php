@@ -15,23 +15,22 @@ return new class extends Migration
         Schema::create('landing_pages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('template_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
             $table->string('name')->nullable();
             $table->string('title')->nullable();
+            $table->string('slug')->unique();
             $table->text('short_description')->nullable();
             $table->string('thumbnail')->nullable();
             $table->string('video')->nullable();
             $table->longText('description')->nullable();
             $table->text('pricing')->nullable();
-            $table->string('slug')->unique();
             $table->string('pixel')->nullable();
             $table->text('meta_access_token')->nullable();
             $table->text('header_code')->nullable();
             $table->string('phone_number')->nullable();
             $table->text('instruction')->nullable();
             $table->string('instruction_title')->nullable();
-            $table->tinyInteger('status')->default(Status::Inactive->value);
+            $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
             $table->softDeletes();
         });

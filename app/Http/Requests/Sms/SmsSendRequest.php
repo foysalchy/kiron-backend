@@ -28,6 +28,7 @@ class SmsSendRequest extends BaseCompanyRequest
             'customer_ids'   => ['nullable', 'array'],
             'customer_ids.*' => ['integer', 'exists:parties,id'],
             'supplier_ids'   => ['nullable', 'array'],
+            'custom_numbers'   => ['nullable', 'array'],
             'supplier_ids.*' => ['integer', 'exists:parties,id'],
             'message'           => ['required', 'string'],
             'status'         => ['nullable', 'integer'],

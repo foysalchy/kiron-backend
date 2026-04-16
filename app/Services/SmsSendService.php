@@ -69,29 +69,71 @@ class SmsSendService
     {
         return DB::transaction(function () use ($data) {
             try {
-                // 1. Fetch phone numbers of selected customers
-                $phoneNumbers = Party::whereIn('id', $data['customer_ids'])
-                    ->whereNotNull('phone')
-                    ->where('phone', '!=', '')
-                    ->pluck('phone')
-                    ->toArray();
+                // 1. Merge System Party IDs (Customers + Suppliers)
+                $partyIds = array_unique(array_merge(
+                    $data['customer_ids'] ?? [],
+                    $data['supplier_ids'] ?? []
+                ));
+
+                $customNumbers = $data['custom_numbers'] ?? [];
+                $phoneNumbers = [];
+
+                // 2. Fetch phone numbers for system parties
+                if (!empty($partyIds)) {
+                    $systemPhones = Party::whereIn('id', $partyIds)
+                        ->whereNotNull('phone')
+                        ->where('phone', '!=', '')
+                        ->pluck('phone')
+                        ->toArray();
+
+                    $phoneNumbers = array_merge($phoneNumbers, $systemPhones);
+                }
+
+                // 3. Add Custom Numbers
+                foreach ($customNumbers as $number) {
+                    $cleanNumber = trim($number);
+                    if (!empty($cleanNumber)) {
+                        $phoneNumbers[] = $cleanNumber;
+                    }
+                }
+
+                // 4. Keep only unique phone numbers
+                $phoneNumbers = array_unique($phoneNumbers);
 
                 if (empty($phoneNumbers)) {
-                    throw ApiException::validationError('Selected customers do not have valid phone numbers.');
+                    throw ApiException::validationError('Selected recipients do not have valid phone numbers.');
+                }
+
+                // Determine message body (Frontend sends 'body', but handling 'message' as fallback)
+                $messageBody = $data['body'] ?? $data['message'] ?? '';
+
+                if (empty($messageBody)) {
+                    throw ApiException::validationError('SMS message cannot be empty.');
                 }
 
                 // Store the record in your database
+                // Ensure 'custom_numbers' and 'supplier_ids' are in your $fillable and cast as 'array'
                 $smsSend = SmsSend::create($data);
 
                 // Send to actual Mobile Gateway
-                $this->sendToGateway($phoneNumbers, $data['message']);
+                $this->sendToGateway($phoneNumbers, $messageBody);
 
                 // Log the success
-                LogHelper::created('sms_send', $smsSend->id, $smsSend->company_id, 'SMS sent to ' . count($phoneNumbers) . ' customers');
+                LogHelper::created(
+                    'sms_send',
+                    $smsSend->id,
+                    $smsSend->company_id,
+                    'SMS sent to ' . count($phoneNumbers) . ' recipients'
+                );
 
                 return $smsSend;
+            } catch (ApiException $e) {
+                // Return API Exceptions directly so the user sees the actual error msg
+                throw $e;
             } catch (\Exception $e) {
-                Log::error("SMS Sending failed: " . $e->getMessage());
+                Log::error("SMS Sending failed: " . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
                 throw ApiException::serverError('Failed to process SMS request');
             }
         });

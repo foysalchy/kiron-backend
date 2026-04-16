@@ -97,7 +97,15 @@ class Product extends Model
     {
         return $this->hasMany(ProductView::class);
     }
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 
+    public function productViews(): HasMany
+    {
+        return $this->hasMany(ProductView::class);
+    }
     // Scopes
     public function scopeActive($query)
     {

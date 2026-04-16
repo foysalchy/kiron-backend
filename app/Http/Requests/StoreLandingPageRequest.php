@@ -13,7 +13,6 @@ class StoreLandingPageRequest extends BaseCompanyRequest
         return array_merge(
             $this->companyRules(),
             [
-                'template_id' => ['nullable', 'exists:templates,id'],
                 'product_id' => ['nullable', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'title' => ['nullable', 'string', 'max:255'],
