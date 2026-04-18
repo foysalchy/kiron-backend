@@ -9,185 +9,168 @@ use App\Models\Brand;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\Product;
+use App\Models\ProductReview;
+use App\Models\ProductVariation;
 use App\Models\ProductView;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class ProductController extends FrontendController
 {
     public function getVariationModal($store, $id)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
         $product = Product::with(['variations.attributes.attributeValue', 'variations.attributes.attributeGroup'])
             ->findOrFail($id);
 
-        return view($template . '.partials.variation_modal_content', compact('product'));
+        return $this->view('partials/variation_modal_content', compact('product'));
     }
     public function index(Request $request, $store)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
+        $query = Product::with('variations');
 
-        $query = Product::with('variations')->where('company_id', $company->id);
-
-        // dd($query);
-$maxPriceLimit = $this->getMaxPriceLimit($company->id);
-
+        $maxPriceLimit = $this->getMaxPriceLimit();
         $this->applyFiltersAndSorting($query, $request);
 
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::where('company_id', $company->id)->get();
-
-        $attributeGroups = AttributeGroup::where('company_id', $company->id)
-            ->whereIn('name', ['Size', 'Color', 'Style'])
+        $brands          = Brand::get();
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->active()
             ->get()
             ->unique('name');
 
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups','maxPriceLimit'))->with([
-            'category' => null,
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit'))->with([
+            'category'    => null,
             'allProducts' => $products
         ]);
     }
 
     public function categoryProducts(Request $request, $store, $slug)
     {
-        $company = getCurrentCompany();
-        if (!$company) abort(401);
-
-        $template = $company->template_name;
-
-        $category = MegaCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+        $category = MegaCategory::where('slug', $slug)->first();
         $column = 'mega_category_ids';
 
 
         if (!$category) {
-            $category = SubCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+            $category = SubCategory::where('slug', $slug)->first();
             $column = 'sub_category_ids';
         }
         if (!$category) {
-            $category = MiniCategory::where('slug', $slug)->where('company_id', $company->id)->first();
+            $category = MiniCategory::where('slug', $slug)->first();
             $column = 'mini_category_ids';
         }
 
         if (!$category) abort(401);
 
-        $query = Product::where('company_id', $company->id)
-            ->active()
+        $query = Product::active()
             ->whereJsonContains('mega_category_ids', (int)$category->id);
 
         $this->applyFiltersAndSorting($query, $request);
-        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
+        $maxPriceLimit = $this->getMaxPriceLimit();
 
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::where('company_id', $company->id)->get();
+        $brands = Brand::get();
 
-        $attributeGroups = AttributeGroup::where('company_id', $company->id)
-            ->whereIn('name', ['Size', 'Color', 'Style'])
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->active()
             ->get()
             ->unique('name');
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }
 
-   // ১. ডাটাবেস থেকে সর্বোচ্চ দাম বের করার ডাইনামিক ফাংশন
-private function getMaxPriceLimit($companyId)
-{
-    $maxProductPrice = Product::where('company_id', $companyId)->max('regular_price');
-    $maxVarPrice = \App\Models\ProductVariation::whereHas('product', function($q) use ($companyId) {
-        $q->where('company_id', $companyId);
-    })->max('regular_price');
+    // highest price limit
+    private function getMaxPriceLimit()
+    {
+        $maxProductPrice = Product::max('regular_price');
+        $maxVarPrice = ProductVariation::max('regular_price');
 
-    return max((float)$maxProductPrice, (float)$maxVarPrice) ?: 1000;
-}
-
-// ২. ফিল্টার ফাংশন (Variation Price Support সহ আপডেট করা হয়েছে)
-private function applyFiltersAndSorting($query, $request)
-{
-    if ($request->filled('min_price')) {
-        $min = $request->min_price;
-        $query->where(function($q) use ($min) {
-            $q->where('regular_price', '>=', $min)
-              ->orWhereHas('variations', function($sq) use ($min) {
-                  $sq->where('regular_price', '>=', $min);
-              });
-        });
+        return max((float)$maxProductPrice, (float)$maxVarPrice) ?: 1000;
     }
 
-    if ($request->filled('max_price')) {
-        $max = $request->max_price;
-        $query->where(function($q) use ($max) {
-            $q->where(function($sub) use ($max) {
-                $sub->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
-            })
-            ->orWhereHas('variations', function($sq) use ($max) {
-                $sq->where('regular_price', '<=', $max);
+    // Variation Price Support
+    private function applyFiltersAndSorting($query, $request)
+    {
+        if ($request->filled('min_price')) {
+            $min = $request->min_price;
+            $query->where(function ($q) use ($min) {
+                $q->where('regular_price', '>=', $min)
+                    ->orWhereHas('variations', function ($sq) use ($min) {
+                        $sq->where('regular_price', '>=', $min);
+                    });
             });
-        });
-    }
+        }
 
-    if ($request->filled('brand') && !request()->routeIs('brand.products')) {
-        $query->whereIn('brand_id', (array)$request->brand);
-    }
+        if ($request->filled('max_price')) {
+            $max = $request->max_price;
+            $query->where(function ($q) use ($max) {
+                $q->where(function ($sub) use ($max) {
+                    $sub->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
+                })
+                    ->orWhereHas('variations', function ($sq) use ($max) {
+                        $sq->where('regular_price', '<=', $max);
+                    });
+            });
+        }
 
-    if ($request->filled('attributes')) {
-        foreach ($request->attributes as $groupId => $ids) {
-            $ids = array_filter((array)$ids);
-            if (!empty($ids)) {
-                $query->whereHas('variations.attributes', function ($q) use ($ids) {
-                    $q->whereIn('attribute_value_id', $ids);
-                });
+        if ($request->filled('brand') && !request()->routeIs('brand.products')) {
+            $query->whereIn('brand_id', (array)$request->brand);
+        }
+
+        if ($request->filled('attributes')) {
+            foreach ($request->attributes as $groupId => $ids) {
+                $ids = array_filter((array)$ids);
+                if (!empty($ids)) {
+                    $query->whereHas('variations.attributes', function ($q) use ($ids) {
+                        $q->whereIn('attribute_value_id', $ids);
+                    });
+                }
             }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('sku_code', 'like', "%{$search}%");
+            });
+        }
+
+        //
+        if ($request->sort == 'price_low') {
+            $query->orderBy('regular_price', 'asc');
+        } elseif ($request->sort == 'price_high') {
+            $query->orderBy('regular_price', 'desc');
+        } else {
+            $query->latest();
         }
     }
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-                ->orWhere('sku_code', 'like', "%{$search}%");
-        });
-    }
-
-    // সর্টিং লজিক...
-    if ($request->sort == 'price_low') {
-        $query->orderBy('regular_price', 'asc');
-    } elseif ($request->sort == 'price_high') {
-        $query->orderBy('regular_price', 'desc');
-    } else {
-        $query->latest();
-    }
-}
-
     public function productDetails($store, $slug)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
         $product = Product::with([
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
             'variations.galleries',
             'galleries',
-            'brand'
-        ])->where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
+            'brand',
+            'reviews.customer',
+            'reviews.variation.attributes.attributeGroup',
+        ])->where('slug', $slug)->firstOrFail();
 
+// dd($product->variations);
 
         $viewKey = 'viewed_product_' . $product->id;
 
         if (!session()->has($viewKey)) {
             ProductView::create([
-                'company_id'  => $company->id,
+                'company_id'  => getCurrentCompany()->id,
                 'product_id'  => $product->id,
                 'customer_id' => auth('customer')->id(),
                 'ip_address'  => request()->ip(),
@@ -220,37 +203,32 @@ private function applyFiltersAndSorting($query, $request)
                     'price' => $variation->final_price,
                     'attributes' => $attrs,
                     'main_image' => $variation->image ? asset('storage/' . $variation->image) : $product->thumbnail_url,
-                    'galleries' => $varGalleries
+                    'galleries' => $varGalleries,
+                    'stock' => $variation->available_stock
                 ];
             }
         }
         //  \Log::info($formattedVariations);
-        $relatedProducts = Product::where('company_id', $company->id)->active()
+        $relatedProducts = Product::active()
             ->where('id', '!=', $product->id)->latest()->take(8)->get();
 
-        return view($template . '.frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
+        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
     }
     public function flashSale(Request $request, $store)
-    {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        // Filter products that have a discount > 0
-        $query = Product::where('company_id', $company->id)
-            ->where('discount', '>', 0)
+    { // Filter products that have a discount > 0
+        $query = Product::where('discount', '>', 0)
             ->active();
 
-        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
+        $maxPriceLimit = $this->getMaxPriceLimit();
 
         $this->applyFiltersAndSorting($query, $request);
 
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::where('company_id', $company->id)->get();
+        $brands = Brand::get();
 
-        $attributeGroups = AttributeGroup::where('company_id', $company->id)
-            ->whereIn('name', ['Size', 'Color', 'Style'])
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->active()
             ->get();
@@ -258,40 +236,33 @@ private function applyFiltersAndSorting($query, $request)
         // Pass a virtual category object for the title
         $category = (object) ['name' => 'Flash Sale Items'];
 
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'));
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'));
     }
 
 
     public function brandProducts(Request $request, $store, $slug)
     {
-        $company = getCurrentCompany();
-        if (!$company) abort(401);
-
-        $template = $company->template_name;
-
-        $brand = Brand::where('slug', $slug)->where('company_id', $company->id)->firstOrFail();
+        $brand = Brand::where('slug', $slug)->firstOrFail();
 
         $query = Product::with('variations')
-            ->where('company_id', $company->id)
             ->where('status', Status::Active->value)
             ->where('brand_id', $brand->id);
-        $maxPriceLimit = $this->getMaxPriceLimit($company->id);
+        $maxPriceLimit = $this->getMaxPriceLimit();
 
         $this->applyFiltersAndSorting($query, $request);
 
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::where('company_id', $company->id)->get();
+        $brands = Brand::get();
 
-        $attributeGroups = AttributeGroup::where('company_id', $company->id)
-            ->whereIn('name', ['Size', 'Color', 'Style'])
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->get();
 
         $category = $brand;
 
-        return view($template . '.frontend.shop', compact('products', 'brands', 'attributeGroups', 'category','maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }

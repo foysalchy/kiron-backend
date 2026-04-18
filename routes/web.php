@@ -31,21 +31,23 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/terms', [TermController::class, 'index'])->name('term.index');
     Route::get('/privacy', [TermController::class, 'privacy'])->name('privacy.index');
 
-    Route::get('/brands',[BrandController::class,'index'])->name('brand.index');
+    Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');
     Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
-    Route::get('/about',[AboutController::class,'index'])->name('about.index');
+    Route::get('/about', [AboutController::class, 'index'])->name('about.index');
 
-    Route::get('/register', [AuthController::class,'register'])->name('user.register');
-    Route::post('/register', [AuthController::class,'storeRegister'])->name('user.register.store');
-    Route::get('/login', [AuthController::class,'login'])->name('user.login');
+    Route::get('/register', [AuthController::class, 'register'])->name('user.register');
+    Route::post('/register', [AuthController::class, 'storeRegister'])->name('user.register.store');
+    Route::get('/login', [AuthController::class, 'login'])->name('user.login');
     Route::post('/login', [AuthController::class, 'storeLogin'])->name('user.login.store');
     Route::middleware(['auth:customer'])->group(function () {
-        Route::get('/profile', [AuthController::class,'profile'])->name('user.profile');
+        Route::get('/profile', [AuthController::class, 'profile'])->name('user.profile');
         Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('user.profile.update');
         Route::post('/password/update', [AuthController::class, 'updatePassword'])->name('user.password.update');
         Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('user.dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('user.logout');
-        });
+        Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
+        Route::post('/order/review/store', [OrderController::class, 'storeReview'])->name('user.review.store');
+    });
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
     Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
@@ -60,13 +62,12 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/coupon/remove', [CartController::class, 'removeCoupon'])->name('coupon.remove');
     Route::post('/cart/shipping', [CartController::class, 'updateShipping'])->name('cart.shipping');
 
-    Route::get('/checkout', [OrderController::class,'index'])->name('checkout.index');
+    Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index');
     Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('order.store');
     Route::post('/order/partial-save', [OrderController::class, 'partialSave'])->name('order.partial');
-    Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
+
     Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
     Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
     Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
-
-
+    Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
 });

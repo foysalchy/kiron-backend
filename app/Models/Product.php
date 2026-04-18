@@ -102,9 +102,9 @@ class Product extends Model
         return $this->hasMany(Wishlist::class);
     }
 
-    public function productViews(): HasMany
+    public function reviews(): HasMany
     {
-        return $this->hasMany(ProductView::class);
+        return $this->hasMany(ProductReview::class);
     }
     // Scopes
     public function scopeActive($query)

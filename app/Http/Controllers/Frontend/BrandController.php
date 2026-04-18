@@ -6,18 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 
-class BrandController extends Controller
+class BrandController extends FrontendController
 {
     public function index()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        $brands = Brand::where('company_id', $company->id)
-            ->active()
+       $brands = Brand::active()
             ->withCount('products')
             ->get();
-        return view($template . '.frontend.brand',compact('brands'));
+        return  $this->view('frontend.brand',compact('brands'));
     }
-    
+
 }

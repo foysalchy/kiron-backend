@@ -231,6 +231,10 @@
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-download"></i> Invoice
                                         </a>
+                                        <a href="{{ route('order.reviews', $order->id) }}"
+                                            class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                            <i class="fa-solid fa-star-half-stroke"></i> Review
+                                        </a>
                                     </div>
                                 </div>
                             @empty
@@ -428,7 +432,6 @@
 @push('scripts')
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // যদি সেশনে active_tab = password থাকে, তবে পাসওয়ার্ড ট্যাব দেখাও
         @if(session('active_tab') == 'password' || $errors->has('password') || $errors->has('current_password'))
             const passwordBtn = document.querySelector('button[onclick*="password"]');
             showSection('password', passwordBtn);
@@ -443,7 +446,6 @@
         if (target) target.classList.remove("hidden");
 
         const navLinks = document.querySelectorAll(".nav-link, .nav-link-custom");
-        // আপনার সাইডবার বাটনে class="nav-link" যোগ করে নিন
         navLinks.forEach((link) => {
             link.classList.remove("bg-[#1D2128]", "text-white");
             link.classList.add("text-gray-600", "hover:bg-orange-50");

@@ -176,7 +176,7 @@
             </div>
 
             <!-- Cart -->
-            <a href="{{ url('/carts') }}"
+            <a href="{{ route('cart.index') }}"
                 class="flex items-center gap-2 hover:text-[#FF6A00] transition-colors relative group">
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>

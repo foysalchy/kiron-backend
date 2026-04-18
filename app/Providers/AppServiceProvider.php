@@ -188,7 +188,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(StockMovementRequestService::class);
         $this->app->bind(SupportDepartmentService::class);
         $this->app->bind(SupportTicketService::class);
-        $this->app->bind(TemplateService::class);
+        // $this->app->bind(TemplateService::class);
         $this->app->bind(WocommerceSettingService::class);
         $this->app->bind(TaxRateService::class);
         $this->app->bind(AccountGroupService::class);

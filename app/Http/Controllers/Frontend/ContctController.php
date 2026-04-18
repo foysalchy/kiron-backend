@@ -7,19 +7,15 @@ use App\Models\ContactMessage;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
 
-class ContctController extends Controller
+class ContctController extends FrontendController
 {
     //
     public function index(Request $request)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        $faqs = KnowledgeBase::where('company_id', $company->id)
-            ->active()
+        $faqs = KnowledgeBase::active()
             ->get();
 
-        return view($template . '.frontend.contact', compact('faqs'));
+        return  $this->view('frontend.contact', compact('faqs'));
     }
     public function send(Request $request)
     {

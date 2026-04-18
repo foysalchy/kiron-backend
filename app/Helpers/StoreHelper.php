@@ -3,6 +3,7 @@
 use App\Models\DomainSetup;
 
 if (!function_exists('getCurrentCompany')) {
+    if (!function_exists('getCurrentCompany')) {
     function getCurrentCompany()
     {
         if (request()->is('api/*')) {
@@ -11,21 +12,21 @@ if (!function_exists('getCurrentCompany')) {
 
         $host = request()->getHost();
 
-        // localhost / IP handle
         if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {
             return null;
         }
 
         $parts = explode('.', $host);
-
-        // www skip
         $subdomain = $parts[0] === 'www' ? null : $parts[0];
 
         if (!$subdomain) {
             return null;
         }
 
-        $store = DomainSetup::where('sub_domain', $subdomain)->first();
+        // ✅ withoutGlobalScopes() — circular loop বন্ধ হবে
+        $store = DomainSetup::withoutGlobalScopes()
+            ->where('sub_domain', $subdomain)
+            ->first();
 
         if ($store) {
             return $store;
