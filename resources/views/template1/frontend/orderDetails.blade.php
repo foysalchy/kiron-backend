@@ -41,24 +41,29 @@
                         @foreach ($order->orderDetails as $item)
                             <div
                                 class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
+
+                                {{-- 1. Safe Image Check --}}
                                 <div
                                     class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
                                     <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
                                         class="w-full h-full object-cover">
                                 </div>
+
                                 <div class="flex-1 text-center sm:text-left">
+                                    {{-- 2. Safe Title Check --}}
                                     <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
-                                        {{ $item->product->title ?? '' }}</h4>
+                                        {{ $item->product->title ?? 'Product Not Available' }}
+                                    </h4>
 
                                     @if ($item->variation)
                                         <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
                                             @foreach ($item->variation->attributes as $attr)
                                                 <span
-                                                    class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded text-gray-600 uppercase">{{ $attr->attributeValue->name }}</span>
+                                                    class="px-2 py-0.5 text-[10px] font-bold bg-gray-100 rounded text-gray-600 uppercase">
+                                                    {{ $attr->attributeValue->name ?? '' }}
+                                                </span>
                                             @endforeach
                                         </div>
-                                        <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-tighter">SKU:
-                                            {{ $item->variation->sku_code ?? 'N/A' }}</p>
                                     @endif
 
                                     <p class="text-gray-900 font-medium">
@@ -69,17 +74,29 @@
                                     </p>
                                 </div>
 
-                                @if ($order->status == 'delivered')
-                                    <button
-                                        class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2">
+                                {{-- 3. Safe Review Button Logic --}}
+                                @php
+                                    // Check if product exists and if order is delivered
+                                    $canReview =
+                                        $item->product &&
+                                        ($order->status === \App\Enums\Status::Delivered->value ||
+                                            strtolower($order->status) == 'delivered');
+                                @endphp
+
+                                @if ($canReview)
+                                    <button type="button"
+                                        onclick="openReviewModal('{{ $item->product->id }}', '{{ $item->product->title }}', '{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}', '{{ $item->variation->display_name ?? '' }}', '{{ $item->variation_id }}')"
+                                        class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2 cursor-pointer">
                                         <i class="far fa-star"></i> Write Review
                                     </button>
                                 @else
                                     <button disabled
                                         class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-[10px] font-bold flex items-center gap-2 cursor-not-allowed">
-                                        <i class="fas fa-lock"></i> Locked
+                                        <i class="fas fa-lock"></i>
+                                        {{ !$item->product ? 'Item Not Found' : 'Locked' }}
                                     </button>
                                 @endif
+
                             </div>
                         @endforeach
                     </div>
@@ -184,8 +201,7 @@
                             // redx
                             elseif (str_contains($courierName, 'redx')) {
                                 $trackingUrl = "https://redx.com.bd/track/{$consignmentId}";
-                            }
-                            elseif (isset($order->courier_info['url'])) {
+                            } elseif (isset($order->courier_info['url'])) {
                                 $trackingUrl = $order->courier_info['url'];
                             }
                         @endphp
@@ -239,9 +255,9 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-gray-900 text-md">{{ $order->customer->name }}</p>
+                                <p class="text-gray-900 text-md">{{ $order->customer->name ?? '' }}</p>
                                 <p class="text-sm text-gray-500 leading-relaxed font-medium">
-                                    {{ $order->customer->address }}</p>
+                                    {{ $order->customer->address ?? '' }}</p>
                             </div>
                         </div>
                         <div class="flex items-center ">
@@ -254,7 +270,7 @@
                                     </path>
                                 </svg>
                             </div>
-                            <p class="text-gray-900 text-md">{{ $order->customer->phone }}</p>
+                            <p class="text-gray-900 text-md">{{ $order->customer->phone ?? '' }}</p>
                         </div>
                     </div>
                 </div>
@@ -335,4 +351,183 @@
             </div>
         </div>
     </section>
+    <!-- Review Modal -->
+    <div id="review-modal"
+        class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onclick="closeReviewModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl cursor-pointer border-none bg-transparent">&times;</button>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Give Product Review</h2>
+
+            <!-- Added enctype for file upload -->
+            <form action="{{ route('user.review.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="product_id" id="modal-product-id">
+                <input type="hidden" name="variation_id" id="modal-variation-id">
+                <input type="hidden" name="rating" id="modal-rating-value" value="5">
+
+                <!-- Product Info -->
+                <div class="flex gap-4 mb-6">
+                    <img id="modal-product-img" src="" class="w-16 h-16 rounded-lg border object-cover">
+                    <div>
+                        <h4 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h4>
+                        <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- Stars Section -->
+                <div class="mb-4">
+                    <p class="text-sm font-bold text-gray-700 mb-2">Rating:</p>
+                    <div class="flex gap-2 text-2xl text-yellow-400" id="star-container">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <i class="fas fa-star cursor-pointer star-btn" data-index="{{ $i }}"></i>
+                        @endfor
+                    </div>
+                </div>
+
+                <!-- Comment -->
+                <div class="mb-4">
+                    <p class="text-sm font-bold text-gray-700 mb-2">Your Review:</p>
+                    <textarea name="comment" rows="3" required
+                        class="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:border-[#FF6A00] bg-gray-50"
+                        placeholder="Write your feedback..."></textarea>
+                </div>
+
+                <!-- Image Upload Section -->
+                <div class="mb-6">
+                    <p class="text-sm font-bold text-gray-700 mb-2">Upload Photos:</p>
+                    <div class="flex flex-wrap gap-2" id="review-image-preview">
+                        <label
+                            class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-orange-500">
+                            <input type="file" name="images[]" multiple accept="image/*" class="hidden"
+                                onchange="handleReviewImagePreview(this)">
+                            <i class="fas fa-camera text-gray-400"></i>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3">
+                    <button type="submit"
+                        class="flex-1 bg-[#1D2128] text-white py-3 rounded-xl font-bold hover:bg-black transition-all cursor-pointer">Submit
+                        Review</button>
+                    <button type="button" onclick="closeReviewModal()"
+                        class="px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 cursor-pointer">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
+@push('scripts')
+    <script>
+        // একাধিক ফাইল স্টোর করার জন্য একটি গ্লোবাল অবজেক্ট
+        let reviewFilesContainer = new DataTransfer();
+
+        function handleReviewImagePreview(input) {
+            const container = document.getElementById('review-image-preview');
+            const addButton = container.querySelector('label');
+
+            if (input.files) {
+                const newFiles = Array.from(input.files);
+                const currentCount = reviewFilesContainer.files.length;
+
+                // Check if total files will exceed 5
+                if (currentCount + newFiles.length > 5) {
+                    toastr.error("You can only upload a maximum of 5 images.");
+                    input.value = ""; // Clear the selection
+                    return;
+                }
+
+                newFiles.forEach(file => {
+                    reviewFilesContainer.items.add(file);
+
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className =
+                            'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
+                        div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeReviewImage(this, '${file.name}')"
+                        class="absolute top-0 right-0 bg-red-500 text-white p-1 cursor-pointer">
+                        <i class="fas fa-times text-[10px]"></i>
+                    </button>
+                `;
+                        container.insertBefore(div, addButton);
+                    }
+                    reader.readAsDataURL(file);
+                });
+
+                // Sync the input with our custom container
+                input.files = reviewFilesContainer.files;
+            }
+        }
+
+        // ইমেজ রিমুভ করার ফাংশন
+        function removeReviewImage(element, fileName) {
+            const input = document.querySelector('input[name="images[]"]');
+
+            // ১. লিস্ট থেকে ফাইলটি বাদ দেওয়া
+            const newDataTransfer = new DataTransfer();
+            Array.from(reviewFilesContainer.files).forEach(file => {
+                if (file.name !== fileName) {
+                    newDataTransfer.items.add(file);
+                }
+            });
+            reviewFilesContainer = newDataTransfer;
+            input.files = reviewFilesContainer.files;
+
+            // ২. প্রিভিউ বক্সটি রিমুভ করা
+            element.parentElement.remove();
+        }
+
+        // মোডাল ক্লোজ করার সময় সব ক্লিয়ার করা
+        function closeReviewModal() {
+            const modal = document.getElementById('review-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+
+                modal.querySelector('form').reset();
+
+                // গ্লোবাল ফাইল কন্টেইনার ক্লিয়ার করা
+                reviewFilesContainer = new DataTransfer();
+
+                const previews = modal.querySelectorAll('.preview-item');
+                previews.forEach(el => el.remove());
+            }
+        }
+
+        // বাকি ফাংশনগুলো (openReviewModal, Star Rating) আগের মতোই থাকবে...
+        function openReviewModal(id, name, img, variant, variationId) {
+            document.getElementById('modal-product-id').value = id;
+            document.getElementById('modal-product-name').innerText = name;
+            document.getElementById('modal-product-img').src = img;
+            document.getElementById('modal-product-variant').innerText = variant ? '(' + variant + ')' : '';
+            document.getElementById('modal-variation-id').value = variationId || '';
+
+            const modal = document.getElementById('review-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        const stars = document.querySelectorAll('.star-btn');
+        const ratingInput = document.getElementById('modal-rating-value');
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const index = this.getAttribute('data-index');
+                ratingInput.value = index;
+                stars.forEach(s => {
+                    if (s.getAttribute('data-index') <= index) {
+                        s.classList.remove('text-gray-200');
+                        s.classList.add('text-yellow-400');
+                    } else {
+                        s.classList.remove('text-yellow-400');
+                        s.classList.add('text-gray-200');
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

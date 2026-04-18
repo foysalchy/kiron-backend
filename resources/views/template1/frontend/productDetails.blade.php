@@ -103,41 +103,26 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap md:flex-nowrap items-center gap-3 mb-8">
-                        <!-- Add To Cart -->
-                        <button onclick="handleAddToCart()"
-                            class="flex-1 bg-[#00A651] hover:bg-green-700 text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-shopping-cart h-5 w-5 mr-2">
-                                <circle cx="8" cy="21" r="1"></circle>
-                                <circle cx="19" cy="21" r="1"></circle>
-                                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
-                                </path>
-                            </svg>
-                            <span class="text-md whitespace-nowrap">Add To Cart</span>
+                        <!-- ১. Add To Cart বাটন -->
+                        <button id="btn-cart" onclick="handleAddToCart()"
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 bg-[#00A651] hover:bg-green-700 text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Add To Cart
                         </button>
 
-                        <!-- Order Now -->
-                        <button onclick="handleAddToCart(true)"
-                            class="flex-1 bg-[#FFCF00] hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
-                            <i class="fas fa-bolt text-xs"></i>
-                            <span class="text-md whitespace-nowrap">Order Now</span>
+                        <!-- ২. Order Now বাটন -->
+                        <button id="btn-order" onclick="handleAddToCart(true)"
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 bg-[#FFCF00] hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Order Now
                         </button>
 
-                        <!-- Wishlist  -->
-                        <button type="button" onclick="toggleWishlist({{ $product->id }})"
-                            class="flex-1 bg-white border-2 border-gray-100 hover:border-red-200 hover:text-red-500 text-gray-600 h-12 rounded-lg font-bold flex items-center justify-center gap-2 cursor-pointer transition-all group shadow-sm">
-                            <svg id="wish-icon-{{ $product->id }}" xmlns="http://www.w3.org/2000/svg" width="18"
-                                height="18" viewBox="0 0 24 24" fill="{{ $isWishlisted ? '#ef4444' : 'none' }}"
-                                stroke="{{ $isWishlisted ? '#ef4444' : 'currentColor' }}" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round" class="transition-colors duration-300">
-                                <path
-                                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z">
-                                </path>
-                            </svg>
-                            <span class="text-md whitespace-nowrap">Wishlist</span>
+                        <!-- ৩. Wishlist বাটন -->
+                        <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 bg-white border-2 border-gray-100 text-gray-600 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Wishlist
                         </button>
-
                     </div>
 
                     <!-- Trust Icons -->
@@ -261,8 +246,9 @@
                     class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
 
                 <button onclick="switchTab('review')" id="tab-btn-review"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Reviews
-                    (42)</button>
+                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
+                    Reviews ({{ $product->reviews->count() }})
+                </button>
             </div>
 
             <!-- Tab Content Area -->
@@ -339,119 +325,118 @@
 
 
                 <!-- Section: Review -->
-                <div id="tab-content-review" class="tab-content hidden">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Customer Reviews</h3>
+                <div id="tab-content-review" class="tab-content hidden px-2">
+                    <h3 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h3>
+
+                    @php
+                        $reviews = $product->reviews;
+                        $avgRating = $reviews->avg('rating') ?? 0;
+                        $totalReviews = $reviews->count();
+                        $avatarColors = ['bg-orange-600', 'bg-blue-600', 'bg-purple-600', 'bg-indigo-600'];
+                    @endphp
 
                     <!-- Review Summary Card -->
-                    <div class="bg-gray-50/50 rounded-xl p-6 mb-10 border border-gray-100">
-                        <div class="text-3xl font-bold text-orange-500 mb-1">4.8</div>
-                        <div class="flex text-yellow-400 text-sm mb-1 gap-0.5">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star-half-alt text-gray-300"></i>
+                    <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
+                        <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
+                        <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <i
+                                    class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-300' }}"></i>
+                            @endfor
                         </div>
-                        <div class="text-sm text-gray-800 font-medium">42 Reviews</div>
+                        <div class="text-sm text-gray-900 font-bold">{{ $totalReviews }} Reviews</div>
                     </div>
 
                     <!-- Individual Reviews List -->
                     <div class="space-y-0">
+                        @forelse($reviews as $index => $review)
+                            <div class="py-8 border-b border-gray-100 last:border-0">
+                                <div class="flex items-start gap-5">
 
-                        <!-- Review 1 -->
-                        <div class="py-8 border-b border-gray-100 last:border-0">
-                            <div class="flex items-start gap-4">
-                                <!-- Avatar -->
-                                <div
-                                    class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    RH</div>
+                                    <!-- Initials Avatar (Like "RH" or "F") -->
+                                    @php
+                                        $nameParts = explode(' ', $review->customer->name ?? 'User');
+                                        $initials = '';
+                                        foreach ($nameParts as $part) {
+                                            $initials .= substr($part, 0, 1);
+                                        }
+                                        $initials = strtoupper(substr($initials, 0, 2));
+                                    @endphp
 
-                                <div class="flex-1">
-                                    <!-- Name, Stars and Date on Same Line -->
-                                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-800">Rahim Uddin</h4>
-                                        <div class="flex text-yellow-400 text-[10px] gap-0.5">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="fas fa-star"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-500">2 days ago</span>
+                                    <div
+                                        class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-white rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
+                                        {{ $initials }}
                                     </div>
 
-                                    <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Great product! The sound quality
-                                        is excellent and the light is very nice. Excellent value for money. I would
-                                        recommend it to everyone.
-                                    </p>
+                                    <div class="flex-1">
+                                        <!-- Header Line: Name, Stars, Date -->
+                                        <div class="flex items-center gap-3 mb-2">
+                                            <h4 class="text-md font-bold text-gray-900">
+                                                {{ $review->customer->name ?? 'Customer' }}</h4>
 
-                                    <!-- Variant Tag -->
-                                    <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Blue
-                                        - Medium</span>
-                                </div>
-                            </div>
-                        </div>
+                                            <div class="flex text-yellow-400 text-[10px] gap-0.5">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
+                                                @endfor
+                                            </div>
 
-                        <!-- Review 2 -->
-                        <div class="py-8 border-b border-gray-100 last:border-0">
-                            <div class="flex items-start gap-4">
-                                <!-- Avatar -->
-                                <div
-                                    class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    F</div>
-
-                                <div class="flex-1">
-                                    <!-- Name, Stars and Date -->
-                                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-900">Fatema Khatun</h4>
-                                        <div class="flex text-yellow-400 text-[10px] gap-0.5">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="far fa-star text-gray-300"></i>
+                                            <span class="text-sm text-gray-400 font-medium ml-1">
+                                                {{ $review->created_at->diffForHumans() }}
+                                            </span>
                                         </div>
-                                        <span class="text-sm text-gray-500">1 week ago</span>
-                                    </div>
 
-                                    <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life
-                                        could have been a bit longer. Still satisfied.</p>
+                                        <!-- Review Content inside the loop -->
+                                        <p class="text-md text-gray-700 leading-relaxed mb-4">
+                                            {{ $review->comment }}
+                                        </p>
 
-                                    <!-- Variant Tag -->
-                                    <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Red
-                                        - Small</span>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Review 2 -->
-                        <div class="py-8 border-b border-gray-100 last:border-0">
-                            <div class="flex items-start gap-4">
-                                <!-- Avatar -->
-                                <div
-                                    class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center text-md font-bold shrink-0">
-                                    F</div>
+                                        @if ($review->images && count($review->images) > 0)
+                                            <!-- Thumbnails -->
+                                            <div class="flex flex-wrap gap-3 mb-4">
+                                                @foreach ($review->images as $img)
+                                                    <div
+                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
+                                                        <img src="{{ asset('storage/' . $img) }}"
+                                                            onclick="expandReviewImage(this.src, '{{ $review->id }}')"
+                                                            class="w-full h-full object-cover" alt="Review Image">
+                                                    </div>
+                                                @endforeach
+                                            </div>
 
-                                <div class="flex-1">
-                                    <!-- Name, Stars and Date -->
-                                    <div class="flex flex-wrap items-center gap-2 mb-2">
-                                        <h4 class="text-md text-gray-900">Fatema Khatun</h4>
-                                        <div class="flex text-yellow-400 text-[10px] gap-0.5">
-                                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                                class="far fa-star text-gray-300"></i>
+                                            <!-- Expanded Image Container (Hidden by default) -->
+                                            <div id="expanded-container-{{ $review->id }}"
+                                                class="hidden mb-6 transition-all duration-500">
+                                                <div class="relative inline-block group">
+                                                    <img id="large-view-{{ $review->id }}" src=""
+                                                        class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
+
+                                                    <!-- Close Button -->
+                                                    <button onclick="closeReviewImage('{{ $review->id }}')"
+                                                        class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                                                        <i class="fas fa-times text-xs"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <!-- Variant Tag -->
+                                        <div
+                                            class="inline-block bg-[#F3F4F6] text-gray-500 text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">
+                                            @if ($review->variation)
+                                                {{ $review->variation->display_name }}
+                                            @else
+                                                Single Product
+                                            @endif
                                         </div>
-                                        <span class="text-sm text-gray-500">1 week ago</span>
                                     </div>
-
-                                    <!-- Comment -->
-                                    <p class="text-md text-gray-600 leading-relaxed mb-3">Good product. The battery life
-                                        could have been a bit longer. Still satisfied.</p>
-
-                                    <!-- Variant Tag -->
-                                    <span
-                                        class="inline-block bg-gray-100 text-gray-500 text-xs px-2.5 py-1 rounded-sm font-medium">Red
-                                        - Small</span>
                                 </div>
                             </div>
-                        </div>
-
+                        @empty
+                            <div class="text-center py-20 bg-white">
+                                <p class="text-gray-400 font-medium italic">No reviews yet. Be the first to share your
+                                    experience!</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -463,6 +448,27 @@
 
 @push('scripts')
     <script>
+        // Function to show the image below thumbnails
+        function expandReviewImage(imgSrc, reviewId) {
+            const container = document.getElementById('expanded-container-' + reviewId);
+            const largeImg = document.getElementById('large-view-' + reviewId);
+
+            // Set the source and show the container
+            largeImg.src = imgSrc;
+            container.classList.remove('hidden');
+
+            // Optional: Smooth scroll to the expanded image
+            container.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        // Function to hide the expanded image
+        function closeReviewImage(reviewId) {
+            const container = document.getElementById('expanded-container-' + reviewId);
+            container.classList.add('hidden');
+        }
         // geneal function
         function changeImage(src) {
             document.getElementById('mainImage').src = src;

@@ -15,14 +15,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AuthController extends FrontendController
 {
     public function register()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        return view($template . '.frontend.user.register');
+        return  $this->view('frontend.user.register');
     }
 
     // user registration
@@ -56,10 +53,7 @@ class AuthController extends Controller
 
     public function login()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        return view($template . '.frontend.user.login');
+        return  $this->view('frontend.user.login');
     }
     // login user
     public function storeLogin(Request $request)
@@ -104,11 +98,9 @@ class AuthController extends Controller
     }
     public function profile()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
         $user = auth('customer')->user();
 
-        return view($template . '.frontend.user.profile', compact('user'));
+        return  $this->view('frontend.user.profile', compact('user'));
     }
     // update your profile
     public function updateProfile(Request $request)
@@ -183,16 +175,12 @@ class AuthController extends Controller
     }
     public function dashboard()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
         $user = Auth::guard('customer')->user();
 
         $allOrders = $user->orders()->with('orderDetails.product')->latest()->get();
         $recentOrders = $allOrders->take(5);
 
-        $wishlistItems = Wishlist::where('company_id', $company->id)
-            ->with(['product.variations', 'product.brand'])
+        $wishlistItems = Wishlist::with(['product.variations', 'product.brand'])
             ->latest()
             ->get();
 
@@ -200,7 +188,7 @@ class AuthController extends Controller
         $totalSpent = $allOrders->where('status', 'delivered')->sum('grand_total');
         $wishlistCount = $wishlistItems->count();
 
-        return view($template . '.frontend.user.dashboard', compact(
+        return  $this->view('frontend.user.dashboard', compact(
             'user',
             'totalOrders',
             'totalSpent',

@@ -5,13 +5,10 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class AboutController extends Controller
+class AboutController extends FrontendController
 {
     public function index()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        return view($template . '.frontend.about');
+        return $this->view('frontend.about');
     }
 }

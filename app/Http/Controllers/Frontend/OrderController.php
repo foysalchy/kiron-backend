@@ -3,28 +3,26 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Enums\Status;
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{CustomerPaymentMethod, Order, Party, ProductVariation, Warehouse};
+use App\Models\{CustomerPaymentMethod, Order, Party, ProductReview, ProductVariation, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\{DB, Hash, Log, Session};
 
-class OrderController extends Controller
+class OrderController extends FrontendController
 {
     public function __construct(protected OrderService $orderService) {}
 
     public function index($store)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
 
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
-        $paymentMethods = CustomerPaymentMethod::where('company_id', $company->id)
-        ->where('status', Status::Active->value)
-        ->get();
+        $paymentMethods = CustomerPaymentMethod::where('status', Status::Active->value)
+            ->get();
 
         // Auto-create draft for logged in users
         if (auth('customer')->check()) {
@@ -42,7 +40,7 @@ class OrderController extends Controller
         $total = ($subtotal - $discount) + $shipping;
         $shipping_area = session()->get('shipping_area', 'inside');
 
-        return view($template . '.frontend.checkout', compact(
+        return $this->view('frontend.checkout', compact(
             'cartContent',
             'subtotal',
             'discount',
@@ -64,12 +62,12 @@ class OrderController extends Controller
 
     private function createDraftOrder($store, $data)
     {
-        $company = getCurrentCompany();
+
         $cartContent = Cart::content();
         if ($cartContent->isEmpty()) return ['success' => false, 'error' => 'Cart is empty'];
 
         // 1. Strict Warehouse Check
-        $warehouseQuery = Warehouse::where('company_id', $company->id)->active();
+        $warehouseQuery = Warehouse::active();
         foreach ($cartContent as $item) {
             $variationId = $item->options->variation_id ?? null;
             $warehouseQuery->whereHas('stocks', function ($query) use ($variationId, $item) {
@@ -88,7 +86,7 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $customer = auth('customer')->check() ? auth('customer')->user() : Party::updateOrCreate(
-                ['company_id' => $company->id, 'phone' => $data['phone'], 'type' => Party::TYPE_CUSTOMER],
+                ['phone' => $data['phone'], 'type' => Party::TYPE_CUSTOMER],
                 ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
             );
 
@@ -110,7 +108,6 @@ class OrderController extends Controller
             ];
 
             $orderData = [
-                'company_id'    => $company->id,
                 'warehouse_id'  => $exactWarehouse->id,
                 'customer_id'   => $customer->id,
                 'items'         => $items,
@@ -139,17 +136,16 @@ class OrderController extends Controller
     public function storeOrder($store, Request $request)
     {
         $request->validate(['name' => 'required', 'phone' => 'required', 'address' => 'required']);
-        $company = getCurrentCompany();
 
         // 1. Try to find the draft order
         $orderId = Session::get('current_draft_order_id');
-        $order = Order::where('company_id', $company->id)->where('status', Status::Draft->value)->find($orderId);
+        $order = Order::where('status', Status::Draft->value)->find($orderId);
 
         // 2. If session failed, try to find by phone
         if (!$order) {
-            $customer = Party::where('company_id', $company->id)->where('phone', $request->phone)->first();
+            $customer = Party::where('phone', $request->phone)->first();
             if ($customer) {
-                $order = Order::where('customer_id', $customer->id)->where('status', Status::Draft->value)->latest()->first();
+                $order = Order::where('status', Status::Draft->value)->latest()->first();
             }
         }
 
@@ -189,47 +185,46 @@ class OrderController extends Controller
     }
     public function orderDetails($store, $id)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        $order = Order::where('company_id', $company->id)
-            ->with([
-                'customer',
-                'orderDetails.product',
-                'orderDetails.variation.attributes.attributeValue',
-                'orderDetails.variation.attributes.attributeGroup'
-            ])
+        $order = Order::with([
+            'customer',
+            'orderDetails.product' => function ($query) {
+                $query->withTrashed(); // This loads deleted products
+            },
+            'orderDetails.variation.attributes.attributeValue',
+            'orderDetails.variation.attributes.attributeGroup'
+        ])
             ->find($id);
 
         if (!$order) {
             abort(404);
         }
+
+        // Authorization check
         if (auth('customer')->check() && $order->customer_id !== auth('customer')->id()) {
-            abort(403, 'এই অর্ডারটি দেখার অনুমতি আপনার নেই।');
+            abort(403, 'Unauthorized access to this order details.');
         }
 
-        return view($template . '.frontend.orderDetails', compact('order'));
+        return $this->view('frontend.orderDetails', compact('order'));
     }
     public function invoice($store, $id)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
-        $order = Order::where('company_id', $company->id)
-            ->with(['customer', 'orderDetails.product', 'company'])
+        $order = Order::with([
+            'customer',
+            'orderDetails.product' => function ($q) {
+                $q->withTrashed();
+            }, // Add this
+            'company'
+        ])
             ->findOrFail($id);
 
-        return view($template . '.frontend.invoice', compact('order'));
+        return $this->view('frontend.invoice', compact('order'));
     }
     public function trackOrder(Request $request)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
         $order = null;
 
         if ($request->filled('order_no')) {
-            $order = Order::where('company_id', $company->id)
-                ->where('order_no', $request->order_no)
+            $order = Order::where('order_no', $request->order_no)
                 ->first();
 
             if (!$order) {
@@ -237,6 +232,57 @@ class OrderController extends Controller
             }
         }
 
-        return view($template . '.frontend.product-track', compact('order'));
+        return $this->view('frontend.product-track', compact('order'));
+    }
+    public function storeReview(Request $request)
+    {
+        // 1. Added variation_id to validation
+        $request->validate([
+            'product_id'   => 'required|exists:products,id',
+            'variation_id' => 'nullable',
+            'rating'       => 'required|integer|min:1|max:5',
+            'comment'      => 'nullable|string|max:1000',
+            'images'       => 'nullable|array|max:5',
+            'images.*'     => 'nullable|image|max:2048'
+        ], [
+            // Custom error message
+            'images.max'   => 'You can only upload a maximum of 5 images.',
+        ]);
+
+        if (!auth('customer')->check()) {
+            return back()->with('error', 'Please login to review.');
+        }
+
+        try {
+            $imagePaths = [];
+
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = FileUploadHelper::uploadImage(
+                        $image,
+                        'reviews',
+                        'public',
+                        2048
+                    );
+                    $imagePaths[] = $path;
+                }
+            }
+
+            ProductReview::create([
+                'company_id'   => getCurrentCompany()->id,
+                'product_id'   => $request->product_id,
+                'variation_id' => $request->filled('variation_id') ? (int)$request->variation_id : null,
+                'customer_id'  => auth('customer')->id(),
+                'rating'       => $request->rating,
+                'comment'      => $request->comment,
+                // FIXED: Removed json_encode because of the 'array' cast in the model
+                'images'       => !empty($imagePaths) ? $imagePaths : null,
+                'status'       => Status::Pending->value,
+            ]);
+
+            return back()->with('success', 'Review submitted successfully!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }

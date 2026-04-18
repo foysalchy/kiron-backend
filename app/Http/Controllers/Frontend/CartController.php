@@ -10,13 +10,12 @@ use App\Services\CouponService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 
-class CartController extends Controller
+class CartController extends FrontendController
 {
     public function __construct(protected CouponService $couponService) {}
     public function index($store)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
+
 
         $cartContent = Cart::content();
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
@@ -47,8 +46,7 @@ class CartController extends Controller
 
         $total = ($subtotal - $discount) + $shipping;
 
-        return view(
-            $template . '.frontend.cart',
+       return $this->view('frontend.cart',
             compact(
                 'cartContent',
                 'subtotal',
@@ -70,7 +68,7 @@ class CartController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
-            // 
+            //
             $discount = 0;
             if (session()->has('coupon')) {
                 try {

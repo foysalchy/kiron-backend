@@ -6,13 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 
-class BlogController extends Controller
+class BlogController extends FrontendController
 {
     public function index(Request $request, $store)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
         $availableTags = Blog::active()
             ->whereNotNull('meta_keywords')
             ->get()
@@ -39,13 +36,10 @@ class BlogController extends Controller
 
         $blogs = $query->latest()->paginate(6)->withQueryString();
 
-        return view($template . '.frontend.blog', compact('blogs', 'availableTags'));
+        return  $this->view('frontend.blog', compact('blogs', 'availableTags'));
     }
     public function blogDetails($store, $slug)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-
         $slugWithDash = str_replace(['%20', ' '], '-', $slug);
         $slugWithSpace = str_replace(['%20', '-'], ' ', $slug);
 
@@ -55,21 +49,18 @@ class BlogController extends Controller
                     ->orWhere('slug', $slugWithDash)
                     ->orWhere('slug', $slugWithSpace);
             })
-            ->where('company_id', $company->company_id ?? $company->id)
             ->active()
             ->firstOrFail();
 
         $relatedPosts = Blog::active()
-            ->where('company_id', $company->company_id ?? $company->id)
             ->where('id', '!=', $blog->id)
             ->latest()->take(3)->get();
 
 
         $popularTags = Blog::active()
-            ->where('company_id', $company->company_id ?? $company->id)
             ->whereNotNull('meta_keywords')
             ->get()->pluck('meta_keywords')->flatten()->unique()->filter()->values();
 
-        return view($template . '.frontend.blogDetails', compact('blog', 'relatedPosts', 'popularTags'));
+        return  $this->view('frontend.blogDetails', compact('blog', 'relatedPosts', 'popularTags'));
     }
 }
