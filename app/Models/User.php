@@ -30,6 +30,7 @@ class User extends Authenticatable
         'profile',
         'status',
         'role',
+        'is_super_admin',
         'password',
     ];
 
@@ -53,6 +54,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_super_admin' => 'boolean',
         ];
     }
 
@@ -63,6 +65,10 @@ class User extends Authenticatable
     public function blog(): HasMany
     {
         return $this->hasMany(Blog::class);
+    }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
     }
     public function isSuperAdmin(): bool
     {

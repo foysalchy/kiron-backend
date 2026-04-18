@@ -23,7 +23,7 @@ class LandingPageService
 
             // Apply filters
             if (isset($filters['status'])) {
-                if ($filters['status'] === Status::Trashed->value) {
+                if ($filters['status'] == Status::Trashed->value) {
                     $query->onlyTrashed();
                 } else {
                     $query->where('status', $filters['status']);

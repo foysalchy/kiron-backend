@@ -10,13 +10,15 @@ class StoreLandingPageRequest extends BaseCompanyRequest
 {
     public function rules(): array
     {
+
         return array_merge(
             $this->companyRules(),
             [
                 'product_id' => ['nullable', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'title' => ['nullable', 'string', 'max:255'],
-                'short_description' => ['nullable', 'string', 'max:500'],
+                'domain' => ['nullable','string'],
+                'short_description' => ['nullable', 'string'],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
                 'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv', 'max:51200'],
                 'description' => ['nullable', 'string'],

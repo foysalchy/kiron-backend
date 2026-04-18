@@ -22,6 +22,7 @@ class Company extends Model
         'business_type',
         'invoice_template',
         'theme_template',
+        'pricing_package_id',
         'status',
     ];
 
@@ -81,6 +82,10 @@ class Company extends Model
     public function generatePayslips(): HasMany
     {
         return $this->hasMany(GeneratePayslip::class);
+    }
+    public function pricingPackage()
+    {
+        return $this->belongsTo(PricingPackage::class, 'pricing_package_id');
     }
 
 

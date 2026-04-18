@@ -46,6 +46,7 @@ class BulkActionController extends Controller
         'pay-rolls'        => \App\Models\PayRoll::class,
         'positions'        => \App\Models\Position::class,
         'pricing-packages'        => \App\Models\PricingPackage::class,
+        'landings'        => \App\Models\LandingPage::class,
     ];
 
     /**
