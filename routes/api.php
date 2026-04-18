@@ -85,6 +85,7 @@ use App\Http\Controllers\Api\PayslipController;
 use App\Http\Controllers\Api\PaySlipManagerController;
 use App\Http\Controllers\Api\PeriodController;
 use App\Http\Controllers\Api\PeriodTypeController;
+use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\PositionController;
 use App\Http\Controllers\Api\PosOrderController;
 use App\Http\Controllers\Api\PricingController;
@@ -101,6 +102,7 @@ use App\Http\Controllers\Api\ResignationController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
+use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SelectOptionController;
 use App\Http\Controllers\Api\SiteSettingController;
@@ -231,6 +233,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
                 Route::get('/support-departments', [SelectOptionController::class, 'supportDepartmentOptions']);
                 Route::get('/customer-groups', [SelectOptionController::class, 'customerGroups']);
+                Route::get('/landing-domains', [SelectOptionController::class, 'getAvailableDomains']);
             });
             //party routes
             Route::prefix('parties')->group(function () {
@@ -655,8 +658,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('{id}/restore', [RequisitionController::class, 'restore']);
                 Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
             });
-  
-  
+
+
             // Landing Pages Routes
             Route::prefix('landing-pages')->group(function () {
                 Route::get('/', [LandingPageController::class, 'index']);
@@ -1414,6 +1417,15 @@ Route::prefix('v1')->group(function () {
                 Route::patch('{id}/toggle-frontend', 'toggleFrontend');
                 Route::delete('{id}', 'destroy');
             });
+            Route::prefix('roles')->group(function () {
+                Route::get('/', [RoleController::class, 'index']);
+                Route::post('/', [RoleController::class, 'store']);
+                Route::get('/{id}', [RoleController::class, 'show']);
+                Route::post('/update/{id}', [RoleController::class, 'update']);
+                Route::delete('/{id}', [RoleController::class, 'destroy']);
+            });
+
+            Route::get('/permissions', [PermissionController::class, 'index']);
         });
     });
     //pricing plan

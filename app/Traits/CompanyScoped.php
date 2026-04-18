@@ -30,6 +30,8 @@ trait CompanyScoped
 
         // Apply global scope for filtering
         static::addGlobalScope('company', function (Builder $builder) {
+
+
             if (Auth::check()) {
                 $user = Auth::user();
 

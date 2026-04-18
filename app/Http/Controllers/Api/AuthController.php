@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{RegisterRequest, UpdateProfileRequest, UpdatePasswordRequest};
 use App\Helpers\{FileUploadHelper, LogHelper};
+use App\Models\Permission;
 use App\Models\User;
 use App\Models\UserLoginHistory;
 use Illuminate\Http\Request;
@@ -66,7 +67,7 @@ class AuthController extends Controller
             ]);
         }
 
-        $user = Auth::user();
+        $user = Auth::user()->load(['company.pricingPackage', 'roles.permissions']);
 
         // Define allowed statuses for login (Draft, Pending, Active)
         $allowedStatuses = [Status::Draft->value, Status::Pending->value, Status::Active->value];
@@ -90,7 +91,35 @@ class AuthController extends Controller
 
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
-        $user->load('company');
+
+        // ========================================================
+        // 🔥 The Magic: Calculating Effective Permissions
+        // ========================================================
+        $effectivePermissions = [];
+
+        if ($user->is_super_admin) {
+            $effectivePermissions = Permission::pluck('name')->toArray();
+        } else {
+            $packageFeatures = $user->company?->pricingPackage?->features ?? [];
+            if (is_string($packageFeatures)) {
+                $packageFeatures = json_decode($packageFeatures, true) ?? [];
+            }
+
+            foreach ($user->roles as $role) {
+                foreach ($role->permissions as $permission) {
+  
+                    if (empty($permission->feature_dependency) || in_array($permission->feature_dependency, $packageFeatures)) {
+                        $effectivePermissions[] = $permission->name;
+                    }
+                }
+            }
+
+            $effectivePermissions = array_values(array_unique($effectivePermissions));
+        }
+        // ========================================================
+
+        $primaryRoleName = $user->is_super_admin ? 'Super Admin' : ($user->roles->first()?->name ?? 'User');
+
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
@@ -102,14 +131,17 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'company_id' => $user->company_id,
-                'role' => $user->role,
-                'status' => $user->status, // Add status here so frontend knows
+                'role' => $primaryRoleName,
+                'is_super_admin' => $user->is_super_admin,
+                'status' => $user->status,
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
                 'company' => $user->company,
             ],
+            'permissions' => $effectivePermissions,
         ]);
     }
+
     /**
      * Register
      */

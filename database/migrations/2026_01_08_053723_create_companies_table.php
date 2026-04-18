@@ -21,6 +21,7 @@ return new class extends Migration
             $table->json('theme_template')->nullable();
             $table->string('logo')->nullable();
             $table->text('address')->nullable();
+            $table->foreignId('pricing_package_id')->nullable()->constrained('pricing_packages')->nullOnDelete();
             $table->tinyInteger('business_type')->default(1);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();

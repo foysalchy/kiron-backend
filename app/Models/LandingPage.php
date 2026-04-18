@@ -17,6 +17,7 @@ class LandingPage extends Model
         'company_id',
         'template_id',
         'product_id',
+        'domain',
         'name',
         'title',
         'short_description',

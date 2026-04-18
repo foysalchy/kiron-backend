@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AccountGroup;
 use App\Models\Area;
@@ -13,6 +14,8 @@ use App\Models\Cell;
 use App\Models\ChartOfAccount;
 use App\Models\CustomerGroup;
 use App\Models\DisposalType;
+use App\Models\Domain;
+use App\Models\DomainSetup;
 use App\Models\MegaCategory;
 use App\Models\Party;
 use App\Models\Product;
@@ -152,7 +155,7 @@ class SelectOptionController extends Controller
                     ->where('bin_id', $binId);
             },
             'variations.stocks.warehouse',
-            'variations.stocks.bin', 
+            'variations.stocks.bin',
         ])
             ->where(function ($q) use ($warehouseId, $binId) {
                 // For Single Products: Check JSON contains both warehouse_id and bin_id
@@ -288,5 +291,21 @@ class SelectOptionController extends Controller
         $groups = CustomerGroup::orderBy('name', 'asc')->get();
 
         return $groups;
+    }
+    public function getAvailableDomains()
+    {
+        $setupDomains = DomainSetup::whereNotNull('custom_domain')
+            ->pluck('custom_domain')
+            ->toArray();
+
+        $multiDomains = Domain::where('status', Status::Active->value)
+            ->pluck('domain')
+            ->toArray();
+
+        $allDomains = array_unique(array_merge($setupDomains, $multiDomains));
+
+        return response()->json([
+            'data' => array_values($allDomains)
+        ]);
     }
 }

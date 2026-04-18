@@ -23,10 +23,10 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->nullable();
+            $table->boolean('is_super_admin')->default(false);
             $table->tinyInteger('status')->default(Status::Active->value);
             $table->rememberToken();
-            $table->timestamps();  
-
+            $table->timestamps();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
