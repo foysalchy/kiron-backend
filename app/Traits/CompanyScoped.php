@@ -30,7 +30,16 @@ trait CompanyScoped
 
         // Apply global scope for filtering
         static::addGlobalScope('company', function (Builder $builder) {
-            
+
+            $company = getCurrentCompany();
+
+
+            if ($company && isset($company->company_id)) {
+                $builder->where('company_id', $company->company_id);
+                return;
+            }
+
+            // Priority 2: Auth User
             if (Auth::check()) {
                 $user = Auth::user();
 
