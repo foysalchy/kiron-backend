@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); 
-            $table->string('group_name'); 
+            $table->string('name');
+            $table->string('group_name');
             $table->string('feature_dependency')->nullable();
+            $table->enum('type', ['company', 'superadmin'])->default('company');
+            $table->unique(['name', 'type']);
             $table->timestamps();
         });
     }

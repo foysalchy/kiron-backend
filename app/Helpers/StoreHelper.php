@@ -23,7 +23,6 @@ if (!function_exists('getCurrentCompany')) {
             return null;
         }
 
-        // ✅ withoutGlobalScopes() — circular loop বন্ধ হবে
         $store = DomainSetup::withoutGlobalScopes()
             ->where('sub_domain', $subdomain)
             ->first();

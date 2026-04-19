@@ -14,10 +14,11 @@ class RoleService
 {
     public function getAllRoles(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
+
+    
         try {
-            $query = Role::with('permissions'); // Load permissions for the frontend
-            
-         
+            $query = Role::with(['permissions', 'users']); // ✅ users যোগ হলো
+
             if (isset($filters['search'])) {
                 $query->where('name', 'like', "%{$filters['search']}%");
             }
@@ -49,13 +50,13 @@ class RoleService
             // Assign to current company automatically
 
             $role = Role::create($data);
-            
+
             // Sync Permissions via Pivot Table
             if (isset($data['permissions'])) {
                 $role->permissions()->sync($data['permissions']);
             }
 
-          //  LogHelper::created('role', $role->id, $role->company_id, $role->name);
+            //  LogHelper::created('role', $role->id, $role->company_id, $role->name);
             DB::commit();
             return $role;
         } catch (\Exception $e) {
@@ -72,12 +73,12 @@ class RoleService
             $role = $this->getRoleById($id);
             $role->update($data);
 
-           
+
             if (isset($data['permissions'])) {
                 $role->permissions()->sync($data['permissions']);
             }
 
-          //  LogHelper::updated('role', $role->id, $role->company_id, $role->name);
+            //  LogHelper::updated('role', $role->id, $role->company_id, $role->name);
             DB::commit();
             return $role;
         } catch (\Exception $e) {
