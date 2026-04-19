@@ -3,7 +3,7 @@
 use App\Models\DomainSetup;
 
 if (!function_exists('getCurrentCompany')) {
-    if (!function_exists('getCurrentCompany')) {
+
     function getCurrentCompany()
     {
         if (request()->is('api/*')) {
@@ -23,7 +23,7 @@ if (!function_exists('getCurrentCompany')) {
             return null;
         }
 
-        // ✅ withoutGlobalScopes() — circular loop বন্ধ হবে
+        // withoutGlobalScopes()
         $store = DomainSetup::withoutGlobalScopes()
             ->where('sub_domain', $subdomain)
             ->first();
@@ -35,4 +35,4 @@ if (!function_exists('getCurrentCompany')) {
         abort(404, 'Store Not Found');
     }
 }
-}
+

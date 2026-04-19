@@ -285,4 +285,37 @@ class OrderController extends FrontendController
             return back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
+    //return order
+    public function requestReturn(Request $request, $store, $id)
+    {
+        $request->validate([
+            'reason'   => 'required|string|max:1000',
+            'images.*' => 'nullable|image|max:2048'
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        // Prevent duplicate requests
+        if ($order->status == Status::ReturnRequest->value) {
+            return back()->with('error', 'Return request already submitted.');
+        }
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns', 'public', 2048);
+            }
+        }
+
+        $order->update([
+            'status' => Status::ReturnRequest->value,
+            'return_info' => [
+                'reason'     => $request->reason,
+                'images'     => $imagePaths,
+                'request_at' => now()->toDateTimeString(),
+            ]
+        ]);
+
+        return back()->with('success', 'Your return request has been submitted.');
+    }
 }

@@ -31,7 +31,14 @@ trait CompanyScoped
         // Apply global scope for filtering
         static::addGlobalScope('company', function (Builder $builder) {
 
-
+  try {
+                $company = getCurrentCompany();
+                if ($company && isset($company->company_id)) {
+                    $builder->where('company_id', $company->company_id);
+                }
+            } catch (\Exception $e) {
+                // Silent fail — boot time এ error হলে ignore
+            }
             if (Auth::check()) {
                 $user = Auth::user();
 
@@ -42,14 +49,7 @@ trait CompanyScoped
             }
 
             // Frontend/Guest: getCurrentCompany থেকে নাও
-            try {
-                $company = getCurrentCompany();
-                if ($company && isset($company->company_id)) {
-                    $builder->where('company_id', $company->company_id);
-                }
-            } catch (\Exception $e) {
-                // Silent fail — boot time এ error হলে ignore
-            }
+
         });
     }
 

@@ -103,21 +103,21 @@
 
                     <!-- Action Buttons -->
                     <div class="flex flex-wrap md:flex-nowrap items-center gap-3 mb-8">
-                        <!-- ১. Add To Cart বাটন -->
+                        <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
                             class="flex-1 bg-[#00A651] hover:bg-green-700 text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
-                        <!-- ২. Order Now বাটন -->
+                        <!-- ২. Order Now -->
                         <button id="btn-order" onclick="handleAddToCart(true)"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
                             class="flex-1 bg-[#FFCF00] hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
-                        <!-- ৩. Wishlist বাটন -->
+                        <!-- ৩. Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
                             class="flex-1 bg-white border-2 border-gray-100 text-gray-600 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
@@ -125,83 +125,41 @@
                         </button>
                     </div>
 
-                    <!-- Trust Icons -->
+                    <!-- Dynamic Trust List -->
                     <div class="space-y-3 text-md mb-6">
-                        <div class="text-[#00A651] flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-truck h-5 w-5">
-                                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
-                                <path d="M15 18H9"></path>
-                                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14">
-                                </path>
-                                <circle cx="17" cy="18" r="2"></circle>
-                                <circle cx="7" cy="18" r="2"></circle>
-                            </svg>
-                            Free delivery on orders over {{ $setup->currency }} 5,000
-                        </div>
-                        <div class="text-[#3B82F6] flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-shield h-5 w-5">
-                                <path
-                                    d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z">
-                                </path>
-                            </svg>
-                            Order before stock runs out!
-                        </div>
-                        <div class="text-[#9333EA] flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-rotate-ccw h-5 w-5">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                <path d="M3 3v5h5"></path>
-                            </svg>
-                            Pay when you receive the product!</div>
-                        <div class="text-[#F15A24] flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                class="lucide lucide-star h-5 w-5">
-                                <path
-                                    d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
-                                </path>
-                            </svg>
-                            Home delivery across Bangladesh within 72 hours</div>
+                        @foreach ($trustBadges->where('page_type', 'product_page') as $item)
+                            <div class="flex items-center gap-2"
+                                style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
+                                <div class="shrink-0">
+                                    @if ($item->icon_file)
+                                        <img src="{{ asset('storage/' . $item->icon_file) }}"
+                                            class="h-5 w-5 object-contain">
+                                    @else
+                                        <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
+                                    @endif
+                                </div>
+                                <span class="">
+                                    {{ $item->title }} {{ $item->subtitle ? ': ' . $item->subtitle : '' }}
+                                </span>
+                            </div>
+                        @endforeach
                     </div>
 
+                    <!-- Dynamic 3-Column Grid -->
                     <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-rotate-ccw h-5 w-5 text-orange-500">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                <path d="M3 3v5h5"></path>
-                            </svg>
-                            <div class="text-[12px] md:text-sm font-medium">Easy Return</div>
-                        </div>
-                        <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-star h-5 w-5 text-orange-500">
-                                <path
-                                    d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
-                                </path>
-                            </svg>
-                            <div class="text-[12px] md:text-sm font-medium">Best Quality</div>
-                        </div>
-                        <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-truck h-5 w-5 text-orange-500">
-                                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
-                                <path d="M15 18H9"></path>
-                                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14">
-                                </path>
-                                <circle cx="17" cy="18" r="2"></circle>
-                                <circle cx="7" cy="18" r="2"></circle>
-                            </svg>
-                            <div class="text-[12px] md:text-sm font-medium">Fast Shipping</div>
-                        </div>
+                        @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
+                            <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
+                                <div class="text-orange-500 shrink-0">
+                                    @if ($card->icon_file)
+                                        <img src="{{ asset('storage/' . $card->icon_file) }}"
+                                            class="h-5 w-5 object-contain">
+                                    @else
+                                        <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
+                                    @endif
+                                </div>
+                                <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
+                            </div>
+                        @endforeach
                     </div>
 
                     <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>

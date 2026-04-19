@@ -45,6 +45,7 @@ class Order extends Model
         'status',
         'note',
         'hold_ref',
+        'return_info',
     ];
 
     protected $casts = [
@@ -62,6 +63,7 @@ class Order extends Model
         'status' => 'integer',
         'courier_info' => 'array',
         'shipping_address' => 'array',
+        'return_info' => 'array',
     ];
 
     /**
@@ -247,6 +249,36 @@ class Order extends Model
             self::PAYMENT_PARTIAL => 'Partial',
             self::PAYMENT_PAID => 'Paid',
             default => 'Unknown',
+        };
+    }
+
+    public function getPaymentStatusColorAttribute(): string
+    {
+        return match ($this->payment_status) {
+            self::PAYMENT_PAID    => 'text-green-600',
+            self::PAYMENT_PARTIAL => 'text-blue-600',
+            self::PAYMENT_UNPAID  => 'text-red-600',
+            default               => 'text-red-600',
+        };
+    }
+    public function getStatusLabelAttribute(): string
+    {
+        // Uses the label() method you defined in your Status Enum
+        return Status::from($this->status)->label();
+    }
+
+    /**
+     * 2. Get Order Status Color (Tailwind classes)
+     */
+    public function getStatusColorAttribute(): string
+    {
+        return match ($this->status) {
+            Status::Pending->value    => 'bg-orange-100 text-orange-700',
+            Status::Processing->value => 'bg-blue-100 text-blue-700',
+            Status::Delivered->value  => 'bg-green-100 text-green-700',
+            Status::Cancelled->value  => 'bg-red-100 text-red-700',
+            Status::ReturnRequest->value => 'bg-purple-100 text-purple-700',
+            default                       => 'bg-gray-100 text-gray-700',
         };
     }
 

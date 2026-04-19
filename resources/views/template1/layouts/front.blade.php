@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -87,7 +87,7 @@
             <button onclick="closeModal()"
                 class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl border-none bg-transparent cursor-pointer">&times;</button>
 
-                
+
             <div id="modal-content-area"></div>
         </div>
     </div>
@@ -111,9 +111,9 @@
                 toastr.error("{{ Session::get('error') }}");
             @endif
 
-             @if (Session::has('warning'))
+            @if (Session::has('warning'))
                 toastr.warning("{{ Session::get('warning') }}");
-                @endif
+            @endif
         });
     </script>
 </body>
