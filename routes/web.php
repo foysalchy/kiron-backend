@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
-    Route::get('/', [HomeController::class, 'index']);
-    Route::get('/blogs', [BlogController::class, 'index']);
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
 
     Route::get('/contact', [ContctController::class, 'index'])->name('contact.index');
@@ -46,6 +46,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
         Route::get('/dashboard', [AuthController::class, 'dashboard'])->name('user.dashboard');
         Route::post('/logout', [AuthController::class, 'logout'])->name('user.logout');
         Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
+        Route::post('/order/return/{id}', [OrderController::class, 'requestReturn'])->name('order.return');
         Route::post('/order/review/store', [OrderController::class, 'storeReview'])->name('user.review.store');
     });
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
@@ -54,6 +55,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
     Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
     Route::get('/flash-sale', [ProductController::class, 'flashSale'])->name('flash.sale');
+    Route::get('/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('search.suggestions');
     Route::get('/carts', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');

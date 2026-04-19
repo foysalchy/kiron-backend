@@ -4,7 +4,7 @@
     <!-- HERO SECTION -->
     <section class="py-6 container mx-auto ">
         <!-- Main 3-Column Layout -->
-        <div class="flex flex-col lg:flex-row gap-4 items-stretch h-auto lg:h-[480px]">
+        <div class="flex flex-col lg:flex-row gap-4 items-stretch h-auto lg:h-[480px] h-[200px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
             <div class="relative w-[250px] bg-white shadow-xs rounded-lg border border-gray-200 p-4 hidden lg:block">
@@ -296,7 +296,6 @@
     </section>
 
     <!-- POPULAR BRANDS SECTION -->
-    <!-- POPULAR BRANDS SECTION (Category Style) -->
     <section class="py-6 container mx-auto">
         <!-- Main Card Container -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 relative">

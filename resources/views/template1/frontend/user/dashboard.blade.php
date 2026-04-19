@@ -168,7 +168,8 @@
                                     <div
                                         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                         <div>
-                                            <h4 class="font-semibold text-md text-gray-900">#{{ $order->order_number }}
+                                            <h4 class="font-semibold text-md text-gray-900">
+                                                #{{ $order->order_no ?? $order->id }}
                                             </h4>
                                             <p class="text-sm text-gray-700 font-medium">
                                                 Order Date: {{ $order->created_at->format('d M, Y') }}
@@ -176,23 +177,19 @@
                                         </div>
 
                                         <div class="flex flex-col md:items-end gap-2 w-full md:w-auto">
-                                            @php
-                                                $statusClasses = [
-                                                    'pending' => 'bg-orange-100 text-orange-700',
-                                                    'processing' => 'bg-blue-100 text-blue-700',
-                                                    'delivered' => 'bg-green-100 text-green-700',
-                                                    'cancelled' => 'bg-red-100 text-red-700',
-                                                ];
-                                                $currentClass =
-                                                    $statusClasses[strtolower($order->status)] ??
-                                                    'bg-gray-100 text-gray-700';
-                                            @endphp
                                             <span
-                                                class="px-3 py-1 {{ $currentClass }} text-xs font-semibold rounded-full flex items-center gap-1.5 w-fit">
-                                                {{ ucfirst($order->status) }}
+                                                class="px-3 py-1 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
+                                                {{ $order->status_label }}
                                             </span>
-                                            <p class="text-lg font-bold text-gray-900 leading-none">
-                                                {{ $setup->currency }} {{ number_format($order->grand_total) }}</p>
+
+                                            <span
+                                                class="px-3 py-1 {{ $order->payment_status_color }} text-[10px] font-bold rounded-full flex items-center gap-1.5 w-fit uppercase border border-current/10">
+                                                {{ $order->payment_status_label }}
+                                            </span>
+
+                                            <p class="text-lg font-bold text-gray-900 leading-none mt-1">
+                                                {{ $setup->currency }} {{ number_format($order->grand_total) }}
+                                            </p>
                                         </div>
                                     </div>
 
@@ -223,18 +220,35 @@
                                     </div>
 
                                     <div class="flex gap-3">
+                                        <!-- View Details Button -->
                                         <a href="{{ route('user.order.details', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-eye"></i> View Details
                                         </a>
+
+                                        <!-- Invoice Button -->
                                         <a href="{{ route('order.invoice', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
                                             <i class="fas fa-download"></i> Invoice
                                         </a>
-                                        <a href="{{ route('order.reviews', $order->id) }}"
-                                            class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
-                                            <i class="fa-solid fa-star-half-stroke"></i> Review
-                                        </a>
+
+                                        <!-- Review Button (Shown only if Delivered) -->
+                                        @if ($order->status === \App\Enums\Status::Delivered->value)
+                                            <a href="{{ route('user.order.details', $order->id) }}"
+                                                class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
+                                                <i class="fa-solid fa-star-half-stroke"></i> Review
+                                            </a>
+                                        @endif
+
+                                        <!-- Pay Now Button (Hidden if status is PAID) -->
+                                        @if (
+                                            $order->payment_status !== \App\Models\Order::PAYMENT_PAID &&
+                                                $order->status !== \App\Enums\Status::Cancelled->value)
+                                            <a href="#" {{-- Replace # with your payment route, e.g., route('order.pay', $order->id) --}}
+                                                class="px-4 py-2 bg-[#FF6A00] text-white border border-[#FF6A00] rounded-lg text-sm font-bold hover:bg-orange-600 flex items-center gap-2">
+                                                <i class="fa-brands fa-amazon-pay"></i> Pay Now
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
@@ -355,33 +369,38 @@
 
                 <!-- 5. SECTION: PASSWORD CHANGE (Initially Hidden) -->
                 <!-- 5. SECTION: PASSWORD CHANGE -->
-<div id="password-section" class="dashboard-content {{ session('active_tab') == 'password' ? '' : 'hidden' }} space-y-6">
-    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Change Your Password</h2>
-        <form action="{{ route('user.password.update') }}" method="POST" class="space-y-5 max-w-2xl">
-            @csrf
-            <div>
-                <label class="text-sm text-gray-800">Current Password</label>
-                <input type="password" name="current_password" required
-                    class="w-full px-4 py-3 rounded-lg border @error('current_password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
-                @error('current_password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="text-sm text-gray-800">New Password</label>
-                <input type="password" name="password" required
-                    class="w-full px-4 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
-                @error('password') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-            </div>
-            <div>
-                <label class="text-sm text-gray-800">Confirm Your Password</label>
-                <input type="password" name="password_confirmation" required
-                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
-            </div>
-            <button type="submit"
-                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
-        </form>
-    </div>
-</div>
+                <div id="password-section"
+                    class="dashboard-content {{ session('active_tab') == 'password' ? '' : 'hidden' }} space-y-6">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-6">Change Your Password</h2>
+                        <form action="{{ route('user.password.update') }}" method="POST" class="space-y-5 max-w-2xl">
+                            @csrf
+                            <div>
+                                <label class="text-sm text-gray-800">Current Password</label>
+                                <input type="password" name="current_password" required
+                                    class="w-full px-4 py-3 rounded-lg border @error('current_password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
+                                @error('current_password')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-800">New Password</label>
+                                <input type="password" name="password" required
+                                    class="w-full px-4 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
+                                @error('password')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                            <div>
+                                <label class="text-sm text-gray-800">Confirm Your Password</label>
+                                <input type="password" name="password_confirmation" required
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
+                            </div>
+                            <button type="submit"
+                                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
+                        </form>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -430,29 +449,29 @@
     </script>
 @endpush
 @push('scripts')
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        @if(session('active_tab') == 'password' || $errors->has('password') || $errors->has('current_password'))
-            const passwordBtn = document.querySelector('button[onclick*="password"]');
-            showSection('password', passwordBtn);
-        @endif
-    });
-
-    function showSection(sectionName, element) {
-        const sections = document.querySelectorAll(".dashboard-content");
-        sections.forEach((s) => s.classList.add("hidden"));
-
-        const target = document.getElementById(sectionName + "-section");
-        if (target) target.classList.remove("hidden");
-
-        const navLinks = document.querySelectorAll(".nav-link, .nav-link-custom");
-        navLinks.forEach((link) => {
-            link.classList.remove("bg-[#1D2128]", "text-white");
-            link.classList.add("text-gray-600", "hover:bg-orange-50");
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            @if (session('active_tab') == 'password' || $errors->has('password') || $errors->has('current_password'))
+                const passwordBtn = document.querySelector('button[onclick*="password"]');
+                showSection('password', passwordBtn);
+            @endif
         });
 
-        element.classList.add("bg-[#1D2128]", "text-white");
-        element.classList.remove("text-gray-600", "hover:bg-orange-50");
-    }
-</script>
+        function showSection(sectionName, element) {
+            const sections = document.querySelectorAll(".dashboard-content");
+            sections.forEach((s) => s.classList.add("hidden"));
+
+            const target = document.getElementById(sectionName + "-section");
+            if (target) target.classList.remove("hidden");
+
+            const navLinks = document.querySelectorAll(".nav-link, .nav-link-custom");
+            navLinks.forEach((link) => {
+                link.classList.remove("bg-[#1D2128]", "text-white");
+                link.classList.add("text-gray-600", "hover:bg-orange-50");
+            });
+
+            element.classList.add("bg-[#1D2128]", "text-white");
+            element.classList.remove("text-gray-600", "hover:bg-orange-50");
+        }
+    </script>
 @endpush

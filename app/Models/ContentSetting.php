@@ -29,12 +29,14 @@ class ContentSetting extends Model
 
     /* ── Page type constants ── */
     const PAGE_PRODUCT  = 'product_page';
+    const PAGE_PRODUCT_SUB  = 'product_page_sub';
     const PAGE_CHECKOUT = 'checkout_page';
     const PAGE_ALL      = 'all_page';
     const PAGE_CART     = 'cart_page';
 
     const PAGE_TYPES = [
         self::PAGE_PRODUCT,
+        self::PAGE_PRODUCT_SUB,
         self::PAGE_CHECKOUT,
         self::PAGE_ALL,
         self::PAGE_CART,

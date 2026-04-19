@@ -15,6 +15,7 @@ class SocialSetting extends Model
         'icon_image',
         'link',
         'hover_bg',
+        'icon_class',
         'status',
     ];
 

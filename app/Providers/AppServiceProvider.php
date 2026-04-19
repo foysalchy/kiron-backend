@@ -2,8 +2,13 @@
 
 namespace App\Providers;
 
+use App\Enums\Status;
+use App\Models\ContentSetting;
 use App\Models\MegaCategory;
+use App\Models\Product;
+use App\Models\SearchProduct;
 use App\Models\SiteSetting;
+use App\Models\SocialSetting;
 use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssetCategoryService;
@@ -102,6 +107,7 @@ use App\Services\TransactionInternalService;
 use App\Services\TransactionJournalService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -235,7 +241,36 @@ class AppServiceProvider extends ServiceProvider
                     ->take(5)
                     ->get();
 
+                $footerFeatures = ContentSetting::where('company_id', $currentStore->company_id ?? $currentStore->id)
+                    ->where('page_type', ContentSetting::PAGE_ALL) // 'all_page'
+                    ->where('status', Status::Active->value)
+                    ->orderBy('sort_order')
+                    ->get();
+
+                $socialLinks = SocialSetting::where('company_id', $currentStore->company_id ?? $currentStore->id)
+                    ->where('status', Status::Active->value)
+                    ->get();
+
+                $popularSearches = SearchProduct::select('keyword', DB::raw('count(*) as total'))
+                    ->groupBy('keyword')
+                    ->orderBy('total', 'desc')
+                    ->take(5)
+                    ->get();
+
+                $relatedProducts = Product::active()
+                    ->where('company_id', $currentStore->company_id ?? $currentStore->id)
+                    ->withCount('views')
+                    ->orderBy('views_count', 'desc')
+                    ->take(5)
+                    ->get();
+
+                View::share('popularSearches', $popularSearches);
+                View::share('relatedProducts', $relatedProducts);
+
+                View::share('socialLinks', $socialLinks);
+
                 View::share('headerCategories', $headerCategories);
+                View::share('footerFeatures', $footerFeatures);
             }
         }
     }

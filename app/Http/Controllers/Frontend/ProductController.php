@@ -6,12 +6,14 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\AttributeGroup;
 use App\Models\Brand;
+use App\Models\ContentSetting;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\ProductVariation;
 use App\Models\ProductView;
+use App\Models\SearchProduct;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
@@ -27,6 +29,15 @@ class ProductController extends FrontendController
     public function index(Request $request, $store)
     {
         $query = Product::with('variations');
+
+        if ($request->filled('search')) {
+            SearchProduct::create([
+                'keyword'     => trim($request->search),
+                'company_id'     => $this->company_id,
+                'customer_id' => auth('customer')->id(),
+                'status'      => Status::Active->value,
+            ]);
+        }
 
         $maxPriceLimit = $this->getMaxPriceLimit();
         $this->applyFiltersAndSorting($query, $request);
@@ -164,7 +175,7 @@ class ProductController extends FrontendController
             'reviews.variation.attributes.attributeGroup',
         ])->where('slug', $slug)->firstOrFail();
 
-// dd($product->variations);
+        // dd($product->variations);
 
         $viewKey = 'viewed_product_' . $product->id;
 
@@ -212,7 +223,16 @@ class ProductController extends FrontendController
         $relatedProducts = Product::active()
             ->where('id', '!=', $product->id)->latest()->take(8)->get();
 
-        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations'));
+        $trustBadges = ContentSetting::where('status', Status::Active->value)
+            ->whereIn('page_type', [
+                ContentSetting::PAGE_PRODUCT,
+                ContentSetting::PAGE_ALL,
+                ContentSetting::PAGE_PRODUCT_SUB,
+            ])
+            ->ordered()
+            ->get();
+
+        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations', 'trustBadges'));
     }
     public function flashSale(Request $request, $store)
     { // Filter products that have a discount > 0
@@ -265,5 +285,22 @@ class ProductController extends FrontendController
         return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
+    }
+    public function searchSuggestions(Request $request)
+    {
+        $query = $request->get('q');
+        $company = getCurrentCompany();
+
+        if (!$query || strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::active()
+            ->where('title', 'LIKE', "%{$query}%")
+            ->select('title', 'slug')
+            ->take(10)
+            ->get();
+
+        return response()->json($products);
     }
 }

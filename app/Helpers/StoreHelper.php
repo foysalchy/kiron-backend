@@ -3,7 +3,7 @@
 use App\Models\DomainSetup;
 
 if (!function_exists('getCurrentCompany')) {
-    if (!function_exists('getCurrentCompany')) {
+
     function getCurrentCompany()
     {
         if (request()->is('api/*')) {
@@ -34,4 +34,4 @@ if (!function_exists('getCurrentCompany')) {
         abort(404, 'Store Not Found');
     }
 }
-}
+

@@ -91,9 +91,9 @@
                                     </button>
                                 @else
                                     <button disabled
-                                        class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-[10px] font-bold flex items-center gap-2 cursor-not-allowed">
+                                        class="px-4 py-2 bg-gray-50 text-gray-300 rounded-lg text-sm flex items-center gap-2 cursor-not-allowed">
                                         <i class="fas fa-lock"></i>
-                                        {{ !$item->product ? 'Item Not Found' : 'Locked' }}
+                                        {{ !$item->product ? 'Item Not Found' : 'Review Locked' }}
                                     </button>
                                 @endif
 
@@ -331,26 +331,57 @@
                             </svg>
                             Support
                         </a>
-                        <button
-                            class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-package h-4 w-4 mr-2">
-                                <path
-                                    d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z">
-                                </path>
-                                <path d="M12 22V12"></path>
-                                <path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"></path>
-                                <path d="m7.5 4.27 9 5.15"></path>
-                            </svg>
-                            Return Request
-                        </button>
+                        @if ($order->status == \App\Enums\Status::ReturnRequest->value)
+                            <button disabled
+                                class="w-full py-2.5 bg-gray-100 text-gray-400 rounded-md text-sm font-bold cursor-not-allowed">
+                                Return Requested
+                            </button>
+                        @else
+                            <button onclick="openReturnModal()"
+                                class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-3 cursor-pointer">
+                                <i class="fas fa-undo h-4 w-4"></i> Return Request
+                            </button>
+                        @endif
                     </div>
                 </div>
 
             </div>
         </div>
     </section>
+    <div id="return-modal"
+        class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onclick="closeReturnModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl cursor-pointer">&times;</button>
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Request a Return</h2>
+
+            <form action="{{ route('order.return', $order->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="mb-4">
+                    <label class="text-sm font-bold text-gray-700 mb-2 block">Reason for Return:</label>
+                    <textarea name="reason" rows="4" required
+                        class="w-full border rounded-xl p-3 text-sm outline-none focus:border-red-500 bg-gray-50"
+                        placeholder="Describe the issue with the product..."></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="text-sm font-bold text-gray-700 mb-2 block">Upload Proof (Images):</label>
+                    <div class="flex flex-wrap gap-2" id="return-image-preview">
+                        <label
+                            class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-red-500">
+                            <input type="file" name="images[]" multiple accept="image/*" class="hidden"
+                                onchange="handleReturnPreview(this)">
+                            <i class="fas fa-camera text-gray-400"></i>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
+                    Request</button>
+            </form>
+        </div>
+    </div>
     <!-- Review Modal -->
     <div id="review-modal"
         class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -421,7 +452,38 @@
 @endsection
 @push('scripts')
     <script>
-        // একাধিক ফাইল স্টোর করার জন্য একটি গ্লোবাল অবজেক্ট
+        let returnFiles = new DataTransfer();
+
+        function openReturnModal() {
+            document.getElementById('return-modal').classList.remove('hidden');
+            document.getElementById('return-modal').classList.add('flex');
+        }
+
+        function closeReturnModal() {
+            document.getElementById('return-modal').classList.add('hidden');
+            document.getElementById('return-modal').classList.remove('flex');
+        }
+
+        function handleReturnPreview(input) {
+            const container = document.getElementById('return-image-preview');
+            const label = container.querySelector('label');
+
+            if (input.files) {
+                Array.from(input.files).forEach(file => {
+                    returnFiles.items.add(file);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const div = document.createElement('div');
+                        div.className = 'w-16 h-16 rounded-xl border overflow-hidden shrink-0 relative';
+                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                        container.insertBefore(div, label);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                input.files = returnFiles.files;
+            }
+        }
+        // multiple file upload
         let reviewFilesContainer = new DataTransfer();
 
         function handleReviewImagePreview(input) {

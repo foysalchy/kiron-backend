@@ -9,11 +9,13 @@ class FrontendController extends Controller
 {
     protected $company;
     protected $template;
+    protected $company_id;
 
     public function __construct()
     {
         $this->company  = getCurrentCompany();
         $this->template = $this->company->template_name;
+        $this->company_id = $this->company->company_id;
     }
 
     protected function view(string $view, array $data = [])
