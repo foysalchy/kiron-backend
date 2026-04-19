@@ -16,7 +16,7 @@ class PermissionSeeder extends Seeder
 
         $permissionsToInsert = [];
 
-        $addCrud = function ($prefix, $groupName, $feature = null) use (&$permissionsToInsert) {
+        $addCrud = function ($prefix, $groupName, $feature) use (&$permissionsToInsert) {
             foreach (['view', 'create', 'edit', 'delete'] as $action) {
                 $permissionsToInsert[] = [
                     'name'               => "{$prefix}.{$action}",
@@ -28,7 +28,7 @@ class PermissionSeeder extends Seeder
             }
         };
 
-        $addViewOnly = function ($prefix, $groupName, $feature = null) use (&$permissionsToInsert) {
+        $addViewOnly = function ($prefix, $groupName, $feature) use (&$permissionsToInsert) {
             $permissionsToInsert[] = [
                 'name'               => "{$prefix}.view",
                 'group_name'         => $groupName,
@@ -38,47 +38,46 @@ class PermissionSeeder extends Seeder
             ];
         };
 
-
         // ==========================================
         // 1. Parties
         // ==========================================
-        $addCrud('customers',             'Customers');
-        $addCrud('suppliers',             'Suppliers');
-        $addCrud('customer_groups',       'Customer Groups');
-        $addCrud('parties_import_export', 'Parties Import & Export');
+        $addCrud('customers',             'Customers',                'customers');
+        $addCrud('suppliers',             'Suppliers',                'suppliers');
+        $addCrud('customer_groups',       'Customer Groups',          'customer_groups');
+        $addCrud('parties_import_export', 'Parties Import & Export',  'parties_import_export');
 
         // ==========================================
         // 2. Purchase
         // ==========================================
-        $addCrud('purchases',             'Purchases');
-        $addCrud('requisitions',          'Requisitions');
-        $addCrud('purchase_returns',      'Purchase Returns');
+        $addCrud('purchases',             'Purchases',                'purchases');
+        $addCrud('requisitions',          'Requisitions',             'requisitions');
+        $addCrud('purchase_returns',      'Purchase Returns',         'purchase_returns');
 
         // ==========================================
         // 3. Orders
         // ==========================================
-        $addCrud('orders',                'Orders');
-        $addCrud('sales_returns',         'Sales Returns');
-        $addCrud('quotations',            'Quotations');
-        $addViewOnly('incomplete_orders', 'Incomplete Orders');
+        $addCrud('orders',                'Orders',                   'orders');
+        $addCrud('sales_returns',         'Sales Returns',            'sales_returns');
+        $addCrud('quotations',            'Quotations',               'quotations');
+        $addViewOnly('incomplete_orders', 'Incomplete Orders',        'incomplete_orders');
         $addCrud('pos',                   'POS',                      'pos_module');
 
         // ==========================================
         // 4. Products
         // ==========================================
-        $addCrud('products',              'Products');
-        $addCrud('product_groups',        'Product Groups');
-        $addCrud('brands',                'Brands');
+        $addCrud('products',              'Products',                 'products');
+        $addCrud('product_groups',        'Product Groups',           'product_groups');
+        $addCrud('brands',                'Brands',                   'brands');
 
         // -- Categories --
-        $addCrud('mega_categories',       'Mega Categories');
-        $addCrud('sub_categories',        'Sub Categories');
-        $addCrud('mini_categories',       'Mini Categories');
-        $addCrud('extra_categories',      'Extra Categories');
+        $addCrud('mega_categories',       'Mega Categories',          'mega_categories');
+        $addCrud('sub_categories',        'Sub Categories',           'sub_categories');
+        $addCrud('mini_categories',       'Mini Categories',          'mini_categories');
+        $addCrud('extra_categories',      'Extra Categories',         'extra_categories');
 
         // -- Attributes --
-        $addCrud('attribute_groups',      'Attribute Groups');
-        $addCrud('attribute_values',      'Attribute Values');
+        $addCrud('attribute_groups',      'Attribute Groups',         'attribute_groups');
+        $addCrud('attribute_values',      'Attribute Values',         'attribute_values');
 
         // ==========================================
         // 5. Warehouses
@@ -92,10 +91,10 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 6. Inventory
         // ==========================================
-        $addViewOnly('inventory_overview',  'Inventory Overview');
-        $addCrud('inventory_movements',     'Inventory Movements');
-        $addCrud('inventory_adjustments',   'Inventory Adjustments');
-        $addCrud('inventory_audits',        'Inventory Audits');
+        $addViewOnly('inventory_overview',  'Inventory Overview',       'inventory_overview');
+        $addCrud('inventory_movements',     'Inventory Movements',      'inventory_movements');
+        $addCrud('inventory_adjustments',   'Inventory Adjustments',    'inventory_adjustments');
+        $addCrud('inventory_audits',        'Inventory Audits',         'inventory_audits');
 
         // ==========================================
         // 7. Landing Page
@@ -105,22 +104,22 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 8. Pricing
         // ==========================================
-        $addCrud('pricing_packages',        'Pricing Packages');
+        $addCrud('pricing_packages',        'Pricing Packages',         'pricing_packages');
 
         // ==========================================
         // 9. Marketing
         // ==========================================
-        $addCrud('marketing_coupons',       'Marketing Coupons');
+        $addCrud('marketing_coupons',       'Marketing Coupons',        'marketing_coupons');
         $addCrud('marketing_email',         'Marketing Email',          'email_marketing');
         $addCrud('marketing_sms',           'Marketing SMS',            'sms_marketing');
 
         // ==========================================
         // 10. CMS
         // ==========================================
-        $addCrud('cms_pages',               'CMS Pages');
-        $addCrud('cms_sliders',             'CMS Sliders');
-        $addCrud('cms_blogs',               'CMS Blogs');
-        $addCrud('social_settings',         'Social Settings');
+        $addCrud('cms_pages',               'CMS Pages',                'cms_pages');
+        $addCrud('cms_sliders',             'CMS Sliders',              'cms_sliders');
+        $addCrud('cms_blogs',               'CMS Blogs',                'cms_blogs');
+        $addCrud('social_settings',         'Social Settings',          'social_settings');
 
         // ==========================================
         // 11. Accounting
@@ -139,8 +138,6 @@ class PermissionSeeder extends Seeder
         $addCrud('hrm_attendances',         'HRM Attendances',          'hrm_module');
         $addCrud('hrm_holidays',            'HRM Holidays',             'hrm_module');
         $addCrud('hrm_resign_rules',        'HRM Resign Rules',         'hrm_module');
-
-        // -- Payroll --
         $addCrud('hrm_salaries',            'HRM Salaries',             'hrm_module');
         $addCrud('hrm_payroll',             'HRM Payroll',              'hrm_module');
         $addCrud('hrm_payslips',            'HRM Payslips',             'hrm_module');
@@ -148,14 +145,14 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 13. Reports
         // ==========================================
-        $addViewOnly('report_sales',        'Report Sales');
+        $addViewOnly('report_sales',        'Report Sales',             'report_sales');
         $addViewOnly('report_pos',          'Report POS',               'pos_module');
-        $addViewOnly('report_customers',    'Report Customers');
-        $addViewOnly('report_suppliers',    'Report Suppliers');
-        $addViewOnly('report_purchase',     'Report Purchase');
-        $addViewOnly('report_stock',        'Report Stock');
+        $addViewOnly('report_customers',    'Report Customers',         'report_customers');
+        $addViewOnly('report_suppliers',    'Report Suppliers',         'report_suppliers');
+        $addViewOnly('report_purchase',     'Report Purchase',          'report_purchase');
+        $addViewOnly('report_stock',        'Report Stock',             'report_stock');
         $addViewOnly('report_profit_loss',  'Report Profit & Loss',     'accounting_module');
-        $addViewOnly('report_audit_logs',   'Report Audit Logs');
+        $addViewOnly('report_audit_logs',   'Report Audit Logs',        'report_audit_logs');
 
         // ==========================================
         // 14. Support Desk
@@ -173,19 +170,19 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 16. Users
         // ==========================================
-        $addCrud('users',                   'Users');
+        $addCrud('users',                   'Users',                    'users');
 
         // ==========================================
         // 17. Security
         // ==========================================
-        $addViewOnly('security_login_history', 'Security Login History');
-        $addViewOnly('security_activity_logs', 'Security Activity Logs');
+        $addViewOnly('security_login_history', 'Security Login History', 'security_login_history');
+        $addViewOnly('security_activity_logs', 'Security Activity Logs', 'security_activity_logs');
 
         // ==========================================
         // 18. Tax & VAT
         // ==========================================
-        $addCrud('tax_rates',               'Tax Rates');
-        $addCrud('tax_groups',              'Tax Groups');
+        $addCrud('tax_rates',               'Tax Rates',                'tax_rates');
+        $addCrud('tax_groups',              'Tax Groups',               'tax_groups');
 
         // ==========================================
         // 19. Leads (CRM)
@@ -197,17 +194,16 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 20. Settings
         // ==========================================
-        $addCrud('site_settings',           'Site Settings');
-        $addCrud('settings_courier',        'Courier Settings');
-        $addCrud('settings_payment',        'Payment Settings');
-        $addCrud('settings_roles',          'Role Settings');
+        $addCrud('site_settings',           'Site Settings',            'site_settings');
+        $addCrud('settings_courier',        'Courier Settings',         'settings_courier');
+        $addCrud('settings_payment',        'Payment Settings',         'settings_payment');
+        $addCrud('settings_roles',          'Role Settings',            'settings_roles');
         $addCrud('settings_domain',         'Domain Settings',          'custom_domain');
         $addCrud('settings_ip',             'IP Restriction Settings',  'ip_restriction');
         $addCrud('woocommerce_integration', 'WooCommerce Integration',  'woocommerce_sync');
-        $addCrud('settings_sms',            'SMS Settings');
-        $addCrud('settings_templates',      'Template Settings');
+        $addCrud('settings_sms',            'SMS Settings',             'settings_sms');
+        $addCrud('settings_templates',      'Template Settings',        'settings_templates');
 
-        // Insert all permissions at once
         Permission::insert($permissionsToInsert);
     }
 }

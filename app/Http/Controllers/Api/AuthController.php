@@ -56,6 +56,7 @@ class AuthController extends Controller
 
     public function login(Request $request): JsonResponse
     {
+        Log::info($request);
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -93,31 +94,58 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // ========================================================
-        // 🔥 The Magic: Calculating Effective Permissions
+        // The Magic: Calculating Effective Permissions
+        // ========================================================
+        // ========================================================
+        // The Magic: Calculating Effective Permissions
         // ========================================================
         $effectivePermissions = [];
-
         if ($user->is_super_admin) {
-            $effectivePermissions = Permission::pluck('name')->toArray();
-        } else {
-            $packageFeatures = $user->company?->pricingPackage?->features ?? [];
-            if (is_string($packageFeatures)) {
-                $packageFeatures = json_decode($packageFeatures, true) ?? [];
-            }
-
-            foreach ($user->roles as $role) {
-                foreach ($role->permissions as $permission) {
-  
-                    if (empty($permission->feature_dependency) || in_array($permission->feature_dependency, $packageFeatures)) {
+            if ($user->roles->isNotEmpty()) {
+                // ✅ Super admin এর role আছে → role এর permissions
+                foreach ($user->roles as $role) {
+                    foreach ($role->permissions as $permission) {
                         $effectivePermissions[] = $permission->name;
                     }
                 }
+                $effectivePermissions = array_values(array_unique($effectivePermissions));
+            } else {
+                // ✅ Role নেই → সব superadmin permissions
+                $effectivePermissions = Permission::where('type', 'superadmin')
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } else {
+            $featureKeys = [];
+            $company = $user->company;
+            if ($company && $company->pricingPackage) {
+                $featureKeys = $company->pricingPackage->features ?? [];
+                if (is_string($featureKeys)) {
+                    $featureKeys = json_decode($featureKeys, true) ?? [];
+                }
             }
 
-            $effectivePermissions = array_values(array_unique($effectivePermissions));
-        }
-        // ========================================================
+            if (!empty($featureKeys)) {
+                if ($user->roles->isNotEmpty()) {
+                    // ✅ Role আছে → role এর permissions (package filter সহ, direct query)
+                    $roleIds = $user->roles->pluck('id')->toArray();
+                    $effectivePermissions = Permission::where('type', 'company')
+                        ->whereIn('feature_dependency', $featureKeys)
+                        ->whereHas('roles', fn($q) => $q->whereIn('roles.id', $roleIds))
+                        ->pluck('name')
+                        ->toArray();
+                } else {
+                    // ✅ Role নেই → package এর সব permissions (direct query)
+                    $effectivePermissions = Permission::where('type', 'company')
+                        ->whereIn('feature_dependency', $featureKeys)
+                        ->pluck('name')
+                        ->toArray();
+                }
+            }
 
+            Log::info('FINAL before return: ' . count($effectivePermissions));
+            Log::info($effectivePermissions);
+        }
         $primaryRoleName = $user->is_super_admin ? 'Super Admin' : ($user->roles->first()?->name ?? 'User');
 
         return response()->json([
@@ -325,7 +353,6 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         $user = $request->user();
-        \Log::info($request);
         $lastLogin = UserLoginHistory::where('user_id', $user->id)
             ->whereNull('logout_at')
             ->latest()

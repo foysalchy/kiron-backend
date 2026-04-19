@@ -1423,6 +1423,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [RoleController::class, 'show']);
                 Route::post('/update/{id}', [RoleController::class, 'update']);
                 Route::delete('/{id}', [RoleController::class, 'destroy']);
+                Route::post('/{id}/assign-users', [RoleController::class, 'assignUsers']);
+                Route::post('/{id}/remove-user',  [RoleController::class, 'removeUser']);
             });
 
             Route::get('/permissions', [PermissionController::class, 'index']);

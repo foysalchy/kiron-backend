@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Exceptions\ApiException;
+use App\Models\Role;
 use App\Services\RoleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -60,5 +61,38 @@ class RoleController extends Controller
     {
         $this->roleService->deleteRole($id);
         return ResponseHelper::success(null, 'Role deleted successfully');
+    }
+
+    // Assign Users to Role
+    public function assignUsers(Request $request, $id)
+    {
+        $request->validate([
+            'user_ids'   => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        $role = Role::findOrFail($id);
+
+        $role->users()->syncWithoutDetaching($request->user_ids);
+
+        return response()->json([
+            'message' => 'Users assigned successfully',
+            'data'    => $role->load('users'),
+        ]);
+    }
+
+    // Remove Single User from Role
+    public function removeUser(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $role = Role::findOrFail($id);
+        $role->users()->detach($request->user_id);
+
+        return response()->json([
+            'message' => 'User removed successfully',
+        ]);
     }
 }
