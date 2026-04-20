@@ -137,6 +137,7 @@ class PermissionSeeder extends Seeder
         $addCrud('hrm_employees',           'HRM Employees',            'hrm_module');
         $addCrud('hrm_attendances',         'HRM Attendances',          'hrm_module');
         $addCrud('hrm_holidays',            'HRM Holidays',             'hrm_module');
+        $addCrud('hrm_holidays',            'HRM Holidays',             'hrm_module');
         $addCrud('hrm_resign_rules',        'HRM Resign Rules',         'hrm_module');
         $addCrud('hrm_salaries',            'HRM Salaries',             'hrm_module');
         $addCrud('hrm_payroll',             'HRM Payroll',              'hrm_module');

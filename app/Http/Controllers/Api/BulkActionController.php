@@ -47,6 +47,14 @@ class BulkActionController extends Controller
         'positions'        => \App\Models\Position::class,
         'pricing-packages'        => \App\Models\PricingPackage::class,
         'landings'        => \App\Models\LandingPage::class,
+        'resign-rules'        => \App\Models\ResignRule::class,
+        'support-departments'        => \App\Models\SupportDepartment::class,
+        'support-tickets'        => \App\Models\SupportTicket::class,
+        'kb'        => \App\Models\KnowledgeBase::class,
+        'asset-categories'        => \App\Models\AssetCategory::class,
+        'assets'        => \App\Models\Asset::class,
+        'asset-purchases'        => \App\Models\AssetPurchase::class,
+        'disposal-types'        => \App\Models\DisposalType::class,
     ];
 
     /**

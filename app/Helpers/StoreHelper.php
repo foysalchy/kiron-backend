@@ -34,4 +34,3 @@ if (!function_exists('getCurrentCompany')) {
         abort(404, 'Store Not Found');
     }
 }
-
