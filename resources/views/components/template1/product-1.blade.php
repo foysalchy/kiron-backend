@@ -76,13 +76,19 @@
             </h3>
         </a>
 
+        @php
+            $avgRating = $product->reviews_avg_rating ?? 0;
+            $totalReviews = $product->reviews_count ?? 0;
+
+        @endphp
         <div class="flex items-center gap-1 mb-2">
             <div class="flex text-yellow-400 text-xs">
                 @for ($i = 1; $i <= 5; $i++)
-                    <i class="fas fa-star {{ $i <= 4 ? '' : 'text-gray-200' }}"></i>
+                    <i
+                        class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
                 @endfor
             </div>
-            <span class="text-xs text-gray-400 font-bold">(25)</span>
+            <span class="text-xs text-gray-400 font-bold">({{ $totalReviews }})</span>
         </div>
     </div>
 
@@ -98,13 +104,26 @@
                 </span>
             @endif
         </div>
+        @php
+            $isOutOfStock = $product->available_stock <= 0;
+        @endphp
 
-        <button
+        <button {{ $isOutOfStock ? 'disabled' : '' }}
+            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
+            class="flex-1 bg-[#1D2128] text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all shrink-0 whitespace-nowrap
+    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#FF6A00] cursor-pointer' }}">
+
+            @if ($isOutOfStock)
+                <i class="fas fa-exclamation-circle mr-1"></i> Stock Out
+            @else
+                Add to Cart
+            @endif
+        </button>
+
+        {{-- <button
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="bg-[#1D2128] text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#FF6A00] transition-all shrink-0 cursor-pointer whitespace-nowrap">
             Add to Cart
-        </button>
+        </button> --}}
     </div>
 </div>
-
-

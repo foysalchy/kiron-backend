@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{CustomerPaymentMethod, Order, Party, ProductReview, ProductVariation, Warehouse};
+use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, Party, ProductReview, ProductVariation, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\{DB, Hash, Log, Session};
 
 class OrderController extends FrontendController
 {
-    public function __construct(protected OrderService $orderService) {}
+    public function __construct(protected OrderService $orderService)
+    {
+        parent::__construct();
+    }
 
     public function index($store)
     {
@@ -86,8 +89,16 @@ class OrderController extends FrontendController
             DB::beginTransaction();
 
             $customer = auth('customer')->check() ? auth('customer')->user() : Party::updateOrCreate(
-                ['phone' => $data['phone'], 'type' => Party::TYPE_CUSTOMER],
-                ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
+                [
+                    'phone' => $data['phone'],
+                    'company_id'     => $this->company_id,
+                    'type' => Party::TYPE_CUSTOMER
+                ],
+                [
+                    'name' => $data['name'] ?? 'Guest',
+                    'password' => Hash::make('12345678'),
+                    'status' => Status::Pending->value
+                ]
             );
 
             $items = [];
@@ -109,7 +120,8 @@ class OrderController extends FrontendController
 
             $orderData = [
                 'warehouse_id'  => $exactWarehouse->id,
-                'customer_id'   => $customer->id,
+                'customer_id'     => $customer->id,
+                'company_id'     => $this->company_id,
                 'items'         => $items,
                 'status'        => Status::Draft->value,
                 'order_date'    => now(),
@@ -120,6 +132,8 @@ class OrderController extends FrontendController
 
             // Cleanup old drafts
             $oldId = Session::get('current_draft_order_id');
+
+            // Log::info($oldId);
             if ($oldId) Order::where('id', $oldId)->where('status', Status::Draft->value)->delete();
 
             $order = $this->orderService->createSalesOrder($orderData);
@@ -135,17 +149,28 @@ class OrderController extends FrontendController
 
     public function storeOrder($store, Request $request)
     {
-        $request->validate(['name' => 'required', 'phone' => 'required', 'address' => 'required']);
+        $request->validate(
+            [
+                'name' => 'required',
+                'phone' => 'required',
+                'address' => 'required'
+            ]
+        );
 
         // 1. Try to find the draft order
         $orderId = Session::get('current_draft_order_id');
-        $order = Order::where('status', Status::Draft->value)->find($orderId);
+        $order = Order::where('company_id', $this->company_id)
+            ->where('status', Status::Draft->value)
+            ->find($orderId);
 
         // 2. If session failed, try to find by phone
         if (!$order) {
             $customer = Party::where('phone', $request->phone)->first();
             if ($customer) {
-                $order = Order::where('status', Status::Draft->value)->latest()->first();
+                $order = Order::where('customer_id', $customer->id)
+                    ->where('status', Status::Draft->value)
+                    ->latest()
+                    ->first();
             }
         }
 
@@ -173,6 +198,15 @@ class OrderController extends FrontendController
 
             // This will deduct stock from the Exact Warehouse assigned in the draft
             $this->orderService->changeStatus($order->id, Status::Pending->value);
+
+            foreach (Cart::content() as $item) {
+                $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
+
+                CartTrack::where('session_id', session()->getId())
+                    ->where('product_id', $cleanProductId)
+                    ->where('variation_id', $item->options->variation_id ?? null)
+                    ->update(['status' => \App\Models\Cart::PURCHASED]); // Status 2
+            }
 
             DB::commit();
             Cart::destroy();

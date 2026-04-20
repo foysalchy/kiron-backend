@@ -1,7 +1,7 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="container mx-auto py-6">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Header Actions -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-2 gap-4">
             <div class="flex items-center gap-4">
@@ -11,7 +11,7 @@
                 </a>
                 <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
-            <div class="flex flex-col items-end">
+            <div class="flex flex-col items-start md:items-end">
                 @php
                     $statusClasses = [
                         'pending' => 'bg-orange-500',
@@ -28,7 +28,7 @@
         </div>
         <p class="text-md text-gray-500 mb-8">Order Number: #{{ $order->order_no }}</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             <!-- Left Column (Products & Tracking) -->
             <div class="lg:col-span-2 space-y-6">
@@ -40,11 +40,11 @@
                     <div class="space-y-4">
                         @foreach ($order->orderDetails as $item)
                             <div
-                                class="flex flex-col sm:flex-row items-center gap-6 p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
+                                class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-3 md:p-4 border border-gray-200 rounded-lg bg-white hover:shadow-sm transition-all">
 
                                 {{-- 1. Safe Image Check --}}
                                 <div
-                                    class="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
+                                    class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
                                     <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
                                         class="w-full h-full object-cover">
                                 </div>
@@ -86,7 +86,7 @@
                                 @if ($canReview)
                                     <button type="button"
                                         onclick="openReviewModal('{{ $item->product->id }}', '{{ $item->product->title }}', '{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}', '{{ $item->variation->display_name ?? '' }}', '{{ $item->variation_id }}')"
-                                        class="px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2 cursor-pointer">
+                                        class="w-full sm:w-auto px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2 cursor-pointer">
                                         <i class="far fa-star"></i> Write Review
                                     </button>
                                 @else
@@ -207,7 +207,7 @@
                         @endphp
 
                         <div
-                            class="mt-10 p-5 bg-blue-50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4">
+                            class="mt-6 md:mt-10 p-4 md:p-5 bg-blue-50 border border-blue-100 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-4">
                             <div class="flex items-center gap-4">
                                 <div
                                     class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-50">
@@ -526,11 +526,11 @@
             }
         }
 
-        // ইমেজ রিমুভ করার ফাংশন
+        // image remove function for review
         function removeReviewImage(element, fileName) {
             const input = document.querySelector('input[name="images[]"]');
 
-            // ১. লিস্ট থেকে ফাইলটি বাদ দেওয়া
+            // reviewFilesContainer from DOM remove
             const newDataTransfer = new DataTransfer();
             Array.from(reviewFilesContainer.files).forEach(file => {
                 if (file.name !== fileName) {
@@ -540,11 +540,11 @@
             reviewFilesContainer = newDataTransfer;
             input.files = reviewFilesContainer.files;
 
-            // ২. প্রিভিউ বক্সটি রিমুভ করা
+            // preview from DOM remove
             element.parentElement.remove();
         }
 
-        // মোডাল ক্লোজ করার সময় সব ক্লিয়ার করা
+        // modal close for review
         function closeReviewModal() {
             const modal = document.getElementById('review-modal');
             if (modal) {
@@ -553,7 +553,6 @@
 
                 modal.querySelector('form').reset();
 
-                // গ্লোবাল ফাইল কন্টেইনার ক্লিয়ার করা
                 reviewFilesContainer = new DataTransfer();
 
                 const previews = modal.querySelectorAll('.preview-item');
@@ -561,7 +560,7 @@
             }
         }
 
-        // বাকি ফাংশনগুলো (openReviewModal, Star Rating) আগের মতোই থাকবে...
+        // openReviewModal, Star Rating
         function openReviewModal(id, name, img, variant, variationId) {
             document.getElementById('modal-product-id').value = id;
             document.getElementById('modal-product-name').innerText = name;
