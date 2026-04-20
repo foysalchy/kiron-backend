@@ -28,7 +28,9 @@ class ProductController extends FrontendController
     }
     public function index(Request $request, $store)
     {
-        $query = Product::with('variations');
+        $query = Product::with('variations')
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');;
 
         if ($request->filled('search')) {
             SearchProduct::create([
@@ -48,7 +50,7 @@ class ProductController extends FrontendController
         $brands          = Brand::get();
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
-            ->active()
+            ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
 
@@ -75,8 +77,10 @@ class ProductController extends FrontendController
 
         if (!$category) abort(401);
 
-        $query = Product::active()
-            ->whereJsonContains('mega_category_ids', (int)$category->id);
+        $query = Product::where('status', Status::Active->value)
+            ->whereJsonContains('mega_category_ids', (int)$category->id)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
 
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
@@ -88,7 +92,7 @@ class ProductController extends FrontendController
 
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
-            ->active()
+            ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
         return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
@@ -220,7 +224,7 @@ class ProductController extends FrontendController
             }
         }
         //  \Log::info($formattedVariations);
-        $relatedProducts = Product::active()
+        $relatedProducts = Product::where('status', Status::Active->value)
             ->where('id', '!=', $product->id)->latest()->take(8)->get();
 
         $trustBadges = ContentSetting::where('status', Status::Active->value)
@@ -237,7 +241,9 @@ class ProductController extends FrontendController
     public function flashSale(Request $request, $store)
     { // Filter products that have a discount > 0
         $query = Product::where('discount', '>', 0)
-            ->active();
+            ->where('status', Status::Active->value)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');;
 
         $maxPriceLimit = $this->getMaxPriceLimit();
 
@@ -250,7 +256,7 @@ class ProductController extends FrontendController
 
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
-            ->active()
+            ->where('status', Status::Active->value)
             ->get();
 
         // Pass a virtual category object for the title
@@ -266,7 +272,9 @@ class ProductController extends FrontendController
 
         $query = Product::with('variations')
             ->where('status', Status::Active->value)
-            ->where('brand_id', $brand->id);
+            ->where('brand_id', $brand->id)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
         $maxPriceLimit = $this->getMaxPriceLimit();
 
         $this->applyFiltersAndSorting($query, $request);
@@ -295,7 +303,7 @@ class ProductController extends FrontendController
             return response()->json([]);
         }
 
-        $products = Product::active()
+        $products = Product::where('status', Status::Active->value)
             ->where('title', 'LIKE', "%{$query}%")
             ->select('title', 'slug')
             ->take(10)

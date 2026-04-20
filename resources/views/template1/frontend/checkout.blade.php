@@ -1,15 +1,15 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="container mx-auto py-6 px-4">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST">
             @csrf
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
-                <div class="lg:col-span-2 space-y-6">
+                <div class="lg:col-span-2 lg:order-1 space-y-6">
 
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
@@ -81,12 +81,13 @@
                 </div>
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6 sticky top-24">
+                <div class="lg:col-span-1 lg:order-2 space-y-6">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         <div class="mb-8">
-                            <h2 class="text-2xl font-semibold leading-none tracking-tight mb-6">Select Delivery Method
+                            <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
+                                Method
                             </h2>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-3 cursor-pointer group">
@@ -133,7 +134,7 @@
                                             </div>
                                         @elseif($item->options->has('variant'))
                                             <p class="text-[11px] text-gray-500 font-medium mb-1">
-                                                 {{ $item->options->variant }}
+                                                {{ $item->options->variant }}
                                             </p>
                                         @endif
 
@@ -158,13 +159,15 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Subtotal:</span>
-                                <span class="text-md font-bold text-gray-900">{{ $setup->currency }} {{ number_format($subtotal) }}</span>
+                                <span class="text-md font-bold text-gray-900">{{ $setup->currency }}
+                                    {{ number_format($subtotal) }}</span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between items-center text-green-600">
                                     <span class="text-md font-medium">Discount:</span>
-                                    <span class="text-md font-bold">- {{ $setup->currency }} {{ number_format($discount) }}</span>
+                                    <span class="text-md font-bold">- {{ $setup->currency }}
+                                        {{ number_format($discount) }}</span>
                                 </div>
                             @endif
 
@@ -198,83 +201,82 @@
     </section>
 @endsection
 
+
 @push('scripts')
-    @push('scripts')
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const phoneInput = document.querySelector('input[name="phone"]');
-                    const nameInput = document.querySelector('input[name="name"]');
-                    const addressInput = document.querySelector('textarea[name="address"]');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneInput = document.querySelector('input[name="phone"]');
+            const nameInput = document.querySelector('input[name="name"]');
+            const addressInput = document.querySelector('textarea[name="address"]');
 
-                    function saveDraft() {
-                        let phone = phoneInput.value;
-                        let name = nameInput.value;
-                        let address = addressInput.value;
+            function saveDraft() {
+                let phone = phoneInput.value;
+                let name = nameInput.value;
+                let address = addressInput.value;
 
-                        if (phone.length >= 11) {
-                            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-                            fetch("{{ route('order.partial') }}", {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Accept': 'application/json',
-                                        'X-CSRF-TOKEN': token
-                                    },
-                                    body: JSON.stringify({
-                                        phone: phone,
-                                        name: name,
-                                        address: address
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        console.log("Success: Draft order created.");
-                                    } else {
-                                        console.log("Error: " + (data.error || "Draft failed"));
-                                    }
-                                })
-                                .catch(error => console.error('Error:', error));
-                        }
-                    }
-
-                    phoneInput.addEventListener('blur', saveDraft);
-
-                    @auth('customer')
-                        saveDraft();
-                    @endauth
-                });
-            </script>
-            <script>
-                function updateCheckoutShipping(value) {
+                if (phone.length >= 11) {
                     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                    fetch("{{ route('cart.shipping') }}", {
+                    fetch("{{ route('order.partial') }}", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': token,
-                                'X-Requested-With': 'XMLHttpRequest'
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': token
                             },
                             body: JSON.stringify({
-                                area: value
+                                phone: phone,
+                                name: name,
+                                address: address
                             })
                         })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                document.getElementById('shipping-display').innerText = data.shipping_cost;
-
-                                document.getElementById('total-display').innerText = data.grand_total;
-
-                                toastr.success(data.message);
+                                console.log("Success: Draft order created.");
+                            } else {
+                                console.log("Error: " + (data.error || "Draft failed"));
                             }
                         })
-                        .catch(error => {
-                            console.error('Error:', error);
-                        });
+                        .catch(error => console.error('Error:', error));
                 }
-            </script>
-        @endpush
+            }
+
+            phoneInput.addEventListener('blur', saveDraft);
+
+            @auth('customer')
+                saveDraft();
+            @endauth
+        });
+    </script>
+    <script>
+        function updateCheckoutShipping(value) {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch("{{ route('cart.shipping') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        area: value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('shipping-display').innerText = data.shipping_cost;
+
+                        document.getElementById('total-display').innerText = data.grand_total;
+
+                        toastr.success(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+@endpush

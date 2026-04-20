@@ -74,54 +74,61 @@
                 }
             }
 
-            function processAddVariation() {
-                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-                const qtyInput = document.getElementById('modal-qty');
-                if (!selectedVariant) {
-                    toastr.warning("Please select an option.");
-                    return;
-                }
-                fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify({
-                            variation_id: selectedVariant.value,
-                            qty: qtyInput ? qtyInput.value : 1
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                            closeModal();
-                            toastr.success(data.message);
-                        }
-                    });
-            }
+            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন
+function processAddVariation() {
+    const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+    const qtyInput = document.getElementById('modal-qty');
+    const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            function addSingleToCart(id) {
-                fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify({
-                            id: id,
-                            qty: 1
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                            toastr.success(data.message);
-                        }
-                    });
+    if (!selectedVariant) {
+        toastr.warning("দয়া করে একটি অপশন সিলেক্ট করুন।");
+        return;
+    }
+
+    fetch("{{ route('cart.add') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+            body: JSON.stringify({
+                variation_id: selectedVariant.value,
+                qty: qtyInput ? qtyInput.value : 1
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            // যদি সাকসেস হয়
+            if (data.status === 'success') {
+                document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                closeModal();
+                toastr.success(data.message);
             }
+            // যদি এরর হয় (যেমন: স্টক আউট)
+            else {
+                toastr.error(data.message || "কিছু একটা ভুল হয়েছে।");
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            toastr.error("সার্ভারে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+        });
+}
+
+// ২. সিঙ্গেল প্রোডাক্ট অ্যাড করার ফাংশন
+function addSingleToCart(id) {
+    fetch("{{ route('cart.add') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+            body: JSON.stringify({ id: id, qty: 1 })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                toastr.success(data.message);
+            } else {
+                toastr.error(data.message); // স্টক আউটের মেসেজ এখানে দেখাবে
+            }
+        });
+}
 
             function toggleWishlist(productId) {
                 const token = document.querySelector('meta[name="csrf-token"]').content;

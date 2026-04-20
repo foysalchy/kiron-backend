@@ -17,7 +17,10 @@ class HomeController extends FrontendController
 
         $categories = MegaCategory::with('subCategories.miniCategories')->get();
 
-        $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])->active()->latest()->take(10)->get();
+        $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
+            ->where('status', Status::Active->value)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')->latest()->take(10)->get();
         // \Log::info($newArrivals);
         //for product groups
         $productGroups = ProductGroup::where('status', Status::Active->value)
@@ -25,17 +28,21 @@ class HomeController extends FrontendController
             ->get()
             ->map(function ($group) {
                 $group->products = Product::whereIn('id', $group->product_ids ?? [])
-                    ->active()
+                    ->where('status', Status::Active->value)
+                    ->withCount('reviews')
+                    ->withAvg('reviews', 'rating')
                     ->take(15)
                     ->get();
                 return $group;
             })
             ->filter(fn($group) => $group->products->count() > 0);
 
-        $brands = Brand::active()->latest()->take(10)->get();
+        $brands = Brand::where('status', Status::Active->value)->latest()->take(10)->get();
 
         $popularProducts = Product::with(['brand', 'variations'])
-            ->active()
+            ->where('status', Status::Active->value)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->withSum('orderDetails as total_sales', 'quantity')
             ->orderByDesc('total_sales')
             ->take(12)

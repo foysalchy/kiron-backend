@@ -1,7 +1,16 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="py-6 container mx-auto">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <div class="lg:hidden mb-3 flex items-center justify-between">
+            <button onclick="toggleMobileSidebar()"
+                class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
+                <i class="fas fa-filter text-[#f15a24]"></i> Filters
+            </button>
+            <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6"></div>
 
         <!-- Main Card Container -->
         <div class="archiveTopInfo">
@@ -52,17 +61,16 @@
 
     </section>
     <!-- SHOP PAGE SECTION -->
-    <section class="py-6 container mx-auto">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
 
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- ══════════════════════════ SIDEBAR ═════════════════════════════ -->
-            <aside class="w-full lg:w-[220px] shrink-0">
+            <aside class="w-full lg:w-[220px] shrink-0" id="shop-sidebar">
                 <form action="{{ url()->current() }}" method="GET" id="sidebar-filter-form">
                     <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
 
-                    <div
-                        class="bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
-
+                    <div id="sidebar-filter-box"
+                        class="hidden lg:block bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
                         <!-- ① Filter By Price -->
                         <div class="p-4 border-b border-gray-50">
                             <h3 class="text-sm font-bold text-gray-800 mb-4">Filter By Price</h3>
@@ -179,13 +187,13 @@
             </aside>
 
             <!-- ══════════════════════════════════════
-                                                        MAIN CONTENT
-                                                    ══════════════════════════════════════ -->
+                                                            MAIN CONTENT
+                                                        ══════════════════════════════════════ -->
             <main class="flex-1 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
 
                 <!-- Shop Header -->
                 <div class="px-5 py-3.5 flex items-center justify-between">
-                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-2">
+                    <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
                         {{ $category ? $category->name : 'All Products' }}
                     </h2>
                     <div class="relative">
@@ -212,7 +220,7 @@
                 </div>
 
                 <!-- Product Grid  -->
-                <div class="p-4 grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                <div class="p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 
                     @forelse($products as $product)
                         <x-template1.product-card :product="$product" />
@@ -243,6 +251,31 @@
 @endsection
 @push('scripts')
     <script>
+        function toggleMobileSidebar() {
+            const box = document.getElementById('sidebar-filter-box');
+            box.classList.toggle('hidden');
+        }
+
+        function toggleAllFilters() {
+            const panel = document.getElementById('all-filters-panel');
+            const arrow = document.getElementById('all-filters-arrow');
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                panel.classList.add('hidden');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // page load e already filter active thakle arrow rotate
+        window.addEventListener('DOMContentLoaded', () => {
+            const panel = document.getElementById('all-filters-panel');
+            const arrow = document.getElementById('all-filters-arrow');
+            if (panel && !panel.classList.contains('hidden')) {
+                arrow.style.transform = 'rotate(180deg)';
+            }
+        });
         const slider = document.getElementById('price-slider');
         const range = document.getElementById('slider-range');
         const handleMin = document.getElementById('handle-min');

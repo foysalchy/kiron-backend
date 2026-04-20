@@ -122,7 +122,7 @@
             </a>
 
             <!-- Account -->
-            <div class="relative cursor-pointer" id="account-menu">
+            <div class="relative cursor-pointer hidden lg:block" id="account-menu">
                 <div onclick="toggleAccount()"
                     class="flex items-center gap-1.5 hover:text-[#FF6A00] transition-colors select-none">
                     @auth('customer')
@@ -257,12 +257,12 @@
                     </div>
                 </div>
             @else
-                {{-- <div class="flex gap-3 px-5 py-4 border-b border-gray-100">
+                <div class="flex gap-3 px-5 py-4 border-b border-gray-100">
                     <a href="{{ route('user.login') }}"
                         class="flex-1 text-center py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-sm font-bold">Login</a>
                     <a href="{{ route('user.register') }}"
                         class="flex-1 text-center py-2 bg-[#FF6A00] text-white rounded-lg text-sm font-bold">Register</a>
-                </div> --}}
+                </div>
             @endauth
 
             <!-- Nav Links -->
@@ -403,7 +403,7 @@
                         .catch(error => {
                             if (error.name !== 'AbortError') console.error('Search error:', error);
                         });
-                }, 1000);
+                }, 500);
             } else {
                 defaultContent.classList.remove('hidden');
                 liveResults.classList.add('hidden');

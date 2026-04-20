@@ -1,7 +1,7 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="container mx-auto py-6">
+    <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
 
         <!-- Back Button: Dynamic URL -->
         <a class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium" href="{{ url('/blogs') }}">
@@ -38,9 +38,9 @@
                         </div>
                     </div>
 
-                    <div class="p-6 md:p-10">
+                    <div class="p-4 md:p-10">
 
-                        <h1 class="text-2xl md:text-3xl font-black text-gray-900 mb-6 leading-tight">
+                        <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
                             {{ $blog->title }}
                         </h1>
 
@@ -91,7 +91,7 @@
 
                         <div class="h-[1px] w-full bg-gray-200 my-10"></div>
 
-                        <div class="flex items-center gap-5 p-6 bg-blue-50/50 rounded-lg mb-12">
+                       <div class="flex items-center gap-3 md:gap-5 p-4 md:p-6 bg-blue-50/50 rounded-lg mb-8 md:mb-12">
                             <div
                                 class="h-16 w-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 shadow-sm border-2 border-white">
                                 <img src="{{ $blog->user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"

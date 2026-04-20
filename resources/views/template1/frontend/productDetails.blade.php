@@ -9,7 +9,7 @@
                 ->exists();
         }
     @endphp
-    <section class="container mx-auto px-4">
+     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
 
         <!-- 1. Breadcrumb -->
         <nav
@@ -23,16 +23,16 @@
 
         <!-- 2. Product Top Info Card -->
         <div class="overflow-hidden mb-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-gray-100 rounded-xl">
 
                 <!-- Left: Image Gallery -->
-                <div class="p-4 border-r border-gray-50">
+                <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                         <img id="mainImage" src="{{ $product->thumbnail_url }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
-                    <div id="thumbnail-container" class="grid grid-cols-5 gap-3">
+                    <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
                         <button onclick="changeImage('{{ $product->thumbnail_url }}')"
                             class="aspect-square rounded-lg border-2 border-[#FF6A00] p-1 bg-white overflow-hidden">
                             <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-contain">
@@ -102,7 +102,7 @@
                     <input type="hidden" id="selected-variation-id" value="">
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-wrap md:flex-nowrap items-center gap-3 mb-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
@@ -146,7 +146,7 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                    <div class="grid grid-cols-3 gap-4 mb-6">
+                   <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                         @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
                             <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
                                 <div class="text-orange-500 shrink-0">
@@ -164,7 +164,7 @@
 
                     <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2 md:gap-3">
 
                         <a href="tel:{{ $setup->phone }}"
                             class="bg-[#EE4D2D] hover:bg-red-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
@@ -196,15 +196,15 @@
         <!-- 3. TABS SECTION -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
             <!-- Tab Buttons -->
-            <div class="flex items-center justify-center border-b border-gray-100 bg-[#F9FAFB]" id="tabs-nav">
+            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar" id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
+                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
                 <button onclick="switchTab('specification')" id="tab-btn-specification"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
+                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
 
                 <button onclick="switchTab('review')" id="tab-btn-review"
-                    class="tab-btn px-8 py-4 text-sm transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
+                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
                     Reviews ({{ $product->reviews->count() }})
                 </button>
             </div>

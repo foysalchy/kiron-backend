@@ -1,7 +1,7 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="container mx-auto py-10 px-4">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="max-w-2xl mx-auto">
 
             <!-- Page Title (Design same) -->
@@ -34,10 +34,10 @@
                 </div>
             </div>
 
-            {{-- ৪. ট্র্যাকিং রেজাল্ট (এটি শুধুমাত্র অর্ডার পাওয়া গেলে দেখাবে) --}}
+            {{-- Tracking Result --}}
             @if ($order)
                 <div class="bg-white rounded-2xl border border-[#FF6A00]/20 shadow-xl p-6 mb-8">
-                    <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <div class="flex flex-wrap justify-between items-start gap-3 mb-6 border-b pb-4">
                         <div>
                             <h3 class="font-bold text-gray-900">Current Status:
                                 <span class="text-[#FF6A00]">{{ $order->status_label }}</span>
@@ -50,7 +50,7 @@
                         </a>
                     </div>
 
-                    {{-- আপনার ড্যাশবোর্ডের সেই একই টাইমলাইন এখানে ব্যবহার করতে পারেন --}}
+                    {{-- Tracking Timeline --}}
                     <div class="relative pl-8 space-y-4">
                         <div class="relative">
                             <div class="absolute -left-8 top-1 w-3 h-3 rounded-full bg-green-500"></div>

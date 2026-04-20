@@ -89,7 +89,9 @@ class Order extends Model
         $date = now()->format('Ymd');
 
         // Get last order number for today and this type
-        $lastOrder = self::where('type', $type)
+        $lastOrder = self::withoutGlobalScopes()
+            ->withTrashed()
+            ->where('type', $type)
             ->whereDate('created_at', now())
             ->orderBy('id', 'desc')
             ->first();
