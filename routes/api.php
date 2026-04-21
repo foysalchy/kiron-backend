@@ -72,6 +72,7 @@ use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\Api\OrderReturnController;
+use App\Http\Controllers\Api\PackageUsageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PassChangeController;
@@ -1428,6 +1429,7 @@ Route::prefix('v1')->group(function () {
             });
 
             Route::get('/permissions', [PermissionController::class, 'index']);
+            Route::get('/company/package-usage', [PackageUsageController::class, 'index']);
         });
     });
     //pricing plan

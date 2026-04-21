@@ -129,6 +129,7 @@ class OrderReturnController extends Controller
                 Rule::in([
                     Status::Pending->value,      // 2
                     Status::Waiting->value,  // 16
+                    Status::Completed->value,  // 16
                     Status::Cancelled->value,  // 10
                     Status::NotCleared->value,  // 18
                     Status::Cleared->value,  // 17

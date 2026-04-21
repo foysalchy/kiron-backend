@@ -25,6 +25,7 @@ class PricingPackageRequest extends FormRequest
 
             'primary_domain' => 'nullable|string|max:255',
             'domain_limit' => 'nullable|integer',
+            'extra_order_charge' => 'nullable',
 
             'features' => 'nullable|array',
             'features.*' => 'string|max:255',

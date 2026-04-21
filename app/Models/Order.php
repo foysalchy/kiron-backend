@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasPackageLimits;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,8 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Order extends Model
 {
-    use HasFactory, SoftDeletes, CompanyScoped;
+    use HasFactory, SoftDeletes, CompanyScoped, HasPackageLimits;
+    public string $limitKey = 'order';
 
     // Order types
     public const TYPE_POS = 'pos';
@@ -73,9 +75,41 @@ class Order extends Model
     {
         parent::boot();
 
+        // Order number generation
         static::creating(function ($order) {
             if (empty($order->order_no)) {
                 $order->order_no = self::generateOrderNumber($order->type);
+            }
+        });
+
+        // Extra charge record
+        static::created(function ($order) {
+            if ($order->type !== self::TYPE_SALES) return;
+
+            $company = \App\Models\Company::with('pricingPackage')
+                ->find($order->company_id);
+
+            if (!$company?->pricingPackage) return;
+
+            $package = $company->pricingPackage;
+
+            if ($package->order_limit === null)        return;
+            if ($package->extra_order_charge === null) return;
+
+            $monthlyCount = self::withoutGlobalScope('company')
+                ->where('company_id', $order->company_id)
+                ->where('type', self::TYPE_SALES)
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
+
+            if ($monthlyCount > $package->order_limit) {
+                ExtraOrderCharge::create([
+                    'company_id'    => $order->company_id,
+                    'order_id'      => $order->id,
+                    'charge_amount' => $package->extra_order_charge,
+                    'month'         => now()->format('Y-m'),
+                ]);
             }
         });
     }

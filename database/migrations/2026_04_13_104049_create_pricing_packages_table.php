@@ -22,8 +22,9 @@ return new class extends Migration
             // Limits
             $table->integer('order_limit')->nullable();
             $table->integer('product_limit')->nullable();
-            $table->json('invoice_limit')->nullable(); // multi select যেমন [1,2,3]
+            $table->integer('invoice_limit')->nullable();
             $table->integer('user_limit')->nullable();
+            $table->decimal('extra_order_charge', 10, 2)->nullable();
 
             // Domain
             $table->string('primary_domain')->nullable(); // 🔥 string as requested
