@@ -20,4 +20,8 @@ class PricingPackage extends Model
     {
         return $this->hasMany(PricingTier::class, 'package_id');
     }
+    public function companySubcription()
+    {
+        return $this->hasMany(CompanySubscription::class);
+    }
 }

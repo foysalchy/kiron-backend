@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +19,29 @@ class CompanyService
     public function getAllCompanies(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Company::query();
+            $query = Company::with([
+                'pricingPackage',
+                'currentSubscription.pricingPackage',
+            ])
+                ->withCount([
+                    // Product count
+                    'products as product_used',
 
-            // Apply filters
-          if (isset($filters['status'])) {
+                    // User count
+                    'users as user_used',
+
+                    // Sales order — current month only
+                    'orders as order_used' => fn($q) => $q
+                        ->where('type', Order::TYPE_SALES)
+                        ->whereMonth('created_at', now()->month)
+                        ->whereYear('created_at', now()->year),
+
+                    // Domain count
+                    'domains as domain_used',
+                ]);
+
+            // filters...
+            if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
                     $query->onlyTrashed();
                 } else {
@@ -41,12 +61,10 @@ class CompanyService
                 });
             }
 
-            // Sorting
-            $sortBy = $filters['sort_by'] ?? 'created_at';
+            $sortBy    = $filters['sort_by'] ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            // Return paginated or all
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
@@ -55,7 +73,6 @@ class CompanyService
             throw ApiException::serverError('Failed to fetch companies');
         }
     }
-
     /**
      * Get company by ID
      */
@@ -305,7 +322,7 @@ class CompanyService
      */
     public function getCompanyProfileById(int $id, string $period = 'month'): Company
     {
-        $startDate = match($period) {
+        $startDate = match ($period) {
             'week'  => now()->startOfWeek(),
             'month' => now()->startOfMonth(),
             'year'  => now()->startOfYear(),
@@ -327,19 +344,18 @@ class CompanyService
             'orders as completed_orders' => fn($q) => $q->where('status', Status::Completed->value),
             'orders as cancelled_orders' => fn($q) => $q->where('status', Status::Cancelled->value),
         ])
-        ->find($id);
+            ->find($id);
 
         if (!$company) {
             throw ApiException::notFound('Company not found');
         }
 
-       // Revenue calculation
+        // Revenue calculation
         $company->total_revenue = $company->orders()->sum('grand_total');
         $company->new_revenue   = $company->orders()
-                                        ->where('created_at', '>=', $startDate)
-                                        ->sum('grand_total');
+            ->where('created_at', '>=', $startDate)
+            ->sum('grand_total');
 
         return $company;
     }
-
 }

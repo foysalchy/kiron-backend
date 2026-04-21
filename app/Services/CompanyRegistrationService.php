@@ -11,6 +11,7 @@ use App\Models\CompanySubscription;
 use App\Models\DomainSetup;
 use App\Models\EmailVerification;
 use App\Models\Pricing;
+use App\Models\PricingPackage;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Models\UserLoginHistory;
@@ -24,8 +25,7 @@ class CompanyRegistrationService
 {
     public function getActivePricings()
     {
-        return Pricing::where('status', Status::Active->value)
-            ->orderBy('monthly_regular_price')
+        return PricingPackage::with('tiers')->where('status', Status::Active->value)
             ->get();
     }
 
@@ -104,28 +104,44 @@ class CompanyRegistrationService
         DB::beginTransaction();
         try {
             $company = Company::findOrFail($data['registration_id']);
-            $pricing = Pricing::findOrFail($data['pricing_id']);
             $billing = $data['billing_cycle'] ?? 'monthly';
 
-            $amountPaid = $billing === 'yearly'
-                ? ($pricing->yearly_discount_price  ?: $pricing->yearly_regular_price)
-                : ($pricing->monthly_discount_price ?: $pricing->monthly_regular_price);
+            // Load package with the matching tier
+            $pricing = PricingPackage::with(['tiers' => function ($q) use ($billing) {
+                $q->where('billing_cycle', $billing);
+            }])->findOrFail($data['pricing_package_id']);
+
+            $tier = $pricing->tiers->first();
+
+            if (!$tier) {
+                throw new \Exception("No pricing tier found for billing cycle: {$billing}");
+            }
+
+            $amountPaid = $tier->discount_price > 0 && $tier->discount_price < $tier->regular_price
+                ? $tier->discount_price
+                : $tier->regular_price;
 
             $now       = Carbon::now();
-            $trialEnds = $pricing->free_trial > 0 ? $now->copy()->addDays($pricing->free_trial) : null;
-            $endsAt    = $billing === 'yearly' ? $now->copy()->addYear() : $now->copy()->addMonth();
+            $trialEnds = $pricing->trial_days > 0 ? $now->copy()->addDays($pricing->trial_days) : null;
 
-            $subscription =      CompanySubscription::create([
-                'company_id'     => $company->id,
-                'pricing_id'     => $pricing->id,
-                'billing_cycle'  => $billing,
-                'amount_paid'    => $amountPaid,
-                'payment_method' => $data['payment_method'] ?? 'card',
-                'payment_status' => 'pending',
-                'trial_ends_at'  => $trialEnds,
-                'starts_at'      => $now,
-                'ends_at'        => $endsAt,
-                'status'         => Status::Active->value,
+            $endsAt = match ($billing) {
+                'yearly'    => $now->copy()->addYear(),
+                'quarterly' => $now->copy()->addMonths(3),
+                default     => $now->copy()->addMonth(),   // monthly
+            };
+
+            $subscription = CompanySubscription::create([
+                'company_id'         => $company->id,
+                'pricing_package_id' => $pricing->id,
+                'pricing_tier_id'    => $tier->id,   // store which tier was used
+
+                'amount_paid'        => $amountPaid,
+                'payment_method'     => $data['payment_method'] ?? 'card',
+                'payment_status'     => 'pending',
+                'trial_ends_at'      => $trialEnds,
+                'starts_at'          => $now,
+                'ends_at'            => $endsAt,
+                'status'             => Status::Active->value,
             ]);
             if (in_array($data['payment_method'], ['manual', 'bank'])) {
                 $documentPath = null;
@@ -152,7 +168,8 @@ class CompanyRegistrationService
                     'updated_at'      => now(),
                 ]);
             }
-
+            $company->pricing_package_id = $subscription->pricing_package_id;
+            $company->update();
             SiteSetting::create([
                 'company_id' => $company->id,
                 'shop_name'  => $company->name,

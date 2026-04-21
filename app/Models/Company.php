@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-
+use App\Enums\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -83,12 +83,25 @@ class Company extends Model
     {
         return $this->hasMany(GeneratePayslip::class);
     }
+    public function domains()
+    {
+        return $this->hasMany(Domain::class);
+    }
     public function pricingPackage()
     {
         return $this->belongsTo(PricingPackage::class, 'pricing_package_id');
     }
 
-
+    public function subscriptions()
+    {
+        return $this->hasMany(CompanySubscription::class);
+    }
+    public function currentSubscription()
+    {
+        return $this->hasOne(CompanySubscription::class)
+            ->where('status', Status::Active->value)
+            ->latestOfMany();
+    }
     // Scopes
     public function scopeActive($query)
     {

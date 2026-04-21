@@ -13,7 +13,7 @@ class CompanySubscription extends Model
 
     protected $fillable = [
         'company_id',
-        'pricing_id',
+        'pricing_package_id',
         'billing_cycle',
         'amount_paid',
         'currency',
@@ -38,9 +38,10 @@ class CompanySubscription extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function pricing(): BelongsTo
+
+    public function pricingPackage()
     {
-        return $this->belongsTo(Pricing::class);
+        return $this->belongsTo(PricingPackage::class);
     }
 
     public function isActive(): bool

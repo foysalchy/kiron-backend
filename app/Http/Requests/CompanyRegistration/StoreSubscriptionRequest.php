@@ -15,8 +15,8 @@ class StoreSubscriptionRequest extends FormRequest
     {
         return [
             'registration_id' => ['required', 'integer', 'exists:companies,id'],
-            'pricing_id'      => ['required', 'integer', 'exists:pricings,id'],
-            'billing_cycle'   => ['required', 'in:monthly,yearly'],
+            'pricing_package_id'      => ['required', 'integer', 'exists:pricing_packages,id'],
+            'billing_cycle'   => ['required'],
             'payment_method'  => 'required|in:card,bank,mobile,manual',
             'transaction_id'      => 'required_if:payment_method,manual,bank|nullable|string|max:255',
             'number'              => 'required_if:payment_method,manual,bank|nullable|string|max:255',
