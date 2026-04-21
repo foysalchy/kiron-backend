@@ -20,7 +20,7 @@
                     ];
                 @endphp
                 <span
-                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'bg-blue-500' }} text-white text-md font-bold rounded-lg mb-1">
+                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'bg-blue-500' }} text-primary text-md font-bold rounded-lg mb-1">
                     {{ App\Enums\Status::from($order->status)->label() }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
@@ -150,7 +150,7 @@
                     {{ $isCurrent ? 'bg-orange-500 shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
                                     @if ($isCompleted && !$isCurrent)
                                         <i
-                                            class="fas fa-check text-[8px] text-white flex items-center justify-center h-full"></i>
+                                            class="fas fa-check text-[8px] text-primary flex items-center justify-center h-full"></i>
                                     @endif
                                 </div>
 
@@ -226,7 +226,7 @@
 
                             @if ($trackingUrl !== '#')
                                 <a href="{{ $trackingUrl }}" target="_blank"
-                                    class="w-full md:w-auto px-6 py-3 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
+                                    class="w-full md:w-auto px-6 py-3 bg-blue-600 text-primary rounded-xl text-sm font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-sm">
                                     <i class="fas fa-external-link-alt text-xs"></i>
                                     Track Now
                                 </a>
@@ -377,7 +377,7 @@
                 </div>
 
                 <button type="submit"
-                    class="w-full bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
+                    class="w-full bg-red-500 text-primary py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
                     Request</button>
             </form>
         </div>
@@ -441,7 +441,7 @@
                 <!-- Buttons -->
                 <div class="flex gap-3">
                     <button type="submit"
-                        class="flex-1 bg-[#1D2128] text-white py-3 rounded-xl font-bold hover:bg-black transition-all cursor-pointer">Submit
+                        class="flex-1 bg-[#1D2128] text-primary py-3 rounded-xl font-bold hover:bg-black transition-all cursor-pointer">Submit
                         Review</button>
                     <button type="button" onclick="closeReviewModal()"
                         class="px-6 py-3 border border-gray-200 rounded-xl font-bold text-gray-600 hover:bg-gray-50 cursor-pointer">Cancel</button>
@@ -512,7 +512,7 @@
                         div.innerHTML = `
                     <img src="${e.target.result}" class="w-full h-full object-cover">
                     <button type="button" onclick="removeReviewImage(this, '${file.name}')"
-                        class="absolute top-0 right-0 bg-red-500 text-white p-1 cursor-pointer">
+                        class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>
                     </button>
                 `;

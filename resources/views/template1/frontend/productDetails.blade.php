@@ -106,14 +106,14 @@
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 bg-[#00A651] hover:bg-green-700 text-white h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
                         <!-- ২. Order Now -->
                         <button id="btn-order" onclick="handleAddToCart(true)"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 bg-[#FFCF00] hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
@@ -167,7 +167,7 @@
                     <div class="grid grid-cols-2 gap-2 md:gap-3">
 
                         <a href="tel:{{ $setup->phone }}"
-                            class="bg-[#EE4D2D] hover:bg-red-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                            class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
@@ -180,7 +180,7 @@
 
                         <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                             target="_blank"
-                            class="bg-[#25D366] hover:bg-green-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                            class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
@@ -322,7 +322,7 @@
                                     @endphp
 
                                     <div
-                                        class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-white rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
+                                        class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-primary rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
                                         {{ $initials }}
                                     </div>
 
@@ -370,7 +370,7 @@
 
                                                     <!-- Close Button -->
                                                     <button onclick="closeReviewImage('{{ $review->id }}')"
-                                                        class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                                                        class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-primary w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
                                                         <i class="fas fa-times text-xs"></i>
                                                     </button>
                                                 </div>

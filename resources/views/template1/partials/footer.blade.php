@@ -1,5 +1,5 @@
 <!-- FOOTER -->
-<footer class="text-white pt-12">
+<footer class="text-primary pt-12">
 
     <!-- 1. Top Features Row -->
     <div class="bg-[#1A2937] p-6">
@@ -7,16 +7,16 @@
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($footerFeatures as $feature)
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 bg-[#FF6A00] rounded-full flex items-center justify-center shrink-0">
+                        <div class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
                             @if ($feature->icon_file)
                                 <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
                                     class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                             @else
-                                <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-white text-lg"></i>
+                                <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-primary text-lg"></i>
                             @endif
                         </div>
                         <div>
-                            <h5 class="font-bold text-sm md:text-[16px] text-white leading-tight">{{ $feature->title }}</h5>
+                            <h5 class="font-bold text-sm md:text-[16px] text-primary leading-tight">{{ $feature->title }}</h5>
                             <p class="text-gray-400 text-xs md:text-sm mt-0.5">{{ $feature->subtitle ?? $feature->text_content }}</p>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                                 class="h-9 md:h-10 w-auto object-contain">
                         @else
                             <div class="w-10 h-10 flex items-center justify-center rounded-lg">
-                                <span class="text-white text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
+                                <span class="text-primary text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
                             </div>
                         @endif
                         <span class="text-lg md:text-xl font-bold tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
@@ -74,37 +74,36 @@
                 <div>
                     <h4 class="text-base md:text-lg font-bold mb-4 md:mb-6">Quick Links</h4>
                     <ul class="space-y-2.5 text-sm">
-                        <li><a href="{{ route('about.index') }}" class="text-gray-400 hover:text-[#FF6A00] transition-colors">About Us</a></li>
-                        <li><a href="{{ route('contact.index') }}" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Contact Us</a></li>
-                        <li><a href="{{ route('order.track') }}" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Track Order</a></li>
-                        <li><a href="{{ route('support.index') }}" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Help & Support</a></li>
-                        <li><a href="{{ route('blog.index') }}" class="text-gray-400 hover:text-[#FF6A00] transition-colors">Blog</a></li>
+                        <li><a href="{{ route('contact.index') }}" class="text-gray-400 hover-text transition-colors">Contact Us</a></li>
+                        <li><a href="{{ route('order.track') }}" class="text-gray-400 hover-text transition-colors">Track Order</a></li>
+                        <li><a href="{{ route('support.index') }}" class="text-gray-400 hover-text transition-colors">Help & Support</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="text-gray-400 hover-text transition-colors">Blog</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 3: Categories -->
+                <!-- Column 3: Pages -->
                 <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-6">Categories</h4>
+                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-6">Pages</h4>
                     <ul class="space-y-2.5 text-sm">
-                        @foreach ($headerCategories as $cat)
+                        {{-- @foreach ($headerCategories as $cat)
                             <li>
                                 <a href="{{ route('category.products', $cat->slug) }}"
-                                    class="text-gray-400 hover:text-[#FF6A00] transition-colors">
+                                    class="text-gray-300 hover-text transition-colors">
                                     {{ $cat->name }}
                                 </a>
                             </li>
-                        @endforeach
+                        @endforeach --}}
                     </ul>
                 </div>
 
                 <!-- Column 4: Newsletter -->
                 <div>
-                    <h4 class="text-base text-white md:text-lg font-bold mb-4 md:mb-6">Newsletter</h4>
+                    <h4 class="text-base text-primary md:text-lg font-bold mb-4 md:mb-6">Newsletter</h4>
                     <p class="text-gray-300 text-sm mb-4">Subscribe to get updates on new products and exclusive offers.</p>
                     <div class="flex mb-5">
                         <input type="email" placeholder="Enter your email"
-                            class="bg-[#1A222F] border border-gray-700 text-white px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
-                        <button class="bg-[#BD4F00] hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
+                            class="bg-[#1A222F] border border-gray-700 text-primary px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
+                        <button class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
                             Subscribe
                         </button>
                     </div>
@@ -132,8 +131,6 @@
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm text-gray-400 text-center">
                     <p>© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
-                    <a href="{{ route('privacy.index') }}" class="hover:text-white">Privacy Policy</a>
-                    <a href="{{ route('term.index') }}" class="hover:text-white">Terms of Service</a>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-xs md:text-sm text-gray-400">We Accept:</span>

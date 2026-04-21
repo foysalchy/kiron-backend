@@ -103,7 +103,7 @@
 
                             <div class="flex items-center justify-between">
                                 <button type="submit"
-                                    class="bg-[#f15a24] text-white px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
+                                    class="bg-[#f15a24] text-primary px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
                                     Filter
                                 </button>
                                 <span class="text-[10px] text-gray-500 font-medium">

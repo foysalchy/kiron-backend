@@ -185,7 +185,7 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full bg-[#EF4444] hover:bg-red-600 text-white font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
+                            class="w-full bg-[#EF4444] hover:bg-red-600 text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
                             Confirm Order
                         </button>
                     </div>

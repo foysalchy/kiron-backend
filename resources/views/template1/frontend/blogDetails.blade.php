@@ -4,7 +4,7 @@
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
 
         <!-- Back Button: Dynamic URL -->
-        <a class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6 font-medium" href="{{ url('/blogs') }}">
+        <a class="inline-flex items-center text-secondary hover:text-primary mb-6 font-medium" href="{{ url('/blogs') }}">
             <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
         </a>
 
@@ -33,7 +33,7 @@
                                 : explode(',', $blog->meta_keywords);
                         @endphp
                         <div
-                            class="absolute top-4 left-4 bg-blue-600 text-white px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
+                            class="absolute top-4 left-4 bg-blue-600 text-primary px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
                             {{ $keywords[0] ?? 'Blog' }}
                         </div>
                     </div>
@@ -46,14 +46,14 @@
 
                         <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8 pb-6">
                             <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-user text-blue-500"></i>
+                                <i class="fa-regular fa-user text-secondary"></i>
                                 <span>{{ $blog->user->name ?? 'Admin' }}</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-calendar text-blue-500"></i>
+                                <i class="fa-regular fa-calendar text-secondary"></i>
                                 <span>{{ $blog->created_at->format('Y-m-d') }}</span>
                             </div>
-                            <span class="text-blue-600">
+                            <span class="primary-bg text-primary px-2 py-0.5 rounded-full text-xs font-medium">
                                 {{ $blog->reading_time ?? 5 }} minutes
                             </span>
                         </div>
@@ -122,7 +122,7 @@
                                         class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all"
                                         placeholder="Write your comment..." rows="4"></textarea>
                                     <button
-                                        class="bg-[#1D2128] text-white px-4 py-2 rounded-lg shadow-xs font-xs hover:bg-black transition-all"
+                                        class="bg-[#1D2128] text-primary px-4 py-2 rounded-lg shadow-xs font-xs hover:bg-black transition-all"
                                         type="submit">Post comment</button>
                                 </form>
                             </div>
@@ -216,7 +216,7 @@
                         <input class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:outline-none"
                             placeholder="Your email address">
                         <button
-                            class="w-full rounded-lg bg-gray-900 px-4 py-3 text-sm font-medium text-white hover:bg-gray-700 transition-all">
+                            class="w-full rounded-lg primary-bg px-4 py-3 text-sm font-medium text-primary hover:bg-gray-700 transition-all">
                             Subscribe
                         </button>
                     </div>
@@ -227,7 +227,7 @@
                     <div class="flex flex-wrap gap-2">
                         @foreach ($popularTags as $tag)
                             <a href="{{ url('/blogs?tag=' . urlencode($tag)) }}"
-                                class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-900 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">
+                                class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-900 hover:bg-blue-600 hover:text-primary hover:border-blue-600 transition-all">
                                 {{ $tag }}
                             </a>
                         @endforeach

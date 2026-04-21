@@ -3,8 +3,8 @@
 @section('content')
     <!-- 1. Hero & Search -->
     <section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 py-10 md:py-24">
-        <div class="container mx-auto px-4 text-center text-white">
-            <h1 class="text-2xl md:text-5xl font-black mb-3 tracking-tight">Our Blog</h1>
+        <div class="container mx-auto px-4 text-center text-primary">
+            <h1 class="text-2xl md:text-5xl font-bold mb-3 tracking-tight">Our Blog</h1>
             <p class="text-lg md:text-xl mb-8 opacity-90">Latest insights, styles, and shopping tips just for you</p>
 
             <form action="{{ url()->current() }}" method="GET" class="max-w-2xl mx-auto relative">
@@ -40,7 +40,7 @@
                 <a href="{{ url()->current() }}"
                     class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
                 {{ empty($currentTag)
-                    ? 'bg-[#1D2128] text-white border-[#1D2128] shadow-md'
+                    ? 'primary-bg text-primary border-[#1D2128] shadow-md'
                     : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
                     All
                 </a>
@@ -50,7 +50,7 @@
                     <a href="{{ url()->current() . '?tag=' . urlencode($tag) }}"
                         class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
                     {{ $currentTag == $tag
-                        ? 'bg-[#1D2128] text-white border-[#1D2128] shadow-md'
+                        ? 'primary-bg text-primary border-[#1D2128] shadow-md'
                         : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
                         {{ $tag }}
                     </a>
@@ -83,7 +83,7 @@
                                 : $blog->meta_keywords ?? 'Blog';
                         @endphp
                         <span
-                            class="absolute top-4 left-4 bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md z-20">
+                            class="absolute top-4 left-4 primary-bg text-primary text-sm font-bold px-3 py-1 rounded-full shadow-md z-20">
                             {{ $badgeText }}
                         </span>
                     </div>
@@ -91,7 +91,7 @@
                     <!-- Card Content -->
                     <div class="p-6">
                         <h3
-                            class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+                            class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                             {{ $blog->title }}
                         </h3>
                         <p class="text-gray-700 text-sm mb-6 line-clamp-2">
@@ -99,14 +99,14 @@
                         </p>
 
                         <!-- Metadata -->
-                        <<div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 mb-5 font-medium pb-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 mb-5 font-medium pb-4">
                             <div class="flex items-center gap-4">
                                 <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-sm"></i>
                                     {{ $blog->user->name ?? 'Admin' }} </span>
                                 <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-sm"></i>
                                     {{ $blog->created_at->format('Y-m-d') }}</span>
                             </div>
-                            <span class="text-blue-600 font-bold">
+                            <span class="text-secondary font-bold">
                                 {{ $blog->reading_time }} Minute
                             </span>
                         </div>
@@ -132,9 +132,8 @@
                         </div>
 
                         <!-- Read More Button (Main Link) -->
-                        <!-- এখানে after:absolute after:inset-0 যোগ করা হয়েছে যা পুরো কার্ডকে লিংক বানিয়ে দিবে -->
                         <a href="{{ route('blog.details', ['slug' => $blog->slug]) }}"
-                            class="after:absolute after:inset-0 after:z-10 block w-full text-center bg-[#1D2128] hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all duration-300 text-sm">
+                            class="after:absolute after:inset-0 after:z-10 block w-full text-center primary-bg hover:bg-blue-600 text-primary font-bold py-3 rounded-lg transition-all duration-300 text-sm">
                             Read More <i class="fas fa-arrow-right ml-2 text-xs"></i>
                         </a>
                     </div>

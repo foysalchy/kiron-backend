@@ -1,7 +1,7 @@
 <header class="w-full bg-white sticky top-0 z-50 font-['Outfit']">
 
     <!-- 1. Top Bar (Orange Row) -->
-    <div class="bg-[var(--primary-color)] text-white py-2 text-sm hidden sm:block">
+    <div class="primary-bg text-primary py-2 text-sm hidden sm:block">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center gap-6">
                 <span class="flex items-center gap-2">
@@ -40,8 +40,8 @@
                     class="h-10 md:h-12 w-auto object-contain">
             @else
                 <div
-                    class="bg-[#FF6A00] w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
-                    <span class="text-white text-xl md:text-2xl font-bold">
+                    class="primary-bg w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
+                    <span class="text-primary text-xl md:text-2xl font-bold">
                         {{ substr($setup->shop_name ?? 'O', 0, 1) }}
                     </span>
                 </div>
@@ -57,7 +57,7 @@
                     value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
-                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md flex-shrink-0"
+                    class="primary-bg text-primary h-9 w-10 flex items-center justify-center rounded-md flex-shrink-0"
                     aria-label="Submit Search">
                     <i class="fas fa-search text-sm"></i>
                 </button>
@@ -105,19 +105,19 @@
 
             <!-- Nav Links (XL only) -->
             <div class="hidden xl:flex items-center gap-5 text-sm font-semibold text-gray-500">
-                <a href="{{ route('order.track') }}" class="hover:text-[#FF6A00] transition-colors">Track Order</a>
-                <a href="{{ route('contact.index') }}" class="hover:text-[#FF6A00] transition-colors">Contact</a>
-                <a href="{{ route('blog.index') }}" class="hover:text-[#FF6A00] transition-colors">Blog</a>
+                <a href="{{ route('order.track') }}" class="hover-text transition-colors">Track Order</a>
+                <a href="{{ route('contact.index') }}" class="hover-text transition-colors">Contact</a>
+                <a href="{{ route('blog.index') }}" class="hover-text transition-colors">Blog</a>
             </div>
 
             <!-- Mobile Search Toggle -->
-            <button class="sm:hidden text-xl hover:text-[#FF6A00]" onclick="toggleMobileSearch()">
+            <button class="sm:hidden text-xl hover-text" onclick="toggleMobileSearch()">
                 <i class="fas fa-search"></i>
             </button>
 
             <!-- Wishlist -->
             <a href="{{ route('user.dashboard') }}"
-                class="flex items-center gap-1.5 hover:text-[#FF6A00] transition-colors relative">
+                class="flex items-center gap-1.5 hover-text transition-colors relative">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl"></i>
                     @auth('customer')
@@ -126,7 +126,7 @@
                         @php $initialWishCount = 0; @endphp
                     @endauth
                     <span id="wishlist-count-nav"
-                        class="absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $initialWishCount > 0 ? '' : 'hidden' }}">
+                        class="absolute -top-2 -right-2 primary-bg text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white {{ $initialWishCount > 0 ? '' : 'hidden' }}">
                         {{ $initialWishCount }}
                     </span>
                 </div>
@@ -136,7 +136,7 @@
             <!-- Account -->
             <div class="relative cursor-pointer hidden lg:block" id="account-menu">
                 <div onclick="toggleAccount()"
-                    class="flex items-center gap-1.5 hover:text-[#FF6A00] transition-colors select-none">
+                    class="flex items-center gap-1.5 hover-text transition-colors select-none">
                     @auth('customer')
                         <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
                             <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
@@ -159,7 +159,7 @@
                         </div>
                         <div class="py-2">
                             <a href="{{ route('user.dashboard') }}?section=orders"
-                                class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
                                 <i class="fas fa-box text-gray-400 w-4"></i>
                                 Dashboard
                             </a>
@@ -178,12 +178,12 @@
                     @else
                         <div class="py-2">
                             <a href="{{ route('user.login') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
                                 <i class="fa-solid fa-right-to-bracket text-gray-400 text-sm"></i>
                                 Login
                             </a>
                             <a href="{{ route('user.register') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
                                 <i class="fa-solid fa-user-plus text-gray-400 text-sm"></i>
                                 Register
                             </a>
@@ -194,11 +194,11 @@
 
             <!-- Cart -->
             <a href="{{ route('cart.index') }}"
-                class="flex items-center gap-1.5 hover:text-[#FF6A00] transition-colors relative">
+                class="flex items-center gap-1.5 hover-text transition-colors relative">
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>
                     <span
-                        class="cart-count-nav absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                        class="cart-count-nav absolute -top-2 -right-2 primary-bg text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
                         {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                     </span>
                 </div>
@@ -206,7 +206,7 @@
             </a>
 
             <!-- Mobile Menu Toggle -->
-            <button class="lg:hidden text-xl hover:text-[#FF6A00]" onclick="toggleMobileMenu()">
+            <button class="lg:hidden text-xl hover-text" onclick="toggleMobileMenu()">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -219,7 +219,7 @@
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
-                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md"
+                    class="primary-bg text-primary h-9 w-10 flex items-center justify-center rounded-md"
                     aria-label="Open Search">
                     <i class="fas fa-search text-sm"></i>
                 </button>
@@ -231,12 +231,12 @@
     <div class="border-t border-gray-100 hidden md:block">
         <div class="container mx-auto px-4 flex items-center gap-6 py-2.5 overflow-x-auto no-scrollbar">
             @foreach ($headerCategories as $cat)
-                <a class="text-sm font-medium hover:text-[#FF6A00] whitespace-nowrap transition-colors"
+                <a class="text-sm font-medium hover-text whitespace-nowrap transition-colors"
                     href="{{ route('category.products', $cat->slug) }}">
                     {{ $cat->name }}
                 </a>
             @endforeach
-            <a class="text-sm font-medium hover:text-[#FF6A00] whitespace-nowrap"
+            <a class="text-sm font-medium hover-text whitespace-nowrap"
                 href="{{ route('brand.index') }}">Brands</a>
             <a class="text-sm font-bold text-red-700 hover:text-red-800 whitespace-nowrap"
                 href="{{ route('flash.sale') }}">Flash Sale 🔥</a>
@@ -252,9 +252,9 @@
         <div class="relative w-72 max-w-[85vw] bg-white h-full overflow-y-auto shadow-2xl flex flex-col">
 
             <!-- Drawer Header -->
-            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-[#FF6A00]">
-                <span class="text-white font-bold text-lg">{{ $setup->shop_name ?? 'Menu' }}</span>
-                <button onclick="toggleMobileMenu()" class="text-white text-xl">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 primary-bg text-primary">
+                <span class="text-primary font-bold text-lg">{{ $setup->shop_name ?? 'Menu' }}</span>
+                <button onclick="toggleMobileMenu()" class="text-primary text-xl">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -276,7 +276,7 @@
                     <a href="{{ route('user.login') }}"
                         class="flex-1 text-center py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-sm font-bold">Login</a>
                     <a href="{{ route('user.register') }}"
-                        class="flex-1 text-center py-2 bg-[#FF6A00] text-white rounded-lg text-sm font-bold">Register</a>
+                        class="flex-1 text-center py-2 primary-bg text-primary text-primary rounded-lg text-sm font-bold">Register</a>
                 </div>
             @endauth
 
@@ -285,11 +285,11 @@
                 <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 tracking-wider">Navigation</p>
 
                 <a href="{{ route('home') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-home w-4 text-gray-400"></i> Home
                 </a>
                 <a href="{{ route('shop.index') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-store w-4 text-gray-400"></i> Shop
                 </a>
                 <a href="{{ route('flash.sale') }}"
@@ -297,19 +297,19 @@
                     <i class="fas fa-bolt w-4 text-red-600"></i> Flash Sale 🔥
                 </a>
                 <a href="{{ route('brand.index') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-tags w-4 text-gray-400"></i> Brands
                 </a>
                 <a href="{{ route('blog.index') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-newspaper w-4 text-gray-400"></i> Blog
                 </a>
                 <a href="{{ route('order.track') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-truck w-4 text-gray-400"></i> Track Order
                 </a>
                 <a href="{{ route('contact.index') }}"
-                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                     <i class="fas fa-envelope w-4 text-gray-400"></i> Contact
                 </a>
 
@@ -318,7 +318,7 @@
                     </p>
                     @foreach ($headerCategories as $cat)
                         <a href="{{ route('category.products', $cat->slug) }}"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                             <i class="fas fa-chevron-right text-[10px] text-gray-300 w-4"></i>
                             {{ $cat->name }}
                         </a>
