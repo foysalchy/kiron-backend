@@ -5,18 +5,14 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class TermController extends Controller
+class TermController extends FrontendController
 {
     public function index()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-        return view($template . '.frontend.terms');
+        return $this->view('frontend.terms');
     }
     public function privacy()
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
-        return view($template . '.frontend.privacy');
+        return $this->view('frontend.privacy');
     }
 }

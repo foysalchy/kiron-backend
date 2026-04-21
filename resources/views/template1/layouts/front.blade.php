@@ -7,6 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ $setup->shop_name ?? 'Oren Mart' }}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
 
     <!-- Outfit Font -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
@@ -18,10 +20,8 @@
 
     <style>
         :root {
-            --primary-bg-color: oklch(93.6% 0.032 17.717);
-            --primary-text-color: oklch(93.6% 0.032 17.717);
-            --secondary-bg-color: oklch(93.6% 0.032 17.717);
-            --secondary-bg-text: oklch(93.6% 0.032 17.717);
+            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '' }};
+            --primary-hover: {{ $themeColor->theme_template['primary_hover'] ?? '' }};
         }
 
         .primary-bg {

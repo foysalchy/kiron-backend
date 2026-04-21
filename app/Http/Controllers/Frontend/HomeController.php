@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\MegaCategory;
 use App\Models\Product;
 use App\Models\ProductGroup;
+use App\Models\Slider;
 use Illuminate\Http\Request;
 
 class HomeController extends FrontendController
@@ -48,6 +49,24 @@ class HomeController extends FrontendController
             ->take(12)
             ->get();
 
-        return  $this->view('frontend.home', compact('categories', 'newArrivals', 'brands', 'popularProducts', 'productGroups'));
+        $allSliders = Slider::where('status', Status::Active->value)->get();
+        $mainSliders = $allSliders->where('placement', 'hero');
+        $sidebarSliders = $allSliders->where('placement', 'left');
+        $middleSliders = $allSliders->where('placement', 'middle')->take(2);
+
+        return  $this->view(
+            'frontend.home',
+            compact(
+                'categories',
+                'newArrivals',
+                'brands',
+                'popularProducts',
+                'productGroups',
+                'allSliders',
+                'mainSliders',
+                'sidebarSliders',
+                'middleSliders'
+            )
+        );
     }
 }

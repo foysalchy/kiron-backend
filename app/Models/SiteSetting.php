@@ -53,4 +53,9 @@ class SiteSetting extends Model
     {
         return $this->logo ? asset('storage/' . $this->logo) : null;
     }
+    // Accessors for Favicon
+    public function getFaviconUrlAttribute(): ?string
+    {
+        return $this->favicon ? asset('storage/' . $this->favicon) : asset('favicon.ico');
+    }
 }

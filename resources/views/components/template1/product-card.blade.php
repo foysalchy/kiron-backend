@@ -1,7 +1,7 @@
 @php
 
     $company = getCurrentCompany();
-    $template = $company->product_card_template ?? 1;
+    $template = $company->product_card_template ?? 2;
 @endphp
 @if ($template == 1)
     @include('components.template1.product-1', ['product' => $product])
@@ -74,61 +74,70 @@
                 }
             }
 
-            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন
-function processAddVariation() {
-    const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-    const qtyInput = document.getElementById('modal-qty');
-    const token = document.querySelector('meta[name="csrf-token"]').content;
+            // 1. Function to add variation
+            function processAddVariation() {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                const qtyInput = document.getElementById('modal-qty');
+                const token = document.querySelector('meta[name="csrf-token"]').content;
 
-    if (!selectedVariant) {
-        toastr.warning("দয়া করে একটি অপশন সিলেক্ট করুন।");
-        return;
-    }
+                if (!selectedVariant) {
+                    toastr.warning("Please select an option.");
+                    return;
+                }
 
-    fetch("{{ route('cart.add') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify({
-                variation_id: selectedVariant.value,
-                qty: qtyInput ? qtyInput.value : 1
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            // যদি সাকসেস হয়
-            if (data.status === 'success') {
-                document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                closeModal();
-                toastr.success(data.message);
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            variation_id: selectedVariant.value,
+                            qty: qtyInput ? qtyInput.value : 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        // If success
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            closeModal();
+                            toastr.success(data.message);
+                        }
+                        // If error (like: stock out)
+                        else {
+                            toastr.error(data.message || "Something went wrong.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        toastr.error("There was a problem with the server, please try again.");
+                    });
             }
-            // যদি এরর হয় (যেমন: স্টক আউট)
-            else {
-                toastr.error(data.message || "কিছু একটা ভুল হয়েছে।");
-            }
-        })
-        .catch(err => {
-            console.error('Error:', err);
-            toastr.error("সার্ভারে সমস্যা হয়েছে, আবার চেষ্টা করুন।");
-        });
-}
 
-// ২. সিঙ্গেল প্রোডাক্ট অ্যাড করার ফাংশন
-function addSingleToCart(id) {
-    fetch("{{ route('cart.add') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify({ id: id, qty: 1 })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                toastr.success(data.message);
-            } else {
-                toastr.error(data.message); // স্টক আউটের মেসেজ এখানে দেখাবে
+            // 2. Function to add single product
+            function addSingleToCart(id) {
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            qty: 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error(data.message); // Stock out message will be shown here
+                        }
+                    });
             }
-        });
-}
 
             function toggleWishlist(productId) {
                 const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -171,7 +180,7 @@ function addSingleToCart(id) {
                                     const iconInWishlist = wishlistSection.querySelector(`[id="wish-icon-${productId}"]`);
                                     if (iconInWishlist) {
                                         const productCard = iconInWishlist.closest(
-                                        '.group.relative'); // main card element
+                                            '.group.relative'); // main card element
                                         if (productCard) {
                                             // remove animation
                                             productCard.style.transition = 'all 0.5s ease';
@@ -185,7 +194,7 @@ function addSingleToCart(id) {
                                                     '.group.relative');
                                                 if (remainingCards.length === 0) {
                                                     location
-                                                .reload();
+                                                        .reload();
                                                 }
                                             }, 500);
                                         }
@@ -197,7 +206,7 @@ function addSingleToCart(id) {
                             }
 
                             const wishCountElements = document.querySelectorAll(
-                            '.wishlist-count-val');
+                                '.wishlist-count-val');
                             wishCountElements.forEach(el => el.innerText = data.wish_count);
                         }
                     })
