@@ -18,54 +18,47 @@
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <style>
-        :root {
-            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '' }};
-            --primary-hover: {{ $themeColor->theme_template['primary_hover'] ?? '' }};
-        }
+<style>
+    :root {
+        --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }};
 
-        .primary-bg {
-            background-color: var(--primary-bg-color);
-        }
+        --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
 
-        .primary-text {
-            color: var(--primary-text-color);
-        }
+        --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }};
+        --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }};
 
-        .secondary-bg {
-            background-color: var(--secondary-bg-color);
-        }
+        --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
+        --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
+    }
 
-        .secondary-text {
-            color: var(--secondary-bg-text);
-        }
+    .primary-bg {
+        background-color: var(--primary-color) !important;
+        color: var(--primary-text) !important;
+    }
 
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
-        }
+    .text-primary {
+        color: var(--primary-text) !important;
+    }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
+    .text-brand {
+        color: var(--primary-color) !important;
+    }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 10px;
-        }
+    .secondary-bg {
+        background-color: var(--secondary-color) !important;
+        color: var(--secondary-text) !important;
+    }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #d1d5db;
-        }
+    .text-secondary { color: var(--secondary-text) !important; }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+    .hover-text:hover {
+        color: var(--primary-hover-text) !important;
+    }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
+    .primary-bg-hover:hover {
+        background-color: var(--primary-hover-color) !important;
+    }
+</style>
     @stack('styles')
 </head>
 

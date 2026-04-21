@@ -163,7 +163,7 @@
                 <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">New Arrivals</h2>
                 <a href="{{ route('shop.index') }}">
                     <button aria-label="View all new arrivals"
-                        class="bg-[#BD4F00] hover:bg-[#a34400] font-semibold text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                        class="primary-bg primary-bg-hover font-semibold text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
                         View all
                     </button>
                 </a>
@@ -219,7 +219,7 @@
                     <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">{{ $group->name }}</h2>
                     <a href="{{ url('/shop', ['group' => $group->slug]) }}">
                         <button
-                            class="bg-[#BD4F00] hover:bg-[#a34400] text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm"
+                            class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm"
                             aria-label="View all products in {{ $group->name }}">
                             View all
                         </button>
@@ -349,7 +349,7 @@
             <!-- View More Button -->
             <div class="flex justify-center mt-10">
                 <a href="{{ route('shop.index') }}"
-                    class="bg-[#BD4F00] text-white hover:bg-gray-50 hover:text-[#a34400] hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                    class="primary-bg text-primary hover:bg-gray-50 primary-bg-hover hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
                     View More
                 </a>
             </div>

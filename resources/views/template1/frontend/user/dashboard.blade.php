@@ -35,7 +35,7 @@
                     <!-- Sidebar Menu -->
                     <nav class="mt-4 lg:mt-8 flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0" id="dashboard-nav">
                         <button onclick="showSection('overview', this)"
-                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 bg-[#1D2128] text-white rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 bg-[#1D2128] text-primary rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-user w-5 text-center"></i> Overview
                         </button>
                         <button onclick="showSection('orders', this)"
@@ -245,7 +245,7 @@
                                             $order->payment_status !== \App\Models\Order::PAYMENT_PAID &&
                                                 $order->status !== \App\Enums\Status::Cancelled->value)
                                             <a href="#" {{-- Replace # with your payment route, e.g., route('order.pay', $order->id) --}}
-                                                class="px-4 py-2 bg-[#FF6A00] text-white border border-[#FF6A00] rounded-lg text-sm font-bold hover:bg-orange-600 flex items-center gap-2">
+                                                class="px-4 py-2 bg-[#FF6A00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold hover:bg-orange-600 flex items-center gap-2">
                                                 <i class="fa-brands fa-amazon-pay"></i> Pay Now
                                             </a>
                                         @endif
@@ -286,7 +286,7 @@
                                     </div>
                                     <h2 class="text-xl font-bold text-gray-800">Your wishlist is currently empty.</h2>
                                     <a href="{{ route('shop.index') }}"
-                                        class="inline-block mt-8 bg-[#FF6A00] text-white px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">শপিং
+                                        class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">শপিং
                                         Start Shopping</a>
                                 </div>
                             @endif
@@ -360,7 +360,7 @@
                             </div>
 
                             <button type="submit"
-                                class="bg-[#FF6A00] text-white px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
+                                class="bg-[#FF6A00] text-primary px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
                                 Save information
                             </button>
                         </form>
@@ -397,7 +397,7 @@
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
                             </div>
                             <button type="submit"
-                                class="bg-[#FF6A00] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
+                                class="bg-[#FF6A00] text-primary px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
                         </form>
                     </div>
                 </div>
@@ -417,11 +417,11 @@
 
             const navLinks = document.querySelectorAll(".nav-link");
             navLinks.forEach((link) => {
-                link.classList.remove("bg-[#1D2128]", "text-white");
+                link.classList.remove("bg-[#1D2128]", "text-primary");
                 link.classList.add("text-gray-600", "hover:bg-orange-50");
             });
 
-            element.classList.add("bg-[#1D2128]", "text-white");
+            element.classList.add("bg-[#1D2128]", "text-primary");
             element.classList.remove("text-gray-600", "hover:bg-orange-50");
         }
     </script>
@@ -466,11 +466,11 @@
 
             const navLinks = document.querySelectorAll(".nav-link, .nav-link-custom");
             navLinks.forEach((link) => {
-                link.classList.remove("bg-[#1D2128]", "text-white");
+                link.classList.remove("bg-[#1D2128]", "text-primary");
                 link.classList.add("text-gray-600", "hover:bg-orange-50");
             });
 
-            element.classList.add("bg-[#1D2128]", "text-white");
+            element.classList.add("bg-[#1D2128]", "text-primary");
             element.classList.remove("text-gray-600", "hover:bg-orange-50");
         }
     </script>

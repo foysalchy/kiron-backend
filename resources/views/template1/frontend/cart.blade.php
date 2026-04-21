@@ -124,7 +124,7 @@
 
                                 @if (session()->has('coupon'))
                                     <a href="{{ route('coupon.remove') }}"
-                                        class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
+                                        class="bg-red-500 text-primary rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
                                         <i class="fas fa-times"></i>
                                     </a>
                                 @else
@@ -171,7 +171,7 @@
 
                         <!-- Checkout Button -->
                         <a href="{{ url('/checkout') }}"
-                            class="block w-full text-center bg-[#FF6A00] hover:bg-[#e65f00] text-white py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
+                            class="block w-full text-center bg-[#FF6A00] hover:bg-[#e65f00] text-primary py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
                             Checkout
                         </a>
 
@@ -215,7 +215,7 @@
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">Your cart is currently empty!</h2>
                 <a href="{{ route('shop.index') }}"
-                    class="inline-block mt-8 bg-[#FF6A00] text-white px-10 py-3 rounded-xl font-bold">Start shopping</a>
+                    class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold">Start shopping</a>
             </div>
         @endif
     </section>

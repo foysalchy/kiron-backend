@@ -67,7 +67,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-lg transition-all">
+                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-lg transition-all">
                         <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
@@ -176,7 +176,7 @@
                     @endphp
 
                     <a href="https://wa.me/{{ $whatsappNumber }}" target="_blank"
-                        class="inline-flex items-center justify-center gap-3 bg-[#16A34A] hover:bg-[#128C7E] text-white font-bold p-4 rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-[0.98]">
+                        class="inline-flex items-center justify-center gap-3 bg-[#16A34A] hover:bg-[#128C7E] text-primary font-bold p-4 rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-[0.98]">
                         <!-- WhatsApp Icon -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
@@ -264,14 +264,12 @@
 
             <!-- Map Container -->
             <div class="relative w-full rounded-lg overflow-hidden border border-gray-200 shadow-inner group">
-                <!-- আসল গুগল ম্যাপ (Google Maps Iframe) -->
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.1075677025856!2d90.41018317589578!3d23.779185187720234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70b22a019d3%3A0xe54331201990c74e!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1709456789012!5m2!1sen!2sbd"
                     class="w-full h-[400px] md:h-[500px] grayscale-[0.2] contrast-[1.1] transition-all group-hover:grayscale-0"
                     style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                 </iframe>
 
-                <!-- ম্যাপের উপর একটি হালকা ওভারলে বাটন (ঐচ্ছিক) -->
                 <div class="absolute bottom-4 right-4 z-10">
                     <a href="https://maps.app.goo.gl/9uT5Qx5Y8hX6q8yX9" target="_blank"
                         class="bg-white text-gray-800 px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 hover:bg-[#FF6A00] hover:text-white transition-all">

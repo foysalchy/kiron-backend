@@ -130,7 +130,7 @@
 
                         <!-- Submit Button -->
                         <button type="submit"
-                            class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
                             Register
                         </button>
 

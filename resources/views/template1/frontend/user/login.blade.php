@@ -13,7 +13,6 @@
 
             <!-- Login Form -->
             <div class="p-6">
-                {{-- ব্যাকএন্ড রাউটে কানেক্ট করা হয়েছে --}}
                 <form action="{{ route('user.login.store') }}" method="POST" class="space-y-4">
                     @csrf
 
@@ -27,7 +26,6 @@
                             <input type="email" name="email" value="{{ old('email') }}" placeholder="user@example.com" required
                                 class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
                         </div>
-                        {{-- এরর মেসেজ (যেমন: পাসওয়ার্ড ভুল বা অ্যাকাউন্ট ব্লক) --}}
                         @error('email')
                             <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
                         @enderror
@@ -58,7 +56,7 @@
 
                     <!-- Login Button -->
                     <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-white font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
+                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
                         Login
                     </button>
 

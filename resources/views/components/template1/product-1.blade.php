@@ -8,29 +8,18 @@
             ->exists();
     }
 
-    // dicount percentage calculation
     $priceData = $product->display_price_data;
     $salePrice = $priceData->sale_price;
     $regularPrice = $priceData->regular_price;
     $isVar = $priceData->is_variation;
 
-    // Single vs Variation
     $discountLabel = '';
-    if ($regularPrice > $salePrice) {
-        // check if product has variations and get discount from first variation if exists
-        if ($isVar) {
-            $firstVar = $product->variations->first();
-            $d_type = $firstVar->discount_type ?? null;
-            $d_val = $firstVar->discount ?? 0;
-        } else {
-            $d_type = $product->discount_type;
-            $d_val = $product->discount;
-        }
+    if ($regularPrice > $salePrice && $regularPrice > 0) {
+        $diff = $regularPrice - $salePrice;
+        $percentage = round(($diff / $regularPrice) * 100);
 
-        if ($d_type == 'percent' && $d_val > 0) {
-            $discountLabel = round($d_val) . '%';
-        } elseif ($d_val > 0) {
-            $discountLabel = $setup->currency . number_format($regularPrice - $salePrice, 0);
+        if ($percentage > 0) {
+            $discountLabel = $percentage . '%';
         }
     }
 @endphp
@@ -61,7 +50,7 @@
         <!-- Discount Badge -->
         @if ($discountLabel)
             <div
-                class="absolute top-2 left-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
+                class="absolute top-2 left-2 secondary-bg secondary-text text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
                 -{{ $discountLabel }}
             </div>
         @endif
@@ -110,7 +99,7 @@
 
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="out of stock"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="flex-1 bg-[#1D2128] text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all shrink-0 whitespace-nowrap
+            class="flex-1 primary-bg text-primary px-3 py-2 rounded-lg text-sm font-semibold transition-all shrink-0 whitespace-nowrap
     {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00] cursor-pointer' }}">
 
             @if ($isOutOfStock)

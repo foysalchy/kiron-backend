@@ -48,7 +48,7 @@
         </div>
 
         <button type="button" onclick="processAddVariation()"
-            class="flex-1 bg-[#1D2128] text-white py-3 rounded-xl font-bold hover:bg-[#FF6A00] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+            class="flex-1 bg-[#1D2128] text-primary py-3 rounded-xl font-bold hover:bg-[#FF6A00] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
             <i class="fas fa-shopping-cart text-sm"></i>
             Add to Cart
         </button>
