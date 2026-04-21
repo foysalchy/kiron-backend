@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Enums\Status;
+use App\Models\Company;
 use App\Models\ContentSetting;
 use App\Models\MegaCategory;
 use App\Models\Product;
@@ -232,45 +233,19 @@ class AppServiceProvider extends ServiceProvider
             $currentStore = getCurrentCompany();
 
             if ($currentStore) {
-                $setup = SiteSetting::where('company_id', $currentStore->company_id)->first();
-                View::share('setup', $setup);
+                $companyId = $currentStore->company_id;
 
-                $headerCategories = MegaCategory::where('company_id', $currentStore->company_id ?? $currentStore->id)
-                    ->where('status', 1)
-                    ->latest()
-                    ->take(5)
-                    ->get();
+                $data = cache()->remember("store_{$companyId}", 600, fn() => [
+                    'setup'            => SiteSetting::where('company_id', $companyId)->first(),
+                    'headerCategories' => MegaCategory::where('company_id', $companyId)->where('status', 1)->latest()->take(5)->get(),
+                    'footerFeatures'   => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::PAGE_ALL)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
+                    'socialLinks'      => SocialSetting::where('company_id', $companyId)->where('status', Status::Active->value)->get(),
+                    'popularSearches'  => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
+                    'relatedProducts'  => Product::where('status', Status::Active->value)->where('company_id', $companyId)->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+                    'themeColor' => Company::where('id', $companyId)->first(),
+                ]);
 
-                $footerFeatures = ContentSetting::where('company_id', $currentStore->company_id ?? $currentStore->id)
-                    ->where('page_type', ContentSetting::PAGE_ALL) // 'all_page'
-                    ->where('status', Status::Active->value)
-                    ->orderBy('sort_order')
-                    ->get();
-
-                $socialLinks = SocialSetting::where('company_id', $currentStore->company_id ?? $currentStore->id)
-                    ->where('status', Status::Active->value)
-                    ->get();
-
-                $popularSearches = SearchProduct::select('keyword', DB::raw('count(*) as total'))
-                    ->groupBy('keyword')
-                    ->orderBy('total', 'desc')
-                    ->take(5)
-                    ->get();
-
-                $relatedProducts = Product::active()
-                    ->where('company_id', $currentStore->company_id ?? $currentStore->id)
-                    ->withCount('views')
-                    ->orderBy('views_count', 'desc')
-                    ->take(5)
-                    ->get();
-
-                View::share('popularSearches', $popularSearches);
-                View::share('relatedProducts', $relatedProducts);
-
-                View::share('socialLinks', $socialLinks);
-
-                View::share('headerCategories', $headerCategories);
-                View::share('footerFeatures', $footerFeatures);
+                View::share($data);
             }
         }
     }

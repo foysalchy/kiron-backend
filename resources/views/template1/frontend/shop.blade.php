@@ -198,7 +198,7 @@
                     </h2>
                     <div class="relative">
                         <form action="" method="GET" id="sortForm">
-                            <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                            <select name="sort" onchange="document.getElementById('sortForm').submit()" aria-label="Sort products"
                                 class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
                                 <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default
                                     Sorting</option>

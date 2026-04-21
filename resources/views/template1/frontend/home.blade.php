@@ -2,18 +2,18 @@
 
 @section('content')
     <!-- HERO SECTION -->
-     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main 3-Column Layout -->
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
-            <div class="relative w-[250px] bg-white shadow-xs rounded-lg border border-gray-200 p-4 hidden lg:block">
+            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden lg:block">
 
                 @foreach ($categories as $category)
                     <div class="group">
-                        <a href="{{ route('category.products' . $category->slug) }}"
+                        <a href="{{ url('category/' . $category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 ">
                                 <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
                                     class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                     alt="{{ $category->name }}">
@@ -63,64 +63,45 @@
 
             <!-- 2. CENTER: Main Horizontal Auto-Slider -->
             <div class="flex-1 min-w-0 h-full">
-                <div class="relative h-full w-full rounded-lg overflow-hidden shadow-xs border border-gray-200 bg-white">
+                <div class="relative h-full w-full rounded-lg overflow-hidden shadow-xs  bg-white">
                     <div id="main-slider" class="flex transition-transform duration-700 ease-in-out h-full w-full">
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero1.jpg') }}"
-                                class="w-full h-full object-cover"></div>
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero2.jpg') }}"
-                                class="w-full h-full object-cover"></div>
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero3.jpg') }}"
-                                class="w-full h-full object-cover"></div>
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero4.jpg') }}"
-                                class="w-full h-full object-cover"></div>
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero-right65.jpg') }}"
-                                class="w-full h-full object-cover"></div>
-                        <div class="min-w-full h-full"><img src="{{ asset('images/template1/frontend/hero1.jpg') }}"
-                                class="w-full h-full object-cover"></div>
+                        @forelse($mainSliders as $slider)
+                            <div class="min-w-full h-full">
+                                <a href="{{ $slider->url ?? '#' }}">
+                                    <img src="{{ $slider->image_url }}" class="w-full h-full object-cover"
+                                        alt="{{ $slider->title }}">
+                                </a>
+                            </div>
+                        @empty
+                            <div class="min-w-full h-full"><img
+                                    src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
+                                    class="w-full h-full object-cover"></div>
+                        @endforelse
                     </div>
 
                     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                        <div class="main-dot w-6 h-1 rounded-full bg-[#FF6A00] transition-all"></div>
-                        <div class="main-dot w-2 h-1 rounded-full bg-white/50 transition-all"></div>
-                        <div class="main-dot w-2 h-1 rounded-full bg-white/50 transition-all"></div>
-                        <div class="main-dot w-2 h-1 rounded-full bg-white/50 transition-all"></div>
-                        <div class="main-dot w-2 h-1 rounded-full bg-white/50 transition-all"></div>
-                        <div class="main-dot w-2 h-1 rounded-full bg-white/50 transition-all"></div>
+                        @foreach ($mainSliders as $index => $slider)
+                            <div onclick="goToSlide({{ $index }})"
+                                class="main-dot cursor-pointer {{ $index == 0 ? 'w-6 bg-[#FF6A00]' : 'w-2 bg-white/50' }} h-1 rounded-full transition-all">
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
             <!-- 3. RIGHT SIDEBAR: Vertical Banner Slider -->
             <div class="hidden lg:block w-[260px] shrink-0">
-                <div class="relative h-full rounded-lg border border-gray-200 overflow-hidden bg-white">
-                    <!-- Vertical Slider Container -->
+                <div class="relative h-full rounded-lg  overflow-hidden bg-white">
                     <div id="vertical-slider"
                         class="flex flex-col transition-transform duration-700 ease-in-out h-full w-full">
-                        <!-- Banner 1 -->
-                        <div class="min-h-full w-full">
-                            <img src="{{ asset('images/template1/frontend/hero-right1.jpg') }}"
-                                class="w-full h-full object-cover rounded-lg">
-                        </div>
-                        <!-- Banner 2 -->
-                        <div class="min-h-full w-full">
-                            <img src="{{ asset('images/template1/frontend/hero-right2.jpg') }}"
-                                class="w-full h-full object-cover rounded-lg">
-                        </div>
-                        <!-- Banner 3 -->
-                        <div class="min-h-full w-full">
-                            <img src="{{ asset('images/template1/frontend/hero-right3.jpg') }}"
-                                class="w-full h-full object-cover rounded-lg">
-                        </div>
-                        <!-- Banner 4 -->
-                        <div class="min-h-full w-full">
-                            <img src="{{ asset('images/template1/frontend/hero-right4.jpg') }}"
-                                class="w-full h-full object-cover rounded-lg">
-                        </div>
-                        <!-- Banner 5 -->
-                        <div class="min-h-full w-full">
-                            <img src="{{ asset('images/template1/frontend/hero-right65.jpg') }}"
-                                class="w-full h-full object-cover rounded-lg">
-                        </div>
+                        @foreach ($sidebarSliders as $slider)
+                            <div class="min-h-full w-full">
+                                <a href="{{ $slider->url ?? '#' }}">
+                                    <img src="{{ $slider->image_url }}" class="w-full h-full object-cover rounded-lg"
+                                        alt="{{ $slider->title }}">
+                                </a>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -129,9 +110,9 @@
     </section>
 
     <!-- TOP CATEGORIES SECTION -->
-     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
 
             <!-- Section Heading -->
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
@@ -142,12 +123,12 @@
             <div class="relative group">
 
                 <!-- Navigation Buttons -->
-                <button onclick="scrollCats(-200)"
+                <button onclick="scrollCats(-200)" aria-label="Scroll left"
                     class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                     <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                 </button>
 
-                <button onclick="scrollCats(200)"
+                <button onclick="scrollCats(200)" aria-label="Scroll right"
                     class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                     <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                 </button>
@@ -155,9 +136,10 @@
                 <!-- Categories Scroll Area (Dynamic) -->
                 <div id="cat-slider" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                     @foreach ($categories as $category)
-                        <a href="{{ route('category.products', $category->slug) }}"
+                        <a href="{{ url('category/' . $category->slug) }}"
                             class="flex flex-col items-center min-w-[105px] group">
-                            <div class="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden mb-2 md:mb-3 border border-gray-100">
+                            <div
+                                class="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden mb-2 md:mb-3 border border-gray-100">
                                 <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
                                     onerror="this.onerror=null;this.src='{{ asset('./images/template1/frontend/default.webp') }}';"
                                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -174,14 +156,14 @@
     </section>
     <!-- NEW ARRIVALS SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
 
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">New Arrivals</h2>
                 <a href="{{ route('shop.index') }}">
-                    <button
-                        class="bg-[#FF6A00] hover:bg-[#d44d1f] text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                    <button aria-label="View all new arrivals"
+                        class="bg-[#BD4F00] hover:bg-[#a34400] font-semibold text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
                         View all
                     </button>
                 </a>
@@ -191,7 +173,7 @@
             <div class="relative">
 
                 <!-- Left Arrow -->
-                <button onclick="scrollNA(-280)"
+                <button onclick="scrollNA(-280)" aria-label="left arrow"
                     class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                         stroke="currentColor" class="w-4 h-4">
@@ -213,7 +195,7 @@
                 </div><!-- /#na-track -->
 
                 <!-- Right Arrow -->
-                <button onclick="scrollNA(280)"
+                <button onclick="scrollNA(280)" aria-label="Scroll right"
                     class="cursor-pointer hidden md:flex absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                         stroke="currentColor" class="w-4 h-4">
@@ -230,14 +212,15 @@
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-            <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+            <div class="bg-white rounded-lg shadow-xs  p-6 relative">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">{{ $group->name }}</h2>
-                    <a href="{{ route('shop.products', ['group' => $group->slug]) }}">
+                    <a href="{{ url('/shop', ['group' => $group->slug]) }}">
                         <button
-                            class="bg-[#FF6A00] hover:bg-[#d44d1f] text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            class="bg-[#BD4F00] hover:bg-[#a34400] text-white text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm"
+                            aria-label="View all products in {{ $group->name }}">
                             View all
                         </button>
                     </a>
@@ -246,7 +229,7 @@
                 <!-- Carousel Wrapper -->
                 <div class="relative">
                     <!-- Left Arrow -->
-                    <button onclick="scrollGroup('track-{{ $group->id }}', -280)"
+                    <button onclick="scrollGroup('track-{{ $group->id }}', -280)" aria-label="Scroll left"
                         class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-left"></i>
                     </button>
@@ -263,7 +246,7 @@
                     </div>
 
                     <!-- Right Arrow -->
-                    <button onclick="scrollGroup('track-{{ $group->id }}', 280)"
+                    <button onclick="scrollGroup('track-{{ $group->id }}', 280)" aria-label="Scroll right"
                         class="cursor-pointer hidden md:flex absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-right"></i>
                     </button>
@@ -273,32 +256,31 @@
     @endforeach
 
     <!-- DUAL BANNER SECTION -->
-   <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
-            <!-- Left Banner -->
-            <div
-                class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
-                <img src="https://orenmart.sgp1.digitaloceanspaces.com/banner/da1e494c-e05c-4725-b0cf-c90e56ccba1f.jpg"
-                    alt="Promo Banner 1" loading="lazy"
-                    class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
-            </div>
+            @foreach ($middleSliders as $slider)
+                <div
+                    class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
+                    <a href="{{ $slider->url ?? '#' }}">
+                        <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
+                            alt="{{ $slider->title }}" loading="lazy"
+                            class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
+                    </a>
+                </div>
+            @endforeach
 
-            <!-- Right Banner -->
-            <div
-                class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
-                <img src="https://orenmart.sgp1.digitaloceanspaces.com/banner/2e43fa93-a2ca-4371-bd4f-b6b4d4dca46e.jpg"
-                    alt="Promo Banner 2" loading="lazy"
-                    class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
-            </div>
+            @if ($middleSliders->count() == 0)
+                <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
+                <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
+            @endif
 
         </div>
     </section>
-
     <!-- POPULAR BRANDS SECTION -->
-     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
 
             <!-- Section Heading -->
             <h2 class="text-md md:text-lg font-bold text-gray-900 uppercase tracking-tight mb-6 px-2">
@@ -309,12 +291,12 @@
             <div class="relative group">
 
                 <!-- Navigation Buttons -->
-                <button onclick="scrollBrands(-200)"
+                <button onclick="scrollBrands(-200)" aria-label="Scroll left"
                     class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                     <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                 </button>
 
-                <button onclick="scrollBrands(200)"
+                <button onclick="scrollBrands(200)" aria-label="Scroll right"
                     class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                     <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                 </button>
@@ -335,7 +317,8 @@
                                 </div>
 
                                 <!-- Brand Name -->
-                                <span class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
+                                <span
+                                    class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
                                     {{ $brand->name }}
                                 </span>
                             </a>
@@ -347,8 +330,8 @@
     </section>
 
     <!-- YOU MAY LIKE SECTION -->
-     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs border border-gray-200 p-4 md:p-6">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <div class="bg-white rounded-lg shadow-xs  p-4 md:p-6">
 
             <!-- Header -->
             <div class="mb-6">
@@ -366,7 +349,7 @@
             <!-- View More Button -->
             <div class="flex justify-center mt-10">
                 <a href="{{ route('shop.index') }}"
-                    class="bg-[#FF6A00] text-white hover:bg-gray-50 hover:text-[#FF6A00] hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                    class="bg-[#BD4F00] text-white hover:bg-gray-50 hover:text-[#a34400] hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
                     View More
                 </a>
             </div>
@@ -416,22 +399,53 @@
         const mainSlider = document.getElementById('main-slider');
         const mainDots = document.querySelectorAll('.main-dot');
         let mainIdx = 0;
+        let mainInterval;
 
         if (mainSlider && mainDots.length > 0) {
-            function slideMain() {
-                mainIdx = (mainIdx + 1) % mainDots.length;
+
+            // slide to specific index when dot is clicked
+            function goToSlide(index) {
+                mainIdx = index;
+                updateSliderUI();
+                resetInterval(); // Reset timer when clicked to prevent automatic sliding
+            }
+
+            // Function to update slider and dots
+            function updateSliderUI() {
                 mainSlider.style.transform = `translateX(-${mainIdx * 100}%)`;
                 mainDots.forEach((dot, i) => {
                     if (i === mainIdx) {
-                        dot.classList.replace('w-2', 'w-6');
-                        dot.classList.replace('bg-white/50', 'bg-[#FF6A00]');
+                        dot.classList.remove('w-2', 'bg-white/50');
+                        dot.classList.add('w-6', 'bg-[#FF6A00]');
                     } else {
-                        dot.classList.replace('w-6', 'w-2');
-                        dot.classList.replace('bg-[#FF6A00]', 'bg-white/50');
+                        dot.classList.remove('w-6', 'bg-[#FF6A00]');
+                        dot.classList.add('w-2', 'bg-white/50');
                     }
                 });
             }
-            setInterval(slideMain, 4000);
+
+            // Auto sliding function
+            function startInterval() {
+                mainInterval = setInterval(() => {
+                    mainIdx = (mainIdx + 1) % mainDots.length;
+                    updateSliderUI();
+                }, 4000);
+            }
+
+            function resetInterval() {
+                clearInterval(mainInterval);
+                startInterval();
+            }
+
+            // Add click event to dots
+            mainDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+            });
+
+            // Start the slider
+            startInterval();
         }
 
         const verticalSlider = document.getElementById('vertical-slider');

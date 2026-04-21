@@ -99,25 +99,25 @@
 
                 <!-- Column 4: Newsletter -->
                 <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-6">Newsletter</h4>
-                    <p class="text-gray-400 text-sm mb-4">Subscribe to get updates on new products and exclusive offers.</p>
+                    <h4 class="text-base text-white md:text-lg font-bold mb-4 md:mb-6">Newsletter</h4>
+                    <p class="text-gray-300 text-sm mb-4">Subscribe to get updates on new products and exclusive offers.</p>
                     <div class="flex mb-5">
                         <input type="email" placeholder="Enter your email"
-                            class="bg-[#1A222F] border border-gray-700 text-white px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#FF6A00]">
-                        <button class="bg-[#FF6A00] hover:bg-orange-600 px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
+                            class="bg-[#1A222F] border border-gray-700 text-white px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
+                        <button class="bg-[#BD4F00] hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
                             Subscribe
                         </button>
                     </div>
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
-                            <a href="{{ $social->link }}" target="_blank"
-                                class="text-gray-400 text-lg transition-all duration-300"
-                                onmouseover="this.style.color='{{ $social->hover_bg ?? '#FF6A00' }}'"
+                            <a href="{{ $social->link }}" target="_blank" aria-label="Follow us on {{ $social->name }}"
+                                class="text-gray-300 text-lg transition-all duration-300"
+                                onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
                                 @if ($social->icon_image)
-                                    <img src="{{ asset('storage/' . $social->icon_image) }}" class="h-5 w-5 object-contain">
+                                    <img src="{{ asset('storage/' . $social->icon_image) }}" alt="social icon" class="h-5 w-5 object-contain">
                                 @else
-                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }}"></i>
+                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }}" aria-hidden="true"></i>
                                 @endif
                             </a>
                         @endforeach

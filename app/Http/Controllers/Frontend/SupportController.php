@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
 
-class SupportController extends Controller
+class SupportController extends FrontendController
 {
     public function index(Request $request)
     {
-        $company = getCurrentCompany();
-        $template = $company->template_name;
 
-        $query = KnowledgeBase::where('company_id', $company->id)->active();
+
+        $query = KnowledgeBase::where('status', Status::Active);
 
         $query->when($request->search, function ($q) use ($request) {
             return $q->where(function ($sub) use ($request) {
@@ -29,13 +29,12 @@ class SupportController extends Controller
 
         $faqs = $query->get();
 
-        $categories = KnowledgeBase::where('company_id', $company->id)
-            ->active()
+        $categories = KnowledgeBase::where('status', Status::Active)
             ->whereNotNull('category')
             ->distinct()
             ->pluck('category');
 
-        return view($template . '.frontend.support', compact('faqs', 'categories'));
+        return $this->view('frontend.support', compact('faqs', 'categories'));
     }
     public function storeMessage(Request $request)
     {

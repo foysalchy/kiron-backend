@@ -14,10 +14,10 @@
             </form>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-8">
             <!-- Left Sidebar: Persistent Profile & Nav -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6 text-center">
+            <div class="lg:col-span-1 space-y-4">
+                <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-4 lg:p-6 text-center">
                     <!-- Avatar -->
                     <div class="flex justify-center mb-4">
                         <div
@@ -33,25 +33,25 @@
                     <p class="text-sm text-gray-500 font-medium">{{ $user->email }}</p>
 
                     <!-- Sidebar Menu -->
-                    <nav class="mt-8 space-y-2" id="dashboard-nav">
+                    <nav class="mt-4 lg:mt-8 flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0" id="dashboard-nav">
                         <button onclick="showSection('overview', this)"
-                            class="nav-link w-full flex items-center gap-3 px-4 py-3 bg-[#1D2128] text-white rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 bg-[#1D2128] text-white rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-user w-5 text-center"></i> Overview
                         </button>
                         <button onclick="showSection('orders', this)"
-                            class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
                             <i class="fas fa-shopping-bag w-5 text-center"></i> My Order
                         </button>
                         <button onclick="showSection('wishlist', this)"
-                            class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-heart w-5 text-center"></i> Wishlist
                         </button>
                         <button onclick="showSection('edit', this)"
-                            class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-edit w-5 text-center"></i> Profile update
                         </button>
                         <button onclick="showSection('password', this)"
-                            class="nav-link w-full flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
                             <i class="fas fa-lock w-5 text-center"></i> Password Change
                         </button>
                     </nav>
@@ -78,9 +78,9 @@
                 <!-- 1. SECTION: OVERVIEW (Default) -->
                 <div id="overview-section" class="dashboard-content space-y-6">
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
                         <div
-                            class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Order</p>
                                 <h4 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h4>
@@ -88,7 +88,7 @@
                             <i class="fas fa-shopping-bag h-8 w-8 text-orange-500 text-2xl"></i>
                         </div>
                         <div
-                            class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
                                 <h4 class="text-2xl font-semibold text-gray-900">{{ $setup->currency }}
@@ -106,7 +106,7 @@
                             </svg>
                         </div>
                         <div
-                            class="bg-white p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
+                            class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Wishlist</p>
                                 <h4 class="text-2xl font-semibold text-gray-900 wishlist-count-val">
@@ -219,7 +219,7 @@
                                         @endforeach
                                     </div>
 
-                                    <div class="flex gap-3">
+                                    <div class="flex flex-wrap gap-2">
                                         <!-- View Details Button -->
                                         <a href="{{ route('user.order.details', $order->id) }}"
                                             class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00] flex items-center gap-2">
@@ -272,7 +272,7 @@
                             <!-- Grid -->
                             @if ($wishlistItems->count() > 0)
                                 <!-- Wishlist Grid (Calling Product Card Component) -->
-                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                                     @foreach ($wishlistItems as $item)
                                         <x-template1.product-card :product="$item->product" />
                                     @endforeach

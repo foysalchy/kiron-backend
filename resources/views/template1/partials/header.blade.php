@@ -1,17 +1,22 @@
 <header class="w-full bg-white sticky top-0 z-50 font-['Outfit']">
 
     <!-- 1. Top Bar (Orange Row) -->
-    <div class="bg-[#FF6A00] text-white py-2 text-sm hidden lg:block">
+    <div class="bg-[var(--primary-color)] text-white py-2 text-sm hidden sm:block">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex items-center gap-6">
                 <span class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
                     </svg>
                     {{ $setup->phone }}
                 </span>
                 <span class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                     </svg>
@@ -31,9 +36,11 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-10 md:h-12 w-auto object-contain">
+                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}"
+                    class="h-10 md:h-12 w-auto object-contain">
             @else
-                <div class="bg-[#FF6A00] w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
+                <div
+                    class="bg-[#FF6A00] w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
                     <span class="text-white text-xl md:text-2xl font-bold">
                         {{ substr($setup->shop_name ?? 'O', 0, 1) }}
                     </span>
@@ -42,14 +49,16 @@
         </a>
 
         <!-- Search Bar (Desktop + Tablet) -->
-        <form action="{{ route('shop.index') }}" method="GET"
-            class="hidden sm:flex flex-1 max-w-2xl relative" id="header-search-container">
-            <div class="flex w-full items-center bg-white border border-gray-200 rounded-md p-1 shadow-xs z-30 relative">
+        <form action="{{ route('shop.index') }}" method="GET" class="hidden sm:flex flex-1 max-w-2xl relative"
+            id="header-search-container">
+            <div
+                class="flex w-full items-center bg-white border border-gray-200 rounded-md p-1 shadow-xs z-30 relative">
                 <input type="text" name="search" id="header-search-input" autocomplete="off"
                     value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
-                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md flex-shrink-0">
+                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md flex-shrink-0"
+                    aria-label="Submit Search">
                     <i class="fas fa-search text-sm"></i>
                 </button>
             </div>
@@ -59,7 +68,8 @@
                 class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-2">
                 <div id="suggestion-content">
                     <div class="pb-2">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular
+                            Searches</p>
                         @forelse($popularSearches as $item)
                             <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
                                 class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
@@ -74,11 +84,13 @@
                         @endforelse
                     </div>
                     <div class="border-t border-gray-50 pt-2 pb-2">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending Products</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
+                            Products</p>
                         @foreach ($relatedProducts as $p)
                             <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                <img src="{{ $p->thumbnail_url }}" class="w-6 h-6 rounded object-cover border border-gray-100">
+                                <img src="{{ $p->thumbnail_url }}"
+                                    class="w-6 h-6 rounded object-cover border border-gray-100">
                                 <span class="truncate">{{ $p->title }}</span>
                             </a>
                         @endforeach
@@ -156,7 +168,8 @@
                             <form action="{{ route('user.logout') }}" method="POST">
                                 @csrf
                                 <button type="submit"
-                                    class="w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors">
+                                    class="w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                                    aria-label="Logout">
                                     <i class="fa-solid fa-right-from-bracket w-4"></i>
                                     Logout
                                 </button>
@@ -184,7 +197,8 @@
                 class="flex items-center gap-1.5 hover:text-[#FF6A00] transition-colors relative">
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>
-                    <span class="cart-count-nav absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                    <span
+                        class="cart-count-nav absolute -top-2 -right-2 bg-[#FF6A00] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
                         {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                     </span>
                 </div>
@@ -202,11 +216,11 @@
     <div id="mobile-search-bar" class="hidden sm:hidden px-4 pb-3">
         <form action="{{ route('shop.index') }}" method="GET">
             <div class="flex items-center bg-white border border-gray-200 rounded-md p-1">
-                <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Find products..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
-                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md">
+                    class="bg-[#FF6A00] text-white h-9 w-10 flex items-center justify-center rounded-md"
+                    aria-label="Open Search">
                     <i class="fas fa-search text-sm"></i>
                 </button>
             </div>
@@ -222,14 +236,15 @@
                     {{ $cat->name }}
                 </a>
             @endforeach
-            <a class="text-sm font-medium hover:text-[#FF6A00] whitespace-nowrap" href="{{ route('brand.index') }}">Brands</a>
-            <a class="text-sm font-medium text-red-500 hover:text-red-600 whitespace-nowrap" href="{{ route('flash.sale') }}">Flash Sale 🔥</a>
+            <a class="text-sm font-medium hover:text-[#FF6A00] whitespace-nowrap"
+                href="{{ route('brand.index') }}">Brands</a>
+            <a class="text-sm font-bold text-red-700 hover:text-red-800 whitespace-nowrap"
+                href="{{ route('flash.sale') }}">Flash Sale 🔥</a>
         </div>
     </div>
 
     <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu"
-        class="hidden lg:hidden fixed inset-0 z-[999] flex">
+    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-[999] flex">
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/50" onclick="toggleMobileMenu()"></div>
 
@@ -269,30 +284,38 @@
             <nav class="flex-1 px-4 py-3">
                 <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 tracking-wider">Navigation</p>
 
-                <a href="{{ route('home') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('home') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-home w-4 text-gray-400"></i> Home
                 </a>
-                <a href="{{ route('shop.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('shop.index') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-store w-4 text-gray-400"></i> Shop
                 </a>
-                <a href="{{ route('flash.sale') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-red-500 transition-colors">
-                    <i class="fas fa-bolt w-4 text-red-400"></i> Flash Sale 🔥
+                <a href="{{ route('flash.sale') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-bold text-red-700 transition-colors">
+                    <i class="fas fa-bolt w-4 text-red-600"></i> Flash Sale 🔥
                 </a>
-                <a href="{{ route('brand.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('brand.index') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-tags w-4 text-gray-400"></i> Brands
                 </a>
-                <a href="{{ route('blog.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('blog.index') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-newspaper w-4 text-gray-400"></i> Blog
                 </a>
-                <a href="{{ route('order.track') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('order.track') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-truck w-4 text-gray-400"></i> Track Order
                 </a>
-                <a href="{{ route('contact.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
+                <a href="{{ route('contact.index') }}"
+                    class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
                     <i class="fas fa-envelope w-4 text-gray-400"></i> Contact
                 </a>
 
-                @if(isset($headerCategories) && $headerCategories->count())
-                    <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 mt-3 tracking-wider">Categories</p>
+                @if (isset($headerCategories) && $headerCategories->count())
+                    <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 mt-3 tracking-wider">Categories
+                    </p>
                     @foreach ($headerCategories as $cat)
                         <a href="{{ route('category.products', $cat->slug) }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover:text-[#FF6A00] transition-colors">
@@ -313,7 +336,8 @@
                     <form action="{{ route('user.logout') }}" method="POST">
                         @csrf
                         <button type="submit"
-                            class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-red-50 text-sm font-medium text-red-500 transition-colors">
+                            class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-red-50 text-sm font-medium text-red-500 transition-colors"
+                            aria-label="Logout">
                             <i class="fa-solid fa-right-from-bracket w-4"></i> Logout
                         </button>
                     </form>
@@ -325,96 +349,105 @@
 </header>
 
 @push('scripts')
-<script>
-    // Mobile Search Toggle
-    function toggleMobileSearch() {
-        const bar = document.getElementById('mobile-search-bar');
-        bar.classList.toggle('hidden');
-        if (!bar.classList.contains('hidden')) {
-            bar.querySelector('input').focus();
+    <script>
+        // Mobile Search Toggle
+        function toggleMobileSearch() {
+            const bar = document.getElementById('mobile-search-bar');
+            bar.classList.toggle('hidden');
+            if (!bar.classList.contains('hidden')) {
+                bar.querySelector('input').focus();
+            }
         }
-    }
 
-    // Mobile Menu Toggle
-    function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-        document.body.classList.toggle('overflow-hidden');
-    }
-
-    // Account Dropdown
-    function toggleAccount() {
-        document.getElementById('account-dropdown').classList.toggle('hidden');
-    }
-
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('account-menu');
-        const dropdown = document.getElementById('account-dropdown');
-        if (menu && !menu.contains(e.target)) {
-            dropdown.classList.add('hidden');
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
         }
-    });
 
-    // Search Suggestions
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('header-search-input');
-        const suggestionBox = document.getElementById('search-suggestions');
-        const defaultContent = document.getElementById('suggestion-content');
-        const liveResults = document.getElementById('live-search-results');
-        const container = document.getElementById('header-search-container');
+        // Account Dropdown
+        function toggleAccount() {
+            document.getElementById('account-dropdown').classList.toggle('hidden');
+        }
 
-        if (!searchInput) return;
-
-        let debounceTimer;
-        let abortController = null;
-
-        searchInput.addEventListener('focus', () => {
-            suggestionBox.classList.remove('hidden');
-        });
-
-        searchInput.addEventListener('input', function() {
-            const query = this.value.trim();
-            clearTimeout(debounceTimer);
-            if (abortController) abortController.abort();
-
-            if (query.length > 1) {
-                debounceTimer = setTimeout(() => {
-                    abortController = new AbortController();
-                    defaultContent.classList.add('hidden');
-                    liveResults.classList.remove('hidden');
-                    liveResults.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
-
-                    fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, { signal: abortController.signal })
-                        .then(res => res.json())
-                        .then(data => {
-                            liveResults.innerHTML = '';
-                            if (data.length > 0) {
-                                data.forEach(item => {
-                                    const link = document.createElement('a');
-                                    link.href = "{{ route('shop.index') }}?search=" + encodeURIComponent(item.title);
-                                    link.className = "flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
-                                    link.innerHTML = `<span>${item.title}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-gray-300"></i>`;
-                                    liveResults.appendChild(link);
-                                });
-                            } else {
-                                liveResults.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
-                            }
-                        })
-                        .catch(error => {
-                            if (error.name !== 'AbortError') console.error('Search error:', error);
-                        });
-                }, 500);
-            } else {
-                defaultContent.classList.remove('hidden');
-                liveResults.classList.add('hidden');
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('account-menu');
+            const dropdown = document.getElementById('account-dropdown');
+            if (menu && !menu.contains(e.target)) {
+                dropdown.classList.add('hidden');
             }
         });
 
-        document.addEventListener('click', (e) => {
-            if (container && !container.contains(e.target)) {
-                suggestionBox.classList.add('hidden');
-            }
+        // Search Suggestions
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('header-search-input');
+            const suggestionBox = document.getElementById('search-suggestions');
+            const defaultContent = document.getElementById('suggestion-content');
+            const liveResults = document.getElementById('live-search-results');
+            const container = document.getElementById('header-search-container');
+
+            if (!searchInput) return;
+
+            let debounceTimer;
+            let abortController = null;
+
+            searchInput.addEventListener('focus', () => {
+                suggestionBox.classList.remove('hidden');
+            });
+
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                clearTimeout(debounceTimer);
+                if (abortController) abortController.abort();
+
+                if (query.length > 1) {
+                    debounceTimer = setTimeout(() => {
+                        abortController = new AbortController();
+                        defaultContent.classList.add('hidden');
+                        liveResults.classList.remove('hidden');
+                        liveResults.innerHTML =
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+
+                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
+                                signal: abortController.signal
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                liveResults.innerHTML = '';
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        const link = document.createElement('a');
+                                        link.href =
+                                            "{{ route('shop.index') }}?search=" +
+                                            encodeURIComponent(item.title);
+                                        link.className =
+                                            "flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
+                                        link.innerHTML =
+                                            `<span>${item.title}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-gray-300"></i>`;
+                                        liveResults.appendChild(link);
+                                    });
+                                } else {
+                                    liveResults.innerHTML =
+                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                                }
+                            })
+                            .catch(error => {
+                                if (error.name !== 'AbortError') console.error('Search error:',
+                                    error);
+                            });
+                    }, 500);
+                } else {
+                    defaultContent.classList.remove('hidden');
+                    liveResults.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (container && !container.contains(e.target)) {
+                    suggestionBox.classList.add('hidden');
+                }
+            });
         });
-    });
-</script>
+    </script>
 @endpush
