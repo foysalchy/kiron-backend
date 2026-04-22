@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreCompanyRequest, UpdateCompanyRequest};
 use App\Services\CompanyService;
 use App\Exceptions\ApiException;
+use App\Models\Company;
+use App\Models\CompanySubscription;
+use App\Models\CompanyUpdateRequest;
+use App\Models\PricingPackage;
 use App\Services\CompanyDeletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CompanyController extends Controller
 {
@@ -67,7 +74,100 @@ class CompanyController extends Controller
         return ResponseHelper::success($company, 'Company updated successfully');
     }
 
+    public function storeUpdateRequest(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'name'  => 'nullable|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'note'  => 'nullable|string|max:500',
+        ]);
 
+        $company = $this->companyService->storeUpdateRequest($id, $data);
+
+        return ResponseHelper::success($company, 'Company updated request successfully');
+    }
+
+    public function approveUpdateRequest(int $requestId): JsonResponse
+    {
+        DB::transaction(function () use ($requestId) {
+            $updateRequest = CompanyUpdateRequest::with('company')->findOrFail($requestId);
+
+
+            $fieldsToUpdate = collect([
+                'name'  => $updateRequest->name,
+                'email' => $updateRequest->email,
+                'phone' => $updateRequest->phone,
+            ])->filter(fn($value) => !is_null($value))->toArray();
+
+            if (!empty($fieldsToUpdate)) {
+                $updateRequest->company->update($fieldsToUpdate);
+            }
+
+            $updateRequest->update(['status' => Status::Approved->value]);
+        });
+
+        return response()->json(['message' => 'Request approved and company updated.']);
+    }
+    public function rejectUpdateRequest(int $requestId): JsonResponse
+    {
+        $updateRequest = CompanyUpdateRequest::findOrFail($requestId);
+
+
+
+        $updateRequest->update(['status' => Status::Rejected->value]);
+
+        return response()->json(['message' => 'Request rejected.']);
+    }
+    public function upgradeSubscription(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'pricing_package_id' => 'required|exists:pricing_packages,id',
+            'billing_cycle'      => 'required|in:monthly,quarterly,yearly',
+        ]);
+
+        DB::transaction(function () use ($data, $id) {
+            $company = Company::findOrFail($id);
+
+            $package = PricingPackage::with([
+                'tiers' => fn($q) =>
+                $q->where('billing_cycle', $data['billing_cycle'])
+            ])->findOrFail($data['pricing_package_id']);
+
+            $tier = $package->tiers->first();
+            if (!$tier) throw new \Exception("No tier for this billing cycle.");
+
+            $amountPaid = $tier->discount_price > 0 && $tier->discount_price < $tier->regular_price
+                ? $tier->discount_price
+                : $tier->regular_price;
+
+            $now    = Carbon::now();
+            $endsAt = match ($data['billing_cycle']) {
+                'yearly'    => $now->copy()->addYear(),
+                'quarterly' => $now->copy()->addMonths(3),
+                default     => $now->copy()->addMonth(),
+            };
+
+    
+            $company->subscriptions()->update(['status' => Status::Inactive->value]);
+
+            CompanySubscription::create([
+                'company_id'         => $company->id,
+                'pricing_package_id'  => $package->id,
+                'billing_cycle'      => $data['billing_cycle'],
+                'amount_paid'        => $amountPaid,
+                'payment_method'     => 'manual',
+                'payment_status'     => 'pending',
+                'starts_at'          => $now,
+                'ends_at'            => $endsAt,
+                'status'             => Status::Active->value,
+            ]);
+            $company->pricing_package_id = $package->id;
+            $company->update();
+        });
+
+        return response()->json(['message' => 'Package upgraded successfully.']);
+    }
     public function destroy(int $id): JsonResponse
     {
         $this->companyDelationService->softDelete($id);

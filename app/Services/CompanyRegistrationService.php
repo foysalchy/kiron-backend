@@ -54,6 +54,8 @@ class CompanyRegistrationService
                 'password'   => Hash::make($data['password']),
                 'company_id' => $company->id,
                 'status'     => Status::Draft->value,
+                'is_primary' => 1,
+
             ]);
 
             LogHelper::created('user', $user->id, $company->id);

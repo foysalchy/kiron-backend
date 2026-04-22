@@ -39,6 +39,15 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function primaryUser()
+    {
+        return $this->hasOne(User::class)->where('is_primary', 1);
+    }
+    public function updateRequests(): HasMany
+    {
+        return $this->hasMany(CompanyUpdateRequest::class);
+    }
     public function parties()
     {
         return $this->hasMany(Party::class);
@@ -101,6 +110,14 @@ class Company extends Model
         return $this->hasOne(CompanySubscription::class)
             ->where('status', Status::Active->value)
             ->latestOfMany();
+    }
+    public function loginHistories(): HasMany
+    {
+        return $this->hasMany(UserLoginHistory::class)->latest('login_at')->limit(10);
+    }
+    public function extraOrderCharges(): HasMany
+    {
+        return $this->hasMany(ExtraOrderCharge::class);
     }
     // Scopes
     public function scopeActive($query)

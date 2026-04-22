@@ -14,7 +14,7 @@ class FileUploadHelper
     public static function upload(
         UploadedFile $file,
         string $folder = 'uploads',
-        string $disk = 'public',
+        string $disk = 'r2',
         bool $preserveName = false
     ): string {
         try {
@@ -40,7 +40,7 @@ class FileUploadHelper
     public static function uploadImage(
         UploadedFile $file,
         string $folder = 'images',
-        string $disk = 'public',
+        string $disk = 'r2',
         int $maxSize = 2048
     ): string {
         try {
@@ -114,7 +114,7 @@ class FileUploadHelper
         UploadedFile $newFile,
         ?string $oldFilePath,
         string $folder,
-        string $disk = 'public'
+        string $disk = 'r2'
     ): string {
         try {
             // Upload new file

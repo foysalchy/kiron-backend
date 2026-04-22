@@ -6,10 +6,11 @@ use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Slider extends Model
 {
-        use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
 
     protected $fillable = [
@@ -46,6 +47,8 @@ class Slider extends Model
     // Accessors
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
     }
 }

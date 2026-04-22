@@ -19,6 +19,8 @@ class CompanySubscription extends Model
         'currency',
         'payment_method',
         'payment_status',
+        'discount_amount',
+        'discount_note',
         'transaction_id',
         'trial_ends_at',
         'starts_at',
@@ -43,7 +45,15 @@ class CompanySubscription extends Model
     {
         return $this->belongsTo(PricingPackage::class);
     }
-
+    public function extraOrderCharges()
+    {
+        return $this->hasMany(ExtraOrderCharge::class, 'company_id', 'company_id')
+            ->whereBetween('created_at', [$this->starts_at, $this->ends_at]);
+    }
+    public function payments()
+    {
+        return $this->hasMany(SubscriptionPayment::class, 'subscription_id');
+    }
     public function isActive(): bool
     {
         return $this->status === Status::Active->value && $this->ends_at?->isFuture();

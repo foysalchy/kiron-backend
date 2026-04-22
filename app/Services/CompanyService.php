@@ -20,6 +20,7 @@ class CompanyService
     {
         try {
             $query = Company::with([
+                'primaryUser',
                 'pricingPackage',
                 'currentSubscription.pricingPackage',
             ])
@@ -78,11 +79,45 @@ class CompanyService
      */
     public function getCompanyById(int $id): Company
     {
-        $company = Company::find($id);
+   
+        $company = Company::with([
+            'primaryUser',                          // is_primary = 1
+            'currentSubscription.pricingPackage',   // active subscription + package
+            'orders' => fn($q) => $q->latest()->limit(10),
+            'users.roles',
+            'subscriptions' => fn($q) => $q->with(['pricingPackage', 'extraOrderCharges.order']),
+            'updateRequests' => fn($q) => $q->latest()->limit(3), // company update requests
+            'domains',
+            'loginHistories.user',
+        ])
+            ->withCount([
+                'products as product_used',
+                'users as user_used',
+                'orders as order_used' => fn($q) => $q
+                    ->where('type', Order::TYPE_SALES)
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year),
+                'domains as domain_used',
+            ])
+            ->find($id);
 
-        if (!$company) {
-            throw ApiException::notFound('Company');
-        }
+     
+    foreach ($company->subscriptions as $sub) {
+        $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
+        $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
+
+        $charges = \App\Models\ExtraOrderCharge::with('order:id,order_no')
+            ->where('company_id', $id)
+            ->whereBetween('month', [$startMonth, $endMonth])
+            ->get();
+
+        // Debug
+        Log::info("Sub ID: {$sub->id} | Start: {$startMonth} | End: {$endMonth} | Charges: " . $charges->count());
+
+        $sub->setRelation('extra_order_charges', $charges);
+    }
+
+    return $company;
 
         return $company;
     }
@@ -152,6 +187,41 @@ class CompanyService
 
             $company->update($data);
             LogHelper::updated('company', $company->id, $company->id);
+
+            DB::commit();
+
+            Log::info('Company updated successfully', ['company_id' => $company->id]);
+
+            return $company->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Delete new uploaded logo if exists
+            if (isset($data['logo'])) {
+                FileUploadHelper::delete($data['logo']);
+            }
+
+            Log::error('Company update failed: ' . $e->getMessage(), [
+                'company_id' => $id,
+                'data' => $data,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            throw ApiException::serverError('Failed to update company');
+        }
+    }
+    public function storeUpdateRequest(int $id, array $data): Company
+    {
+        DB::beginTransaction();
+
+        try {
+            $company = Company::findOrFail($id);
+            $company->updateRequests()->create($data);
+
+            LogHelper::updated('company', $company->id, $company->id, $company->name . "request for update");
 
             DB::commit();
 

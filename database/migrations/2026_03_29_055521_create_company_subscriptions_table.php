@@ -23,16 +23,17 @@ return new class extends Migration
             $table->string('currency', 10)->default('USD');
 
             // Payment
-            $table->string('payment_method')->default('card'); 
+            $table->string('payment_method')->default('card');
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'cancelled'])->default('pending');
             $table->string('transaction_id')->nullable();
-
+            $table->decimal('discount_amount', 10, 2)->default(0);
+            $table->string('discount_note')->nullable();
             // Subscription period
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('starts_at')->nullable();
             $table->timestamp('ends_at')->nullable();
 
-            $table->tinyInteger('status')->default(Status::Active->value); 
+            $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
             $table->softDeletes();
         });

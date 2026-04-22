@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{RegisterRequest, UpdateProfileRequest, UpdatePasswordRequest};
 use App\Helpers\{FileUploadHelper, LogHelper};
+use App\Models\Company;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\UserLoginHistory;
@@ -53,34 +54,8 @@ class AuthController extends Controller
     /**
      * Login - Cookie based authentication
      */
-
-    public function login(Request $request): JsonResponse
+    private function generateLoginResponse(User $user, Request $request): array
     {
-        Log::info($request);
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid credentials'],
-            ]);
-        }
-
-        $user = Auth::user()->load(['company.pricingPackage', 'roles.permissions']);
-
-        // Define allowed statuses for login (Draft, Pending, Active)
-        $allowedStatuses = [Status::Draft->value, Status::Pending->value, Status::Active->value];
-
-        if (!in_array($user->status, $allowedStatuses)) {
-            $user->tokens()->delete(); // Ensure token is removed
-            Auth::logout();
-            throw ValidationException::withMessages([
-                'email' => ['Your account is inactive or suspended.'],
-            ]);
-        }
-
         // Login history
         $history = UserLoginHistory::create([
             'company_id' => $user->company_id,
@@ -93,16 +68,11 @@ class AuthController extends Controller
         $user->tokens()->delete();
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // ========================================================
-        // The Magic: Calculating Effective Permissions
-        // ========================================================
-        // ========================================================
-        // The Magic: Calculating Effective Permissions
-        // ========================================================
+        // 👉 তোমার existing permission logic (copy same as login)
         $effectivePermissions = [];
+
         if ($user->is_super_admin) {
             if ($user->roles->isNotEmpty()) {
-                // ✅ Super admin এর role আছে → role এর permissions
                 foreach ($user->roles as $role) {
                     foreach ($role->permissions as $permission) {
                         $effectivePermissions[] = $permission->name;
@@ -110,7 +80,6 @@ class AuthController extends Controller
                 }
                 $effectivePermissions = array_values(array_unique($effectivePermissions));
             } else {
-                // ✅ Role নেই → সব superadmin permissions
                 $effectivePermissions = Permission::where('type', 'superadmin')
                     ->pluck('name')
                     ->toArray();
@@ -118,6 +87,7 @@ class AuthController extends Controller
         } else {
             $featureKeys = [];
             $company = $user->company;
+
             if ($company && $company->pricingPackage) {
                 $featureKeys = $company->pricingPackage->features ?? [];
                 if (is_string($featureKeys)) {
@@ -127,28 +97,27 @@ class AuthController extends Controller
 
             if (!empty($featureKeys)) {
                 if ($user->roles->isNotEmpty()) {
-                    // ✅ Role আছে → role এর permissions (package filter সহ, direct query)
                     $roleIds = $user->roles->pluck('id')->toArray();
+
                     $effectivePermissions = Permission::where('type', 'company')
                         ->whereIn('feature_dependency', $featureKeys)
                         ->whereHas('roles', fn($q) => $q->whereIn('roles.id', $roleIds))
                         ->pluck('name')
                         ->toArray();
                 } else {
-                    // ✅ Role নেই → package এর সব permissions (direct query)
                     $effectivePermissions = Permission::where('type', 'company')
                         ->whereIn('feature_dependency', $featureKeys)
                         ->pluck('name')
                         ->toArray();
                 }
             }
-
-            Log::info('FINAL before return: ' . count($effectivePermissions));
-            Log::info($effectivePermissions);
         }
-        $primaryRoleName = $user->is_super_admin ? 'Super Admin' : ($user->roles->first()?->name ?? 'User');
 
-        return response()->json([
+        $primaryRoleName = $user->is_super_admin
+            ? 'Super Admin'
+            : ($user->roles->first()?->name ?? 'User');
+
+        return [
             'success' => true,
             'message' => 'Login successful',
             'token' => $token,
@@ -167,7 +136,86 @@ class AuthController extends Controller
                 'company' => $user->company,
             ],
             'permissions' => $effectivePermissions,
+        ];
+    }
+    public function login(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
+
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            throw ValidationException::withMessages([
+                'email' => ['Invalid credentials'],
+            ]);
+        }
+
+        $user = Auth::user()->load(['company.pricingPackage', 'roles.permissions']);
+
+        // ✅ Status check
+        $allowedStatuses = [Status::Draft->value, Status::Pending->value, Status::Active->value];
+
+        if (!in_array($user->status, $allowedStatuses)) {
+            $user->tokens()->delete();
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => ['Your account is inactive or suspended.'],
+            ]);
+        }
+
+        return response()->json(
+            $this->generateLoginResponse($user, $request)
+        );
+    }
+    public function impersonateCompany($companyId, Request $request): JsonResponse
+    {
+        DB::beginTransaction();
+
+        try {
+            // ✅ Only super admin allowed
+            if (!Auth::user()->is_super_admin) {
+                abort(403, 'Unauthorized');
+            }
+
+            $company = Company::findOrFail($companyId);
+
+        
+            $users = User::where('company_id', $company->id)
+                ->with(['company.pricingPackage', 'roles.permissions'])
+                ->get();
+
+            if ($users->isEmpty()) {
+                throw new \Exception('No users found for this company');
+            }
+
+            // 
+            $targetUser = $users->first(function ($user) {
+                return $user->roles->isEmpty();
+            });
+
+            // 👉 fallback → first user
+            if (!$targetUser) {
+                $targetUser = $users->first();
+            }
+
+            // 🔐 logout current user
+            Auth::user()?->tokens()->delete();
+
+            DB::commit();
+
+            return response()->json(
+                $this->generateLoginResponse($targetUser, $request)
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

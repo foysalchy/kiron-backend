@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('role')->nullable();
             $table->boolean('is_super_admin')->default(false);
+            $table->boolean('is_primary')->default(false);
             $table->tinyInteger('status')->default(Status::Active->value);
             $table->rememberToken();
             $table->timestamps();

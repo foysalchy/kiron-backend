@@ -115,6 +115,7 @@ use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\SupportDepartmentController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TaxGroupController;
@@ -162,6 +163,15 @@ Route::prefix('v1')->group(function () {
         Route::post('auth/logout-all', [AuthController::class, 'logoutAll']);
         Route::delete('auth/account', [AuthController::class, 'deleteAccount']);
 
+        //impersonate
+        Route::middleware(['super_admin'])->group(function () {
+            Route::post('/impersonate/company/{company}', [AuthController::class, 'impersonateCompany']);
+            Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
+            Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addPayment']);
+            Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscription']);
+            Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
+
+        });
         //site settings routes
         Route::middleware('check.user.status:allow_pending')->group(function () {
 
@@ -202,6 +212,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('/', [CompanyController::class, 'store']);
                 Route::get('/{id}', [CompanyController::class, 'show']);
                 Route::post('/update/{id}', [CompanyController::class, 'update'])->name('company');
+                Route::post('/{id}/update-requests', [CompanyController::class, 'storeUpdateRequest']);
+                Route::patch('/update-requests/{id}/approve', [CompanyController::class, 'approveUpdateRequest']);
+                Route::patch('/update-requests/{id}/reject',  [CompanyController::class, 'rejectUpdateRequest']);
                 Route::get('/{id}/delation-summary', [CompanyController::class, 'deletionSummary']);
                 Route::get('/{id}/can-delete', [CompanyController::class, 'canDeleteCompany']);
                 Route::delete('/{id}', [CompanyController::class, 'destroy']);
