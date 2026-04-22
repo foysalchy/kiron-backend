@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Models\Company;
 use App\Models\ContentSetting;
 use App\Models\MegaCategory;
+use App\Models\Page;
 use App\Models\Product;
 use App\Models\SearchProduct;
 use App\Models\SiteSetting;
@@ -239,10 +240,12 @@ class AppServiceProvider extends ServiceProvider
                     'setup'            => SiteSetting::where('company_id', $companyId)->first(),
                     'headerCategories' => MegaCategory::where('company_id', $companyId)->where('status', 1)->latest()->take(5)->get(),
                     'footerFeatures'   => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::PAGE_ALL)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
+                    'footerBottomRight' => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
                     'socialLinks'      => SocialSetting::where('company_id', $companyId)->where('status', Status::Active->value)->get(),
                     'popularSearches'  => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
                     'relatedProducts'  => Product::where('status', Status::Active->value)->where('company_id', $companyId)->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
                     'themeColor' => Company::where('id', $companyId)->first(),
+                    'footerPages' => Page::where('company_id', $companyId)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
                 ]);
 
                 View::share($data);

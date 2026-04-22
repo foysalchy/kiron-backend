@@ -10,6 +10,7 @@ use App\Models\ContentSetting;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\Product;
+use App\Models\ProductGroup;
 use App\Models\ProductReview;
 use App\Models\ProductVariation;
 use App\Models\ProductView;
@@ -39,6 +40,15 @@ class ProductController extends FrontendController
                 'customer_id' => auth('customer')->id(),
                 'status'      => Status::Active->value,
             ]);
+        }
+        $category = null;
+        // Group Product
+        if ($request->filled('group')) {
+            $group = ProductGroup::where('slug', $request->group)->first();
+            if ($group) {
+                $category = $group;
+                $request->merge(['filter_product_ids' => $group->product_ids]);
+            }
         }
 
         $maxPriceLimit = $this->getMaxPriceLimit();
@@ -112,6 +122,11 @@ class ProductController extends FrontendController
     // Variation Price Support
     private function applyFiltersAndSorting($query, $request)
     {
+        // group product
+        if ($request->filled('filter_product_ids')) {
+            $ids = (array)$request->filter_product_ids;
+            $query->whereIn('id', $ids);
+        }
         if ($request->filled('min_price')) {
             $min = $request->min_price;
             $query->where(function ($q) use ($min) {
@@ -297,18 +312,24 @@ class ProductController extends FrontendController
     public function searchSuggestions(Request $request)
     {
         $query = $request->get('q');
-        $company = getCurrentCompany();
-
         if (!$query || strlen($query) < 2) {
             return response()->json([]);
         }
 
         $products = Product::where('status', Status::Active->value)
             ->where('title', 'LIKE', "%{$query}%")
-            ->select('title', 'slug')
+            ->select('id', 'title', 'slug', 'thumbnail')
             ->take(10)
             ->get();
 
-        return response()->json($products);
+        $results = $products->map(function ($product) {
+            return [
+                'title' => $product->title,
+                'slug'  => $product->slug,
+                'thumbnail_url' => $product->thumbnail_url
+            ];
+        });
+
+        return response()->json($results);
     }
 }

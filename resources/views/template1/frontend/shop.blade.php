@@ -78,17 +78,17 @@
                             <!-- Slider Container -->
                             <div id="price-slider" class="relative h-1.5 bg-gray-100 rounded-full mb-6 mx-2 cursor-pointer">
                                 <!-- Orange Progress Bar -->
-                                <div id="slider-range" class="absolute h-full bg-[#f15a24] rounded-full"
+                                <div id="slider-range" class="absolute h-full primary-bg rounded-full"
                                     style="left:0%; right:0%;"></div>
 
                                 <!-- Left Handle -->
                                 <div id="handle-min"
-                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
+                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[var(--primary-color)] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
                                     style="left:0%;"></div>
 
                                 <!-- Right Handle -->
                                 <div id="handle-max"
-                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[#f15a24] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
+                                    class="absolute w-4 h-4 bg-white rounded-full border-2 border-[var(--primary-color)] -top-1.5 cursor-grab active:cursor-grabbing shadow-sm z-20"
                                     style="left:100%; transform: translateX(-100%);"></div>
                             </div>
 
@@ -103,7 +103,7 @@
 
                             <div class="flex items-center justify-between">
                                 <button type="submit"
-                                    class="bg-[#f15a24] text-primary px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
+                                    class="primary-bg text-primary px-4 py-1.5 rounded text-xs font-bold hover:bg-orange-600 transition-colors uppercase">
                                     Filter
                                 </button>
                                 <span class="text-[10px] text-gray-500 font-medium">

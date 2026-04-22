@@ -67,7 +67,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-lg transition-all">
+                        class="w-full primary-bg hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-lg transition-all">
                         <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
@@ -75,12 +75,12 @@
 
             <div class="space-y-6">
 
-                <!-- যোগাযোগের তথ্য  -->
+                <!-- Contact Information -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-8">
                     <h3 class="text-2xl font-black text-gray-900 mb-8">Contact Information</h3>
 
                     <div class="space-y-6">
-                        <!-- ফোন -->
+                        <!-- Phone -->
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 text-[#FF6A00] rounded-xl flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -100,7 +100,7 @@
 
                         <div class="h-[1px] bg-gray-200"></div>
 
-                        <!-- ইমেইল -->
+                        <!-- Email -->
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 text-[#FF6A00] rounded-xl flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -118,7 +118,7 @@
 
                         <div class="h-[1px] bg-gray-200"></div>
 
-                        <!-- ঠিকানা -->
+                        <!-- Address -->
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 text-[#FF6A00] rounded-xl flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -132,10 +132,9 @@
                             </div>
                             <div>
                                 <p class=" text-gray-900">Address</p>
-                                <p class="text-gray-700">{!! nl2br(e($setup->store_address)) ?? 'ঠিকানা পাওয়া যায়নি' !!}</p>
+                                <p class="text-gray-700">{!! nl2br(e($setup->store_address)) ?? 'Address not found' !!}</p>
                             </div>
                         </div>
-                        <!-- ঠিকানা -->
                         <div class="flex items-start gap-4">
                             <div class="w-10 h-10 text-[#FF6A00] rounded-xl flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -157,7 +156,7 @@
                     </div>
                 </div>
 
-                <!-- হোয়াটসঅ্যাপ কার্ড -->
+                <!-- WhatsApp Card -->
                 <div class="bg-[#EFFFF6] rounded-lg border border-green-200 p-8 text-center group">
                     <div
                         class="w-16 h-16 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-100 group-hover:scale-110 transition-transform">
@@ -188,31 +187,31 @@
                     </a>
                 </div>
 
-                <!-- সোশ্যাল মিডিয়া -->
+                <!-- Social Media -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 font-['Outfit']">
                     <h3 class="text-lg md:text-2xl font-black text-gray-900 mb-8">Social Media</h3>
 
                     <div class="flex flex-wrap gap-3">
-                        <!-- Facebook -->
-                        <a href="#"
-                            class="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all group">
-                            <i class="fab fa-facebook-f text-gray-700 group-hover:text-[#FF6A00]"></i>
-                            <span class="text-sm text-gray-800 group-hover:text-[#FF6A00]">Facebook</span>
-                        </a>
+                        @foreach ($socialLinks as $social)
+                            <a href="{{ $social->link }}" target="_blank"
+                                class="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2 transition-all group"
+                                onmouseover="this.style.borderColor='{{ $social->hover_bg ?? '#FF6A00' }}'; this.style.color='{{ $social->hover_bg ?? '#FF6A00' }}'"
+                                onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='inherit'">
 
-                        <!-- Instagram -->
-                        <a href="#"
-                            class="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all group">
-                            <i class="fab fa-instagram text-gray-700 group-hover:text-[#FF6A00]"></i>
-                            <span class="text-sm text-gray-800 group-hover:text-[#FF6A00]">Instagram</span>
-                        </a>
+                                @if ($social->icon_image)
+                                    <img src="{{ asset('storage/' . $social->icon_image) }}"
+                                        alt="{{ $social->icon_name }}"
+                                        class="h-5 w-5 object-contain group-hover:primary-bg transition-transform">
+                                @else
+                                    <i
+                                        class="{{ $social->icon_class ?? 'fab fa-share' }} text-gray-700 group-hover:text-inherit transition-colors"></i>
+                                @endif
 
-                        <!-- YouTube -->
-                        <a href="#"
-                            class="flex items-center gap-3 border border-gray-200 rounded-md px-3 py-2 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all group">
-                            <i class="fab fa-youtube text-gray-700 group-hover:text-[#FF6A00]"></i>
-                            <span class="text-sm text-gray-800 group-hover:text-[#FF6A00]">YouTube</span>
-                        </a>
+                                <span class="text-sm text-gray-800 font-medium group-hover:text-inherit transition-colors">
+                                    {{ $social->icon_name }}
+                                </span>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
 
@@ -241,7 +240,6 @@
                         </button>
                         <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
                             <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                                {{-- যদি কন্টেন্টে HTML থাকে তবে {!! $faq->content !!} ব্যবহার করুন --}}
                                 {!! nl2br(e($faq->content)) !!}
                             </div>
                         </div>

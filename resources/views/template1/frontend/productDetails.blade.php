@@ -9,7 +9,7 @@
                 ->exists();
         }
     @endphp
-     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
 
         <!-- 1. Breadcrumb -->
         <nav
@@ -74,7 +74,7 @@
                             <span id="regular-price" class="text-gray-400 text-lg line-through">{{ $setup->currency }}
                                 {{ number_format($product->display_price_data->regular_price) }}</span>
                         @endif
-                        <span id="sale-price" class="text-3xl font-black text-[#00A651]">{{ $setup->currency }}
+                        <span id="sale-price" class="text-3xl font-black secondary-text">{{ $setup->currency }}
                             {{ number_format($product->display_price_data->sale_price) }}</span>
                     </div>
 
@@ -117,11 +117,16 @@
                             Order Now
                         </button>
 
-                        <!-- ৩. Wishlist -->
+                        <!--  Wishlist -->
+                        <!-- Wishlist Button Updated -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 bg-white border-2 border-gray-100 text-gray-600 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                            Wishlist
+                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
+    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+
+                            <i id="wish-icon-main"
+                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                            <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
 
@@ -146,7 +151,7 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                   <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                         @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
                             <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
                                 <div class="text-orange-500 shrink-0">
@@ -196,7 +201,8 @@
         <!-- 3. TABS SECTION -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
             <!-- Tab Buttons -->
-            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar" id="tabs-nav">
+            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
+                id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
                     class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
@@ -589,6 +595,10 @@
 
         function toggleWishlist(productId) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
+            const btnWish = document.getElementById('btn-wish');
+            const wishIcon = document.getElementById('wish-icon-main');
+            const wishText = document.getElementById('wish-text-main');
+
             fetch("{{ route('wishlist.toggle') }}", {
                     method: 'POST',
                     headers: {
@@ -604,7 +614,24 @@
                     if (data.status === 'unauthorized') {
                         toastr.warning(data.message);
                     } else {
-                        // update all icons with same product id in the page
+                        // temporary disable button to prevent multiple clicks
+                        if (data.status === 'added') {
+                            // added to change to active style and 'Wishlisted' text
+                            btnWish.classList.add('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
+                            btnWish.classList.remove('bg-white', 'border-gray-100', 'text-gray-600');
+                            wishIcon.className = 'fas fa-heart text-red-500';
+                            wishText.innerText = 'Wishlisted';
+                            toastr.success(data.message);
+                        } else {
+                            // removed to change to default style and 'Wishlist' text
+                            btnWish.classList.remove('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
+                            btnWish.classList.add('bg-white', 'border-gray-100', 'text-gray-600');
+                            wishIcon.className = 'far fa-heart';
+                            wishText.innerText = 'Wishlist';
+                            toastr.info(data.message);
+                        }
+
+                        // update all icons with the same product id (in case there are multiple wishlist buttons for the same product)
                         const icons = document.querySelectorAll(`[id="wish-icon-${productId}"]`);
                         icons.forEach(icon => {
                             if (data.status === 'added') {
@@ -615,8 +642,6 @@
                                 icon.setAttribute('stroke', 'currentColor');
                             }
                         });
-                        if (data.status === 'added') toastr.success(data.message);
-                        else toastr.info(data.message);
                     }
                 });
         }

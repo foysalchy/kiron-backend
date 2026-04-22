@@ -28,12 +28,9 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
 
     Route::get('/support', [SupportController::class, 'index'])->name('support.index');
     Route::post('/support/send', [SupportController::class, 'storeMessage'])->name('support.send');
-    Route::get('/terms', [TermController::class, 'index'])->name('term.index');
-    Route::get('/privacy', [TermController::class, 'privacy'])->name('privacy.index');
 
     Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');
     Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
-    Route::get('/about', [AboutController::class, 'index'])->name('about.index');
 
     Route::get('/register', [AuthController::class, 'register'])->name('user.register');
     Route::post('/register', [AuthController::class, 'storeRegister'])->name('user.register.store');
@@ -72,4 +69,5 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
     Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
     Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
+    Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
 });
