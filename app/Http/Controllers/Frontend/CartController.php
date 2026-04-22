@@ -114,9 +114,23 @@ class CartController extends FrontendController
 
             session()->put('coupon', $result);
 
-            return back()->with('success', 'Congratulations! The coupon has been applied successfully.');
+            if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Congratulations! The coupon has been applied successfully.'
+            ]);
+        }
+
+        return back()->with('success', 'Congratulations! The coupon has been applied successfully.');
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 422);
+        }
+
+        return back()->with('error', $e->getMessage());
         }
     }
 

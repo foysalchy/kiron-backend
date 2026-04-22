@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, Party, ProductReview, ProductVariation, Warehouse};
+use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, ProductReview, ProductVariation, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -351,5 +351,44 @@ class OrderController extends FrontendController
         ]);
 
         return back()->with('success', 'Your return request has been submitted.');
+    }
+    public function submitPayment(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'reference_no' => 'required',
+            'screenshot' => 'nullable|image|max:2048'
+        ]);
+
+        $order = Order::where('id', $request->order_id)
+            ->where('customer_id', auth('customer')->id())
+            ->firstOrFail();
+
+        // ব্যাংকের এক্সট্রা ফিল্ডগুলো নোট হিসেবে সেভ করা
+        $note = "";
+        if ($request->has('note_details')) {
+            foreach ($request->note_details as $key => $val) {
+                $note .= ucwords(str_replace('_', ' ', $key)) . ": " . $val . " | ";
+            }
+        }
+
+        $screenshotPath = null;
+        if ($request->hasFile('screenshot')) {
+            $screenshotPath = FileUploadHelper::uploadImage($request->file('screenshot'), 'payments/screenshots', 'public');
+        }
+
+        OrderPayment::create([
+            'order_id' => $order->id,
+            'payment_method' => $request->payment_method,
+            'reference_no' => $request->reference_no,
+            'amount' => $request->amount,
+            'sender_number' => $request->sender_number,
+            'screenshot' => $screenshotPath,
+            'note' => $note,
+        ]);
+
+        $order->update(['payment_status' => 'pending']);
+
+        return back()->with('success', 'পেমেন্ট তথ্য জমা দেওয়া হয়েছে। আমরা এটি যাচাই করব।');
     }
 }

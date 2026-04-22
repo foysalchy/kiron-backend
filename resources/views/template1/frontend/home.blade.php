@@ -218,10 +218,11 @@
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">{{ $group->name }}</h2>
                     <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
-    <button class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
-        View all
-    </button>
-</a>
+                        <button
+                            class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
+                    </a>
                 </div>
 
                 <!-- Carousel Wrapper -->

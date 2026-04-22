@@ -154,6 +154,28 @@
                                 </div>
                             @endforeach
                         </div>
+                        <!-- 2.5 Coupon Section -->
+<div class="mb-6 border-t border-gray-100 pt-6">
+    <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
+    <div class="flex gap-2">
+        <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
+            value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
+            class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
+            {{ session()->has('coupon') ? 'readonly' : '' }}>
+
+        @if (session()->has('coupon'))
+            <button type="button" onclick="removeCoupon()"
+                class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
+                <i class="fas fa-times text-white"></i>
+            </button>
+        @else
+            <button type="button" onclick="applyCoupon()"
+                class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
+                Apply Now
+            </button>
+        @endif
+    </div>
+</div>
 
                         <!-- 3. Cost Breakdown -->
                         <div class="space-y-4 border-t border-gray-100 pt-6">
@@ -164,12 +186,13 @@
                             </div>
 
                             @if ($discount > 0)
-                                <div class="flex justify-between items-center text-green-600">
-                                    <span class="text-md font-medium">Discount:</span>
-                                    <span class="text-md font-bold">- {{ $setup->currency }}
-                                        {{ number_format($discount) }}</span>
-                                </div>
-                            @endif
+    <div class="flex justify-between items-center text-green-600">
+        <span class="text-md font-medium">Discount {{ session()->has('coupon') ? '('.session('coupon')['coupon_code'].')' : '' }}:</span>
+        <span class="text-md font-bold">- {{ $setup->currency }}
+            <span id="discount-display">{{ number_format($discount) }}</span>
+        </span>
+    </div>
+@endif
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
@@ -185,7 +208,7 @@
 
                         <!-- 4. Confirm Button -->
                         <button type="submit"
-                            class="w-full bg-[#EF4444] hover:bg-red-600 text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-red-100 transition-all active:scale-[0.98]">
+                            class="w-full primary-bg hover:bg-[#e65f00] text-primary font-bold py-4 text-md rounded-lg mt-8 shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
                             Confirm Order
                         </button>
                     </div>
@@ -203,6 +226,56 @@
 
 
 @push('scripts')
+<script>
+    function applyCoupon() {
+    const code = document.getElementById('coupon-code-input').value;
+    if (!code) return toastr.warning('Please enter a coupon code');
+
+    const token = document.querySelector('meta[name="csrf-token"]').content;
+
+    // বাটন লোডিং স্টেট (ঐচ্ছিক)
+    const btn = event.target;
+    const originalText = btn.innerText;
+    btn.innerText = 'Applying...';
+    btn.disabled = true;
+
+    fetch("{{ route('coupon.apply') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'X-Requested-With': 'XMLHttpRequest' // এই লাইনটি জরুরি
+            },
+            body: JSON.stringify({ coupon_code: code })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // কুপন অ্যাপ্লাই হলে পেজ রিলোড হবে নতুন ডিসকাউন্ট দেখানোর জন্য
+                location.reload();
+            } else {
+                toastr.error(data.message || "Invalid coupon");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            toastr.error("Server error occurred. Please try again.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        });
+}
+
+    // ২. কুপন রিমুভ করার ফাংশন
+    function removeCoupon() {
+        fetch("{{ route('coupon.remove') }}")
+            .then(() => {
+                location.reload();
+            });
+    }
+</script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.querySelector('input[name="phone"]');
