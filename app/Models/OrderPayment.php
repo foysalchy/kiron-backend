@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrderPayment extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'order_id',
         'amount',
         'change_amount',
         'payment_method',
         'reference_no',
+        'sender_number',
+        'screenshot',
         'note',
     ];
 
@@ -24,5 +26,11 @@ class OrderPayment extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+    public function getScreenshotUrlAttribute(): ?string
+    {
+        return $this->screenshot
+            ? asset('storage/' . $this->screenshot)
+            : null;
     }
 }

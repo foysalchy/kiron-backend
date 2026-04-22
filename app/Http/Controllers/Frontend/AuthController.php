@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
+use App\Models\CustomerPaymentMethod;
 use App\Models\Party;
 use App\Models\User;
 use App\Models\Wishlist;
@@ -185,6 +186,9 @@ class AuthController extends FrontendController
             ->latest()
             ->get();
 
+        $paymentMethods = CustomerPaymentMethod::where('status', Status::Active->value)
+            ->get();
+
         $totalOrders = $allOrders->count();
         $totalSpent = $allOrders->where('status', 'delivered')->sum('grand_total');
         $wishlistCount = $wishlistItems->count();
@@ -197,6 +201,7 @@ class AuthController extends FrontendController
             'recentOrders',
             'allOrders',
             'wishlistItems',
+            'paymentMethods',
 
         ));
     }

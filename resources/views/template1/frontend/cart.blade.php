@@ -164,7 +164,7 @@
 
                         <!-- Checkout Button -->
                         <a href="{{ url('/checkout') }}"
-                            class="block w-full text-center bg-[#FF6A00] hover:bg-[#e65f00] text-primary py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
+                            class="block w-full text-center primary-bg hover:bg-[#e65f00] text-primary py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
                             Checkout
                         </a>
 

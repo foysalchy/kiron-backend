@@ -241,14 +241,13 @@
                                         @endif
 
                                         <!-- Pay Now Button (Hidden if status is PAID) -->
-                                        @if (
-                                            $order->payment_status !== \App\Models\Order::PAYMENT_PAID &&
-                                                $order->status !== \App\Enums\Status::Cancelled->value)
-                                            <a href="#" {{-- Replace # with your payment route, e.g., route('order.pay', $order->id) --}}
-                                                class="px-4 py-2 bg-[#FF6A00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold hover:bg-orange-600 flex items-center gap-2">
-                                                <i class="fa-brands fa-amazon-pay"></i> Pay Now
-                                            </a>
-                                        @endif
+@if ($order->payment_status !== \App\Models\Order::PAYMENT_PAID && $order->status !== \App\Enums\Status::Cancelled->value)
+    <button type="button"
+        onclick="openPaymentModal('{{ $order->id }}', '{{ $order->grand_total }}')"
+        class="px-4 py-2 primary-bg hover:bg-[#e65f00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold flex items-center gap-2">
+        <i class="fa-brands fa-amazon-pay"></i> Pay Now
+    </button>
+@endif
                                     </div>
                                 </div>
                             @empty
@@ -405,6 +404,7 @@
             </div>
         </div>
     </section>
+    @include('template1.partials.payments._modal')
 @endsection
 @push('scripts')
     <script>
