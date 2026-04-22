@@ -24,7 +24,7 @@
                                     </h3>
                                     <!-- You can add a 'is_featured' check here if you add that column to your DB -->
                                     @if($loop->iteration <= 3)
-                                        <span class="px-2.5 py-0.5 bg-[#FF6A00] text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Featured</span>
+                                        <span class="px-2.5 py-0.5 primary-bg text-primary text-[10px] font-bold rounded-full uppercase tracking-wider">Featured</span>
                                     @endif
                                 </div>
 
@@ -34,7 +34,7 @@
                                 </p>
 
                                 <div class="flex flex-wrap items-center justify-between gap-1">
-                                    <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-[11px] font-bold rounded-lg group-hover:bg-orange-100 group-hover:text-[#FF6A00] transition-colors uppercase">
+                                    <span class="px-2.5 py-1 secondary-bg text-secondary text-xs font-semibold rounded-lg group-hover:bg-orange-100 group-hover:text-[#FF6A00] transition-colors uppercase">
                                         Official Brand
                                     </span>
                                     <span class="text-sm text-gray-500 tracking-tight">

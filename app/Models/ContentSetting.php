@@ -33,6 +33,7 @@ class ContentSetting extends Model
     const PAGE_CHECKOUT = 'checkout_page';
     const PAGE_ALL      = 'all_page';
     const PAGE_CART     = 'cart_page';
+    const FOOTER_BOTTOM_RIGHT = 'footer_bottom_right';
 
     const PAGE_TYPES = [
         self::PAGE_PRODUCT,
@@ -40,6 +41,7 @@ class ContentSetting extends Model
         self::PAGE_CHECKOUT,
         self::PAGE_ALL,
         self::PAGE_CART,
+        self::FOOTER_BOTTOM_RIGHT,
     ];
 
     /* ── Relations ── */

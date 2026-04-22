@@ -106,6 +106,12 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class);
     }
+
+public function productGroups()
+{
+    return $this->belongsToMany(ProductGroup::class, 'product_group_product');
+
+}
     // Scopes
     public function scopeActive($query)
     {

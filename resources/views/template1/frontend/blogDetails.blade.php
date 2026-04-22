@@ -33,7 +33,7 @@
                                 : explode(',', $blog->meta_keywords);
                         @endphp
                         <div
-                            class="absolute top-4 left-4 bg-blue-600 text-primary px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
+                            class="absolute top-4 left-4 primary-bg text-primary px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
                             {{ $keywords[0] ?? 'Blog' }}
                         </div>
                     </div>

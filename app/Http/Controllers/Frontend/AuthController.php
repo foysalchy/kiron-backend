@@ -180,7 +180,8 @@ class AuthController extends FrontendController
         $allOrders = $user->orders()->with('orderDetails.product')->latest()->get();
         $recentOrders = $allOrders->take(5);
 
-        $wishlistItems = Wishlist::with(['product.variations', 'product.brand'])
+        $wishlistItems = Wishlist::where('customer_id', $user->id)
+            ->with(['product.variations', 'product.brand'])
             ->latest()
             ->get();
 

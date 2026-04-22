@@ -39,8 +39,7 @@
                 <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}"
                     class="h-10 md:h-12 w-auto object-contain">
             @else
-                <div
-                    class="primary-bg w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
+                <div class="primary-bg w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
                     <span class="text-primary text-xl md:text-2xl font-bold">
                         {{ substr($setup->shop_name ?? 'O', 0, 1) }}
                     </span>
@@ -117,7 +116,7 @@
 
             <!-- Wishlist -->
             <a href="{{ route('user.dashboard') }}"
-                class="flex items-center gap-1.5 hover-text transition-colors relative">
+                class="hidden lg:flex flex items-center gap-1.5 hover-text transition-colors relative">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl"></i>
                     @auth('customer')
@@ -194,7 +193,7 @@
 
             <!-- Cart -->
             <a href="{{ route('cart.index') }}"
-                class="flex items-center gap-1.5 hover-text transition-colors relative">
+                class="lg:flex flex hidden items-center gap-1.5 hover-text transition-colors relative">
                 <div class="relative">
                     <i class="fa-solid fa-cart-shopping text-xl"></i>
                     <span
@@ -205,10 +204,6 @@
                 <span class="hidden lg:block font-semibold text-sm">Cart</span>
             </a>
 
-            <!-- Mobile Menu Toggle -->
-            <button class="lg:hidden text-xl hover-text" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
         </div>
     </div>
 
@@ -236,15 +231,14 @@
                     {{ $cat->name }}
                 </a>
             @endforeach
-            <a class="text-sm font-medium hover-text whitespace-nowrap"
-                href="{{ route('brand.index') }}">Brands</a>
+            <a class="text-sm font-medium hover-text whitespace-nowrap" href="{{ route('brand.index') }}">Brands</a>
             <a class="text-sm font-bold text-red-700 hover:text-red-800 whitespace-nowrap"
                 href="{{ route('flash.sale') }}">Flash Sale 🔥</a>
         </div>
     </div>
 
     <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-[999] flex">
+    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-[1100] flex">
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/50" onclick="toggleMobileMenu()"></div>
 
@@ -345,7 +339,62 @@
             @endauth
         </div>
     </div>
+    <!-- Bottom Navigation Bar (First Image Style) -->
+    <div
+        class="sm:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 flex justify-around items-center py-2 z-[1000] shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
 
+        <!-- Home -->
+        <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 text-gray-700">
+            <img src="{{ asset('./images/template1/frontend/home.png') }}" alt="home" height="24px"
+                width="24px">
+            <span class="text-xs font-medium">Home</span>
+        </a>
+
+        <!-- Category (Triggers the existing Mobile Menu) -->
+        <button onclick="toggleMobileMenu()" class="flex flex-col items-center gap-1 text-gray-700">
+            <img src="{{ asset('./images/template1/frontend/app.png') }}" height="24px" width="24px"
+                alt="Category">
+            <span class="text-xs font-medium">Category</span>
+        </button>
+
+        <!-- Cart -->
+        <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-1 text-gray-700 relative">
+            <img src="{{ asset('./images/template1/frontend/sell.png') }}" alt="Cart" height="24px"
+                width="24px">
+            <span
+                class="absolute -top-1 -right-2 primary-bg text-primary text-[9px] font-bold px-1 rounded-full border border-white">
+                {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
+            </span>
+            <span class="text-xs font-medium">Cart</span>
+        </a>
+
+        <!-- Profile -->
+        <a href="{{ route('user.dashboard') }}" class="flex flex-col items-center gap-1 text-gray-700">
+            @auth('customer')
+                <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+                    <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                        alt="User" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <p class="text-xs font-medium">{{ auth('customer')->user()->name }}</p>
+                </div>
+            @else
+                <img src="{{ asset('./images/template1/frontend/people.png') }}" alt="Profile" height="24px"
+                    width="24px">
+                <span class="text-xs font-medium">Profile</span>
+            @endauth
+        </a>
+
+    </div>
+
+    <!-- Padding for Body to avoid content overlap -->
+    <style>
+        @media (max-width: 640px) {
+            body {
+                padding-bottom: 65px;
+            }
+        }
+    </style>
 </header>
 
 @push('scripts')
@@ -418,13 +467,17 @@
                                 if (data.length > 0) {
                                     data.forEach(item => {
                                         const link = document.createElement('a');
-                                        link.href =
-                                            "{{ route('shop.index') }}?search=" +
-                                            encodeURIComponent(item.title);
+                                        link.href = "{{ url('product') }}/" + item
+                                        .slug;
                                         link.className =
-                                            "flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
-                                        link.innerHTML =
-                                            `<span>${item.title}</span><i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-gray-300"></i>`;
+                                            "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
+
+                                        link.innerHTML = `
+                                            <img src="${item.thumbnail_url}"
+                                                class="w-6 h-6 rounded object-cover border border-gray-100"
+                                                onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                            <span class="truncate">${item.title}</span>
+                                        `;
                                         liveResults.appendChild(link);
                                     });
                                 } else {

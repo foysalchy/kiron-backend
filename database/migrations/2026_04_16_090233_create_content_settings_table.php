@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('content_settings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->enum('page_type', ['product_page', 'checkout_page', 'all_page', 'cart_page', 'product_page_sub']);
+            $table->enum('page_type', ['product_page', 'checkout_page', 'all_page', 'cart_page', 'product_page_sub','footer_bottom_right']);
             $table->string('icon_url')->nullable();
             $table->string('icon_file')->nullable();
             $table->string('title')->nullable();       // all_page only
