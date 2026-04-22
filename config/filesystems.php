@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'r2'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,6 +58,17 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
             'report' => false,
+        ],
+        'r2' => [
+            'driver' => 's3',
+            'key' => 'da04c8c5fe09873bd650c4d3aeceacff',
+            'secret' => 'dbb6de63793353743a854df378085ac58ee4728c89655ca180134334b4a34868',
+            'region' => env('R2_REGION', 'auto'),
+            'bucket' => 'ekaz',
+            'url' => 'https://pub-a17d46c849f84ef782ddae78162e6197.r2.dev',
+            'endpoint' => 'https://3dde6820133185f55d19f2424f7df71a.r2.cloudflarestorage.com',
+            'use_path_style_endpoint' => true,
+            'throw' => false,
         ],
 
     ],
