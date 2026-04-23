@@ -13,14 +13,15 @@ class OrderPayment extends Model
         'change_amount',
         'payment_method',
         'reference_no',
-        'sender_number',
-        'screenshot',
+        'transaction_id',
+        'sender_info',
         'note',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'change_amount' => 'decimal:2',
+        'sender_info' => 'array',
     ];
 
     public function order(): BelongsTo

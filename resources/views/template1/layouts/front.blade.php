@@ -18,47 +18,49 @@
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-<style>
-    :root {
-        --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }};
+    <style>
+        :root {
+            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }};
 
-        --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
+            --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
 
-        --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }};
-        --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }};
+            --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }};
+            --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }};
 
-        --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
-        --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
-    }
+            --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
+            --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
+        }
 
-    .primary-bg {
-        background-color: var(--primary-color) !important;
-        color: var(--primary-text) !important;
-    }
+        .primary-bg {
+            background-color: var(--primary-color) !important;
+            color: var(--primary-text) !important;
+        }
 
-    .text-primary {
-        color: var(--primary-text) !important;
-    }
+        .text-primary {
+            color: var(--primary-text) !important;
+        }
 
-    .text-brand {
-        color: var(--primary-color) !important;
-    }
+        .text-brand {
+            color: var(--primary-color) !important;
+        }
 
-    .secondary-bg {
-        background-color: var(--secondary-color) !important;
-        color: var(--secondary-text) !important;
-    }
+        .secondary-bg {
+            background-color: var(--secondary-color) !important;
+            color: var(--secondary-text) !important;
+        }
 
-    .text-secondary { color: var(--secondary-text) !important; }
+        .text-secondary {
+            color: var(--secondary-text) !important;
+        }
 
-    .hover-text:hover {
-        color: var(--primary-hover-text) !important;
-    }
+        .hover-text:hover {
+            color: var(--primary-hover-text) !important;
+        }
 
-    .primary-bg-hover:hover {
-        background-color: var(--primary-hover-color) !important;
-    }
-</style>
+        .primary-bg-hover:hover {
+            background-color: var(--primary-hover-color) !important;
+        }
+    </style>
     @stack('styles')
 </head>
 
@@ -95,6 +97,11 @@
                 "positionClass": "toast-top-right",
                 "timeOut": "3000"
             };
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    toastr.error("{{ $error }}");
+                @endforeach
+            @endif
 
             @if (Session::has('success'))
                 toastr.success("{{ Session::get('success') }}");

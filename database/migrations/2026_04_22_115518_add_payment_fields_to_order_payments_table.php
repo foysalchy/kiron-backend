@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
-            $table->string('sender_number')->nullable()->after('reference_no');
-            $table->string('screenshot')->nullable()->after('sender_number');
+            $table->string('transaction_id')->nullable()->after('reference_no');
+            $table->json('sender_info')->nullable()->after('transaction_id');
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
-            $table->dropColumn(['sender_number', 'screenshot']);
+            $table->dropColumn(['sender_info', 'transaction_id']);
         });
     }
 };
