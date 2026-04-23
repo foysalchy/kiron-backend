@@ -22,7 +22,6 @@ class SubscriptionController extends Controller
         $sub->update([
             'discount_amount' => $data['discount_amount'],
             'discount_note'   => $data['note'] ?? null,
-            'amount_paid'     => max(0, $sub->amount_paid - $data['discount_amount']),
         ]);
 
         return response()->json(['message' => 'Discount applied.']);
@@ -89,24 +88,53 @@ class SubscriptionController extends Controller
     }
     public function billing(Request $request): JsonResponse
     {
-        $companies = Company::with([
+        $query = Company::with([
             'currentSubscription.pricingPackage',
             'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
-        ])
-            ->when(
-                $request->search,
-                fn($q, $s) =>
-                $q->where('name', 'like', "%{$s}%")
-                    ->orWhere('email', 'like', "%{$s}%")
-            )
-            ->latest()
-            ->get();
+        ]);
 
+        // Search
+        if ($request->search) {
+            $query->where(
+                fn($q) => $q
+                    ->where('name',  'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%")
+            );
+        }
+
+        // Status filter — subscription payment_status
+        if ($request->status && $request->status !== 'all') {
+            $status = $request->status === 'failed' ? ['failed', 'cancelled'] : [$request->status];
+            $query->whereHas(
+                'currentSubscription',
+                fn($q) =>
+                $q->whereIn('payment_status', $status)
+            );
+        }
+
+        // Date range — subscription starts_at
+        if ($request->date_from) {
+            $query->whereHas(
+                'currentSubscription',
+                fn($q) =>
+                $q->whereDate('starts_at', '>=', $request->date_from)
+            );
+        }
+        if ($request->date_to) {
+            $query->whereHas(
+                'currentSubscription',
+                fn($q) =>
+                $q->whereDate('starts_at', '<=', $request->date_to)
+            );
+        }
+
+        $companies = $query->latest()->get();
+
+        // Extra charges attach
         foreach ($companies as $company) {
             foreach ($company->subscriptions as $sub) {
                 $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
                 $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
-
                 $sub->setRelation(
                     'extra_order_charges',
                     \App\Models\ExtraOrderCharge::with('order:id,order_no')
@@ -117,6 +145,21 @@ class SubscriptionController extends Controller
             }
         }
 
-        return response()->json(['data' => $companies]);
+        // Stats — always from full dataset (no filter)
+        $allSubs = \App\Models\CompanySubscription::query();
+
+        $stats = [
+            'total_companies'  => Company::count(),
+            'total_paid_amount' => (clone $allSubs)->where('payment_status', 'paid')->sum('amount_paid'),
+            'pending_count'    => (clone $allSubs)->where('payment_status', 'pending')->count(),
+            'pending_amount'   => (clone $allSubs)->where('payment_status', 'pending')->sum('amount_paid'),
+            'unpaid_count'     => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->count(),
+            'unpaid_amount'    => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->sum('amount_paid'),
+        ];
+
+        return response()->json([
+            'data'  => $companies,
+            'stats' => $stats,
+        ]);
     }
 }

@@ -37,16 +37,23 @@ class CompanyController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $filters = [
-            'status' => $request->query('status'),
-            'business_type' => $request->query('business_type'),
-            'search' => $request->query('search'),
-            'sort_by' => $request->query('sort_by', 'created_at'),
-            'sort_order' => $request->query('sort_order', 'desc'),
-            'per_page' => $request->query('per_page', 15),
-        ];
+        $filters = array_filter([
+            'search'              => $request->search,
+            'status'              => $request->status,
+            'business_type'       => $request->business_type,
+            'pricing_package_id'  => $request->pricing_package_id,
+            'registered_from'     => $request->registered_from,
+            'registered_to'       => $request->registered_to,
+            'expire_from'         => $request->expire_from,
+            'expire_to'           => $request->expire_to,
+            'free_trial'          => $request->free_trial,
+            'expiring_in_days' => $request->expiring_in_days ? (int) $request->expiring_in_days : null,
+            'sort_by'             => $request->sort_by,
+            'sort_order'          => $request->sort_order,
+            'per_page'            => $request->per_page,
+        ], fn($v) => $v !== null && $v !== '');
 
-        $companies = $this->companyService->getAllCompanies($filters, true);
+        $companies = $this->companyService->getAllCompanies($filters);
 
         return ResponseHelper::success($companies, 'Companies retrieved successfully');
     }
@@ -148,7 +155,7 @@ class CompanyController extends Controller
                 default     => $now->copy()->addMonth(),
             };
 
-    
+
             $company->subscriptions()->update(['status' => Status::Inactive->value]);
 
             CompanySubscription::create([

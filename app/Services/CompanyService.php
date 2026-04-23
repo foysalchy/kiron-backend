@@ -25,23 +25,16 @@ class CompanyService
                 'currentSubscription.pricingPackage',
             ])
                 ->withCount([
-                    // Product count
                     'products as product_used',
-
-                    // User count
                     'users as user_used',
-
-                    // Sales order — current month only
                     'orders as order_used' => fn($q) => $q
                         ->where('type', Order::TYPE_SALES)
                         ->whereMonth('created_at', now()->month)
                         ->whereYear('created_at', now()->year),
-
-                    // Domain count
                     'domains as domain_used',
                 ]);
 
-            // filters...
+            // Existing filters
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
                     $query->onlyTrashed();
@@ -56,13 +49,79 @@ class CompanyService
 
             if (isset($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
-                    $q->where('name', 'like', "%{$filters['search']}%")
+                    $q->where('name',  'like', "%{$filters['search']}%")
                         ->orWhere('email', 'like', "%{$filters['search']}%")
                         ->orWhere('phone', 'like', "%{$filters['search']}%");
                 });
             }
 
-            $sortBy    = $filters['sort_by'] ?? 'created_at';
+            // ── New filters ──
+
+            // Package wise
+            if (isset($filters['pricing_package_id'])) {
+                $query->whereHas(
+                    'currentSubscription',
+                    fn($q) =>
+                    $q->where('pricing_package_id', $filters['pricing_package_id'])
+                );
+            }
+
+            // Registered date range
+            if (isset($filters['registered_from'])) {
+                $query->whereDate('created_at', '>=', $filters['registered_from']);
+            }
+            if (isset($filters['registered_to'])) {
+                $query->whereDate('created_at', '<=', $filters['registered_to']);
+            }
+
+            // Subscription expire date range
+            if (isset($filters['expire_from'])) {
+                $query->whereHas(
+                    'currentSubscription',
+                    fn($q) =>
+                    $q->whereDate('ends_at', '>=', $filters['expire_from'])
+                );
+            }
+            if (isset($filters['expire_to'])) {
+                $query->whereHas(
+                    'currentSubscription',
+                    fn($q) =>
+                    $q->whereDate('ends_at', '<=', $filters['expire_to'])
+                );
+            }
+
+            // Free trial — trial_ends_at is not null and in future
+            if (isset($filters['free_trial'])) {
+                if ($filters['free_trial'] == 1) {
+                    // On free trial
+                    $query->whereHas(
+                        'currentSubscription',
+                        fn($q) =>
+                        $q->whereNotNull('trial_ends_at')
+                            ->where('trial_ends_at', '>', now())
+                    );
+                } else {
+                    // Trial ended or no trial
+                    $query->whereDoesntHave(
+                        'currentSubscription',
+                        fn($q) =>
+                        $q->whereNotNull('trial_ends_at')
+                            ->where('trial_ends_at', '>', now())
+                    );
+                }
+            }
+
+            if (isset($filters['expiring_in_days'])) {
+                $days = (int) $filters['expiring_in_days']; // string → int cast
+                $query->whereHas(
+                    'currentSubscription',
+                    fn($q) =>
+                    $q->whereDate('ends_at', '<=', now()->addDays($days))
+                        ->whereDate('ends_at', '>=', now())
+                );
+            }
+
+            $sortBy    = $filters['sort_by']    ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
@@ -79,7 +138,7 @@ class CompanyService
      */
     public function getCompanyById(int $id): Company
     {
-   
+
         $company = Company::with([
             'primaryUser',                          // is_primary = 1
             'currentSubscription.pricingPackage',   // active subscription + package
@@ -101,23 +160,23 @@ class CompanyService
             ])
             ->find($id);
 
-     
-    foreach ($company->subscriptions as $sub) {
-        $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
-        $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
 
-        $charges = \App\Models\ExtraOrderCharge::with('order:id,order_no')
-            ->where('company_id', $id)
-            ->whereBetween('month', [$startMonth, $endMonth])
-            ->get();
+        foreach ($company->subscriptions as $sub) {
+            $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
+            $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
 
-        // Debug
-        Log::info("Sub ID: {$sub->id} | Start: {$startMonth} | End: {$endMonth} | Charges: " . $charges->count());
+            $charges = \App\Models\ExtraOrderCharge::with('order:id,order_no')
+                ->where('company_id', $id)
+                ->whereBetween('month', [$startMonth, $endMonth])
+                ->get();
 
-        $sub->setRelation('extra_order_charges', $charges);
-    }
+            // Debug
+            Log::info("Sub ID: {$sub->id} | Start: {$startMonth} | End: {$endMonth} | Charges: " . $charges->count());
 
-    return $company;
+            $sub->setRelation('extra_order_charges', $charges);
+        }
+
+        return $company;
 
         return $company;
     }
