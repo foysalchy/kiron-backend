@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - #{{ $order->order_no }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -594,7 +595,7 @@
                     <div class="billing-section">
                         <h3>Payment Information:</h3>
                         <p><strong>Payment Method:</strong>
-                            {{ strtoupper(str_replace('_', ' ', $order->payment_method ?? 'Cash on Delivery')) }}</p>
+                               {{ str_replace('_', ' ', $order->orderPayments->last()->payment_method) ?? 'Cash on Delivery' }}</p>
                         <p><strong>Payment Status:</strong> {{ $order->payment_status_label }}</p>
                     </div>
                 </div>

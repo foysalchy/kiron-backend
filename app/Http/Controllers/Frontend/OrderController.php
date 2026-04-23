@@ -43,6 +43,7 @@ class OrderController extends FrontendController
         $total = ($subtotal - $discount) + $shipping;
         $shipping_area = session()->get('shipping_area', 'inside');
 
+        $draftOrderId = Session::get('current_draft_order_id');
         return $this->view('frontend.checkout', compact(
             'cartContent',
             'subtotal',
@@ -51,6 +52,7 @@ class OrderController extends FrontendController
             'total',
             'shipping_area',
             'paymentMethods',
+            'draftOrderId'
         ));
     }
 
@@ -140,7 +142,7 @@ class OrderController extends FrontendController
             Session::put('current_draft_order_id', $order->id);
 
             DB::commit();
-            return ['success' => true];
+            return ['success' => true, 'order_id' => $order->id];
         } catch (\Exception $e) {
             DB::rollBack();
             return ['success' => false, 'error' => $e->getMessage()];
@@ -244,6 +246,7 @@ class OrderController extends FrontendController
     {
         $order = Order::with([
             'customer',
+            'orderPayments',
             'orderDetails.product' => function ($q) {
                 $q->withTrashed();
             }, // Add this
@@ -352,43 +355,72 @@ class OrderController extends FrontendController
 
         return back()->with('success', 'Your return request has been submitted.');
     }
+
     public function submitPayment(Request $request)
     {
         $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'reference_no' => 'required',
-            'screenshot' => 'nullable|image|max:2048'
+            'order_id'       => 'required|exists:orders,id',
+            'payment_method' => 'required|string',
+            'transaction_id' => 'required|string|unique:order_payments,transaction_id',
+            'reference_no'   => 'nullable|string|max:100',
+            'amount'         => 'required|numeric|min:1',
+            'sender_number'  => 'nullable|string|max:20',
+            'note'           => 'nullable|string|max:500',
+            'bank_name'      => 'nullable|string|max:100',
+            'branch_name'    => 'nullable|string|max:100',
+            'card_type'      => 'nullable|string|max:50',
+            'screenshots' => 'nullable|array|max:3',
+            'screenshots.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'transaction_id.unique' => 'This transaction ID has already been used. Please check and try again.',
+            'transaction_id.required' => 'Transaction ID is required.',
         ]);
 
-        $order = Order::where('id', $request->order_id)
-            ->where('customer_id', auth('customer')->id())
-            ->firstOrFail();
+        $draftIdFromSession = Session::get('current_draft_order_id');
+        $order = Order::where('id', $request->order_id);
 
-        // ব্যাংকের এক্সট্রা ফিল্ডগুলো নোট হিসেবে সেভ করা
-        $note = "";
-        if ($request->has('note_details')) {
-            foreach ($request->note_details as $key => $val) {
-                $note .= ucwords(str_replace('_', ' ', $key)) . ": " . $val . " | ";
+
+        if (auth('customer')->check()) {
+            $order->where('customer_id', auth('customer')->id());
+        } else {
+            $order->where('id', $draftIdFromSession);
+        }
+        $order = $order->firstOrFail();
+
+        $transactionId = $request->transaction_id;
+        if ($request->payment_method == 'cod') {
+            $transactionId = 'COD-' . $order->order_no . '-' . time();
+        }
+        $screenshotPaths = [];
+        if ($request->hasFile('screenshots')) {
+            foreach ($request->file('screenshots') as $image) {
+                $path = FileUploadHelper::uploadImage($image, 'payments/screenshots', 'public');
+                $screenshotPaths[] = $path;
             }
         }
 
-        $screenshotPath = null;
-        if ($request->hasFile('screenshot')) {
-            $screenshotPath = FileUploadHelper::uploadImage($request->file('screenshot'), 'payments/screenshots', 'public');
-        }
-
-        OrderPayment::create([
-            'order_id' => $order->id,
-            'payment_method' => $request->payment_method,
-            'reference_no' => $request->reference_no,
-            'amount' => $request->amount,
+        // All extra sender/payment info stored as JSON
+        $senderInfo = array_filter([
             'sender_number' => $request->sender_number,
-            'screenshot' => $screenshotPath,
-            'note' => $note,
+            'screenshot'    => $screenshotPaths,
+            'bank_name'     => $request->bank_name,
+            'branch_name'   => $request->branch_name,
+            'card_type'     => $request->card_type,   // ← card এর জন্য
         ]);
 
-        $order->update(['payment_status' => 'pending']);
+        OrderPayment::create([
+            'order_id'       => $order->id,
+            'payment_method' => $request->payment_method,
+            'transaction_id' => $transactionId,
+            'reference_no'   => $request->reference_no,
+            'amount'         => $request->amount,
+            'change_amount'  => 0,
+            'sender_info'    => $senderInfo,
+            'note'           => $request->note,
+        ]);
 
-        return back()->with('success', 'পেমেন্ট তথ্য জমা দেওয়া হয়েছে। আমরা এটি যাচাই করব।');
+        $order->update(['payment_status' => Order::PAYMENT_PENDING]);
+
+        return back()->with('success', 'Payment information submitted successfully! Our team will verify and update the order status soon.');
     }
 }

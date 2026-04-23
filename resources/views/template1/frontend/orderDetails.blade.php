@@ -20,7 +20,7 @@
                     ];
                 @endphp
                 <span
-                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'bg-blue-500' }} text-primary text-md font-bold rounded-lg mb-1">
+                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'primary-bg' }} text-primary text-md font-bold rounded-lg mb-1">
                     {{ App\Enums\Status::from($order->status)->label() }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
@@ -377,7 +377,7 @@
                 </div>
 
                 <button type="submit"
-                    class="w-full bg-red-500 text-primary py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
+                    class="w-full primary-bg text-primary py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
                     Request</button>
             </form>
         </div>

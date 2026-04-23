@@ -62,20 +62,43 @@
                         </div>
                         <div class="space-y-3 p-6">
                             @foreach ($paymentMethods as $method)
-                                <label
-                                    class="flex items-center space-x-4 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-all group">
-                                    <input type="radio" name="payment_method" value="{{ $method->name }}"
+                                @php $slug = strtolower(trim($method->name)); @endphp
+                                <label id="label-{{ $slug }}"
+                                    class="payment-method-label flex items-center space-x-4 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-[#FF6A00] transition-all group"
+                                    onclick="checkoutSelectMethod('{{ $slug }}', '{{ $method->name }}')">
+
+                                    <input type="radio" name="_payment_method_radio" value="{{ $slug }}"
                                         {{ $loop->first ? 'checked' : '' }}
-                                        class="w-4 h-4 border-gray-300 focus:ring-0 accent-black">
+                                        class="w-4 h-4 border-gray-300 focus:ring-0 accent-black pointer-events-none">
 
                                     <div
                                         class="w-7 h-7 bg-gray-100 rounded flex items-center justify-center border border-gray-50">
-                                        <i class="{{ $method->icon ?? 'fas fa-wallet' }} text-xs text-gray-400"></i>
+                                        @if ($method->icon)
+                                            <img src="{{ $method->icon_url }}" class="h-5 object-contain"
+                                                onerror="this.style.display='none'">
+                                        @else
+                                            <i class="fas fa-wallet text-xs text-gray-400"></i>
+                                        @endif
                                     </div>
 
                                     <span class="text-md font-medium text-gray-900">{{ $method->name }}</span>
+
+                                    <span id="badge-{{ $slug }}"
+                                        class="ml-auto hidden text-[11px] font-bold text-[#FF6A00]">✓ Selected</span>
                                 </label>
                             @endforeach
+                        </div>
+
+                        {{-- Selected method display bar --}}
+                        <div id="selected-method-display" class="px-6 pb-4 hidden">
+                            <div class="flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                                <i class="fas fa-check-circle text-[#FF6A00] text-sm"></i>
+                                <span class="text-sm font-semibold text-gray-700">
+                                    Payment: <span id="selected-method-name" class="text-[#FF6A00]"></span>
+                                </span>
+                                <button type="button" onclick="reopenPaymentModal()"
+                                    class="ml-auto text-xs text-[#FF6A00] font-bold underline">Change</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -155,27 +178,27 @@
                             @endforeach
                         </div>
                         <!-- 2.5 Coupon Section -->
-<div class="mb-6 border-t border-gray-100 pt-6">
-    <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
-    <div class="flex gap-2">
-        <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
-            value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
-            class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
-            {{ session()->has('coupon') ? 'readonly' : '' }}>
+                        <div class="mb-6 border-t border-gray-100 pt-6">
+                            <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
+                                    value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
+                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
+                                    {{ session()->has('coupon') ? 'readonly' : '' }}>
 
-        @if (session()->has('coupon'))
-            <button type="button" onclick="removeCoupon()"
-                class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
-                <i class="fas fa-times text-white"></i>
-            </button>
-        @else
-            <button type="button" onclick="applyCoupon()"
-                class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
-                Apply Now
-            </button>
-        @endif
-    </div>
-</div>
+                                @if (session()->has('coupon'))
+                                    <button type="button" onclick="removeCoupon()"
+                                        class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
+                                        <i class="fas fa-times text-white"></i>
+                                    </button>
+                                @else
+                                    <button type="button" onclick="applyCoupon()"
+                                        class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
+                                        Apply Now
+                                    </button>
+                                @endif
+                            </div>
+                        </div>
 
                         <!-- 3. Cost Breakdown -->
                         <div class="space-y-4 border-t border-gray-100 pt-6">
@@ -186,13 +209,14 @@
                             </div>
 
                             @if ($discount > 0)
-    <div class="flex justify-between items-center text-green-600">
-        <span class="text-md font-medium">Discount {{ session()->has('coupon') ? '('.session('coupon')['coupon_code'].')' : '' }}:</span>
-        <span class="text-md font-bold">- {{ $setup->currency }}
-            <span id="discount-display">{{ number_format($discount) }}</span>
-        </span>
-    </div>
-@endif
+                                <div class="flex justify-between items-center text-green-600">
+                                    <span class="text-md font-medium">Discount
+                                        {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}:</span>
+                                    <span class="text-md font-bold">- {{ $setup->currency }}
+                                        <span id="discount-display">{{ number_format($discount) }}</span>
+                                    </span>
+                                </div>
+                            @endif
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
@@ -222,60 +246,155 @@
             <input type="hidden" name="area" id="shipping-area-input">
         </form>
     </section>
+    <x-template1.payment-modal :methods="$paymentMethods" :currency="$setup->currency" />
 @endsection
 
 
 @push('scripts')
-<script>
-    function applyCoupon() {
-    const code = document.getElementById('coupon-code-input').value;
-    if (!code) return toastr.warning('Please enter a coupon code');
+    <script>
+        let _activeDraftOrderId = @json($draftOrderId ?? null);
+        let _checkoutTotal = {{ $total }};
+        let _checkoutSlug = '';
 
-    const token = document.querySelector('meta[name="csrf-token"]').content;
 
-    // বাটন লোডিং স্টেট (ঐচ্ছিক)
-    const btn = event.target;
-    const originalText = btn.innerText;
-    btn.innerText = 'Applying...';
-    btn.disabled = true;
-
-    fetch("{{ route('coupon.apply') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': token,
-                'X-Requested-With': 'XMLHttpRequest' // এই লাইনটি জরুরি
-            },
-            body: JSON.stringify({ coupon_code: code })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                // কুপন অ্যাপ্লাই হলে পেজ রিলোড হবে নতুন ডিসকাউন্ট দেখানোর জন্য
-                location.reload();
-            } else {
-                toastr.error(data.message || "Invalid coupon");
-                btn.innerText = originalText;
-                btn.disabled = false;
+        // ── Page load: auto-select first method ──
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstRadio = document.querySelector('input[name="_payment_method_radio"]');
+            if (firstRadio) {
+                const slug = firstRadio.value;
+                const nameEl = firstRadio.closest('label')?.querySelector('span.text-md');
+                _checkoutSlug = slug;
+                highlightMethod(slug, nameEl?.innerText?.trim() ?? slug);
+                document.getElementById('selected-payment-method').value = slug;
             }
-        })
-        .catch(err => {
-            console.error(err);
-            toastr.error("Server error occurred. Please try again.");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        });
-}
 
-    // ২. কুপন রিমুভ করার ফাংশন
-    function removeCoupon() {
-        fetch("{{ route('coupon.remove') }}")
-            .then(() => {
-                location.reload();
+            // ── Modal-এর method button click intercept ──
+            // (dashboard-এর selectPaymentMethod touch না করে)
+            document.querySelectorAll('.method-icon-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const slug = this.id.replace('method-btn-', '');
+                    const nameEl = this.querySelector('span');
+                    const name = nameEl ? nameEl.innerText.trim() : slug;
+
+                    // Update hidden field + radio + display
+                    setTimeout(() => {
+                        _checkoutSlug = slug;
+                        document.getElementById('selected-payment-method').value = slug;
+                        highlightMethod(slug, name);
+
+                        // COD হলে modal বন্ধ করো
+                        if (slug.includes('cash') || slug.includes('cod')) {
+                            closePaymentModal();
+                        }
+                    }, 60);
+                });
             });
-    }
-</script>
+        });
+
+        // ── Radio label click → open modal ──
+        function checkoutSelectMethod(slug, name) {
+            if (!_activeDraftOrderId) {
+                toastr.error('Please enter your Phone and Address first to generate Order ID!');
+                document.querySelector('input[name="phone"]').focus();
+                return;
+            }
+            _checkoutSlug = slug;
+
+            // Sync radio
+            const radio = document.querySelector(`input[name="_payment_method_radio"][value="${slug}"]`);
+            if (radio) radio.checked = true;
+
+            if (slug.includes('cash') || slug.includes('cod')) {
+                highlightMethod(slug, name);
+                return;
+            }
+
+            // Modal open করো
+            openPaymentModal(_activeDraftOrderId, _checkoutTotal);
+
+            // Modal-এর ভেতরে সেই method-এর form দেখাও
+            setTimeout(() => selectPaymentMethod(slug, name), 80);
+        }
+
+        function reopenPaymentModal() {
+            openPaymentModal('checkout', _checkoutTotal);
+            if (_checkoutSlug) {
+                setTimeout(() => selectPaymentMethod(_checkoutSlug, _checkoutSlug), 80);
+            }
+        }
+
+        // ── Radio border + badge highlight ──
+        function highlightMethod(slug, name) {
+            document.querySelectorAll('.payment-method-label').forEach(l => {
+                l.classList.remove('border-[#FF6A00]', 'bg-orange-50');
+                l.classList.add('border-gray-200');
+            });
+            document.querySelectorAll('[id^="badge-"]').forEach(b => b.classList.add('hidden'));
+
+            const lbl = document.getElementById('label-' + slug);
+            if (lbl) {
+                lbl.classList.remove('border-gray-200');
+                lbl.classList.add('border-[#FF6A00]', 'bg-orange-50');
+            }
+            const badge = document.getElementById('badge-' + slug);
+            if (badge) badge.classList.remove('hidden');
+
+            // Display bar
+            document.getElementById('selected-method-name').innerText = name;
+            document.getElementById('selected-method-display').classList.remove('hidden');
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('coupon-code-input').value;
+            if (!code) return toastr.warning('Please enter a coupon code');
+
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            // বাটন লোডিং স্টেট (ঐচ্ছিক)
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Applying...';
+            btn.disabled = true;
+
+            fetch("{{ route('coupon.apply') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest' // এই লাইনটি জরুরি
+                    },
+                    body: JSON.stringify({
+                        coupon_code: code
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // কুপন অ্যাপ্লাই হলে পেজ রিলোড হবে নতুন ডিসকাউন্ট দেখানোর জন্য
+                        location.reload();
+                    } else {
+                        toastr.error(data.message || "Invalid coupon");
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    toastr.error("Server error occurred. Please try again.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                });
+        }
+
+        // ২. কুপন রিমুভ করার ফাংশন
+        function removeCoupon() {
+            fetch("{{ route('coupon.remove') }}")
+                .then(() => {
+                    location.reload();
+                });
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.querySelector('input[name="phone"]');
@@ -283,35 +402,34 @@
             const addressInput = document.querySelector('textarea[name="address"]');
 
             function saveDraft() {
-                let phone = phoneInput.value;
-                let name = nameInput.value;
-                let address = addressInput.value;
+                const phoneInput = document.querySelector('input[name="phone"]');
+                const nameInput = document.querySelector('input[name="name"]');
+                const addressInput = document.querySelector('textarea[name="address"]');
 
+                let phone = phoneInput.value;
                 if (phone.length >= 11) {
                     const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
                     fetch("{{ route('order.partial') }}", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Accept': 'application/json',
                                 'X-CSRF-TOKEN': token
                             },
                             body: JSON.stringify({
                                 phone: phone,
-                                name: name,
-                                address: address
+                                name: nameInput.value,
+                                address: addressInput.value
                             })
                         })
-                        .then(response => response.json())
+                        .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                console.log("Success: Draft order created.");
-                            } else {
-                                console.log("Error: " + (data.error || "Draft failed"));
+                                _activeDraftOrderId = data.order_id; // এখানে আইডি আপডেট হবে
+                                console.log("Draft Updated. ID:", _activeDraftOrderId);
                             }
-                        })
-                        .catch(error => console.error('Error:', error));
+                        });
+                } else {
+                    console.log("Phone number must be at least 11 digits to save draft.");
                 }
             }
 

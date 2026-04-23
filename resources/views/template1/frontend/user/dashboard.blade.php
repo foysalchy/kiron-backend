@@ -33,7 +33,8 @@
                     <p class="text-sm text-gray-500 font-medium">{{ $user->email }}</p>
 
                     <!-- Sidebar Menu -->
-                    <nav class="mt-4 lg:mt-8 flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0" id="dashboard-nav">
+                    <nav class="mt-4 lg:mt-8 flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0"
+                        id="dashboard-nav">
                         <button onclick="showSection('overview', this)"
                             class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 bg-[#1D2128] text-primary rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-user w-5 text-center"></i> Overview
@@ -240,14 +241,25 @@
                                             </a>
                                         @endif
 
-                                        <!-- Pay Now Button (Hidden if status is PAID) -->
-@if ($order->payment_status !== \App\Models\Order::PAYMENT_PAID && $order->status !== \App\Enums\Status::Cancelled->value)
-    <button type="button"
-        onclick="openPaymentModal('{{ $order->id }}', '{{ $order->grand_total }}')"
-        class="px-4 py-2 primary-bg hover:bg-[#e65f00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold flex items-center gap-2">
-        <i class="fa-brands fa-amazon-pay"></i> Pay Now
-    </button>
-@endif
+                                        @if (
+                                            $order->payment_status === \App\Models\Order::PAYMENT_UNPAID &&
+                                                $order->status !== \App\Enums\Status::Cancelled->value)
+                                            <button type="button"
+                                                onclick="openPaymentModal('{{ $order->id }}', '{{ $order->grand_total }}')"
+                                                class="px-4 py-2 primary-bg hover:bg-[#e65f00] text-primary border border-[#FF6A00] rounded-lg text-sm font-bold flex items-center gap-2">
+                                                <i class="fa-brands fa-amazon-pay"></i> Pay Now
+                                            </button>
+                                        @elseif($order->payment_status === \App\Models\Order::PAYMENT_PENDING)
+                                            <span
+                                                class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-xs font-bold flex items-center gap-2 border border-yellow-200">
+                                                <i class="fas fa-history"></i> Verification Pending
+                                            </span>
+                                        @elseif($order->payment_status === \App\Models\Order::PAYMENT_PAID)
+                                            <span
+                                                class="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-xs font-bold flex items-center gap-2">
+                                                <i class="fas fa-check-circle"></i> Paid
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
@@ -365,8 +377,6 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- 5. SECTION: PASSWORD CHANGE (Initially Hidden) -->
                 <!-- 5. SECTION: PASSWORD CHANGE -->
                 <div id="password-section"
                     class="dashboard-content {{ session('active_tab') == 'password' ? '' : 'hidden' }} space-y-6">
@@ -404,7 +414,7 @@
             </div>
         </div>
     </section>
-    @include('template1.partials.payments._modal')
+    <x-template1.payment-modal :methods="$paymentMethods" :currency="$setup->currency" />
 @endsection
 @push('scripts')
     <script>
@@ -447,8 +457,6 @@
             }
         }
     </script>
-@endpush
-@push('scripts')
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             @if (session('active_tab') == 'password' || $errors->has('password') || $errors->has('current_password'))
@@ -474,4 +482,26 @@
             element.classList.remove("text-gray-600", "hover:bg-orange-50");
         }
     </script>
+    <script>
+    // ১. ভ্যালিডেশন এররগুলো দেখানোর জন্য (যেমন: Transaction ID Already Used)
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            toastr.error("{{ $error }}", "Error", {
+                positionClass: "toast-top-right",
+                progressBar: true,
+                timeOut: 5000
+            });
+        @endforeach
+    @endif
+
+    // ২. সাকসেস মেসেজ দেখানোর জন্য
+    @if(session('success'))
+        toastr.success("{{ session('success') }}", "Success");
+    @endif
+
+    // ৩. জেনারেল এরর মেসেজ দেখানোর জন্য
+    @if(session('error'))
+        toastr.error("{{ session('error') }}", "Error");
+    @endif
+</script>
 @endpush

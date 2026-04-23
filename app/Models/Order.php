@@ -22,6 +22,7 @@ class Order extends Model
     public const PAYMENT_UNPAID = 0;
     public const PAYMENT_PARTIAL = 1;
     public const PAYMENT_PAID = 2;
+    public const PAYMENT_PENDING = 3;
 
     protected $fillable = [
         'company_id',
@@ -227,6 +228,10 @@ class Order extends Model
     /**
      * Payment status helpers
      */
+    public function isPendingPayment(): bool
+    {
+        return $this->payment_status === self::PAYMENT_PENDING;
+    }
     public function isUnpaid(): bool
     {
         return $this->payment_status === self::PAYMENT_UNPAID;
@@ -284,6 +289,7 @@ class Order extends Model
             self::PAYMENT_UNPAID => 'Unpaid',
             self::PAYMENT_PARTIAL => 'Partial',
             self::PAYMENT_PAID => 'Paid',
+            self::PAYMENT_PENDING => 'Pending',
             default => 'Unknown',
         };
     }
@@ -294,6 +300,7 @@ class Order extends Model
             self::PAYMENT_PAID    => 'text-green-600',
             self::PAYMENT_PARTIAL => 'text-blue-600',
             self::PAYMENT_UNPAID  => 'text-red-600',
+            self::PAYMENT_PENDING => 'text-yellow-600',
             default               => 'text-red-600',
         };
     }
