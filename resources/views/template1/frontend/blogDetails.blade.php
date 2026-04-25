@@ -98,7 +98,7 @@
                                     alt="{{ $blog->user->name ?? 'Author' }}" class="w-full h-full object-cover">
                             </div>
                             <div>
-                                <h3 class="font-bold text-lg text-gray-900">{{ $blog->user->name ?? 'Admin' }}</h3>
+                                <h2 class="font-bold text-lg text-gray-900">{{ $blog->user->name ?? 'Admin' }}</h2>
                                 {{-- <p class="text-gray-600 text-sm">Professional content writer and fashion expert. Regularly works with us.</p> --}}
                             </div>
                         </div>
@@ -188,11 +188,11 @@
                             <a href="{{ route('blog.details', ['slug' => $rp->slug]) }}" class="flex gap-4 group">
                                 <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                                     @if ($rp->thumbnail_url)
-                                        <img src="{{ $rp->thumbnail_url }}"
+                                        <img src="{{ $rp->thumbnail_url }}" alt="blog image"
                                             onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                     @else
-                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}"
+                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="blog image"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                     @endif
                                 </div>

@@ -17,8 +17,8 @@
                             @endif
                         </div>
                         <div>
-                            <h5 class="font-bold text-sm md:text-[16px] text-primary leading-tight">
-                                {{ $feature->title }}</h5>
+                            <h4 class="font-bold text-sm md:text-[16px] text-primary leading-tight">
+                                {{ $feature->title }}</h4>
                             <p class="text-gray-400 text-xs md:text-sm mt-0.5">
                                 {{ $feature->subtitle ?? $feature->text_content }}</p>
                         </div>
@@ -162,7 +162,7 @@
                         @foreach ($footerBottomRight as $item)
                             <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
                                 @if ($item->icon_file)
-                                    <img src="{{ asset('storage/' . $item->icon_file) ?? ('./images/template1/frontend/default.webp') }}" alt="{{ $item->title }}"
+                                    <img src="{{ asset('storage/' . $item->icon_file) ?? ('./images/template1/frontend/default.webp') }}" height="16" width="120" loading="lazy" alt="{{ $item->title }}"
                                         class="h-4">
                                 @else
                                     {{ $item->title }}

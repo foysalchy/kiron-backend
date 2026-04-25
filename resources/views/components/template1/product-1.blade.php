@@ -30,7 +30,7 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
+            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}" height="350" width="300"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
         </a>
 

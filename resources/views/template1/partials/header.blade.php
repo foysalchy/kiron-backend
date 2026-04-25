@@ -52,6 +52,7 @@
             id="header-search-container">
             <div
                 class="flex w-full items-center bg-white border border-gray-200 rounded-md p-1 shadow-xs z-30 relative">
+                <label for="search-input" class="sr-only">Search Products</label>
                 <input type="text" name="search" id="header-search-input" autocomplete="off"
                     value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
@@ -211,6 +212,7 @@
     <div id="mobile-search-bar" class="hidden sm:hidden px-4 pb-3">
         <form action="{{ route('shop.index') }}" method="GET">
             <div class="flex items-center bg-white border border-gray-200 rounded-md p-1">
+                <label for="search-input" class="sr-only">Search Products</label>
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
@@ -468,7 +470,7 @@
                                     data.forEach(item => {
                                         const link = document.createElement('a');
                                         link.href = "{{ url('product') }}/" + item
-                                        .slug;
+                                            .slug;
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
 
