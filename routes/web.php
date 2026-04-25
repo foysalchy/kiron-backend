@@ -7,6 +7,7 @@ use App\Http\Controllers\Frontend\BrandController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\ContctController;
 use App\Http\Controllers\Frontend\HomeController;
+use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\Frontend\OrderController;
 use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
@@ -71,4 +72,9 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
     Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
+
+
+    //landing page
+    Route::get('/sale', [LandingController::class, 'index'])->name('landing.index');
+    Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 });

@@ -35,7 +35,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                 </svg>
 
-                <span class="text-[#f15a24]">{{ $category->name ?? 'Shop' }}</span>
+                <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
             </nav>
 
             <!-- Description Section -->
@@ -94,9 +94,9 @@
 
                             <!-- Inputs -->
                             <div class="flex items-center gap-2 mb-4">
-                                <input type="number" id="min_price" name="min_price" value="{{ request('min_price', 0) }}"
+                                <input type="number" id="min_price" name="min_price" aria-label="Minimum Price"  value="{{ request('min_price', 0) }}"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
-                                <input type="number" id="max_price" name="max_price"
+                                <input type="number" id="max_price" name="max_price" aria-label="Maximum Price"
                                     value="{{ request('max_price', (int) $maxPriceLimit) }}"
                                     class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
                             </div>
@@ -187,8 +187,8 @@
             </aside>
 
             <!-- ══════════════════════════════════════
-                                                            MAIN CONTENT
-                                                        ══════════════════════════════════════ -->
+                                                                MAIN CONTENT
+                                                            ══════════════════════════════════════ -->
             <main class="flex-1 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
 
                 <!-- Shop Header -->
@@ -198,7 +198,8 @@
                     </h2>
                     <div class="relative">
                         <form action="" method="GET" id="sortForm">
-                            <select name="sort" onchange="document.getElementById('sortForm').submit()" aria-label="Sort products"
+                            <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                                aria-label="Sort products"
                                 class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
                                 <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default
                                     Sorting</option>
@@ -233,15 +234,13 @@
 
 
                 </div>
-                <div class="mt-12 flex flex-col items-center gap-4 border-t border-gray-100 pt-8 pb-8">
-                    <p class="text-sm text-gray-500 font-medium">
-                        Showing {{ $products->firstItem() ?? 0 }} to {{ $products->lastItem() ?? 0 }} of
-                        {{ $products->total() }} products
-                    </p>
+                <div class="mt-12 flex flex-col items-center">
+                    {{-- pagination --}}
+                    {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
 
-                    <div class="flex justify-center">
-                        {{ $products->appends(request()->query())->links() }}
-                    </div>
+                    {{-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">
+                        Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} Products
+                    </p> --}}
                 </div>
             </main>
 
