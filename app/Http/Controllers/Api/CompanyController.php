@@ -11,6 +11,7 @@ use App\Exceptions\ApiException;
 use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\CompanyUpdateRequest;
+use App\Models\ExtraOrderCharge;
 use App\Models\PricingPackage;
 use App\Services\CompanyDeletionService;
 use Illuminate\Http\JsonResponse;
@@ -85,12 +86,27 @@ class CompanyController extends Controller
     {
         $data = $request->validate([
             'name'  => 'nullable|string|max:255',
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
             'note'  => 'nullable|string|max:500',
         ]);
 
         $company = $this->companyService->storeUpdateRequest($id, $data);
+
+        return ResponseHelper::success($company, 'Company updated request successfully');
+    }
+    public function updateUpdateRequest(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'name'  => 'nullable|string|max:255',
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string|max:20',
+            'note'  => 'nullable|string|max:500',
+        ]);
+
+        $company = $this->companyService->updateUpdateRequest($id,$data);
 
         return ResponseHelper::success($company, 'Company updated request successfully');
     }
@@ -102,6 +118,7 @@ class CompanyController extends Controller
 
 
             $fieldsToUpdate = collect([
+                'logo'  => $updateRequest->logo,
                 'name'  => $updateRequest->name,
                 'email' => $updateRequest->email,
                 'phone' => $updateRequest->phone,
@@ -187,6 +204,15 @@ class CompanyController extends Controller
 
         return ResponseHelper::success($data, 'Company deletion summary retrived successfully');
     }
+    public function deleteUpdateRequest(int $id): JsonResponse
+    {
+        $data = CompanyUpdateRequest::findOrFail($id);
+        if ($data->status == Status::Approved->value || $data->status == Status::Rejected->value) {
+            throw ApiException::notFound('Cannot delete this request');
+        }
+        $data->delete();
+        return ResponseHelper::success($data, 'Company update request deleted successfully');
+    }
     public function canDeleteCompany(int $id): JsonResponse
     {
         $data =  $this->companyDelationService->canDelete($id);
@@ -254,5 +280,17 @@ class CompanyController extends Controller
         $companies = $this->companyService->searchCompanies($term);
 
         return ResponseHelper::success($companies, 'Search results retrieved successfully');
+    }
+    public function extraCharges(Request $request, int $id): JsonResponse
+    {
+        $charges = ExtraOrderCharge::with('order:id,order_no')
+            ->where('company_id', $id)
+            ->whereBetween('month', [
+                $request->start_month,
+                $request->end_month,
+            ])
+            ->get();
+
+        return response()->json(['data' => $charges]);
     }
 }
