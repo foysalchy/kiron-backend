@@ -575,9 +575,9 @@
                         <div class="invoice-title">Invoice</div>
                         <div class="invoice-meta-info">
                             <p>Invoice no: <span>#{{ $order->order_no }}</span></p>
-                            <p>Order no: <span>#{{ $order->id }}</span></p>
-                            <p>Date: <span>{{ $order->created_at->format('d F, Y') }}</span></p>
-                            <p>Payment Status: <span style="font-weight:700;">{{ $order->payment_status_label }}</span>
+                            <p>Order Date: <span>{{ $order->created_at->format('d F, Y') }}</span></p>
+                            <p>Payment Status: <span
+                                    class="{{ $order->payment_status_color }}">{{ $order->payment_status_label }}</span>
                             </p>
                         </div>
                     </div>
@@ -592,12 +592,21 @@
                         <p>Phone: {{ $order->customer->phone }}</p>
                         <p>Email: {{ $order->customer->email ?? 'N/A' }}</p>
                     </div>
-                    <div class="billing-section">
-                        <h3>Payment Information:</h3>
-                        <p><strong>Payment Method:</strong>
-                               {{ str_replace('_', ' ', $order->orderPayments->last()->payment_method) ?? 'Cash on Delivery' }}</p>
-                        <p><strong>Payment Status:</strong> {{ $order->payment_status_label }}</p>
-                    </div>
+                    p><strong>Payment Method:</strong>
+                    @if ($order->orderPayments->isNotEmpty())
+                        <span style="text-transform: uppercase; font-weight: 700; color: #1D2128;">
+                            {{ str_replace(['_', '-'], ' ', $order->orderPayments->last()->payment_method) }}
+                        </span>
+                    @else
+                        Cash on Delivery
+                    @endif
+                    </p>
+
+                    <p><strong>Payment Status:</strong>
+                        <span class="{{ $order->payment_status_color }}" style="font-weight:700;">
+                            {{ $order->payment_status_label }}
+                        </span>
+                    </p>
                 </div>
 
                 <!-- Product Table -->

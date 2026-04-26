@@ -424,7 +424,7 @@
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                _activeDraftOrderId = data.order_id; // এখানে আইডি আপডেট হবে
+                                _activeDraftOrderId = data.order_id;
                                 console.log("Draft Updated. ID:", _activeDraftOrderId);
                             }
                         });
@@ -470,4 +470,20 @@
                 });
         }
     </script>
+@endpush
+@push('scripts')
+<script>
+document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit', function(e) {
+    const btn = this.querySelector('button[type="submit"]');
+
+    const name = this.querySelector('input[name="name"]').value;
+    const phone = this.querySelector('input[name="phone"]').value;
+    if(!name || !phone) return;
+
+    setTimeout(() => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    }, 50);
+});
+</script>
 @endpush

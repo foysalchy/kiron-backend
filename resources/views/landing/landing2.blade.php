@@ -18,11 +18,11 @@
         }
 
         .bg-grid-blue {
-            background-color: #f4f9ff;
+
             background-image:
-                linear-gradient(rgba(100, 160, 230, 0.1) 2px, transparent 1px),
-                linear-gradient(90deg, rgba(100, 160, 230, 0.1) 2px, transparent 1px);
-            background-size: 60px 60px;
+                linear-gradient(rgba(100, 160, 230, 0.1) 3px, transparent 1px),
+                linear-gradient(90deg, rgba(100, 160, 230, 0.1) 3px, transparent 1px);
+            background-size: 60px 38px;
         }
 
         /* Circle sketch SVG underline */
@@ -71,13 +71,29 @@
             animation: draw-circle 1s ease forwards 0.6s;
         }
 
-        /* Grid dark background */
-        .bg-grid-dark {
-            background-color: #0b1221;
+        .bg-dark-grid {
+            background-color: #05053c;
+            /* Deep Navy Blue */
             background-image:
-                linear-gradient(rgba(50, 66, 99, 0.4) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(30, 60, 120, 0.4) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(255, 255, 255, 0.068) 3px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 3px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Circle Sketch for Price */
+        .price-circle {
+            position: relative;
+            display: inline-block;
+        }
+
+        .price-circle svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130%;
+            height: 120%;
+            pointer-events: none;
         }
 
         /* Pulse badge */
@@ -118,163 +134,231 @@
 
 <body class="bg-grid-blue text-gray-800">
 
-    {{-- ══ LOGO ══ --}}
-    <div class="py-5 flex justify-center bg-white shadow-sm">
-        <img src="https://kidzfunbd.com/wp-content/uploads/2025/11/Asset-3-scaled-1-1300x281.png" alt="KidzFun Logo"
-            class="w-44 md:w-56">
-    </div>
+    <section class="main-hero">
+        <div class="h-6 md:h-12"></div>
 
-
-    {{-- ══ HERO ══ --}}
-    <section class="py-12 px-4 text-center">
-        <div class="max-w-5xl mx-auto">
-
-            {{-- Blue badge --}}
-            <div
-                class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg ">
-                শিশুর মেধা 🧠 এবং সৃজনশীলতা বিকাশে সাহায্য করবে
+        <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
+            <div class="px-8 py-6">
+                <img src="https://kidzfunbd.com/wp-content/uploads/2025/11/Asset-3-scaled-1-1300x281.png"
+                    alt="KidzFun Logo" class="w-40">
             </div>
-
-            {{-- Main headline --}}
-            <h1 class="text-2xl md:text-5xl font-bold text-[#003A9C] leading-snug mb-10">
-                📢 বাংলাদেশে একমাত্র আমরাই দিচ্ছি<br>
-                <span class="circle-sketch text-[#003A9C] px-3">
-                    <span class="text-red-500">২৫৫ টি কার্ডে ৫১০ টি লেসন</span>📚 একটা ডিভাইসেই বাংলা + ইংরেজি + আরবি অংক সহ অনেক কিছু 👉
-            </h1>
-
-            {{-- Product image --}}
-            <div class="max-w-2xl mx-auto rounded-3xl overflow-hidden shadow-2xl mb-8">
-                <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/255-as-800x800.jpg" alt="Product"
-                    class="w-full">
-            </div>
-
-            {{-- Stock status --}}
-            <div class="space-y-3 mb-8 text-lg md:text-xl font-bold">
-                <p>📱 বাচ্চার মোবাইল অ্যাডিকশন কমাবে</p>
-                <p>💥 সীমিত স্টক ⏰
-                    <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1">দেরি করলে মিস</span>
-                </p>
-            </div>
-
-            {{-- Warranty badge --}}
-            <div
-                class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] text-black px-8 py-3 rounded-xl font-bold text-2xl mb-14 shadow-lg">
-                সাথে ১ বছরের রিপ্লেসমেন্ট ওয়ারেন্টি 😍
-            </div>
-
-            {{-- Why best section --}}
-            <div class="mb-10">
-                <h2 class="text-3xl md:text-5xl font-black leading-snug">
-                    এটি কেন আপনার
-                    <span class="wavy-underline text-[#fc4124] px-1">
-                        সোনামণির জন্য সেরা?
-                        <svg viewBox="0 0 500 40" preserveAspectRatio="none">
-                            <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2" stroke="#fc4124" />
-                        </svg>
-                    </span>
-                </h2>
-            </div>
-
-            {{-- Category map image --}}
-            <div class="max-w-2xl mx-auto mb-14 rounded-2xl overflow-hidden shadow-xl">
-                <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp" alt="Categories"
-                    class="w-full">
-            </div>
-
-            {{-- Bullet points --}}
-            <div
-                class="max-w-3xl mx-auto text-left space-y-4 mb-14 bg-white/60 backdrop-blur-sm p-6 md:p-8 rounded-3xl shadow-sm">
-                <div class="flex gap-3 text-base md:text-lg font-bold items-start">
-                    <i class="fa-solid fa-circle-check text-green-600 mt-1 flex-shrink-0"></i>
-                    ✅ বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124] font-black">৫১০ টি কার্ডে রয়েছে ৪২টি
-                        ক্যাটাগরির শব্দ</span>
-                </div>
-                <div class="flex gap-3 text-base md:text-lg font-bold items-start">
-                    <i class="fa-solid fa-circle-check text-green-600 mt-1 flex-shrink-0"></i>
-                    ✅ স্মার্ট ও টেকসই ডিজাইন <span class="text-[#005EFF] font-black">লেমিনেটেড কাগজ, সম্পূর্ণ
-                        ওয়াটারপ্রুফ</span> খুবই মজবুত
-                </div>
-                <div class="flex gap-3 text-base md:text-lg font-bold items-start">
-                    <i class="fa-solid fa-circle-check text-green-600 mt-1 flex-shrink-0"></i>
-                    ✅ ভয়েস রিপিট ফিচার, শিশু যা বলবে বইটি তা-ই রিপিট করবে
-                </div>
-                <div class="flex gap-3 text-base md:text-lg font-bold items-start">
-                    <i class="fa-solid fa-circle-check text-green-600 mt-1 flex-shrink-0"></i>
-                    ✅ প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#005EFF]">বাংলা ও ইংরেজি বর্ণমালা</span> রয়েছে
-                </div>
-            </div>
-
         </div>
-    </section>
+        <div class="main-container bg-[#ebf0fa]/60 p-10">
+
+            {{-- ══ HERO ══ --}}
+            <section class="py-4 px-4 text-center">
+                <div class="max-w-5xl mx-auto">
+
+                    {{-- Blue badge --}}
+                    <div
+                        class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg ">
+                        শিশুর মেধা 🧠 এবং সৃজনশীলতা বিকাশে সাহায্য করবে
+                    </div>
+
+                    {{-- Main headline --}}
+                    <h1 class="text-2xl md:text-5xl font-extrabold text-[#003A9C] leading-snug mb-6">
+                        📢 বাংলাদেশে একমাত্র আমরাই দিচ্ছি<br>
+                        <span class="circle-sketch text-[#003A9C] px-3">
+                            <span class="text-red-500">২৫৫ টি কার্ডে ৫১০ টি লেসন</span>📚 একটা ডিভাইসেই বাংলা + ইংরেজি +
+                            আরবি অংক সহ অনেক কিছু 👉
+                    </h1>
+
+                    {{-- Product image --}}
+                    <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8">
+                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/255-as-800x800.jpg" alt="Product"
+                            class="w-full">
+                    </div>
+
+                    {{-- Stock status --}}
+                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold">
+                        <p class="mb-4">📱 বাচ্চার মোবাইল অ্যাডিকশন কমাবে</p>
+                        <p>💥 সীমিত স্টক ⏰
+                            <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1">দেরি করলে মিস</span>
+                        </p>
+                    </div>
+
+                    {{-- Warranty badge --}}
+                    <div
+                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] text-extrabold px-8 py-3 rounded-xl font-bold text-3xl mb-14 shadow-lg">
+                        সাথে ১ বছরের রিপ্লেসমেন্ট ওয়ারেন্টি 😍
+                    </div>
+
+                    {{-- Why best section --}}
+                    <div class="mb-10">
+                        <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                            এটি কেন আপনার
+                            <span class="wavy-underline text-[#fc4124] px-1">
+                                সোনামণির জন্য সেরা?
+                                <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+                                    <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
+                                        stroke="#fc4124" />
+                                </svg>
+                            </span>
+                        </h2>
+                    </div>
+
+                    {{-- Category map image --}}
+                    <div class="max-w-3xl mx-auto mb-14 overflow-hidden">
+                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp"
+                            alt="Categories" class="w-full">
+                    </div>
+
+                    {{-- Bullet points --}}
+                    <!-- Points Section Start -->
+                    <div class="container mx-auto space-y-6 mb-16 ">
+
+                        <!-- Point 1 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-48">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124]">৫১০ টি কার্ডে</span> রয়েছে
+                                ৪২টি
+                                ক্যাটাগরির শব্দ
+                            </p>
+                        </div>
+
+                        <!-- Point 2 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-32">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                স্মার্ট ও টেকসই ডিজাইন লেমিনেটেড কাগজ, <span class="text-[#fc4124]">সম্পূর্ণ
+                                    ওয়াটারপ্রুফ
+                                    খুবই মজবুত,</span> সহজে ছিঁড়ে যায় না বা নষ্ট হয় না
+                            </p>
+                        </div>
+
+                        <!-- Point 3 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-16">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                ভয়েস রিপিট ফিচার, <span class="text-[#fc4124]">শিশু যা বলবে, বইটি তা-ই রিপিট
+                                    করবে।</span>
+                                এতে করে শেখা হবে আরও মজাদার, বাড়বে আত্মবিশ্বাস ও পড়ার আগ্রহ।
+                            </p>
+                        </div>
+
+                        <!-- Point 4 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-8">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#fc4124]">বাংলা বর্ণমালা, Alphabet,
+                                    আরবি
+                                    বর্ণমালা, বাংলা সাংখ্যা, ইংরেজি সংখ্যা</span> রয়েছে এই বইটিতে
+                            </p>
+                        </div>
+
+                        <!-- Point 5 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-0">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                পবিত্র কোরআনের ১৫টি সুরা ১৫টি শ্রুতিমধুর ইসলামিক গজল নতুন সংযোজন হয়েছে, <span
+                                    class="text-[#fc4124]">এতে আপনার শিশু</span> ধর্মীয় শিক্ষায় সুশিক্ষা লাভ করবে
+                            </p>
+                        </div>
+
+                    </div>
+                    <!-- Points Section End -->
+
+                </div>
+            </section>
 
 
-    {{-- ══ BLACK OFFER SECTION ══ --}}
-    <section class="bg-grid-dark py-16 px-4 text-center text-white">
-        <div class="max-w-3xl mx-auto">
+            {{-- ══ BLACK OFFER SECTION ══ --}}
+            <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white">
+                <!-- Heading -->
+                <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
+                    <span class="text-orange-500">⚡</span> দেরি করলেই শেষ!
+                </h3>
 
-            <h3 class="text-3xl md:text-4xl font-black mb-10">⚡ দেরি করলেই শেষ!</h3>
+                <!-- Product Image in Frame -->
+                <div
+                    class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl">
+                    <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/Smart-set-1-800x800.jpg"
+                        alt="Smart Learning Cards" class="w-full">
+                </div>
 
-            <div class="max-w-md mx-auto rounded-3xl overflow-hidden mb-10 border-4 border-[#1f2d4a] shadow-2xl">
-                <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/Smart-set-1-800x800.jpg" alt="Final Set"
-                    class="w-full">
+                <!-- Price Section -->
+                <div class="space-y-8 mb-12">
+                    <h4 class="text-2xl md:text-5xl font-medium leading-tight">
+                        📢 বর্তমান অফার প্রাইজ
+                        <span class="price-circle text-yellow-400">
+                            999/=
+                            <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+                                <!-- Hand-drawn Red Circle -->
+                                <path
+                                    d="M325,18C228.7-8.3,118.5,8.3,78,21C22.4,38.4,4.6,54.6,5.6,77.6c1.4,32.4,52.2,54,142.6,63.7c66.2,7.1,212.2,7.5,273.5-8.3c64.4-16.6,104.3-57.6,33.8-98.2C386.7-4.9,179.4-1.4,126.3,20.7"
+                                    fill="none" stroke="#ff0000" stroke-width="12" />
+                            </svg>
+                        </span>
+                        টাকা <span class="text-orange-500">🔥</span>
+                    </h4>
+
+                    <h4 class="text-xl md:text-4xl font-medium text-white/90">
+                        এবং সারা বাংলাদেশে ডেলিভারি চার্জ
+                        <span class="text-yellow-400 border-b-4 border-yellow-400/50">100/= টাকা</span>
+                    </h4>
+                </div>
+
+                <!-- 3D Green Button -->
+
+
+            </section>
+            <div class="mt-14 text-center">
+                <a href="#order"
+                    class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
+                    <i class="fa-solid fa-circle-down text-2xl md:text-3xl"></i>
+                    ৫২০০০+ বাবা মা তার বাচ্চার জন্য নিয়েছে ! আপনারটি নিন এখনই 😍
+                </a>
             </div>
-
-            <div class="space-y-6 mb-12">
-                <h4 class="text-2xl md:text-4xl font-black">
-                    📢 বর্তমান অফার প্রাইজ
-                    <span class="circle-sketch text-yellow-400 px-4">
-                        999/=
-                        <svg viewBox="0 0 500 150" preserveAspectRatio="none">
-                            <path
-                                d="M325,18C228.7-8.3,118.5,8.3,78,21C22.4,38.4,4.6,54.6,5.6,77.6c1.4,32.4,52.2,54,142.6,63.7c66.2,7.1,212.2,7.5,273.5-8.3c64.4-16.6,104.3-57.6,33.8-98.2C386.7-4.9,179.4-1.4,126.3,20.7"
-                                stroke="#FFEF5F" stroke-width="10" />
-                        </svg>
-                    </span> টাকা 🔥
-                </h4>
-
-                <h4 class="text-xl md:text-3xl font-bold">
-                    এবং সারা বাংলাদেশে ডেলিভারি চার্জ
-                    <span class="wavy-underline text-red-500 px-1">
-                        100/= টাকা
-                        <svg viewBox="0 0 500 40" preserveAspectRatio="none">
-                            <path d="M5,30c80-10,200-15,300-10s180,8,195,5" stroke="#fc4124" stroke-width="7" />
-                        </svg>
-                    </span>
-                </h4>
-            </div>
-
-            <a href="#order"
-                class="inline-flex items-center gap-3 bg-[#1f8a54] hover:bg-[#176840] text-white px-6 md:px-10 py-5 rounded-full font-black text-base md:text-xl shadow-xl hover:scale-105 transition-all border-b-8 border-[#124d2f] active:border-b-2 active:translate-y-1">
-                <i class="fa-solid fa-circle-arrow-down text-2xl bounce"></i>
-                ৫২০০০+ বাবা মা তার বাচ্চার জন্য নিয়েছে ! আপনারটি নিন এখনই 😍
-            </a>
-
         </div>
     </section>
 
 
     {{-- ══ ORDER FORM ══ --}}
-    <section id="order" class="py-16 px-4 bg-white">
+    <section id="order" class="py-16 px-4 bg-[#f5f6ff] relative z-10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.15)]">
         <x-landing.order-form />
     </section>
 
 
     {{-- ══ FOOTER ══ --}}
-    <footer class="bg-grid-dark py-16 px-4 text-center text-white border-t border-gray-800">
-        <div class="max-w-4xl mx-auto">
-            <div class="text-lg md:text-2xl font-black mb-8">
+    <footer class="bg-grid-dark py-16 px-4 text-center text-white bg-dark-grid border-gray-800">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-lg md:text-4xl font-extrabold mb-8">
                 📢 আমাদের অফিশিয়াল
-                <span class="text-blue-400 underline italic">Facebook</span>
+                <span class="text-[#7DF9FF] italic">Facebook</span>
                 পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
-            <img src="https://kidzfunbd.com/wp-content/uploads/2025/11/Asset-3-scaled-1-1300x281.png" alt="Logo"
-                class="w-44 mx-auto mb-6 brightness-200">
-            <p class="text-gray-400 text-sm">Copyright © 2025 KidzFun. All Rights Reserved.</p>
-            <p class="text-gray-500 text-xs mt-2">Designed by Funnel Liner</p>
+            <img src="{{asset('images/landing/img/footer-land2.png')}}" alt="Logo"
+                class="w-44 md:w-68 mx-auto mb-6 brightness-200">
+            <p class="text-gray-200 text-sm font-semibold">Copyright © 2025 KidzFun. All Rights Reserved. Developed By</p>
+            <p class="text-yellow-300 text-sm mt-2">RoseCreativity</p>
         </div>
     </footer>
-
-
 
 
 </body>

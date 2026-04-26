@@ -7,14 +7,13 @@
             <div class="p-3 rounded-lg text-sm" style="background:#fdf2f7; border:1px solid #e2136e30;">
                 Send money to the following bKash number:<br>
                 <span class="font-bold" style="color:#e2136e;">
-                    {{-- ডাটাবেসের account_number ফিল্ড থেকে ডাটা দেখাচ্ছে --}}
                     bKash Number ({{ $method->method_details['type'] ?? 'Merchant' }}): {{ $method->account_number ?? $method->phone }}
                 </span>
             </div>
         @endif
 
 
-        <form action="{{ route('order.payment.submit') }}" method="POST"
+        <form onsubmit="handlePaymentSubmit(event, 'bkash')" method="POST"
             enctype="multipart/form-data" class="space-y-3">
             @csrf
             <input type="hidden" name="order_id" id="bkash-order-id">

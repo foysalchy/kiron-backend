@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, ProductReview, ProductVariation, Warehouse};
+use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductVariation, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -67,22 +67,55 @@ class OrderController extends FrontendController
 
     private function createDraftOrder($store, $data)
     {
-
         $cartContent = Cart::content();
         if ($cartContent->isEmpty()) return ['success' => false, 'error' => 'Cart is empty'];
 
-        // 1. Strict Warehouse Check
         $warehouseQuery = Warehouse::active();
+
         foreach ($cartContent as $item) {
+            $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
             $variationId = $item->options->variation_id ?? null;
-            $warehouseQuery->whereHas('stocks', function ($query) use ($variationId, $item) {
-                if ($variationId) $query->where('product_variation_id', $variationId);
-                $query->where('quantity', '>=', $item->qty);
-            });
+            $requiredQty = $item->qty;
+
+            $product = Product::find($cleanProductId);
+            if (!$product) continue;
+
+            if ($product->type === 'single') {
+                // logic for single product stock check (warehouse_info)
+                $validWarehouseIds = [];
+
+                // stock chcek from warehouse_info
+                if (!empty($product->warehouse_info)) {
+                    foreach ($product->warehouse_info as $info) {
+                        $q = (int) ($info['quantity'] ?? 0);
+                        $wId = (int) ($info['warehouse_id'] ?? 0);
+
+                        if ($wId > 0 && $q >= $requiredQty) {
+                            $validWarehouseIds[] = $wId;
+                        }
+                    }
+                }
+
+                // if no warehouse can fulfill this product's stock requirement, return error immediately
+                if (empty($validWarehouseIds)) {
+                    return ['success' => false, 'error' => "Stock out for: {$product->title}"];
+                }
+
+
+                $warehouseQuery->whereIn('id', $validWarehouseIds);
+            } else {
+                // --- VARIATION PRODUCT(Stocks ) ---
+                if ($variationId) {
+                    $warehouseQuery->whereHas('stocks', function ($query) use ($variationId, $requiredQty) {
+                        $query->where('product_variation_id', $variationId)
+                            ->where('quantity', '>=', $requiredQty);
+                    });
+                }
+            }
         }
+
         $exactWarehouse = $warehouseQuery->first();
 
-        // If no stock in any exact warehouse, return error
         if (!$exactWarehouse) {
             return ['success' => false, 'error' => 'One or more items are out of stock in our warehouses.'];
         }
@@ -91,51 +124,37 @@ class OrderController extends FrontendController
             DB::beginTransaction();
 
             $customer = auth('customer')->check() ? auth('customer')->user() : Party::updateOrCreate(
-                [
-                    'phone' => $data['phone'],
-                    'company_id'     => $this->company_id,
-                    'type' => Party::TYPE_CUSTOMER
-                ],
-                [
-                    'name' => $data['name'] ?? 'Guest',
-                    'password' => Hash::make('12345678'),
-                    'status' => Status::Pending->value
-                ]
+                ['phone' => $data['phone'], 'company_id' => $this->company_id, 'type' => Party::TYPE_CUSTOMER],
+                ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
             );
 
             $items = [];
             foreach ($cartContent as $item) {
-                $variationId = $item->options->variation_id ?? null;
-                $actualProductId = $variationId ? ProductVariation::find($variationId)?->product_id : (int) $item->id;
+                $vId = $item->options->variation_id ?? null;
                 $items[] = [
-                    'product_id'   => $actualProductId,
-                    'variation_id' => $variationId,
+                    'product_id'   => $vId ? ProductVariation::find($vId)?->product_id : (int) $item->id,
+                    'variation_id' => $vId,
                     'quantity'     => (int) $item->qty,
                     'unit_price'   => (float) $item->price,
                 ];
             }
-            $shippingAddress = [
-                'name'    => $data['name'] ?? $customer->name,
-                'phone'   => $data['phone'] ?? $customer->phone,
-                'address' => $data['address'] ?? $customer->address ?? 'N/A',
-            ];
 
             $orderData = [
                 'warehouse_id'  => $exactWarehouse->id,
-                'customer_id'     => $customer->id,
-                'company_id'     => $this->company_id,
+                'customer_id'   => $customer->id,
+                'company_id'    => $this->company_id,
                 'items'         => $items,
                 'status'        => Status::Draft->value,
                 'order_date'    => now(),
-                'coupon_code'   => session('coupon')['coupon_code'] ?? null,
                 'other_charges' => session()->get('shipping_cost', 60),
-                'shipping_address' => $shippingAddress,
+                'shipping_address' => [
+                    'name' => $data['name'] ?? $customer->name,
+                    'phone' => $data['phone'] ?? $customer->phone,
+                    'address' => $data['address'] ?? $customer->address ?? 'N/A',
+                ],
             ];
 
-            // Cleanup old drafts
             $oldId = Session::get('current_draft_order_id');
-
-            // Log::info($oldId);
             if ($oldId) Order::where('id', $oldId)->where('status', Status::Draft->value)->delete();
 
             $order = $this->orderService->createSalesOrder($orderData);
@@ -161,6 +180,7 @@ class OrderController extends FrontendController
 
         // 1. Try to find the draft order
         $orderId = Session::get('current_draft_order_id');
+
         $order = Order::where('company_id', $this->company_id)
             ->where('status', Status::Draft->value)
             ->find($orderId);
@@ -185,6 +205,11 @@ class OrderController extends FrontendController
                 // This means the "Order session not found" was actually a "Stock issue"
                 return back()->with('error', 'Order failed: ' . $draftResult['error']);
             }
+        }
+        if ($order->status !== Status::Draft->value) {
+            Cart::destroy();
+            Session::forget(['coupon', 'current_draft_order_id']);
+            return redirect()->route('order.invoice', $order->id)->with('success', 'Order already placed.');
         }
 
         // 4. Confirm the Order
@@ -376,51 +401,61 @@ class OrderController extends FrontendController
             'transaction_id.required' => 'Transaction ID is required.',
         ]);
 
-        $draftIdFromSession = Session::get('current_draft_order_id');
-        $order = Order::where('id', $request->order_id);
+        try {
+            $draftIdFromSession = Session::get('current_draft_order_id');
+            $order = Order::where('id', $request->order_id);
 
 
-        if (auth('customer')->check()) {
-            $order->where('customer_id', auth('customer')->id());
-        } else {
-            $order->where('id', $draftIdFromSession);
-        }
-        $order = $order->firstOrFail();
-
-        $transactionId = $request->transaction_id;
-        if ($request->payment_method == 'cod') {
-            $transactionId = 'COD-' . $order->order_no . '-' . time();
-        }
-        $screenshotPaths = [];
-        if ($request->hasFile('screenshots')) {
-            foreach ($request->file('screenshots') as $image) {
-                $path = FileUploadHelper::uploadImage($image, 'payments/screenshots', 'public');
-                $screenshotPaths[] = $path;
+            if (auth('customer')->check()) {
+                $order->where('customer_id', auth('customer')->id());
+            } else {
+                $order->where('id', $draftIdFromSession);
             }
+            $order = $order->firstOrFail();
+
+            $transactionId = $request->transaction_id;
+            if ($request->payment_method == 'cod') {
+                $transactionId = 'COD-' . $order->order_no . '-' . time();
+            }
+            $screenshotPaths = [];
+            if ($request->hasFile('screenshots')) {
+                foreach ($request->file('screenshots') as $image) {
+                    $path = FileUploadHelper::uploadImage($image, 'payments/screenshots');
+                    $screenshotPaths[] = $path;
+                }
+            }
+
+            // All extra sender/payment info stored as JSON
+            $senderInfo = array_filter([
+                'sender_number' => $request->sender_number,
+                'screenshot'    => $screenshotPaths,
+                'bank_name'     => $request->bank_name,
+                'branch_name'   => $request->branch_name,
+                'card_type'     => $request->card_type,   // ← card এর জন্য
+            ]);
+
+            OrderPayment::create([
+                'order_id'       => $order->id,
+                'payment_method' => $request->payment_method,
+                'transaction_id' => $transactionId,
+                'reference_no'   => $request->reference_no,
+                'amount'         => $request->amount,
+                'change_amount'  => 0,
+                'sender_info'    => $senderInfo,
+                'note'           => $request->note,
+            ]);
+
+            $order->update(['payment_status' => Order::PAYMENT_PENDING]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Payment submitted! Our team will verify it soon.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
         }
-
-        // All extra sender/payment info stored as JSON
-        $senderInfo = array_filter([
-            'sender_number' => $request->sender_number,
-            'screenshot'    => $screenshotPaths,
-            'bank_name'     => $request->bank_name,
-            'branch_name'   => $request->branch_name,
-            'card_type'     => $request->card_type,   // ← card এর জন্য
-        ]);
-
-        OrderPayment::create([
-            'order_id'       => $order->id,
-            'payment_method' => $request->payment_method,
-            'transaction_id' => $transactionId,
-            'reference_no'   => $request->reference_no,
-            'amount'         => $request->amount,
-            'change_amount'  => 0,
-            'sender_info'    => $senderInfo,
-            'note'           => $request->note,
-        ]);
-
-        $order->update(['payment_status' => Order::PAYMENT_PENDING]);
-
-        return back()->with('success', 'Payment information submitted successfully! Our team will verify and update the order status soon.');
     }
 }
