@@ -1,257 +1,364 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moringa - Premium Sajina Leaf Powder</title>
+    <title>KidzFun - Smart Learning Cards</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Noto+Sans+Bengali:wght@400;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        body {
+            font-family: 'Noto Sans Bengali', 'Outfit', sans-serif;
+        }
+
+        .bg-grid-blue {
+
+            background-image:
+                linear-gradient(rgba(100, 160, 230, 0.1) 3px, transparent 1px),
+                linear-gradient(90deg, rgba(100, 160, 230, 0.1) 3px, transparent 1px);
+            background-size: 60px 38px;
+        }
+
+        /* Circle sketch SVG underline */
+        .circle-sketch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .circle-sketch svg {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 220%;
+            pointer-events: none;
+            fill: none;
+            stroke-width: 8;
+            stroke-dasharray: 1500;
+            stroke-dashoffset: 1500;
+            animation: draw-circle 1.2s ease forwards 0.3s;
+        }
+
+        @keyframes draw-circle {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Wavy underline */
+        .wavy-underline {
+            position: relative;
+            display: inline-block;
+        }
+
+        .wavy-underline svg {
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            fill: none;
+            stroke-width: 6;
+            stroke-dasharray: 800;
+            stroke-dashoffset: 800;
+            animation: draw-circle 1s ease forwards 0.6s;
+        }
+
+        .bg-dark-grid {
+            background-color: #05053c;
+            /* Deep Navy Blue */
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.068) 3px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.05) 3px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        /* Circle Sketch for Price */
+        .price-circle {
+            position: relative;
+            display: inline-block;
+        }
+
+        .price-circle svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130%;
+            height: 120%;
+            pointer-events: none;
+        }
+
+        /* Pulse badge */
+        @keyframes pulse-badge {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .pulse {
+            animation: pulse-badge 2s ease-in-out infinite;
+        }
+
+        /* Bounce arrow */
+        @keyframes bounce-down {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(6px);
+            }
+        }
+
+        .bounce {
+            animation: bounce-down 1.4s ease-in-out infinite;
+        }
+    </style>
 </head>
 
-<body class="font-['Outfit'] text-gray-800 bg-gray-100">
+<body class="bg-grid-blue text-gray-800">
 
-    {{-- ══ SECTION 1: HERO ══ --}}
-    <section class="bg-[#0D2601] text-white pt-12 pb-20 px-4 text-center">
-        <div class="max-w-7xl mx-auto">
+    <section class="main-hero">
+        <div class="h-6 md:h-12"></div>
 
-            <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/logo.png" alt="Moringa Logo"
-                class="mx-auto mb-8 w-51">
-
-            <div class="border-1 border-[#2e8c03] p-6 rounded mb-6">
-                <h1 class="text-2xl md:text-4xl lg:text-5xl font-semibold leading-tight">
-                    1 glass of sajan leaf juice daily will benefit you and your family
-                    <span class="text-[#d97f11]">300 diseases</span>
-                    Which will protect you from research-tested!!
-                </h1>
+        <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
+            <div class="px-8 py-6">
+                <img src="https://kidzfunbd.com/wp-content/uploads/2025/11/Asset-3-scaled-1-1300x281.png"
+                    alt="KidzFun Logo" class="w-40">
             </div>
+        </div>
+        <div class="main-container bg-[#ebf0fa]/60 p-10">
 
-            <p class="text-lg md:text-3xl text-green-50 mb-8">
-                525 grams of premium sajina powder + 100 grams of black cumin honey free.
-            </p>
+            {{-- ══ HERO ══ --}}
+            <section class="py-4 px-4 text-center">
+                <div class="max-w-5xl mx-auto">
 
-            <a href="#order"
-                class="inline-flex items-center gap-2 bg-[#f5a623] mb-6 text-white px-8 py-4 border-3 border-[#ad7419] rounded-xl font-bold text-xl md:text-3xl shadow-lg hover:scale-105 transition-transform">
-                Click to order.
-                <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/hand.png" class="w-12"
-                    alt="">
-            </a>
+                    {{-- Blue badge --}}
+                    <div
+                        class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg ">
+                        শিশুর মেধা 🧠 এবং সৃজনশীলতা বিকাশে সাহায্য করবে
+                    </div>
 
-            <!-- Video Section Start -->
-            <div class="max-w-6xl mx-auto">
-                <div
-                    class="relative border-[12px] md:border-[22px] border-[#35B11E] rounded-lg md:rounded-3xl overflow-hidden bg-black shadow-2xl">
-                    <div class="relative aspect-video">
+                    {{-- Main headline --}}
+                    <h1 class="text-2xl md:text-5xl font-extrabold text-[#003A9C] leading-snug mb-6">
+                        📢 বাংলাদেশে একমাত্র আমরাই দিচ্ছি<br>
+                        <span class="circle-sketch text-[#003A9C] px-3">
+                            <span class="text-red-500">২৫৫ টি কার্ডে ৫১০ টি লেসন</span>📚 একটা ডিভাইসেই বাংলা + ইংরেজি +
+                            আরবি অংক সহ অনেক কিছু 👉
+                    </h1>
 
-                        {{-- ── YouTube Iframe ── --}}
-                        <iframe
-                            src="https://www.youtube.com/embed/uFjU5zFJx3E?autoplay=0&mute=0&controls=0&playsinline=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1"
-                            frameborder="0" allowfullscreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" title="Funnel Liner Logo Launching Video"
-                            class="absolute inset-0 w-full h-full">
-                        </iframe>
+                    {{-- Product image --}}
+                    <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8">
+                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/255-as-800x800.jpg" alt="Product"
+                            class="w-full">
+                    </div>
 
-                        {{-- ── Overlay: Top title + Bottom icons ── --}}
-                        {{-- pointer-events-none so clicks go to iframe --}}
-                        <div
-                            class="absolute inset-0 pointer-events-none flex flex-col justify-between p-3 md:p-6 bg-gradient-to-t from-black/70 via-transparent to-black/40">
+                    {{-- Stock status --}}
+                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold">
+                        <p class="mb-4">📱 বাচ্চার মোবাইল অ্যাডিকশন কমাবে</p>
+                        <p>💥 সীমিত স্টক ⏰
+                            <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1">দেরি করলে মিস</span>
+                        </p>
+                    </div>
 
-                            {{-- Top Title --}}
-                            <div class="flex items-center gap-3">
+                    {{-- Warranty badge --}}
+                    <div
+                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] text-extrabold px-8 py-3 rounded-xl font-bold text-3xl mb-14 shadow-lg">
+                        সাথে ১ বছরের রিপ্লেসমেন্ট ওয়ারেন্টি 😍
+                    </div>
 
+                    {{-- Why best section --}}
+                    <div class="mb-10">
+                        <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                            এটি কেন আপনার
+                            <span class="wavy-underline text-[#fc4124] px-1">
+                                সোনামণির জন্য সেরা?
+                                <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+                                    <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
+                                        stroke="#fc4124" />
+                                </svg>
+                            </span>
+                        </h2>
+                    </div>
+
+                    {{-- Category map image --}}
+                    <div class="max-w-3xl mx-auto mb-14 overflow-hidden">
+                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp"
+                            alt="Categories" class="w-full">
+                    </div>
+
+                    {{-- Bullet points --}}
+                    <!-- Points Section Start -->
+                    <div class="container mx-auto space-y-6 mb-16 ">
+
+                        <!-- Point 1 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-48">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
                             </div>
+                            <p class="leading-relaxed">
+                                বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124]">৫১০ টি কার্ডে</span> রয়েছে
+                                ৪২টি
+                                ক্যাটাগরির শব্দ
+                            </p>
+                        </div>
 
-                            {{-- Bottom Icons — always visible, never hides --}}
-                            <div class="flex justify-between items-end">
-
-                                {{-- Left: Share --}}
-                                <div>
-
-                                </div>
-
-                                {{-- Right: More videos + YouTube --}}
-                                <div
-                                    class="flex items-center gap-3 md:gap-4 bg-black/40 backdrop-blur-sm rounded-full px-3 py-2">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-white text-[10px] md:text-xs font-medium">More videos</span>
-                                        <div
-                                            class="w-8 h-6 bg-white/20 rounded border border-white/30 overflow-hidden flex-shrink-0">
-                                            <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/logo.png"
-                                                class="w-full h-full object-cover" alt="">
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1.5">
-                                        <i class="fa-brands fa-youtube text-red-600 text-xl md:text-2xl"></i>
-                                        <span class="text-white font-bold text-sm md:text-base">YouTube</span>
-                                    </div>
-                                </div>
-
+                        <!-- Point 2 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-32">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
                             </div>
+                            <p class="leading-relaxed">
+                                স্মার্ট ও টেকসই ডিজাইন লেমিনেটেড কাগজ, <span class="text-[#fc4124]">সম্পূর্ণ
+                                    ওয়াটারপ্রুফ
+                                    খুবই মজবুত,</span> সহজে ছিঁড়ে যায় না বা নষ্ট হয় না
+                            </p>
+                        </div>
+
+                        <!-- Point 3 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-16">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                ভয়েস রিপিট ফিচার, <span class="text-[#fc4124]">শিশু যা বলবে, বইটি তা-ই রিপিট
+                                    করবে।</span>
+                                এতে করে শেখা হবে আরও মজাদার, বাড়বে আত্মবিশ্বাস ও পড়ার আগ্রহ।
+                            </p>
+                        </div>
+
+                        <!-- Point 4 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-8">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#fc4124]">বাংলা বর্ণমালা, Alphabet,
+                                    আরবি
+                                    বর্ণমালা, বাংলা সাংখ্যা, ইংরেজি সংখ্যা</span> রয়েছে এই বইটিতে
+                            </p>
+                        </div>
+
+                        <!-- Point 5 -->
+                        <div class="flex gap-3 text-lg font-bold items-start md:pl-0">
+                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <p class="leading-relaxed">
+                                পবিত্র কোরআনের ১৫টি সুরা ১৫টি শ্রুতিমধুর ইসলামিক গজল নতুন সংযোজন হয়েছে, <span
+                                    class="text-[#fc4124]">এতে আপনার শিশু</span> ধর্মীয় শিক্ষায় সুশিক্ষা লাভ করবে
+                            </p>
                         </div>
 
                     </div>
+                    <!-- Points Section End -->
+
                 </div>
+            </section>
+
+
+            {{-- ══ BLACK OFFER SECTION ══ --}}
+            <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white">
+                <!-- Heading -->
+                <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
+                    <span class="text-orange-500">⚡</span> দেরি করলেই শেষ!
+                </h3>
+
+                <!-- Product Image in Frame -->
+                <div
+                    class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl">
+                    <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/Smart-set-1-800x800.jpg"
+                        alt="Smart Learning Cards" class="w-full">
+                </div>
+
+                <!-- Price Section -->
+                <div class="space-y-8 mb-12">
+                    <h4 class="text-2xl md:text-5xl font-medium leading-tight">
+                        📢 বর্তমান অফার প্রাইজ
+                        <span class="price-circle text-yellow-400">
+                            999/=
+                            <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+                                <!-- Hand-drawn Red Circle -->
+                                <path
+                                    d="M325,18C228.7-8.3,118.5,8.3,78,21C22.4,38.4,4.6,54.6,5.6,77.6c1.4,32.4,52.2,54,142.6,63.7c66.2,7.1,212.2,7.5,273.5-8.3c64.4-16.6,104.3-57.6,33.8-98.2C386.7-4.9,179.4-1.4,126.3,20.7"
+                                    fill="none" stroke="#ff0000" stroke-width="12" />
+                            </svg>
+                        </span>
+                        টাকা <span class="text-orange-500">🔥</span>
+                    </h4>
+
+                    <h4 class="text-xl md:text-4xl font-medium text-white/90">
+                        এবং সারা বাংলাদেশে ডেলিভারি চার্জ
+                        <span class="text-yellow-400 border-b-4 border-yellow-400/50">100/= টাকা</span>
+                    </h4>
+                </div>
+
+                <!-- 3D Green Button -->
+
+
+            </section>
+            <div class="mt-14 text-center">
+                <a href="#order"
+                    class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
+                    <i class="fa-solid fa-circle-down text-2xl md:text-3xl"></i>
+                    ৫২০০০+ বাবা মা তার বাচ্চার জন্য নিয়েছে ! আপনারটি নিন এখনই 😍
+                </a>
             </div>
-            <!-- Video Section End -->
         </div>
     </section>
 
 
-
-    {{-- ══ SECTION 9: ORDER FORM ══ --}}
-    <section id="order" class="py-16 px-4 bg-[#f8faff]">
+    {{-- ══ ORDER FORM ══ --}}
+    <section id="order" class="py-16 px-4 bg-[#f5f6ff] relative z-10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.15)]">
         <x-landing.order-form />
     </section>
 
+
     {{-- ══ FOOTER ══ --}}
-    <footer class="bg-gray-50 pt-16 pb-10 px-4 border-t border-gray-100">
-        <div class="max-w-6xl mx-auto">
-            <!-- Top Section: Info and Links -->
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8 mb-10">
-
-                <!-- Location Info -->
-                <div class="flex items-center gap-3 text-gray-700 group">
-                    <div
-                        class="w-10 h-10 rounded-full bg-[#2e8c03]/10 flex items-center justify-center text-[#2e8c03] group-hover:bg-[#2e8c03] group-hover:text-white transition-all">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <span class="font-medium text-base">Kuril, Vatara, Dhaka-1229, Bangladesh</span>
-                </div>
-
-                <!-- Policy Links -->
-                <div class="flex gap-8 font-semibold text-gray-600">
-                    <a href="#"
-                        class="hover:text-[#2e8c03] transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-[#2e8c03] hover:after:w-full after:transition-all">
-                        Privacy Policy
-                    </a>
-                    <a href="#"
-                        class="hover:text-[#2e8c03] transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-[#2e8c03] hover:after:w-full after:transition-all">
-                        Terms & Conditions
-                    </a>
-                </div>
+    <footer class="bg-grid-dark py-16 px-4 text-center text-white bg-dark-grid border-gray-800">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-lg md:text-4xl font-extrabold mb-8">
+                📢 আমাদের অফিশিয়াল
+                <span class="text-[#7DF9FF] italic">Facebook</span>
+                পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
-
-            <!-- Horizontal Divider (Dashed/Dotted style as per original design) -->
-            <div class="border-t-1 border-gray-200 w-full mb-8"></div>
-
-            <!-- Bottom Section: Copyright -->
-            <div class="text-center">
-                <p class="text-gray-500 text-sm tracking-wide">
-                    © 2026 All Rights Reserved Designed by
-                    <span class="text-[#2e8c03] font-black uppercase ml-1">Funnel Liner</span>
-                </p>
-            </div>
+            <img src="{{asset('images/landing/img/footer-land2.png')}}" alt="Logo"
+                class="w-44 md:w-68 mx-auto mb-6 brightness-200">
+            <p class="text-gray-200 text-sm font-semibold">Copyright © 2025 KidzFun. All Rights Reserved. Developed By</p>
+            <p class="text-yellow-300 text-sm mt-2">RoseCreativity</p>
         </div>
     </footer>
-
-    <script>
-        function updateTotal(amount) {
-            document.getElementById('total-amount').innerText = amount.toFixed(2);
-            document.getElementById('btn-total').innerText = amount.toFixed(2);
-        }
-
-        function placeOrder() {
-            const name = document.getElementById('f-name').value.trim();
-            const phone = document.getElementById('f-phone').value.trim();
-            const address = document.getElementById('f-address').value.trim();
-
-            if (!name) {
-                alert('Please enter your name.');
-                return;
-            }
-            if (!phone) {
-                alert('Please enter your phone number.');
-                return;
-            }
-            if (!address) {
-                alert('Please enter your address.');
-                return;
-            }
-
-            alert('Order placed successfully! We will contact you shortly.');
-        }
-    </script>
-    <script>
-        const UNIT_PRICE = 999;
-        const DELIVERY = 100;
-        let qty = 1;
-
-        function changeQty(delta) {
-            qty = Math.max(1, qty + delta);
-            const subtotal = qty * UNIT_PRICE;
-            const total = subtotal + DELIVERY;
-
-            document.getElementById('qty-display').innerText = qty;
-            document.getElementById('unit-price-display').innerText = subtotal.toFixed(2) + '৳';
-            document.getElementById('summary-qty').innerText = qty;
-            document.getElementById('summary-subtotal').innerText = subtotal.toFixed(2);
-            document.getElementById('summary-total').innerText = total.toLocaleString('en-BD', {
-                minimumFractionDigits: 2
-            }) + '৳';
-            document.getElementById('btn-total').innerText = total.toLocaleString('en-BD', {
-                minimumFractionDigits: 2
-            });
-        }
-
-        function submitOrder() {
-            const name = document.getElementById('f-name').value.trim();
-            const phone = document.getElementById('f-phone').value.trim();
-            const address = document.getElementById('f-address').value.trim();
-
-            if (!name) {
-                alert('Write Your name');
-                return;
-            }
-            if (!phone) {
-                alert('Write your phone number');
-                return;
-            }
-            if (!address) {
-                alert('Write your address');
-                return;
-            }
-
-            alert('Order placed successfully! We will contact you shortly.');
-        }
-    </script>
-    <script>
-        ! function() {
-            const track = document.getElementById('rv-track');
-            const dots = document.getElementById('rv-dots');
-            const slides = track.querySelectorAll('.rv-slide');
-            const n = slides.length;
-            let cur = 0;
-
-            // build dots
-            slides.forEach((_, i) => {
-                const d = document.createElement('button');
-                dots.appendChild(d);
-                d.onclick = () => go(i);
-            });
-
-            function go(i) {
-                cur = (i + n) % n; // wrap
-                track.scrollLeft = slides[cur].offsetLeft - track.offsetLeft;
-                dots.querySelectorAll('button').forEach((d, j) =>
-                    d.className = 'h-2.5 rounded-full transition-all ' + (j === cur ? 'bg-[#1a3a1a] w-8' :
-                        'bg-gray-300 w-2.5')
-                );
-            }
-
-            window.rv = dir => go(cur + dir);
-
-            // auto-play
-            let t = setInterval(() => rv(1), 4000);
-            track.parentElement.addEventListener('mouseenter', () => clearInterval(t));
-            track.parentElement.addEventListener('mouseleave', () => t = setInterval(() => rv(1), 4000));
-
-            go(0); // init
-        }();
-    </script>
 
 
 </body>

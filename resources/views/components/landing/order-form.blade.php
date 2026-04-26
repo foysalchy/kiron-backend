@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-2xl shadow-sm">
+<div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
 
     {{-- Header --}}
     <div class="text-center mb-10">

@@ -281,7 +281,7 @@ class OrderService
                 ]);
 
                 // Deduct stock using ProductService (for completed/pending orders, not hold)
-                if ($order->status !== Status::Hold->value) {
+                if ($order->status !== Status::Hold->value && $order->status !== Status::Draft->value) {
                     $this->deductOrderStock($order, $item);
                 }
             }
@@ -635,7 +635,7 @@ class OrderService
             }
 
             // Hold থেকে change হলে stock deduct করো
-            if ($oldStatus === Status::Hold->value) {
+            if ($oldStatus === Status::Hold->value || $oldStatus === Status::Draft->value) {
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id'   => $detail->product_id,

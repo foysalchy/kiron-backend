@@ -120,7 +120,7 @@
             } else if (s.includes('bank')) {
                 formId = 'form-bank';
             } else if (s.includes('cash') || s.includes('cod')) {
-                 formId = 'form-cod';
+                formId = 'form-cod';
             }
 
             console.log("Looking for Form ID:", formId); // এটি ব্রাউজারে F12 চেপে চেক করুন
@@ -140,6 +140,57 @@
             } else {
                 console.error("Form not found for ID:", formId);
             }
+        }
+        //
+        // পেমেন্ট সাবমিট করার AJAX ফাংশন
+        function handlePaymentSubmit(event, type) {
+            event.preventDefault(); // পেজ রিলোড আটকাবে
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const btn = form.querySelector('button[type="submit"]');
+            const originalBtnText = btn.innerHTML;
+
+            // বাটন ডিজেবল এবং লোডিং দেখানো
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch("{{ route('order.payment.submit') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest', // এটি লারাভেলকে বলে এটি AJAX
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(async response => {
+                    const data = await response.json();
+
+                    if (response.ok && data.success) {
+                        toastr.success(data.message);
+                        closePaymentModal();
+                        // সাফল্য হলে ১.৫ সেকেন্ড পর রিলোড দিন স্ট্যাটাস দেখার জন্য
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        // ভ্যালিডেশন এরর বা অন্যান্য এরর
+                        if (data.errors) {
+                            // সব এরর লুপ চালিয়ে দেখানো
+                            Object.values(data.errors).forEach(err => toastr.error(err[0]));
+                        } else {
+                            toastr.error(data.message || 'Something went wrong!');
+                        }
+                        // বাটন আবার সচল করা
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('Connection failed. Please try again.');
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnText;
+                });
         }
     </script>
 @endpush

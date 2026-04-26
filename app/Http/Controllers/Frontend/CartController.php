@@ -115,22 +115,22 @@ class CartController extends FrontendController
             session()->put('coupon', $result);
 
             if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Congratulations! The coupon has been applied successfully.'
-            ]);
-        }
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Congratulations! The coupon has been applied successfully.'
+                ]);
+            }
 
-        return back()->with('success', 'Congratulations! The coupon has been applied successfully.');
+            return back()->with('success', 'Congratulations! The coupon has been applied successfully.');
         } catch (\Exception $e) {
             if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 422);
-        }
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 422);
+            }
 
-        return back()->with('error', $e->getMessage());
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -143,26 +143,31 @@ class CartController extends FrontendController
     public function add($store, Request $request)
     {
         try {
-            $qty = (int) ($request->qty ?? 1);
-            $productId = null;
+            $qty       = (int) ($request->qty ?? 1);
+            $productId   = null;
             $variationId = null;
 
             if ($request->filled('variation_id')) {
-                // Case: Product Variation
+
                 $variation = ProductVariation::with('product')->findOrFail($request->variation_id);
 
-                // --- ১. ভ্যারিয়েশন স্টক চেক শুরু ---
-                if ($variation->available_stock < $qty) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'দুঃখিত, এই ভ্যারিয়েশনটি বর্তমানে পর্যাপ্ত স্টকে নেই।'
-                    ], 422); // ৪২২ স্ট্যাটাস কোড (Unprocessable Entity)
-                }
-                // --- স্টক চেক শেষ ---
+                // Check available stock excluding quantity already in the cart
+                $alreadyInCart = $this->getCartQty(null, $variation->id);
+                $availableForCart = $variation->available_stock - $alreadyInCart;
 
-                $productId = $variation->product_id;
+                if ($availableForCart < $qty) {
+                    $msg = $alreadyInCart > 0
+                        ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
+                        : 'Sorry, this variation is currently out of stock.';
+
+                    return response()->json(['status' => 'error', 'message' => $msg], 422);
+                }
+
+                $productId   = $variation->product_id;
                 $variationId = $variation->id;
-                $thumb = $variation->image ? asset('storage/' . $variation->image) : $variation->product->thumbnail_url;
+                $thumb       = $variation->image
+                    ? asset('storage/' . $variation->image)
+                    : $variation->product->thumbnail_url;
 
                 Cart::add([
                     'id'      => 'var_' . $variation->id,
@@ -171,26 +176,29 @@ class CartController extends FrontendController
                     'price'   => $variation->final_price,
                     'weight'  => 0,
                     'options' => [
-                        'variation_id' => $variation->id,
-                        'thumbnail'    => $thumb,
-                        'variant'      => $variation->display_name,
-                        'regular_price' => $variation->regular_price
-                    ]
+                        'variation_id'  => $variation->id,
+                        'thumbnail'     => $thumb,
+                        'variant'       => $variation->display_name,
+                        'regular_price' => $variation->regular_price,
+                    ],
                 ]);
             } else {
-                // Case: Single Product
+
                 $product = Product::findOrFail($request->id);
 
-                // --- ২. সিঙ্গেল প্রোডাক্ট স্টক চেক শুরু ---
-                if ($product->available_stock < $qty) {
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => 'দুঃখিত, এই পণ্যটি বর্তমানে পর্যাপ্ত স্টকে নেই।'
-                    ], 422);
-                }
-                // --- স্টক চেক শেষ ---
+                // Check available stock excluding quantity already in the cart
+                $alreadyInCart    = $this->getCartQty($product->id, null);
+                $availableForCart = $product->available_stock - $alreadyInCart;
 
-                $productId = $product->id;
+                if ($availableForCart < $qty) {
+                    $msg = $alreadyInCart > 0
+                        ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
+                        : 'Sorry, this product is currently out of stock.';
+
+                    return response()->json(['status' => 'error', 'message' => $msg], 422);
+                }
+
+                $productId   = $product->id;
                 $variationId = null;
 
                 Cart::add([
@@ -200,29 +208,60 @@ class CartController extends FrontendController
                     'price'   => $product->sale_price,
                     'weight'  => 0,
                     'options' => [
-                        'thumbnail' => $product->thumbnail_url,
-                        'regular_price' => $product->regular_price
-                    ]
+                        'thumbnail'     => $product->thumbnail_url,
+                        'regular_price' => $product->regular_price,
+                    ],
                 ]);
             }
 
-            // DATABASE TRACKING
+            // Database tracking
             CartTrack::updateOrCreate(
-                ['session_id' => session()->getId(), 'product_id' => $productId, 'variation_id' => $variationId],
-                ['company_id' => getCurrentCompany()->id, 'customer_id' => auth('customer')->id(), 'quantity' => $qty, 'status' => CartTrack::ADDED]
+                [
+                    'session_id'   => session()->getId(),
+                    'product_id'   => $productId,
+                    'variation_id' => $variationId,
+                ],
+                [
+                    'company_id'  => getCurrentCompany()->id,
+                    'customer_id' => auth('customer')->id(),
+                    'quantity'    => $qty,
+                    'status'      => CartTrack::ADDED,
+                ]
             );
 
             return response()->json([
                 'status'     => 'success',
                 'cart_count' => Cart::count(),
-                'message'    => 'Successfully added to cart!'
+                'message'    => 'Successfully added to cart!',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Sorry, there was an issue: ' . $e->getMessage()
+                'message' => 'Sorry, there was an issue: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Return how much quantity of this product/variation is already in the cart.
+     */
+    private function getCartQty(?int $productId, ?int $variationId): int
+    {
+        $total = 0;
+        foreach (Cart::content() as $item) {
+            if ($variationId !== null) {
+                // Variation match
+                if (($item->options->variation_id ?? null) == $variationId) {
+                    $total += $item->qty;
+                }
+            } else {
+                // Single product match
+                if (is_numeric($item->id) && (int) $item->id === $productId) {
+                    $total += $item->qty;
+                }
+            }
+        }
+        return $total;
     }
     //update cart
     public function update($store, Request $request)
