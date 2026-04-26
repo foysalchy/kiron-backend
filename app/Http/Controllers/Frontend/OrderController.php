@@ -138,7 +138,12 @@ class OrderController extends FrontendController
                     'unit_price'   => (float) $item->price,
                 ];
             }
-
+            $shippingAddress = [
+                'name'    => $data['name'] ?? $customer->name,
+                'phone'   => $data['phone'] ?? $customer->phone,
+                'address' => $data['address'] ?? $customer->address ?? 'N/A',
+            ];
+            \Log::info("Exact warehouse ID: ", [$exactWarehouse->id]);
             $orderData = [
                 'warehouse_id'  => $exactWarehouse->id,
                 'customer_id'   => $customer->id,

@@ -45,6 +45,7 @@ class Order extends Model
         'payment_amount',
         'payment_status',
         'courier_info',
+        'assigned_to',
         'status',
         'note',
         'hold_ref',
@@ -67,6 +68,7 @@ class Order extends Model
         'courier_info' => 'array',
         'shipping_address' => 'array',
         'return_info' => 'array',
+        'assigned_to' => 'array',
     ];
 
     /**

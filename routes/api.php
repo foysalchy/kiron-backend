@@ -548,6 +548,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [SalesOrderController::class, 'show']);
                 Route::post('{id}/cancel', [SalesOrderController::class, 'cancel']);
                 Route::post('{id}/complete', [SalesOrderController::class, 'complete']);
+                Route::post('/{id}/assign-users', [SalesOrderController::class, 'assignUsers']);
             });
 
             Route::prefix('fetch-orders')->group(function () {

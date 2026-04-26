@@ -207,8 +207,7 @@ class ProductService
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'products/thumbnails',
-                    'public',
-                    2048
+                   
                 );
             }
 
@@ -350,8 +349,7 @@ class ProductService
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-                    'public',
-                    2048
+                
                 );
             }
 
@@ -585,8 +583,7 @@ class ProductService
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-                    'public',
-                    2048
+                   
                 );
             }
             // Check if this combination already exists (by hash, not by ID)
@@ -934,8 +931,7 @@ class ProductService
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-                'public',
-                2048
+              
             );
 
             Gallery::create([
@@ -950,8 +946,7 @@ class ProductService
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-                'public',
-                2048
+                
             );
 
             VariationGallery::create([

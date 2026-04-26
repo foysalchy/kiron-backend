@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Services\OrderService;
 use App\Helpers\ResponseHelper;
+use App\Models\Order;
 use Illuminate\Http\{JsonResponse, Request};
 
 class SalesOrderController extends Controller
@@ -53,7 +54,7 @@ class SalesOrderController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $data = $this->orderService->getOrderById($id,'sales');
+        $data = $this->orderService->getOrderById($id, 'sales');
 
         return ResponseHelper::success($data, 'Sales order retrieved successfully');
     }
@@ -63,7 +64,7 @@ class SalesOrderController extends Controller
      */
     public function cancel(int $id): JsonResponse
     {
-        $data = $this->orderService->cancelOrder($id,'sales');
+        $data = $this->orderService->cancelOrder($id, 'sales');
 
         return ResponseHelper::success($data, 'Sales order cancelled successfully');
     }
@@ -73,8 +74,19 @@ class SalesOrderController extends Controller
      */
     public function complete(int $id): JsonResponse
     {
-        $data = $this->orderService->completeOrder($id,'sales');
+        $data = $this->orderService->completeOrder($id, 'sales');
 
         return ResponseHelper::success($data, 'Sales order completed successfully');
+    }
+    public function assignUsers(Request $request, $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'user_ids'   => 'required|array',
+            'user_ids.*' => 'integer|exists:users,id',
+        ]);
+
+        $data = $this->orderService->assignUsers($id, $validated['user_ids']);
+
+        return ResponseHelper::success($data, 'Users assigned successfully');
     }
 }
