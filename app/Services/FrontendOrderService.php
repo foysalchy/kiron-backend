@@ -102,7 +102,7 @@ class FrontendOrderService
 
         // Paginate results
         $perPage = $filters['per_page'] ?? 20;
-        $orders = $query->whereNot('status',Status::Draft->value)->paginate($perPage);
+        $orders = $query->whereNot('status', Status::Draft->value)->paginate($perPage);
 
         // Transform the data to include calculated fields
         $orders->getCollection()->transform(function ($order) {
@@ -159,6 +159,7 @@ class FrontendOrderService
                 'reference_no' => $order->reference_no,
                 'is_walk_in' => (bool) $order->is_walk_in,
                 'courierInfo' => $this->getCourierInfo($order),
+                'assigned_to' => $order->assigned_to,
             ];
         });
 
@@ -174,7 +175,7 @@ class FrontendOrderService
             'customer',
             'warehouse',
             'company',
-            'actionLogs',
+            'actionLogs.user',
             'orderDetails.product',
             'orderDetails.variation.attributes.attributeGroup',
             'orderDetails.variation.attributes.attributeValue',
@@ -186,7 +187,21 @@ class FrontendOrderService
         ])
             ->findOrFail($orderId);
 
-        return $this->transformOrderData($order);
+
+        $assignedUsers = [];
+        if (!empty($order->assigned_to)) {
+            $assignedUsers = \App\Models\User::whereIn('id', $order->assigned_to)
+                ->select('id', 'name', 'email')
+                ->get()
+                ->map(fn($u) => [
+                    'id'    => $u->id,
+                    'name'  => $u->name,
+                    'email' => $u->email,
+                ])
+                ->toArray();
+        }
+
+        return $this->transformOrderData($order, $assignedUsers);
     }
     public function getEditOrder(int $id,): Order
     {
@@ -300,7 +315,7 @@ class FrontendOrderService
     /**
      * Transform single order data
      */
-    private function transformOrderData($order)
+    private function transformOrderData($order, $assignedUsers)
     {
         // Get customer total orders count
         $customerTotalOrders = 1; // Default for walk-in
@@ -384,6 +399,7 @@ class FrontendOrderService
                     'id' => $log->id,
                     'action' => $log->action,
                     'type' => $log->action_type,
+                    'user_name'  => $log->user?->name ?? '',
                     'created_at' => $log->created_at->format('Y-m-d H:i:s'),
                     'time_ago' => $log->created_at->diffForHumans(),
                 ];
@@ -406,6 +422,9 @@ class FrontendOrderService
             'is_walk_in' => (bool) $order->is_walk_in,
             'courierInfo' => $this->getCourierInfo($order),
             'courierMethod' => $this->getCourierMethod(),
+            'assigned_users' => $assignedUsers,
+            'assigned_to' => $order->assigned_to, // Raw assigned_to array (user IDs)
+
         ];
     }
     public function updateStatus(int $id, $paymentStatus = null, $orderStatus = null): Order

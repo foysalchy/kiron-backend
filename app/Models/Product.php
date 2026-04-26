@@ -19,6 +19,7 @@ class Product extends Model
     protected $fillable = [
         'company_id',
         'brand_id',
+        'assigned_to',
         'title',
         'slug',
         'thumbnail',
@@ -72,6 +73,11 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class)->select('id', 'name');
+    }
+
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
     public function galleries(): HasMany

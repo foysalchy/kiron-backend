@@ -119,7 +119,7 @@ class OrderController extends FrontendController
                 'phone'   => $data['phone'] ?? $customer->phone,
                 'address' => $data['address'] ?? $customer->address ?? 'N/A',
             ];
-
+            \Log::info("Exact warehouse ID: ", [$exactWarehouse->id]);
             $orderData = [
                 'warehouse_id'  => $exactWarehouse->id,
                 'customer_id'     => $customer->id,

@@ -22,6 +22,7 @@ class StoreProductRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'brand_id' => ['nullable', 'exists:brands,id'],
+                'assigned_to' => ['nullable', 'exists:users,id'],
 
                 // Basic Info
                 'title'      => ['required', 'string', 'max:255'],

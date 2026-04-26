@@ -182,7 +182,7 @@ class OrderService
             // Check if customer already exists by phone
             $customer = null;
             if ($phone) {
-                $customer = Party::where('type',Party::TYPE_CUSTOMER)->where('phone', $phone)
+                $customer = Party::where('type', Party::TYPE_CUSTOMER)->where('phone', $phone)
                     ->first();
             }
 
@@ -285,7 +285,20 @@ class OrderService
                     $this->deductOrderStock($order, $item);
                 }
             }
+            if ($order->type === Order::TYPE_SALES) {
+                $productIds = collect($items)->pluck('product_id')->filter();
 
+                $assignedUsers = Product::whereIn('id', $productIds)
+                    ->whereNotNull('assigned_to')
+                    ->pluck('assigned_to')
+                    ->unique()
+                    ->values()
+                    ->toArray();
+
+                if (!empty($assignedUsers)) {
+                    $order->updateQuietly(['assigned_to' => $assignedUsers]);
+                }
+            }
             // Create payments
             if (!empty($payments)) {
                 foreach ($payments as $payment) {
@@ -661,7 +674,32 @@ class OrderService
             throw ApiException::serverError('Failed to change order status');
         }
     }
+public function assignUsers(int $id, array $userIds): array
+{
+    $order = Order::findOrFail($id);
+    
+    $previousIds = $order->assigned_to ?? [];
+    $added       = array_diff($userIds, $previousIds);
+    $removed     = array_diff($previousIds, $userIds);
 
+    $order->update(['assigned_to' => $userIds]);
+
+    $parts = [];
+    if (!empty($added)) {
+        $parts[] = count($added) . ' user' . (count($added) > 1 ? 's' : '') . ' added';
+    }
+    if (!empty($removed)) {
+        $parts[] = count($removed) . ' user' . (count($removed) > 1 ? 's' : '') . ' removed';
+    }
+    $message = !empty($parts) ? implode(', ', $parts) : 'no changes';
+
+    LogHelper::custom('assigned_users', 'orders', $id, $order->company_id, $message);
+
+    return [
+        'order_id'    => $order->id,
+        'assigned_to' => $userIds,
+    ];
+}
     /**
      * Hold order (POS only)
      */
