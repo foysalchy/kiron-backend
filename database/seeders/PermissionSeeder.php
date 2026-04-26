@@ -205,6 +205,9 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_sms',            'SMS Settings',             'settings_sms');
         $addCrud('settings_templates',      'Template Settings',        'settings_templates');
 
+        //21. Subscriptions
+        $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');
+        $addViewOnly('company_profile',           'Subscription & Billing Management',            'subscription');
         Permission::insert($permissionsToInsert);
     }
 }

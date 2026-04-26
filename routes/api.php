@@ -167,11 +167,16 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['super_admin'])->group(function () {
             Route::post('/impersonate/company/{company}', [AuthController::class, 'impersonateCompany']);
             Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
-            Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addPayment']);
-            Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscription']);
             Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
-
         });
+        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addPayment']);
+        Route::patch('/subscription-payments/{id}/status', [SubscriptionController::class, 'updateStatus']);
+        Route::get('/pricing-packages', [PricingPackageController::class, 'index']);
+        Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscription']);
+        Route::post('/companies/{id}/update-requests', [CompanyController::class, 'storeUpdateRequest']);
+        Route::post('/companies/update-requests/{reqId}', [CompanyController::class, 'updateUpdateRequest']);
+        Route::delete('/companies/update-requests/{reqId}', [CompanyController::class, 'deleteUpdateRequest']);
+        Route::get('/companies/{id}/extra-charges', [CompanyController::class, 'extraCharges']);
         //site settings routes
         Route::middleware('check.user.status:allow_pending')->group(function () {
 
@@ -1458,7 +1463,6 @@ Route::prefix('v1')->group(function () {
             Route::patch('/{id}/toggle-status', [PricingController::class, 'toggleStatus']);
         });
         Route::prefix('pricing-packages')->group(function () {
-            Route::get('/', [PricingPackageController::class, 'index']);
             Route::post('/', [PricingPackageController::class, 'store']);
             Route::get('/{id}', [PricingPackageController::class, 'show']);
             Route::post('/update/{id}', [PricingPackageController::class, 'update']);

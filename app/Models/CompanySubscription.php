@@ -54,6 +54,11 @@ class CompanySubscription extends Model
     {
         return $this->hasMany(SubscriptionPayment::class, 'subscription_id');
     }
+    // CompanySubscription.php
+    public function subscriptionPayments()
+    {
+        return $this->hasMany(SubscriptionPayment::class, 'subscription_id');
+    }
     public function isActive(): bool
     {
         return $this->status === Status::Active->value && $this->ends_at?->isFuture();

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CompanySubscription;
+use App\Models\SubscriptionPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,23 +48,31 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'account_holder_name' => 'nullable|string|max:255',
+            'payment_method' => 'required|string|max:255',
             'number'              => 'nullable|string|max:50',
-            'transaction_id'      => 'nullable|string|max:255',
-            'document'            => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'transaction_id' => 'nullable|string|max:255|unique:subscription_payments,transaction_id',
+            'document'            => 'required|image|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         DB::transaction(function () use ($request, $id) {
             $subscription = CompanySubscription::findOrFail($id);
 
             $documentPath = null;
+
+
             if ($request->hasFile('document')) {
-                $documentPath = $request->file('document')->store('payment_documents', 'public');
+                $documentPath = FileUploadHelper::uploadImage(
+                    $request->file('document'),
+                    'payment_documents'
+                );
             }
+
+
 
             DB::table('subscription_payments')->insert([
                 'subscription_id' => $subscription->id,
                 'company_id'      => $subscription->company_id,
-                'payment_method'  => 'manual',
+                'payment_method'  => $request->payment_method,
                 'amount'          => $subscription->amount_paid,
                 'transaction_id'  => $request->transaction_id ?? null,
                 'sender_number'   => $request->number ?? null,
@@ -73,23 +83,40 @@ class SubscriptionController extends Controller
                     'account_holder_name' => $request->account_holder_name ?? null,
                     'document_path'       => $documentPath,
                 ]),
+                'paid_at'      => now(),
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ]);
 
             // subscription payment status pending এ রাখো — admin approve করলে paid হবে
             $subscription->update([
-                'payment_method' => 'manual',
+                'payment_method' => $request->payment_method,
                 'payment_status' => 'paid',
             ]);
         });
 
         return response()->json(['message' => 'Payment submitted successfully.']);
     }
+    // SubscriptionPaymentController.php
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:success,failed',
+        ]);
+
+        $payment = SubscriptionPayment::findOrFail($id);
+        $payment->update([
+            'status'  => $request->status,
+        ]);
+
+        return response()->json(['message' => 'Payment status updated.']);
+    }
     public function billing(Request $request): JsonResponse
     {
         $query = Company::with([
             'currentSubscription.pricingPackage',
+            'subscriptions.subscriptionPayments',
+
             'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
         ]);
 

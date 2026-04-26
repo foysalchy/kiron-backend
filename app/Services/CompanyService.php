@@ -7,6 +7,8 @@ use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
+use App\Http\Requests\UpdateCompanyRequest;
+use App\Models\CompanyUpdateRequest;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -146,6 +148,9 @@ class CompanyService
             'users.roles',
             'subscriptions' => fn($q) => $q->with(['pricingPackage', 'extraOrderCharges.order']),
             'updateRequests' => fn($q) => $q->latest()->limit(3), // company update requests
+
+            'subscriptions.subscriptionPayments',
+
             'domains',
             'loginHistories.user',
         ])
@@ -194,7 +199,6 @@ class CompanyService
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'companies/logos',
-                    'public',
                     2048 // 2MB max
                 );
             }
@@ -278,6 +282,13 @@ class CompanyService
 
         try {
             $company = Company::findOrFail($id);
+            if (isset($data['logo'])) {
+                $data['logo'] = FileUploadHelper::uploadImage(
+                    $data['logo'],
+                    'companies/logos',
+                    2048
+                );
+            }
             $company->updateRequests()->create($data);
 
             LogHelper::updated('company', $company->id, $company->id, $company->name . "request for update");
@@ -287,6 +298,51 @@ class CompanyService
             Log::info('Company updated successfully', ['company_id' => $company->id]);
 
             return $company->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Delete new uploaded logo if exists
+            if (isset($data['logo'])) {
+                FileUploadHelper::delete($data['logo']);
+            }
+
+            Log::error('Company update failed: ' . $e->getMessage(), [
+                'company_id' => $id,
+                'data' => $data,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            throw ApiException::serverError('Failed to update company');
+        }
+    }
+    public function updateUpdateRequest(int $id, array $data): CompanyUpdateRequest
+    {
+        DB::beginTransaction();
+
+        try {
+            $companyReq = CompanyUpdateRequest::find($id);
+
+            if ($companyReq == Status::Approved->value || $companyReq->status == Status::Rejected->value) {
+                throw ApiException::notFound('Cannot update this request');
+            }
+            if (isset($data['logo'])) {
+                $data['logo'] = FileUploadHelper::replace(
+                    $data['logo'],
+                    $companyReq->logo,
+                    'companies/logos'
+                );
+            }
+            $companyReq->update($data);
+
+
+            DB::commit();
+
+            Log::info('Company updated successfully', ['company_id' => $companyReq->id]);
+
+            return $companyReq->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
