@@ -21,14 +21,22 @@ class OrderController extends FrontendController
     public function index($store)
     {
 
+
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
         $paymentMethods = CustomerPaymentMethod::where('status', Status::Active->value)
             ->get();
 
+        $existingDraftId = Session::get('current_draft_order_id');
+        $existingDraft   = $existingDraftId
+            ? Order::where('id', $existingDraftId)
+            ->where('status', Status::Draft->value)
+            ->first()
+            : null;
+
         // Auto-create draft for logged in users
-        if (auth('customer')->check()) {
+        if (auth('customer')->check() && !$existingDraft) {
             $this->createDraftOrder($store, [
                 'phone'   => auth('customer')->user()->phone,
                 'name'    => auth('customer')->user()->name,
@@ -37,6 +45,8 @@ class OrderController extends FrontendController
         }
 
         $cartContent = Cart::content();
+
+
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
         $shipping = session()->get('shipping_cost', 60);
         $discount = session()->has('coupon') ? session('coupon')['discount_amount'] : 0;
@@ -44,6 +54,8 @@ class OrderController extends FrontendController
         $shipping_area = session()->get('shipping_area', 'inside');
 
         $draftOrderId = Session::get('current_draft_order_id');
+
+        // dd($cartContent, $subtotal, $discount, $shipping, $total, $shipping_area, $paymentMethods, $draftOrderId);
         return $this->view('frontend.checkout', compact(
             'cartContent',
             'subtotal',
@@ -70,44 +82,32 @@ class OrderController extends FrontendController
         $cartContent = Cart::content();
         if ($cartContent->isEmpty()) return ['success' => false, 'error' => 'Cart is empty'];
 
+        // Warehouse check (existing code same থাকবে)
         $warehouseQuery = Warehouse::active();
-
         foreach ($cartContent as $item) {
             $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
-            $variationId = $item->options->variation_id ?? null;
-            $requiredQty = $item->qty;
-
-            $product = Product::find($cleanProductId);
+            $variationId    = $item->options->variation_id ?? null;
+            $requiredQty    = $item->qty;
+            $product        = Product::find($cleanProductId);
             if (!$product) continue;
 
             if ($product->type === 'single') {
-                // logic for single product stock check (warehouse_info)
                 $validWarehouseIds = [];
-
-                // stock chcek from warehouse_info
                 if (!empty($product->warehouse_info)) {
                     foreach ($product->warehouse_info as $info) {
-                        $q = (int) ($info['quantity'] ?? 0);
+                        $q   = (int) ($info['quantity'] ?? 0);
                         $wId = (int) ($info['warehouse_id'] ?? 0);
-
-                        if ($wId > 0 && $q >= $requiredQty) {
-                            $validWarehouseIds[] = $wId;
-                        }
+                        if ($wId > 0 && $q >= $requiredQty) $validWarehouseIds[] = $wId;
                     }
                 }
-
-                // if no warehouse can fulfill this product's stock requirement, return error immediately
                 if (empty($validWarehouseIds)) {
                     return ['success' => false, 'error' => "Stock out for: {$product->title}"];
                 }
-
-
                 $warehouseQuery->whereIn('id', $validWarehouseIds);
             } else {
-                // --- VARIATION PRODUCT(Stocks ) ---
                 if ($variationId) {
-                    $warehouseQuery->whereHas('stocks', function ($query) use ($variationId, $requiredQty) {
-                        $query->where('product_variation_id', $variationId)
+                    $warehouseQuery->whereHas('stocks', function ($q) use ($variationId, $requiredQty) {
+                        $q->where('product_variation_id', $variationId)
                             ->where('quantity', '>=', $requiredQty);
                     });
                 }
@@ -115,18 +115,19 @@ class OrderController extends FrontendController
         }
 
         $exactWarehouse = $warehouseQuery->first();
-
         if (!$exactWarehouse) {
-            return ['success' => false, 'error' => 'One or more items are out of stock in our warehouses.'];
+            return ['success' => false, 'error' => 'One or more items are out of stock.'];
         }
 
         try {
             DB::beginTransaction();
 
-            $customer = auth('customer')->check() ? auth('customer')->user() : Party::updateOrCreate(
-                ['phone' => $data['phone'], 'company_id' => $this->company_id, 'type' => Party::TYPE_CUSTOMER],
-                ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
-            );
+            $customer = auth('customer')->check()
+                ? auth('customer')->user()
+                : Party::updateOrCreate(
+                    ['phone' => $data['phone'], 'company_id' => $this->company_id, 'type' => Party::TYPE_CUSTOMER],
+                    ['name' => $data['name'] ?? 'Guest', 'password' => Hash::make('12345678'), 'status' => Status::Pending->value]
+                );
 
             $items = [];
             foreach ($cartContent as $item) {
@@ -139,23 +140,41 @@ class OrderController extends FrontendController
                 ];
             }
 
-            $orderData = [
-                'warehouse_id'  => $exactWarehouse->id,
-                'customer_id'   => $customer->id,
-                'company_id'    => $this->company_id,
-                'items'         => $items,
-                'status'        => Status::Draft->value,
-                'order_date'    => now(),
-                'other_charges' => session()->get('shipping_cost', 60),
-                'shipping_address' => [
-                    'name' => $data['name'] ?? $customer->name,
-                    'phone' => $data['phone'] ?? $customer->phone,
-                    'address' => $data['address'] ?? $customer->address ?? 'N/A',
-                ],
+            $shippingAddress = [
+                'name'    => $data['name']    ?? $customer->name,
+                'phone'   => $data['phone']   ?? $customer->phone,
+                'address' => $data['address'] ?? $customer->address ?? 'N/A',
             ];
 
-            $oldId = Session::get('current_draft_order_id');
-            if ($oldId) Order::where('id', $oldId)->where('status', Status::Draft->value)->delete();
+            // ✅ FIX: existing draft থাকলে update করো, delete+recreate করো না
+            $oldId    = Session::get('current_draft_order_id');
+            echo $oldId; // Debugging line
+            $oldOrder = $oldId
+                ? Order::where('id', $oldId)->where('status', Status::Draft->value)->first()
+                : null;
+
+            if ($oldOrder) {
+                // শুধু shipping address আর charges update করো
+                $oldOrder->update([
+                    'shipping_address' => $shippingAddress,
+                    'other_charges'    => session()->get('shipping_cost', 60),
+                    'warehouse_id'     => $exactWarehouse->id,
+                ]);
+                DB::commit();
+                return ['success' => true, 'order_id' => $oldOrder->id];
+            }
+
+            // নতুন draft create
+            $orderData = [
+                'warehouse_id'     => $exactWarehouse->id,
+                'customer_id'      => $customer->id,
+                'company_id'       => $this->company_id,
+                'items'            => $items,
+                'status'           => Status::Draft->value,
+                'order_date'       => now(),
+                'other_charges'    => session()->get('shipping_cost', 60),
+                'shipping_address' => $shippingAddress,
+            ];
 
             $order = $this->orderService->createSalesOrder($orderData);
             Session::put('current_draft_order_id', $order->id);
@@ -164,6 +183,7 @@ class OrderController extends FrontendController
             return ['success' => true, 'order_id' => $order->id];
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Draft creation failed: ' . $e->getMessage());
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -174,7 +194,8 @@ class OrderController extends FrontendController
             [
                 'name' => 'required',
                 'phone' => 'required',
-                'address' => 'required'
+                'address' => 'required',
+                'payment_method' => 'nullable|string',
             ]
         );
 
@@ -219,11 +240,14 @@ class OrderController extends FrontendController
                 'name'    => $request->name,
                 'phone'   => $request->phone,
                 'address' => $request->address,
+                'payment_method' => $request->payment_method,
             ];
             $order->update(['shipping_address' => $finalAddress]);
             $order->customer->update(['name' => $request->name, 'address' => $request->address]);
 
             // This will deduct stock from the Exact Warehouse assigned in the draft
+
+
             $this->orderService->changeStatus($order->id, Status::Pending->value);
 
             foreach (Cart::content() as $item) {

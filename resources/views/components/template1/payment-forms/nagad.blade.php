@@ -19,14 +19,14 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-500">*</span></label>
                 <input type="number" name="amount" id="nagad-amount"
-                    placeholder="Paid amount" required step="0.01" min="1"
+                    placeholder="Paid amount" step="0.01" min="1"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#f5821f]">
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span class="text-red-500">*</span></label>
                 <input type="text" name="transaction_id"
-                    placeholder="e.g. NA6XXXXXXX" required
+                    placeholder="e.g. NA6XXXXXXX"
                     oninput="this.value=this.value.toUpperCase()"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-[#f5821f]">
             </div>
@@ -41,7 +41,7 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Sender Nagad Number <span class="text-red-500">*</span></label>
                 <input type="tel" name="sender_number"
-                    placeholder="01XXXXXXXXX" required maxlength="11"
+                    placeholder="01XXXXXXXXX" maxlength="11"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#f5821f]">
             </div>
 

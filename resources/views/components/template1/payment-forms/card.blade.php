@@ -1,74 +1,145 @@
-{{-- resources/views/components/template1/payment-forms/card.blade.php --}}
-<div class="payment-form hidden" id="form-card">
-    <div class="mt-4 p-5 border border-blue-100 rounded-xl space-y-4 bg-blue-50/30">
+{{-- resources/views/template1/partials/payments/card.blade.php --}}
+@props(['method', 'mode' => 'modal'])
 
-        {{-- Instructions Box --}}
-        <div class="flex items-start gap-3 p-3 rounded-lg bg-white border border-blue-100 shadow-sm">
-            <i class="fas fa-credit-card text-blue-500 mt-0.5"></i>
-            <div>
-                <p class="text-xs font-bold text-blue-900 uppercase">Card Payment Instructions</p>
-                <p class="text-[11px] text-blue-700 leading-tight">Please pay through your card and provide the Approval Code or Transaction ID from the receipt below.</p>
-            </div>
+<div class="payment-form hidden" id="form-card">
+    <div class="space-y-3">
+        {{-- Instructions Box (Blue Theme like bKash) --}}
+        <div class="p-4 rounded-xl text-sm" style="background:#f0f7ff; border:1px solid #2563eb30;">
+            <p class="text-[#2563eb] font-medium mb-1">Card Payment Instructions:</p>
+            <span class="text-xs text-blue-700 leading-tight">
+                Please pay via your card and provide the Transaction ID/Approval Code and the last 4 digits of your card below.
+            </span>
         </div>
 
-        <form action="{{ route('order.payment.submit') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+        {{-- ড্যাশবোর্ড মোডে থাকলে ফর্ম ট্যাগ থাকবে --}}
+        @if($mode === 'modal')
+        <form onsubmit="handlePaymentSubmit(event, 'card')" method="POST" action="{{ route('order.payment.submit') }}" enctype="multipart/form-data" class="space-y-3">
             @csrf
-            {{-- Hidden Inputs: JS will fill these --}}
-            <input type="hidden" name="order_id">
+            <input type="hidden" name="order_id" id="card-order-id">
             <input type="hidden" name="payment_method" value="card">
-            <input type="hidden" name="amount">
+        @endif
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {{-- Card Type Selection --}}
-                <div class="md:col-span-1">
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Card Type <span class="text-red-500">*</span></label>
-                    <select name="card_type" required
-                        class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20">
-                        <option value="">-- Select Card --</option>
+            {{-- Amount --}}
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-500">*</span></label>
+                <input type="number" name="amount" id="card-amount" placeholder="Paid amount" step="0.01" min="1"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#2563eb]">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {{-- Card Type --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Card Type <span class="text-red-500">*</span></label>
+                    <select name="card_type" class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#2563eb]">
                         <option value="Visa">Visa Card</option>
                         <option value="Mastercard">Mastercard</option>
-                        <option value="Amex">American Express</option>
-                        <option value="Nexus">DBBL Nexus</option>
+                        <option value="Amex">Amex</option>
+                        <option value="Others">Others</option>
                     </select>
                 </div>
-
                 {{-- Transaction ID --}}
-                <div class="md:col-span-1">
-                    <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Transaction ID / Approval Code <span class="text-red-500">*</span></label>
-                    <input type="text" name="transaction_id" placeholder="e.g. 524103" required
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction / Approval ID <span class="text-red-500">*</span></label>
+                    <input type="text" name="transaction_id" placeholder="e.g. 524103"
                         oninput="this.value=this.value.toUpperCase()"
-                        class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono bg-white focus:outline-none focus:border-blue-500">
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-[#2563eb]">
                 </div>
             </div>
 
-            {{-- Last 4 Digits (Stored in sender_number field) --}}
-            <div>
-                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Last 4 Digits of your Card</label>
-                <input type="text" name="sender_number" maxlength="4" placeholder="e.g. 1234" pattern="\d{4}"
-                    class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono bg-white focus:outline-none focus:border-blue-500">
-                <p class="text-[10px] text-gray-400 mt-1">Enter the last 4 digits of your card number.</p>
-            </div>
-
-            {{-- Screenshot Upload --}}
-            <div>
-                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-1">Payment Receipt / Screenshot</label>
-                <div class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center bg-white hover:border-blue-400 transition-colors cursor-pointer group"
-                    onclick="document.getElementById('card-ss').click()">
-                    <img id="card-preview" class="hidden mx-auto mb-2 max-h-32 rounded-lg object-contain shadow-sm">
-                    <div id="card-placeholder">
-                        <i class="fas fa-camera text-gray-300 text-2xl mb-2 group-hover:text-blue-400"></i>
-                        <p class="text-[11px] text-gray-400">Click to upload transaction receipt</p>
-                    </div>
-                    <input type="file" id="card-ss" name="screenshot" accept="image/*" class="hidden"
-                        onchange="previewScreenshot(this,'card-preview','card-placeholder')">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {{-- Reference --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Reference No</label>
+                    <input type="text" name="reference_no" placeholder="e.g. REF123"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-[#2563eb]">
+                </div>
+                {{-- Last 4 Digits --}}
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Last 4 Digits <span class="text-red-500">*</span></label>
+                    <input type="text" name="sender_number" placeholder="e.g. 1234" maxlength="4" pattern="\d{4}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-[#2563eb]">
                 </div>
             </div>
 
-            {{-- Submit Button --}}
-            <button type="submit"
-                class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
-                <i class="fas fa-check-circle"></i> Confirm Card Payment
+            {{-- ── Multi Screenshot Upload (Same Logic as bKash) ── --}}
+            <div>
+                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-2">
+                    Payment Receipts <span class="normal-case text-gray-400 font-normal">(max 3)</span>
+                </label>
+                <div id="card-preview-grid" class="flex flex-wrap gap-2 mb-2"></div>
+                <div id="card-dropzone" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-white cursor-pointer hover:border-blue-400 transition-colors"
+                    onclick="document.getElementById('card-file-input').click()">
+                    <i class="fas fa-plus-circle text-gray-300 text-2xl mb-1"></i>
+                    <p class="text-[11px] text-gray-400">Click to add receipts <span id="card-count-label">(0/3)</span></p>
+                </div>
+                <input type="file" id="card-file-input" accept="image/*" class="hidden" onchange="cardAddImage(this)">
+                <div id="card-hidden-inputs"></div>
+            </div>
+
+            {{-- সাবমিট বাটন (শুধুমাত্র মোডাল মোডে দেখাবে) --}}
+            @if($mode === 'modal')
+            <button type="submit" class="w-full py-2.5 rounded text-white font-semibold text-sm hover:bg-blue-700 transition-all shadow-md"
+                style="background:#2563eb;">
+                <i class="fas fa-check-circle mr-1"></i> Confirm Card Payment
             </button>
         </form>
+        @endif
     </div>
 </div>
+
+<script>
+    const cardFiles = [];
+    const card_MAX = 3;
+
+    function cardAddImage(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        input.value = '';
+        if (cardFiles.length >= card_MAX) { alert('Maximum ' + card_MAX + ' allowed.'); return; }
+        cardFiles.push(file);
+        cardRenderPreviews();
+        cardSyncHiddenInputs();
+    }
+
+    function cardRemoveImage(index) {
+        cardFiles.splice(index, 1);
+        cardRenderPreviews();
+        cardSyncHiddenInputs();
+    }
+
+    function cardRenderPreviews() {
+        const grid = document.getElementById('card-preview-grid');
+        const countLabel = document.getElementById('card-count-label');
+        const dropzone = document.getElementById('card-dropzone');
+        grid.innerHTML = '';
+        cardFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative w-20 h-20 border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm group';
+                div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">
+                    <button type="button" onclick="cardRemoveImage(${index})" class="absolute top-0 right-0 bg-red-500 text-white w-5 h-5 flex items-center justify-center text-xs rounded-bl-lg opacity-0 group-hover:opacity-100 transition-all">&times;</button>`;
+                grid.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+        countLabel.innerText = `(${cardFiles.length}/${card_MAX})`;
+        dropzone.style.display = cardFiles.length >= card_MAX ? 'none' : 'block';
+    }
+
+    function cardSyncHiddenInputs() {
+        const container = document.getElementById('card-hidden-inputs');
+        container.innerHTML = '';
+        cardFiles.forEach((file) => {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const inp = document.createElement('input');
+            inp.type = 'file';
+            inp.name = 'screenshots[]';
+            inp.style.display = 'none';
+            inp.files = dt.files;
+            container.appendChild(inp);
+        });
+    }
+</script>

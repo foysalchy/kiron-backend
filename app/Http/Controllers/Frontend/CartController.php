@@ -149,17 +149,17 @@ class CartController extends FrontendController
 
             if ($request->filled('variation_id')) {
 
-                $variation = ProductVariation::with('product')->findOrFail($request->variation_id);
+                $variation = ProductVariation::with(['product', 'stocks'])->findOrFail($request->variation_id);
 
                 // Check available stock excluding quantity already in the cart
-                $alreadyInCart = $this->getCartQty(null, $variation->id);
-                $availableForCart = $variation->available_stock - $alreadyInCart;
+                $realStock = $variation->stocks->sum('quantity');
+                $alreadyInCart    = $this->getCartQty(null, $variation->id);
+                $availableForCart = $realStock - $alreadyInCart;
 
                 if ($availableForCart < $qty) {
                     $msg = $alreadyInCart > 0
                         ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
                         : 'Sorry, this variation is currently out of stock.';
-
                     return response()->json(['status' => 'error', 'message' => $msg], 422);
                 }
 
@@ -213,7 +213,6 @@ class CartController extends FrontendController
                     ],
                 ]);
             }
-
             // Database tracking
             CartTrack::updateOrCreate(
                 [

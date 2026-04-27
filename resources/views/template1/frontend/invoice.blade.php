@@ -592,7 +592,7 @@
                         <p>Phone: {{ $order->customer->phone }}</p>
                         <p>Email: {{ $order->customer->email ?? 'N/A' }}</p>
                     </div>
-                    p><strong>Payment Method:</strong>
+                    <p><strong>Payment Method:</strong>
                     @if ($order->orderPayments->isNotEmpty())
                         <span style="text-transform: uppercase; font-weight: 700; color: #1D2128;">
                             {{ str_replace(['_', '-'], ' ', $order->orderPayments->last()->payment_method) }}

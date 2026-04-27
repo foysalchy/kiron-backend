@@ -262,6 +262,7 @@
 
                         @php
                             $grouped = [];
+
                             if ($product->type === 'variation') {
                                 foreach ($product->variations as $variation) {
                                     foreach ($variation->attributes as $attr) {

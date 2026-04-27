@@ -182,7 +182,7 @@ class OrderService
             // Check if customer already exists by phone
             $customer = null;
             if ($phone) {
-                $customer = Party::where('type',Party::TYPE_CUSTOMER)->where('phone', $phone)
+                $customer = Party::where('type', Party::TYPE_CUSTOMER)->where('phone', $phone)
                     ->first();
             }
 
@@ -590,11 +590,13 @@ class OrderService
     {
         DB::beginTransaction();
 
+
         try {
             $order = Order::with([
                 'orderDetails.product',
                 'orderDetails.variation',
             ])->find($id);
+            Log::info("Changing order status for order ID: {$id} to {$status}");
 
             if (!$order) {
                 throw ApiException::notFound('Order not found');
@@ -801,6 +803,12 @@ class OrderService
      */
     private function deductOrderStock(Order $order, array $item): void
     {
+        Log::info('Deducting stock for order item', [
+            'order_id' => $order->id,
+            'product_id' => $item['product_id'],
+            'variation_id' => $item['variation_id'] ?? null,
+            'quantity' => $item['quantity']
+        ]);
         $stockData = [
             'warehouse_id' => $order->warehouse_id,
             'bin_id' => $item['bin_id'] ?? null,
@@ -812,10 +820,11 @@ class OrderService
             'reference_id' => $order->id,
             'notes' => "Stock deducted for order: {$order->order_no}"
         ];
-
+    Log::info('Prepared stock data for deduction', $stockData);
         if (isset($item['variation_id']) && $item['variation_id']) {
             $stockData['variation_id'] = $item['variation_id'];
         }
+        // dd($stockData);
 
         $this->productService->removeStockFromWarehouse($item['product_id'], $stockData);
     }

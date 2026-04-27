@@ -18,14 +18,14 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-500">*</span></label>
                 <input type="number" name="amount" id="rocket-amount"
-                    placeholder="Paid amount" required step="0.01" min="1"
+                    placeholder="Paid amount" step="0.01" min="1"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#8B1FA8]">
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span class="text-red-500">*</span></label>
                 <input type="text" name="reference_no"
-                    placeholder="Rocket Transaction ID" required
+                    placeholder="Rocket Transaction ID"
                     oninput="this.value=this.value.toUpperCase()"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-[#8B1FA8]">
             </div>
@@ -33,7 +33,7 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Sender Rocket Number <span class="text-red-500">*</span></label>
                 <input type="tel" name="sender_number"
-                    placeholder="01XXXXXXXXX" required maxlength="11"
+                    placeholder="01XXXXXXXXX" maxlength="11"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-[#8B1FA8]">
             </div>
 

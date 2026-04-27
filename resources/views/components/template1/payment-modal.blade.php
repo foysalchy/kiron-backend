@@ -1,5 +1,5 @@
 {{-- resources/views/components/payment-modal.blade.php --}}
-@props(['methods', 'currency' => '৳'])
+@props(['methods', 'currency' => '৳', 'mode' => 'modal'])
 
 @php
     $bkashMethod = $methods->first(fn($m) => str_contains(strtolower($m->name), 'bkash'));
@@ -13,7 +13,12 @@
 
         {{-- Header --}}
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-            <h3 class="text-base font-bold text-gray-800">Select Payment Method</h3>
+            <div class="flex items-center gap-3">
+                <button id="back-to-methods" onclick="goBackToMethods()" class="hidden text-gray-500 hover:text-black">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h3 class="text-base font-bold text-gray-800">Select Payment Method</h3>
+            </div>
             <button onclick="closePaymentModal()"
                 class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
         </div>
@@ -99,59 +104,56 @@
             resetPaymentForms();
 
             const btn = document.getElementById('method-btn-' + slug);
-
-            console.log("Selected Payment Method:", name, "Slug:", slug); // Debugging log
             if (btn) btn.classList.add('border-[#FF6A00]', 'bg-orange-50');
+
+            document.getElementById('payment-method-list').classList.add('hidden');
+
+            document.getElementById('back-to-methods').classList.remove('hidden');
 
             let s = slug.toLowerCase();
             let formId = '';
 
-            // ১. সঠিক ফর্ম আইডি খুঁজে বের করার লজিক (সংশোধিত)
-            if (s.includes('bkash')) {
-                formId = 'form-bkash';
-            } else if (s.includes('nagad')) {
-                formId = 'form-nagad';
-            } else if (s.includes('rocket')) {
-                formId = 'form-rocket';
-            } else if (s.includes('card') || s.includes('visa') || s.includes('master')) {
-                console.log("Card-related method detected:", slug);
-                // এখানে 'card' শব্দটি যোগ করা হয়েছে
-                formId = 'form-card';
-            } else if (s.includes('bank')) {
-                formId = 'form-bank';
-            } else if (s.includes('cash') || s.includes('cod')) {
-                formId = 'form-cod';
-            }
-
-            console.log("Looking for Form ID:", formId); // এটি ব্রাউজারে F12 চেপে চেক করুন
+            if (s.includes('bkash')) formId = 'form-bkash';
+            else if (s.includes('nagad')) formId = 'form-nagad';
+            else if (s.includes('rocket')) formId = 'form-rocket';
+            else if (s.includes('card') || s.includes('visa') || s.includes('master')) formId = 'form-card';
+            else if (s.includes('bank')) formId = 'form-bank';
+            else if (s.includes('cash') || s.includes('cod')) formId = 'form-cod';
 
             const form = document.getElementById(formId);
             if (form) {
-                console.log("Form found for ID:", formId); // ফর্ম পাওয়া গেছে কিনা তা নিশ্চিত করার জন্য
-                // ভ্যালু সেট করা
                 const orderInput = form.querySelector('[name="order_id"]');
                 const amountInput = form.querySelector('[name="amount"]');
-
                 if (orderInput) orderInput.value = _activeOrderId;
                 if (amountInput) amountInput.value = _payableAmount;
 
-                // ফর্মটি দেখানো
                 form.classList.remove('hidden');
-            } else {
-                console.error("Form not found for ID:", formId);
             }
         }
+
+        // iccon list
+        function goBackToMethods() {
+            resetPaymentForms();
+            document.getElementById('payment-method-list').classList.remove('hidden');
+            document.getElementById('back-to-methods').classList.add('hidden');
+        }
+
+        // modal close function
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.replace('flex', 'hidden');
+            document.body.style.overflow = '';
+            goBackToMethods();
+        }
         //
-        // পেমেন্ট সাবমিট করার AJAX ফাংশন
+
         function handlePaymentSubmit(event, type) {
-            event.preventDefault(); // পেজ রিলোড আটকাবে
+            event.preventDefault();
 
             const form = event.target;
             const formData = new FormData(form);
             const btn = form.querySelector('button[type="submit"]');
             const originalBtnText = btn.innerHTML;
 
-            // বাটন ডিজেবল এবং লোডিং দেখানো
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
 
@@ -170,17 +172,13 @@
                     if (response.ok && data.success) {
                         toastr.success(data.message);
                         closePaymentModal();
-                        // সাফল্য হলে ১.৫ সেকেন্ড পর রিলোড দিন স্ট্যাটাস দেখার জন্য
                         setTimeout(() => location.reload(), 1500);
                     } else {
-                        // ভ্যালিডেশন এরর বা অন্যান্য এরর
                         if (data.errors) {
-                            // সব এরর লুপ চালিয়ে দেখানো
                             Object.values(data.errors).forEach(err => toastr.error(err[0]));
                         } else {
                             toastr.error(data.message || 'Something went wrong!');
                         }
-                        // বাটন আবার সচল করা
                         btn.disabled = false;
                         btn.innerHTML = originalBtnText;
                     }

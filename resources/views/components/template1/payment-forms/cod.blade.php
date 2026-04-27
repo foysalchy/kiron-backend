@@ -19,16 +19,16 @@
 
         <form action="{{ route('order.payment.submit') }}" method="POST">
             @csrf
-            <<input type="hidden" name="order_id">
-                <input type="hidden" name="payment_method" value="cod">
-                <input type="hidden" name="amount">
+            <input type="hidden" name="order_id">
+            <input type="hidden" name="payment_method" value="cod">
+            <input type="hidden" name="amount">
 
-                <<input type="hidden" name="transaction_id" value="COD-PLACEHOLDER">
+            <input type="hidden" name="transaction_id" value="COD-PLACEHOLDER">
 
-                    <button type="submit"
-                        class="w-full py-3 rounded-xl bg-green-600 text-white font-bold text-sm shadow-lg shadow-green-200 hover:bg-green-700 transition-all flex items-center justify-center gap-2">
-                        <i class="fas fa-check-circle"></i> Confirm Order
-                    </button>
+            <button type="submit"
+                class="w-full py-3 rounded-xl bg-green-600 text-white font-bold text-sm shadow-lg shadow-green-200 hover:bg-green-700 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle"></i> Confirm Order
+            </button>
         </form>
     </div>
 </div>

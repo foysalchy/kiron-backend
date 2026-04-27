@@ -91,4 +91,11 @@ class ProductVariation extends Model
             ->pluck('attributeValue.name')
             ->join(' / ');
     }
+    public function getAvailableStockAttribute(): int
+    {
+        if ($this->relationLoaded('stocks')) {
+            return $this->stocks->sum('quantity');
+        }
+        return $this->stocks()->sum('quantity');
+    }
 }
