@@ -29,6 +29,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'header_code' => ['nullable', 'string'],
                 'phone_number' => ['nullable', 'string', 'max:20'],
                 'instruction' => ['nullable', 'string'],
+                'extras' => ['nullable'],
                 'instruction_title' => ['nullable', 'string', 'max:255'],
                 'status' => ['nullable'],
             ]

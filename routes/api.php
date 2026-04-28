@@ -1035,6 +1035,7 @@ Route::prefix('v1')->group(function () {
             Route::prefix('support-departments')->group(function () {
                 Route::get('/', [SupportDepartmentController::class, 'index']);
                 Route::get('/{id}', [SupportDepartmentController::class, 'show']);
+                Route::patch('{id}/response-status', [SupportTicketController::class, 'updateResponseStatus']);
 
                 Route::middleware(['super_admin'])->group(function () {
                     Route::post('/', [SupportDepartmentController::class, 'store']);

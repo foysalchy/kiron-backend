@@ -12,6 +12,7 @@ class CustomerPaymentMethod extends Model
     protected $fillable = [
         'company_id',
         'name',
+        'type',
         'icon',
         'method_details',
         'account_holder',

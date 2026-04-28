@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('payment_method_id')->constrained('payment_method_types')->cascadeOnDelete();
+            $table->string('name');
+            $table->string('type');
             $table->string('icon');
             $table->string('contact_name');
             $table->string('phone');

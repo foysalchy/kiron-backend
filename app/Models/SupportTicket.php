@@ -19,10 +19,20 @@ class SupportTicket extends Model
         'subject',
         'description',
         'image',
-        'status'
+        'status',
+        'response_status'
     ];
 
     protected $hidden = ['deleted_at'];
+    protected static function booted(): void
+    {
+        static::updating(function (SupportTicket $ticket) {
+            if ($ticket->isDirty('status') && $ticket->status === Status::Closed->value) {
+                $ticket->response_status = null;
+            }
+        });
+    }
+
 
     /**
      * Scopes

@@ -260,24 +260,29 @@ class SupportTicketService
     /**
      * Toggle status
      */
-    public function toggleStatus(int $id): SupportTicket
-    {
-        DB::beginTransaction();
-        try {
-            $ticket = $this->getTicketById($id);
-            $currentStatus = Status::from($ticket->status);
-            $newStatus = ($currentStatus === Status::Closed) ? Status::Waiting : Status::Closed;
+public function toggleStatus(int $id, string $newStatus): SupportTicket
+{
+    DB::beginTransaction();
+    try {
+        $ticket = $this->getTicketById($id);
 
-            $ticket->update(['status' => $newStatus->value]);
-            LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+        $updateData = ['status' => $newStatus];
 
-            DB::commit();
-            return $ticket;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw ApiException::serverError('Failed to toggle status');
+        // Close হলে response_status null করো
+        if ($newStatus == Status::Closed->value) {
+            $updateData['response_status'] = null;
         }
+
+        $ticket->update($updateData);
+        LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+
+        DB::commit();
+        return $ticket;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw ApiException::serverError('Failed to toggle status');
     }
+}
     /**
      * Store a ticket reply and update status automatically
      */
@@ -286,6 +291,12 @@ class SupportTicketService
         DB::beginTransaction();
 
         try {
+
+
+            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
+            if ($ticket->status === Status::Closed->value) {
+                throw ApiException::badRequest('Cannot reply to a closed ticket.');
+            }
             if (isset($data['image'])) {
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
@@ -293,18 +304,16 @@ class SupportTicketService
 
                 );
             }
-
+            $authUser = auth()->user();
             $data['user_id'] = auth()->id();
             $reply = SupportTicketReply::create($data);
+            $isStaff = $authUser->is_super_admin || $authUser->roles()->exists();
 
-            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
-
-            $newStatus = (auth()->user()->role === 'super_admin')
-                ? Status::Replied
-                : Status::Waiting;
-
-            $ticket->update(['status' => $newStatus->value]);
-
+            $ticket->update([
+                'response_status' => $isStaff
+                    ? Status::WaitingForClientResponse->value  
+                    : Status::WaitForResponse->value,          
+            ]);
             LogHelper::updated('support_ticket_reply', $reply->id, $ticket->company_id, 'New reply added');
 
             DB::commit();

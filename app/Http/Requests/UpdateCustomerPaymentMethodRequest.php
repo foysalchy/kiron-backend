@@ -25,6 +25,7 @@ class UpdateCustomerPaymentMethodRequest extends UpdateBaseCompanyRequest
     {
         return array_merge($this->companyRules(), [
             'name' => ['sometimes', 'required'],
+            'type' => ['sometimes', 'required'],
             'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg', 'max:2048'],
             'method_details' => ['nullable', 'array'],
             'contact_name'   => ['sometimes', 'required', 'string', 'max:255'],
