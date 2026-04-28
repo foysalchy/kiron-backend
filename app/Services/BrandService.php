@@ -72,8 +72,7 @@ class BrandService
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'brands/logos',
-                    'public',
-                    2048
+                   
                 );
             }
 

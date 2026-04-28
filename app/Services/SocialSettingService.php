@@ -53,8 +53,7 @@ class SocialSettingService
                 $data['icon_image'] = FileUploadHelper::uploadImage(
                     $data['icon_image'],
                     'social-settings/icons',
-                    'public',
-                    2048
+                   
                 );
             }
 

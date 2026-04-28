@@ -133,11 +133,25 @@ class OrderController extends FrontendController
                     'unit_price'   => (float) $item->price,
                 ];
             }
-
             $shippingAddress = [
-                'name'    => $data['name']    ?? $customer->name,
-                'phone'   => $data['phone']   ?? $customer->phone,
+                'name'    => $data['name'] ?? $customer->name,
+                'phone'   => $data['phone'] ?? $customer->phone,
                 'address' => $data['address'] ?? $customer->address ?? 'N/A',
+            ];
+            \Log::info("Exact warehouse ID: ", [$exactWarehouse->id]);
+            $orderData = [
+                'warehouse_id'  => $exactWarehouse->id,
+                'customer_id'   => $customer->id,
+                'company_id'    => $this->company_id,
+                'items'         => $items,
+                'status'        => Status::Draft->value,
+                'order_date'    => now(),
+                'other_charges' => session()->get('shipping_cost', 60),
+                'shipping_address' => [
+                    'name' => $data['name'] ?? $customer->name,
+                    'phone' => $data['phone'] ?? $customer->phone,
+                    'address' => $data['address'] ?? $customer->address ?? 'N/A',
+                ],
             ];
 
             $oldId    = Session::get('current_draft_order_id');

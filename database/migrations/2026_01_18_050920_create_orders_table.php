@@ -36,6 +36,7 @@ return new class extends Migration
             $table->decimal('round_off', 15, 2)->default(0);
             $table->decimal('grand_total', 15, 2)->default(0);
             $table->json('shipping_address')->nullable();
+            $table->json('assigned_to')->nullable();
             // Payment Status (amount stored in order_payments table)
             $table->decimal('payment_amount', 15, 2)->default(0)->comment('Total paid amount');
             $table->tinyInteger('payment_status')->default(0)->comment('0=unpaid, 1=partial, 2=paid');

@@ -21,6 +21,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'brand_id' => ['nullable', 'exists:brands,id'],
+                'assigned_to' => ['nullable', 'exists:users,id'],
 
                 // Basic Info
                 'title' => ['sometimes', 'required', 'string', 'max:255'],

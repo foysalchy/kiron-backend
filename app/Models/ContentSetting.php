@@ -34,6 +34,8 @@ class ContentSetting extends Model
     const PAGE_ALL      = 'all_page';
     const PAGE_CART     = 'cart_page';
     const FOOTER_BOTTOM_RIGHT = 'footer_bottom_right';
+    const PRIVACY_POLICY = 'privacy_policy';
+    const TERMS_AND_CONDITIONS = 'terms_and_conditions';
 
     const PAGE_TYPES = [
         self::PAGE_PRODUCT,
@@ -42,6 +44,8 @@ class ContentSetting extends Model
         self::PAGE_ALL,
         self::PAGE_CART,
         self::FOOTER_BOTTOM_RIGHT,
+        self::PRIVACY_POLICY,
+        self::TERMS_AND_CONDITIONS,
     ];
 
     /* ── Relations ── */

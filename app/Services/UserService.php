@@ -91,8 +91,7 @@ class UserService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
-                    'public',
-                    2048
+                   
                 );
             }
             $data['status'] = Status::Active->value;
@@ -130,8 +129,7 @@ class UserService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
-                    'public',
-                    2048
+                   
                 );
             }
 

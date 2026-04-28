@@ -93,8 +93,7 @@ class EmployeeService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'employees/images',
-                    'public',
-                    2048
+                   
                 );
             }
 

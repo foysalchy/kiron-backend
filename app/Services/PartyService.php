@@ -145,8 +145,7 @@ class PartyService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'parties/profiles',
-                    'public',
-                    2048
+                   
                 );
             }
             $data['password'] = Hash::make($data['password']);

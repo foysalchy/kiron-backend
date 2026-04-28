@@ -24,6 +24,7 @@ class StoreCustomerPaymentMethodRequest extends BaseCompanyRequest
     {
         return array_merge($this->companyRules(), [
             'name' => ['required'],
+            'type' => ['required'],
             'icon'           => ['nullable', 'image', 'max:2048'],
             'method_details' => ['nullable', 'array'],
             'account_holder' => ['nullable', 'string', 'max:150'],

@@ -21,6 +21,7 @@ class CustomerPaymentMethodController extends Controller
         $filters = [
             'status'      => $request->query('status'),
             'name' => $request->query('name'),
+            'type' => $request->query('type'),
             'search'      => $request->query('search'),
             'sort_by'     => $request->query('sort_by', 'created_at'),
             'sort_order'  => $request->query('sort_order', 'desc'),

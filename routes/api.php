@@ -243,6 +243,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
                 Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
                 Route::get('/users', [SelectOptionController::class, 'userOptions']);
+                Route::get('/super-admin-users', [SelectOptionController::class, 'superAdminUserOptions']);
                 Route::get('/asset-categories', [SelectOptionController::class, 'assetCategoryOptions']);
                 Route::get('/assets', [SelectOptionController::class, 'assetOptions']);
                 Route::get('/disposal-types', [SelectOptionController::class, 'disposalTypeOptions']);
@@ -548,6 +549,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [SalesOrderController::class, 'show']);
                 Route::post('{id}/cancel', [SalesOrderController::class, 'cancel']);
                 Route::post('{id}/complete', [SalesOrderController::class, 'complete']);
+                Route::post('/{id}/assign-users', [SalesOrderController::class, 'assignUsers']);
             });
 
             Route::prefix('fetch-orders')->group(function () {
@@ -1033,6 +1035,7 @@ Route::prefix('v1')->group(function () {
             Route::prefix('support-departments')->group(function () {
                 Route::get('/', [SupportDepartmentController::class, 'index']);
                 Route::get('/{id}', [SupportDepartmentController::class, 'show']);
+                Route::patch('{id}/response-status', [SupportTicketController::class, 'updateResponseStatus']);
 
                 Route::middleware(['super_admin'])->group(function () {
                     Route::post('/', [SupportDepartmentController::class, 'store']);
@@ -1048,8 +1051,9 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [SupportTicketController::class, 'index']);
                 Route::post('/', [SupportTicketController::class, 'store']);
                 Route::get('/{id}', [SupportTicketController::class, 'show']);
-
+                Route::post('/{id}/assign-user', [SupportTicketController::class, 'assignUser']);
                 Route::post('/reply', [SupportTicketController::class, 'storeReply']);
+
 
                 Route::middleware(['super_admin'])->group(function () {
                     Route::post('/update/{id}', [SupportTicketController::class, 'update']);

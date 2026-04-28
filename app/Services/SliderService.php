@@ -73,8 +73,7 @@ class SliderService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'sliders/images',
-                    'public',
-                    2048
+                   
                 );
             }
 

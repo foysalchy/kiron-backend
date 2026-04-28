@@ -37,6 +37,10 @@ enum Status: int
   case ReturntoCourier = 30;
   case ReturnReceived = 31;
   case ReturnRequest = 32;
+  case Solved = 33;
+  case WaitForResponse         = 34;
+  case WaitingForClientResponse = 35;
+  case Open = 36;
 
 
   public function label(): string
@@ -75,6 +79,10 @@ enum Status: int
       self::ReturntoCourier => 'Return to Courier',
       self::ReturnReceived => 'Return Received',
       self::ReturnRequest => 'Return Request',
+      self::Solved => 'Solved',
+      self::WaitForResponse => 'Waiting for Response',
+      self::WaitingForClientResponse => 'Waiting for Client Response',  
+      self::Open => 'Open',
     };
   }
   public const ORDER_FLOW = [
@@ -89,6 +97,7 @@ enum Status: int
     self::ReturntoCourier,
     self::ReturnReceived,
     self::Cancelled,
+
   ];
 
   public static function getOrderProgress(int $currentStatus): array

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->text('header_code')->nullable();
             $table->string('phone_number')->nullable();
             $table->text('instruction')->nullable();
+            $table->json('extras')->nullable();
             $table->string('instruction_title')->nullable();
             $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();

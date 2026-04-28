@@ -90,9 +90,12 @@ class SupportTicketController extends Controller
     /**
      * Toggle ticket status (Open/Closed).
      */
-    public function toggleStatus(int $id): JsonResponse
+    public function toggleStatus(Request $request, int $id): JsonResponse
     {
-        $data = $this->ticketService->toggleStatus($id);
+        $request->validate([
+            'status' => ['required']
+        ]);
+        $data = $this->ticketService->toggleStatus($id, $request->input('status'));
 
         return ResponseHelper::success($data, 'Support ticket status updated successfully');
     }
@@ -104,5 +107,14 @@ class SupportTicketController extends Controller
         $data = $this->ticketService->storeReply($request->validated());
 
         return ResponseHelper::success($data, 'Reply submitted and status updated', 201);
+    }
+    /**
+     * assign user to ticket
+     */
+    public function assignUser(Request $request, int $id): JsonResponse
+    {
+        $userId = $request->input('user_id');
+        $data = $this->ticketService->assignUser($id, ['user_id' => $userId]);
+        return ResponseHelper::success($data, 'User assigned to ticket successfully');
     }
 }

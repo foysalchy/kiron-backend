@@ -19,6 +19,7 @@ class Product extends Model
     protected $fillable = [
         'company_id',
         'brand_id',
+        'assigned_to',
         'title',
         'slug',
         'thumbnail',
@@ -74,6 +75,11 @@ class Product extends Model
         return $this->belongsTo(Brand::class)->select('id', 'name');
     }
 
+    public function assignedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
+
     public function galleries(): HasMany
     {
         return $this->hasMany(Gallery::class);
@@ -106,12 +112,14 @@ class Product extends Model
     {
         return $this->hasMany(ProductReview::class);
     }
-
-public function productGroups()
-{
-    return $this->belongsToMany(ProductGroup::class, 'product_group_product');
-
-}
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class);
+    }
+    public function productGroups()
+    {
+        return $this->belongsToMany(ProductGroup::class, 'product_group_product');
+    }
     // Scopes
     public function scopeActive($query)
     {

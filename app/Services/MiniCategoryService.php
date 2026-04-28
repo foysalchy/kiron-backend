@@ -69,8 +69,7 @@ class MiniCategoryService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mini',
-                    'public',
-                    2048
+                   
                 );
             }
 

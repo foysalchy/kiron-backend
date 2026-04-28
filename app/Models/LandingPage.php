@@ -31,10 +31,13 @@ class LandingPage extends Model
         'header_code',
         'phone_number',
         'instruction',
+        'extras',
         'instruction_title',
         'status',
     ];
-
+    protected $casts = [
+        'extras' => 'array', 
+    ];
     protected $hidden = ['deleted_at', 'meta_access_token'];
 
 
@@ -96,11 +99,11 @@ class LandingPage extends Model
             if (empty($landingPage->slug)) {
                 $landingPage->slug = Str::slug($landingPage->name);
             }
-            
+
             // Ensure slug uniqueness
             $originalSlug = $landingPage->slug;
             $count = 1;
-            
+
             while (static::where('slug', $landingPage->slug)->exists()) {
                 $landingPage->slug = $originalSlug . '-' . $count;
                 $count++;

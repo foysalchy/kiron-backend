@@ -271,25 +271,37 @@ class CustomerGroupService
 
                 // C. Abandoned Cart Users
                 if (!empty($params['abandoned_cart']) && $params['abandoned_cart'] == true) {
-                    /*
-                    $query->whereHas('carts', function($q) {
-                        // Cart has items but status is not converted/ordered
-                        $q->where('status', 'active')
-                          ->where('updated_at', '<=', now()->subHours(12)); // Example: left for 12 hours
-                    });
-                    */
-                }
 
+                    $query->whereHas('carts', function ($q) use ($params) {
+                        $q->where('status', 1);
+                        if (!empty($params['date_from'])) {
+                            $q->whereDate('created_at', '>=', $params['date_from']);
+                        }
+                        if (!empty($params['date_to'])) {
+                            $q->whereDate('created_at', '<=', $params['date_to']);
+                        }
+                    });
+
+
+
+                    $query->whereDoesntHave('carts', function ($cq) {
+                        $cq->where('status', 3);
+                    });
+                }
                 // D. Wishlisted but not purchased
                 if (!empty($params['wishlist_no_purchase']) && $params['wishlist_no_purchase'] == true) {
-                    /*
-                    $query->whereHas('wishlists', function($wishlistQuery) {
-                        // Check if the product in wishlist exists in their order details
-                        $wishlistQuery->whereDoesntHave('product.orderDetails.order', function($orderQuery) {
-                            $orderQuery->whereColumn('orders.customer_id', 'parties.id');
-                        });
-                    });
-                    */
+                    $query->whereHas('wishlists', function ($q) use ($params) {
+                        if (!empty($params['date_from'])) {
+                            $q->whereDate('created_at', '>=', $params['date_from']);
+                        }
+                        if (!empty($params['date_to'])) {
+                            $q->whereDate('created_at', '<=', $params['date_to']);
+                        }
+                    })
+                        ->whereDoesntHave('orders', function ($q) {
+                            $q->where('status', '!=', Status::Cancelled->value);
+                        })
+                        ->orderBy('created_at', 'desc');    
                 }
                 $query->orderBy('created_at', 'desc');
             } elseif ($type === 'coupon') {

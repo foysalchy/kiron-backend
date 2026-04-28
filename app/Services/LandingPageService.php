@@ -106,50 +106,82 @@ class LandingPageService
     {
         DB::beginTransaction();
         try {
-            // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'landing-pages/thumbnails',
-                    'public',
-                    5120 // 5MB
+
                 );
             }
 
-            // Handle video upload
             if (isset($data['video'])) {
                 $data['video'] = FileUploadHelper::upload(
                     $data['video'],
                     'landing-pages/videos',
-                    'public',
-                    51200 // 50MB
+
                 );
             }
 
+            if (isset($data['extras']) && is_string($data['extras'])) {
+                $data['extras'] = json_decode($data['extras'], true);
+            }
+
+            if (isset($data['extras'])) {
+                $data['extras'] = $this->handleExtrasImages(
+                    $data['extras'],
+                    [],           // ← create mode-এ existing নেই, empty array দাও
+                    request()
+                );
+            }
             $landingPage = LandingPage::create($data);
 
             LogHelper::created('landing_page', $landingPage->id, $landingPage->company_id, $landingPage->name);
 
             DB::commit();
-            Log::info('Landing page created successfully', ['landing_page_id' => $landingPage->id]);
-
             return $landingPage;
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Clean up uploaded files
-            if (isset($data['thumbnail'])) {
-                FileUploadHelper::delete($data['thumbnail']);
-            }
-            if (isset($data['video'])) {
-                FileUploadHelper::delete($data['video']);
-            }
-
+            if (isset($data['thumbnail'])) FileUploadHelper::delete($data['thumbnail']);
+            if (isset($data['video'])) FileUploadHelper::delete($data['video']);
             Log::error('Landing page creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create landing page');
         }
     }
 
+    // Card extras image upload helper
+    private function handleExtrasImages(array $extras, array $existingExtras = [], $request): array
+    {
+        foreach ($extras as $fieldName => &$fieldValue) {
+            if (is_array($fieldValue) && !empty($fieldValue) && isset($fieldValue[0]['title'])) {
+                foreach ($fieldValue as $i => &$card) {
+                    $fileKey = "extras_{$fieldName}_image_{$i}";
+
+                    if ($request->hasFile($fileKey)) {
+                        $oldImage = $existingExtras[$fieldName][$i]['image'] ?? null;
+
+                        $card['image'] = $oldImage
+                            ? FileUploadHelper::replace(
+                                $request->file($fileKey),
+                                $oldImage,
+                                'landing-pages/extras'
+                            )
+                            : FileUploadHelper::uploadImage(
+                                $request->file($fileKey),
+                                'landing-pages/extras',
+                             
+                            );
+                    } elseif (isset($card['image']) && str_starts_with((string)$card['image'], '__file__')) {
+                        $card['image'] = null;
+                    } elseif (!array_key_exists('image', $card) || $card['image'] === null) {
+                        // image field আসেনি — existing রেখে দাও
+                        $card['image'] = $existingExtras[$fieldName][$i]['image'] ?? null;
+                    }
+                }
+            }
+        }
+
+        return $extras;
+    }
     /**
      * Update landing page
      */
@@ -159,7 +191,6 @@ class LandingPageService
         try {
             $landingPage = $this->getLandingPageById($id);
 
-            // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
                 $data['thumbnail'] = FileUploadHelper::replace(
                     $data['thumbnail'],
@@ -168,7 +199,6 @@ class LandingPageService
                 );
             }
 
-            // Handle video upload
             if (isset($data['video'])) {
                 $data['video'] = FileUploadHelper::replace(
                     $data['video'],
@@ -177,28 +207,34 @@ class LandingPageService
                 );
             }
 
+            // extras JSON decode
+            if (isset($data['extras']) && is_string($data['extras'])) {
+                $data['extras'] = json_decode($data['extras'], true);
+            }
+
+            // Card images handle — existing image replace করবে
+            if (isset($data['extras'])) {
+                $existingExtras = $landingPage->extras ?? [];
+                $data['extras'] = $this->handleExtrasImages(
+                    $data['extras'],
+                    $existingExtras,  // ← পুরনো data pass করো
+                    request()
+                );
+            }
+
             $landingPage->update($data);
 
             LogHelper::updated('landing_page', $landingPage->id, $landingPage->company_id, $landingPage->name);
 
             DB::commit();
-            Log::info('Landing page updated successfully', ['landing_page_id' => $landingPage->id]);
-
             return $landingPage;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-
-            // Clean up uploaded files
-            if (isset($data['thumbnail'])) {
-                FileUploadHelper::delete($data['thumbnail']);
-            }
-            if (isset($data['video'])) {
-                FileUploadHelper::delete($data['video']);
-            }
-
+            if (isset($data['thumbnail'])) FileUploadHelper::delete($data['thumbnail']);
+            if (isset($data['video'])) FileUploadHelper::delete($data['video']);
             Log::error('Landing page update failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to update landing page');
         }

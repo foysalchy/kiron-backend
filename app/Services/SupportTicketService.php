@@ -20,11 +20,25 @@ class SupportTicketService
     public function getAllTickets(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = SupportTicket::with(['supportDepartment', 'company', 'user']);
+            $user  = auth()->user();
+            $query = SupportTicket::with(['supportDepartment', 'company', 'user', 'assignedUser']);
+
+            // ── Visibility Filter ───────────────────────────────────────
+            $hasRole = $user->roles()->exists();
+
+            if ($hasRole) {
+                if ($user->is_super_admin) {
+                    $query->where('assigned_to', $user->id);
+                } else {
+                    $query->where('user_id', $user->id);
+                }
+            }
+            // ────────────────────────────────────────────────────────────
+
 
             if (!empty($filters['date_filter'])) {
                 $fromDate = null;
-                $toDate = now()->format('Y-m-d');
+                $toDate   = now()->format('Y-m-d');
 
                 switch ($filters['date_filter']) {
                     case 'Today':
@@ -32,7 +46,7 @@ class SupportTicketService
                         break;
                     case 'Yesterday':
                         $fromDate = now()->subDay()->format('Y-m-d');
-                        $toDate = $fromDate;
+                        $toDate   = $fromDate;
                         break;
                     case 'Last 7 Days':
                         $fromDate = now()->subDays(7)->format('Y-m-d');
@@ -45,16 +59,19 @@ class SupportTicketService
                         break;
                     case 'Last Month':
                         $fromDate = now()->subMonth()->startOfMonth()->format('Y-m-d');
-                        $toDate = now()->subMonth()->endOfMonth()->format('Y-m-d');
+                        $toDate   = now()->subMonth()->endOfMonth()->format('Y-m-d');
                         break;
                     case 'Custom Range':
                         $fromDate = $filters['from_date'] ?? null;
-                        $toDate = $filters['to_date'] ?? now()->format('Y-m-d');
+                        $toDate   = $filters['to_date'] ?? now()->format('Y-m-d');
                         break;
                 }
 
                 if ($fromDate) {
-                    $query->whereBetween('created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59']);
+                    $query->whereBetween('created_at', [
+                        $fromDate . ' 00:00:00',
+                        $toDate   . ' 23:59:59',
+                    ]);
                 }
             }
 
@@ -76,13 +93,14 @@ class SupportTicketService
 
             $query->orderBy($filters['sort_by'] ?? 'created_at', $filters['sort_order'] ?? 'desc');
 
-            return $paginate ? $query->paginate($filters['per_page'] ?? 10) : $query->get();
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 10)
+                : $query->get();
         } catch (\Exception $e) {
             Log::error('Error fetching tickets: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch tickets');
         }
     }
-
     /**
      * Get ticket by ID
      */
@@ -109,8 +127,7 @@ class SupportTicketService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/attachments',
-                    'public',
-                    2048
+
                 );
             }
             $data['user_id'] = auth()->id();
@@ -243,24 +260,29 @@ class SupportTicketService
     /**
      * Toggle status
      */
-    public function toggleStatus(int $id): SupportTicket
-    {
-        DB::beginTransaction();
-        try {
-            $ticket = $this->getTicketById($id);
-            $currentStatus = Status::from($ticket->status);
-            $newStatus = ($currentStatus === Status::Closed) ? Status::Waiting : Status::Closed;
+public function toggleStatus(int $id, string $newStatus): SupportTicket
+{
+    DB::beginTransaction();
+    try {
+        $ticket = $this->getTicketById($id);
 
-            $ticket->update(['status' => $newStatus->value]);
-            LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+        $updateData = ['status' => $newStatus];
 
-            DB::commit();
-            return $ticket;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw ApiException::serverError('Failed to toggle status');
+        // Close হলে response_status null করো
+        if ($newStatus == Status::Closed->value) {
+            $updateData['response_status'] = null;
         }
+
+        $ticket->update($updateData);
+        LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+
+        DB::commit();
+        return $ticket;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw ApiException::serverError('Failed to toggle status');
     }
+}
     /**
      * Store a ticket reply and update status automatically
      */
@@ -269,26 +291,29 @@ class SupportTicketService
         DB::beginTransaction();
 
         try {
+
+
+            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
+            if ($ticket->status === Status::Closed->value) {
+                throw ApiException::badRequest('Cannot reply to a closed ticket.');
+            }
             if (isset($data['image'])) {
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/replies',
-                    'public',
-                    2048
+
                 );
             }
-
+            $authUser = auth()->user();
             $data['user_id'] = auth()->id();
             $reply = SupportTicketReply::create($data);
+            $isStaff = $authUser->is_super_admin || $authUser->roles()->exists();
 
-            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
-
-            $newStatus = (auth()->user()->role === 'super_admin')
-                ? Status::Replied
-                : Status::Waiting;
-
-            $ticket->update(['status' => $newStatus->value]);
-
+            $ticket->update([
+                'response_status' => $isStaff
+                    ? Status::WaitingForClientResponse->value  
+                    : Status::WaitForResponse->value,          
+            ]);
             LogHelper::updated('support_ticket_reply', $reply->id, $ticket->company_id, 'New reply added');
 
             DB::commit();
@@ -302,6 +327,23 @@ class SupportTicketService
             }
             Log::error('Ticket reply creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to send reply');
+        }
+    }
+
+    public function assignUser(int $ticketId, array $data): SupportTicket
+    {
+        DB::beginTransaction();
+        try {
+            $ticket = $this->getTicketById($ticketId);
+            $ticket->assigned_to = $data['user_id'];
+            $ticket->save();
+
+            DB::commit();
+            return $ticket;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to assign user to ticket: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to assign user');
         }
     }
 }
