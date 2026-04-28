@@ -11,7 +11,7 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
-        
+
 }
 
 #toast-container {
@@ -39,10 +39,13 @@
 }
 
 .toast-message {
-    font-family: 'Outfit', sans-serif;
+    font-family: Google Sans,Roboto,Arial,sans-serif;
     font-weight: 700;
     font-size: 14px;
 }
 button:hover{
 cursor: pointer;
+}
+*{
+    font-family: Google Sans,Roboto,Arial,sans-serif;
 }

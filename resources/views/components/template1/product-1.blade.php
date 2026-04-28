@@ -30,7 +30,7 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}" height="350" width="300"
+            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" alt="{{ $product->title }}" height="350" width="300"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
         </a>
 
@@ -84,7 +84,7 @@
     <!-- Price & Button -->
     <div class="mt-auto pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
-            <span class="text-md font-bold text-[#BD4F00] truncate">
+            <span class="text-md font-medium text-[var(--primary-color)] truncate">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
             @if ($regularPrice > $salePrice)
@@ -99,7 +99,7 @@
 
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="out of stock"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="flex-1 primary-bg text-primary px-3 py-2 rounded-lg text-sm font-semibold transition-all shrink-0 whitespace-nowrap
+            class="flex-1 primary-bg text-primary px-3 py-2 rounded-lg text-sm font-medium transition-all shrink-0 whitespace-nowrap
     {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00] cursor-pointer' }}">
 
             @if ($isOutOfStock)
@@ -109,10 +109,5 @@
             @endif
         </button>
 
-        {{-- <button
-            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="bg-[#1D2128] text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-[#FF6A00] transition-all shrink-0 cursor-pointer whitespace-nowrap">
-            Add to Cart
-        </button> --}}
     </div>
 </div>

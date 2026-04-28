@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('coupon_id')->nullable()->constrained('coupons')->onDelete('set null');
 
             // Order Type & Info
+            $table->json('warehouse_info')->nullable();
             $table->string('type')->comment('pos, sales');
             $table->string('order_no')->unique();
             $table->string('reference_no')->nullable();

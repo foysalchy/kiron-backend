@@ -4,7 +4,7 @@
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
 
-        <form action="{{ route('order.store') }}" method="POST">
+        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -64,17 +64,10 @@
                             <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
                                 <label
                                     class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[#FF6A00] has-[:checked]:border-[#FF6A00] has-[:checked]:bg-orange-50 transition-all">
-
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
-                                        class="w-5 h-5 accent-[#FF6A00]" {{ $loop->first ? '' : '' }}>
-
-                                    <div class="flex items-center gap-3">
-                                        @if ($method->icon)
-                                            <img src="{{ $method->icon_url }}" class="h-6 w-auto object-contain">
-                                        @endif
-                                        <span class="text-md font-bold uppercase text-gray-700">{{ $method->name }}</span>
-                                    </div>
+                                        class="w-5 h-5 accent-[#FF6A00]">
+                                    <span class="text-md font-medium text-gray-700">{{ $method->name }}</span>
                                 </label>
 
                                 <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
@@ -86,6 +79,7 @@
                         @endforeach
                     </div>
 
+                    {{-- Payment Forms Repository --}}
                     <div id="forms-repository" class="hidden">
                         <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
                     </div>
@@ -439,6 +433,32 @@
 @endpush
 @push('scripts')
     <script>
+        function previewImages(input, slug) {
+    const grid = document.getElementById(slug + '-preview');
+    const hidden = document.getElementById(slug + '-hidden-files');
+    grid.innerHTML = '';
+    hidden.innerHTML = '';
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
+                <img src="${e.target.result}" class="w-full h-full object-cover">
+            </div>`;
+        };
+        reader.readAsDataURL(input.files[0]);
+
+        // ক্রিয়েট হিডেন ইনপুট
+        const dt = new DataTransfer();
+        dt.items.add(input.files[0]);
+        const newInp = document.createElement('input');
+        newInp.type = 'file';
+        newInp.name = 'screenshots[]';
+        newInp.files = dt.files;
+        newInp.classList.add('hidden');
+        hidden.appendChild(newInp);
+    }
+}
         document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit',
             function(e) {
                 const btn = this.querySelector('button[type="submit"]');

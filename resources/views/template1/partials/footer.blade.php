@@ -1,5 +1,5 @@
 <!-- FOOTER -->
-<footer class="text-primary pt-12">
+<footer class="text-primary       ">
 
     <!-- 1. Top Features Row -->
     <div class="bg-[#1A2937] p-6">
@@ -17,7 +17,7 @@
                             @endif
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm md:text-[16px] text-primary leading-tight">
+                            <h4 class="font-medium text-sm md:text-[16px] text-primary leading-tight">
                                 {{ $feature->title }}</h4>
                             <p class="text-gray-400 text-xs md:text-sm mt-0.5">
                                 {{ $feature->subtitle ?? $feature->text_content }}</p>
@@ -71,7 +71,9 @@
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                 </path>
                             </svg>
-                            {{ $setup->phone }}
+                            <a href="tel:{{ $setup->phone }}" class="hover:text-orange-500 transition-colors">
+                                {{ $setup->phone }}
+                            </a>
                         </li>
                         <li class="flex items-center gap-3 text-gray-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -80,7 +82,9 @@
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
-                            {{ $setup->email }}
+                            <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                {{ $setup->email }}
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -162,7 +166,8 @@
                         @foreach ($footerBottomRight as $item)
                             <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
                                 @if ($item->icon_file)
-                                    <img src="{{ asset('storage/' . $item->icon_file) ?? ('./images/template1/frontend/default.webp') }}" height="16" width="120" loading="lazy" alt="{{ $item->title }}"
+                                    <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
+                                        height="16" width="120" loading="lazy" alt="{{ $item->title }}"
                                         class="h-4">
                                 @else
                                     {{ $item->title }}

@@ -1,4 +1,4 @@
-@props(['method'])
+@props(['method', 'mode' => 'modal'])
 <div class="payment-form hidden" id="form-nagad">
     <div class="mt-4 p-4 border border-gray-200 rounded-lg space-y-3 bg-gray-50">
          @if($method)

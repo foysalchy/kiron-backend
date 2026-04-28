@@ -92,9 +92,23 @@
                                 </svg>
                             </div>
                             <div>
-                                <p class="text-gray-900">Phone</p>
-                                <p class="text-gray-700">{{ $setup->phone }}</p>
-                                <p class="text-gray-700">{{ $setup->alt_phone }}</p>
+                                <p class="text-gray-900 font-semibold mb-1">Phone</p>
+
+                                {{-- মেইন ফোন নম্বর --}}
+                                <a href="tel:{{ str_replace(' ', '', $setup->phone) }}"
+                                    class="text-gray-600 hover:text-orange-500 transition-colors inline-block mb-1">
+                                    {{ $setup->phone }}
+                                </a>
+
+                                <br>
+
+                                {{-- অল্টারনেটিভ ফোন নম্বর --}}
+                                @if ($setup->alt_phone)
+                                    <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}"
+                                        class="text-gray-600 hover:text-orange-500 transition-colors inline-block">
+                                        {{ $setup->alt_phone }}
+                                    </a>
+                                @endif
                             </div>
                         </div>
 
@@ -112,7 +126,9 @@
                             </div>
                             <div>
                                 <p class="text-gray-900">Email</p>
-                                <p class="text-gray-700">{{ $setup->email }}</p>
+                                <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                    {{ $setup->email }}
+                                </a>
                             </div>
                         </div>
 

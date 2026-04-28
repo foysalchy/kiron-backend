@@ -211,7 +211,7 @@
                                                 </div>
                                                 <div class="text-sm">
                                                     <p class="text-gray-800 leading-tight">
-                                                        {{ $item->product->name ?? 'Product Deleted' }}</p>
+                                                        {{ $item->product->title ?? 'Product Deleted' }}</p>
                                                     <p class="text-gray-500 font-medium">
                                                         {{ $setup->currency }} {{ number_format($item->price) }} x
                                                         {{ $item->quantity }}</p>

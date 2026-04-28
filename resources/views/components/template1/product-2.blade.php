@@ -38,7 +38,7 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_url }}"
+            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350" width="300"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
         </a>
@@ -70,7 +70,7 @@
     <div class="flex flex-col flex-grow px-1">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
             <h3
-                class="text-[15px] font-semibold leading-tight text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
+                class="text-sm font-semibold leading-tight text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
@@ -83,17 +83,17 @@
                         class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
                 @endfor
             </div>
-            <span class="text-[10px] text-gray-400 font-bold">({{ $totalReviews }})</span>
+            <span class="text-[10px] text-gray-400 font-medium">({{ $totalReviews }})</span>
         </div>
 
         <!-- Price Section (Colors from Card 1) -->
         <div class="flex items-center gap-2 mb-3">
             @if ($regularPrice > $salePrice)
-                <span class="text-gray-500 text-sm font-bold line-through">
+                <span class="text-gray-500 text-sm font-medium line-through">
                     {{ $setup->currency }} {{ number_format($regularPrice) }}
                 </span>
             @endif
-            <span class="text-[#BD4F00] text-lg font-black">
+            <span class="text-[var(--primary-color)] text-md font-medium">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
         </div>
@@ -101,17 +101,17 @@
 
     <div class="flex items-center gap-2 mt-auto">
         <!-- Order Now Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
-            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
-            class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-bold text-[14px] transition-all cursor-pointer
-            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">
-            @if ($isOutOfStock)
-                Stock Out
-            @else
-                Order Now
-            @endif
-        </button>
+       <button {{ $isOutOfStock ? 'disabled' : '' }}
+    onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
+    class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
+    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'primary-bg-hover' }}">
 
+    @if ($isOutOfStock)
+        Stock Out
+    @else
+        Order Now
+    @endif
+</button>
         <!-- Cart Icon Button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id)" }}"
@@ -125,3 +125,6 @@
         </button>
     </div>
 </div>
+<script>
+
+</script>

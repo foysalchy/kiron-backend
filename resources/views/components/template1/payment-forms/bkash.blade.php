@@ -64,8 +64,7 @@
                 <p class="text-[11px] text-gray-400">Click to add screenshot <span id="bkash-count-label">(0/3)</span>
                 </p>
             </div>
-            <input type="file" id="bkash-file-input" accept="screenshots/*" class="hidden"
-                onchange="bkashAddImage(this)">
+           <input type="file" id="bkash-file-input" accept="image/*" class="hidden" onchange="bkashAddImage(this)">
             <div id="bkash-hidden-inputs"></div>
         </div>
 
@@ -135,6 +134,7 @@
             inp.name = 'screenshots[]';
             inp.style.display = 'none';
             inp.files = dt.files;
+             inp.disabled = false;
             container.appendChild(inp);
         });
     }

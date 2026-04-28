@@ -59,7 +59,7 @@
             </div>
 
             <div id="payment-forms-area">
-                <x-template1.payment-forms.card />
+                {{-- <x-template1.payment-forms.card /> --}}
                 <x-template1.payment-forms.cod />
                 <x-template1.payment-forms.bkash :method="$bkashMethod" />
                 <x-template1.payment-forms.nagad :method="$nagadMethod" />
