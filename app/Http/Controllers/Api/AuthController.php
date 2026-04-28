@@ -233,8 +233,7 @@ class AuthController extends Controller
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $request->file('profile'),
                     'users/profiles',
-                    'public',
-                    2048
+                   
                 );
             }
 

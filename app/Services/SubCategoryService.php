@@ -70,8 +70,7 @@ class SubCategoryService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/sub',
-                    'public',
-                    2048
+                   
                 );
             }
 

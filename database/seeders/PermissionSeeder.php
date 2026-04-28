@@ -37,6 +37,17 @@ class PermissionSeeder extends Seeder
                 'updated_at'         => now(),
             ];
         };
+        $addCreateView = function ($prefix, $groupName, $feature) use (&$permissionsToInsert) {
+           foreach (['view', 'create'] as $action) {
+                $permissionsToInsert[] = [
+                    'name'               => "{$prefix}.{$action}",
+                    'group_name'         => $groupName,
+                    'feature_dependency' => $feature,
+                    'created_at'         => now(),
+                    'updated_at'         => now(),
+                ];
+            }
+        };
 
         // ==========================================
         // 1. Parties
@@ -158,8 +169,7 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 14. Support Desk
         // ==========================================
-        $addCrud('support_departments',     'Support Departments',      'support_module');
-        $addCrud('support_tickets',         'Support Tickets',          'support_module');
+        $addCreateView('support_tickets',         'Support Tickets',          'support_module');
         $addCrud('support_kb',              'Support Knowledge Base',   'support_module');
 
         // ==========================================

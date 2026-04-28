@@ -22,6 +22,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Rack;
 use App\Models\SupportDepartment;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 
@@ -220,6 +221,10 @@ class SelectOptionController extends Controller
     public function userOptions()
     {
         return auth()->user()->company->users()->select('id', 'name')->orderBy('name', 'asc')->get();
+    }
+    public function superAdminUserOptions()
+    {
+        return User::where('is_super_admin', true)->select('id', 'name')->orderBy('name', 'asc')->get();
     }
     public function purchaseOptions()
     {

@@ -20,11 +20,25 @@ class SupportTicketService
     public function getAllTickets(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = SupportTicket::with(['supportDepartment', 'company', 'user']);
+            $user  = auth()->user();
+            $query = SupportTicket::with(['supportDepartment', 'company', 'user', 'assignedUser']);
+
+            // ── Visibility Filter ───────────────────────────────────────
+            $hasRole = $user->roles()->exists();
+
+            if ($hasRole) {
+                if ($user->is_super_admin) {
+                    $query->where('assigned_to', $user->id);
+                } else {
+                    $query->where('user_id', $user->id);
+                }
+            }
+            // ────────────────────────────────────────────────────────────
+
 
             if (!empty($filters['date_filter'])) {
                 $fromDate = null;
-                $toDate = now()->format('Y-m-d');
+                $toDate   = now()->format('Y-m-d');
 
                 switch ($filters['date_filter']) {
                     case 'Today':
@@ -32,7 +46,7 @@ class SupportTicketService
                         break;
                     case 'Yesterday':
                         $fromDate = now()->subDay()->format('Y-m-d');
-                        $toDate = $fromDate;
+                        $toDate   = $fromDate;
                         break;
                     case 'Last 7 Days':
                         $fromDate = now()->subDays(7)->format('Y-m-d');
@@ -45,16 +59,19 @@ class SupportTicketService
                         break;
                     case 'Last Month':
                         $fromDate = now()->subMonth()->startOfMonth()->format('Y-m-d');
-                        $toDate = now()->subMonth()->endOfMonth()->format('Y-m-d');
+                        $toDate   = now()->subMonth()->endOfMonth()->format('Y-m-d');
                         break;
                     case 'Custom Range':
                         $fromDate = $filters['from_date'] ?? null;
-                        $toDate = $filters['to_date'] ?? now()->format('Y-m-d');
+                        $toDate   = $filters['to_date'] ?? now()->format('Y-m-d');
                         break;
                 }
 
                 if ($fromDate) {
-                    $query->whereBetween('created_at', [$fromDate . ' 00:00:00', $toDate . ' 23:59:59']);
+                    $query->whereBetween('created_at', [
+                        $fromDate . ' 00:00:00',
+                        $toDate   . ' 23:59:59',
+                    ]);
                 }
             }
 
@@ -76,13 +93,14 @@ class SupportTicketService
 
             $query->orderBy($filters['sort_by'] ?? 'created_at', $filters['sort_order'] ?? 'desc');
 
-            return $paginate ? $query->paginate($filters['per_page'] ?? 10) : $query->get();
+            return $paginate
+                ? $query->paginate($filters['per_page'] ?? 10)
+                : $query->get();
         } catch (\Exception $e) {
             Log::error('Error fetching tickets: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch tickets');
         }
     }
-
     /**
      * Get ticket by ID
      */
@@ -109,8 +127,7 @@ class SupportTicketService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/attachments',
-                    'public',
-                    2048
+
                 );
             }
             $data['user_id'] = auth()->id();
@@ -273,8 +290,7 @@ class SupportTicketService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/replies',
-                    'public',
-                    2048
+
                 );
             }
 
@@ -302,6 +318,23 @@ class SupportTicketService
             }
             Log::error('Ticket reply creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to send reply');
+        }
+    }
+
+    public function assignUser(int $ticketId, array $data): SupportTicket
+    {
+        DB::beginTransaction();
+        try {
+            $ticket = $this->getTicketById($ticketId);
+            $ticket->assigned_to = $data['user_id'];
+            $ticket->save();
+
+            DB::commit();
+            return $ticket;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to assign user to ticket: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to assign user');
         }
     }
 }

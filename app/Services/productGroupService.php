@@ -234,6 +234,23 @@ class productGroupService
             if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
             if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
         }
+        if ($group->filter_type === 'most_added_to_cart') {
+            if (!empty($params['date_from']))  $filterDetails['Date From']     = $params['date_from'];
+            if (!empty($params['date_to']))    $filterDetails['Date To']       = $params['date_to'];
+            if (!empty($params['min_count']))  $filterDetails['Min Cart Count'] = $params['min_count'];
+            if (!empty($params['limit']))      $filterDetails['Limit']         = $params['limit'];
+        }
+        if ($group->filter_type === 'high_cart_low_purchase') {
+            $filterDetails['Max Conversion Rate'] = ($params['conversion_rate'] ?? 5) . '%';
+            if (!empty($params['date_from'])) $filterDetails['Date From'] = $params['date_from'];
+            if (!empty($params['date_to']))   $filterDetails['Date To']   = $params['date_to'];
+            if (!empty($params['limit']))     $filterDetails['Limit']     = $params['limit'];
+        }
+        if ($group->filter_type === 'trending_products') {
+            $filterDetails['Min Trending Score'] = ($params['min_trending_score'] ?? 20);
+            $filterDetails['Period']             = 'Last 7 days vs Previous 7 days';
+            if (!empty($params['limit']))        $filterDetails['Limit'] = $params['limit'];
+        }
         return [
             'group'          => $group,
             'products'       => $products,
@@ -371,6 +388,212 @@ class productGroupService
                         'total_qty_sold'    => $product->total_order_count,
                         'total_order_count' => $product->total_order_count,
                         'product'           => $product,
+                    ];
+                });
+            }
+            if ($type === 'trending_products') {
+                $minScore = !empty($params['min_trending_score']) ? (float) $params['min_trending_score'] : 20.0;
+
+                $now            = now();
+                $current_start  = $now->copy()->subDays(7)->format('Y-m-d');
+                $current_end    = $now->format('Y-m-d');
+                $previous_start = $now->copy()->subDays(14)->format('Y-m-d');
+                $previous_end   = $now->copy()->subDays(8)->format('Y-m-d');
+
+                $cancelledStatus = Status::Cancelled->value;
+
+                $query = Product::query()
+                    ->select([
+                        'products.id',
+                        'products.title',
+                        'products.thumbnail',
+                        'products.regular_price',
+                        'products.stock_quantity',
+                        'products.stock_status',
+
+                        // Current Orders
+                        DB::raw("(
+                SELECT COUNT(od.id)
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                    AND o.type = 'sales'
+                WHERE od.product_id = products.id
+                AND o.status != $cancelledStatus
+                AND o.deleted_at IS NULL
+                AND DATE(o.order_date) BETWEEN '$current_start' AND '$current_end'
+            ) as current_orders"),
+
+                        // Previous Orders
+                        DB::raw("(
+                SELECT COUNT(od.id)
+                FROM order_details od
+                JOIN orders o ON od.order_id = o.id
+                    AND o.type = 'sales'
+                WHERE od.product_id = products.id
+                AND o.status != $cancelledStatus
+                AND o.deleted_at IS NULL
+                AND DATE(o.order_date) BETWEEN '$previous_start' AND '$previous_end'
+            ) as previous_orders"),
+
+                        // Current Views
+                        DB::raw("(
+                SELECT COUNT(pv.id)
+                FROM product_views pv
+                WHERE pv.product_id = products.id
+                AND DATE(pv.created_at) BETWEEN '$current_start' AND '$current_end'
+            ) as current_views"),
+
+                        // Previous Views
+                        DB::raw("(
+                SELECT COUNT(pv.id)
+                FROM product_views pv
+                WHERE pv.product_id = products.id
+                AND DATE(pv.created_at) BETWEEN '$previous_start' AND '$previous_end'
+            ) as previous_views"),
+
+                        // Current Cart
+                        DB::raw("(
+                SELECT COUNT(c.id)
+                FROM carts c
+                WHERE c.product_id = products.id
+                AND c.status = 1
+                AND DATE(c.created_at) BETWEEN '$current_start' AND '$current_end'
+            ) as current_cart"),
+
+                        // Previous Cart
+                        DB::raw("(
+                SELECT COUNT(c.id)
+                FROM carts c
+                WHERE c.product_id = products.id
+                AND c.status = 1
+                AND DATE(c.created_at) BETWEEN '$previous_start' AND '$previous_end'
+            ) as previous_cart"),
+
+                        // Current Wishlist
+                        DB::raw("(
+                SELECT COUNT(w.id)
+                FROM wishlists w
+                WHERE w.product_id = products.id
+                AND DATE(w.created_at) BETWEEN '$current_start' AND '$current_end'
+            ) as current_wishlist"),
+
+                        // Previous Wishlist
+                        DB::raw("(
+                SELECT COUNT(w.id)
+                FROM wishlists w
+                WHERE w.product_id = products.id
+                AND DATE(w.created_at) BETWEEN '$previous_start' AND '$previous_end'
+            ) as previous_wishlist"),
+
+                        // Trending Score
+                        DB::raw("(
+                (
+                    (
+                        (SELECT COUNT(od.id) FROM order_details od
+                            JOIN orders o ON od.order_id = o.id AND o.type = 'sales'
+                            WHERE od.product_id = products.id
+                            AND o.status != $cancelledStatus
+                            AND o.deleted_at IS NULL
+                            AND DATE(o.order_date) BETWEEN '$current_start' AND '$current_end')
+                        -
+                        (SELECT COUNT(od.id) FROM order_details od
+                            JOIN orders o ON od.order_id = o.id AND o.type = 'sales'
+                            WHERE od.product_id = products.id
+                            AND o.status != $cancelledStatus
+                            AND o.deleted_at IS NULL
+                            AND DATE(o.order_date) BETWEEN '$previous_start' AND '$previous_end')
+                    )
+                    /
+                    (
+                        (SELECT COUNT(od.id) FROM order_details od
+                            JOIN orders o ON od.order_id = o.id AND o.type = 'sales'
+                            WHERE od.product_id = products.id
+                            AND o.status != $cancelledStatus
+                            AND o.deleted_at IS NULL
+                            AND DATE(o.order_date) BETWEEN '$previous_start' AND '$previous_end')
+                        + 1
+                    )
+                    * 100 * 0.4
+                )
+                +
+                (
+                    (
+                        (SELECT COUNT(pv.id) FROM product_views pv
+                            WHERE pv.product_id = products.id
+                            AND DATE(pv.created_at) BETWEEN '$current_start' AND '$current_end')
+                        -
+                        (SELECT COUNT(pv.id) FROM product_views pv
+                            WHERE pv.product_id = products.id
+                            AND DATE(pv.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                    )
+                    /
+                    (
+                        (SELECT COUNT(pv.id) FROM product_views pv
+                            WHERE pv.product_id = products.id
+                            AND DATE(pv.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                        + 1
+                    )
+                    * 100 * 0.2
+                )
+                +
+                (
+                    (
+                        (SELECT COUNT(c.id) FROM carts c
+                            WHERE c.product_id = products.id AND c.status = 1
+                            AND DATE(c.created_at) BETWEEN '$current_start' AND '$current_end')
+                        -
+                        (SELECT COUNT(c.id) FROM carts c
+                            WHERE c.product_id = products.id AND c.status = 1
+                            AND DATE(c.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                    )
+                    /
+                    (
+                        (SELECT COUNT(c.id) FROM carts c
+                            WHERE c.product_id = products.id AND c.status = 1
+                            AND DATE(c.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                        + 1
+                    )
+                    * 100 * 0.2
+                )
+                +
+                (
+                    (
+                        (SELECT COUNT(w.id) FROM wishlists w
+                            WHERE w.product_id = products.id
+                            AND DATE(w.created_at) BETWEEN '$current_start' AND '$current_end')
+                        -
+                        (SELECT COUNT(w.id) FROM wishlists w
+                            WHERE w.product_id = products.id
+                            AND DATE(w.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                    )
+                    /
+                    (
+                        (SELECT COUNT(w.id) FROM wishlists w
+                            WHERE w.product_id = products.id
+                            AND DATE(w.created_at) BETWEEN '$previous_start' AND '$previous_end')
+                        + 1
+                    )
+                    * 100 * 0.2
+                )
+            ) as trending_score"),
+                    ])
+                    ->having('trending_score', '>', $minScore)
+                    ->orderByDesc('trending_score');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'current_orders'   => $product->current_orders,
+                        'previous_orders'  => $product->previous_orders,
+                        'current_views'    => $product->current_views,
+                        'current_cart'     => $product->current_cart,
+                        'current_wishlist' => $product->current_wishlist,
+                        'trending_score'   => round($product->trending_score, 2),
+                        'product'          => $product,
                     ];
                 });
             }
@@ -730,7 +953,37 @@ class productGroupService
                     ];
                 });
             }
+            if ($type === 'most_added_to_cart') {
+                $query = Product::query()
+                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->withCount(['carts as total_cart_count' => function ($q) use ($params) {
+                        // $q->where('status', 1); // Added to cart
+                        if (!empty($params['date_from'])) {
+                            $q->whereDate('created_at', '>=', $params['date_from']);
+                        }
+                        if (!empty($params['date_to'])) {
+                            $q->whereDate('created_at', '<=', $params['date_to']);
+                        }
+                    }])
+                    ->having('total_cart_count', '>', 0)
+                    ->orderByDesc('total_cart_count');
 
+                if (!empty($params['min_count'])) {
+                    $query->having('total_cart_count', '>=', (int) $params['min_count']);
+                }
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'total_cart_count' => $product->total_cart_count,
+                        'product'          => $product,
+                    ];
+                });
+            }
             if ($type === 'frequently_viewed') {
                 $query = Product::query()
                     ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
@@ -757,6 +1010,79 @@ class productGroupService
                     return (object)[
                         'product_id'       => $product->id,
                         'total_view_count' => $product->total_view_count,
+                        'product'          => $product,
+                    ];
+                });
+            }
+            if ($type === 'high_cart_low_purchase') {
+                $conversionThreshold = !empty($params['conversion_rate']) ? (float) $params['conversion_rate'] : 5.0;
+
+                $dateFrom = $params['date_from'] ?? null;
+                $dateTo   = $params['date_to']   ?? null;
+
+                $query = Product::query()
+                    ->select([
+                        'products.id',
+                        'products.title',
+                        'products.thumbnail',
+                        'products.regular_price',
+                        'products.stock_quantity',
+                        'products.stock_status',
+                        DB::raw('(
+                SELECT COUNT(c.id)
+                FROM carts c
+                WHERE c.product_id = products.id
+                AND c.status = 1
+                ' . ($dateFrom ? "AND DATE(c.created_at) >= '$dateFrom'" : '') . '
+                ' . ($dateTo   ? "AND DATE(c.created_at) <= '$dateTo'"   : '') . '
+            ) as total_cart_count'),
+                        DB::raw('(
+    SELECT COALESCE(SUM(od.quantity), 0)
+    FROM order_details od
+    JOIN orders o ON od.order_id = o.id
+      AND o.type = "sales"           -- ✅ Fix
+    WHERE od.product_id = products.id
+    AND o.status != ' . Status::Cancelled->value . '
+    AND o.deleted_at IS NULL
+    ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+    ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+) as total_orders'),
+                        DB::raw('(
+    SELECT ROUND(
+        COALESCE(SUM(od.quantity), 0) /
+        NULLIF((
+            SELECT COUNT(c2.id)
+            FROM carts c2
+            WHERE c2.product_id = products.id
+            AND c2.status = 1
+            ' . ($dateFrom ? "AND DATE(c2.created_at) >= '$dateFrom'" : '') . '
+            ' . ($dateTo   ? "AND DATE(c2.created_at) <= '$dateTo'"   : '') . '
+        ), 0) * 100, 2
+    )
+    FROM order_details od
+    JOIN orders o ON od.order_id = o.id
+      AND o.type = "sales"           -- ✅ Fix
+    WHERE od.product_id = products.id
+    AND o.status != ' . Status::Cancelled->value . '
+    AND o.deleted_at IS NULL
+    ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+    ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+) as conversion_rate'),
+                    ])
+                    ->having('total_cart_count', '>', 0)
+                    ->having(DB::raw('COALESCE(conversion_rate, 0)'), '<', $conversionThreshold)
+                    ->orderByDesc('total_cart_count');
+
+                if (!empty($params['limit'])) {
+                    $query->limit((int) $params['limit']);
+                }
+
+                return $query->get()->map(function ($product) {
+                    return (object)[
+                        'product_id'       => $product->id,
+                        'total_cart_count' => $product->total_cart_count,
+                        'total_orders'     => $product->total_orders,
+                        'conversion_rate'  => $product->conversion_rate ?? 0,
                         'product'          => $product,
                     ];
                 });
@@ -796,9 +1122,10 @@ class productGroupService
                         DB::raw('(
     SELECT ROUND(
         COALESCE((
-            SELECT COUNT(DISTINCT o.id)   -- ✅ quantity নয়, unique order count
+            SELECT COUNT(DISTINCT o.id)
             FROM order_details od
             JOIN orders o ON od.order_id = o.id
+               AND o.type = "sales"          -- ✅ Fix 1: missing condition add
             WHERE od.product_id = products.id
             AND o.status != ' . Status::Cancelled->value . '
             AND o.deleted_at IS NULL
@@ -869,24 +1196,25 @@ class productGroupService
                 ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
             ) as total_orders'),
                         DB::raw('(
-                SELECT ROUND(
-                    COALESCE(SUM(od.quantity), 0) /
-                    NULLIF((
-                        SELECT COUNT(w2.id)
-                        FROM wishlists w2
-                        WHERE w2.product_id = products.id
-                        ' . ($dateFrom ? "AND DATE(w2.created_at) >= '$dateFrom'" : '') . '
-                        ' . ($dateTo   ? "AND DATE(w2.created_at) <= '$dateTo'"   : '') . '
-                    ), 0) * 100, 2
-                )
-                FROM order_details od
-                JOIN orders o ON od.order_id = o.id
-                WHERE od.product_id = products.id
-                AND o.status != ' . Status::Cancelled->value . '
-                AND o.deleted_at IS NULL
-                ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
-                ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
-            ) as conversion_rate'),
+    SELECT ROUND(
+        COALESCE(SUM(od.quantity), 0) /
+        NULLIF((
+            SELECT COUNT(w2.id)
+            FROM wishlists w2
+            WHERE w2.product_id = products.id
+            ' . ($dateFrom ? "AND DATE(w2.created_at) >= '$dateFrom'" : '') . '
+            ' . ($dateTo   ? "AND DATE(w2.created_at) <= '$dateTo'"   : '') . '
+        ), 0) * 100, 2
+    )
+    FROM order_details od
+    JOIN orders o ON od.order_id = o.id
+       AND o.type = "sales"   
+    WHERE od.product_id = products.id
+    AND o.status != ' . Status::Cancelled->value . '
+    AND o.deleted_at IS NULL
+    ' . ($dateFrom ? "AND DATE(o.order_date) >= '$dateFrom'" : '') . '
+    ' . ($dateTo   ? "AND DATE(o.order_date) <= '$dateTo'"   : '') . '
+) as conversion_rate'),
                     ])
                     ->having('total_wishlists', '>', 0)
                     ->having('total_orders', '>', 0)

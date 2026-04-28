@@ -68,8 +68,7 @@ class ExtraCategoryService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/extra',
-                    'public',
-                    2048
+                   
                 );
             }
 

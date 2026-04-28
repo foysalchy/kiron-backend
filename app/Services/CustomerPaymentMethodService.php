@@ -83,8 +83,7 @@ class CustomerPaymentMethodService
                 $data['icon'] = FileUploadHelper::uploadImage(
                     $data['icon'],
                     'customer_payments/icons',
-                    'public',
-                    2048
+                   
                 );
             }
 

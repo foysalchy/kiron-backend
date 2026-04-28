@@ -10,18 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SupportTicket extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
     protected $fillable = [
         'company_id',
         'support_department_id',
         'user_id',
+        'assigned_to',
         'subject',
         'description',
         'image',
         'status'
     ];
 
-     protected $hidden = ['deleted_at'];
+    protected $hidden = ['deleted_at'];
 
     /**
      * Scopes
@@ -65,5 +66,9 @@ class SupportTicket extends Model
     public function replies()
     {
         return $this->hasMany(SupportTicketReply::class);
+    }
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 }

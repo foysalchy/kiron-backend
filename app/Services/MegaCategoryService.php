@@ -63,8 +63,7 @@ class MegaCategoryService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mega',
-                    'public',
-                    2048
+                   
                 );
             }
 

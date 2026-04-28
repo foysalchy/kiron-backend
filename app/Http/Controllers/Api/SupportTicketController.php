@@ -105,4 +105,13 @@ class SupportTicketController extends Controller
 
         return ResponseHelper::success($data, 'Reply submitted and status updated', 201);
     }
+    /**
+     * assign user to ticket
+     */
+    public function assignUser(Request $request, int $id): JsonResponse
+    {
+         $userId = $request->input('user_id'); 
+        $data = $this->ticketService->assignUser($id, ['user_id' => $userId]); 
+        return ResponseHelper::success($data, 'User assigned to ticket successfully');
+    }
 }

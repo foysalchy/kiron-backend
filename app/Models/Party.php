@@ -13,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Party extends Authenticatable
 {
-    use HasFactory, SoftDeletes, CompanyScoped,Notifiable;
+    use HasFactory, SoftDeletes, CompanyScoped, Notifiable;
 
     // Type constants
     const TYPE_SUPPLIER = 1;
@@ -93,7 +93,14 @@ class Party extends Authenticatable
     }
 
 
-
+    public function carts(): HasMany
+    {
+        return $this->hasMany(Cart::class, 'customer_id');
+    }
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class, 'customer_id');
+    }
     // Accessors
     public function getTypeTextAttribute(): string
     {

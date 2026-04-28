@@ -114,8 +114,7 @@ class RejoinService
                 $data['appointment_letter'] = FileUploadHelper::uploadImage(
                     $data['appointment_letter'],
                     'rejoins/appointment_letters',
-                    'public',
-                    2048
+                   
                 );
             }
 

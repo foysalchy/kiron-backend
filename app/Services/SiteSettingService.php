@@ -74,8 +74,7 @@ class SiteSettingService
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'settings/logos',
-                    'public',
-                    2048
+                   
                 );
             }
 

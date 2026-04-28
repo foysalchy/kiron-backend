@@ -82,8 +82,7 @@ public function createAsset(array $data): Asset
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'assets/images',
-                    'public',
-                    2048
+                   
                 );
             }
 
