@@ -31,10 +31,11 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
                     'required'
                 ],
                 'warehouse_id' => [
-                    'required',
+                    'nullable',
                     Rule::exists('warehouses', 'id')
                         ->where('company_id', $companyId),
                 ],
+                'warehouse_info' => ['nullable', 'array'],
                 'customer_id' => ['nullable',  Rule::exists('parties', 'id')
                     ->where('company_id', $companyId)
                     ->where('type', 2)],

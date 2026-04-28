@@ -19,9 +19,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         media="print" onload="this.media='all' rel="stylesheet" />
     <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        media="print" onload="this.media='all'">
     <!-- Local CSS -->
-    <link rel="preload" href="{{ asset('build/assets/app.css') }}" as="style">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -70,12 +70,12 @@
     @stack('styles')
 </head>
 
-<body class="font-['Outfit']">
+<body>
     <!-- HEADER -->
     @include('template1.partials.header')
 
     <!-- Page Content Area -->
-    <main class="bg-white  ">
+    <main class="bg-[#f9f9fb]  ">
         @yield('content')
     </main>
 

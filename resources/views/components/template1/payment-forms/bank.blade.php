@@ -40,13 +40,13 @@
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-500">*</span></label>
                 <input type="number" name="amount" id="bank-amount"
-                    placeholder="Paid amount" required step="0.01" min="1"
+                    placeholder="Paid amount" step="0.01" min="1"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span class="text-red-500">*</span></label>
-                <input type="text" name="transaction_id" placeholder="Transaction number" required
+                <input type="text" name="transaction_id" placeholder="Transaction number"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
             </div>
 
@@ -59,7 +59,7 @@
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Your Account Number <span class="text-red-500">*</span></label>
-                <input type="text" name="sender_number" placeholder="Sender account number" required
+                <input type="text" name="sender_number" placeholder="Sender account number"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
             </div>
 

@@ -4,7 +4,7 @@
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
 
-        <form action="{{ route('order.store') }}" method="POST">
+        <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -56,50 +56,32 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
-                        <div class="p-6">
-                            <h2 class="text-xl font-bold text-gray-800">Select Payment Method</h2>
-                        </div>
-                        <div class="space-y-3 p-6">
-                            @foreach ($paymentMethods as $method)
-                                @php $slug = strtolower(trim($method->name)); @endphp
-                                <label id="label-{{ $slug }}"
-                                    class="payment-method-label flex items-center space-x-4 p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-[#FF6A00] transition-all group"
-                                    onclick="checkoutSelectMethod('{{ $slug }}', '{{ $method->name }}')">
+                    <div class="space-y-3 p-6 bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
-                                    <input type="radio" name="_payment_method_radio" value="{{ $slug }}"
-                                        {{ $loop->first ? 'checked' : '' }}
-                                        class="w-4 h-4 border-gray-300 focus:ring-0 accent-black pointer-events-none">
-
-                                    <div
-                                        class="w-7 h-7 bg-gray-100 rounded flex items-center justify-center border border-gray-50">
-                                        @if ($method->icon)
-                                            <img src="{{ $method->icon_url }}" class="h-5 object-contain"
-                                                onerror="this.style.display='none'">
-                                        @else
-                                            <i class="fas fa-wallet text-xs text-gray-400"></i>
-                                        @endif
-                                    </div>
-
-                                    <span class="text-md font-medium text-gray-900">{{ $method->name }}</span>
-
-                                    <span id="badge-{{ $slug }}"
-                                        class="ml-auto hidden text-[11px] font-bold text-[#FF6A00]">✓ Selected</span>
+                        @foreach ($paymentMethods as $method)
+                            @php $slug = strtolower(trim($method->name)); @endphp
+                            <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
+                                <label
+                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[#FF6A00] has-[:checked]:border-[#FF6A00] has-[:checked]:bg-orange-50 transition-all">
+                                    <input type="radio" name="payment_method" value="{{ $method->name }}"
+                                        onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
+                                        class="w-5 h-5 accent-[#FF6A00]">
+                                    <span class="text-md font-medium text-gray-700">{{ $method->name }}</span>
                                 </label>
-                            @endforeach
-                        </div>
 
-                        {{-- Selected method display bar --}}
-                        <div id="selected-method-display" class="px-6 pb-4 hidden">
-                            <div class="flex items-center gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                                <i class="fas fa-check-circle text-[#FF6A00] text-sm"></i>
-                                <span class="text-sm font-semibold text-gray-700">
-                                    Payment: <span id="selected-method-name" class="text-[#FF6A00]"></span>
-                                </span>
-                                <button type="button" onclick="reopenPaymentModal()"
-                                    class="ml-auto text-xs text-[#FF6A00] font-bold underline">Change</button>
+                                <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
+                                    <div class="bg-gray-50 p-4 rounded-xl border border-orange-100">
+                                        <div class="form-injection-point"></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Payment Forms Repository --}}
+                    <div id="forms-repository" class="hidden">
+                        <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
                     </div>
                 </div>
 
@@ -259,7 +241,7 @@
 
         // ── Page load: auto-select first method ──
         document.addEventListener('DOMContentLoaded', function() {
-            const firstRadio = document.querySelector('input[name="_payment_method_radio"]');
+            const firstRadio = document.querySelector('input[name="payment_method"]');
             if (firstRadio) {
                 const slug = firstRadio.value;
                 const nameEl = firstRadio.closest('label')?.querySelector('span.text-md');
@@ -268,27 +250,7 @@
                 document.getElementById('selected-payment-method').value = slug;
             }
 
-            // ── Modal-এর method button click intercept ──
-            // (dashboard-এর selectPaymentMethod touch না করে)
-            document.querySelectorAll('.method-icon-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const slug = this.id.replace('method-btn-', '');
-                    const nameEl = this.querySelector('span');
-                    const name = nameEl ? nameEl.innerText.trim() : slug;
 
-                    // Update hidden field + radio + display
-                    setTimeout(() => {
-                        _checkoutSlug = slug;
-                        document.getElementById('selected-payment-method').value = slug;
-                        highlightMethod(slug, name);
-
-                        // COD হলে modal বন্ধ করো
-                        if (slug.includes('cash') || slug.includes('cod')) {
-                            closePaymentModal();
-                        }
-                    }, 60);
-                });
-            });
         });
 
         // ── Radio label click → open modal ──
@@ -301,7 +263,7 @@
             _checkoutSlug = slug;
 
             // Sync radio
-            const radio = document.querySelector(`input[name="_payment_method_radio"][value="${slug}"]`);
+            const radio = document.querySelector(`input[name="payment_method"][value="${slug}"]`);
             if (radio) radio.checked = true;
 
             if (slug.includes('cash') || slug.includes('cod')) {
@@ -312,8 +274,7 @@
             // Modal open করো
             openPaymentModal(_activeDraftOrderId, _checkoutTotal);
 
-            // Modal-এর ভেতরে সেই method-এর form দেখাও
-            setTimeout(() => selectPaymentMethod(slug, name), 80);
+
         }
 
         function reopenPaymentModal() {
@@ -350,7 +311,6 @@
 
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            // বাটন লোডিং স্টেট (ঐচ্ছিক)
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = 'Applying...';
@@ -362,7 +322,7 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest' // এই লাইনটি জরুরি
+                        'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
                         coupon_code: code
@@ -472,18 +432,45 @@
     </script>
 @endpush
 @push('scripts')
-<script>
-document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit', function(e) {
-    const btn = this.querySelector('button[type="submit"]');
+    <script>
+        function previewImages(input, slug) {
+    const grid = document.getElementById(slug + '-preview');
+    const hidden = document.getElementById(slug + '-hidden-files');
+    grid.innerHTML = '';
+    hidden.innerHTML = '';
 
-    const name = this.querySelector('input[name="name"]').value;
-    const phone = this.querySelector('input[name="phone"]').value;
-    if(!name || !phone) return;
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
+                <img src="${e.target.result}" class="w-full h-full object-cover">
+            </div>`;
+        };
+        reader.readAsDataURL(input.files[0]);
 
-    setTimeout(() => {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
-    }, 50);
-});
-</script>
+        // ক্রিয়েট হিডেন ইনপুট
+        const dt = new DataTransfer();
+        dt.items.add(input.files[0]);
+        const newInp = document.createElement('input');
+        newInp.type = 'file';
+        newInp.name = 'screenshots[]';
+        newInp.files = dt.files;
+        newInp.classList.add('hidden');
+        hidden.appendChild(newInp);
+    }
+}
+        document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit',
+            function(e) {
+                const btn = this.querySelector('button[type="submit"]');
+
+                const name = this.querySelector('input[name="name"]').value;
+                const phone = this.querySelector('input[name="phone"]').value;
+                if (!name || !phone) return;
+
+                setTimeout(() => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+                }, 50);
+            });
+    </script>
 @endpush

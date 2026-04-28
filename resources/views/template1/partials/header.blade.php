@@ -24,7 +24,7 @@
                 </span>
             </div>
             <div class="flex items-center gap-6">
-                <span>Free Shipping on Orders Over $50</span>
+
                 <a href="{{ route('support.index') }}" class="hover:underline">Help</a>
             </div>
         </div>
@@ -116,7 +116,7 @@
             </button>
 
             <!-- Wishlist -->
-            <a href="{{ route('user.dashboard') }}"
+            {{-- <a href="{{ route('user.dashboard') }}"
                 class="hidden lg:flex flex items-center gap-1.5 hover-text transition-colors relative">
                 <div class="relative">
                     <i class="fa-regular fa-heart text-xl"></i>
@@ -131,7 +131,7 @@
                     </span>
                 </div>
                 <span class="hidden lg:block font-semibold text-sm">Wishlist</span>
-            </a>
+            </a> --}}
 
             <!-- Account -->
             <div class="relative cursor-pointer hidden lg:block" id="account-menu">

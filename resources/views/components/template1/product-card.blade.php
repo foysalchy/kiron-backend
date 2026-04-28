@@ -212,6 +212,7 @@
                     })
                     .catch(error => console.error('Error:', error));
             }
+            
         </script>
     @endpush
 @endonce

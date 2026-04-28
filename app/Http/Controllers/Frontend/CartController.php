@@ -11,6 +11,7 @@ use App\Services\CouponService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use App\Models\Cart as CartModel;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends FrontendController
 {
@@ -140,32 +141,52 @@ class CartController extends FrontendController
         return back()->with('success', 'The coupon has been removed.');
     }
     // product add to cart
+
     public function add($store, Request $request)
     {
         try {
-            $qty       = (int) ($request->qty ?? 1);
+            $qty         = (int) ($request->qty ?? 1);
             $productId   = null;
             $variationId = null;
+            $warehouseId = null;
+            $binId       = null;
 
             if ($request->filled('variation_id')) {
 
-                $variation = ProductVariation::with('product')->findOrFail($request->variation_id);
+                // ── VARIATION PRODUCT ──
+                $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($request->variation_id);
 
-                // Check available stock excluding quantity already in the cart
-                $alreadyInCart = $this->getCartQty(null, $variation->id);
-                $availableForCart = $variation->available_stock - $alreadyInCart;
+                // ✅ কোন warehouse-এ stock আছে সেটা খোঁজো
+                $stockRecord = $variation->stocks
+                    ->where('quantity', '>=', $qty)
+                    ->sortByDesc('quantity') // সবচেয়ে বেশি stock আছে যেটায়
+                    ->first();
+
+                if (!$stockRecord) {
+                    $alreadyInCart = $this->getCartQty(null, $variation->id);
+                    $msg = $alreadyInCart > 0
+                        ? "Only cart qty available. (Already {$alreadyInCart} in cart)"
+                        : 'Sorry, this variation is currently out of stock.';
+                    return response()->json(['status' => 'error', 'message' => $msg], 422);
+                }
+
+                // Cart-এ already থাকা qty বাদ দিয়ে check
+                $alreadyInCart    = $this->getCartQty(null, $variation->id);
+                $availableForCart = $stockRecord->quantity - $alreadyInCart;
 
                 if ($availableForCart < $qty) {
                     $msg = $alreadyInCart > 0
                         ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
                         : 'Sorry, this variation is currently out of stock.';
-
                     return response()->json(['status' => 'error', 'message' => $msg], 422);
                 }
 
                 $productId   = $variation->product_id;
                 $variationId = $variation->id;
-                $thumb       = $variation->image
+                $warehouseId = $stockRecord->warehouse_id;
+                $binId       = $stockRecord->bin_id;
+
+                $thumb = $variation->image
                     ? asset('storage/' . $variation->image)
                     : $variation->product->thumbnail_url;
 
@@ -180,26 +201,49 @@ class CartController extends FrontendController
                         'thumbnail'     => $thumb,
                         'variant'       => $variation->display_name,
                         'regular_price' => $variation->regular_price,
+                        'warehouse_id'  => $warehouseId,
+                        'bin_id'        => $binId ?? null,
                     ],
                 ]);
+                Log::info("Cart Add (Variation); Product ID: {$productId}, Variation ID: {$variationId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
             } else {
 
+                // ── SINGLE PRODUCT ──
                 $product = Product::findOrFail($request->id);
 
-                // Check available stock excluding quantity already in the cart
-                $alreadyInCart    = $this->getCartQty($product->id, null);
-                $availableForCart = $product->available_stock - $alreadyInCart;
+                // warehouse_info 
+                $bestWarehouse = null;
+                $bestBinId     = null;
+                $bestQty       = 0;
 
-                if ($availableForCart < $qty) {
+                if (!empty($product->warehouse_info)) {
+                    foreach ($product->warehouse_info as $info) {
+                        $q   = (int) ($info['quantity'] ?? 0);
+                        $wId = (int) ($info['warehouse_id'] ?? 0);
+                        $bId = $info['bin_id'] ?? null;
+
+                        if ($wId > 0 && $q > $bestQty) {
+                            $bestQty       = $q;
+                            $bestWarehouse = $wId;
+                            $bestBinId     = $bId;
+                        }
+                    }
+                }
+
+                $alreadyInCart    = $this->getCartQty($product->id, null);
+                $availableForCart = $bestQty - $alreadyInCart;
+
+                if ($bestQty < $qty || $availableForCart < $qty) {
                     $msg = $alreadyInCart > 0
                         ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
                         : 'Sorry, this product is currently out of stock.';
-
                     return response()->json(['status' => 'error', 'message' => $msg], 422);
                 }
 
                 $productId   = $product->id;
                 $variationId = null;
+                $warehouseId = $bestWarehouse;
+                $binId       = $bestBinId;
 
                 Cart::add([
                     'id'      => $product->id,
@@ -210,8 +254,11 @@ class CartController extends FrontendController
                     'options' => [
                         'thumbnail'     => $product->thumbnail_url,
                         'regular_price' => $product->regular_price,
+                        'warehouse_id'  => $warehouseId,
+                        'bin_id'        => $binId ?? null,
                     ],
                 ]);
+                Log::info("Cart Add (Single Product); Product ID: {$productId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
             }
 
             // Database tracking
@@ -228,6 +275,7 @@ class CartController extends FrontendController
                     'status'      => CartTrack::ADDED,
                 ]
             );
+            Log::info("Cart Update; Product ID: {$productId}, Variation ID: {$variationId}, Quantity: {$qty}");
 
             return response()->json([
                 'status'     => 'success',

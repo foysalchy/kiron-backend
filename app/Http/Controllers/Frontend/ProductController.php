@@ -54,7 +54,7 @@ class ProductController extends FrontendController
         $maxPriceLimit = $this->getMaxPriceLimit();
         $this->applyFiltersAndSorting($query, $request);
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $brands          = Brand::get();

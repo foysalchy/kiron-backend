@@ -178,7 +178,7 @@ class AuthController extends FrontendController
     {
         $user = Auth::guard('customer')->user();
 
-        $allOrders = $user->orders()->with('orderDetails.product')->latest()->get();
+        $allOrders = $user->orders()->with('orderDetails.product')->latest()->take(15)->get();
         $recentOrders = $allOrders->take(5);
 
         $wishlistItems = Wishlist::where('customer_id', $user->id)

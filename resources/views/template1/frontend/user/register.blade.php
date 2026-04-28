@@ -122,8 +122,10 @@
                             <input type="checkbox" name="terms" id="terms" required
                                 class="mt-1 w-4 h-4 accent-[#FF6A00] cursor-pointer">
                             <label for="terms" class="text-sm font-medium text-gray-600 cursor-pointer">
-                                I accept the <a href="{{ route('term.index') }}" class="text-[#FF6A00] hover:underline">Terms and
-                                    Conditions</a> and <a href="{{ route('privacy.index') }}" class="text-[#FF6A00] hover:underline">Privacy
+                                I accept the <a href="{{ route('term.index') }}"
+                                    class="text-[#FF6A00] hover:underline">Terms and
+                                    Conditions</a> and <a href="{{ route('privacy.index') }}"
+                                    class="text-[#FF6A00] hover:underline">Privacy
                                     Policy</a>
                             </label>
                         </div>

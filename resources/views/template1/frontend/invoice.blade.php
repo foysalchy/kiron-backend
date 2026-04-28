@@ -592,21 +592,26 @@
                         <p>Phone: {{ $order->customer->phone }}</p>
                         <p>Email: {{ $order->customer->email ?? 'N/A' }}</p>
                     </div>
-                    p><strong>Payment Method:</strong>
-                    @if ($order->orderPayments->isNotEmpty())
-                        <span style="text-transform: uppercase; font-weight: 700; color: #1D2128;">
-                            {{ str_replace(['_', '-'], ' ', $order->orderPayments->last()->payment_method) }}
-                        </span>
-                    @else
-                        Cash on Delivery
-                    @endif
-                    </p>
 
-                    <p><strong>Payment Status:</strong>
-                        <span class="{{ $order->payment_status_color }}" style="font-weight:700;">
-                            {{ $order->payment_status_label }}
-                        </span>
-                    </p>
+                    <div class="billing-section">
+                        <h3>Payment Info:</h3>
+                        <p><strong>Payment Method:</strong>
+                            @if ($order->orderPayments->isNotEmpty())
+                                <span style="text-transform: uppercase; font-weight: 700; color: #1D2128;">
+                                    {{ str_replace(['_', '-'], ' ', $order->orderPayments->last()->payment_method) }}
+                                </span>
+                            @else
+                                <span style="text-transform: uppercase; font-weight: 700; color: #1D2128;">Cash on
+                                    Delivery</span>
+                            @endif
+                        </p>
+
+                        <p><strong>Payment Status:</strong>
+                            <span class="{{ $order->payment_status_color }}" style="font-weight:700;">
+                                {{ $order->payment_status_label }}
+                            </span>
+                        </p>
+                    </div>
                 </div>
 
                 <!-- Product Table -->

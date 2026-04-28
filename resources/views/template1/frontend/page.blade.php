@@ -17,7 +17,7 @@
             <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
 
                 <!-- Header -->
-                <div class="p-8 md:p-12">
+                <div class="p-8 md:p-12 pb-0 md:pb-0">
                     <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
                         {{ $page->title }}
                     </h1>
@@ -25,7 +25,7 @@
                 </div>
 
                 <!-- Body -->
-                <div class="p-8 md:p-12">
+                <div class="p-8 md:p-12 mt-0 md:pt-0 pt-0">
                     @if ($page->image)
                         <img src="{{ asset('storage/' . $page->image) }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif

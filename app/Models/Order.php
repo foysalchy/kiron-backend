@@ -27,6 +27,7 @@ class Order extends Model
     protected $fillable = [
         'company_id',
         'warehouse_id',
+        'warehouse_info',
         'customer_id',
         'coupon_id',
         'type',
@@ -68,6 +69,7 @@ class Order extends Model
         'courier_info' => 'array',
         'shipping_address' => 'array',
         'return_info' => 'array',
+        'warehouse_info' => 'array',
         'assigned_to' => 'array',
     ];
 
