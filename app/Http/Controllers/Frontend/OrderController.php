@@ -133,25 +133,11 @@ class OrderController extends FrontendController
                     'unit_price'   => (float) $item->price,
                 ];
             }
+
             $shippingAddress = [
-                'name'    => $data['name'] ?? $customer->name,
-                'phone'   => $data['phone'] ?? $customer->phone,
+                'name'    => $data['name']    ?? $customer->name,
+                'phone'   => $data['phone']   ?? $customer->phone,
                 'address' => $data['address'] ?? $customer->address ?? 'N/A',
-            ];
-            \Log::info("Exact warehouse ID: ", [$exactWarehouse->id]);
-            $orderData = [
-                'warehouse_id'  => $exactWarehouse->id,
-                'customer_id'   => $customer->id,
-                'company_id'    => $this->company_id,
-                'items'         => $items,
-                'status'        => Status::Draft->value,
-                'order_date'    => now(),
-                'other_charges' => session()->get('shipping_cost', 60),
-                'shipping_address' => [
-                    'name' => $data['name'] ?? $customer->name,
-                    'phone' => $data['phone'] ?? $customer->phone,
-                    'address' => $data['address'] ?? $customer->address ?? 'N/A',
-                ],
             ];
 
             $oldId    = Session::get('current_draft_order_id');
@@ -361,7 +347,6 @@ class OrderController extends FrontendController
                             'quantity_before'  => $qtyBefore,
                             'quantity_change'  => -$qty,
                             'quantity_after'   => $qtyAfter,
-                            'created_by'       => auth()->id(), // null হলে সমস্যা নেই যেহেতু nullable
                             'notes'            => 'Stock deducted for Order #' . $order->id,
                         ]);
                     }
@@ -407,7 +392,6 @@ class OrderController extends FrontendController
                         'quantity_before'  => $qtyBeforeGlobal,
                         'quantity_change'  => -$qty,
                         'quantity_after'   => $product->stock_quantity,
-                        'created_by'       => auth()->id(),
                         'notes'            => 'Single product stock deducted for Order #' . $order->id,
                     ]);
                 }
@@ -620,7 +604,7 @@ class OrderController extends FrontendController
                 'branch_name'   => $request->branch_name,
                 'card_type'     => $request->card_type,
             ]);
-             Log::info("Submitting payment for Order ID: {$order->id}, Payment Method: {$request->payment_method}, Transaction ID: {$transactionId}", $senderInfo);
+            Log::info("Submitting payment for Order ID: {$order->id}, Payment Method: {$request->payment_method}, Transaction ID: {$transactionId}", $senderInfo);
 
             OrderPayment::create([
                 'order_id'       => $order->id,
