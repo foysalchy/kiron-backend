@@ -42,7 +42,7 @@ class StorePartyRequest extends BaseCompanyRequest
                         ->where('company_id', $companyId)
                         ->where('type', $this->input('type')),
                 ],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
                 'alternative_phone' => ['nullable', 'string', 'max:20'],
                 'gender' => ['nullable', 'string'],
                 'division' => ['nullable', 'string'],

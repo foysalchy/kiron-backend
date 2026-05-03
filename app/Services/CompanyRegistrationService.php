@@ -232,6 +232,7 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to save basic settings.');
         }
     }
+    
     public function verifyOtp(int $registrationId, string $type, string $otp): void
     {
         $record = EmailVerification::where('company_id', $registrationId)
