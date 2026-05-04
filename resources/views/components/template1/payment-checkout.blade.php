@@ -51,7 +51,7 @@
 
             const amountInput = targetForm.querySelector('[name="amount"]');
             if (amountInput && typeof _checkoutTotal !== 'undefined') {
-                amountInput.value = _checkoutTotal;
+                amountInput.value = Math.round(_checkoutTotal); 
             }
         }
 

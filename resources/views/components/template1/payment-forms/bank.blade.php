@@ -1,11 +1,15 @@
 {{-- resources/views/template1/partials/payments/bank.blade.php --}}
-@props(['method'])
+@props(['method', 'mode' => 'modal', 'slug' => 'bank'])
+@php
+    $currentTheme = ['color' => '#374151', 'bg' => '#f9fafb'];
+@endphp
 <div class="payment-form hidden" id="form-bank">
     <div class="mt-4 p-4 border border-gray-200 rounded-lg space-y-3 bg-gray-50">
 
-        @if($method)
+        @if ($method)
             <div class="p-4 rounded-xl text-sm bg-yellow-50 border border-yellow-200 shadow-sm space-y-2">
-                <p class="text-[10px] font-black text-yellow-800 uppercase tracking-widest mb-1">Bank Transfer Details:</p>
+                <p class="text-[10px] font-black text-yellow-800 uppercase tracking-widest mb-1">Bank Transfer Details:
+                </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-gray-700">
                     <div>
                         <span class="text-[11px] font-medium text-gray-500">Bank Name:</span>
@@ -31,86 +35,106 @@
             </div>
         @endif
 
-        <form action="{{ route('order.payment.submit') }}" method="POST"
+        {{-- <form action="{{ route('order.payment.submit') }}" method="POST"
             enctype="multipart/form-data" class="space-y-3" id="bank-payment-form">
             @csrf
-            <input type="hidden" name="order_id"       id="bank-order-id">
-            <input type="hidden" name="payment_method" value="bank">
+            <input type="hidden" name="order_id" id="bank-order-id">
+            <input type="hidden" name="payment_method" value="bank"> --}}
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span class="text-red-500">*</span></label>
-                <input type="number" name="amount" id="bank-amount"
-                    placeholder="Paid amount" step="0.01" min="1"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
+
+        @if ($mode === 'modal')
+            <form action="{{ route('order.payment.submit') }}" method="POST"
+                onsubmit="handlePaymentSubmit(event, 'bank')" enctype="multipart/form-data" class="space-y-3">
+                @csrf
+                <input type="hidden" name="order_id">
+                <input type="hidden" name="payment_method">
+        @endif
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Amount <span
+                    class="text-red-500">*</span></label>
+            <input type="number" name="amount" id="bank-amount" value="{{ old('amount') }}" placeholder="Paid amount"
+                step="0.01" min="1"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span
+                    class="text-red-500">*</span></label>
+            <input type="text" name="transaction_id" placeholder="Transaction number"
+                value="{{ old('transaction_id') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Reference Number</label>
+            <input type="text" name="reference_no" placeholder="e.g. REF-XXXXXXX" value="{{ old('reference_no') }}"
+                oninput="this.value=this.value.toUpperCase()"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Your Account Number <span
+                    class="text-red-500">*</span></label>
+            <input type="text" name="sender_number" placeholder="Sender account number"
+                value="{{ old('sender_number') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Your Bank Name</label>
+            <input type="text" name="bank_name" placeholder="e.g. Dutch-Bangla Bank" value="{{ old('bank_name') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Branch Name</label>
+            <input type="text" name="branch_name" placeholder="e.g. Dhaka" value="{{ old('branch_name') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Account Holder Name</label>
+            <input type="text" name="holder_name" placeholder="e.g. John Doe" value="{{ old('holder_name') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
+        </div>
+
+        {{-- ── Multi Screenshot Upload ── --}}
+        <div>
+            <label class="block text-[11px] font-bold text-gray-500 uppercase mb-2">
+                Payment Screenshots <span class="normal-case text-gray-400 font-normal">(max 3)</span>
+            </label>
+
+            {{-- Preview Grid --}}
+            <div id="bank-preview-grid" class="flex flex-wrap gap-2 mb-2"></div>
+
+            {{-- Drop Zone --}}
+            <div id="bank-dropzone"
+                class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-white cursor-pointer hover:border-gray-400 transition-colors"
+                onclick="document.getElementById('bank-file-input').click()">
+                <i class="fas fa-plus-circle text-gray-300 text-2xl mb-1"></i>
+                <p class="text-[11px] text-gray-400">Click to add screenshot <span id="bank-count-label">(0/3)</span>
+                </p>
             </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span class="text-red-500">*</span></label>
-                <input type="text" name="transaction_id" placeholder="Transaction number"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
-            </div>
+            {{-- Hidden real input (single, not multiple — we manage files manually) --}}
+            <input type="file" id="bank-file-input" accept="image/*" class="hidden" onchange="bankAddImage(this)">
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Reference Number</label>
-                <input type="text" name="reference_no" placeholder="e.g. REF-XXXXXXX"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
-            </div>
+            {{-- Hidden inputs container — one per image --}}
+            <div id="bank-hidden-inputs"></div>
+        </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Your Account Number <span class="text-red-500">*</span></label>
-                <input type="text" name="sender_number" placeholder="Sender account number"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono bg-white focus:outline-none focus:border-gray-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Your Bank Name</label>
-                <input type="text" name="bank_name" placeholder="e.g. Dutch-Bangla Bank"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Branch Name</label>
-                <input type="text" name="branch_name" placeholder="e.g. Dhaka"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
-            </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Account Holder Name</label>
-                <input type="text" name="holder_name" placeholder="e.g. John Doe"
-                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-white focus:outline-none focus:border-gray-500">
-            </div>
-
-            {{-- ── Multi Screenshot Upload ── --}}
-            <div>
-                <label class="block text-[11px] font-bold text-gray-500 uppercase mb-2">
-                    Payment Screenshots <span class="normal-case text-gray-400 font-normal">(max 3)</span>
-                </label>
-
-                {{-- Preview Grid --}}
-                <div id="bank-preview-grid" class="flex flex-wrap gap-2 mb-2"></div>
-
-                {{-- Drop Zone --}}
-                <div id="bank-dropzone"
-                    class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-white cursor-pointer hover:border-gray-400 transition-colors"
-                    onclick="document.getElementById('bank-file-input').click()">
-                    <i class="fas fa-plus-circle text-gray-300 text-2xl mb-1"></i>
-                    <p class="text-[11px] text-gray-400">Click to add screenshot <span id="bank-count-label">(0/3)</span></p>
-                </div>
-
-                {{-- Hidden real input (single, not multiple — we manage files manually) --}}
-                <input type="file" id="bank-file-input" accept="image/*" class="hidden"
-                    onchange="bankAddImage(this)">
-
-                {{-- Hidden inputs container — one per image --}}
-                <div id="bank-hidden-inputs"></div>
-            </div>
-
-            <button type="submit"
-                class="w-full py-2.5 rounded bg-gray-700 text-white font-semibold text-sm hover:bg-gray-800 transition-all">
-                <i class="fas fa-check-circle mr-1"></i> Confirm Bank Payment
+        {{-- <button type="submit"
+            class="w-full py-2.5 rounded bg-gray-700 text-white font-semibold text-sm hover:bg-gray-800 transition-all">
+            <i class="fas fa-check-circle mr-1"></i> Confirm Bank Payment
+        </button> --}}
+         @if($mode === 'modal')
+            <button type="submit" class="w-full py-2.5 rounded text-white font-semibold text-sm hover:opacity-90 mt-4"
+                style="background:{{ $currentTheme['color'] }}">
+                <i class="fas fa-check-circle mr-1"></i> Confirm {{ $method->name ?? 'MFS' }} Payment
             </button>
         </form>
+        @endif
     </div>
 </div>
 
@@ -152,7 +176,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const div = document.createElement('div');
-                div.className = 'relative w-20 h-20 border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm group';
+                div.className =
+                    'relative w-20 h-20 border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm group';
                 div.innerHTML = `
                     <img src="${e.target.result}" class="w-full h-full object-cover">
                     <button type="button"

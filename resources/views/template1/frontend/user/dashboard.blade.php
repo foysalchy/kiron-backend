@@ -344,14 +344,12 @@
                                     @enderror
                                 </div>
 
-                                <!-- ঠিকানা -->
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Address</label>
                                     <input type="text" name="address" value="{{ old('address', $user->address) }}"
                                         class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
                                 </div>
 
-                                <!-- প্রোফাইল ইমেজ এবং প্রিভিউ -->
                                 <div class="md:col-span-2 flex items-center gap-6">
                                     <div class="shrink-0">
                                         <img id="image-preview"

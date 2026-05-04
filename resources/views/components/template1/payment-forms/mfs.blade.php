@@ -19,6 +19,14 @@
 
 <div class="payment-form hidden" id="form-{{ $slug }}">
     <div class="space-y-3">
+        @if($mode === 'modal')
+        <form action="{{ route('order.payment.submit') }}" method="POST"
+              onsubmit="handlePaymentSubmit(event, '{{ $slug }}')"
+              enctype="multipart/form-data" class="space-y-3">
+            @csrf
+            <input type="hidden" name="order_id">
+            <input type="hidden" name="payment_method">
+        @endif
         <div class="p-4 rounded-xl text-sm" style="background:{{ $currentTheme['bg'] }}; border:1px solid {{ $currentTheme['color'] }}30;">
             <p style="color:{{ $currentTheme['color'] }};" class="font-medium mb-1">Send money to this {{ $method->name }} number:</p>
             <span style="color:{{ $currentTheme['color'] }};" class="text-lg font-black">{{ $method->account_number ?? $method->phone }}</span>
@@ -28,23 +36,26 @@
         <div class="grid grid-cols-1 gap-3">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Paid Amount <span class="text-red-500">*</span></label>
-                <input type="number" name="amount" required class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
+                <input type="number" name="amount" required  value="{{ old('amount') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Transaction ID <span class="text-red-500">*</span></label>
-                <input type="text" name="transaction_id" required oninput="this.value=this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
+                <input type="text" name="transaction_id" required  value="{{ old('transaction_id') }}"
+                oninput="this.value=this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Reference No <span class="text-red-500">(Optional)</span></label>
-                <input type="text" name="reference_no"  oninput="this.value=this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
+                <input type="text" name="reference_no"  value="{{ old('reference_no') }}"
+                oninput="this.value=this.value.toUpperCase()" class="w-full px-3 py-2 border border-gray-300 rounded text-sm font-mono focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-gray-600 mb-1">Sender {{ $method->name }} Number <span class="text-red-500">*</span></label>
-                <input type="tel" name="sender_number" required maxlength="11" class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
+                <input type="tel" name="sender_number" required maxlength="11"  value="{{ old('sender_number') }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none" style="border-color:{{ $currentTheme['color'] }}50">
             </div>
         </div>
 
-        {{-- Screenshot logic (Common for all) --}}
         <div class="mt-2">
             <label class="block text-[11px] font-bold text-gray-500 uppercase mb-2">Screenshot</label>
             <div id="{{ $slug }}-preview" class="flex gap-2 mb-2"></div>
@@ -54,5 +65,12 @@
             <input type="file" id="file-{{ $slug }}" class="hidden" onchange="previewImages(this, '{{ $slug }}')">
             <div id="{{ $slug }}-hidden-files"></div>
         </div>
+        @if($mode === 'modal')
+            <button type="submit" class="w-full py-2.5 rounded text-white font-semibold text-sm hover:opacity-90 mt-4 shadow-md"
+                style="background:{{ $currentTheme['color'] }}">
+                <i class="fas fa-check-circle mr-1"></i> Confirm {{ $method->name ?? 'MFS' }} Payment
+            </button>
+        </form>
+        @endif
     </div>
 </div>
