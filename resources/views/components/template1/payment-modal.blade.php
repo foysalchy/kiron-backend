@@ -1,12 +1,5 @@
-{{-- resources/views/components/payment-modal.blade.php --}}
-@props(['methods', 'currency' => '৳', 'mode' => 'modal'])
-
-@php
-    $bkashMethod = $methods->first(fn($m) => str_contains(strtolower($m->name), 'bkash'));
-    $nagadMethod = $methods->first(fn($m) => str_contains(strtolower($m->name), 'nagad'));
-    $rocketMethod = $methods->first(fn($m) => str_contains(strtolower($m->name), 'rocket'));
-    $bankMethod = $methods->first(fn($m) => str_contains(strtolower($m->name), 'bank'));
-@endphp
+{{-- resources/views/components/template1/payment-modal.blade.php --}}
+@props(['methods', 'currency' => '৳'])
 
 <div id="payment-modal" class="fixed inset-0 z-[2000] hidden items-center justify-center bg-black/50 p-4">
     <div class="bg-white w-full max-w-xl rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
@@ -58,13 +51,47 @@
                 </div>
             </div>
 
+            {{-- Forms Area --}}
+            {{-- Forms Area --}}
             <div id="payment-forms-area">
-                {{-- <x-template1.payment-forms.card /> --}}
-                <x-template1.payment-forms.cod />
-                <x-template1.payment-forms.bkash :method="$bkashMethod" />
-                <x-template1.payment-forms.nagad :method="$nagadMethod" />
-                <x-template1.payment-forms.rocket :method="$rocketMethod" />
-                <x-template1.payment-forms.bank :method="$bankMethod" />
+                @foreach ($methods as $method)
+                    @php
+                        $slug = strtolower(trim($method->name));
+                        $isBank = str_contains($slug, 'bank');
+                        $isCOD = str_contains($slug, 'cash') || str_contains($slug, 'delivery') || $slug == 'cod';
+                        $isMFS =
+                            str_contains($slug, 'bkash') ||
+                            str_contains($slug, 'nagad') ||
+                            str_contains($slug, 'rocket') ||
+                            str_contains($slug, 'upay');
+                    @endphp
+
+                    @if ($isBank)
+                        <x-template1.payment-forms.bank :method="$method" mode="modal" :slug="$slug" />
+                    @elseif($isMFS)
+                        <x-template1.payment-forms.mfs :method="$method" mode="modal" :slug="$slug" />
+                    @elseif($isCOD)
+                        <div class="payment-form hidden" id="form-{{ $slug }}">
+                            <form onsubmit="handlePaymentSubmit(event, 'cod')" class="space-y-4">
+                                @csrf
+                                <input type="hidden" name="order_id">
+                                <input type="hidden" name="payment_method" value="{{ $method->name }}">
+                                <input type="hidden" name="amount">
+
+                                <div class="p-6 bg-green-50 border border-green-200 rounded-xl text-center">
+                                    <i class="fas fa-truck text-3xl text-green-600 mb-3"></i>
+                                    <p class="text-green-800 font-bold">Cash on Delivery</p>
+                                    <p class="text-sm text-green-600 mt-1">Pay when you receive the product.</p>
+                                </div>
+
+                                <button type="submit"
+                                    class="w-full py-3 bg-[#1D2128] text-white rounded-xl font-bold hover:bg-black transition-all">
+                                    Confirm Order (COD)
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                @endforeach
             </div>
         </div>
     </div>
@@ -72,32 +99,55 @@
 
 @push('scripts')
     <script>
+        function previewImages(input, slug) {
+            const grid = document.getElementById(slug + '-preview');
+            const hidden = document.getElementById(slug + '-hidden-files');
+            grid.innerHTML = '';
+            hidden.innerHTML = '';
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
+                <img src="${e.target.result}" class="w-full h-full object-cover">
+            </div>`;
+                };
+                reader.readAsDataURL(input.files[0]);
+
+                const dt = new DataTransfer();
+                dt.items.add(input.files[0]);
+                const newInp = document.createElement('input');
+                newInp.type = 'file';
+                newInp.name = 'screenshots[]';
+                newInp.files = dt.files;
+                newInp.classList.add('hidden');
+                hidden.appendChild(newInp);
+            }
+        }
         let _activeOrderId = null;
         let _payableAmount = 0;
 
         function openPaymentModal(orderId, amount) {
-            console.log("Opening Payment Modal for Order ID:", orderId, "Amount:", amount);
             _activeOrderId = orderId;
             _payableAmount = amount;
             document.getElementById('modal-amount').innerText = parseFloat(amount).toLocaleString();
 
-            // Reset and Show
             resetPaymentForms();
             document.getElementById('payment-modal').classList.replace('hidden', 'flex');
             document.body.style.overflow = 'hidden';
         }
 
-        function closePaymentModal() {
-            document.getElementById('payment-modal').classList.replace('flex', 'hidden');
-            document.body.style.overflow = '';
-        }
-
         function resetPaymentForms() {
-            document.querySelectorAll('.payment-form').forEach(f => f.classList.add('hidden'));
+            document.querySelectorAll('.payment-form').forEach(f => {
+                f.classList.add('hidden');
+                f.querySelectorAll('input, select, textarea').forEach(i => i.disabled = true);
+            });
             document.querySelectorAll('.method-icon-btn').forEach(b => {
                 b.classList.remove('border-[#FF6A00]', 'bg-orange-50');
                 b.classList.add('border-gray-100');
             });
+            document.getElementById('payment-method-list').classList.remove('hidden');
+            document.getElementById('back-to-methods').classList.add('hidden');
         }
 
         function selectPaymentMethod(slug, name) {
@@ -107,44 +157,32 @@
             if (btn) btn.classList.add('border-[#FF6A00]', 'bg-orange-50');
 
             document.getElementById('payment-method-list').classList.add('hidden');
-
             document.getElementById('back-to-methods').classList.remove('hidden');
 
-            let s = slug.toLowerCase();
-            let formId = '';
-
-            if (s.includes('bkash')) formId = 'form-bkash';
-            else if (s.includes('nagad')) formId = 'form-nagad';
-            else if (s.includes('rocket')) formId = 'form-rocket';
-            else if (s.includes('card') || s.includes('visa') || s.includes('master')) formId = 'form-card';
-            else if (s.includes('bank')) formId = 'form-bank';
-            else if (s.includes('cash') || s.includes('cod')) formId = 'form-cod';
-
-            const form = document.getElementById(formId);
+            const form = document.getElementById('form-' + slug);
             if (form) {
-                const orderInput = form.querySelector('[name="order_id"]');
-                const amountInput = form.querySelector('[name="amount"]');
-                if (orderInput) orderInput.value = _activeOrderId;
-                if (amountInput) amountInput.value = _payableAmount;
-
                 form.classList.remove('hidden');
+
+                form.querySelectorAll('input, select, textarea').forEach(i => {
+                    i.disabled = false;
+                    if (i.name === 'order_id') i.value = _activeOrderId;
+
+                    if (i.name === 'amount') i.value = _payableAmount;
+
+                    if (i.name === 'payment_method') i.value = name;
+                });
             }
         }
 
-        // iccon list
         function goBackToMethods() {
             resetPaymentForms();
-            document.getElementById('payment-method-list').classList.remove('hidden');
-            document.getElementById('back-to-methods').classList.add('hidden');
         }
 
-        // modal close function
         function closePaymentModal() {
             document.getElementById('payment-modal').classList.replace('flex', 'hidden');
             document.body.style.overflow = '';
             goBackToMethods();
         }
-        //
 
         function handlePaymentSubmit(event, type) {
             event.preventDefault();
@@ -160,7 +198,7 @@
             fetch("{{ route('order.payment.submit') }}", {
                     method: 'POST',
                     headers: {
-                        'X-Requested-With': 'XMLHttpRequest', // এটি লারাভেলকে বলে এটি AJAX
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json'
                     },

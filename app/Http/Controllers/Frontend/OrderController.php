@@ -119,9 +119,12 @@ class OrderController extends FrontendController
                     [
                         'name'     => $data['name'] ?? 'Guest',
                         'password' => Hash::make('12345678'),
-                        'status'   => Status::Pending->value
+                        'status'   => Status::Active->value
                     ]
                 );
+            if (!auth('customer')->check()) {
+                auth('customer')->login($customer);
+            }
 
             $items = [];
             foreach ($cartContent as $item) {
@@ -146,18 +149,17 @@ class OrderController extends FrontendController
                 : null;
 
             if ($oldOrder) {
-                // পুরাতন ড্রাফট থাকলে আপডেট করা হচ্ছে
                 $oldOrder->update([
+                    'customer_id'      => $customer->id,
                     'shipping_address' => $shippingAddress,
                     'other_charges'    => session()->get('shipping_cost', 60),
                     'warehouse_info'   => $warehouseInfo,
                     'items'            => $items,
                 ]);
                 DB::commit();
-                return ['success' => true, 'order_id' => $oldOrder->id];
+                return ['success' => true, 'order_id' => $oldOrder->id, 'logged_in' => true];
             }
 
-            // নতুন ড্রাফট অর্ডার তৈরি
             $orderData = [
 
                 'warehouse_info'   => $warehouseInfo, // JSON Column Store
@@ -174,7 +176,7 @@ class OrderController extends FrontendController
             Session::put('current_draft_order_id', $order->id);
 
             DB::commit();
-            return ['success' => true, 'order_id' => $order->id];
+            return ['success' => true, 'order_id' => $order->id, 'logged_in' => true];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Draft creation failed: ' . $e->getMessage());
@@ -183,13 +185,16 @@ class OrderController extends FrontendController
     }
     public function storeOrder($store, Request $request)
     {
+        $pm = strtolower($request->payment_method);
+        $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
+
         $request->validate([
             'name'           => 'required',
             'phone'          => 'required',
             'address'        => 'required',
             'payment_method' => 'required|string',
-            'transaction_id' => $request->payment_method != 'cod' ? 'required|string|unique:order_payments,transaction_id' : 'nullable',
-            'amount'         => $request->payment_method != 'cod' ? 'required|numeric' : 'nullable',
+            'transaction_id' => $isCOD ? 'nullable' : 'required|string|unique:order_payments,transaction_id',
+            'amount'         => $isCOD ? 'nullable' : 'required|numeric',
             'screenshots'    => 'nullable|array|max:3',
             'screenshots.*'  => 'image|max:2048',
         ]);
@@ -219,7 +224,6 @@ class OrderController extends FrontendController
         try {
             DB::beginTransaction();
 
-            // শিপিং অ্যাড্রেস আপডেট
             $finalAddress = [
                 'name'           => $request->name,
                 'phone'          => $request->phone,
@@ -239,7 +243,7 @@ class OrderController extends FrontendController
 
 
             $transactionId = $request->transaction_id;
-            if ($request->payment_method == 'cod') {
+            if ($isCOD) {
                 $transactionId = 'COD-' . ($order->order_no ?? $order->id) . '-' . time();
             }
 
@@ -316,7 +320,6 @@ class OrderController extends FrontendController
 
                 if ($qty <= 0) continue;
 
-                // যদি variation_id থাকে (আপনার JSON অনুযায়ী single product এ এটি null থাকে)
                 if ($variationId) {
                     // --- VARIATION PRODUCT STOCK DEDUCTION ---
                     $variation = ProductVariation::with('product')->find($variationId);
@@ -361,20 +364,17 @@ class OrderController extends FrontendController
 
                     $qtyBeforeGlobal = $product->stock_quantity;
 
-                    // ১. মূল প্রোডাক্টের warehouse_info (JSON) আপডেট করা
                     $productWarehouseInfo = $product->warehouse_info ?? [];
                     $updatedProductInfo = [];
 
                     foreach ($productWarehouseInfo as $pWInfo) {
                         $currentBin = $pWInfo['bin_id'] ?? null;
-                        // চেক: একই ওয়ারহাউজ এবং বিন কি না
                         if ($pWInfo['warehouse_id'] == $warehouseId && $currentBin == $binId) {
                             $pWInfo['quantity'] = (int)$pWInfo['quantity'] - $qty;
                         }
                         $updatedProductInfo[] = $pWInfo;
                     }
 
-                    // ২. Product Table আপডেট
                     $product->update([
                         'stock_quantity'  => $product->stock_quantity - $qty,
                         'available_stock' => $product->available_stock - $qty,
@@ -397,12 +397,10 @@ class OrderController extends FrontendController
                 }
             }
 
-            // ৪. অর্ডারের স্ট্যাটাস পরিবর্তন
             $order->update(['status' => Status::Pending->value]);
 
             DB::commit();
 
-            // সেশন ক্লিয়ারেন্স
             Cart::destroy();
             Session::forget('current_draft_order_id');
 
@@ -554,12 +552,14 @@ class OrderController extends FrontendController
 
     public function submitPayment(Request $request)
     {
+        $pm = strtolower($request->payment_method);
+        $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
         $request->validate([
             'order_id'       => 'required|exists:orders,id',
             'payment_method' => 'required|string',
-            'transaction_id' => 'required|string|unique:order_payments,transaction_id',
+            'transaction_id' => $isCOD ? 'nullable' : 'required|string|unique:order_payments,transaction_id',
+            'amount'         => $isCOD ? 'nullable' : 'required|numeric|min:1',
             'reference_no'   => 'nullable|string|max:100',
-            'amount'         => 'required|numeric|min:1',
             'sender_number'  => 'nullable|string|max:20',
             'note'           => 'nullable|string|max:500',
             'bank_name'      => 'nullable|string|max:100',
@@ -584,8 +584,11 @@ class OrderController extends FrontendController
             }
             $order = $order->firstOrFail();
 
+            $pm = strtolower($request->payment_method);
+            $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
+
             $transactionId = $request->transaction_id;
-            if ($request->payment_method == 'cod') {
+            if ($isCOD) {
                 $transactionId = 'COD-' . $order->order_no . '-' . time();
             }
             $screenshotPaths = [];
@@ -611,13 +614,19 @@ class OrderController extends FrontendController
                 'payment_method' => $request->payment_method,
                 'transaction_id' => $transactionId,
                 'reference_no'   => $request->reference_no,
-                'amount'         => $request->amount,
+                'amount'         => $isCOD ? $order->grand_total : $request->amount,
                 'change_amount'  => 0,
                 'sender_info'    => $senderInfo,
                 'note'           => $request->note,
             ]);
 
             $order->update(['payment_status' => Order::PAYMENT_PENDING]);
+
+            if ($order->status == Status::Draft->value) {
+                $order->update(['status' => Status::Pending->value]);
+
+                $this->finalizeOrderAndDeductStock($order);
+            }
 
             return response()->json([
                 'success' => true,

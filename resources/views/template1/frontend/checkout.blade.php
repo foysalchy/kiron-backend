@@ -228,7 +228,7 @@
             <input type="hidden" name="area" id="shipping-area-input">
         </form>
     </section>
-    <x-template1.payment-modal :methods="$paymentMethods" :currency="$setup->currency" />
+    <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
 @endsection
 
 
@@ -331,7 +331,6 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        // কুপন অ্যাপ্লাই হলে পেজ রিলোড হবে নতুন ডিসকাউন্ট দেখানোর জন্য
                         location.reload();
                     } else {
                         toastr.error(data.message || "Invalid coupon");
@@ -347,7 +346,6 @@
                 });
         }
 
-        // ২. কুপন রিমুভ করার ফাংশন
         function removeCoupon() {
             fetch("{{ route('coupon.remove') }}")
                 .then(() => {
@@ -434,31 +432,30 @@
 @push('scripts')
     <script>
         function previewImages(input, slug) {
-    const grid = document.getElementById(slug + '-preview');
-    const hidden = document.getElementById(slug + '-hidden-files');
-    grid.innerHTML = '';
-    hidden.innerHTML = '';
+            const grid = document.getElementById(slug + '-preview');
+            const hidden = document.getElementById(slug + '-hidden-files');
+            grid.innerHTML = '';
+            hidden.innerHTML = '';
 
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
                 <img src="${e.target.result}" class="w-full h-full object-cover">
             </div>`;
-        };
-        reader.readAsDataURL(input.files[0]);
+                };
+                reader.readAsDataURL(input.files[0]);
 
-        // ক্রিয়েট হিডেন ইনপুট
-        const dt = new DataTransfer();
-        dt.items.add(input.files[0]);
-        const newInp = document.createElement('input');
-        newInp.type = 'file';
-        newInp.name = 'screenshots[]';
-        newInp.files = dt.files;
-        newInp.classList.add('hidden');
-        hidden.appendChild(newInp);
-    }
-}
+                const dt = new DataTransfer();
+                dt.items.add(input.files[0]);
+                const newInp = document.createElement('input');
+                newInp.type = 'file';
+                newInp.name = 'screenshots[]';
+                newInp.files = dt.files;
+                newInp.classList.add('hidden');
+                hidden.appendChild(newInp);
+            }
+        }
         document.querySelector('form[action*="order/store"], form[action*="order/confirm"]').addEventListener('submit',
             function(e) {
                 const btn = this.querySelector('button[type="submit"]');

@@ -38,7 +38,8 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350" width="300"
+            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350"
+                width="300"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
         </a>
@@ -60,8 +61,8 @@
         @if ($discountLabel)
             <div
                 class="absolute top-1 right-1 secondary-bg text-secondary w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
-                <span class="text-[10px] font-bold leading-none">{{ $discountLabel }}</span>
-                <span class="text-[8px] font-medium leading-none mt-0.5 uppercase">Off</span>
+                <span class="text-xs font-bold leading-none">{{ $discountLabel }}</span>
+                <span class="text-[10px] font-medium leading-none mt-0.5 uppercase">Off</span>
             </div>
         @endif
     </div>
@@ -101,17 +102,17 @@
 
     <div class="flex items-center gap-2 mt-auto">
         <!-- Order Now Button -->
-       <button {{ $isOutOfStock ? 'disabled' : '' }}
-    onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
-    class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
+        <button {{ $isOutOfStock ? 'disabled' : '' }}
+            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
+            class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
     {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'primary-bg-hover' }}">
 
-    @if ($isOutOfStock)
-        Stock Out
-    @else
-        Order Now
-    @endif
-</button>
+            @if ($isOutOfStock)
+                Stock Out
+            @else
+                Order Now
+            @endif
+        </button>
         <!-- Cart Icon Button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id)" }}"
@@ -125,6 +126,4 @@
         </button>
     </div>
 </div>
-<script>
-
-</script>
+<script></script>

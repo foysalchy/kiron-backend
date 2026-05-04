@@ -22,7 +22,7 @@ return new class extends Migration
             $table->longText('description');
             $table->string('image')->nullable();
             $table->tinyInteger('status')->default(Status::Pending->value);
-            $table->tinyInteger('response_status')->default(Status::WaitForResponse->value)
+            $table->tinyInteger('response_status')->default(Status::WaitForResponse->value);
             $table->timestamps();
             $table->softDeletes();
         });
