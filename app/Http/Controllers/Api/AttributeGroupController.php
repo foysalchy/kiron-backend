@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{AttributeGroupRequest, UpdateAttributeGroupRequest};
-use App\Services\attributeGroupService;
+use App\Services\AttributeGroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

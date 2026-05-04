@@ -69,6 +69,8 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Variation Product Fields (only validated when type='variation')
                 'variations' => ['required_if:type,variation', 'nullable', 'array', 'min:1'],
+                'variations.*.sku'                               => ['nullable'],
+
                 'variations.*.attributes' => ['required_with:variations', 'array', 'min:1'],
                 'variations.*.attributes.*.attribute_group_id' => ['required', 'exists:attribute_groups,id'],
                 'variations.*.attributes.*.attribute_value_id' => ['required', 'exists:attribute_values,id'],

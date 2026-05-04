@@ -19,8 +19,9 @@ class StoreAttributeRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'attribute_group_id' => ['required', 'exists:attribute_groups,id'],
-                'name' => ['required', 'string', 'max:255'],
-                'status' => ['boolean'],
+                'names'              => ['required', 'array', 'min:1'],
+                'names.*'            => ['required', 'string', 'max:255'],
+                'status'             => ['boolean'],
             ]
         );
     }
@@ -31,12 +32,12 @@ class StoreAttributeRequest extends BaseCompanyRequest
             $this->companyMessages(),
             [
                 'attribute_group_id.required' => 'Attribute group is required',
-                'attribute_group_id.exists' => 'Selected attribute group does not exist',
-                'name.required' => 'Attribute name is required',
+                'attribute_group_id.exists'   => 'Selected attribute group does not exist',
+                'names.required'              => 'At least one attribute name is required',
+                'names.*.required'            => 'Attribute name cannot be empty',
             ]
         );
     }
-
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(

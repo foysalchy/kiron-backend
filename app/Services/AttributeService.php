@@ -8,6 +8,7 @@ use App\Helpers\LogHelper;
 use App\Models\AttributeValue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AttributeService
@@ -68,20 +69,35 @@ class AttributeService
     /**
      * Create a new attribute
      */
-    public function createAttribute(array $data): AttributeValue
+    public function createAttributes(array $data): array
     {
         try {
-            $attribute = AttributeValue::create($data);
-            LogHelper::created('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
-            Log::info('Attribute created successfully', ['attribute_id' => $attribute->id]);
+            $attributes = [];
 
-            return $attribute->load(['attributeGroup']);
+            DB::transaction(function () use ($data,  &$attributes) {
+                foreach ($data['names'] as $name) {
+                    $attribute = AttributeValue::create([
+                        'name'               => $name,
+                        'attribute_group_id' => $data['attribute_group_id'],
+                        'status'             => $data['status'] ?? true,
+                    ]);
+
+                    LogHelper::created('attribute_value', $attribute->id, $attribute->company_id, $name);
+                    $attributes[] = $attribute;
+                }
+            });
+
+            Log::info('Attributes created successfully', ['count' => count($attributes)]);
+
+            return [
+                'count'              => count($attributes),
+                'attribute_group_id' => $data['attribute_group_id'],
+            ];
         } catch (\Exception $e) {
             Log::error('Attribute creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create attribute');
+            throw ApiException::serverError('Failed to create attributes');
         }
     }
-
     /**
      * Update attribute
      */
@@ -90,7 +106,7 @@ class AttributeService
         try {
             $attribute = $this->getAttributeById($id);
             $attribute->update($data);
-            LogHelper::updated('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
+            LogHelper::updated('attribute_value', $attribute->id, $attribute->company_id, $attribute->name);
             Log::info('Attribute updated successfully', ['attribute_id' => $attribute->id]);
 
             return $attribute->fresh(['attributeGroup']);
@@ -110,7 +126,7 @@ class AttributeService
         try {
             $attribute = $this->getAttributeById($id);
             $attribute->delete();
-            LogHelper::deleted('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
+            LogHelper::deleted('attribute_value', $attribute->id, $attribute->company_id, $attribute->name);
 
             Log::info('Attribute deleted successfully', ['attribute_id' => $id]);
 
@@ -136,7 +152,7 @@ class AttributeService
             }
 
             $attribute->restore();
-            LogHelper::restored('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
+            LogHelper::restored('attribute_value', $attribute->id, $attribute->company_id, $attribute->name);
 
             Log::info('Attribute restored successfully', ['attribute_id' => $id]);
 
@@ -162,7 +178,7 @@ class AttributeService
             }
 
             $attribute->forceDelete();
-            LogHelper::forceDeleted('attribute_value', $attribute->id, $attribute->company_id,$attribute->name);
+            LogHelper::forceDeleted('attribute_value', $attribute->id, $attribute->company_id, $attribute->name);
 
             Log::info('Attribute permanently deleted', ['attribute_id' => $id]);
 
@@ -192,7 +208,7 @@ class AttributeService
             $attribute->update([
                 'status' => $newStatus->value
             ]);
-            LogHelper::statusChanged('attribute_value', $attribute->id, $attribute->company_id,$attribute->name .' new status '. $newStatus->label());
+            LogHelper::statusChanged('attribute_value', $attribute->id, $attribute->company_id, $attribute->name . ' new status ' . $newStatus->label());
 
             Log::info('Attribute status toggled', ['attribute_id' => $id]);
 

@@ -267,4 +267,24 @@ class ProductController extends Controller
             'message'   => "{$generated} barcode(s) generated, {$skipped} skipped.",
         ]);
     }
+
+    public function checkSku(Request $request): JsonResponse
+    {
+        $sku = $request->query('sku');
+        $excludeId = $request->query('exclude_id');
+
+        // products table-এ check — sku_code column
+        $existsInProducts = Product::where('sku_code', $sku)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->exists();
+
+        // product_variations table-এ check — sku column
+        $existsInVariations = ProductVariation::where('sku', $sku)
+            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
+            ->exists();
+
+        return response()->json([
+            'available' => !$existsInProducts && !$existsInVariations,
+        ]);
+    }
 }

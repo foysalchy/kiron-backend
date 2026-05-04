@@ -104,6 +104,7 @@ class ActionLogService
     {
         return User::whereIn('id', ActionLog::select('user_id')->distinct())
             ->select('id', 'name', 'email')
+            ->where('company_id', auth()->user()->company_id)
             ->orderBy('name')
             ->get()
             ->toArray();

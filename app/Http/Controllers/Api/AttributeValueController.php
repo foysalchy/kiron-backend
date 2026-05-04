@@ -36,7 +36,7 @@ class AttributeValueController extends Controller
 
     public function store(StoreAttributeRequest $request): JsonResponse
     {
-        $data = $this->attributeService->createAttribute($request->validated());
+        $data = $this->attributeService->createAttributes($request->validated());
 
         return ResponseHelper::success($data, 'Attribute created successfully');
     }

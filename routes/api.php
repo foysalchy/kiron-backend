@@ -444,6 +444,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/{id}/generate-barcode', [ProductController::class, 'generateBarcodes']);
                 Route::post('/bulk/generate-barcodes', [ProductController::class, 'bulkGenerateBarcodes']);
             });
+            Route::get('/check-sku/product', [ProductController::class, 'checkSku']);
 
             // Page Routes
             Route::prefix('pages')->group(function () {
