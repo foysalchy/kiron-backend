@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
+
+    //landing page
+    Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
@@ -73,8 +76,4 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
 
-
-    //landing page
-    Route::get('/sale', [LandingController::class, 'index'])->name('landing.index');
-    Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 });
