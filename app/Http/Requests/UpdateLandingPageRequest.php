@@ -27,7 +27,8 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
                 'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv', 'max:51200'],
                 'description' => ['nullable', 'string'],
-                'pricing' => ['nullable', 'string'],
+                'regular_price' => ['nullable'],
+                'discount_price' => ['nullable'],
                 'slug' => ['nullable', 'string', 'max:255', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
@@ -36,6 +37,9 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'instruction' => ['nullable', 'string'],
                 'extras' => ['nullable', 'string'],
                 'instruction_title' => ['nullable', 'string', 'max:255'],
+                'img_paths.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+                'existing_img_paths' => ['nullable', 'array'],
+                'existing_img_paths.*' => ['nullable', 'string'],
                 'status' => ['nullable'],
             ]
         );

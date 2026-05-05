@@ -822,8 +822,8 @@ public function assignUsers(int $id, array $userIds): array
             ]);
             DB::commit();
 
-            Log::info('Order resumed from hold', ['order_id' => $id]);
-            LogHelper::custom('resumed', 'orders', $id, $order->company_id);
+            Log::info('Order payment submit', ['order_id' => $id]);
+            LogHelper::custom('payment', 'orders', $id, $order->company_id,'paid amount. '.$data['amount']);
 
             return $order;
         } catch (ApiException $e) {

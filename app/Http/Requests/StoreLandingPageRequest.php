@@ -17,12 +17,13 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'product_id' => ['nullable', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'title' => ['nullable', 'string', 'max:255'],
-                'domain' => ['nullable','string'],
+                'domain' => ['nullable', 'string'],
                 'short_description' => ['nullable', 'string'],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
                 'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv', 'max:51200'],
                 'description' => ['nullable', 'string'],
-                'pricing' => ['nullable', 'string'],
+                'regular_price' => ['nullable'],
+                'discount_price' => ['nullable'],
                 'slug' => ['nullable', 'string', 'max:255', 'unique:landing_pages,slug', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
@@ -32,6 +33,9 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'extras' => ['nullable'],
                 'instruction_title' => ['nullable', 'string', 'max:255'],
                 'status' => ['nullable'],
+                'img_paths.*' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
+                'existing_img_paths' => ['nullable', 'array'],
+                'existing_img_paths.*' => ['nullable', 'string'],
             ]
         );
     }

@@ -13,9 +13,7 @@ class LandingController extends FrontendController
     {
         $landing = LandingPage::with('product')->where('slug', $slug)->firstOrFail();
 
-    
-        $product = $landing->product;
-
-        return view('landing.landing1', compact('landing', 'product'));
+        // For now, we'll just return a view with the slug
+        return view('landing.landing1', compact('slug'));
     }
 }

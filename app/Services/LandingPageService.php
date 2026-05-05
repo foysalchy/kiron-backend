@@ -110,7 +110,6 @@ class LandingPageService
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'landing-pages/thumbnails',
-
                 );
             }
 
@@ -118,9 +117,22 @@ class LandingPageService
                 $data['video'] = FileUploadHelper::upload(
                     $data['video'],
                     'landing-pages/videos',
-
                 );
             }
+
+        
+            $request = request();
+            if ($request->hasFile('img_paths')) {
+                $newPaths = [];
+                foreach ($request->file('img_paths') as $file) {
+                    $newPaths[] = FileUploadHelper::uploadImage(
+                        $file,
+                        'landing-pages/images',
+                    );
+                }
+                $data['img_paths'] = $newPaths;
+            }
+            unset($data['existing_img_paths']); // create-এ দরকার নেই
 
             if (isset($data['extras']) && is_string($data['extras'])) {
                 $data['extras'] = json_decode($data['extras'], true);
@@ -129,10 +141,11 @@ class LandingPageService
             if (isset($data['extras'])) {
                 $data['extras'] = $this->handleExtrasImages(
                     $data['extras'],
-                    [],           // ← create mode-এ existing নেই, empty array দাও
-                    request()
+                    [],
+                    $request
                 );
             }
+
             $landingPage = LandingPage::create($data);
 
             LogHelper::created('landing_page', $landingPage->id, $landingPage->company_id, $landingPage->name);
@@ -168,7 +181,7 @@ class LandingPageService
                             : FileUploadHelper::uploadImage(
                                 $request->file($fileKey),
                                 'landing-pages/extras',
-                             
+
                             );
                     } elseif (isset($card['image']) && str_starts_with((string)$card['image'], '__file__')) {
                         $card['image'] = null;
@@ -191,7 +204,7 @@ class LandingPageService
         try {
             $landingPage = $this->getLandingPageById($id);
 
-            if (isset($data['thumbnail'])) {
+            if (isset($data['thumbnail']) && !is_string($data['thumbnail'])) {
                 $data['thumbnail'] = FileUploadHelper::replace(
                     $data['thumbnail'],
                     $landingPage->thumbnail,
@@ -207,18 +220,43 @@ class LandingPageService
                 );
             }
 
-            // extras JSON decode
+            // Multiple images
+            $request = request();
+            if ($request->hasFile('img_paths')) {
+                $existingPaths = $data['existing_img_paths'] ?? [];
+
+                // Remove হয়ে যাওয়া পুরনো images delete করো
+                $oldPaths = $landingPage->img_paths ?? [];
+                foreach (array_diff($oldPaths, $existingPaths) as $removed) {
+                    FileUploadHelper::delete($removed);
+                }
+
+                // নতুন upload
+                $newPaths = [];
+                foreach ($request->file('img_paths') as $file) {
+                    $newPaths[] = FileUploadHelper::uploadImage(
+                        $file,
+                        'landing-pages/images',
+                    );
+                }
+
+                $data['img_paths'] = array_merge($existingPaths, $newPaths);
+            } else {
+                // কোনো নতুন file নেই — existing রেখে দাও
+                $data['img_paths'] = $data['existing_img_paths'] ?? $landingPage->img_paths ?? [];
+            }
+            unset($data['existing_img_paths']);
+
             if (isset($data['extras']) && is_string($data['extras'])) {
                 $data['extras'] = json_decode($data['extras'], true);
             }
 
-            // Card images handle — existing image replace করবে
             if (isset($data['extras'])) {
                 $existingExtras = $landingPage->extras ?? [];
                 $data['extras'] = $this->handleExtrasImages(
                     $data['extras'],
-                    $existingExtras,  // ← পুরনো data pass করো
-                    request()
+                    $existingExtras,
+                    $request
                 );
             }
 

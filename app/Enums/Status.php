@@ -41,6 +41,7 @@ enum Status: int
   case WaitForResponse         = 34;
   case WaitingForClientResponse = 35;
   case Open = 36;
+  case Resumed = 37;
 
 
   public function label(): string
@@ -83,6 +84,7 @@ enum Status: int
       self::WaitForResponse => 'Waiting for Response',
       self::WaitingForClientResponse => 'Waiting for Client Response',  
       self::Open => 'Open',
+      self::Resumed => 'Resumed',
     };
   }
   public const ORDER_FLOW = [
