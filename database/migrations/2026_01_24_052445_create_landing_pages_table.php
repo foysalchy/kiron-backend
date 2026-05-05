@@ -24,13 +24,15 @@ return new class extends Migration
             $table->string('thumbnail')->nullable();
             $table->string('video')->nullable();
             $table->longText('description')->nullable();
-            $table->text('pricing')->nullable();
+            $table->decimal('regular_price', 10, 2)->nullable();
+            $table->decimal('discount_price', 10, 2)->nullable();
             $table->string('pixel')->nullable();
             $table->text('meta_access_token')->nullable();
             $table->text('header_code')->nullable();
             $table->string('phone_number')->nullable();
             $table->text('instruction')->nullable();
             $table->json('extras')->nullable();
+            $table->json('img_paths')->nullable();
             $table->string('instruction_title')->nullable();
             $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();

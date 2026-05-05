@@ -24,7 +24,8 @@ class LandingPage extends Model
         'thumbnail',
         'video',
         'description',
-        'pricing',
+        'regular_price',
+        'discount_price',
         'slug',
         'pixel',
         'meta_access_token',
@@ -33,10 +34,12 @@ class LandingPage extends Model
         'instruction',
         'extras',
         'instruction_title',
+        'img_paths',
         'status',
     ];
     protected $casts = [
         'extras' => 'array', 
+        'img_paths' => 'array',
     ];
     protected $hidden = ['deleted_at', 'meta_access_token'];
 

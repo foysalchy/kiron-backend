@@ -13,6 +13,6 @@ class LandingController extends Controller
         // For example, you might want to fetch a specific product or category based on the slug
 
         // For now, we'll just return a view with the slug
-        return view('landing.landing2', compact('slug'));
+        return view('landing.landing1', compact('slug'));
     }
 }

@@ -17,7 +17,7 @@ class EditorImagesController extends Controller
         $path = FileUploadHelper::upload(
             file: $request->file('image'),
             folder: 'editor/images',
-            disk: 'public'
+
         );
 
         $url = asset('storage/' . $path);
