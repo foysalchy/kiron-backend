@@ -175,7 +175,7 @@ class OrderService
     public function createPOSOrder(array $data): Order
     {
         $data['type'] = Order::TYPE_POS;
-        if ($data['is_walk_in'] && !empty($data['walk_in_customer'])) {
+        if ($data['is_walk_in'] && !empty($data['walk_in_customer']['phone'])) {
             $phone = $data['walk_in_customer']['phone'] ?? null;
             $name  = $data['walk_in_customer']['name']  ?? 'Walk-in Customer';
 
@@ -281,7 +281,7 @@ class OrderService
                 ]);
 
                 // Deduct stock using ProductService (for completed/pending orders, not hold)
-                if ($order->status !== Status::Hold->value && $order->status !== Status::Draft->value) {
+                if ($order->status != Status::Hold->value || $order->status != Status::Draft->value) {
                     $this->deductOrderStock($order, $item);
                 }
             }

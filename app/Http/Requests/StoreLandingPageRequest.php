@@ -16,6 +16,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
             [
                 'product_id' => ['nullable', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
+                'template_id' => ['nullable'],
                 'title' => ['nullable', 'string', 'max:255'],
                 'domain' => ['nullable', 'string'],
                 'short_description' => ['nullable', 'string'],
