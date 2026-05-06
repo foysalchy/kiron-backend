@@ -1,141 +1,234 @@
+@props(['landing'])
+@php
+    $mainProduct = $landing->product;
+    $insideCharge = $setup->inside_charge ?? 60;
+    $outsideCharge = $setup->outside_charge ?? 100;
+@endphp
+
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
+    <form action="{{ route('landing.order.store') }}" method="POST" id="landing-order-form">
+        @csrf
+        <input type="hidden" name="product_id" value="{{ $landing->product_id }}">
+        <input type="hidden" name="landing_page_id" value="{{ $landing->id }}">
+        <input type="hidden" name="qty" id="input-qty" value="1">
 
-    {{-- Header --}}
-    <div class="text-center mb-10">
-        <h2 class="text-2xl md:text-3xl  mb-5">
-            Provide the correct information to order
-        </h2>
-        <div class="inline-block bg-[#1f8a54] text-white px-10 py-3 rounded-lg text-xl md:text-2xl  shadow-md">
-            Fill out the form below
-        </div>
-    </div>
+        @if ($mainProduct->type === 'variation')
+            <input type="hidden" name="variation_id" id="selected-variation-id">
+        @endif
 
-    {{-- Product Selection Bar --}}
-    <div
-        class="border border-gray-200 rounded-xl p-4 mb-10 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-4">
-            <input type="radio" checked class="w-5 h-5 accent-red-600 flex-shrink-0">
-            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                <img src="https://via.placeholder.com/100x100/eee/999?text=P" class="w-full h-full object-cover"
-                    alt="product">
-            </div>
-            <span class="text-lg md:text-lg ">
-                Fun Flash Card Combo for Kids 🔥
-            </span>
+        {{-- Header --}}
+        <div class="text-center mb-10">
+            <h2 class="text-2xl md:text-3xl font-bold mb-5 text-black">অর্ডার করতে সঠিক তথ্য দিয়ে</h2>
+            <div class="inline-block bg-[#1f8a54] text-white px-10 py-3 rounded-lg text-xl md:text-2xl shadow-md font-bold">নিচের ফর্মটি পূরণ করুন</div>
         </div>
 
-        <div class="flex items-center gap-6 flex-shrink-0">
-            {{-- Qty --}}
-            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden bg-white">
-                <button type="button" onclick="changeQty(-1)"
-                    class="w-9 h-9 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 text-lg font-bold">−</button>
-                <span id="qty-display" class="w-10 text-center font-bold text-lg">1</span>
-                <button type="button" onclick="changeQty(1)"
-                    class="w-9 h-9 flex items-center justify-center hover:bg-gray-100 border-l border-gray-300 text-lg font-bold">+</button>
-            </div>
-            <span class="text-lg " id="unit-price-display">999.00৳</span>
-        </div>
-    </div>
+        {{-- Product Selection Area --}}
+        <div class="space-y-4 mb-10">
+            <label class="block text-lg font-bold mb-4 text-gray-800">পণ্যটি সিলেক্ট করুন <span class="text-red-500">*</span></label>
 
-    {{-- Form + Summary Grid --}}
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            @if ($mainProduct->type === 'variation')
+                @foreach ($mainProduct->variations as $index => $variation)
+                    @php
+                        $vSalePrice = $variation->regular_price - $variation->discount;
+                        $vImage = $variation->image ? asset('storage/' . $variation->image) : ($mainProduct->thumbnail_url ?? asset('images/default.webp'));
+                    @endphp
+                    <label class="relative cursor-pointer block">
+                        <input type="radio" name="variant_radio" value="{{ $variation->id }}"
+                            {{ $index === 0 ? 'checked' : '' }}
+                            onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}')"
+                            class="hidden peer">
 
-        {{-- LEFT: Billing Form --}}
-        <div class="lg:col-span-7 space-y-6">
-
-            <div>
-                <label class="block text-lg  mb-2">
-                    Enter your name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="f-name" placeholder=""
-                    class="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 bg-white focus:border-[#1f8a54] outline-none transition-all text-lg"
-                    style="font-family:'Noto Sans Bengali',sans-serif;">
-            </div>
-
-            <div>
-                <label class="block text-lg  mb-2">
-                    Enter mobile number <span class="text-red-500">*</span>
-                </label>
-                <input type="tel" id="f-phone" placeholder=""
-                    class="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 bg-white focus:border-[#1f8a54] outline-none transition-all text-lg"
-                    style="font-family:'Noto Sans Bengali',sans-serif;">
-            </div>
-
-            <div>
-                <label class="block text-lg  mb-2">
-                    Enter district, police station, and area name <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="f-address" placeholder=""
-                    class="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 bg-white focus:border-[#1f8a54] outline-none transition-all text-lg"
-                    style="font-family:'Noto Sans Bengali',sans-serif;">
-            </div>
-
-            <div>
-                <label class="block text-lg  mb-2">Country (Optional)</label>
-                <select
-                    class="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 bg-white focus:border-[#1f8a54] outline-none text-lg">
-                    <option>Bangladesh</option>
-                </select>
-            </div>
-
-            {{-- Delivery Charge --}}
-            <div class="flex justify-between items-center border border-gray-200 rounded-xl px-5 py-4">
-                <span class="text-red-600  text-lg">
-                    Delivery charge:
-                </span>
-                <span class=" text-lg">100.00৳</span>
-            </div>
-        </div>
-
-        {{-- RIGHT: Order Summary --}}
-        <div class="lg:col-span-5">
-            <div class="bg-white p-6 sticky top-8">
-
-                {{-- Table Header --}}
-                <div
-                    class="flex justify-between text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 pb-3 border-b border-dashed border-gray-200">
-                    <span>Product</span>
-                    <span>Subtotal</span>
-                </div>
-
-                {{-- Product Row --}}
-                <div class="flex justify-between items-start gap-3 pb-5 mb-5 border-b border-dashed border-gray-200">
-                    <div class="flex items-center gap-3">
-                        <img src="https://via.placeholder.com/50x50/eee/999?text=P"
-                            class="w-12 h-12 rounded-lg flex-shrink-0 object-cover" alt="">
-                        <span class="text-sm font-bold leading-snug">
-                            Fun educational 235 flash card combo for kids
-                        </span>
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-[#1f8a54] peer-checked:bg-green-50 bg-white hover:border-gray-300">
+                            <div class="flex items-center gap-4 w-full">
+                                <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                                    <img src="{{ $vImage }}" class="w-full h-full object-contain">
+                                </div>
+                                <div class="flex-grow text-left">
+                                    <p class="text-sm md:text-md font-bold text-gray-800">{{ $mainProduct->title }}</p>
+                                    <p class="text-xs text-[#1f8a54] font-bold uppercase mt-1">Option: {{ $variation->display_name }}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 flex-shrink-0">
+                                <span class="text-lg font-bold text-gray-900">{{ number_format($vSalePrice, 2) }}{{ $setup->currency }}</span>
+                            </div>
+                        </div>
+                    </label>
+                @endforeach
+            @else
+                <div class="border-2 border-[#1f8a54] bg-green-50 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 w-full">
+                        <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" class="w-full h-full object-contain">
+                        </div>
+                        <div class="text-left">
+                            <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
+                        </div>
                     </div>
-                    <span class="text-sm  whitespace-nowrap">
-                        ×<span id="summary-qty">1</span> <span id="summary-subtotal">999.00</span>৳
-                    </span>
+                    <span class="text-lg font-bold text-gray-900">{{ number_format($mainProduct->sale_price, 2) }}{{ $setup->currency }}</span>
                 </div>
-
-                {{-- Total --}}
-                <div class="flex justify-between items-center text-lg  mb-6">
-                    <span>Total</span>
-                    <span id="summary-total">1,099.00৳</span>
-                </div>
-
-                {{-- COD Box --}}
-                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-6">
-                    <h5 class=" text-lg mb-2">
-                        Cash on Delivery
-                    </h5>
-                    <div class="bg-gray-100 rounded-xl p-3 text-xs leading-relaxed text-gray-600">
-                        💯 Order with total confidence — pay only after checking the product and being satisfied
-                    </div>
-                </div>
-
-                {{-- CTA Button --}}
-                <button type="button" onclick="submitOrder()"
-                    class="w-full bg-[#1f8a54] hover:bg-[#176840] active:translate-y-1 text-white  py-5 rounded-[18px] text-lg md:text-xl shadow-[0_7px_0_0_#124d2f] hover:shadow-[0_3px_0_0_#124d2f] transition-all">
-                    Place Order <span id="btn-total">1,099.00</span>৳
-                </button>
-
-            </div>
+            @endif
         </div>
 
-    </div>
+        {{-- Main Grid --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+            {{-- LEFT: Billing Info --}}
+            <div class="lg:col-span-7 space-y-6">
+                <div>
+                    <label class="block text-md font-bold mb-2 text-gray-800">আপনার নাম লিখুন <span class="text-red-500">*</span></label>
+                    <input type="text" name="name" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+                <div>
+                    <label class="block text-md font-bold mb-2 text-gray-800">মোবাইল নাম্বার লিখুন <span class="text-red-500">*</span></label>
+                    <input type="tel" name="phone" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+                <div>
+                    <label class="block text-md font-bold mb-2 text-gray-800">সম্পূর্ণ ঠিকানা লিখুন <span class="text-red-500">*</span></label>
+                    <input type="text" name="address" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                </div>
+            </div>
+
+            {{-- RIGHT: Order Summary with Shipping Area --}}
+            <div class="lg:col-span-5">
+                <div class="bg-white p-2 sticky top-8 ">
+
+                    {{-- Table Header --}}
+                    <div class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 pb-3 border-b border-dashed border-gray-200">
+                        <span>Product</span><span class="text-right">Price</span>
+                    </div>
+
+                    {{-- Product Info Row --}}
+                    <div class="flex justify-between items-start gap-4 pb-5 mb-5 border-b border-dashed border-gray-200">
+                        <div class="flex items-start gap-3">
+                            <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
+                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" class="w-full h-full object-contain">
+                            </div>
+                            <div class="max-w-[150px]">
+                                <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
+                                <p id="summary-variant-name" class="text-[10px] text-green-600 font-bold mt-1 uppercase"></p>
+                            </div>
+                        </div>
+                        <div class="text-right whitespace-nowrap pt-1">
+                            <span class="text-sm font-bold text-gray-800">
+                                <span class="text-gray-400">×</span> <span id="summary-qty">1</span>
+                                <span id="summary-unit-price" class="ml-1"></span>{{ $setup->currency }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Qty Selector & Shipping Area (Inside Summary) --}}
+                    <div class="px-2 space-y-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-bold text-gray-700">Quantity</span>
+                            <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
+                                <button type="button" onclick="changeQty(-1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 font-bold">−</button>
+                                <span id="qty-display" class="w-10 text-center font-bold text-sm">1</span>
+                                <button type="button" onclick="changeQty(1)" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-l border-gray-300 font-bold">+</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-sm font-bold text-gray-500 uppercase tracking-wide">Delivery Area</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="shipping_area" value="inside" checked onchange="updateDeliveryCharge({{ $insideCharge }})" class="hidden peer">
+                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#1f8a54] bg-gray-50">Inside Dhaka</div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="shipping_area" value="outside" onchange="updateDeliveryCharge({{ $outsideCharge }})" class="hidden peer">
+                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#1f8a54] bg-gray-50">Outside Dhaka</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Calculations --}}
+                    <div class="px-2 space-y-2 border-t border-dashed border-gray-100 pt-4 mb-6">
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Subtotal</span>
+                            <span class="font-bold text-gray-800"><span id="summary-subtotal"></span>{{ $setup->currency }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>Shipping Charge</span>
+                            <span class="font-bold text-red-600">+<span id="delivery-charge-display"></span>{{ $setup->currency }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg font-bold text-gray-900 pt-2 border-t border-gray-50">
+                            <span>Total</span>
+                            <span id="summary-total" class="text-2xl font-black"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-[#1f8a54] hover:bg-[#176840] text-white font-bold py-5 rounded-xl text-2xl  active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                        অর্ডার করুন <span id="btn-total"></span>{{ $setup->currency }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
+
+<script>
+    let UNIT_PRICE = parseFloat("{{ $mainProduct->type === 'single' ? $mainProduct->sale_price : 0 }}") || 0;
+    let DELIVERY = parseFloat("{{ $insideCharge }}");
+    const CURRENCY = "{{ $setup->currency }}";
+    let qty = 1;
+    const isVarProduct = {{ $mainProduct->type === 'variation' ? 'true' : 'false' }};
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (isVarProduct) {
+            const firstRadio = document.querySelector('input[name="variant_radio"]:checked');
+            if (firstRadio) firstRadio.dispatchEvent(new Event('change'));
+        } else {
+            updateUI();
+        }
+    });
+
+    function updateVariation(id, price, name, img) {
+        document.getElementById('selected-variation-id').value = id;
+        UNIT_PRICE = parseFloat(price);
+        document.getElementById('summary-img').src = img;
+        const varLabel = document.getElementById('summary-variant-name');
+        if(varLabel) varLabel.innerText = "Option: " + name;
+        updateUI();
+    }
+
+    function updateDeliveryCharge(amount) {
+        DELIVERY = parseFloat(amount);
+        updateUI();
+    }
+
+    function changeQty(delta) {
+        qty = Math.max(1, qty + delta);
+        updateUI();
+    }
+
+    function updateUI() {
+        const sub = qty * UNIT_PRICE;
+        const total = sub + DELIVERY;
+
+        document.getElementById('qty-display').innerText = qty;
+        document.getElementById('input-qty').value = qty;
+        document.getElementById('summary-qty').innerText = qty;
+
+        const unitFormatted = UNIT_PRICE.toLocaleString(undefined, {minimumFractionDigits: 2});
+        const subFormatted = sub.toLocaleString(undefined, {minimumFractionDigits: 2});
+        const totalFormatted = total.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+        document.getElementById('summary-unit-price').innerText = unitFormatted;
+        document.getElementById('summary-subtotal').innerText = subFormatted;
+        document.getElementById('delivery-charge-display').innerText = DELIVERY.toFixed(2);
+        document.getElementById('summary-total').innerText = totalFormatted + CURRENCY;
+        document.getElementById('btn-total').innerText = totalFormatted;
+    }
+
+    document.getElementById('landing-order-form').onsubmit = function(e) {
+        if (isVarProduct && !document.getElementById('selected-variation-id').value) {
+            e.preventDefault();
+            alert('দয়া করে একটি অপশন সিলেক্ট করুন!');
+            return false;
+        }
+        this.querySelector('button[type="submit"]').disabled = true;
+        this.querySelector('button[type="submit"]').innerText = "প্রসেসিং...";
+        return true;
+    };
+</script>

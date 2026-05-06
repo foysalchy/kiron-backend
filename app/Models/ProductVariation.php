@@ -98,4 +98,11 @@ class ProductVariation extends Model
         }
         return $this->stocks()->sum('quantity');
     }
+
+    public function getSalePriceAttribute()
+    {
+        // regular_price থেকে discount বিয়োগ করা হচ্ছে
+        $price = $this->regular_price - $this->discount;
+        return $price > 0 ? $price : $this->regular_price;
+    }
 }

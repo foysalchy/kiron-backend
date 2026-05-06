@@ -38,7 +38,7 @@ class LandingPage extends Model
         'status',
     ];
     protected $casts = [
-        'extras' => 'array', 
+        'extras' => 'array',
         'img_paths' => 'array',
     ];
     protected $hidden = ['deleted_at', 'meta_access_token'];
@@ -48,11 +48,6 @@ class LandingPage extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
-    }
-
-    public function template(): BelongsTo
-    {
-        return $this->belongsTo(Template::class);
     }
 
     public function product(): BelongsTo
@@ -113,4 +108,16 @@ class LandingPage extends Model
             }
         });
     }
+    public function getDiscountPercentageAttribute()
+    {
+        $regular = $this->regular_price;
+        $sale = $this->discount_price;
+
+        if ($regular > 0 && $regular > $sale) {
+            return round((($regular - $sale) / $regular) * 100);
+        }
+
+        return 0;
+    }
+    
 }

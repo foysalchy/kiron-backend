@@ -17,6 +17,8 @@ class SiteSetting extends Model
         'logo',
         'favicon',
         'phone',
+        'inside_charge',
+        'outside_charge',
         'alt_phone',
         'email',
         'lang',
