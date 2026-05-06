@@ -30,7 +30,8 @@
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
-            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" alt="{{ $product->title }}" height="350" width="300"
+            <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
+                alt="{{ $product->title }}" height="350" width="300"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
         </a>
 
@@ -111,3 +112,136 @@
 
     </div>
 </div>
+@once
+    @push('scripts')
+        <script>
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            // product variation modal related scripts
+            function updateModalTotal() {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                const qtyInput = document.getElementById('modal-qty');
+                const totalDisplay = document.getElementById('modal-total-price-display');
+                const unitPriceDisplay = document.getElementById('modal-unit-price');
+
+                if (selectedVariant && qtyInput && totalDisplay) {
+                    const unitPrice = parseFloat(selectedVariant.getAttribute('data-price'));
+                    const qty = parseInt(qtyInput.value);
+                    const currency = "{{ $setup->currency }}";
+
+                    // calculate total
+                    const total = unitPrice * qty;
+
+                    // update display
+                    unitPriceDisplay.innerText = currency + " " + unitPrice.toLocaleString();
+                    totalDisplay.innerText = currency + " " + total.toLocaleString();
+                }
+            }
+
+            // quantity change function for variation modal
+            function changeQty(val) {
+                let qtyInput = document.getElementById('modal-qty');
+                if (qtyInput) {
+                    let newVal = parseInt(qtyInput.value) + val;
+                    if (newVal >= 1) {
+                        qtyInput.value = newVal;
+                        updateModalTotal();
+                    }
+                }
+            }
+
+            // modal open function with loading state
+            function openVariationModal(id) {
+                const modal = document.getElementById('variation-modal');
+                const contentArea = document.getElementById('modal-content-area');
+                if (!modal) return;
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                contentArea.innerHTML =
+                    '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
+
+                fetch("/product-variation/" + id)
+                    .then(res => res.text())
+                    .then(html => {
+                        contentArea.innerHTML = html;
+
+                        updateModalTotal();
+                    });
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('variation-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            }
+
+            // 1. Function to add variation
+            function processAddVariation() {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                const qtyInput = document.getElementById('modal-qty');
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+
+                if (!selectedVariant) {
+                    toastr.warning("Please select an option.");
+                    return;
+                }
+
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            variation_id: selectedVariant.value,
+                            qty: qtyInput ? qtyInput.value : 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        // If success
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            closeModal();
+                            toastr.success(data.message);
+                        }
+                        // If error (like: stock out)
+                        else {
+                            toastr.error(data.message || "Something went wrong.");
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        toastr.error("There was a problem with the server, please try again.");
+                    });
+            }
+
+            // 2. Function to add single product
+            function addSingleToCart(id) {
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            qty: 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            toastr.success(data.message);
+                        } else {
+                            toastr.error(data.message); // Stock out message will be shown here
+                        }
+                    });
+            }
+        </script>
+    @endpush
+@endonce

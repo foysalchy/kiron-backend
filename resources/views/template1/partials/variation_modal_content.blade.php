@@ -20,7 +20,7 @@
 
     <!-- variation list -->
     <div class="space-y-4">
-        <p class="text-sm font-bold text-gray-600 uppercase tracking-wide">একটি ভেরিয়েশন সিলেক্ট করুন:</p>
+        <p class="text-sm font-bold text-gray-600 uppercase tracking-wide">Select a variation:</p>
         <div class="grid grid-cols-1 gap-2 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
             @foreach($product->variations as $variation)
                 <label class="relative block">
@@ -49,8 +49,8 @@
 
         <button type="button" onclick="processAddVariation()"
             class="flex-1 bg-[#1D2128] text-primary py-3 rounded-xl font-bold hover:bg-[#FF6A00] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-            <i class="fas fa-shopping-cart text-sm"></i>
-            Add to Cart
+            <i id="modal-btn-icon" class="fas fa-shopping-cart text-sm"></i>
+            <span id="modal-btn-text">Add to Cart</span>
         </button>
     </div>
 </div>

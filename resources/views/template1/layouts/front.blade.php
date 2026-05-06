@@ -8,7 +8,7 @@
     <meta name="description" content="Explore our shop for the best products. Fast delivery and quality guaranteed.">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
-    <title>{{ $setup->shop_name ?? 'Oren Mart' }}</title>
+    <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
 

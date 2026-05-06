@@ -316,6 +316,15 @@
             margin-top: 4px;
         }
 
+        #invoice-content {
+            margin-top: 0 !important;
+            page-break-before: avoid !important;
+        }
+
+        .invoice-inner {
+            display: block !important;
+        }
+
         .td-center {
             text-align: center;
             font-weight: 700;
@@ -464,14 +473,16 @@
         }
 
         /* ── PRINT ── */
+        /* ── PRINT OPTIMIZATION ── */
         @media print {
             @page {
                 size: A4;
-                margin: .6in .4in;
+                margin: 10mm 10mm;
             }
 
             body {
                 background: #fff !important;
+                font-size: 12px;
             }
 
             .toolbar {
@@ -479,48 +490,83 @@
             }
 
             .page-wrapper {
-                margin: 0;
-                padding: 0;
-                max-width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
             }
 
             .invoice-card {
-                border: 1px solid #e5e7eb !important;
+                border: none !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
+                overflow: visible !important;
             }
 
             .invoice-inner {
-                padding: 30px !important;
+                padding: 10px !important;
             }
 
             .invoice-header {
-                margin-bottom: 28px !important;
+                margin-bottom: 20px !important;
+            }
+
+            .shop-logo-row img {
+                height: 35px !important;
+            }
+
+            .invoice-title {
+                font-size: 28px !important;
+                margin-bottom: 10px !important;
             }
 
             .billing-row {
-                margin-bottom: 28px !important;
-                gap: 24px !important;
+                margin-bottom: 20px !important;
+                gap: 15px !important;
+                display: flex !important;
+                justify-content: space-between;
+            }
+
+            .billing-section {
+                width: 48%;
+            }
+
+            .product-table th,
+            .product-table td {
+                padding: 10px 5px !important;
+            }
+
+            .product-table {
+                margin-bottom: 20px !important;
+                page-break-inside: auto;
+            }
+
+            .product-table tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto;
             }
 
             .summary-wrapper {
-                margin-bottom: 28px !important;
-            }
-
-            .summary-wrapper,
-            .footer-row,
-            .thankyou {
-                page-break-inside: avoid;
-            }
-
-            /* Summary + Footer  */
-            .summary-wrapper+div {
-                page-break-before: avoid;
+                margin-bottom: 15px !important;
+                page-break-inside: avoid !important;
             }
 
             .footer-row {
-                padding-top: 20px !important;
-                margin-bottom: 20px !important;
+                display: flex !important;
+                justify-content: space-between;
+                gap: 20px !important;
+                padding-top: 15px !important;
+                margin-bottom: 15px !important;
+                border-top: 1px solid #eee !important;
+                page-break-inside: avoid !important;
+            }
+
+            .footer-contact {
+                text-align: right;
+            }
+
+            .thankyou {
+                padding-top: 10px !important;
+                page-break-inside: avoid !important;
             }
         }
     </style>
@@ -709,7 +755,7 @@
         function downloadInvoicePDF() {
             const element = document.getElementById('invoice-content');
             const opt = {
-                margin: [5, 5],
+                margin: [10, 10, 10, 10],
                 filename: 'Invoice-{{ $order->order_no }}.pdf',
                 image: {
                     type: 'jpeg',
@@ -718,14 +764,20 @@
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
-                    letterRendering: true
+                    letterRendering: true,
+                    scrollY: 0,
+                    windowHeight: element.scrollHeight
                 },
                 jsPDF: {
                     unit: 'mm',
                     format: 'a4',
                     orientation: 'portrait'
+                },
+                pagebreak: {
+                    mode: ['avoid-all', 'css', 'legacy']
                 }
             };
+            window.scrollTo(0, 0);
             html2pdf().set(opt).from(element).save();
         }
     </script>

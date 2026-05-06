@@ -9,7 +9,7 @@
             ->exists();
     }
 
-    // 2. Price and Percentage Discount logic (from Card 1)
+    // 2. Price and Percentage Discount logic
     $priceData = $product->display_price_data;
     $salePrice = $priceData->sale_price;
     $regularPrice = $priceData->regular_price;
@@ -44,7 +44,7 @@
                 alt="{{ $product->title }}">
         </a>
 
-        <!-- Wishlist Button (Dynamic Heart) -->
+        <!-- Wishlist Button -->
         <button type="button" onclick="toggleWishlist({{ $product->id }})"
             class="absolute top-2 left-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-20 cursor-pointer transition-all {{ $isWishlisted ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
             <svg id="wish-icon-{{ $product->id }}" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
@@ -57,7 +57,6 @@
             </svg>
         </button>
 
-        <!-- Circular Discount Badge (Always %) -->
         @if ($discountLabel)
             <div
                 class="absolute top-1 right-1 secondary-bg text-secondary w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
@@ -87,7 +86,7 @@
             <span class="text-[10px] text-gray-400 font-medium">({{ $totalReviews }})</span>
         </div>
 
-        <!-- Price Section (Colors from Card 1) -->
+        <!-- Price Section -->
         <div class="flex items-center gap-2 mb-3">
             @if ($regularPrice > $salePrice)
                 <span class="text-gray-500 text-sm font-medium line-through">
@@ -103,19 +102,19 @@
     <div class="flex items-center gap-2 mt-auto">
         <!-- Order Now Button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
-            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id)" }}"
+            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
             class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
-    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'primary-bg-hover' }}">
-
+            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'primary-bg-hover' }}">
             @if ($isOutOfStock)
                 Stock Out
             @else
                 Order Now
             @endif
         </button>
+
         <!-- Cart Icon Button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
-            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id)" }}"
+            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id, false)" }}"
             class="primary-bg text-primary p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center
             {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -126,4 +125,148 @@
         </button>
     </div>
 </div>
-<script></script>
+
+@once
+    @push('scripts')
+        <script>
+            // Global state to track if Order Now was clicked
+            let isOrderNowGlobal = false;
+
+            // --- Variation Modal Functions ---
+            function updateModalTotal() {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                const qtyInput = document.getElementById('modal-qty');
+                const totalDisplay = document.getElementById('modal-total-price-display');
+                const unitPriceDisplay = document.getElementById('modal-unit-price');
+
+                if (selectedVariant && qtyInput && totalDisplay) {
+                    const unitPrice = parseFloat(selectedVariant.getAttribute('data-price'));
+                    const qty = parseInt(qtyInput.value);
+                    const currency = "{{ $setup->currency }}";
+                    const total = unitPrice * qty;
+
+                    if (unitPriceDisplay) unitPriceDisplay.innerText = currency + " " + unitPrice.toLocaleString();
+                    totalDisplay.innerText = currency + " " + total.toLocaleString();
+                }
+            }
+
+            function changeQty(val) {
+                let qtyInput = document.getElementById('modal-qty');
+                if (qtyInput) {
+                    let newVal = parseInt(qtyInput.value) + val;
+                    if (newVal >= 1) {
+                        qtyInput.value = newVal;
+                        updateModalTotal();
+                    }
+                }
+            }
+
+            function openVariationModal(id, isOrderNow = false) {
+                isOrderNowGlobal = isOrderNow; 
+
+                const modal = document.getElementById('variation-modal');
+                const contentArea = document.getElementById('modal-content-area');
+                if (!modal) return;
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                contentArea.innerHTML =
+                    '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
+
+                fetch("/product-variation/" + id)
+                    .then(res => res.text())
+                    .then(html => {
+                        contentArea.innerHTML = html;
+
+                        const btnText = document.getElementById('modal-btn-text');
+                        const btnIcon = document.getElementById('modal-btn-icon');
+
+                        if (isOrderNowGlobal) {
+                            if (btnText) btnText.innerText = "Order Now";
+                            if (btnIcon) btnIcon.className = "fas fa-bolt text-sm";
+                        } else {
+                            if (btnText) btnText.innerText = "Add to Cart";
+                            if (btnIcon) btnIcon.className = "fas fa-shopping-cart text-sm";
+                        }
+
+                        updateModalTotal();
+                    });
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('variation-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            }
+
+            function processAddVariation() {
+                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
+                const qtyInput = document.getElementById('modal-qty');
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+
+                if (!selectedVariant) {
+                    toastr.warning("Please select an option.");
+                    return;
+                }
+
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            variation_id: selectedVariant.value,
+                            qty: qtyInput ? qtyInput.value : 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            closeModal();
+
+                            if (isOrderNowGlobal) {
+                                window.location.href = "{{ route('checkout.index') }}";
+                            } else {
+                                toastr.success(data.message);
+                            }
+                        } else {
+                            toastr.error(data.message || "Something went wrong.");
+                        }
+                    }).catch(err => toastr.error("Server error."));
+            }
+
+            // --- Single Product Function ---
+            function addSingleToCart(id, isOrderNow = false) {
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                fetch("{{ route('cart.add') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            qty: 1
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                            if (isOrderNow) {
+                                window.location.href = "{{ route('checkout.index') }}";
+                            } else {
+                                toastr.success(data.message);
+                            }
+                        } else {
+                            toastr.error(data.message);
+                        }
+                    });
+            }
+        </script>
+    @endpush
+@endonce
