@@ -21,7 +21,7 @@ return new class extends Migration
 
             // Order Type & Info
             $table->json('warehouse_info')->nullable();
-            $table->string('type')->comment('pos, sales');
+            $table->string('type')->comment('pos, sales, landing');
             $table->string('order_no')->unique();
             $table->string('reference_no')->nullable();
             $table->date('order_date');

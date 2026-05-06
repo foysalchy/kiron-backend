@@ -18,6 +18,7 @@ class Order extends Model
     // Order types
     public const TYPE_POS = 'pos';
     public const TYPE_SALES = 'sales';
+    public const TYPE_LANDING = 'landing';
     // Payment status constants
     public const PAYMENT_UNPAID = 0;
     public const PAYMENT_PARTIAL = 1;
@@ -89,7 +90,8 @@ class Order extends Model
 
         // Extra charge record
         static::created(function ($order) {
-            if ($order->type !== self::TYPE_SALES) return;
+            // if ($order->type !== self::TYPE_SALES) return;
+            if (!in_array($order->type, [self::TYPE_SALES, self::TYPE_LANDING])) return;
 
             $company = \App\Models\Company::with('pricingPackage')
                 ->find($order->company_id);
@@ -103,7 +105,8 @@ class Order extends Model
 
             $monthlyCount = self::withoutGlobalScope('company')
                 ->where('company_id', $order->company_id)
-                ->where('type', self::TYPE_SALES)
+                // ->where('type', self::TYPE_SALES)
+                ->whereIn('type', [self::TYPE_SALES, self::TYPE_LANDING])
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year)
                 ->count();
@@ -124,7 +127,12 @@ class Order extends Model
      */
     public static function generateOrderNumber(string $type): string
     {
-        $prefix = $type === self::TYPE_POS ? 'POS' : 'SALE';
+        // $prefix = $type === self::TYPE_POS ? 'POS' : 'SALE';
+        $prefix = match ($type) {
+            self::TYPE_POS => 'POS',
+            self::TYPE_LANDING => 'LAND',
+            default => 'SALE',
+        };
         $date = now()->format('Ymd');
 
         // Get last order number for today and this type
@@ -200,6 +208,10 @@ class Order extends Model
     public function isSales(): bool
     {
         return $this->type === self::TYPE_SALES;
+    }
+    public function isLanding(): bool
+    {
+        return $this->type === self::TYPE_LANDING;
     }
 
     /**
@@ -278,6 +290,7 @@ class Order extends Model
         return match ($this->type) {
             self::TYPE_POS => 'POS Order',
             self::TYPE_SALES => 'Sales Order',
+            self::TYPE_LANDING => 'Landing Page Order',
             default => 'Unknown',
         };
     }
@@ -340,6 +353,10 @@ class Order extends Model
     public function scopeSales($query)
     {
         return $query->where('type', self::TYPE_SALES);
+    }
+    public function scopeLanding($query)
+    {
+        return $query->where('type', self::TYPE_LANDING);
     }
 
     public function scopePending($query)

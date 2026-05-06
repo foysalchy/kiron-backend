@@ -23,6 +23,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
 
     //landing page
     Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
+    Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
     Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');

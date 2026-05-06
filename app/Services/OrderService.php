@@ -210,6 +210,11 @@ class OrderService
         $data['type'] = Order::TYPE_SALES;
         return $this->createOrder($data, false);
     }
+    public function createLandingOrder(array $data): Order
+    {
+        $data['type'] = Order::TYPE_LANDING;
+        return $this->createOrder($data, false);
+    }
 
     /**
      * Create order (unified logic)
@@ -285,7 +290,7 @@ class OrderService
                     $this->deductOrderStock($order, $item);
                 }
             }
-            if ($order->type === Order::TYPE_SALES) {
+            if ($order->type === Order::TYPE_SALES || $order->type === Order::TYPE_LANDING) {
                 $productIds = collect($items)->pluck('product_id')->filter();
 
                 $assignedUsers = Product::whereIn('id', $productIds)
@@ -676,32 +681,32 @@ class OrderService
             throw ApiException::serverError('Failed to change order status');
         }
     }
-public function assignUsers(int $id, array $userIds): array
-{
-    $order = Order::findOrFail($id);
-    
-    $previousIds = $order->assigned_to ?? [];
-    $added       = array_diff($userIds, $previousIds);
-    $removed     = array_diff($previousIds, $userIds);
+    public function assignUsers(int $id, array $userIds): array
+    {
+        $order = Order::findOrFail($id);
 
-    $order->update(['assigned_to' => $userIds]);
+        $previousIds = $order->assigned_to ?? [];
+        $added       = array_diff($userIds, $previousIds);
+        $removed     = array_diff($previousIds, $userIds);
 
-    $parts = [];
-    if (!empty($added)) {
-        $parts[] = count($added) . ' user' . (count($added) > 1 ? 's' : '') . ' added';
+        $order->update(['assigned_to' => $userIds]);
+
+        $parts = [];
+        if (!empty($added)) {
+            $parts[] = count($added) . ' user' . (count($added) > 1 ? 's' : '') . ' added';
+        }
+        if (!empty($removed)) {
+            $parts[] = count($removed) . ' user' . (count($removed) > 1 ? 's' : '') . ' removed';
+        }
+        $message = !empty($parts) ? implode(', ', $parts) : 'no changes';
+
+        LogHelper::custom('assigned_users', 'orders', $id, $order->company_id, $message);
+
+        return [
+            'order_id'    => $order->id,
+            'assigned_to' => $userIds,
+        ];
     }
-    if (!empty($removed)) {
-        $parts[] = count($removed) . ' user' . (count($removed) > 1 ? 's' : '') . ' removed';
-    }
-    $message = !empty($parts) ? implode(', ', $parts) : 'no changes';
-
-    LogHelper::custom('assigned_users', 'orders', $id, $order->company_id, $message);
-
-    return [
-        'order_id'    => $order->id,
-        'assigned_to' => $userIds,
-    ];
-}
     /**
      * Hold order (POS only)
      */
@@ -823,7 +828,7 @@ public function assignUsers(int $id, array $userIds): array
             DB::commit();
 
             Log::info('Order payment submit', ['order_id' => $id]);
-            LogHelper::custom('payment', 'orders', $id, $order->company_id,'paid amount. '.$data['amount']);
+            LogHelper::custom('payment', 'orders', $id, $order->company_id, 'paid amount. ' . $data['amount']);
 
             return $order;
         } catch (ApiException $e) {
@@ -854,11 +859,16 @@ public function assignUsers(int $id, array $userIds): array
             'batch_number' => null,
             'serial_numbers' => null,
             'transaction_type' => 'sale',
-            'reference_type' => $order->type === Order::TYPE_POS ? 'POSOrder' : 'SalesOrder',
+            // 'reference_type' => $order->type === Order::TYPE_POS ? 'POSOrder' : 'SalesOrder',
+            'reference_type' => match ($order->type) {
+                Order::TYPE_POS => 'POSOrder',
+                Order::TYPE_LANDING => 'LandingOrder',
+                default => 'SalesOrder',
+            },
             'reference_id' => $order->id,
             'notes' => "Stock deducted for order: {$order->order_no}"
         ];
-    Log::info('Prepared stock data for deduction', $stockData);
+        Log::info('Prepared stock data for deduction', $stockData);
         if (isset($item['variation_id']) && $item['variation_id']) {
             $stockData['variation_id'] = $item['variation_id'];
         }
