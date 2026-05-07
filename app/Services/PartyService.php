@@ -145,7 +145,7 @@ class PartyService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'parties/profiles',
-                   
+
                 );
             }
             $data['password'] = Hash::make($data['password']);
@@ -429,12 +429,12 @@ class PartyService
     public function import($file): array
     {
         $import = new PartiesImport();
-
         Excel::import($import, $file);
 
         return [
             'imported' => $import->getRowCount(),
-            'failed' => $import->getFailedRows(),
+            'skipped'  => $import->getSkippedCount(), 
+            'failed'   => $import->getFailedRows(),
         ];
     }
 }

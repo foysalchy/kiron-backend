@@ -679,6 +679,8 @@ Route::prefix('v1')->group(function () {
                 Route::post('{id}/complete', [RequisitionController::class, 'complete']);
                 Route::get('{id}/restore', [RequisitionController::class, 'restore']);
                 Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
+                Route::get('/{id}/convert-data', [RequisitionController::class, 'convertData']);
+
             });
 
 

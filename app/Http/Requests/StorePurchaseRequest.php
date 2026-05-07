@@ -42,7 +42,10 @@ class StorePurchaseRequest extends BaseCompanyRequest
                         ->where('company_id', $companyId)
                         ->where('type', Party::TYPE_SUPPLIER),
                 ],
+                'requisition_id' => ['nullable', 'exists:requisitions,id'],
+
                 'purchase_date' => ['required', 'date'],
+                'due_date' => ['nullable', 'date', 'after_or_equal:purchase_date'],
 
                 // Purchase Details
                 'items' => ['required', 'array', 'min:1'],

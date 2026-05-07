@@ -16,10 +16,12 @@ class AddPurchasePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:0'],
+            'amount'       => ['required', 'numeric', 'min:0.01'],
+            'payment_date' => ['required', 'date'],
             'payment_type' => ['nullable', 'in:cash,bank,card,cheque'],
-            'account' => ['nullable', 'string', 'max:255'],
-            'payment_note' => ['nullable', 'string', 'max:255'],
+            'account'      => ['nullable', 'string', 'max:255'],
+            'reference_no' => ['nullable', 'string', 'max:255'],
+            'note'         => ['nullable', 'string', 'max:255'],
         ];
     }
 

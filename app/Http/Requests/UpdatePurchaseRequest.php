@@ -45,6 +45,7 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 ],
 
                 'purchase_date' => ['sometimes', 'required', 'date'],
+                'due_date' => ['nullable', 'date', 'after_or_equal:purchase_date'],
 
                 // Purchase Details
                 'items' => ['sometimes', 'required', 'array', 'min:1'],

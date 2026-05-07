@@ -12,61 +12,66 @@ use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
-class PartiesImport implements 
-    ToModel, 
-    WithHeadingRow, 
-    WithValidation, 
+class PartiesImport implements
+    ToModel,
+    WithHeadingRow,
+    WithValidation,
     SkipsOnError,
-    SkipsEmptyRows  
+    SkipsEmptyRows
 {
     use SkipsErrors;
 
     private int $rowCount = 0;
     private array $failedRows = [];
+    private int $skippedCount = 0;
+
 
     public function model(array $row)
     {
-        
         if ($this->isEmptyRow($row)) {
             return null;
         }
 
         try {
-            $this->rowCount++;
 
+            if (Party::where('phone', $row['phone'] ?? '')->exists()) {
+                $this->skippedCount++;
+                return null;
+            }
+
+            $this->rowCount++;
             $type = $this->extractType($row);
             $status = $this->extractStatus($row);
 
             return new Party([
-                'name' => $row['name'] ?? null,
-                'email' => $row['email'] ?? null,
-                'phone' => $row['phone'] ?? null,
+                'name'             => $row['name'] ?? null,
+                'email'            => $row['email'] ?? null,
+                'phone'            => $row['phone'] ?? null,
                 'alternative_phone' => $row['alternative_phone'] ?? null,
-                'address' => $row['address'] ?? null,
-                'type' => $type,
-                'balance' => $row['balance'] ?? 0,
-                'status' => $status,
-                'password' => Hash::make('12345678'),
+                'address'          => $row['address'] ?? null,
+                'type'             => $type,
+                'balance'          => $row['balance'] ?? 0,
+                'status'           => $status,
+                'password'         => Hash::make('12345678'),
             ]);
         } catch (\Exception $e) {
             $this->failedRows[] = [
-                'row' => $this->rowCount + 1, // +1 because header is row 1
+                'row'   => $this->rowCount + 1,
                 'error' => $e->getMessage()
             ];
             return null;
         }
     }
-
     /**
      *  Check if row is empty
      */
     private function isEmptyRow(array $row): bool
     {
         // Remove null values and check if anything remains
-        $filtered = array_filter($row, function($value) {
+        $filtered = array_filter($row, function ($value) {
             return $value !== null && $value !== '';
         });
-        
+
         return empty($filtered);
     }
 
@@ -75,9 +80,9 @@ class PartiesImport implements
      */
     private function extractType(array $row): int
     {
-        $typeValue = $row['type_1supplier_2customer'] 
-                  ?? $row['type'] 
-                  ?? 2;
+        $typeValue = $row['type_1supplier_2customer']
+            ?? $row['type']
+            ?? 2;
 
         if (is_string($typeValue)) {
             $typeValue = strtolower(trim($typeValue));
@@ -92,9 +97,9 @@ class PartiesImport implements
      */
     private function extractStatus(array $row): int
     {
-        $statusValue = $row['status_0inactive_1active'] 
-                    ?? $row['status'] 
-                    ?? 0;
+        $statusValue = $row['status_0inactive_1active']
+            ?? $row['status']
+            ?? 0;
 
         if (is_string($statusValue)) {
             $statusValue = strtolower(trim($statusValue));
@@ -103,15 +108,18 @@ class PartiesImport implements
 
         return (int) $statusValue;
     }
-
+    public function getSkippedCount(): int
+    {
+        return $this->skippedCount;
+    }
     /**
      * Validation rules 
      */
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:parties,email',
+            'name'  => 'required|string|max:255',
+            'email' => 'nullable|email',
             'phone' => 'required|max:20',
         ];
     }
@@ -139,7 +147,7 @@ class PartiesImport implements
         if ($this->isEmptyRow($data)) {
             return null;
         }
-        
+
         return $data;
     }
 

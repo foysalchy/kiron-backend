@@ -21,8 +21,10 @@ class Purchase extends Model
         'company_id',
         'warehouse_id',
         'supplier_id',
+        'requisition_id',
         'reference_no',
         'purchase_date',
+        'due_date',
         'total_quantities',
         'subtotal',
         'other_charges',
@@ -39,7 +41,7 @@ class Purchase extends Model
     ];
 
     protected $casts = [
-        'purchase_date' => 'date',
+       
         'total_quantities' => 'integer',
         'subtotal' => 'decimal:2',
         'other_charges' => 'decimal:2',
@@ -71,8 +73,26 @@ class Purchase extends Model
 
         return 'PUR-' . $date . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
     }
+    public function payments()
+    {
+        return $this->hasMany(PurchasePayment::class);
+    }
 
- 
+    public function updatePaymentStatus(): void
+    {
+        $totalPaid = $this->payments()->sum('amount');
+
+        if ($totalPaid <= 0) {
+            $status =   self::PAYMENT_UNPAID; // unpaid
+        } elseif ($totalPaid >= $this->grand_total) {
+            $status =   self::PAYMENT_PAID ; // paid
+        } else {
+            $status = self::PAYMENT_PARTIAL; // partial
+        }
+
+        $this->update(['payment_status' => $status]);
+    }
+
     // Relationships
     public function company(): BelongsTo
     {

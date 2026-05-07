@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger, ProductVariationStockLedger};
+use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger, ProductVariationStockLedger, PurchasePayment};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -31,7 +31,7 @@ class PurchaseService
                 'purchaseDetails.product',
                 'purchaseDetails.variation.attributes.attributeGroup',
                 'purchaseDetails.variation.attributes.attributeValue'
-            ]);
+            ])->withSum('payments', 'amount');
 
             if (isset($filters['warehouse_id'])) {
                 $query->where('warehouse_id', $filters['warehouse_id']);
@@ -82,10 +82,12 @@ class PurchaseService
         $purchase = Purchase::with([
             'warehouse',
             'supplier',
+            'payments',
             'purchaseDetails.product',
             'purchaseDetails.variation.attributes.attributeGroup',
             'purchaseDetails.variation.attributes.attributeValue'
-        ])->find($id);
+        ])->withSum('payments', 'amount')
+            ->findOrFail($id);
 
         if (!$purchase) {
             throw ApiException::notFound('Purchase');
@@ -203,7 +205,7 @@ class PurchaseService
                     PurchaseDetail::create([
                         'purchase_id' => $purchase->id,
                         'product_id' => $item['product_id'],
-                        'variation_id' => $item['variation_id'] ?? null, 
+                        'variation_id' => $item['variation_id'] ?? null,
                         'quantity' => $item['quantity'],
                         'purchase_price' => $item['purchase_price'],
                         'unit_cost' => $item['unit_cost'],
@@ -338,31 +340,33 @@ class PurchaseService
         try {
             $purchase = $this->getPurchaseById($id);
 
-            $currentPaid = $purchase->payment_amount ?? 0;
-            $newPaid = $currentPaid + $paymentData['amount'];
-
-            $purchase->update([
-                'payment_amount' => $newPaid,
-                'payment_type' => $paymentData['payment_type'] ?? $purchase->payment_type,
-                'account' => $paymentData['account'] ?? $purchase->account,
-                'payment_note' => $paymentData['payment_note'] ?? $purchase->payment_note,
-                'payment_status' => $this->determinePaymentStatus($purchase->grand_total, $newPaid),
+            PurchasePayment::create([
+                'purchase_id'  => $purchase->id,
+                'amount'       => $paymentData['amount'],
+                'payment_date' => $paymentData['payment_date'],
+                'payment_type' => $paymentData['payment_type'] ?? null,
+                'account'      => $paymentData['account'] ?? null,
+                'reference_no' => $paymentData['reference_no'] ?? null,
+                'note'         => $paymentData['note'] ?? null,
             ]);
+
+            $purchase->updatePaymentStatus();
 
             DB::commit();
 
-            Log::info('Payment added to purchase', ['purchase_id' => $id, 'amount' => $paymentData['amount']]);
+            Log::info('Payment added to purchase', [
+                'purchase_id' => $id,
+                'amount'      => $paymentData['amount'],
+            ]);
             LogHelper::custom('payment_added', 'purchase', $id, $purchase->company_id);
 
-            return $purchase;
+            return $purchase->fresh();
         } catch (\Exception $e) {
             DB::rollBack();
-
             Log::error('Add payment failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to add payment');
         }
     }
-
     /**
      * Restore purchase
      */

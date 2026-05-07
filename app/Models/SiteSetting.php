@@ -23,6 +23,8 @@ class SiteSetting extends Model
         'email',
         'lang',
         'currency',
+        'inside_charge',
+        'outside_charge',
         'corporate_address',
         'store_address',
         'tags',

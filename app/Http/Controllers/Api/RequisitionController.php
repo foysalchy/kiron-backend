@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreRequisitionRequest, UpdateRequisitionRequest};
 use App\Services\RequisitionService;
 use App\Helpers\ResponseHelper;
+use App\Models\Requisition;
 use Illuminate\Http\{JsonResponse, Request};
 use Illuminate\Validation\Rule;
 
@@ -155,5 +156,28 @@ class RequisitionController extends Controller
         $this->requisitionService->forceDeleteRequisition($id);
 
         return ResponseHelper::success(null, 'Requisition permanently deleted successfully');
+    }
+
+    public function convertData(int $id): JsonResponse
+    {
+        $requisition = Requisition::with([
+            'requisitionDetails.product',
+            'requisitionDetails.variation',
+        ])->findOrFail($id);
+
+        if ($requisition->status !== Status::Approved->value) {
+            return ResponseHelper::error('Only approved requisitions can be converted', 422);
+        }
+
+        return ResponseHelper::success([
+            'note'    => $requisition->note,
+            'details' => $requisition->requisitionDetails->map(fn($d) => [
+                'product_id'   => $d->product_id,
+                'variation_id' => $d->variation_id,
+                'quantity'     => $d->quantity,
+                'price'        => $d->price,
+                'unit'         => $d->unit,
+            ]),
+        ]);
     }
 }
