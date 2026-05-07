@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KidzFun - Smart Learning Cards</title>
+    <title>{{ $landing->title }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Noto+Sans+Bengali:wght@400;600;700;800;900&display=swap"
@@ -139,8 +140,8 @@
 
         <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
             <div class="px-8 py-6">
-                <img src="https://kidzfunbd.com/wp-content/uploads/2025/11/Asset-3-scaled-1-1300x281.png"
-                    alt="KidzFun Logo" class="w-40">
+
+                <img src={{ $setup->logo_url ?? '' }} alt="KidzFun Logo" class="w-20">
             </div>
         </div>
         <div class="main-container bg-[#ebf0fa]/60 p-10">
@@ -152,178 +153,135 @@
                     {{-- Blue badge --}}
                     <div
                         class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg ">
-                        শিশুর মেধা 🧠 এবং সৃজনশীলতা বিকাশে সাহায্য করবে
+                        {!! $landing->name !!}
                     </div>
 
                     {{-- Main headline --}}
-                    <h1 class="text-2xl md:text-5xl font-extrabold text-[#003A9C] leading-snug mb-6">
-                        📢 বাংলাদেশে একমাত্র আমরাই দিচ্ছি<br>
-                        <span class="circle-sketch text-[#003A9C] px-3">
-                            <span class="text-red-500">২৫৫ টি কার্ডে ৫১০ টি লেসন</span>📚 একটা ডিভাইসেই বাংলা + ইংরেজি +
-                            আরবি অংক সহ অনেক কিছু 👉
-                    </h1>
+                    <div
+                        class="prose prose-slate max-w-none mb-4
+                        prose-h1:text-6xl lg:prose-h1:text-7xl
+                        prose-p:text-3xl lg:prose-p:text-4xl
+                        ">
+                        {!! $landing->short_description ?? '' !!}
+                    </div>
 
                     {{-- Product image --}}
                     <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8">
-                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/255-as-800x800.jpg" alt="Product"
-                            class="w-full">
+                        @if ($landing->video)
+                            <video class="w-full h-[600px] " controls playsinline poster="{{ $landing->thumbnail_url }}">
+                                <source src="{{ $landing->video_url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        @else
+                            <img src="{{ $landing->thumbnail_url ?? asset('./images/default-thumbnail.jpg') }}"
+                                class="w-full" alt="{{ $landing->name }}">
+                        @endif
                     </div>
 
                     {{-- Stock status --}}
-                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold">
-                        <p class="mb-4">📱 বাচ্চার মোবাইল অ্যাডিকশন কমাবে</p>
-                        <p>💥 সীমিত স্টক ⏰
-                            <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1">দেরি করলে মিস</span>
+                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center">
+                        <p class="mb-4">📱 {{ $landing->extras['features'][0] ?? 'অ্যাডিকশন কমাবে' }}
+                        </p>
+
+                        <p>💥 {{ $landing->extras['features'][1] ?? '' }} ⏰
+                            <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0">
+                                {{ $landing->extras['features'][2] ?? '' }}
+                            </span>
                         </p>
                     </div>
-
-                    {{-- Warranty badge --}}
                     <div
-                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] text-extrabold px-8 py-3 rounded-xl font-bold text-3xl mb-14 shadow-lg">
-                        সাথে ১ বছরের রিপ্লেসমেন্ট ওয়ারেন্টি 😍
+                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] px-6 md:px-8 py-3 rounded-xl font-bold text-xl md:text-3xl mb-14 shadow-lg text-black">
+                        {{ $landing->extras['features'][3] ?? 'সাথে ১ বছরের রিপ্লেসমেন্ট' }}😍
                     </div>
 
                     {{-- Why best section --}}
+                    @php
+                        $feature2Title =
+                            $landing->extras['features2'][0]['title'] ?? 'এটি কেন আপনার সোনামণির জন্য সেরা?';
+                        $words = explode(' ', $feature2Title);
+                        $lastPart = array_splice($words, -3); //
+                        $firstPart = implode(' ', $words);
+                    @endphp
                     <div class="mb-10">
                         <h2 class="text-xl md:text-4xl font-semibold leading-snug">
-                            এটি কেন আপনার
-                            <span class="wavy-underline text-[#fc4124] px-1">
-                                সোনামণির জন্য সেরা?
-                                <svg viewBox="0 0 500 40" preserveAspectRatio="none">
+                            {{ $firstPart }}
+                            <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
+                                {{ implode(' ', $lastPart) }}
+                                <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
+                                    preserveAspectRatio="none">
                                     <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
-                                        stroke="#fc4124" />
+                                        stroke="#fc4124" fill="transparent" stroke-width="4" />
                                 </svg>
                             </span>
                         </h2>
                     </div>
 
                     {{-- Category map image --}}
-                    <div class="max-w-3xl mx-auto mb-14 overflow-hidden">
-                        <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp"
-                            alt="Categories" class="w-full">
+                    <div class="max-w-3xl mx-auto mb-14 overflow-hidden rounded-xl">
+                        @php
+                            $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
+                        @endphp
+                        <img src="{{ $categoryMap ? asset('storage/' . $categoryMap) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp' }}"
+                            alt="Categories" class="w-full object-contain">
                     </div>
 
-                    {{-- Bullet points --}}
-                    <!-- Points Section Start -->
-                    <div class="container mx-auto space-y-6 mb-16 ">
+                    <div class="container mx-auto space-y-6 mb-16">
+                        @php
+                            $features3 = $landing->extras['features3'] ?? [];
+                            $paddingClasses = ['md:pl-48', 'md:pl-32', 'md:pl-16', 'md:pl-8', 'md:pl-0'];
+                        @endphp
 
-                        <!-- Point 1 -->
-                        <div class="flex gap-3 text-lg font-bold items-start md:pl-48">
-                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
+                        @foreach ($features3 as $index => $point)
+                            <div
+                                class="flex gap-3 text-lg font-bold items-start {{ $paddingClasses[$index] ?? 'md:pl-0' }}">
+                                <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                            d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+
+                                <div class="leading-relaxed text-gray-800">
+                                    {!! $point !!}
+                                </div>
                             </div>
-                            <p class="leading-relaxed">
-                                বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124]">৫১০ টি কার্ডে</span> রয়েছে
-                                ৪২টি
-                                ক্যাটাগরির শব্দ
-                            </p>
-                        </div>
-
-                        <!-- Point 2 -->
-                        <div class="flex gap-3 text-lg font-bold items-start md:pl-32">
-                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <p class="leading-relaxed">
-                                স্মার্ট ও টেকসই ডিজাইন লেমিনেটেড কাগজ, <span class="text-[#fc4124]">সম্পূর্ণ
-                                    ওয়াটারপ্রুফ
-                                    খুবই মজবুত,</span> সহজে ছিঁড়ে যায় না বা নষ্ট হয় না
-                            </p>
-                        </div>
-
-                        <!-- Point 3 -->
-                        <div class="flex gap-3 text-lg font-bold items-start md:pl-16">
-                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <p class="leading-relaxed">
-                                ভয়েস রিপিট ফিচার, <span class="text-[#fc4124]">শিশু যা বলবে, বইটি তা-ই রিপিট
-                                    করবে।</span>
-                                এতে করে শেখা হবে আরও মজাদার, বাড়বে আত্মবিশ্বাস ও পড়ার আগ্রহ।
-                            </p>
-                        </div>
-
-                        <!-- Point 4 -->
-                        <div class="flex gap-3 text-lg font-bold items-start md:pl-8">
-                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <p class="leading-relaxed">
-                                প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#fc4124]">বাংলা বর্ণমালা, Alphabet,
-                                    আরবি
-                                    বর্ণমালা, বাংলা সাংখ্যা, ইংরেজি সংখ্যা</span> রয়েছে এই বইটিতে
-                            </p>
-                        </div>
-
-                        <!-- Point 5 -->
-                        <div class="flex gap-3 text-lg font-bold items-start md:pl-0">
-                            <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <p class="leading-relaxed">
-                                পবিত্র কোরআনের ১৫টি সুরা ১৫টি শ্রুতিমধুর ইসলামিক গজল নতুন সংযোজন হয়েছে, <span
-                                    class="text-[#fc4124]">এতে আপনার শিশু</span> ধর্মীয় শিক্ষায় সুশিক্ষা লাভ করবে
-                            </p>
-                        </div>
-
+                        @endforeach
                     </div>
-                    <!-- Points Section End -->
-
                 </div>
             </section>
 
 
             {{-- ══ BLACK OFFER SECTION ══ --}}
             <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white">
+                @php
+                    $promoData = $landing->extras['features4'][0] ?? null;
+                    $promoHeading = $promoData['title'] ?? '⚡ দেরি শেষ!';
+                    $promoImage = $promoData['image'] ?? null;
+                @endphp
                 <!-- Heading -->
                 <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
-                    <span class="text-orange-500">⚡</span> দেরি করলেই শেষ!
+                    {!! $promoHeading !!}
                 </h3>
 
                 <!-- Product Image in Frame -->
                 <div
-                    class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl">
-                    <img src="https://kidzfunbd.com/wp-content/uploads/2026/04/Smart-set-1-800x800.jpg"
-                        alt="Smart Learning Cards" class="w-full">
+                    class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl bg-white/5">
+
+                    <img src="{{ $promoImage ? asset('storage/' . $promoImage) : $landing->thumbnail_url }}"
+                        alt="Offer Product" class="w-full object-contain">
                 </div>
 
                 <!-- Price Section -->
                 <div class="space-y-8 mb-12">
                     <h4 class="text-2xl md:text-5xl font-medium leading-tight">
-                        📢 বর্তমান অফার প্রাইজ
-                        <span class="price-circle text-yellow-400">
-                            999/=
-                            <svg viewBox="0 0 500 150" preserveAspectRatio="none">
-                                <!-- Hand-drawn Red Circle -->
-                                <path
-                                    d="M325,18C228.7-8.3,118.5,8.3,78,21C22.4,38.4,4.6,54.6,5.6,77.6c1.4,32.4,52.2,54,142.6,63.7c66.2,7.1,212.2,7.5,273.5-8.3c64.4-16.6,104.3-57.6,33.8-98.2C386.7-4.9,179.4-1.4,126.3,20.7"
-                                    fill="none" stroke="#ff0000" stroke-width="12" />
-                            </svg>
-                        </span>
-                        টাকা <span class="text-orange-500">🔥</span>
+                        {{ $landing->discount_price }}
+
                     </h4>
 
                     <h4 class="text-xl md:text-4xl font-medium text-white/90">
-                        এবং সারা বাংলাদেশে ডেলিভারি চার্জ
-                        <span class="text-yellow-400 border-b-4 border-yellow-400/50">100/= টাকা</span>
+                        {{ $landing->regular_price }}
                     </h4>
                 </div>
-
                 <!-- 3D Green Button -->
 
 
@@ -332,7 +290,7 @@
                 <a href="#order"
                     class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
                     <i class="fa-solid fa-circle-down text-2xl md:text-3xl"></i>
-                    ৫২০০০+ বাবা মা তার বাচ্চার জন্য নিয়েছে ! আপনারটি নিন এখনই 😍
+                    আপনারটি নিন এখনই 😍
                 </a>
             </div>
         </div>
@@ -341,25 +299,29 @@
 
     {{-- ══ ORDER FORM ══ --}}
     <section id="order" class="py-16 px-4 bg-[#f5f6ff] relative z-10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.15)]">
-        <x-landing.order-form />
+        <x-landing.order-form :landing="$landing" />
     </section>
 
 
     {{-- ══ FOOTER ══ --}}
     <footer class="bg-grid-dark py-16 px-4 text-center text-white bg-dark-grid border-gray-800">
         <div class="max-w-5xl mx-auto">
-            <div class="text-lg md:text-4xl font-extrabold mb-8">
+            <div class="text-lg md:text-3xl font-bold mb-8">
                 📢 আমাদের অফিশিয়াল
-                <span class="text-[#7DF9FF] italic">Facebook</span>
+                <span>
+                    @foreach ($socialLinks as $link)
+                        <a href="{{ $link->link }}" target="_blank"
+                            class="text-white hover:text-[#7DF9FF] transition-colors">
+                            Facebook
+                        </a>
+                    @endforeach
+                </span>
                 পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
-            <img src="{{asset('images/landing/img/footer-land2.png')}}" alt="Logo"
-                class="w-44 md:w-68 mx-auto mb-6 brightness-200">
-            <p class="text-gray-200 text-sm font-semibold">Copyright © 2025 KidzFun. All Rights Reserved. Developed By</p>
-            <p class="text-yellow-300 text-sm mt-2">RoseCreativity</p>
+            <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" class="w-20 mx-auto mb-6 brightness-200">
+            <p>© {{ date('Y') }} {{ $setup->title ?? '' }}. All rights reserved.</p>
         </div>
     </footer>
-
 
 </body>
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
-use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, Warehouse};
+use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, Party, Product, ProductReview, ProductStockLedger, ProductVariation, ProductVariationStock, ProductVariationStockLedger, SiteSetting, Warehouse};
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
@@ -44,14 +44,16 @@ class OrderController extends FrontendController
             ]);
         }
 
+        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $defaultInside = $settings->inside_charge ?? 60;
         $cartContent = Cart::content();
 
 
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
-        $shipping = session()->get('shipping_cost', 60);
+        $shipping = session()->get('shipping_cost', $defaultInside);
+        $shipping_area = session()->get('shipping_area', 'inside');
         $discount = session()->has('coupon') ? session('coupon')['discount_amount'] : 0;
         $total = ($subtotal - $discount) + $shipping;
-        $shipping_area = session()->get('shipping_area', 'inside');
 
         $draftOrderId = Session::get('current_draft_order_id');
 
