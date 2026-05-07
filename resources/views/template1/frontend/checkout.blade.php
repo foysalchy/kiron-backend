@@ -92,22 +92,25 @@
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         <div class="mb-8">
                             <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
-                                Method
-                            </h2>
+                                Method</h2>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="delivery_area" value="inside"
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">Inside Dhaka
-                                        ({{ $setup->currency }} 60)</span>
+                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">
+                                        Inside Dhaka ({{ $setup->currency }}
+                                        {{ number_format($setup->inside_charge, 0) }})
+                                    </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="delivery_area" value="outside"
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
-                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">Outside Dhaka
-                                        ({{ $setup->currency }} 120)</span>
+                                    <span class="text-sm font-medium text-gray-700 group-hover:text-black">
+                                        Outside Dhaka ({{ $setup->currency }}
+                                        {{ number_format($setup->outside_charge, 0) }})
+                                    </span>
                                 </label>
                             </div>
                         </div>

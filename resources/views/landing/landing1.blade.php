@@ -63,11 +63,8 @@
     <section class="bg-[#0D2601] text-white pt-10 pb-16 px-4 text-center">
         <div class="max-w-7xl mx-auto">
 
-            {{-- <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/logo.png" alt="Moringa Logo"
-                class="mx-auto mb-6 w-28 md:w-40 lg:w-48"> --}}
-            <div>
-                <h1 class="text-xl sm:text-2xl md:text-4xl font-semibold leading-snug mb-4">{{ $landing->name }}</h1>
-            </div>
+            <img src={{ $setup->logo_url }} alt="Moringa Logo"
+                class="mx-auto mb-6 w-20">
 
             <div class="border border-[#2e8c03] p-4 md:p-6 rounded mb-6">
                 <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-semibold leading-snug">

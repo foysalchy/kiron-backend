@@ -25,9 +25,10 @@
 
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
-                                <div class="flex flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
+                                <div
+                                    class="flex flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
                                     <!-- Image -->
-                                   <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
+                                    <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
                                         <img src="{{ $item->options->thumbnail }}"
                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                             class="w-full h-full object-cover">
@@ -35,7 +36,8 @@
 
                                     <!-- Details -->
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1">{{ $item->name }}
+                                        <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1">
+                                            {{ $item->name }}
                                         </h3>
                                         <div class="flex items-center gap-2 mb-2">
                                             <span
@@ -93,25 +95,30 @@
                             <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
                                 @csrf
                                 <div class="space-y-2">
+                                    {{-- ১. Inside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="inside" onchange="this.form.submit()"
                                             {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#FF6A00]">
-                                        <span class="text-sm font-bold text-gray-700">Inside Dhaka ({{ $setup->currency }}
-                                            60)</span>
+                                        <span class="text-sm font-bold text-gray-700">
+                                            Inside Dhaka ({{ $setup->currency }}
+                                            {{ number_format($setup->inside_charge, 0) }})
+                                        </span>
                                     </label>
 
+                                    {{-- ২. Outside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="outside" onchange="this.form.submit()"
                                             {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#FF6A00]">
-                                        <span class="text-sm font-bold text-gray-700">outside Dhaka ({{ $setup->currency }}
-                                            120)</span>
+                                        <span class="text-sm font-bold text-gray-700">
+                                            Outside Dhaka ({{ $setup->currency }}
+                                            {{ number_format($setup->outside_charge, 0) }})
+                                        </span>
                                     </label>
                                 </div>
                             </form>
                         </div>
-
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf

@@ -11,6 +11,7 @@ use App\Services\CouponService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use App\Models\Cart as CartModel;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Log;
 
 class CartController extends FrontendController
@@ -24,9 +25,11 @@ class CartController extends FrontendController
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
         //delivvery charge default=60
-        $shipping = session()->get('shipping_cost', 60);
-        $shipping_area = session()->get('shipping_area', 'inside');
+        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $defaultInside = $settings->inside_charge ?? 60;
 
+        $shipping = session()->get('shipping_cost', $defaultInside);
+        $shipping_area = session()->get('shipping_area', 'inside');
         //coupon discount
         $discount = 0;
 
@@ -64,7 +67,11 @@ class CartController extends FrontendController
     //shipping area method
     public function updateShipping($store, Request $request)
     {
-        $cost = ($request->area == 'outside') ? 120 : 60;
+        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $inside = $settings->inside_charge ?? 60;
+        $outside = $settings->outside_charge ?? 100;
+
+        $cost = ($request->area == 'outside') ? $outside : $inside;
 
         session()->put('shipping_area', $request->area);
         session()->put('shipping_cost', $cost);
@@ -156,10 +163,10 @@ class CartController extends FrontendController
                 // ── VARIATION PRODUCT ──
                 $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($request->variation_id);
 
-                // ✅ কোন warehouse-এ stock আছে সেটা খোঁজো
+                //  warehouse-
                 $stockRecord = $variation->stocks
                     ->where('quantity', '>=', $qty)
-                    ->sortByDesc('quantity') // সবচেয়ে বেশি stock আছে যেটায়
+                    ->sortByDesc('quantity') //stock
                     ->first();
 
                 if (!$stockRecord) {
@@ -211,7 +218,7 @@ class CartController extends FrontendController
                 // ── SINGLE PRODUCT ──
                 $product = Product::findOrFail($request->id);
 
-                // warehouse_info 
+                // warehouse_info
                 $bestWarehouse = null;
                 $bestBinId     = null;
                 $bestQty       = 0;
@@ -260,6 +267,17 @@ class CartController extends FrontendController
                 ]);
                 Log::info("Cart Add (Single Product); Product ID: {$productId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
             }
+            $customerId = null;
+
+            if (auth('customer')->check()) {
+                $user = auth('customer')->user();
+                if ($user) {
+                    $customerId = $user->id;
+                } else {
+                    auth('customer')->logout();
+                }
+            }
+
 
             // Database tracking
             CartTrack::updateOrCreate(
@@ -270,7 +288,7 @@ class CartController extends FrontendController
                 ],
                 [
                     'company_id'  => getCurrentCompany()->id,
-                    'customer_id' => auth('customer')->id(),
+                    'customer_id' => $customerId,
                     'quantity'    => $qty,
                     'status'      => CartTrack::ADDED,
                 ]
