@@ -366,7 +366,7 @@
             </div>
             <div class="border-t border-gray-200 pt-6 text-center">
                 <p class="text-gray-500 text-sm">
-                <p>© {{ date('Y') }} {{ $landing->title ?? '' }}. All rights reserved.</p>
+                <p>© {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.</p>
                 </p>
             </div>
         </div>

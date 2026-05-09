@@ -41,11 +41,11 @@
                         <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-[#1f8a54] peer-checked:bg-green-50 bg-white hover:border-gray-300">
                             <div class="flex items-center gap-4 w-full">
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                                    <img src="{{ $vImage }}" class="w-full h-full object-contain">
+                                    <img src="{{ $vImage }}" class="w-full h-full object-contain" alt="PTOFUVT">
                                 </div>
                                 <div class="flex-grow text-left">
                                     <p class="text-sm md:text-md font-bold text-gray-800">{{ $mainProduct->title }}</p>
-                                    <p class="text-xs text-[#1f8a54] font-bold uppercase mt-1">Option: {{ $variation->display_name }}</p>
+                                    <p class="text-xs text-[#145a32] font-bold uppercase mt-1">Option: {{ $variation->display_name }}</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 flex-shrink-0">
@@ -58,7 +58,7 @@
                 <div class="border-2 border-[#1f8a54] bg-green-50 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4 w-full">
                         <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" class="w-full h-full object-contain">
+                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" class="w-full h-full object-contain" alt="THUMBNAIL">
                         </div>
                         <div class="text-left">
                             <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
@@ -75,16 +75,16 @@
             {{-- LEFT: Billing Info --}}
             <div class="lg:col-span-7 space-y-6">
                 <div>
-                    <label class="block text-md font-bold mb-2 text-gray-800">আপনার নাম লিখুন <span class="text-red-500">*</span></label>
-                    <input type="text" name="name" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                    <label for="name" class="block text-md font-bold mb-2 text-gray-800">আপনার নাম লিখুন <span class="text-red-500">*</span></label>
+                    <input id="name" type="text" name="name" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
-                    <label class="block text-md font-bold mb-2 text-gray-800">মোবাইল নাম্বার লিখুন <span class="text-red-500">*</span></label>
-                    <input type="tel" name="phone" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                    <label for="phone" class="block text-md font-bold mb-2 text-gray-800">মোবাইল নাম্বার লিখুন <span class="text-red-500">*</span></label>
+                    <input type="tel" id="phone" name="phone" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
-                    <label class="block text-md font-bold mb-2 text-gray-800">সম্পূর্ণ ঠিকানা লিখুন <span class="text-red-500">*</span></label>
-                    <input type="text" name="address" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
+                    <label for="address" class="block text-md font-bold mb-2 text-gray-800">সম্পূর্ণ ঠিকানা লিখুন <span class="text-red-500">*</span></label>
+                    <input type="text" id="address" name="address" required class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
                     <div class="flex justify-between items-start gap-4 pb-5 mb-5 border-b border-dashed border-gray-200">
                         <div class="flex items-start gap-3">
                             <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
-                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" class="w-full h-full object-contain">
+                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" alt="{{ $landing->product->title ?? 'Product Image' }}" class="w-full h-full object-contain">
                             </div>
                             <div class="max-w-[150px]">
                                 <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
@@ -132,11 +132,11 @@
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="cursor-pointer">
                                     <input type="radio" name="shipping_area" value="inside" checked onchange="updateDeliveryCharge({{ $insideCharge }})" class="hidden peer">
-                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#1f8a54] bg-gray-50">Inside Dhaka</div>
+                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">Inside Dhaka</div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="shipping_area" value="outside" onchange="updateDeliveryCharge({{ $outsideCharge }})" class="hidden peer">
-                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#1f8a54] bg-gray-50">Outside Dhaka</div>
+                                    <div class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">Outside Dhaka</div>
                                 </label>
                             </div>
                         </div>
@@ -144,11 +144,11 @@
 
                     {{-- Calculations --}}
                     <div class="px-2 space-y-2 border-t border-dashed border-gray-100 pt-4 mb-6">
-                        <div class="flex justify-between text-sm text-gray-600">
+                        <div class="flex justify-between text-sm text-gray-800">
                             <span>Subtotal</span>
                             <span class="font-bold text-gray-800"><span id="summary-subtotal"></span>{{ $setup->currency }}</span>
                         </div>
-                        <div class="flex justify-between text-sm text-gray-600">
+                        <div class="flex justify-between text-sm text-gray-800">
                             <span>Shipping Charge</span>
                             <span class="font-bold text-red-600">+<span id="delivery-charge-display"></span>{{ $setup->currency }}</span>
                         </div>
