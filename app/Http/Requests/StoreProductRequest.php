@@ -53,7 +53,7 @@ class StoreProductRequest extends BaseCompanyRequest
 
                 // Single Product Fields
                 'regular_price' => ['required_if:type,single', 'nullable', 'numeric', 'min:0'],
-                'purchase_price' => ['nullable', 'numeric', 'min:0'],
+                'purchase_price' => ['nullable'],
                 'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
                 'discount'      => ['nullable', 'numeric', 'min:0'],
                 'warehouse_info'                        => ['required_if:type,single', 'nullable', 'array'],
@@ -72,7 +72,7 @@ class StoreProductRequest extends BaseCompanyRequest
                 'variations.*.gallery_images' => ['nullable', 'array'],
                 'variations.*.gallery_images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'variations.*.regular_price'  => ['required', 'numeric', 'min:0'],
-                'variations.*.purchase_price'  => ['nullable', 'numeric', 'min:0'],
+                'variations.*.purchase_price'  => ['nullable'],
                 'variations.*.discount_type'  => ['nullable', Rule::in(['flat', 'percent'])],
                 'variations.*.discount'       => ['nullable', 'numeric', 'min:0'],
                 'variations.*.warehouse_info'                    => ['required', 'array', 'min:1'],

@@ -19,6 +19,9 @@ return new class extends Migration
             $table->json('supplier_ids');
             $table->json('custom_numbers');
             $table->text('message');
+            $table->integer('total_recipients')->default(0); 
+            $table->integer('sms_count')->default(0);        
+            $table->decimal('rate_per_sms', 8, 4)->default(0);
             $table->tinyInteger('status')->default(Status::Inactive->value);
             $table->timestamps();
             $table->softDeletes();

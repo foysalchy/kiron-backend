@@ -13,6 +13,9 @@ class SmsSendService
     /**
      * Get all SMS logs with filters.
      */
+    public function __construct(
+        private SmsWalletService $smsWalletService
+    ) {}
     public function getAllSmsSends(array $filters)
     {
         try {
@@ -69,7 +72,7 @@ class SmsSendService
     {
         return DB::transaction(function () use ($data) {
             try {
-                // 1. Merge System Party IDs (Customers + Suppliers)
+                // 1. Merge System Party IDs
                 $partyIds = array_unique(array_merge(
                     $data['customer_ids'] ?? [],
                     $data['supplier_ids'] ?? []
@@ -101,34 +104,51 @@ class SmsSendService
                 $phoneNumbers = array_unique($phoneNumbers);
 
                 if (empty($phoneNumbers)) {
-                    throw ApiException::validationError('Selected recipients do not have valid phone numbers.');
+                    throw ApiException::badRequest('Selected recipients do not have valid phone numbers.');
                 }
 
-                // Determine message body (Frontend sends 'body', but handling 'message' as fallback)
                 $messageBody = $data['body'] ?? $data['message'] ?? '';
 
                 if (empty($messageBody)) {
-                    throw ApiException::validationError('SMS message cannot be empty.');
+                    throw ApiException::badRequest('SMS message cannot be empty.');
                 }
 
-                // Store the record in your database
-                // Ensure 'custom_numbers' and 'supplier_ids' are in your $fillable and cast as 'array'
-                $smsSend = SmsSend::create($data);
+                // ✅ 5. Balance check
+                $smsCount = count($phoneNumbers);
+                $wallet   = $this->smsWalletService->getOrCreate();
 
-                // Send to actual Mobile Gateway
+                if (!$wallet->hasSufficientBalance($smsCount)) {
+                    throw ApiException::badRequest(
+                        "Insufficient SMS balance. Required: {$smsCount}, Available: {$wallet->sms_count}"
+                    );
+                }
+
+                // 6. Store record
+                $smsSend = SmsSend::create(array_merge($data, [
+                    'total_recipients' => $smsCount,
+                    'sms_count'        => $smsCount,
+                    'rate_per_sms'     => $wallet->currentRate(),
+                ]));
+
+                // 7. Send to gateway
                 $this->sendToGateway($phoneNumbers, $messageBody);
 
-                // Log the success
+                // ✅ 8. Deduct balance
+                $this->smsWalletService->deductBalance(
+                    $smsCount,
+                    $smsSend->id,
+                    $smsSend->rate_per_sms ?? 0
+                );
+
                 LogHelper::created(
                     'sms_send',
                     $smsSend->id,
                     $smsSend->company_id,
-                    'SMS sent to ' . count($phoneNumbers) . ' recipients'
+                    'SMS sent to ' . $smsCount . ' recipients'
                 );
 
                 return $smsSend;
             } catch (ApiException $e) {
-                // Return API Exceptions directly so the user sees the actual error msg
                 throw $e;
             } catch (\Exception $e) {
                 Log::error("SMS Sending failed: " . $e->getMessage(), [

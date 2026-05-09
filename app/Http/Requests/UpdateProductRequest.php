@@ -59,7 +59,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Single Product Fields (only validated when type='single')
                 'regular_price' => ['required_if:type,single', 'nullable', 'numeric', 'min:0'],
-                'purchase_price' => ['nullable', 'numeric', 'min:0'],
+                'purchase_price' => ['nullable'],
                 'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
                 'discount' => ['nullable', 'numeric', 'min:0'],
                 'warehouse_info' => ['required_if:type,single', 'nullable', 'array'],
@@ -80,7 +80,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'variations.*.deleted_gallery_ids' => ['nullable', 'array'],
                 'variations.*.deleted_gallery_ids.*' => ['integer'],
                 'variations.*.regular_price' => ['required', 'numeric', 'min:0'],
-                'variations.*.purchase_price' => ['nullable', 'numeric', 'min:0'],
+                'variations.*.purchase_price' => ['nullable'],
                 'variations.*.discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
                 'variations.*.discount' => ['nullable', 'numeric', 'min:0'],
                 'variations.*.warehouse_info' => ['required', 'array', 'min:1'],

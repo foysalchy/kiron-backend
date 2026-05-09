@@ -81,4 +81,10 @@ class CustomerPaymentMethodController extends Controller
 
         return ResponseHelper::success($data, 'Status updated successfully');
     }
+    public function publicMethod(): JsonResponse
+    {
+        $data = $this->paymentService->getPublicCustomerPaymentMethods();
+
+        return ResponseHelper::success($data, 'Status updated successfully');
+    }
 }

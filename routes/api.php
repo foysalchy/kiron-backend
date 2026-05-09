@@ -107,9 +107,12 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SelectOptionController;
 use App\Http\Controllers\Api\SiteSettingController;
+use App\Http\Controllers\Api\SmsPackageController;
+use App\Http\Controllers\Api\SmsRechargeController;
 use App\Http\Controllers\Api\SmsSendController;
 use App\Http\Controllers\Api\SmsSettingController;
 use App\Http\Controllers\Api\SmsTemplateController;
+use App\Http\Controllers\Api\SmsWalletController;
 use App\Http\Controllers\Api\SocialSettingController;
 use App\Http\Controllers\Api\SteadfastOrderController;
 use App\Http\Controllers\Api\StockAdjustmentController;
@@ -142,6 +145,8 @@ Route::prefix('v1')->group(function () {
 
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
+    Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
+
     Route::prefix('registration')->group(function () {
         Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
         Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);
@@ -680,7 +685,6 @@ Route::prefix('v1')->group(function () {
                 Route::get('{id}/restore', [RequisitionController::class, 'restore']);
                 Route::delete('{id}/force', [RequisitionController::class, 'forceDestroy']);
                 Route::get('/{id}/convert-data', [RequisitionController::class, 'convertData']);
-
             });
 
 
@@ -970,6 +974,7 @@ Route::prefix('v1')->group(function () {
             });
             //customer-payments routes
             Route::prefix('customer-payments')->group(function () {
+
                 Route::get('/', [CustomerPaymentMethodController::class, 'index']);
                 Route::post('/', [CustomerPaymentMethodController::class, 'store']);
                 Route::get('/{id}', [CustomerPaymentMethodController::class, 'show']);
@@ -979,6 +984,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
             });
+
             //courier-methods routes
             Route::prefix('courier-methods')->group(function () {
                 Route::get('/', [CourierMethodController::class, 'index']);
@@ -1417,7 +1423,12 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/{id}/toggle-status',     [ContentSettingController::class, 'toggleStatus']);
                 Route::patch('/reorder',                [ContentSettingController::class, 'reorder']);
             });
-
+            //sms
+            Route::get('/sms/wallet', [SmsWalletController::class, 'wallet']);
+            Route::get('/sms/packages', [SmsWalletController::class, 'packages']);
+            Route::post('/sms/recharge', [SmsWalletController::class, 'requestRecharge']);
+            Route::get('/sms/recharge/history', [SmsWalletController::class, 'rechargeHistory']);
+            Route::get('/sms/transactions', [SmsWalletController::class, 'transactions']);
             // Customer Groups Routes
             Route::prefix('customer-groups')->controller(CustomerGroupController::class)->group(function () {
 
@@ -1478,6 +1489,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/{id}/force', [PricingPackageController::class, 'forceDestroy']);
             Route::patch('/{id}/toggle-status', [PricingPackageController::class, 'toggleStatus']);
         });
+
+
+        Route::apiResource('/sms-packages', SmsPackageController::class);
+        Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);
+        Route::post('/sms-recharges/{id}/process', [SmsRechargeController::class, 'process']);
     });
     //bkash route
     Route::prefix('bkash')->group(function () {

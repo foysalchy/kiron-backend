@@ -9,6 +9,7 @@ use App\Helpers\LogHelper;
 use App\Models\Company;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -21,7 +22,7 @@ class SiteSettingService
     public function getAllSiteSettings(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = SiteSetting::query();
+            $query = SiteSetting::with('company');
 
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
@@ -55,7 +56,7 @@ class SiteSettingService
      */
     public function getSiteSettingById(int $id): SiteSetting
     {
-        $siteSetting = SiteSetting::find($id);
+        $siteSetting = SiteSetting::with('company')->find($id);
         if (!$siteSetting) {
             throw ApiException::notFound('Site Setting');
         }
@@ -74,7 +75,7 @@ class SiteSettingService
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'settings/logos',
-                   
+
                 );
             }
 
@@ -125,19 +126,52 @@ class SiteSettingService
 
             // Handle favicon replace
             if (isset($data['favicon'])) {
-                $data['favicon'] = FileUploadHelper::replace($data['favicon'], $setting->favicon, 'settings/favicons');
+                $data['favicon'] = FileUploadHelper::replace(
+                    $data['favicon'],
+                    $setting->favicon,
+                    'settings/favicons'
+                );
             }
 
             $setting->update($data);
-            if ($setting->company_id) {
-                Company::where('id', $setting->company_id)
-                    ->where('status', '!=', Status::Active->value)
-                    ->update(['status' => Status::Active->value]);
 
-                User::where('company_id', $setting->company_id)
-                    ->where('status', '!=', Status::Active->value)
-                    ->update(['status' => Status::Active->value]);
+            if ($setting->company_id) {
+                $company = Company::find($setting->company_id);
+
+                // Status update
+                if ($company->status != Status::Active->value) {
+                    $company->update(['status' => Status::Active->value]);
+
+                    User::where('company_id', $company->id)
+                        ->where('status', '!=', Status::Active->value)
+                        ->update(['status' => Status::Active->value]);
+                }
+
+                if (isset($data['manage_warehouse'])) {
+                    $manageWarehouse = (bool) $data['manage_warehouse'];
+
+                    $company->update(['manage_warehouse' => $manageWarehouse]);
+
+                    if (!$manageWarehouse) {
+                        $exists = Warehouse::where('company_id', $company->id)
+                            ->where('is_default', 1)
+                            ->exists();
+
+                        if (!$exists) {
+                            $warehouse = Warehouse::create([
+                                'company_id' => $company->id,
+                                'name'       => 'Default Warehouse',
+                                'location'   => null,
+                                'is_default' => 1,
+                                'status'     => Status::Active->value,
+                            ]);
+
+                            $company->update(['default_warehouse_id' => $warehouse->id]);
+                        }
+                    }
+                }
             }
+
             LogHelper::updated('site_setting', $setting->id, $setting->company_id ?? null);
 
             DB::commit();
@@ -153,7 +187,6 @@ class SiteSettingService
             throw ApiException::serverError('Failed to update site setting');
         }
     }
-
     /**
      * Delete site setting (soft delete)
      */

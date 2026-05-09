@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerPaymentMethod extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes;
     protected $fillable = [
         'company_id',
         'name',

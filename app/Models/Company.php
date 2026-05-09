@@ -24,6 +24,8 @@ class Company extends Model
         'theme_template',
         'pricing_package_id',
         'status',
+        'manage_warehouse',
+        'default_warehouse_id',
     ];
 
 
@@ -34,6 +36,7 @@ class Company extends Model
     protected $casts = [
         'invoice_template' => 'array',
         'theme_template' => 'array',
+        'manage_warehouse' => 'boolean',
     ];
     public function users()
     {

@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\DomainSetup;
 use App\Models\EmailVerification;
+use App\Models\Permission;
 use App\Models\Pricing;
 use App\Models\PricingPackage;
 use App\Models\SiteSetting;
@@ -193,7 +194,7 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to process subscription.');
         }
     }
-    public function registerBasicSettings(array $data): void
+    public function registerBasicSettings(array $data): array
     {
         DB::beginTransaction();
         try {
@@ -212,27 +213,77 @@ class CompanyRegistrationService
                     'currency' => $data['currency'],
                 ]);
 
+
+
             // Activate Company
             $company->update([
-                'status' => Status::Active->value,
+                'status'               => Status::Active->value,
             ]);
 
             // Activate the Company's primary User
             User::where('company_id', $company->id)
-                ->update([
-                    'status' => Status::Active->value,
-                ]);
+                ->update(['status' => Status::Active->value]);
 
             DB::commit();
 
             Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
+
+            $user = User::where('company_id', $company->id)
+                ->first()
+                ->load(['company.pricingPackage', 'roles.permissions']);
+
+            return [
+                'permissions'          => $this->resolvePermissions($user),
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Basic settings registration failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to save basic settings.');
         }
     }
-    
+
+    private function resolvePermissions(User $user): array
+    {
+        if ($user->is_super_admin) {
+            if ($user->roles->isNotEmpty()) {
+                $perms = [];
+                foreach ($user->roles as $role) {
+                    foreach ($role->permissions as $permission) {
+                        $perms[] = $permission->name;
+                    }
+                }
+                return array_values(array_unique($perms));
+            }
+            return Permission::where('type', 'superadmin')->pluck('name')->toArray();
+        }
+
+        $featureKeys = [];
+        $company = $user->company;
+
+        if ($company && $company->pricingPackage) {
+            $featureKeys = $company->pricingPackage->features ?? [];
+            if (is_string($featureKeys)) {
+                $featureKeys = json_decode($featureKeys, true) ?? [];
+            }
+        }
+
+        if (empty($featureKeys)) return [];
+
+        if ($user->roles->isNotEmpty()) {
+            $roleIds = $user->roles->pluck('id')->toArray();
+            return Permission::where('type', 'company')
+                ->whereIn('feature_dependency', $featureKeys)
+                ->whereHas('roles', fn($q) => $q->whereIn('roles.id', $roleIds))
+                ->pluck('name')
+                ->toArray();
+        }
+
+        return Permission::where('type', 'company')
+            ->whereIn('feature_dependency', $featureKeys)
+            ->pluck('name')
+            ->toArray();
+    }
+
     public function verifyOtp(int $registrationId, string $type, string $otp): void
     {
         $record = EmailVerification::where('company_id', $registrationId)

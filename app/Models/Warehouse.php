@@ -16,10 +16,13 @@ class Warehouse extends Model
         'company_id',
         'name',
         'location',
+        'is_default',
         'status',
     ];
 
-
+    protected $casts = [
+        'is_default' => 'boolean',
+    ];
 
     protected $hidden = ['deleted_at'];
 

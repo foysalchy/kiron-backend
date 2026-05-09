@@ -33,8 +33,8 @@ class CompanyRegistrationController extends Controller
     }
     public function storeBasicSettings(StoreBasicSettingsRequest $request): JsonResponse
     {
-        $this->registrationService->registerBasicSettings($request->validated());
-        return ResponseHelper::success(null, 'Basic settings saved.');
+        $data=$this->registrationService->registerBasicSettings($request->validated());
+        return ResponseHelper::success($data, 'Basic settings saved.');
     }
 
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse

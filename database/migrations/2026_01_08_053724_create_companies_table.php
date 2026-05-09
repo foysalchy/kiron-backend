@@ -24,6 +24,8 @@ return new class extends Migration
             $table->foreignId('pricing_package_id')->nullable()->constrained('pricing_packages')->nullOnDelete();
             $table->tinyInteger('business_type')->default(1);
             $table->tinyInteger('status')->default(1);
+            $table->boolean('manage_warehouse')->default(false);
+            $table->unsignedBigInteger('default_warehouse_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

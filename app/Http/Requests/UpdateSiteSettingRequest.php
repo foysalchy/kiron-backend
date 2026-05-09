@@ -43,6 +43,8 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'store_address'     => ['nullable', 'string'],
                 'tags'              => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
+                'manage_warehouse'     => ['nullable'],
+                'manage_warehouse'     => ['nullable'],
 
             ]
         );

@@ -17,6 +17,9 @@ class SmsSend extends Model
         'customer_ids',
         'supplier_ids',
         'custom_numbers',
+        'total_recipients',
+        'sms_count',
+        'rate_per_sms',
         'message',
         'status',
     ];
