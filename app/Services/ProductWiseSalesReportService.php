@@ -19,195 +19,290 @@ class ProductWiseSalesReportService
         Status::ReturnReceived->value,
         Status::ReturnRequest->value,
     ];
+public function generate(array $filters): array
+{
+    $startDate       = $filters['start_date'];
+    $endDate         = $filters['end_date'];
+    $megaCategoryId  = $filters['mega_category_id'] ?? null;
+    $brandId         = $filters['brand_id'] ?? null;
+    $productId       = $filters['product_id'] ?? null;
+    $statusFilter    = $filters['status_filter'] ?? 'delivered';
+    $sortBy          = $filters['sort_by'] ?? 'quantity';
 
-    public function generate(array $filters): array
-    {
-        $startDate       = $filters['start_date'];
-        $endDate         = $filters['end_date'];
-        $megaCategoryId  = $filters['mega_category_id'] ?? null;
-        $brandId         = $filters['brand_id'] ?? null;
-        $productId       = $filters['product_id'] ?? null;
-        $statusFilter    = $filters['status_filter'] ?? 'delivered';
-        $sortBy          = $filters['sort_by'] ?? 'quantity';
+    // ── 1. Load Orders Once ──
+    $statuses = $statusFilter === 'delivered'
+        ? $this->deliveredStatuses
+        : array_merge($this->deliveredStatuses, $this->returnedStatuses);
 
-        // ── 1. Filter Orders ──
-        $statuses = $statusFilter === 'delivered'
-            ? $this->deliveredStatuses
-            : array_merge($this->deliveredStatuses, $this->returnedStatuses);
+    $orders = Order::whereBetween('order_date', [$startDate, $endDate])
+        ->whereIn('status', $statuses)
+        ->get(['id', 'status']);
 
-        $orderIds = Order::whereBetween('order_date', [$startDate, $endDate])
-            ->whereIn('status', $statuses)
-            ->pluck('id');
+    $orderStatusMap = $orders->pluck('status', 'id');
 
-        // ── 2. Get Order Details ──
-        $orderDetailsQuery = OrderDetail::whereIn('order_id', $orderIds)
-            ->with(['product.brand', 'variation.attributes.attributeGroup', 'variation.attributes.attributeValue']);
+    $orderIds = $orders->pluck('id');
 
-        // Filter by product/brand/category
-        if ($productId) {
-            $orderDetailsQuery->where('product_id', $productId);
-        }
+    // ── 2. Get Order Details ──
+    $orderDetailsQuery = OrderDetail::whereIn('order_id', $orderIds)
+        ->with([
+            'product.brand',
+            'variation.attributes.attributeGroup',
+            'variation.attributes.attributeValue'
+        ]);
 
-        if ($brandId) {
-            $orderDetailsQuery->whereHas('product', fn($q) => $q->where('brand_id', $brandId));
-        }
-
-        if ($megaCategoryId) {
-            $megaCategoryId = (int) $megaCategoryId; 
-
-            $orderDetailsQuery->whereHas('product', function ($q) use ($megaCategoryId) {
-                $q->whereJsonContains('mega_category_ids', $megaCategoryId);
-            });
-        }
-        $orderDetails = $orderDetailsQuery->get();
-
-        // ── 3. Separate Delivered & Returned ──
-        $deliveredOrderIds = Order::whereBetween('order_date', [$startDate, $endDate])
-            ->whereIn('status', $this->deliveredStatuses)
-            ->pluck('id');
-
-        $returnedOrderIds = Order::whereBetween('order_date', [$startDate, $endDate])
-            ->whereIn('status', $this->returnedStatuses)
-            ->pluck('id');
-
-        // ── 4. Group by Product & Variation ──
-        $grouped = [];
-
-        foreach ($orderDetails as $detail) {
-            $productId   = $detail->product_id;
-            $variationId = $detail->variation_id;
-            $key         = $variationId ? "p{$productId}_v{$variationId}" : "p{$productId}";
-
-            if (!isset($grouped[$key])) {
-                $grouped[$key] = [
-                    'product_id'        => $productId,
-                    'product_name'      => $detail->product->title ?? 'Unknown',
-                    'product_type'      => $detail->product->type ?? 'single',
-                    'brand'             => $detail->product->brand->name ?? 'No Brand',
-                    'category'          => $this->extractMegaCategory($detail->product),
-                    'variation_id'      => $variationId,
-                    'variation_name'    => $variationId ? $this->formatVariationName($detail->variation) : null,
-                    'sku'               => $variationId ? ($detail->variation->sku ?? null) : ($detail->product->sku_code ?? null),
-                    'sold_qty'          => 0,
-                    'return_qty'        => 0,
-                    'net_qty'           => 0,
-                    'sales_amount'      => 0,
-                    'purchase_cost'     => 0,
-                    'profit'            => 0,
-                    'profit_margin'     => 0,
-                    'total_orders'      => 0,
-                ];
-            }
-
-            $isDelivered = $deliveredOrderIds->contains($detail->order_id);
-            $isReturned  = $returnedOrderIds->contains($detail->order_id);
-
-            if ($isDelivered) {
-                $grouped[$key]['sold_qty']      += $detail->quantity;
-                $grouped[$key]['sales_amount']  += $detail->total;
-                $grouped[$key]['total_orders']  += 1;
-            }
-
-            if ($isReturned) {
-                $grouped[$key]['return_qty'] += $detail->quantity;
-            }
-        }
-
-        // ── 5. Calculate Purchase Cost & Profit ──
-        foreach ($grouped as $key => &$item) {
-            $purchasePrice = $this->resolvePurchasePrice($item['product_id'], $item['variation_id']);
-
-            $item['net_qty']        = $item['sold_qty'] - $item['return_qty'];
-            $item['purchase_cost']  = $purchasePrice * $item['sold_qty'];
-            $item['profit']         = $item['sales_amount'] - $item['purchase_cost'];
-            $item['profit_margin']  = $item['sales_amount'] > 0
-                ? round(($item['profit'] / $item['sales_amount']) * 100, 2)
-                : 0;
-        }
-
-        // ── 6. Group by Product (with variations as children) ──
-        $products = [];
-
-        foreach ($grouped as $item) {
-            $productId = $item['product_id'];
-
-            if (!isset($products[$productId])) {
-                $products[$productId] = [
-                    'product_id'    => $productId,
-                    'product_name'  => $item['product_name'],
-                    'product_type'  => $item['product_type'],
-                    'brand'         => $item['brand'],
-                    'category'      => $item['category'],
-                    'sku'           => $item['product_type'] === 'single' ? $item['sku'] : null,
-                    'variations'    => [],
-                    'sold_qty'      => 0,
-                    'return_qty'    => 0,
-                    'net_qty'       => 0,
-                    'sales_amount'  => 0,
-                    'purchase_cost' => 0,
-                    'profit'        => 0,
-                    'profit_margin' => 0,
-                    'total_orders'  => 0,
-                ];
-            }
-
-            if ($item['variation_id']) {
-                $products[$productId]['variations'][] = $item;
-            }
-
-            $products[$productId]['sold_qty']      += $item['sold_qty'];
-            $products[$productId]['return_qty']    += $item['return_qty'];
-            $products[$productId]['net_qty']       += $item['net_qty'];
-            $products[$productId]['sales_amount']  += $item['sales_amount'];
-            $products[$productId]['purchase_cost'] += $item['purchase_cost'];
-            $products[$productId]['profit']        += $item['profit'];
-            $products[$productId]['total_orders']  += $item['total_orders'];
-        }
-
-        // Recalculate profit margin for parent
-        foreach ($products as &$product) {
-            $product['profit_margin'] = $product['sales_amount'] > 0
-                ? round(($product['profit'] / $product['sales_amount']) * 100, 2)
-                : 0;
-        }
-
-        // ── 7. Sort ──
-        $products = collect($products)->sortByDesc(function ($item) use ($sortBy) {
-            return match ($sortBy) {
-                'sales'    => $item['sales_amount'],
-                'profit'   => $item['profit'],
-                default    => $item['sold_qty'],
-            };
-        })->values()->toArray();
-
-        // ── 8. Summary ──
-        $summary = [
-            'total_products'    => count($products),
-            'total_sold_qty'    => array_sum(array_column($products, 'sold_qty')),
-            'total_return_qty'  => array_sum(array_column($products, 'return_qty')),
-            'total_net_qty'     => array_sum(array_column($products, 'net_qty')),
-            'total_sales'       => round(array_sum(array_column($products, 'sales_amount')), 2),
-            'total_purchase'    => round(array_sum(array_column($products, 'purchase_cost')), 2),
-            'total_profit'      => round(array_sum(array_column($products, 'profit')), 2),
-        ];
-
-        $summary['overall_profit_margin'] = $summary['total_sales'] > 0
-            ? round(($summary['total_profit'] / $summary['total_sales']) * 100, 2)
-            : 0;
-
-        return [
-            'date_range' => ['start' => $startDate, 'end' => $endDate],
-            'filters'    => [
-                'mega_category_id' => $megaCategoryId,
-                'brand_id'         => $brandId,
-                'product_id'       => $productId,
-                'status_filter'    => $statusFilter,
-                'sort_by'          => $sortBy,
-            ],
-            'summary'    => $summary,
-            'products'   => $products,
-        ];
+    // Product Filter
+    if ($productId) {
+        $orderDetailsQuery->where('product_id', $productId);
     }
+
+    // Brand Filter
+    if ($brandId) {
+        $orderDetailsQuery->whereHas('product', function ($q) use ($brandId) {
+            $q->where('brand_id', $brandId);
+        });
+    }
+
+    // Mega Category Filter
+    if ($megaCategoryId) {
+        $megaCategoryId = (int) $megaCategoryId;
+
+        $orderDetailsQuery->whereHas('product', function ($q) use ($megaCategoryId) {
+            $q->whereJsonContains('mega_category_ids', $megaCategoryId);
+        });
+    }
+
+    $orderDetails = $orderDetailsQuery->get();
+
+    // ── 3. Group Product + Variation ──
+    $grouped = [];
+
+    foreach ($orderDetails as $detail) {
+
+        $productIdValue   = $detail->product_id;
+        $variationIdValue = $detail->variation_id;
+
+        $key = $variationIdValue
+            ? "p{$productIdValue}_v{$variationIdValue}"
+            : "p{$productIdValue}";
+
+        if (!isset($grouped[$key])) {
+
+            $grouped[$key] = [
+                'product_id'        => $productIdValue,
+                'product_name'      => $detail->product->title ?? 'Unknown',
+                'product_type'      => $detail->product->type ?? 'single',
+                'brand'             => $detail->product->brand->name ?? 'No Brand',
+                'category'          => $this->extractMegaCategory($detail->product),
+
+                'variation_id'      => $variationIdValue,
+                'variation_name'    => $variationIdValue
+                    ? $this->formatVariationName($detail->variation)
+                    : null,
+
+                'sku'               => $variationIdValue
+                    ? ($detail->variation->sku ?? null)
+                    : ($detail->product->sku_code ?? null),
+
+                'sold_qty'          => 0,
+                'return_qty'        => 0,
+                'net_qty'           => 0,
+
+                'sales_amount'      => 0,
+                'return_amount'     => 0,
+                'net_sales'         => 0,
+
+                'purchase_cost'     => 0,
+                'profit'            => 0,
+                'profit_margin'     => 0,
+
+                'total_orders'      => 0,
+            ];
+        }
+
+        $status = $orderStatusMap[$detail->order_id] ?? null;
+
+        $isDelivered = in_array($status, $this->deliveredStatuses);
+        $isReturned  = in_array($status, $this->returnedStatuses);
+
+        // ── Delivered ──
+        if ($isDelivered) {
+
+            $grouped[$key]['sold_qty'] += $detail->quantity;
+
+            $grouped[$key]['sales_amount'] += $detail->total;
+
+            $grouped[$key]['total_orders'] += 1;
+        }
+
+        // ── Returned ──
+        if ($isReturned) {
+
+            $grouped[$key]['return_qty'] += $detail->quantity;
+
+            $grouped[$key]['return_amount'] += $detail->total;
+        }
+    }
+
+    // ── 4. Final Calculation ──
+    foreach ($grouped as &$item) {
+
+        $purchasePrice = $this->resolvePurchasePrice(
+            $item['product_id'],
+            $item['variation_id']
+        );
+
+        // Qty
+        $item['net_qty'] = $item['sold_qty'] - $item['return_qty'];
+
+        // Sales
+        $item['net_sales'] = $item['sales_amount'] - $item['return_amount'];
+
+        // Purchase
+        $item['purchase_cost'] = $purchasePrice * $item['net_qty'];
+
+        // Profit
+        $item['profit'] = $item['net_sales'] - $item['purchase_cost'];
+
+        // Margin
+        $item['profit_margin'] = $item['net_sales'] > 0
+            ? round(($item['profit'] / $item['net_sales']) * 100, 2)
+            : 0;
+    }
+
+    // ── 5. Group Parent Product ──
+    $products = [];
+
+    foreach ($grouped as $item) {
+
+        $productIdValue = $item['product_id'];
+
+        if (!isset($products[$productIdValue])) {
+
+            $products[$productIdValue] = [
+
+                'product_id'    => $productIdValue,
+                'product_name'  => $item['product_name'],
+                'product_type'  => $item['product_type'],
+                'brand'         => $item['brand'],
+                'category'      => $item['category'],
+
+                'sku'           => $item['product_type'] === 'single'
+                    ? $item['sku']
+                    : null,
+
+                'variations'    => [],
+
+                'sold_qty'      => 0,
+                'return_qty'    => 0,
+                'net_qty'       => 0,
+
+                'sales_amount'  => 0,
+                'return_amount' => 0,
+                'net_sales'     => 0,
+
+                'purchase_cost' => 0,
+                'profit'        => 0,
+                'profit_margin' => 0,
+
+                'total_orders'  => 0,
+            ];
+        }
+
+        // Add Variation
+        if ($item['variation_id']) {
+            $products[$productIdValue]['variations'][] = $item;
+        }
+
+        // Summary
+        $products[$productIdValue]['sold_qty'] += $item['sold_qty'];
+
+        $products[$productIdValue]['return_qty'] += $item['return_qty'];
+
+        $products[$productIdValue]['net_qty'] += $item['net_qty'];
+
+        $products[$productIdValue]['sales_amount'] += $item['sales_amount'];
+
+        $products[$productIdValue]['return_amount'] += $item['return_amount'];
+
+        $products[$productIdValue]['net_sales'] += $item['net_sales'];
+
+        $products[$productIdValue]['purchase_cost'] += $item['purchase_cost'];
+
+        $products[$productIdValue]['profit'] += $item['profit'];
+
+        $products[$productIdValue]['total_orders'] += $item['total_orders'];
+    }
+
+    // ── 6. Parent Margin ──
+    foreach ($products as &$product) {
+
+        $product['profit_margin'] = $product['net_sales'] > 0
+            ? round(($product['profit'] / $product['net_sales']) * 100, 2)
+            : 0;
+    }
+
+    // ── 7. Sorting ──
+    $products = collect($products)
+        ->sortByDesc(function ($item) use ($sortBy) {
+
+            return match ($sortBy) {
+
+                'sales'  => $item['net_sales'],
+                'profit' => $item['profit'],
+
+                default  => $item['sold_qty'],
+            };
+        })
+        ->values()
+        ->toArray();
+
+    // ── 8. Summary ──
+    $summary = [
+
+        'total_products' => count($products),
+
+        'total_sold_qty' => array_sum(array_column($products, 'sold_qty')),
+
+        'total_return_qty' => array_sum(array_column($products, 'return_qty')),
+
+        'total_net_qty' => array_sum(array_column($products, 'net_qty')),
+
+        'total_sales' => round(array_sum(array_column($products, 'sales_amount')), 2),
+
+        'total_return_amount' => round(array_sum(array_column($products, 'return_amount')), 2),
+
+        'total_net_sales' => round(array_sum(array_column($products, 'net_sales')), 2),
+
+        'total_purchase' => round(array_sum(array_column($products, 'purchase_cost')), 2),
+
+        'total_profit' => round(array_sum(array_column($products, 'profit')), 2),
+    ];
+
+    $summary['overall_profit_margin'] = $summary['total_net_sales'] > 0
+        ? round(($summary['total_profit'] / $summary['total_net_sales']) * 100, 2)
+        : 0;
+
+    // ── 9. Response ──
+    return [
+
+        'date_range' => [
+            'start' => $startDate,
+            'end'   => $endDate
+        ],
+
+        'filters' => [
+            'mega_category_id' => $megaCategoryId,
+            'brand_id'         => $brandId,
+            'product_id'       => $productId,
+            'status_filter'    => $statusFilter,
+            'sort_by'          => $sortBy,
+        ],
+
+        'summary' => $summary,
+
+        'products' => $products,
+    ];
+}
 
     // ── Purchase Price Resolve ──
     private function resolvePurchasePrice(int $productId, ?int $variationId): float

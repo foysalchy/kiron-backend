@@ -25,10 +25,32 @@ class TransactionIncome extends Model
         'status',
     ];
     protected $hidden = ['deleted_at'];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (!$model->reference_number) {
+                $year   = date('Y');
+                $prefix = "CV-{$year}-";
+
+                $latest = self::withoutGlobalScopes()
+                    ->where('reference_number', 'like', "{$prefix}%")
+                    ->orderByRaw('CAST(SUBSTRING(reference_number, -8) AS UNSIGNED) DESC')
+                    ->lockForUpdate()
+                    ->first();
+
+                $sequence = $latest
+                    ? ((int) substr($latest->reference_number, -8)) + 1
+                    : 1;
+
+                $model->reference_number = $prefix . str_pad($sequence, 8, '0', STR_PAD_LEFT);
+            }
+        });
+    }
     // Relationships
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class)->select('id', 'name','logo');
+        return $this->belongsTo(Company::class)->select('id', 'name', 'logo');
     }
     public function categories(): HasMany
     {
@@ -59,25 +81,7 @@ class TransactionIncome extends Model
         return $query->where('status', Status::Approved->value);
     }
     //its for reference number
-    public function generateReferenceNumber(): void
-    {
-        if ($this->reference_number) {
-            return;
-        }
 
-        $year = date('Y');
-        $prefix = "CV-{$year}-";
-
-        $latest = self::withoutGlobalScopes()
-            ->where('reference_number', 'like', "{$prefix}%")
-            ->orderByRaw('CAST(SUBSTRING(reference_number, -8) AS UNSIGNED) DESC')
-            ->first();
-
-        $sequence = $latest ? ((int) substr($latest->reference_number, -8)) + 1 : 1;
-
-        $this->reference_number = $prefix . str_pad($sequence, 8, '0', STR_PAD_LEFT);
-        $this->save();
-    }
     // Accessors
     public function getFileUrlAttribute(): ?string
     {

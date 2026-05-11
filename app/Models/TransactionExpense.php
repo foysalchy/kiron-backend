@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TransactionExpense extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
@@ -25,10 +25,31 @@ class TransactionExpense extends Model
         'created_by',
     ];
     protected $hidden = ['deleted_at'];
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (!$model->reference_number) {
+                $year   = date('Y');
+                $prefix = "DV-{$year}-";
+
+                $latest = self::withoutGlobalScopes()
+                    ->where('reference_number', 'like', "{$prefix}%")
+                    ->orderByRaw('CAST(SUBSTRING(reference_number, -8) AS UNSIGNED) DESC')
+                    ->lockForUpdate()
+                    ->first();
+
+                $sequence = $latest
+                    ? ((int) substr($latest->reference_number, -8)) + 1
+                    : 1;
+
+                $model->reference_number = $prefix . str_pad($sequence, 8, '0', STR_PAD_LEFT);
+            }
+        });
+    }
     // Relationships
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class)->select('id', 'name','logo');
+        return $this->belongsTo(Company::class)->select('id', 'name', 'logo');
     }
     public function categories(): HasMany
     {
@@ -61,26 +82,10 @@ class TransactionExpense extends Model
     /**
      * Generate Reference only when Approved
      */
-    public function generateReferenceNumber(): void
-    {
-        if ($this->reference_number) return;
-
-        $year = date('Y');
-        $prefix = "DV-{$year}-";
-
-        $latest = self::withoutGlobalScopes()
-            ->where('reference_number', 'like', "{$prefix}%")
-            ->orderByRaw('CAST(SUBSTRING(reference_number, -8) AS UNSIGNED) DESC')
-            ->first();
-
-        $sequence = $latest ? ((int)substr($latest->reference_number, -8)) + 1 : 1;
-        $this->reference_number = $prefix . str_pad($sequence, 8, '0', STR_PAD_LEFT);
-        $this->save();
-    }
+  
     // Accessors
     public function getFileUrlAttribute(): ?string
     {
         return $this->file ? asset('storage/' . $this->file) : null;
     }
-
 }

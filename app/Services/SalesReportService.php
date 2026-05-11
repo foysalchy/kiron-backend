@@ -34,6 +34,7 @@ class SalesReportService
         $delivered = $this->orderSummary($startDate, $endDate, $deliveredStatuses);
         $cancelled = $this->orderSummary($startDate, $endDate, $cancelledStatuses);
         $returned  = $this->orderSummary($startDate, $endDate, $returnedStatuses);
+        $returnReceived = $this->orderSummary($startDate, $endDate, [Status::ReturnReceived->value]);
 
         // Sales Summary (delivered only)
         $deliveredOrders = Order::whereBetween('order_date', [$startDate, $endDate])
@@ -58,6 +59,7 @@ class SalesReportService
                 'delivered_orders' => $delivered,
                 'cancelled_orders' => $cancelled,
                 'return_orders'    => $returned,
+                'return_received'    => $returnReceived,
             ],
             'sales_summary' => [
                 'total_sales'       => round($totalSales, 2),
