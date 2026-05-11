@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
+use App\Enums\Status;
 
 class ApproveRechargeRequest extends FormRequest
 {
@@ -16,8 +18,15 @@ class ApproveRechargeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status'        => ['required', 'in:1,2'],   // 1=approved, 2=rejected
-            'reject_reason' => ['required_if:status,2', 'nullable', 'string'],
+            'status'        => ['required',  Rule::in([
+                Status::Approved->value,
+                Status::Rejected->value,
+            ])],
+            'reject_reason' => [
+                'required_if:status,' . Status::Rejected->value,
+                'nullable',
+                'string',
+            ],
         ];
     }
 

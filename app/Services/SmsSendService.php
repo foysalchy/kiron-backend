@@ -113,10 +113,11 @@ class SmsSendService
                     throw ApiException::badRequest('SMS message cannot be empty.');
                 }
 
-                // ✅ 5. Balance check
-                $smsCount = count($phoneNumbers);
-                $wallet   = $this->smsWalletService->getOrCreate();
+                $recipientCount = count($phoneNumbers);
+                $smsCount       = $this->calculateSmsCount($messageBody, $recipientCount);
 
+                // Balance check
+                $wallet = $this->smsWalletService->getOrCreate();
                 if (!$wallet->hasSufficientBalance($smsCount)) {
                     throw ApiException::badRequest(
                         "Insufficient SMS balance. Required: {$smsCount}, Available: {$wallet->sms_count}"
@@ -158,7 +159,37 @@ class SmsSendService
             }
         });
     }
+    private function calculateSmsCount(string $message, int $recipientCount): int
+    {
+        $messageLength = mb_strlen($message);
 
+        // Unicode detect (Bengali, Arabic etc)
+        $isUnicode = $this->isUnicode($message);
+
+        if ($isUnicode) {
+            // Unicode: 1st SMS = 70 chars, subsequent = 67 chars
+            $singleLimit = 70;
+            $multiLimit  = 67;
+        } else {
+            // ASCII: 1st SMS = 160 chars, subsequent = 153 chars
+            $singleLimit = 160;
+            $multiLimit  = 153;
+        }
+
+        if ($messageLength <= $singleLimit) {
+            $smsPerRecipient = 1;
+        } else {
+            $smsPerRecipient = (int) ceil(($messageLength - $singleLimit) / $multiLimit) + 1;
+        }
+
+        return $smsPerRecipient * $recipientCount;
+    }
+
+    private function isUnicode(string $message): bool
+    {
+        return mb_strlen($message) !== strlen($message)
+            || preg_match('/[^\x00-\x7F]/', $message);
+    }
     /**
      * Logic to communicate with SMS Provider API
      */

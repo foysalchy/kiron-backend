@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerGroupController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
+use App\Http\Controllers\Api\CustomerReportController;
 use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EditorImagesController;
@@ -93,6 +94,8 @@ use App\Http\Controllers\Api\PricingController;
 use App\Http\Controllers\Api\PricingPackageController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductGroupController;
+use App\Http\Controllers\Api\ProductWiseSalesReportController;
+use App\Http\Controllers\Api\ProfitLossReportController;
 use App\Http\Controllers\Api\PurchaseController;
 use App\Http\Controllers\Api\PurchaseReturnController;
 use App\Http\Controllers\Api\QuotationController;
@@ -105,6 +108,7 @@ use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\SalesOrderController;
+use App\Http\Controllers\Api\SalesReportController;
 use App\Http\Controllers\Api\SelectOptionController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\SmsPackageController;
@@ -1466,6 +1470,10 @@ Route::prefix('v1')->group(function () {
 
             Route::get('/permissions', [PermissionController::class, 'index']);
             Route::get('/company/package-usage', [PackageUsageController::class, 'index']);
+            Route::get('/reports/profit-loss', [ProfitLossReportController::class, 'generate']);
+            Route::get('/reports/sales', [SalesReportController::class, 'generate']);
+            Route::get('/reports/product-wise-sales', [ProductWiseSalesReportController::class, 'generate']);
+            Route::get('/reports/customer', [CustomerReportController::class, 'generate']);
         });
     });
     //pricing plan

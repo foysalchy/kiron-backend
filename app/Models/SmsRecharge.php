@@ -14,7 +14,7 @@ class SmsRecharge extends Model
         'company_id', 'sms_package_id', 'reference_no',
         'sms_count', 'price', 'rate_per_sms',
         'payment_method', 'transaction_id', 'account_number',
-        'note', 'status', 'reject_reason',
+        'note', 'screenshot','status', 'reject_reason',
         'approved_by', 'approved_at',
     ];
 

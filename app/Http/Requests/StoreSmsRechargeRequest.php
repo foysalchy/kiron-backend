@@ -13,16 +13,17 @@ class StoreSmsRechargeRequest extends FormRequest
         return true;
     }
 
-public function rules(): array
-{
-    return [
-        'sms_package_id'   => ['required', 'exists:sms_packages,id'],
-        'payment_method'   => ['required', 'in:cash,bank,bkash,nagad'],
-        'transaction_id'   => ['nullable', 'string', 'max:255'],
-        'account_number'   => ['nullable', 'string', 'max:255'],
-        'note'             => ['nullable', 'string'],
-    ];
-}
+    public function rules(): array
+    {
+        return [
+            'sms_package_id'   => ['required', 'exists:sms_packages,id'],
+            'payment_method'   => ['required', 'in:cash,bank,bkash,nagad'],
+            'transaction_id'   => ['nullable', 'string', 'max:255'],
+            'account_number'   => ['nullable', 'string', 'max:255'],
+            'note'             => ['nullable', 'string'],
+            'screenshot'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
+        ];
+    }
 
 
 

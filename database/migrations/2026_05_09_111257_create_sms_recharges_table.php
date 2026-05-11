@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +24,8 @@ return new class extends Migration
             $table->string('transaction_id')->nullable();    // bkash/bank transaction
             $table->string('account_number')->nullable();    // bkash/bank account
             $table->text('note')->nullable();
-            $table->tinyInteger('status')->default(0)->comment('0=pending, 1=approved, 2=rejected');
+            $table->string('screenshot')->nullable();
+            $table->tinyInteger('status')->default(Status::Pending->value);
             $table->text('reject_reason')->nullable();
             $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();

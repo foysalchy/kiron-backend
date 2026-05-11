@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
+use App\Helpers\FileUploadHelper;
 use App\Models\{SmsWallet, SmsPackage, SmsRecharge, SmsSend, SmsWalletTransaction};
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PhpParser\Node\Stmt\StaticVar;
 
 class SmsWalletService
 {
@@ -21,20 +24,44 @@ class SmsWalletService
     // Recharge request create
     public function requestRecharge(array $data): SmsRecharge
     {
-        $package = SmsPackage::findOrFail($data['sms_package_id']);
+        DB::beginTransaction();
+        try {
+            $package = SmsPackage::findOrFail($data['sms_package_id']);
 
-        return SmsRecharge::create([
-            'sms_package_id' => $package->id,
-            'reference_no'   => $this->generateReferenceNo(),
-            'sms_count'      => $package->sms_count,
-            'price'          => $package->price,
-            'rate_per_sms'   => $package->rate_per_sms,
-            'payment_method' => $data['payment_method'],
-            'transaction_id' => $data['transaction_id'] ?? null,
-            'account_number' => $data['account_number'] ?? null,
-            'note'           => $data['note'] ?? null,
-            'status'         => 0, // pending
-        ]);
+            // ✅ Screenshot upload
+            $screenshotPath = null;
+            if (isset($data['screenshot'])) {
+                $screenshotPath = FileUploadHelper::uploadImage(
+                    $data['screenshot'],
+                    'sms_recharges/screenshots'
+                );
+            }
+
+            $recharge = SmsRecharge::create([
+                'sms_package_id' => $package->id,
+                'reference_no'   => $this->generateReferenceNo(),
+                'sms_count'      => $package->sms_count,
+                'price'          => $package->price,
+                'rate_per_sms'   => $package->rate_per_sms,
+                'payment_method' => $data['payment_method'],
+                'transaction_id' => $data['transaction_id'] ?? null,
+                'account_number' => $data['account_number'] ?? null,
+                'note'           => $data['note'] ?? null,
+                'screenshot'     => $screenshotPath,
+                'status'         => Status::Pending->value,
+            ]);
+
+            DB::commit();
+            return $recharge;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            if (isset($screenshotPath)) {
+                FileUploadHelper::delete($screenshotPath);
+            }
+            Log::error('Recharge request failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to submit recharge request');
+        }
     }
 
     // Super admin approve/reject
@@ -44,7 +71,7 @@ class SmsWalletService
         try {
             $recharge = SmsRecharge::findOrFail($rechargeId);
 
-            if ($recharge->status !== 0) {
+            if ($recharge->status != Status::Pending->value) {
                 throw ApiException::badRequest('Recharge already processed');
             }
 
@@ -57,8 +84,8 @@ class SmsWalletService
                 'approved_at'   => now(),
             ]);
 
-            // Approve হলে wallet এ add করো
-            if ($status === 1) {
+            // Approve হলে wallet এ add করো 
+            if ($status == Status::Approved->value) {
                 $wallet = $this->getOrCreate();
                 $balanceBefore = $wallet->sms_count;
                 $balanceAfter  = $balanceBefore + $recharge->sms_count;
