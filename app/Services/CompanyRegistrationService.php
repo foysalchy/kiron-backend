@@ -125,7 +125,11 @@ class CompanyRegistrationService
                 : $tier->regular_price;
 
             $now       = Carbon::now();
-            $trialEnds = $pricing->trial_days > 0 ? $now->copy()->addDays($pricing->trial_days) : null;
+           $trialDays = (int) $pricing->trial_days;
+
+$trialEnds = $trialDays > 0
+    ? $now->copy()->addDays($trialDays)
+    : null;
 
             $endsAt = match ($billing) {
                 'yearly'    => $now->copy()->addYear(),
