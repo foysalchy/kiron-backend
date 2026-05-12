@@ -1478,6 +1478,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/reports/product-wise-sales', [ProductWiseSalesReportController::class, 'generate']);
             Route::get('/reports/customer', [CustomerReportController::class, 'generate']);
             Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
+            Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
             Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
             Route::get('/reports/inventory-stock', [InventoryStockReportController::class, 'generate']);
         });
