@@ -1,4 +1,4 @@
-<header class="w-full bg-white sticky top-0 z-50 font-['Outfit']">
+<header class="w-full bg-white sticky top-0 z-50">
 
     <!-- 1. Top Bar (Orange Row) -->
     <div class="primary-bg text-primary py-2 text-sm hidden sm:block">

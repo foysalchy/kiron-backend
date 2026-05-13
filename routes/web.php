@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Backend\IndexController;
 use App\Http\Controllers\Frontend\AboutController;
 use App\Http\Controllers\Frontend\AuthController;
 use App\Http\Controllers\Frontend\BlogController;
@@ -14,8 +15,13 @@ use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
 use App\Http\Controllers\Frontend\WishlistController;
+use App\Http\Controllers\Saas\IndexController as SaasIndexController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
+
+
+Route::get('/saas', [SaasIndexController::class,'index'])->name('saas.index');
+
 
 
 Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
@@ -77,4 +83,6 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
 
+
+    // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
