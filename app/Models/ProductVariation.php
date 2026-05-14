@@ -31,6 +31,8 @@ class ProductVariation extends Model
         'discount' => 'decimal:2',
         'stock_quantity' => 'integer',
         'available_stock' => 'integer',
+        'product_id' => 'integer',
+
     ];
 
     /**

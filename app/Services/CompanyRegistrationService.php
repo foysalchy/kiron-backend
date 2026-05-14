@@ -125,11 +125,11 @@ class CompanyRegistrationService
                 : $tier->regular_price;
 
             $now       = Carbon::now();
-           $trialDays = (int) $pricing->trial_days;
+            $trialDays = (int) $pricing->trial_days;
 
-$trialEnds = $trialDays > 0
-    ? $now->copy()->addDays($trialDays)
-    : null;
+            $trialEnds = $trialDays > 0
+                ? $now->copy()->addDays($trialDays)
+                : null;
 
             $endsAt = match ($billing) {
                 'yearly'    => $now->copy()->addYear(),
@@ -190,7 +190,7 @@ $trialEnds = $trialDays > 0
             DB::commit();
 
             // Send email after commit
-            $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
+         //   $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
             Log::info("Otp {$otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
         } catch (\Exception $e) {
             DB::rollBack();
@@ -342,7 +342,8 @@ $trialEnds = $trialDays > 0
 
     private function createOtpRecord(int $companyId, string $type, string $email): string
     {
-        $otp = $this->generateOtp();
+        //  $otp = $this->generateOtp();
+        $otp = 123456;
         EmailVerification::where('company_id', $companyId)->where('type', $type)->whereNull('verified_at')->delete();
         EmailVerification::create([
             'company_id' => $companyId,

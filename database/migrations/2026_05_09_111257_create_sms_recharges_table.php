@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->foreignId('sms_package_id')->constrained('sms_packages')->restrictOnDelete();
-            $table->string('reference_no')->unique();        // REQ-0001
+            $table->string('reference_no');        // SMS-0001
             $table->integer('sms_count');                   
             $table->decimal('price', 10, 2);               
             $table->decimal('rate_per_sms', 8, 4);           

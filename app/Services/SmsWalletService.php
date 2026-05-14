@@ -55,11 +55,12 @@ class SmsWalletService
             return $recharge;
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if (isset($screenshotPath)) {
                 FileUploadHelper::delete($screenshotPath);
             }
             Log::error('Recharge request failed: ' . $e->getMessage());
+
             throw ApiException::serverError('Failed to submit recharge request');
         }
     }

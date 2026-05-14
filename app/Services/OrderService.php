@@ -263,7 +263,7 @@ class OrderService
             if (!isset($data['status'])) {
                 $data['status'] = Status::Pending->value;
             }
-            if ($data['payment_status'] === Order::PAYMENT_PAID && $data['status'] !== Status::Hold->value) {
+            if ($data['payment_status'] == Order::PAYMENT_PAID && $data['status'] != Status::Hold->value) {
                 $data['status'] = Status::Delivered->value;
             }
             // Create order
@@ -386,7 +386,7 @@ class OrderService
             $oldCouponId = $order->coupon_id;
 
             // If order was not on hold, restore stock first (we'll deduct new stock later)
-            if ($oldStatus !== Status::Hold->value) {
+            if ($oldStatus != Status::Hold->value) {
                 $this->restoreOrderStock($order);
             }
 
@@ -453,7 +453,7 @@ class OrderService
             }
 
             // Deduct new stock (only if not on hold)
-            if ($order->status !== Status::Hold->value) {
+            if ($order->status != Status::Hold->value) {
                 foreach ($items as $item) {
                     $this->deductOrderStock($order, $item);
                 }
@@ -577,7 +577,7 @@ class OrderService
             $oldStatus = $order->status;
 
             // If order was on hold, deduct stock now
-            if ($oldStatus === Status::Hold->value) {
+            if ($oldStatus == Status::Hold->value) {
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id' => $detail->product_id,
@@ -642,7 +642,7 @@ class OrderService
             }
 
             // Hold থেকে change হলে stock deduct করো
-            if ($oldStatus === Status::Hold->value || $oldStatus === Status::Draft->value) {
+            if ($oldStatus == Status::Hold->value || $oldStatus == Status::Draft->value) {
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id'   => $detail->product_id,
@@ -732,7 +732,7 @@ class OrderService
             $oldStatus = $order->status;
 
             // If order was pending, restore stock (will be deducted when resumed/completed)
-            if ($oldStatus === Status::Pending->value) {
+            if ($oldStatus == Status::Pending->value) {
                 $this->restoreOrderStock($order);
             }
 
@@ -903,9 +903,8 @@ class OrderService
         }
     }
 
-    // ========================================
+  
     // CALCULATION METHODS
-    // ========================================
 
     /**
      * Calculate item total

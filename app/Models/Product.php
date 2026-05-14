@@ -48,6 +48,7 @@ class Product extends Model
     ];
 
     protected $casts = [
+        'id'         => 'integer',
         'mega_category_ids' => IntegerArray::class,
         'sub_category_ids' => IntegerArray::class,
         'mini_category_ids' => IntegerArray::class,
@@ -58,6 +59,7 @@ class Product extends Model
         'stock_quantity' => 'integer',
         'regular_price' => 'decimal:2',
         'discount' => 'decimal:2',
+
     ];
 
     protected $hidden = ['deleted_at'];

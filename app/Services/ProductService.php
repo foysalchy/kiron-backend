@@ -26,7 +26,7 @@ class ProductService
                     $query->orderBy('regular_price', 'asc');
                 },
                 'variations.barcode',
-                
+
                 'variations.attributes.attributeGroup',
                 'variations.attributes.attributeValue',
                 'variations.stocks.warehouse',
@@ -117,9 +117,7 @@ class ProductService
 
             Product::loadCategoriesForCollection($items);
 
-            // ==========================================
             // Single Product 
-            // ==========================================
             $warehouseIds = [];
             $binIds = [];
 
@@ -207,7 +205,7 @@ class ProductService
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'products/thumbnails',
-                   
+
                 );
             }
 
@@ -349,7 +347,7 @@ class ProductService
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-                
+
                 );
             }
 
@@ -583,7 +581,7 @@ class ProductService
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-                   
+
                 );
             }
             // Check if this combination already exists (by hash, not by ID)
@@ -931,7 +929,7 @@ class ProductService
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-              
+
             );
 
             Gallery::create([
@@ -946,7 +944,7 @@ class ProductService
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-                
+
             );
 
             VariationGallery::create([
@@ -1150,7 +1148,7 @@ class ProductService
         // Get variation
         $variation = ProductVariation::find($variationId);
 
-        if (!$variation || $variation->product_id !== $product->id) {
+        if (!$variation || (int)$variation->product_id !== (int)$product->id) {
             throw ApiException::badRequest('Invalid variation for this product');
         }
 
@@ -1288,10 +1286,10 @@ class ProductService
         $variation = ProductVariation::with(['attributes.attributeGroup', 'attributes.attributeValue'])
             ->find($variationId);
 
-        if (!$variation || $variation->product_id !== $product->id) {
+
+        if (!$variation || (int)$variation->product_id !== (int)$product->id) {
             throw ApiException::badRequest('Invalid variation for this product');
         }
-
         $query = ProductVariationStockLedger::where('variation_id', $variationId);
 
         if ($warehouseId) {
@@ -1434,9 +1432,7 @@ class ProductService
         }
     }
 
-    // ========================================
     // PRIVATE HELPER METHODS
-    // ========================================
 
     /**
      * Update product's warehouse_info JSON
@@ -1674,7 +1670,7 @@ class ProductService
         // Get variation
         $variation = ProductVariation::find($variationId);
 
-        if (!$variation || $variation->product_id !== $product->id) {
+        if (!$variation || (int)$variation->product_id !== (int)$product->id) {
             throw ApiException::badRequest('Invalid variation for this product');
         }
 
@@ -1897,10 +1893,9 @@ class ProductService
     ): Product {
         $variation = ProductVariation::find($variationId);
 
-        if (!$variation || $variation->product_id !== $product->id) {
+        if (!$variation || (int)$variation->product_id !== (int)$product->id) {
             throw ApiException::badRequest('Invalid variation for this product');
         }
-
         $currentStock = ProductVariationStockLedger::getCurrentStock(
             $variationId,
             $warehouseId,
