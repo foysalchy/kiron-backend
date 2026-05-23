@@ -64,22 +64,33 @@ class RoleController extends Controller
     }
 
     // Assign Users to Role
-    public function assignUsers(Request $request, $id)
-    {
-        $request->validate([
-            'user_ids'   => 'required|array',
-            'user_ids.*' => 'exists:users,id',
-        ]);
+public function assignUsers(Request $request, $id)
+{
+    $request->validate([
+        'user_ids'   => 'required|array',
+        'user_ids.*' => 'exists:users,id',
+    ]);
 
-        $role = Role::findOrFail($id);
+    $role = Role::findOrFail($id);
 
-        $role->users()->syncWithoutDetaching($request->user_ids);
+    foreach ($request->user_ids as $userId) {
+        // Check if user already has any role
+        $existingRoles = Role::whereHas('users', fn($q) => $q->where('users.id', $userId))->get();
 
-        return response()->json([
-            'message' => 'Users assigned successfully',
-            'data'    => $role->load('users'),
-        ]);
+        // Remove from existing roles
+        foreach ($existingRoles as $existingRole) {
+            $existingRole->users()->detach($userId);
+        }
+
+        // Assign to new role
+        $role->users()->syncWithoutDetaching([$userId]);
     }
+
+    return response()->json([
+        'message' => 'Users assigned successfully',
+        'data'    => $role->load('users'),
+    ]);
+}
 
     // Remove Single User from Role
     public function removeUser(Request $request, $id)

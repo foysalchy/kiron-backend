@@ -25,7 +25,7 @@ class UpdateUserRequest extends FormRequest // Or BaseCompanyRequest if applicab
             'alternative_phone' => ['nullable', 'string', 'max:20'],
             'profile'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'password'          => ['nullable', 'string', 'min:6'], // Nullable during update
-            'role'              => ['nullable', 'string', 'max:100'],
+            'role_id'              => ['nullable',],
         ];
     }
 

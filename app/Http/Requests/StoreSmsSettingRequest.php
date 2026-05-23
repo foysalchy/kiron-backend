@@ -29,7 +29,7 @@ class StoreSmsSettingRequest extends BaseCompanyRequest
             [
                 'settings'                  => ['required', 'array'],
                 'settings.*.event_name'     => ['required', 'string'],
-                'settings.*.message'        => ['required', 'string'],
+                'settings.*.message'        => ['nullable', 'string'],
                 'settings.*.status'         => ['required', 'integer', 'in:0,1'],
             ]
         );

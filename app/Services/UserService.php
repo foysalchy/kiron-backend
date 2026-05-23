@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Database\Eloquent\Collection;
@@ -30,7 +31,7 @@ class UserService
     public function getAllUsers(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = User::query();
+            $query = User::with('roles');
 
             $query->where('company_id', $this->companyId);
 
@@ -69,7 +70,7 @@ class UserService
      */
     public function getUserById(int $id): User
     {
-        $user = User::find($id);
+        $user = User::with('roles')->find($id);
         if (!$user) {
             throw ApiException::notFound('User');
         }
@@ -83,7 +84,9 @@ class UserService
     {
         DB::beginTransaction();
         try {
-            // Hash the password before saving
+            $roleId = $data['role_id'] ?? null;
+            unset($data['role_id']);
+
             if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             }
@@ -91,13 +94,17 @@ class UserService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
-                   
                 );
             }
             $data['status'] = Status::Active->value;
             $data['company_id'] = $this->companyId;
             $user = User::create($data);
 
+            // Assign role if provided
+            if ($roleId) {
+                $role = Role::findOrFail($roleId);
+                $role->users()->syncWithoutDetaching([$user->id]);
+            }
 
             DB::commit();
             Log::info('User created successfully', ['user_id' => $user->id]);
@@ -109,7 +116,6 @@ class UserService
             throw ApiException::serverError('Failed to create user');
         }
     }
-
     /**
      * Update user
      */
@@ -119,7 +125,9 @@ class UserService
         try {
             $user = $this->getUserById($id);
 
-            // Handle password update
+            $roleId = $data['role_id'] ?? null;
+            unset($data['role_id']);
+
             if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
             } else {
@@ -129,11 +137,24 @@ class UserService
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
-                   
                 );
             }
 
             $user->update($data);
+
+            // Handle role assignment
+            if ($roleId) {
+                // Remove user from any existing roles first
+                $existingRoles = Role::whereHas('users', fn($q) => $q->where('users.id', $user->id))->get();
+                foreach ($existingRoles as $existingRole) {
+                    $existingRole->users()->detach($user->id);
+                }
+
+                // Assign new role
+                $role = Role::findOrFail($roleId);
+                $role->users()->syncWithoutDetaching([$user->id]);
+            }
+            // If no role_id provided, skip role handling entirely
 
             Log::info('User updated successfully', ['user_id' => $user->id]);
 

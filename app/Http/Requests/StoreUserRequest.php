@@ -22,7 +22,7 @@ class StoreUserRequest extends FormRequest // Or BaseCompanyRequest if applicabl
             'alternative_phone' => ['nullable', 'string', 'max:20'],
             'profile'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'password'          => ['required', 'string', 'min:6'],
-            'role'              => ['nullable', 'string', 'max:100'],
+            'role_id'            => ['nullable'],
         ];
     }
 

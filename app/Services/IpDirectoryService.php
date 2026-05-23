@@ -203,9 +203,9 @@ class IpDirectoryService
             $ip = $this->getIpById($id);
 
             $currentStatus = Status::from($ip->status);
-            $newStatus = $currentStatus === Status::Active
+            $newStatus = $currentStatus == Status::Active
                 ? Status::Inactive
-                : Status::Active;
+                : Status::Active; 
 
             $ip->update([
                 'status' => $newStatus->value

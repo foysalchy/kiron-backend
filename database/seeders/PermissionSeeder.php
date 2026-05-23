@@ -38,7 +38,7 @@ class PermissionSeeder extends Seeder
             ];
         };
         $addCreateView = function ($prefix, $groupName, $feature) use (&$permissionsToInsert) {
-           foreach (['view', 'create'] as $action) {
+            foreach (['view', 'create'] as $action) {
                 $permissionsToInsert[] = [
                     'name'               => "{$prefix}.{$action}",
                     'group_name'         => $groupName,
@@ -192,8 +192,8 @@ class PermissionSeeder extends Seeder
         // ==========================================
         // 18. Tax & VAT
         // ==========================================
-        $addCrud('tax_rates',               'Tax Rates',                'tax_rates');
-        $addCrud('tax_groups',              'Tax Groups',               'tax_groups');
+        // $addCrud('tax_rates',               'Tax Rates',                'tax_rates');
+        // $addCrud('tax_groups',              'Tax Groups',               'tax_groups');
 
         // ==========================================
         // 19. Leads (CRM)
@@ -214,6 +214,7 @@ class PermissionSeeder extends Seeder
         $addCrud('woocommerce_integration', 'WooCommerce Integration',  'woocommerce_sync');
         $addCrud('settings_sms',            'SMS Settings',             'settings_sms');
         $addCrud('settings_templates',      'Template Settings',        'settings_templates');
+        $addCrud('settings_tax',      'Tax Settings',        'settings_tax');
 
         //21. Subscriptions
         $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');

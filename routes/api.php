@@ -266,6 +266,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/support-departments', [SelectOptionController::class, 'supportDepartmentOptions']);
                 Route::get('/customer-groups', [SelectOptionController::class, 'customerGroups']);
                 Route::get('/landing-domains', [SelectOptionController::class, 'getAvailableDomains']);
+                Route::get('/roles', [SelectOptionController::class, 'getRoles']);
             });
             //party routes
             Route::prefix('parties')->group(function () {

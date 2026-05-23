@@ -48,9 +48,9 @@ class LeadNoteService
     /**
      * Get Note by ID
      */
-    public function getNoteById(int $id): LeadNote
+    public function getNoteById(int $id)
     {
-        $note = LeadNote::with('lead','user')->find($id);
+        $note = LeadNote::with('lead','user')->where('lead_id',$id)->get();
 
         if (!$note) {
             throw ApiException::notFound('Lead Note');
@@ -83,7 +83,7 @@ class LeadNoteService
     /**
      * Update Lead Note
      */
-    public function updateLeadNote(int $id, array $data): LeadNote
+    public function updateLeadNote(int $id, array $data)
     {
         DB::beginTransaction();
         try {
@@ -108,7 +108,7 @@ class LeadNoteService
     {
         DB::beginTransaction();
         try {
-            $note = $this->getNoteById($id);
+            $note =LeadNote::find($id);
             $note->delete();
 
             LogHelper::deleted('lead_note', $id, $note->company_id, 'Note soft deleted');

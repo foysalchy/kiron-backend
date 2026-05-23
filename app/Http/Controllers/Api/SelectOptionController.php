@@ -21,6 +21,7 @@ use App\Models\Party;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Rack;
+use App\Models\Role;
 use App\Models\SupportDepartment;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -296,6 +297,12 @@ class SelectOptionController extends Controller
         $groups = CustomerGroup::orderBy('name', 'asc')->get();
 
         return $groups;
+    }
+    public function getRoles()
+    {
+        $roles = Role::orderBy('name', 'asc')->get();
+
+        return $roles;
     }
     public function getAvailableDomains()
     {
