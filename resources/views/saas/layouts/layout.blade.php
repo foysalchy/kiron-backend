@@ -10,7 +10,7 @@
 
     <title>New</title>
     <!-- Favicon -->
-    {{-- <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}"> --}}
+    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,8 +43,20 @@
 
     @stack('scripts')
     <script>
+        const menuToggle = document.getElementById("menu-toggle");
+        const menuClose = document.getElementById("menu-close");
+        const mobileMenu = document.getElementById("mobile-menu");
+        const menuOverlay = document.getElementById("menu-overlay");
 
+        function toggleMenu() {
+            mobileMenu.classList.toggle("translate-x-full");
+        }
+
+        menuToggle.addEventListener("click", toggleMenu);
+        menuClose.addEventListener("click", toggleMenu);
+        menuOverlay.addEventListener("click", toggleMenu);
     </script>
+
 </body>
 
 </html>

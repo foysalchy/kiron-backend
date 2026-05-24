@@ -2,19 +2,18 @@
     <div class="container mx-auto px-4 md:px-10 h-20 flex items-center justify-between">
         <!-- Logo Section -->
         <div class="flex-shrink-0">
-            <a href="/" class="flex items-center gap-2">
+            <a href="{{ route('saas.index') }}" class="flex items-center gap-2">
                 <img src="./assets/images/shopify-logo.png" alt="Shopify" class="h-8 md:h-9"
                     onerror="
                 this.src =
                   'https://upload.wikimedia.org/wikipedia/commons/e/e1/Shopify_Logo.png'
               " />
-                <span class="font-bold text-lg md:text-xl text-gray-900">Shopify</span>
             </a>
         </div>
 
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
-            <a href="#" class="text-[#5c46e5] font-semibold text-lg">হোম</a>
+            <a href="{{ route('saas.index') }}" class="text-[#5c46e5] font-semibold text-lg">হোম</a>
             <a href="#" class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">ফিচারসমূহ</a>
             <a href="#"
                 class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">ইন্টিগ্রেশন</a>

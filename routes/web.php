@@ -16,11 +16,14 @@ use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Saas\IndexController as SaasIndexController;
+use App\Http\Controllers\Saas\MasterBrandController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/saas', [SaasIndexController::class,'index'])->name('saas.index');
+
+
+Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
 
 
 

@@ -110,6 +110,7 @@ use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\Saas\MasterBrandController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SalesReportController;
 use App\Http\Controllers\Api\SelectOptionController;
@@ -1519,5 +1520,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/execute', [BkashController::class, 'execute']);
         Route::get('/success', [BkashController::class, 'successPayment'])->name('bkash.success');
         Route::get('/failure', [BkashController::class, 'failurePayment'])->name('bkash.failure');
+    });
+    Route::prefix('saas')->group(function () {
+        Route::apiResource('master-brands', MasterBrandController::class);
+        Route::post('master-brands/{id}/toggle-status', [MasterBrandController::class, 'toggleStatus']);
     });
 });
