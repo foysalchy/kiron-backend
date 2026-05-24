@@ -222,7 +222,6 @@
                 @endforeach
             </div>
 
-            {{-- ৩. অর্ডার বাটন --}}
             <div class="mb-4 text-center mt-8 md:mt-12">
                 <a href="#order"
                     class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase">
@@ -387,13 +386,6 @@
                     </div>
                 </div>
 
-                {{-- <div
-                    class="swiper-button-prev !w-10 !h-10 !bg-white !text-gray-800 shadow-lg rounded-full after:!text-xs !-left-2 md:!-left-5">
-                </div>
-                <div
-                    class="swiper-button-next !w-10 !h-10 !bg-white !text-gray-800 shadow-lg rounded-full after:!text-xs !-right-2 md:!-right-5">
-                </div> --}}
-
                 <div class="swiper-pagination !-bottom-2"></div>
             </div>
         </div>
@@ -426,10 +418,8 @@
                 </div>
             </div>
 
-            {{-- ২. চিকন ডিভাইডার লাইন --}}
             <hr class="border-gray-300 mb-8">
 
-            {{-- ৩. নিচের অংশ: কপিরাইট এবং ক্রেডিট --}}
             <div class="text-center text-gray-800 text-sm md:text-base tracking-wide">
                 <p>
                     © {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.

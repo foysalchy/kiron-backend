@@ -1,5 +1,5 @@
 <!-- FOOTER -->
-<footer class="text-primary       ">
+<footer class="text-primary">
 
     <!-- 1. Top Features Row -->
     <div class="bg-[#1A2937] p-6">
