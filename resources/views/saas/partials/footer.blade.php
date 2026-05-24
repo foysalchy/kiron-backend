@@ -30,30 +30,25 @@
              <!-- Col 1: Logo & Socials -->
              <div class="space-y-6">
                  <a href="/" class="flex items-center gap-2">
-                     <img src="./assets/images/shopify-logo.png" alt="Shopify" class="h-8"
+                     <img src="{{ $setup->logo  ?? ''}}" alt="Shopify" class="h-8"
                          onerror="
                   this.src =
                     'https://upload.wikimedia.org/wikipedia/commons/e/e1/Shopify_Logo.png'
                 " />
-                     <span class="font-bold text-2xl tracking-tight">shopify</span>
                  </a>
                  <p class="text-gray-400 leading-relaxed text-[15px]">
                      আপনার ব্যবসার সেলস, ইনভেন্টরি, অ্যাকাউন্টিং, CRM এবং
                      ই-কমার্স—সবকিছু এখন একটি শক্তিশালী প্ল্যাটফর্মে।
                  </p>
                  <div class="flex items-center gap-3">
-                     <a href="#"
-                         class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
-                         <i class="fa-brands fa-facebook-f text-lg text-gray-400 group-hover:text-white"></i>
-                     </a>
-                     <a href="#"
-                         class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
-                         <i class="fa-brands fa-linkedin-in text-lg text-gray-400 group-hover:text-white"></i>
-                     </a>
-                     <a href="#"
-                         class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
-                         <i class="fa-brands fa-whatsapp text-lg text-gray-400 group-hover:text-white"></i>
-                     </a>
+                     @foreach ($socialLinks as $social)
+                         <a href="{{ $social->link ?? '#' }}" target="_blank"
+                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
+
+                             <i
+                                 class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
+                         </a>
+                     @endforeach
                  </div>
              </div>
 
@@ -64,16 +59,13 @@
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#5c46e5] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
-                     <li><a href="#" class="hover:text-white transition">ব্লগ</a></li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">যোগাযোগ</a>
-                     </li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">সলিউশন</a>
-                     </li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">শর্তাবলী</a>
-                     </li>
+                     @foreach ($footerPages as $page)
+                         <li>
+                             <a href="{{ url('/page/' . $page->slug) }}" class="hover:text-white transition">
+                                 {{ $page->title }}
+                             </a>
+                         </li>
+                     @endforeach
                  </ul>
              </div>
 
@@ -108,15 +100,15 @@
                  <ul class="space-y-5 text-gray-400 text-[15px]">
                      <li class="flex items-start gap-3">
                          <i class="fa-solid fa-phone mt-1 text-[#5c46e5]"></i>
-                         <span>০৯ ৬৩-২৩৬৫৪৫৪</span>
+                         <span>{{ $setup->phone ?? '0188-8888888' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
                          <i class="fa-solid fa-envelope mt-1 text-[#5c46e5]"></i>
-                         <span>hello@sopify.com</span>
+                         <span>{{ $setup->email ?? 'hello@sopify.com' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
                          <i class="fa-solid fa-location-dot mt-1 text-[#5c46e5]"></i>
-                         <span>প ২০৮/৩ দক্ষিণ বাড্ডা<br />ঢাকা -১২২২</span>
+                         <span>{{ $setup->corporate_address ?? 'প ২০৮/৩ দক্ষিণ বাড্ডা<br />ঢাকা -১২২২' }}</span>
                      </li>
                  </ul>
              </div>
@@ -126,14 +118,14 @@
          <div
              class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-500">
              <p>
-                 © ২০২৬ <span class="text-white font-semibold">Shopify.</span> সকল
+                 © ২০২৬ <span class="text-white font-semibold"></span> সকল
                  স্বত্ব সংরক্ষিত।
              </p>
-             <div class="flex items-center gap-6">
+             {{-- <div class="flex items-center gap-6">
                  <a href="#" class="hover:text-white transition">শর্তাবলী</a>
                  <a href="#" class="hover:text-white transition">গোপনীয়তা</a>
                  <a href="#" class="hover:text-white transition">কুকি পলিসি</a>
-             </div>
+             </div> --}}
          </div>
      </div>
  </footer>

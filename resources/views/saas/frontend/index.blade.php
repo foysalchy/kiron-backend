@@ -22,14 +22,10 @@
             <!-- Left Side: Content -->
             <div class="text-center lg:text-left order-2 lg:order-1">
                 <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                    ম্যানেজ করুন, অটোমেট করুন, গ্রো করুন — সব একসাথে, এক প্ল্যাটফর্মে
-                    !
+                    {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
                 </h1>
                 <p class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
-                    আপনার ব্যবসার সেলস, ইনভেন্টরি, অ্যাকাউন্টিং, CRM এবং
-                    ই-কমার্স—সবকিছু এখন একটি শক্তিশালী প্ল্যাটফর্মে। আলাদা আলাদা
-                    সফটওয়্যার ব্যবহার করার ঝামেলা ছাড়াই সহজে অর্ডার ম্যানেজ করুন, স্টক
-                    ট্র্যাক করুন, কাস্টমার হ্যান্ডেল করুন—সবকিছু রিয়েল-টাইমে।
+                    {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
                 </p>
 
                 <!-- Action Buttons -->
@@ -68,7 +64,7 @@
 
                 <!-- Central White Box Logo -->
                 <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
-                    <img src="{{ asset('./images/saas/hero.png') }}" class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain"
+                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain"
                         alt="Core Platform" />
                 </div>
 
