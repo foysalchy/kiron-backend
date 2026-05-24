@@ -28,7 +28,11 @@ class StorePageRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'title'       => ['required', 'string', 'max:255'],
+                'slug' => ['required', 'string'],
                 'description' => ['nullable', 'string'],
+                'meta_title' => ['nullable', 'string'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable'],
                 'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]

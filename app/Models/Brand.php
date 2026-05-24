@@ -19,11 +19,16 @@ class Brand extends Model
         'name',
         'slug',
         'logo',
+        'meta_title',
         'meta_description',
+        'meta_keywords',
         'description',
         'status',
     ];
-
+    protected $casts = [
+        'id'         => 'integer',
+        'meta_keywords' => 'array',
+    ];
 
     protected $hidden = ['deleted_at'];
 

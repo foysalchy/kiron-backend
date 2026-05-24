@@ -29,7 +29,11 @@ class UpdatePageRequest extends UpdateBaseCompanyRequest
             [
                 // 'sometimes' ensures validation only runs if the field is actually sent
                 'title'       => ['sometimes', 'required', 'string', 'max:255'],
+  
                 'description' => ['nullable', 'string'],
+                'meta_title' => ['nullable', 'string'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable'],
                 'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
                 'status'      => ['sometimes', 'integer', 'in:0,1'],
             ]

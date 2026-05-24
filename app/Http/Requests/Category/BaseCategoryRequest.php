@@ -34,8 +34,11 @@ abstract class BaseCategoryRequest extends FormRequest
             ],
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255'],
-            'meta_description' => ['nullable', 'string'],
+
             'description' => ['nullable', 'string'],
+            'meta_title' => ['nullable', 'string'],
+            'meta_description' => ['nullable', 'string'],
+            'meta_keywords' => ['nullable'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'status' => ['integer'],
         ];
@@ -52,8 +55,10 @@ abstract class BaseCategoryRequest extends FormRequest
             ],
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
-            'meta_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
+            'meta_title' => ['nullable', 'string'],
+            'meta_description' => ['nullable', 'string'],
+            'meta_keywords' => ['nullable'],
             'status' => ['integer'],
         ];
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->date('from_date');
             $table->date('to_date');
             $table->string('theme_color')->default('#ffffff');
-            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
+            $table->tinyInteger('status')->default(Status::Active->value)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

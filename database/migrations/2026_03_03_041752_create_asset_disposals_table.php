@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('disposal_type_id')->constrained('disposal_types')->cascadeOnDelete();
             $table->string('date');
             $table->string('amount');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->tinyInteger('status')->default(Status::Inactive->value)->comment('Active / Inactive / Disposed');
             $table->timestamps();
             $table->softDeletes();

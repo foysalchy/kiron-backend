@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
 
     protected $fillable = [
@@ -22,8 +22,12 @@ class Page extends Model
         'sort_order',
         'meta_title',
         'meta_description',
+        'meta_keywords'
     ];
-
+    protected $casts = [
+        'id'         => 'integer',
+        'meta_keywords' => 'array',
+    ];
 
     protected $hidden = ['deleted_at'];
 
