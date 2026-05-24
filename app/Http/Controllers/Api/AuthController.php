@@ -14,6 +14,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\{Auth, Hash, DB, Log};
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -66,9 +70,7 @@ class AuthController extends Controller
         ]);
 
         $user->tokens()->delete();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // 👉 তোমার existing permission logic (copy same as login)
+        $token = $user->createToken('auth_token', ['*'], now()->addDays(30))->plainTextToken;
         $effectivePermissions = [];
 
         if ($user->is_super_admin) {
@@ -181,7 +183,7 @@ class AuthController extends Controller
 
             $company = Company::findOrFail($companyId);
 
-        
+
             $users = User::where('company_id', $company->id)
                 ->with(['company.pricingPackage', 'roles.permissions'])
                 ->get();
@@ -233,7 +235,7 @@ class AuthController extends Controller
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $request->file('profile'),
                     'users/profiles',
-                   
+
                 );
             }
 
@@ -494,5 +496,98 @@ class AuthController extends Controller
                 'message' => 'Account deletion failed: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Always return 200 to avoid user enumeration attacks.
+        if (! $user) {
+            return response()->json([
+                'message' => 'If an account exists for that email, you will receive a reset link shortly.',
+            ]);
+        }
+
+        // Delete any existing token for this email.
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        $token = Str::random(64);
+
+        DB::table('password_reset_tokens')->insert([
+            'email'      => $request->email,
+            'token'      => Hash::make($token),
+            'created_at' => Carbon::now(),
+        ]);
+
+        // Send the email (uses resources/views/emails/reset-password.blade.php)
+        Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $token));
+
+        return response()->json([
+            'message' => 'If an account exists for that email, you will receive a reset link shortly.',
+        ]);
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // POST /api/v1/auth/reset-password
+    // ──────────────────────────────────────────────────────────────────────────
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'                 => ['required', 'string'],
+            'email'                 => ['required', 'email'],
+            'password'              => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $record = DB::table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->first();
+
+        if (! $record) {
+            return response()->json([
+                'message' => 'Invalid or expired reset link. Please request a new one.',
+            ], 422);
+        }
+
+        // Token expires after 60 minutes.
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            return response()->json([
+                'message' => 'This reset link has expired. Please request a new one.',
+            ], 422);
+        }
+
+        if (! Hash::check($request->token, $record->token)) {
+            return response()->json([
+                'message' => 'Invalid or expired reset link. Please request a new one.',
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return response()->json([
+                'message' => 'No account found for this email.',
+            ], 422);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Delete the used token.
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Optional: invalidate all existing tokens for this user (Sanctum).
+        // $user->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Your password has been reset successfully.',
+        ]);
     }
 }

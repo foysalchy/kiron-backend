@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('title');
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('image')->nullable();
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->json('meta_keywords')->nullable();
             $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();

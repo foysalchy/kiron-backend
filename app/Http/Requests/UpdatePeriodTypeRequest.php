@@ -23,16 +23,25 @@ class UpdatePeriodTypeRequest extends UpdateBaseCompanyRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
-    {
-        return array_merge(
-            $this->companyRules(),
-            [
-                'type' => ['sometimes', 'string', 'max:255', Rule::unique('period_types', 'type')->ignore($this->route('period_type'))],
-                'status' => ['sometimes', 'integer'],
-            ]
-        );
-    }
+  public function rules(): array
+{
+    $companyId = $this->input('company_id') ?? $this->user()->company_id;
+    
+    return array_merge(
+        $this->companyRules(),
+        [
+            'type' => [
+                'sometimes', 
+                'string', 
+                'max:255', 
+                Rule::unique('period_types', 'type')
+                    ->where('company_id', $companyId)
+                    ->ignore($this->route('period_type')),
+            ],
+            'status' => ['sometimes', 'integer'],
+        ]
+    );
+}
     /**
      * Custom validation messages
      */

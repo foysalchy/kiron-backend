@@ -153,7 +153,8 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
-
+    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+    Route::post('/auth/reset-password',  [AuthController::class, 'resetPassword']);
     Route::prefix('registration')->group(function () {
         Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
         Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);

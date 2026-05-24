@@ -20,12 +20,17 @@ class MiniCategory extends Model
         'name',
         'slug',
         'image',
-        'meta_description',
         'description',
         'status',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
-
+   protected $casts = [
+        'id'         => 'integer',
+        'meta_keywords' => 'array',
+    ];
     protected $hidden = ['deleted_at'];
 
 

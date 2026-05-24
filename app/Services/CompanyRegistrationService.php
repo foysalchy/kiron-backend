@@ -190,7 +190,7 @@ class CompanyRegistrationService
             DB::commit();
 
             // Send email after commit
-         //   $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
+            //   $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
             Log::info("Otp {$otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
         } catch (\Exception $e) {
             DB::rollBack();
@@ -233,11 +233,12 @@ class CompanyRegistrationService
             Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
 
             $user = User::where('company_id', $company->id)
-                ->first()
-                ->load(['company.pricingPackage', 'roles.permissions']);
+                ->with(['company.pricingPackage', 'roles.permissions'])
+                ->first();
 
             return [
                 'permissions'          => $this->resolvePermissions($user),
+                 'company'     => $company->load('pricingPackage'),
             ];
         } catch (\Exception $e) {
             DB::rollBack();

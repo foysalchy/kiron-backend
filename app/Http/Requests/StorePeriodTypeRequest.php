@@ -25,8 +25,15 @@ class StorePeriodTypeRequest extends BaseCompanyRequest
      */
     public function rules(): array
     {
+        $companyId = $this->input('company_id') ?? $this->user()->company_id;
         return array_merge($this->companyRules(), [
-            'type'   => ['required', 'string', 'max:255', Rule::unique('period_types', 'type')],
+            'type' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('period_types', 'type')
+                    ->where('company_id', $companyId),
+            ],
             'status' => ['nullable', 'integer'],
         ]);
     }

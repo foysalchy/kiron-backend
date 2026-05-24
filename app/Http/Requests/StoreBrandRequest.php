@@ -26,8 +26,10 @@ class StoreBrandRequest extends BaseCompanyRequest
                     null,
                     $this->getCompanyId()
                 ),
-                'meta_description' => ['nullable', 'string'],
                 'description' => ['nullable', 'string'],
+                'meta_title' => ['nullable', 'string'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable'],
                 'status' => ['boolean'],
             ]
         );

@@ -10,22 +10,25 @@ use Illuminate\Support\Str;
 
 class MegaCategory extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
         'name',
         'slug',
         'image',
-        'meta_description',
         'description',
         'status',
+        'meta_title',
+        'meta_description',
+        'meta_keywords'
     ];
 
     protected $casts = [
+        'id'         => 'integer',
+        'meta_keywords' => 'array',
         'status' => 'integer',
     ];
-
     protected $hidden = ['deleted_at'];
 
 
