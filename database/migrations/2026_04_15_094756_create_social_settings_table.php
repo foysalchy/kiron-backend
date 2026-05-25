@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('social_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
             $table->string('icon_name')->nullable();
             $table->string('icon_image')->nullable();
             $table->string('link');

@@ -1132,6 +1132,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/{id}', [LeadController::class, 'show']);
                 Route::post('/update/{id}', [LeadController::class, 'update']);
                 Route::post('/{id}/convert-to-seller', [LeadController::class, 'convertToSeller']);
+                Route::post('/{id}/convert-to-customer', [LeadController::class, 'convertToCustomer']);
                 Route::delete('/{id}', [LeadController::class, 'destroy']);
                 Route::get('{id}/restore', [LeadController::class, 'restore']);
                 Route::delete('{id}/force', [LeadController::class, 'forceDestroy']);

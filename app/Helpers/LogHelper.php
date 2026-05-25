@@ -13,7 +13,7 @@ class LogHelper
         string $action,
         string $module,
         int $actionId,
-        int $companyId,
+        ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
     ): ?ActionLog {
@@ -39,7 +39,7 @@ class LogHelper
     public static function created(
         string $module,
         int $actionId,
-        int $companyId,
+        ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
     ): ?ActionLog {
@@ -52,7 +52,7 @@ class LogHelper
     public static function updated(
         string $module,
         int $actionId,
-        int $companyId,
+        ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 
@@ -66,7 +66,7 @@ class LogHelper
     public static function deleted(
         string $module,
         int $actionId,
-        int $companyId,
+         ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 
@@ -80,7 +80,7 @@ class LogHelper
     public static function restored(
         string $module,
         int $actionId,
-        int $companyId,
+        ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 
@@ -94,7 +94,7 @@ class LogHelper
     public static function forceDeleted(
         string $module,
         int $actionId,
-        int $companyId,
+          ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 
@@ -108,7 +108,7 @@ class LogHelper
     public static function statusChanged(
         string $module,
         int $actionId,
-        int $companyId,
+         ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 
@@ -123,7 +123,7 @@ class LogHelper
         string $action,
         string $module,
         int $actionId,
-        int $companyId,
+       ?int $companyId = null,
         ?string $actionType = null,
         ?int $userId = null
 

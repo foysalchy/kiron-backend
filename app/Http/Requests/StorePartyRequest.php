@@ -50,6 +50,7 @@ class StorePartyRequest extends BaseCompanyRequest
                 'thana' => ['nullable', 'string'],
                 'address' => ['nullable', 'string'],
                 'balance' => ['nullable', 'numeric'],
+                'convert_to_customer' => ['nullable'],
                 'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status' => ['integer'],
             ]

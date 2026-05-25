@@ -28,7 +28,6 @@ class DashboardController extends Controller
     public function fullReport(Request $request): JsonResponse
     {
 
-        \Log::info('Incoming Request: ', $request->all());
 
         $period = $request->get('period', 'this_month');
         $customStart = $request->get('start_date');

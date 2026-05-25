@@ -150,6 +150,7 @@ class PartyService
             }
             $data['password'] = Hash::make($data['password']);
             $party = Party::create($data);
+            
             LogHelper::created('party', $party->id, $party->company_id, $party->type_text . " created");
 
             DB::commit();

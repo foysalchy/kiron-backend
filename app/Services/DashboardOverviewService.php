@@ -57,14 +57,13 @@ class DashboardOverviewService
     {
         $lowStockThreshold = 10;
 
-        // Single products
+        // ✅ Single products — scope already applied
         $singles = Product::where('type', 'single')->get();
 
         $singleTotal    = $singles->count();
         $singleActive   = $singles->where('status', Status::Active->value)->count();
         $singleInactive = $singles->where('status', Status::Inactive->value)->count();
 
-        // Stock from warehouse_info JSON
         $singleOutOfStock = $singles->filter(function ($p) {
             $stock = collect($p->warehouse_info ?? [])->sum('quantity');
             return $stock <= 0;
@@ -75,22 +74,27 @@ class DashboardOverviewService
             return $stock > 0 && $stock < $lowStockThreshold;
         })->count();
 
-        // Variable products (via product_variation_stocks)
+        $variables = Product::where('type', 'variation')->get();
+
+        $variableTotal    = $variables->count();
+        $variableActive   = $variables->where('status', Status::Active->value)->count();
+        $variableInactive = $variables->where('status', Status::Inactive->value)->count();
+
+        // ✅ Variation stocks — 
         $variationColumn = $this->getVariationColumnName();
+        $variableProductIds = $variables->pluck('id');
 
         $variationStocks = DB::table('product_variation_stocks as pvs')
             ->join('product_variations as pv', "pvs.{$variationColumn}", '=', 'pv.id')
-            ->join('products as p', 'pv.product_id', '=', 'p.id')
-            ->select('pv.id', 'p.status', DB::raw('SUM(pvs.quantity) as total_stock'))
-            ->groupBy('pv.id', 'p.status')
+            ->whereIn('pv.product_id', $variableProductIds)
+            ->select('pv.id', DB::raw('SUM(pvs.quantity) as total_stock'))
+            ->groupBy('pv.id')
             ->get();
 
-        $variableTotal    = DB::table('products')->where('type', 'variable')->count();
-        $variableActive   = DB::table('products')->where('type', 'variable')->where('status', Status::Active->value)->count();
-        $variableInactive = DB::table('products')->where('type', 'variable')->where('status', Status::Inactive->value)->count();
-
         $variableOutOfStock = $variationStocks->where('total_stock', '<=', 0)->count();
-        $variableLowStock   = $variationStocks->filter(fn($v) => $v->total_stock > 0 && $v->total_stock < $lowStockThreshold)->count();
+        $variableLowStock   = $variationStocks->filter(
+            fn($v) => $v->total_stock > 0 && $v->total_stock < $lowStockThreshold
+        )->count();
 
         return [
             'total'        => $singleTotal + $variableTotal,
@@ -290,8 +294,15 @@ class DashboardOverviewService
         ];
 
         // Inventory status
-        $variationReceived = (int) DB::table('product_variation_stocks')->sum('quantity');
+        $scopedVariationIds = ProductVariation::whereHas('product', function ($q) {
+            $q->where('type', 'variable');
+        })->pluck('id');
 
+        $variationColumn = $this->getVariationColumnName();
+
+        $variationReceived = (int) DB::table('product_variation_stocks')
+            ->whereIn($variationColumn, $scopedVariationIds)
+            ->sum('quantity');
         $singleReceived = (int) Product::where('type', 'single')
             ->get()
             ->sum(fn($p) => collect($p->warehouse_info ?? [])->sum('quantity'));

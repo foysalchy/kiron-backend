@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCompanyRequest;
+use App\Http\Requests\{ StoreCompanyRequest, StorePartyRequest };
 use App\Http\Requests\StoreLeadRequest;
 use App\Http\Requests\UpdateLeadRequest;
 use App\Services\LeadService;
@@ -73,6 +73,12 @@ class LeadController extends Controller
         $this->leadService->convertToSeller($request->validated(), $id);
 
         return ResponseHelper::success(null, 'Converted to seller done succsessfully');
+    }
+    public function convertToCustomer(StorePartyRequest $request, int $id): JsonResponse
+    {
+        $this->leadService->convertToCustomer($request->validated(), $id);
+
+        return ResponseHelper::success(null, 'Converted to customer done succsessfully');
     }
     /**
      * Soft delete the lead.

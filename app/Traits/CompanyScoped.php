@@ -29,28 +29,32 @@ trait CompanyScoped
         });
 
         // Apply global scope for filtering
-        static::addGlobalScope('company', function (Builder $builder) {
+  // Apply global scope for filtering
+static::addGlobalScope('company', function (Builder $builder) {
 
-            try {
-                $company = getCurrentCompany();
-                if ($company && isset($company->company_id)) {
-                    $builder->where('company_id', $company->company_id);
-                }
-            } catch (\Exception $e) {
-                // Silent fail — boot time এ error হলে ignore
+    try {
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            if (self::isSuperAdmin($user)) {
+                // Super admin: only fetch records where company_id is null
+                $builder->whereNull('company_id');
+            } else {
+                // Regular user: fetch their company's records
+                $builder->where('company_id', $user->company_id);
             }
-            if (Auth::check()) {
-                $user = Auth::user();
+            return;
+        }
 
-                if (!self::isSuperAdmin($user)) {
-                    $builder->where('company_id', $user->company_id);
-                }
-                return; // auth user হলে এখানেই শেষ
-            }
+        $company = getCurrentCompany();
+        if ($company && isset($company->company_id)) {
+            $builder->where('company_id', $company->company_id);
+        }
 
-            // Frontend/Guest: getCurrentCompany থেকে নাও
-
-        });
+    } catch (\Exception $e) {
+        // Silent fail — boot time এ error হলে ignore
+    }
+});
     }
 
     /**

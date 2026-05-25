@@ -4,13 +4,15 @@ namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
+use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\Company;
 use App\Models\Lead;
 use App\Models\LeadStatus;
+use App\Models\Party;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{DB, Hash, Log};
 
 class LeadService
 {
@@ -139,6 +141,43 @@ class LeadService
             DB::rollBack();
             Log::error('Converted to seller failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to converted seller');
+        }
+    }
+    public function convertToCustomer(array $data, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $lead = $this->getLeadById($id);
+
+            // create company
+            if (isset($data['profile'])) {
+                $data['profile'] = FileUploadHelper::uploadImage(
+                    $data['profile'],
+                    'parties/profiles',
+
+                );
+            }
+            $data['password'] = Hash::make($data['password']);
+            $party = Party::create($data);
+
+
+            // get status
+            $convertStatus = LeadStatus::where('name', 'Succeffully Converted')->first();
+
+            if (!$convertStatus) {
+                throw new \Exception('Lead status not found');
+            }
+
+            $lead->lead_status_id = $convertStatus->id;
+            $lead->save();
+            LogHelper::custom('convert_to_customer', 'lead', $id, $party->company_id, $lead->full_name . ' Converted Customer');
+
+            DB::commit();
+            return $lead;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Converted to customer failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to converted customer');
         }
     }
     /**
