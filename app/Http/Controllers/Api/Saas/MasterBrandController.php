@@ -68,6 +68,18 @@ class MasterBrandController extends Controller
         $this->brandService->deleteBrand($id);
         return ResponseHelper::success(null, 'Master brand deleted successfully');
     }
+    public function restore(int $id): JsonResponse
+    {
+        $data = $this->brandService->restoreBrand($id);
+
+        return ResponseHelper::success($data, 'Brand restore successfully');
+    }
+    public function forceDestroy(int $id): JsonResponse
+    {
+        $this->brandService->forceDeleteBrand($id);
+
+        return ResponseHelper::success(null, 'Brand permanently deleted');
+    }
 
     /**
      * toggle the status of a specific master brand

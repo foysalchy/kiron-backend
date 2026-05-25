@@ -1,20 +1,21 @@
 @extends('saas.layouts.layout')
 
 @section('content')
-<style>
-      .hero-bg {
-        background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #0a061e 60%);
-      }
-      .hero-bg::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-        background-size: 40px 40px;
-        pointer-events: none;
-      }
+    <style>
+        .hero-bg {
+            background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #0a061e 60%);
+        }
+
+        .hero-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
     </style>
     <!-- HERO SECTION -->
     <section class="hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
@@ -64,8 +65,8 @@
 
                 <!-- Central White Box Logo -->
                 <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
-                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain"
-                        alt="Core Platform" />
+                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
+                        class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
                 </div>
 
                 <!-- --- CUSTOMER REVIEW SECTION --- -->
@@ -94,41 +95,23 @@
         <div class="container mx-auto">
             <div
                 class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center justify-items-center gap-y-12 gap-x-8 grayscale hover:opacity-100 transition-all duration-500">
-                <!-- Ghorer Bazar -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/ghore.png') }}" alt="Ghorer Bazar"
-                        class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
-
-                <!-- Daraz -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"
-                        class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
-
-                <!-- Honeyraj -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/honeyraj.png') }}" alt="Honeyraj"
-                        class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
-
-                <!-- Chaldal -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/chaldal.svg') }}" alt="Chaldal"
-                        class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
-
-                <!-- bKash -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"
-                        class="h-8 md:h-10 lg:h-11 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
-
-                <!-- Rokomari -->
-                <div class="w-full flex justify-center">
-                    <img src="{{ asset('./images/saas/rokomari.png') }}" alt="Rokomari"
-                        class="h-8 md:h-10 lg:h-11 object-contain hover:grayscale-0 transition cursor-pointer" />
-                </div>
+                @forelse($brands as $brand)
+                    <div class="w-full flex justify-center text-white">
+                        {{-- @if ($brand->link) --}}
+                            <a href="{{ $brand->link }}" target="_blank" class="block">
+                                <img src="{{ $brand->logo_url ?? ''}}" alt="{{ $brand->name }}"
+                                    class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer"
+                                     />
+                            </a>
+                        {{-- @else --}}
+                            {{-- <img src="{{ $brand->logo_url ?? ''}}" alt="{{ $brand->name }}"
+                                class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer"
+                               /> --}}
+                        {{-- @endif --}}
+                    </div>
+                @empty
+                    <div class="col-span-full text-gray-500 text-sm italic">No active brands available</div>
+                @endforelse
             </div>
         </div>
     </section>
@@ -335,7 +318,8 @@
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
-                                <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain" alt="Nagad"
+                                <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Nagad"
                                     onerror="
                         this.src =
                           'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png'
@@ -343,13 +327,13 @@
                             </div>
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
-                                <img src="{{ asset('./images/saas/bkash.png') }}"
-                                    class="h-8 md:h-10 object-contain" alt="bKash" />
+                                <img src="{{ asset('./images/saas/bkash.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="bKash" />
                             </div>
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
-                                <img src="{{ asset('./images/saas/sslcommerz.png') }}"
-                                    class="h-5 md:h-7 object-contain" alt="SSL" />
+                                <img src="{{ asset('./images/saas/sslcommerz.png') }}" class="h-5 md:h-7 object-contain"
+                                    alt="SSL" />
                             </div>
                         </div>
                     </div>
@@ -385,13 +369,13 @@
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
-                                <img src="{{ asset('./images/saas/steadfast.png') }}"
-                                    class="h-8 md:h-10 object-contain" alt="Steadfast" />
+                                <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Steadfast" />
                             </div>
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
-                                <img src="{{ asset('./images/saas/pathao.png') }}"
-                                    class="h-8 md:h-10 object-contain" alt="Pathao" />
+                                <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Pathao" />
                             </div>
                             <div
                                 class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">

@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MasterBrand extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'name',
         'logo',
@@ -13,7 +15,7 @@ class MasterBrand extends Model
         'status',
     ];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['created_at', 'updated_at','deleted_at'];
 
     public function getLogoUrlAttribute(): ?string
     {
