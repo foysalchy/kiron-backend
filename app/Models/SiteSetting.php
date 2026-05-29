@@ -55,11 +55,15 @@ class SiteSetting extends Model
     // Accessors
     public function getLogoUrlAttribute(): ?string
     {
-        return $this->logo ? asset('storage/' . $this->logo) : null;
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
     }
     // Accessors for Favicon
     public function getFaviconUrlAttribute(): ?string
     {
-        return $this->favicon ? asset('storage/' . $this->favicon) : asset('favicon.ico');
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
     }
 }
