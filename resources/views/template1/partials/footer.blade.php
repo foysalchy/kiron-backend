@@ -2,6 +2,7 @@
 <footer class="text-primary">
 
     <!-- 1. Top Features Row -->
+     @if($footerFeatures->count() > 0)
     <div class="bg-[#1A2937] p-6">
         <div class="container mx-auto">
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -27,6 +28,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <div class="bg-gray-900">
         <!-- 2. Main Footer Content -->
@@ -48,10 +50,10 @@
                         <span
                             class="text-lg md:text-xl font-bold tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
                     </div>
-                    <p class="text-gray-400 text-sm md:text-[16px] leading-relaxed mb-5">
+                    <p class="text-gray-400 text-[16px] leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
                     </p>
-                    <ul class="space-y-3 text-sm">
+                    <ul class="space-y-3 text-[16px]">
                         <li class="flex items-start gap-3 text-gray-200">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -90,17 +92,17 @@
                 </div>
 
                 <!-- Column 2: Quick Links -->
-                <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-6">Quick Links</h4>
+                <div class=" ">
+                    <h4 class="text-[18px] font-bold mb-4 md:mb-6">Quick Links</h4>
                     <ul class="space-y-2.5 text-sm">
                         <li><a href="{{ route('contact.index') }}"
-                                class="text-gray-400 hover-text transition-colors">Contact Us</a></li>
+                                class="text-[16px] text-gray-400 hover-text transition-colors">Contact Us</a></li>
                         <li><a href="{{ route('order.track') }}"
-                                class="text-gray-400 hover-text transition-colors">Track Order</a></li>
+                                class="text-[16px] text-gray-400 hover-text transition-colors">Track Order</a></li>
                         <li><a href="{{ route('support.index') }}"
-                                class="text-gray-400 hover-text transition-colors">Help & Support</a></li>
+                                class="text-[16px] text-gray-400 hover-text transition-colors">Help & Support</a></li>
                         <li><a href="{{ route('blog.index') }}"
-                                class="text-gray-400 hover-text transition-colors">Blog</a></li>
+                                class="text-[16px] text-gray-400 hover-text transition-colors">Blog</a></li>
                     </ul>
                 </div>
 
@@ -111,7 +113,7 @@
                         @foreach ($footerPages as $page)
                             <li>
                                 <a href="{{ url('page', ['slug' => $page->slug]) }}"
-                                    class="text-gray-400 hover:text-[#FF6A00] transition-colors">
+                                    class="text-[16px] text-gray-400 hover:text-[#FF6A00] transition-colors">
                                     {{ $page->title }}
                                 </a>
                             </li>
@@ -122,7 +124,7 @@
                 <!-- Column 4: Newsletter -->
                 <div>
                     <h4 class="text-base text-primary md:text-lg font-bold mb-4 md:mb-6">Newsletter</h4>
-                    <p class="text-gray-300 text-sm mb-4">Subscribe to get updates on new products and exclusive offers.
+                    <p class="text-gray-300 text-[16px] mb-4">Subscribe to get updates on new products and exclusive offers.
                     </p>
                     <div class="flex mb-5">
                         <input type="email" placeholder="Enter your email"

@@ -255,6 +255,7 @@
     @endforeach
 
     <!-- DUAL BANNER SECTION -->
+     @if($middleSliders->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
@@ -276,7 +277,9 @@
 
         </div>
     </section>
+    @endif
     <!-- POPULAR BRANDS SECTION -->
+     @if($brands->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
         <div class="bg-white rounded-lg shadow-xs  p-6 relative">
@@ -327,6 +330,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     <!-- YOU MAY LIKE SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
