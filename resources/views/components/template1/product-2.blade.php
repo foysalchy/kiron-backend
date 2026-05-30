@@ -70,7 +70,7 @@
     <div class="flex flex-col flex-grow px-1">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
             <h3
-                class="text-sm font-semibold leading-tight text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
+                class="hind-siliguri-medium text-[17px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
@@ -87,13 +87,13 @@
         </div>
 
         <!-- Price Section -->
-        <div class="flex items-center gap-2 mb-3">
+        <div class="flex items-center gap-2 mb-3 ">
             @if ($regularPrice > $salePrice)
-                <span class="text-gray-500 text-sm font-medium line-through">
+                <span class="text-gray-500 text-[18px] line-through hind-siliguri-bold">
                     {{ $setup->currency }} {{ number_format($regularPrice) }}
                 </span>
             @endif
-            <span class="text-[var(--primary-color)] text-md font-medium">
+            <span class="text-[var(--primary-color)] text-[18px]  hind-siliguri-bold">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
         </div>
