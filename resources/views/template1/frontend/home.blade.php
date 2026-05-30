@@ -7,14 +7,14 @@
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
-            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden lg:block">
+            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden overflow-scroll lg:block">
 
                 @foreach ($categories as $category)
                     <div class="group">
                         <a href="{{ url('category/' . $category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
                             <div class="flex items-center gap-3 ">
-                                <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
+                                <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
                                     class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                     alt="{{ $category->name }}">
                                 <span class="text-md text-gray-800">{{ $category->name }}</span>
@@ -137,15 +137,15 @@
                 <div id="cat-slider" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                     @foreach ($categories as $category)
                         <a href="{{ url('category/' . $category->slug) }}"
-                            class="flex flex-col items-center min-w-[105px] group">
+                            class="flex flex-col items-center min-w-[110px] ">
                             <div
-                                class="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden mb-2 md:mb-3 border border-gray-100">
-                                <img src="{{ !empty($category->image) ? asset('storage/' . $category->image) : asset('./images/template1/frontend/default.webp') }}"
+                                class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
+                                <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
                                     onerror="this.onerror=null;this.src='{{ asset('./images/template1/frontend/default.webp') }}';"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    class="w-full h-full object-cover   transition-transform duration-500"
                                     alt="{{ $category->name }}">
                             </div>
-                            <span class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
+                            <span class="text-md   text-gray-800 text-center   w-full px-1">
                                 {{ $category->name }}
                             </span>
                         </a>

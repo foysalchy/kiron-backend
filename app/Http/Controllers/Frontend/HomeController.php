@@ -51,7 +51,7 @@ class HomeController extends FrontendController
 
         $allSliders = Slider::where('status', Status::Active->value)->get();
         $mainSliders = $allSliders->where('placement', 'hero');
-        $sidebarSliders = $allSliders->where('placement', 'left');
+        $sidebarSliders = $allSliders->where('placement', 'right');
         $middleSliders = $allSliders->where('placement', 'middle')->take(2);
 
         return  $this->view(

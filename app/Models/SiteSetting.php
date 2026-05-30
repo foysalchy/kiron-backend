@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class SiteSetting extends Model
 {
@@ -55,15 +56,15 @@ class SiteSetting extends Model
     // Accessors
     public function getLogoUrlAttribute(): ?string
     {
-        return $this->image
-            ? Storage::disk('r2')->url($this->image)
+        return $this->logo
+            ? Storage::disk('r2')->url($this->logo)
             : null;
     }
     // Accessors for Favicon
     public function getFaviconUrlAttribute(): ?string
     {
-        return $this->image
-            ? Storage::disk('r2')->url($this->image)
+        return $this->favicon
+            ? Storage::disk('r2')->url($this->favicon)
             : null;
     }
 }

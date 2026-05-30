@@ -49,3 +49,6 @@ cursor: pointer;
 *{
     font-family: Google Sans,Roboto,Arial,sans-serif;
 }
+#cat-slider a:hover img {
+    transform: scale(1.1);
+}

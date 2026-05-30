@@ -32,7 +32,7 @@
     @include('saas.partials.header')
 
     <!-- Page Content Area -->
-    <main class="bg-[#f9f9fb]  ">
+    <main class="bg-[#f2f4f8]  ">
         @yield('content')
     </main>
 

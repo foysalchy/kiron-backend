@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -157,7 +158,10 @@ class Product extends Model
     // Accessors
     public function getThumbnailUrlAttribute(): ?string
     {
-        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
+       
+         return $this->thumbnail
+            ? Storage::disk('r2')->url($this->thumbnail)
+            : null;
     }
 
     public function getSalePriceAttribute()

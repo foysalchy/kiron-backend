@@ -104,11 +104,7 @@
         <div class="flex items-center gap-3 lg:gap-6 text-[#1D2128]">
 
             <!-- Nav Links (XL only) -->
-            <div class="hidden xl:flex items-center gap-5 text-sm font-semibold text-gray-500">
-                <a href="{{ route('order.track') }}" class="hover-text transition-colors">Track Order</a>
-                <a href="{{ route('contact.index') }}" class="hover-text transition-colors">Contact</a>
-                <a href="{{ route('blog.index') }}" class="hover-text transition-colors">Blog</a>
-            </div>
+          
 
             <!-- Mobile Search Toggle -->
             <button class="sm:hidden text-xl hover-text" onclick="toggleMobileSearch()">
@@ -130,7 +126,7 @@
                         {{ $initialWishCount }}
                     </span>
                 </div>
-                <span class="hidden lg:block font-semibold text-sm">Wishlist</span>
+                <span class="hidden lg:block  text-[16px]">Wishlist</span>
             </a> --}}
 
             <!-- Account -->
@@ -145,7 +141,7 @@
                     @else
                         <i class="fa-regular fa-user text-xl"></i>
                     @endauth
-                    <span class="hidden lg:block font-semibold text-sm">Account</span>
+                    <span class="hidden lg:block  text-[16px]">Account</span>
                     <i class="fas fa-chevron-down text-xs text-gray-400 hidden lg:block"></i>
                 </div>
 
@@ -202,7 +198,7 @@
                         {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                     </span>
                 </div>
-                <span class="hidden lg:block font-semibold text-sm">Cart</span>
+                <span class="hidden lg:block  text-[16px]">Cart</span>
             </a>
 
         </div>
@@ -226,16 +222,34 @@
 
     <!-- 3. Bottom Category Nav (Desktop) -->
     <div class="border-t border-gray-100 hidden md:block">
-        <div class="container mx-auto px-4 flex items-center gap-6 py-2.5 overflow-x-auto no-scrollbar">
-            @foreach ($headerCategories as $cat)
-                <a class="text-sm font-medium hover-text whitespace-nowrap transition-colors"
-                    href="{{ route('category.products', $cat->slug) }}">
-                    {{ $cat->name }}
+        <div class="container mx-auto px-2 flex items-center gap-6 py-2.5 overflow-x-auto no-scrollbar">
+             
+             <a  href="{{ route('home') }}"
+                  class=" text-[16px] hover-text whitespace-nowrap border-r border-gray-300  pr-[20px]">
+                    Home
                 </a>
-            @endforeach
-            <a class="text-sm font-medium hover-text whitespace-nowrap" href="{{ route('brand.index') }}">Brands</a>
-            <a class="text-sm font-bold text-red-700 hover:text-red-800 whitespace-nowrap"
-                href="{{ route('flash.sale') }}">Flash Sale 🔥</a>
+                  <a href="{{ route('brand.index') }}"
+                   class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                   Brands
+                </a>
+                <a href="{{ route('shop.index') }}"
+                  class=" text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                    All Products
+                </a>
+                <a href="{{ route('flash.sale') }}"
+                    class=" f text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                    Flash Sale 🔥
+                </a>
+              
+                
+                <a href="{{ route('order.track') }}"
+                    class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                    Track Order
+                </a>
+                <a href="{{ route('contact.index') }}"
+                    class=" text-[16px] hover-text whitespace-nowrap">
+                   Contact
+                </a>
         </div>
     </div>
 
