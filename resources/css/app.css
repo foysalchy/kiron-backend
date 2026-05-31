@@ -82,3 +82,64 @@ cursor: pointer;
   font-weight: 700;
   font-style: normal;
 }
+
+.container {
+  width: 100%;
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.prose li p{
+  margin: 0px !important;
+
+}
+.prose li {
+  margin: 0px !important;
+}
+.prose p{
+  margin-top: 5px !important;
+  margin-bottom: 0;
+}
+.prose ul{
+  margin-top: 0 !important;
+}
+/* Small devices (phones) */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+/* Small laptops */
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* Desktops */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Large desktops */
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1440px;
+  }
+}

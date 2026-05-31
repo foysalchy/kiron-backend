@@ -9,11 +9,11 @@
                 ->exists();
         }
     @endphp
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <!-- 1. Breadcrumb -->
         <nav
-            class="flex items-center space-x-2 text-md text-gray-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+            class="flex items-center space-x-2 text-md text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
             <a href="/" class="hover:text-[#FF6A00]">Home</a>
             <i class="fas fa-chevron-right text-[8px]"></i>
             <a href="#" class="hover:text-[#FF6A00]">{{ $category->name ?? 'Product Details' }}</a>
@@ -23,7 +23,7 @@
 
         <!-- 2. Product Top Info Card -->
         <div class="overflow-hidden mb-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-gray-100 rounded-xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-lg shadow-xs ">
 
                 <!-- Left: Image Gallery -->
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
@@ -58,7 +58,7 @@
 
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
 
-                    <div class="flex items-center gap-2 mb-6 text-sm text-gray-600">
+                    <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
                         <span class="uppercase font-bold">SKU</span>: <span class="font-mono">
                             @if (is_array($product->sku_code))
                                 {{ implode(', ', $product->sku_code) }}
@@ -67,6 +67,9 @@
                             @endif
                         </span>
                         <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
+                    </div>
+                    <div class="  mb-4 text-[18px] hind-siliguri-medium overflow-hidden relative">
+                        {!! $product->short_description ?? 'No detailed description available for this product.' !!}
                     </div>
 
                     <div class="flex items-baseline gap-4 mb-6">
@@ -151,6 +154,7 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
+                     @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                         @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
                             <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
@@ -166,7 +170,9 @@
                             </div>
                         @endforeach
                     </div>
+                    @endif
 
+                    <div class="bg-gray-100 py-3 px-3 rounded">
                     <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
                     <div class="grid grid-cols-2 gap-2 md:gap-3">
@@ -193,13 +199,13 @@
                             </svg>
                             WhatsApp
                         </a>
-                    </div>
+                    </div></div>
                 </div>
             </div>
         </div>
 
         <!-- 3. TABS SECTION -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
+        <div class="bg-white rounded-lg shadow-xs   relative overflow-hidden mb-12">
             <!-- Tab Buttons -->
             <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
                 id="tabs-nav">
@@ -221,7 +227,7 @@
                 <!-- Section: Description  -->
                 <div id="tab-content-description" class="tab-content block">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
-                    <div class="text-gray-600 leading-relaxed prose prose-orange max-w-none">
+                    <div class="text-[18px] prose prose-orange max-w-none">
                         {!! $product->full_description ?? 'No detailed description available for this product.' !!}
                     </div>
                 </div>
@@ -486,12 +492,12 @@
                 });
 
                 let groupHtml =
-                    `<div class="mb-4"><h3 class="text-sm font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+                    `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const activeClass = (userSelections[groupName] == valId) ?
                         'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
                     groupHtml +=
-                        `<button type="button" onclick="selectOption('${groupName}', ${valId})" class="px-4 py-2 rounded-lg border text-sm font-bold transition-all ${activeClass}">${valName}</button>`;
+                        `<button type="button" onclick="selectOption('${groupName}', ${valId})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
                 }
                 groupHtml += `</div></div>`;
                 container.innerHTML += groupHtml;
