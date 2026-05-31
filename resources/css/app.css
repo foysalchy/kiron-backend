@@ -104,6 +104,13 @@ cursor: pointer;
 .prose ul{
   margin-top: 0 !important;
 }
+.prose a{
+  color: rgb(50, 50, 230);
+}
+.prose h2,.prose h3{
+margin-top: 15px;
+  margin-bottom: 0px;
+}
 /* Small devices (phones) */
 @media (min-width: 576px) {
   .container {

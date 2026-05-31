@@ -1,7 +1,8 @@
 @extends('template1.layouts.front')
 
 @section('content')
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="bg-white border-t-1 border-t border-gray-300 pb-4">
+        <div class="py-2 md:py-2 container mx-auto px-4 lg:px-0">
         <div class="lg:hidden mb-3 flex items-center justify-between">
             <button onclick="toggleMobileSidebar()"
                 class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
@@ -10,13 +11,12 @@
             <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-6"></div>
 
         <!-- Main Card Container -->
         <div class="archiveTopInfo">
 
             <!-- Breadcrumb -->
-            <nav class="hidden md:flex items-center gap-2 mb-6 text-md font-medium text-gray-500">
+            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
                 <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
 
                 <!-- Chevron Icon -->
@@ -37,31 +37,22 @@
 
                 <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
             </nav>
-
-            <!-- Description Section -->
-            @if (isset($category->description) && $category->description)
-                {{-- isset  --}}
-                <div class="mb-6">
-                    @if (request()->routeIs('brand.products'))
-                        {{-- brand description --}}
-                        <div class="text-sm text-gray-600 leading-relaxed border-l-4 border-orange-500 pl-4 italic">
-                            {!! $category->description !!}
-                        </div>
-                    @else
-                        {{-- category description --}}
-                        <div class="text-sm text-gray-600 leading-relaxed">
-                            {!! $category->description !!}
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-
+            <div class="meta_info">
+                @if (isset($category->meta_title) && $category->meta_title)
+                    <h1 class="text-[24px] py-1">{{$category->meta_title}}</h1>
+                @endif
+                <!-- Description Section -->
+                @if (isset($category->meta_description) && $category->meta_description)
+                        <p class="text-[15px] text-gray-600 l">
+                            {!! $category->meta_description !!}
+                        </p>
+                @endif
+            </div>
         </div>
-
+</div>
     </section>
     <!-- SHOP PAGE SECTION -->
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pt-0">
 
         <div class="flex flex-col lg:flex-row gap-6">
             <!-- ══════════════════════════ SIDEBAR ═════════════════════════════ -->
@@ -70,9 +61,9 @@
                     <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
 
                     <div id="sidebar-filter-box"
-                        class="hidden lg:block bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
+                        class="hidden lg:block bg-white rounded-lg  overflow-hidden lg:sticky lg:top-[70px] lg:max-h-[calc(100vh-90px)] lg:overflow-y-auto no-scrollbar">
                         <!-- ① Filter By Price -->
-                        <div class="p-4 border-b border-gray-50">
+                        <div class="p-4 ">
                             <h3 class="text-sm font-bold text-gray-800 mb-4">Filter By Price</h3>
 
                             <!-- Slider Container -->
@@ -189,60 +180,69 @@
             <!-- ══════════════════════════════════════
                                                                 MAIN CONTENT
                                                             ══════════════════════════════════════ -->
-            <main class="flex-1 bg-white rounded-lg shadow-xs border border-gray-200 overflow-hidden">
-
-                <!-- Shop Header -->
-                <div class="px-5 py-3.5 flex items-center justify-between">
-                    <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
-                        {{ $category ? $category->name : 'All Products' }}
-                    </h2>
-                    <div class="relative">
-                        <form action="" method="GET" id="sortForm">
-                            <select name="sort" onchange="document.getElementById('sortForm').submit()"
-                                aria-label="Sort products"
-                                class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
-                                <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default
-                                    Sorting</option>
-                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price:
-                                    Low to High</option>
-                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price:
-                                    High to Low</option>
-                                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First
-                                </option>
-                            </select>
-                        </form>
-                        <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
-                            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
+            <main class="flex-1 ">
+                <div class="bg-white rounded-lg shadow-xs overflow-hidden">
+                    <!-- Shop Header -->
+                    <div class="px-5 py-3.5 flex items-center justify-between">
+                        <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
+                            {{ $category ? $category->name : 'All Products' }}
+                        </h2>
+                        <div class="relative">
+                            <form action="" method="GET" id="sortForm">
+                                <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                                    aria-label="Sort products"
+                                    class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
+                                    <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default
+                                        Sorting</option>
+                                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price:
+                                        Low to High</option>
+                                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price:
+                                        High to Low</option>
+                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First
+                                    </option>
+                                </select>
+                            </form>
+                            <div class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-gray-400">
+                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Product Grid  -->
+                    <div class="p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+
+                        @forelse($products as $product)
+                            <x-template1.product-card :product="$product" />
+                        @empty
+                            <div class="col-span-full py-20 text-center">
+                                <i class="fas fa-box-open text-5xl text-gray-200 mb-4"></i>
+                                <p class="text-gray-500 font-medium">No products found in this category.</p>
+                            </div>
+                        @endforelse
+
+
+                    </div>
+                    <div class="mt-12 flex flex-col items-center">
+                        {{-- pagination --}}
+                        {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
+
+                        {{-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">
+                            Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} Products
+                        </p> --}}
                     </div>
                 </div>
 
-                <!-- Product Grid  -->
-                <div class="p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 
-                    @forelse($products as $product)
-                        <x-template1.product-card :product="$product" />
-                    @empty
-                        <div class="col-span-full py-20 text-center">
-                            <i class="fas fa-box-open text-5xl text-gray-200 mb-4"></i>
-                            <p class="text-gray-500 font-medium">No products found in this category.</p>
-                        </div>
-                    @endforelse
-
-
+                 @if (isset($category->description) && $category->description)
+                <div class="bg-white rounded-lg shadow-xs  mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
+                    {!! $category->description !!}
                 </div>
-                <div class="mt-12 flex flex-col items-center">
-                    {{-- pagination --}}
-                    {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
-
-                    {{-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">
-                        Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} Products
-                    </p> --}}
-                </div>
+                @endif
             </main>
+            
 
         </div>
 

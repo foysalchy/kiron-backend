@@ -13,7 +13,7 @@
 
         <!-- 1. Breadcrumb -->
         <nav
-            class="flex items-center space-x-2 text-md text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+            class="flex items-center space-x-2 text-sm text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
             <a href="/" class="hover:text-[#FF6A00]">Home</a>
             <i class="fas fa-chevron-right text-[8px]"></i>
             <a href="#" class="hover:text-[#FF6A00]">{{ $category->name ?? 'Product Details' }}</a>

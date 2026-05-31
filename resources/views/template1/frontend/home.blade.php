@@ -112,7 +112,7 @@
     <!-- TOP CATEGORIES SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
             <!-- Section Heading -->
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
@@ -134,10 +134,10 @@
                 </button>
 
                 <!-- Categories Scroll Area (Dynamic) -->
-                <div id="cat-slider" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
+                <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                     @foreach ($categories as $category)
                         <a href="{{ url('category/' . $category->slug) }}"
-                            class="flex flex-col items-center min-w-[110px] ">
+                            class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
                             <div
                                 class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
                                 <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
@@ -145,7 +145,7 @@
                                     class="w-full h-full object-cover   transition-transform duration-500"
                                     alt="{{ $category->name }}">
                             </div>
-                            <span class="text-md   text-gray-800 text-center   w-full px-1">
+                            <span class="md:text-md text-sm   text-gray-800 text-center   w-full px-1">
                                 {{ $category->name }}
                             </span>
                         </a>
@@ -156,7 +156,7 @@
     </section>
     <!-- NEW ARRIVALS SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
@@ -182,7 +182,7 @@
                 </button>
 
                 <!-- Track -->
-                <div id="na-track" class="flex gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-4"
+                <div id="na-track" class="flex md:gap-4 gap-2 overflow-x-auto scroll-smooth no-scrollbar pb-4"
                     style="-ms-overflow-style:none; scrollbar-width:none;">
 
                     <!-- NEW ARRIVALS -->
@@ -212,7 +212,7 @@
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-            <div class="bg-white rounded-lg shadow-xs  p-6 relative">
+            <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6 relative">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6">
@@ -282,7 +282,7 @@
      @if($brands->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs  p-6 relative">
+        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
             <!-- Section Heading -->
             <h2 class="text-md md:text-lg font-bold text-gray-900 uppercase tracking-tight mb-6 px-2">
@@ -334,7 +334,7 @@
 
     <!-- YOU MAY LIKE SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs  p-4 md:p-6">
+        <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
             <!-- Header -->
             <div class="mb-6">
@@ -342,7 +342,7 @@
             </div>
 
             <!-- Product Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
                 @foreach ($popularProducts as $product)
                     <x-template1.product-card :product="$product" />
                 @endforeach
