@@ -11,7 +11,7 @@
             </div>
 
             <!-- Tracking Card (Form Updated) -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 mb-8 overflow-hidden">
+            <div class="bg-white rounded-2xl   shadow-xs mb-8 overflow-hidden">
                 <h2 class="text-xl md:text-2xl font-bold text-gray-800 text-center p-4">Order Tracking</h2>
                 <div class="p-6">
                     <form action="{{ route('order.track') }}" method="GET" class="space-y-5">
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                         <button type="submit"
-                            class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-bold py-3 rounded-lg shadow-lg shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full primary-bg text-primary  font-bold py-3 rounded-lg   transition-all active:scale-[0.98]">
                             Track Order
                         </button>
                     </form>
@@ -68,14 +68,14 @@
             @endif
 
             <!-- Instruction Steps (Design same) -->
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm mb-8">
-                <div class="p-6 border-b border-gray-50">
+            <div class="bg-white rounded-2xl  shadow-xs  mb-8">
+                <div class="p-6 border-b border-gray-50 pb-0">
                     <h3 class="text-lg md:text-2xl font-bold text-gray-800">How to Track?</h3>
                 </div>
                 <div class="p-6 space-y-6">
                     <div class="flex items-start gap-4">
                         <div
-                            class="w-6 h-6 bg-[#FF6A00] text-primary rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                            class="w-6 h-6  primary-bg text-primary rounded-full flex items-center justify-center text-sm font-bold shrink-0">
                             1</div>
                         <div>
                             <h4 class="font-bold text-gray-900">Find Your Order Number</h4>
@@ -85,7 +85,7 @@
                     </div>
                     <div class="flex items-start gap-4">
                         <div
-                            class="w-6 h-6 bg-[#FF6A00] text-primary rounded-full flex items-center justify-center text-sm font-bold shrink-0">
+                            class="w-6 h-6  primary-bg text-primary rounded-full flex items-center justify-center text-sm font-bold shrink-0">
                             2</div>
                         <div>
                             <h4 class="font-bold text-gray-900">Enter Order Number</h4>
