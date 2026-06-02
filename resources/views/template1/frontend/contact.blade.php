@@ -36,13 +36,13 @@
                             <label class="block text-sm font-bold text-gray-700 mb-2">Name *</label>
                             <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name.."
                                 required
-                                class="w-full h-10 px-3 rounded-lg focus:border-[#FF6A00] outline-none border border-gray-300">
+                                class="w-full h-10 px-3 rounded-lg focus:border-[#016738] outline-none border border-gray-300">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Email *</label>
                             <input type="email" name="email" value="{{ old('email') }}"
                                 placeholder="Enter Your Email.." required
-                                class="w-full h-10 px-3 rounded-lg focus:border-[#FF6A00] outline-none border border-gray-300">
+                                class="w-full h-10 px-3 rounded-lg focus:border-[#016738] outline-none border border-gray-300">
                         </div>
                     </div>
 
@@ -51,19 +51,19 @@
                             <label class="block text-sm font-bold text-gray-700 mb-2">Phone No *</label>
                             <input type="tel" name="phone" value="{{ old('phone') }}"
                                 placeholder="Enter Your Phone .." required
-                                class="w-full h-10 px-3 rounded-lg focus:border-[#FF6A00] outline-none border border-gray-300">
+                                class="w-full h-10 px-3 rounded-lg focus:border-[#016738] outline-none border border-gray-300">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Subject</label>
                             <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Enter subject.."
-                                class="w-full h-10 px-3 rounded-lg focus:border-[#FF6A00] outline-none border border-gray-300">
+                                class="w-full h-10 px-3 rounded-lg focus:border-[#016738] outline-none border border-gray-300">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Message *</label>
                         <textarea name="message" placeholder="Enter Your Message..." rows="5" required
-                            class="w-full px-3 py-2 rounded-lg focus:border-[#FF6A00] outline-none border border-gray-300">{{ old('message') }}</textarea>
+                            class="w-full px-3 py-2 rounded-lg focus:border-[#016738] outline-none border border-gray-300">{{ old('message') }}</textarea>
                     </div>
 
                     <button type="submit"

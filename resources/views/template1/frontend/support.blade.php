@@ -55,71 +55,7 @@
             @endforelse
         </div>
     </section>
-    <section class="container py-6 mx-auto">
-        <!-- ASK A QUESTION FORM SECTION -->
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-
-            <!-- Title -->
-            <h3 class="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                Ask your question.
-            </h3>
-
-            @if (session('success'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form action="{{ route('support.send') }}" method="POST" class="space-y-6">
-                @csrf
-                <!-- Name & Email Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Name *</label>
-                        <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name"
-                            required
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:ring-4 focus:ring-orange-50 focus:border-[#FF6A00] outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Email *</label>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter Your Email"
-                            required
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:ring-4 focus:ring-orange-50 focus:border-[#FF6A00] outline-none transition-all">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- বিষয় (Subject) -->
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Subject *</label>
-                        <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Subject.." required
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:ring-4 focus:ring-orange-50 focus:border-[#FF6A00] outline-none transition-all">
-                    </div>
-
-                    <!-- ফোন নম্বর (Phone) -->
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Phone *</label>
-                        <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="Enter Your Phone"
-                            required
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:ring-4 focus:ring-orange-50 focus:border-[#FF6A00] outline-none transition-all">
-                    </div>
-                </div>
-
-                <!-- Message Detail -->
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Details *</label>
-                    <textarea name="message" placeholder="Write your question in detail...." rows="4" required
-                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md focus:ring-4 focus:ring-orange-50 focus:border-[#FF6A00] outline-none transition-all">{{ old('message') }}</textarea>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit"
-                    class="w-full bg-black hover:bg-orange-600 text-white text-sm py-3 rounded-md flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-                    Send
-                </button>
-            </form>
-        </div>
-    </section>
+   
 @endsection
 @push('scripts')
     <script>

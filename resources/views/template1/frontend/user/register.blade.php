@@ -4,7 +4,7 @@
     <section class="container py-6 mx-auto">
         <div class="max-w-xl mx-auto">
             <!-- Registration Card -->
-            <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-lg   shadow-xs overflow-hidden">
 
                 <!-- Header -->
                 <div class="p-8 text-center border-b border-gray-50">
@@ -26,7 +26,7 @@
                                 </span>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     placeholder="Enter Your Full Name" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('name')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -42,7 +42,7 @@
                                 </span>
                                 <input type="email" name="email" value="{{ old('email') }}"
                                     placeholder="user@example.com" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('email')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -58,7 +58,7 @@
                                 </span>
                                 <input type="tel" name="phone" value="{{ old('phone') }}"
                                     placeholder="Enter Your Phone Number.." required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('phone')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -73,7 +73,7 @@
                                     <i class="fas fa-map-marker-alt text-sm"></i>
                                 </span>
                                 <textarea name="address" placeholder="Enter Your Full Address" rows="3" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('address') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">{{ old('address') }}</textarea>
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('address') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">{{ old('address') }}</textarea>
                             </div>
                             @error('address')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -88,7 +88,7 @@
                                     <i class="fas fa-lock text-sm"></i>
                                 </span>
                                 <input type="password" name="password" id="password" placeholder="••••••••" required
-                                    class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password', this)"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
                                     <i class="far fa-eye text-[14px]"></i>
@@ -109,7 +109,7 @@
                                 {{-- পাসওয়ার্ড কনফার্মেশনের জন্য নাম অবশ্যই password_confirmation হতে হবে --}}
                                 <input type="password" name="password_confirmation" id="password_confirmation"
                                     placeholder="Re-enter password" required
-                                    class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password_confirmation', this)"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
                                     <i class="far fa-eye text-sm"></i>
@@ -122,9 +122,9 @@
                             <input type="checkbox" name="terms" id="terms" required
                                 class="mt-1 w-4 h-4 accent-[#FF6A00] cursor-pointer">
                             <label for="terms" class="text-sm font-medium text-gray-600 cursor-pointer">
-                                I accept the <a href="{{ route('term.index') }}"
+                                I accept the <a href=" "
                                     class="text-[#FF6A00] hover:underline">Terms and
-                                    Conditions</a> and <a href="{{ route('privacy.index') }}"
+                                    Conditions</a> and <a href=" "
                                     class="text-[#FF6A00] hover:underline">Privacy
                                     Policy</a>
                             </label>

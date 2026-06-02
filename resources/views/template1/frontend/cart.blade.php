@@ -126,7 +126,7 @@
                             <div class="flex gap-2">
                                 <input type="text" name="coupon_code" placeholder="Enter Coupon Code"
                                     value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
-                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
+                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
 
                                 @if (session()->has('coupon'))

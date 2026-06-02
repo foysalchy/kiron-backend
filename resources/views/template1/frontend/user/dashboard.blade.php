@@ -318,7 +318,7 @@
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Name</label>
                                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                                        class="w-full px-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                        class="w-full px-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#016738] outline-none">
                                     @error('name')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -328,7 +328,7 @@
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Email</label>
                                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                                        class="w-full px-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                        class="w-full px-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#016738] outline-none">
                                     @error('email')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -338,7 +338,7 @@
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Phone</label>
                                     <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
-                                        class="w-full px-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                        class="w-full px-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-100 @enderror bg-gray-50 text-sm focus:border-[#016738] outline-none">
                                     @error('phone')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -347,7 +347,7 @@
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Address</label>
                                     <input type="text" name="address" value="{{ old('address', $user->address) }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#FF6A00] outline-none">
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-100 bg-gray-50 text-sm focus:border-[#016738] outline-none">
                                 </div>
 
                                 <div class="md:col-span-2 flex items-center gap-6">
@@ -385,7 +385,7 @@
                             <div>
                                 <label class="text-sm text-gray-800">Current Password</label>
                                 <input type="password" name="current_password" required
-                                    class="w-full px-4 py-3 rounded-lg border @error('current_password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
+                                    class="w-full px-4 py-3 rounded-lg border @error('current_password') border-red-500 @else border-gray-200 @enderror focus:border-[#016738] outline-none text-sm">
                                 @error('current_password')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -393,7 +393,7 @@
                             <div>
                                 <label class="text-sm text-gray-800">New Password</label>
                                 <input type="password" name="password" required
-                                    class="w-full px-4 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror focus:border-[#FF6A00] outline-none text-sm">
+                                    class="w-full px-4 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror focus:border-[#016738] outline-none text-sm">
                                 @error('password')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -401,7 +401,7 @@
                             <div>
                                 <label class="text-sm text-gray-800">Confirm Your Password</label>
                                 <input type="password" name="password_confirmation" required
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#FF6A00] outline-none text-sm">
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#016738] outline-none text-sm">
                             </div>
                             <button type="submit"
                                 class="bg-[#FF6A00] text-primary px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>

@@ -421,7 +421,7 @@
                 <div class="mb-4">
                     <p class="text-sm font-bold text-gray-700 mb-2">Your Review:</p>
                     <textarea name="comment" rows="3" required
-                        class="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:border-[#FF6A00] bg-gray-50"
+                        class="w-full border border-gray-200 rounded-xl p-3 text-sm outline-none focus:border-[#016738] bg-gray-50"
                         placeholder="Write your feedback..."></textarea>
                 </div>
 

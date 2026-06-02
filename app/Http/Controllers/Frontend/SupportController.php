@@ -36,28 +36,5 @@ class SupportController extends FrontendController
 
         return $this->view('frontend.support', compact('faqs', 'categories'));
     }
-    public function storeMessage(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'subject' => 'required|string|max:255',
-            'phone'   => 'required|string|max:20',
-            'message' => 'required|string',
-        ]);
-
-        $company = getCurrentCompany();
-
-        ContactMessage::create([
-            'company_id' => $company->id,
-            'name'       => $request->name,
-            'email'      => $request->email,
-            'phone'      => $request->phone,
-            'subject'    => $request->subject,
-            'message'    => $request->message,
-            'is_read'    => 0,
-        ]);
-
-        return back()->with('success', 'Your question has been submitted successfully.');
-    }
+ 
 }

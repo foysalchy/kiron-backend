@@ -24,7 +24,7 @@
                                 <i class="far fa-envelope text-sm"></i>
                             </span>
                             <input type="email" name="email" value="{{ old('email') }}" placeholder="user@example.com" required
-                                class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                         </div>
                         @error('email')
                             <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
@@ -39,7 +39,7 @@
                                 <i class="fas fa-lock text-sm"></i>
                             </span>
                             <input type="password" name="password" id="password" placeholder="••••••••" required
-                                class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all text-sm">
+                                class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
 
                             <!-- Toggle Visibility Button -->
                             <button type="button" onclick="togglePassword()"

@@ -25,21 +25,21 @@
                                             class="text-red-500">*</span></label>
                                     <input type="text" name="name" placeholder="Enter your full name" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                                 <div class="space-y-2">
                                     <label class="text-sm font-medium text-gray-700">Phone Number <span
                                             class="text-red-500">*</span></label>
                                     <input type="tel" name="phone" placeholder="Your mobile number" required
                                         value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Address <span
                                         class="text-red-500">*</span></label>
                                 <textarea name="address" placeholder="Your address" rows="3" required
-                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#FF6A00] focus:ring-4 focus:ring-orange-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                             </div>
 
                             <!-- Checkboxes -->
@@ -168,7 +168,7 @@
                             <div class="flex gap-2">
                                 <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
                                     value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
-                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#FF6A00] transition-all"
+                                    class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
 
                                 @if (session()->has('coupon'))

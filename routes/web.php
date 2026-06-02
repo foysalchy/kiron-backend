@@ -41,7 +41,7 @@ Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
     Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
 
     Route::get('/support', [SupportController::class, 'index'])->name('support.index');
-    Route::post('/support/send', [SupportController::class, 'storeMessage'])->name('support.send');
+ 
 
     Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');
     Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
