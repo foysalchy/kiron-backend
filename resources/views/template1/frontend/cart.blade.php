@@ -18,7 +18,7 @@
 
                 <!-- Cart Items -->
                 <div class="lg:col-span-2">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
+                    <div class="bg-white rounded-lg   shadow-xs overflow-hidden">
                         <div class="p-5">
                             <h2 class="text-xl font-bold text-gray-800">Cart Items</h2>
                         </div>
@@ -86,7 +86,7 @@
 
                 <!-- RIGHT: Summary -->
                 <div class="lg:col-span-1">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-white rounded-lg   shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
                         <!-- selection shipping area -->
@@ -190,20 +190,7 @@
                         </p>
 
                         <!-- Trust Badges -->
-                        <div class="grid grid-cols-2 gap-y-4 gap-x-2 border-t border-gray-50 pt-8">
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-green-500 rounded-full"></span> Secure Payment
-                            </div>
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-blue-400 rounded-full"></span> Free Return
-                            </div>
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-orange-400 rounded-full"></span> 24/7 Support
-                            </div>
-                            <div class="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase">
-                                <span class="w-2 h-2 bg-purple-400 rounded-full"></span> Quality
-                            </div>
-                        </div>
+                         
                     </div>
                 </div>
             </div>

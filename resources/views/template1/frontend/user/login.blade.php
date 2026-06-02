@@ -56,7 +56,7 @@
 
                     <!-- Login Button -->
                     <button type="submit"
-                        class="w-full bg-[#FF6A00] hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
+                        class="w-full  primary-bg text-primary font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
                         Login
                     </button>
 

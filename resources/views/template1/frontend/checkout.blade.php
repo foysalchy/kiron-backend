@@ -12,7 +12,7 @@
                 <div class="lg:col-span-2 lg:order-1 space-y-6">
 
                     <!-- 1. Customer Information Card -->
-                    <div class="bg-white rounded-xl border border-gray-200 shadow-xs overflow-hidden">
+                    <div class="bg-white rounded-xl  shadow-xs overflow-hidden">
                         <div class="p-6">
                             <h2 class="text-2xl font-semibold text-gray-800 leading-tight">
                                 To confirm your order, enter your name, address, phone number and click confirm
@@ -56,7 +56,7 @@
                     </div>
 
                     <!-- 2. Payment Method Card -->
-                    <div class="space-y-3 p-6 bg-white rounded-xl border border-gray-200 shadow-sm mt-6">
+                    <div class="space-y-3 p-6 bg-white rounded-xl   shadow-sm mt-6">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
                         @foreach ($paymentMethods as $method)
@@ -87,7 +87,7 @@
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
                 <div class="lg:col-span-1 lg:order-2 space-y-6">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
+                    <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         <div class="mb-8">
