@@ -51,7 +51,7 @@
 
                     <!-- Forgot Password Link -->
                     <div class="text-left">
-                        <a href="#" class="text-[#FF6A00] text-sm font-medium hover:underline">Forgot Your Password?</a>
+                        <a href="#"  style="color:var(--primary-color)"  class="  text-sm font-medium hover:underline">Forgot Your Password?</a>
                     </div>
 
                     <!-- Login Button -->
@@ -64,7 +64,7 @@
                     <div class="text-center pt-2">
                         <p class="text-gray-500 font-medium">
                            Don't have an account?<a href="{{url('/register')}}"
-                                class="text-[#FF6A00] font-medium hover:underline ml-1">Register</a>
+                                style="color:var(--primary-color)"   class=" font-medium hover:underline ml-1">Register</a>
                         </p>
                     </div>
                 </form>
