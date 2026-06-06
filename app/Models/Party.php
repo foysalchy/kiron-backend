@@ -32,6 +32,7 @@ class Party extends Authenticatable
         'thana',
         'address',
         'balance',
+        'due_amount',
         'profile',
         'password',
         'status',

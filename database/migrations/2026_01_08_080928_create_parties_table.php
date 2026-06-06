@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('thana')->nullable();
             $table->text('address')->nullable();
             $table->decimal('balance', 10, 2)->default(0);
+            $table->decimal('due_amount', 10, 2)->default(0);
             $table->string('profile')->nullable();
             $table->string('password')->nullable();
             $table->tinyInteger('status')->default(Status::Active->value);

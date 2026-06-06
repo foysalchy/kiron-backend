@@ -110,28 +110,29 @@ class PartyService
 
         return $party;
     }
-    public function getSupplierProfile(int $id): Party
-    {
-        $party = Party::with([
-            'logs.user:id,name',
-            'purchases' => fn($q) => $q->latest()->select([
+public function getSupplierProfile(int $id): Party
+{
+    $party = Party::with([
+        'logs.user:id,name',
+        'purchases' => fn($q) => $q->latest()
+            ->select([
                 'id',
                 'supplier_id',
                 'reference_no',
                 'purchase_date',
                 'status',
                 'total_quantities',
-                'payment_amount',
                 'grand_total',
-            ]),
-        ])->suppliers()->find($id);
+            ])
+            ->withSum('payments', 'amount'),
+    ])->suppliers()->find($id);
 
-        if (!$party) {
-            throw ApiException::notFound('Supplier');
-        }
-
-        return $party;
+    if (!$party) {
+        throw ApiException::notFound('Supplier');
     }
+
+    return $party;
+}
     /**
      * Create a new party
      */

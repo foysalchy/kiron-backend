@@ -160,6 +160,8 @@ class FrontendOrderService
                 'is_walk_in' => (bool) $order->is_walk_in,
                 'courierInfo' => $this->getCourierInfo($order),
                 'assigned_to' => $order->assigned_to,
+                'due_amount' => (float) ($order->grand_total - $order->payment_amount),
+
             ];
         });
 

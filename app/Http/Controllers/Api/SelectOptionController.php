@@ -240,6 +240,57 @@ class SelectOptionController extends Controller
     {
         return MegaCategory::select('id', 'name')->orderBy('name', 'asc')->get();
     }
+    public function nestedCategoryOptions()
+    {
+        $megaCategories = MegaCategory::select('id', 'name')
+            ->where('status', 1)
+            ->with([
+                'subCategories' => function ($q) {
+                    $q->select('id', 'mega_category_id', 'name')
+                        ->where('status', 1)
+                        ->orderBy('name')
+                        ->with([
+                            'miniCategories' => function ($q2) {
+                                $q2->select('id', 'sub_category_id', 'name')
+                                    ->where('status', 1)
+                                    ->orderBy('name')
+                                    ->with([
+                                        'extraCategories' => function ($q3) {
+                                            $q3->select('id', 'mini_category_id', 'name')
+                                                ->where('status', 1)
+                                                ->orderBy('name');
+                                        }
+                                    ]);
+                            }
+                        ]);
+                }
+            ])
+            ->orderBy('name')
+            ->get()
+            ->map(fn($mega) => [
+                'id'       => $mega->id,
+                'name'     => $mega->name,
+                'type'     => 'mega',
+                'children' => $mega->subCategories->map(fn($sub) => [
+                    'id'       => $sub->id,
+                    'name'     => $sub->name,
+                    'type'     => 'sub',
+                    'children' => $sub->miniCategories->map(fn($mini) => [
+                        'id'       => $mini->id,
+                        'name'     => $mini->name,
+                        'type'     => 'mini',
+                        'children' => $mini->extraCategories->map(fn($extra) => [
+                            'id'       => $extra->id,
+                            'name'     => $extra->name,
+                            'type'     => 'extra',
+                            'children' => [],
+                        ])->values(),
+                    ])->values(),
+                ])->values(),
+            ]);
+
+        return response()->json($megaCategories);
+    }
     public function assetCategoryOptions()
     {
         return AssetCategory::select('id', 'name')->orderBy('name', 'asc')->get();

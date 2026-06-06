@@ -199,7 +199,20 @@ class OrderService
             // Attach to order
             $data['customer_id'] = $customer->id;
         }
-        return $this->createOrder($data, true);
+        // Create the order
+        $order = $this->createOrder($data, true);
+
+        // ── Due amount: add to customer's balance ────────────────────────────
+        // Frontend sends: is_due (bool), due_amount (decimal)
+        $isDue     = !empty($data['is_due']);
+        $dueAmount = isset($data['due_amount']) ? (float) $data['due_amount'] : 0;
+
+        if ($isDue && $dueAmount > 0 && !empty($data['customer_id'])) {
+            Party::where('id', $data['customer_id'])
+                ->increment('due_amount', $dueAmount);
+        }
+
+        return $order;
     }
 
     /**
@@ -430,10 +443,21 @@ class OrderService
 
             $data['payment_amount'] = $totalPaid;
             $data['payment_status'] = $this->determinePaymentStatus($data['grand_total'], $totalPaid);
+            $oldDue = max(0, $order->grand_total - $order->payment_amount);
 
             // Update order
             $order->update($data);
+            if ($order->customer_id) {
+                $newDue = max(0, $data['grand_total'] - $data['payment_amount']);
+                $dueDifference = $newDue - $oldDue;
 
+                if ($dueDifference > 0) {
+                    Party::where('id', $order->customer_id)->increment('due_amount', $dueDifference);
+                } elseif ($dueDifference < 0) {
+                    $reduceAmount = min(abs($dueDifference), Party::where('id', $order->customer_id)->value('due_amount'));
+                    Party::where('id', $order->customer_id)->decrement('due_amount', $reduceAmount);
+                }
+            }
             // Create new order details
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
@@ -825,6 +849,15 @@ class OrderService
                 'payment_amount' => $totalPaid,
                 'payment_status' => $payment_status,
             ]);
+
+            $customer = $order->customer;
+            if ($customer && $data['amount'] > 0) {
+                // If due amount was added to customer balance during order creation, reduce it now
+
+                $reduceAmount = min($data['amount'], $customer->due_amount);
+                Party::where('id', $customer->id)
+                    ->decrement('due_amount', $reduceAmount);
+            }
             DB::commit();
 
             Log::info('Order payment submit', ['order_id' => $id]);

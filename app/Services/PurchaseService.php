@@ -61,7 +61,7 @@ class PurchaseService
                 $query->where('reference_no', 'like', "%{$filters['search']}%");
             }
 
-            $sortBy = $filters['sort_by'] ?? 'purchase_date';
+            $sortBy = $filters['sort_by'] ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 

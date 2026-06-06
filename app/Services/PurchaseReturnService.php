@@ -160,7 +160,7 @@ class PurchaseReturnService
             }
 
             // Remove returned stock from warehouse (if status is Cleared)
-            if ($purchaseReturn->status === Status::Cleared->value) {
+            if ($purchaseReturn->status == Status::Cleared->value) {
                 $this->removeReturnedStockFromWarehouse($purchaseReturn);
             }
 
