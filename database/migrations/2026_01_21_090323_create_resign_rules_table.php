@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Status;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +14,9 @@ return new class extends Migration
     {
         Schema::create('resign_rules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('name');
-            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
+            $table->tinyInteger('status')->default(Status::Active->value)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

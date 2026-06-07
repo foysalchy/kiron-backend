@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('resignations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->string('letter')->nullable()->comment('img or pdf');
             $table->string('type')->comment('resignation, termination');

@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('rejoins', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->date('rejoin_date')->nullable();
             $table->string('appointment_letter')->nullable()->comment('pdf ,JPG, JPEG & PNG file');

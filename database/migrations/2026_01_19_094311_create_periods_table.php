@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('periods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('period_type_id')->constrained('period_types')->cascadeOnDelete();
             $table->string('period_name')->comment('e.g., Jan-24 To Apr-24');
             $table->date('start_date');

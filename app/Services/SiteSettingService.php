@@ -84,8 +84,7 @@ class SiteSettingService
                 $data['favicon'] = FileUploadHelper::uploadImage(
                     $data['favicon'],
                     'settings/favicons',
-                    'public',
-                    512
+                  
                 );
             }
 

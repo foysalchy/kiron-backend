@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('wocommerce_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('domain_url');
             $table->string('consumer_key');
             $table->string('consumer_secret');

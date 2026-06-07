@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pay_rolls', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('name');
             $table->string('period_type_id');
             $table->string('payment_type')->nullable()->comment('cash, bank, card, cheque, bkash');

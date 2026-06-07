@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pay_heads', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('name');
             $table->string('type')->comment('addition, deduction');
             $table->text('description')->nullable();

@@ -72,7 +72,7 @@ class RejoinService
         try {
             // Handle appointment letter upload
             if (isset($data['appointment_letter']) && $data['appointment_letter']->isValid()) {
-                $data['appointment_letter'] = FileUploadHelper::uploadImage(
+                $data['appointment_letter'] = FileUploadHelper::upload(
                     $data['appointment_letter'],
                     'rejoins/letters'
                 );
@@ -111,10 +111,9 @@ class RejoinService
                     FileUploadHelper::delete($rejoin->appointment_letter);
                 }
                 // Upload new letter
-                $data['appointment_letter'] = FileUploadHelper::uploadImage(
+                $data['appointment_letter'] = FileUploadHelper::upload(
                     $data['appointment_letter'],
-                    'rejoins/appointment_letters',
-                   
+                    'rejoins/appointment_letters'
                 );
             }
 

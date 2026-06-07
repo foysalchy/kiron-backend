@@ -26,7 +26,7 @@ class SocialSettingController extends Controller
             'hover_bg'   => 'required|string|max:20',
         ]);
 
-        $social = $this->service->create($validated, $request->user()->company_id);
+        $social = $this->service->create($validated);
         return response()->json(['success' => true, 'data' => $social], 201);
     }
 

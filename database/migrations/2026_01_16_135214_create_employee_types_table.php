@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('type_name');
             $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
             $table->timestamps();

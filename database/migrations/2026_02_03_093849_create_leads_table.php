@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('leads', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('lead_source_id')->nullable()->constrained('lead_sources')->cascadeOnDelete();
             $table->foreignId('lead_status_id')->nullable()->constrained('lead_statuses')->cascadeOnDelete();
             $table->string('full_name');

@@ -95,8 +95,9 @@ class OrderService
                 ->when($q, function ($query) use ($q) {
                     $query->where('order_no', 'like', "%{$q}%");
                 })
+                ->where('status', Status::Delivered->value)
                 ->orderBy('updated_at', 'desc')
-                ->limit(20) // only 20 orders
+                ->limit(20)
                 ->get(['id', 'order_no', 'grand_total']);
         } catch (\Exception $e) {
             Log::error('Error fetching orders: ' . $e->getMessage());

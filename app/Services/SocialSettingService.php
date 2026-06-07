@@ -43,7 +43,7 @@ class SocialSettingService
     /**
      * Create a new social setting
      */
-    public function create(array $data, int $companyId): SocialSetting
+    public function create(array $data): SocialSetting
     {
         DB::beginTransaction();
 
@@ -58,7 +58,7 @@ class SocialSettingService
             }
 
             $social = SocialSetting::create($data);
-            LogHelper::created('social_setting', $social->id, $social->company_id, $social->icon_name ?? $social->link);
+            LogHelper::created('social_setting', $social->id, $social->company_id ?? null, $social->icon_name ?? $social->link);
 
             DB::commit();
 

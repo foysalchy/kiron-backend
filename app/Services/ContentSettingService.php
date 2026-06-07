@@ -45,8 +45,7 @@ class ContentSettingService
             $data['icon'] = FileUploadHelper::uploadImage(
                 $data['icon'],
                 'icons',
-                'public',
-                2048
+              
             );
         }
 
@@ -75,8 +74,7 @@ class ContentSettingService
             $data['icon'] = FileUploadHelper::uploadImage(
                 $data['icon'],
                 'icons',
-                'public',
-                2048
+              
             );
         }
         $setting->update([

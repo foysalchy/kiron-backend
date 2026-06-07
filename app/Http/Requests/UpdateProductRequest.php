@@ -16,6 +16,8 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
     public function rules(): array
     {
+        $companyId = $this->input('company_id') ?? $this->user()->company_id;
+
         $productId = $this->route('id');
         return array_merge(
             $this->companyRules(),
@@ -51,7 +53,14 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 // Product Type
                 'type' => ['sometimes', 'required', Rule::in(['single', 'variation'])],
 
-
+                'sku_code' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('products')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    })->ignore($productId),
+                ],
 
                 // Stock
                 'stock_status' => ['sometimes', 'required', Rule::in(['in_stock', 'out_of_stock'])],

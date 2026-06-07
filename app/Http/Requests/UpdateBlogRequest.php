@@ -43,9 +43,9 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
                 'images.*' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
 
                 // SEO Metadata
-                'meta_title'       => ['nullable', 'string', 'max:255'],
+               'meta_title' => ['nullable', 'string'],
                 'meta_description' => ['nullable', 'string'],
-                'meta_keywords'    => ['nullable', 'array'],
+                'meta_keywords' => ['nullable'],
                 'status'           => ['sometimes', 'integer', 'in:0,1'],
             ]
         );

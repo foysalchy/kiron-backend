@@ -494,8 +494,7 @@ class OrderController extends FrontendController
                     $path = FileUploadHelper::uploadImage(
                         $image,
                         'reviews',
-                        'public',
-                        2048
+                       
                     );
                     $imagePaths[] = $path;
                 }
@@ -536,7 +535,7 @@ class OrderController extends FrontendController
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns', 'public', 2048);
+                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns',);
             }
         }
 

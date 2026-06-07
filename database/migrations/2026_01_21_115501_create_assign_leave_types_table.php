@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('assign_leave_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();
             $table->foreignId('leave_type_id')->constrained('leave_types')->cascadeOnDelete();
             $table->decimal('leave_count', 8, 2)->default(0);

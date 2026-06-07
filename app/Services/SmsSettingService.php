@@ -70,14 +70,14 @@ class SmsSettingService
     /**
      * Create a new SMS setting
      */
-    public function saveAllSmsSettings(array $settings, int $companyId)
+    public function saveAllSmsSettings(array $settings, int $companyId = null)
     {
         DB::beginTransaction();
         try {
             $result = collect($settings)->map(function ($item) use ($companyId) {
                 $setting = SmsSetting::updateOrCreate(
                     [
-                        'company_id' => $companyId,
+                        'company_id' => $companyId ?? null,
                         'event_name' => $item['event_name'],
                     ],
                     [
@@ -86,7 +86,7 @@ class SmsSettingService
                     ]
                 );
 
-                LogHelper::created('sms_setting', $setting->id, $companyId, $setting->event_name);
+                LogHelper::created('sms_setting', $setting->id, $companyId ?? null, $setting->event_name);
 
                 return $setting;
             });

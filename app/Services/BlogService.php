@@ -71,8 +71,7 @@ class BlogService
                     $uploadedImages[] = FileUploadHelper::uploadImage(
                         $image,
                         'blogs/images',
-                        'public',
-                        2048
+
                     );
                 }
                 $data['images'] = $uploadedImages;
@@ -128,8 +127,7 @@ class BlogService
                     $finalImages[] = FileUploadHelper::uploadImage(
                         $image,
                         'blogs/images',
-                        'public',
-                        2048
+
                     );
                 }
             }

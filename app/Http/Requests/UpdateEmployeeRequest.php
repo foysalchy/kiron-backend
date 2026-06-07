@@ -35,6 +35,7 @@ class UpdateEmployeeRequest extends UpdateBaseCompanyRequest
                 'employee_type_id'   => ['sometimes', 'required', 'exists:employee_types,id'],
                 'job_title_id'       => ['nullable', 'exists:job_titles,id'],
                 'office_location_id' => ['nullable', 'exists:office_locations,id'],
+                'position_id'             => ['nullable', 'exists:positions,id'],
 
                 // --- General Info ---
                 'first_name' => ['sometimes', 'required', 'string', 'max:100'],

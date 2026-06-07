@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('payroll_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->integer('late_days_for_penalty')->default(3); // 3 days late
             $table->decimal('penalty_amount_in_days', 8, 2)->default(1.0); // = 1 day salary deduct
             $table->boolean('has_overtime_allowance')->default(false);

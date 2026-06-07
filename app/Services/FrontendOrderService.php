@@ -28,6 +28,8 @@ class FrontendOrderService
                 'warehouse:id,name',
                 'company:id,name',
                 'orderDetails.product:id,title,sku_code,thumbnail',
+                'orderDetails.variation.attributes.attributeGroup',
+                'orderDetails.variation.attributes.attributeValue',
                 'orderNotes',
                 'coupon:id,code,discount_value'
             ])
@@ -41,6 +43,7 @@ class FrontendOrderService
         if (isset($filters['payment_status'])) {
             $query->where('orders.payment_status', $filters['payment_status']);
         }
+
         if (!empty($filters['customer_name'])) {
             $query->whereHas('customer', function ($q) use ($filters) {
                 $q->where('name', 'like', '%' . $filters['customer_name'] . '%');
@@ -125,9 +128,11 @@ class FrontendOrderService
                 'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'items' => $order->orderDetails->map(function ($detail) {
-                    return [
+                    $item = [
                         'id' => $detail->id,
                         'title' => $detail->product?->title ?? 'Unknown Product',
+                        'product_id' => $detail->product_id,
+                        'variation_id' => $detail->variation_id,
                         'sku' => $detail->product?->sku_code ?? '',
                         'price' => (float) $detail->unit_price,
                         'quantity' => $detail->quantity,
@@ -136,6 +141,28 @@ class FrontendOrderService
                         'total' => (float) $detail->total,
                         'image' => $detail->product?->thumbnail ?? null,
                     ];
+
+                    if ($detail->variation) {
+                        $item['variation'] = [
+                            'id' => $detail->variation->id,
+                            'sku' => $detail->variation->sku,
+                            'attributes' => $detail->variation->attributes->map(function ($attr) {
+                                return [
+                                    'id' => $attr->id,
+                                    'group_name' => $attr->attributeGroup?->name ?? '',
+                                    'value_name' => $attr->attributeValue?->name ?? '',
+                                ];
+                            }),
+                        ];
+
+                        if ($detail->variation->sku) {
+                            $item['sku'] = $detail->variation->sku;
+                        }
+                    } else {
+                        $item['variation'] = null;
+                    }
+
+                    return $item;
                 }),
                 'subtotal' => (float) $order->subtotal,
                 'discount' => (float) ($order->discount_on_all + $order->coupon_discount),
@@ -161,7 +188,6 @@ class FrontendOrderService
                 'courierInfo' => $this->getCourierInfo($order),
                 'assigned_to' => $order->assigned_to,
                 'due_amount' => (float) ($order->grand_total - $order->payment_amount),
-
             ];
         });
 

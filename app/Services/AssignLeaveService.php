@@ -11,7 +11,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
 
 class AssignLeaveService
-{ 
+{
     /**
      * Get all assigned leaves with filtering and pagination
      */
@@ -77,15 +77,17 @@ class AssignLeaveService
         try {
             $positionId = $data['position_id'];
 
-            // Remove existing assignments for the position
-            AssignLeaveType::where('position_id', $positionId)->forceDelete();
-
             foreach ($data['leaves'] as $leave) {
+                // Same position_id + leave_type_id match হলে force delete
+                AssignLeaveType::where('position_id', $positionId)
+                    ->where('leave_type_id', $leave['leave_type_id'])
+                    ->forceDelete();
+
                 AssignLeaveType::create([
                     'position_id'   => $positionId,
                     'leave_type_id' => $leave['leave_type_id'],
                     'leave_count'   => $leave['leave_count'],
-                    'status'        => $data['status'] ?? 1
+                    'status'        => $data['status'] ?? Status::Active->value,
                 ]);
             }
 
@@ -93,13 +95,12 @@ class AssignLeaveService
                 ->where('position_id', $positionId)
                 ->get();
 
-            LogHelper::created('assign_leave_type', $positionId, 2, 'Leaves assigned to position');
+            LogHelper::created('assign_leave_type', $positionId, auth()->user()->company_id ?? null, 'Leaves assigned to position');
             DB::commit();
 
-            Log::info('Leaves assigned successfully', ['position_id' => $positionId, 'company_id' => 2]);
+            Log::info('Leaves assigned successfully', ['position_id' => $positionId, 'company_id' => auth()->user()->company_id ?? null]);
 
-            return $updatedAssignments; 
-
+            return $updatedAssignments;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Assignment creation failed: ' . $e->getMessage());

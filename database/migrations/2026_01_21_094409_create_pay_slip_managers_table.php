@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pay_slip_managers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->foreignId('payroll_id')->constrained('pay_rolls')->cascadeOnDelete();
             $table->foreignId('position_id')->constrained('positions')->cascadeOnDelete();

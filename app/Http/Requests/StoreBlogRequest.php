@@ -39,9 +39,9 @@ class StoreBlogRequest extends BaseCompanyRequest
                 'images.*'         => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
 
                 // SEO Metadata
-                'meta_title'       => ['nullable', 'string', 'max:255'],
+                 'meta_title' => ['nullable', 'string'],
                 'meta_description' => ['nullable', 'string'],
-                'meta_keywords'    => ['nullable', 'array'],
+                'meta_keywords' => ['nullable'],
 
                 'status'           => ['nullable', 'integer', 'in:0,1'],
             ]

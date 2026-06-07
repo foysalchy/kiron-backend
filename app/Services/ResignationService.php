@@ -70,10 +70,10 @@ class ResignationService
         try {
             // Handle Letter Upload (Image or PDF)
             if (isset($data['letter'])) {
-                $data['letter'] = FileUploadHelper::uploadImage(
+                $data['letter'] = FileUploadHelper::upload(
                     $data['letter'],
                     'resignations/letters',
-                    'public'
+
                 );
             }
 
@@ -114,7 +114,7 @@ class ResignationService
                 if ($resignation->letter) {
                     FileUploadHelper::delete($resignation->letter);
                 }
-                $data['letter'] = FileUploadHelper::uploadImage($data['letter'], 'resignations', 'public', 2048);
+                $data['letter'] = FileUploadHelper::upload($data['letter'], 'resignations');
             }
 
             // 3. Update core data

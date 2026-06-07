@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('name');
             $table->string('short_code')->nullable();
             $table->integer('display_order')->default(1);
             $table->text('description')->nullable(); // Description
             $table->date('from_date')->nullable();
             $table->date('to_date')->nullable();
-            $table->tinyInteger('status')->default(0)->comment('0: Inactive, 1: Active');
+            $table->tinyInteger('status')->default(1)->comment('0: Inactive, 1: Active');
             $table->timestamps();
             $table->softDeletes();
         });

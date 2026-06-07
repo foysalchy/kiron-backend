@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('office_locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
             $table->string('location_name');
             $table->string('address');
             $table->string('country')->nullable();
