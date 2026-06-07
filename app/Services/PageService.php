@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class PageService
 {
    /**
-     * ১. Get All Pages (With Pagination & Filters)
+     *  Get All Pages (With Pagination & Filters)
      */
     public function getAllPages(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
