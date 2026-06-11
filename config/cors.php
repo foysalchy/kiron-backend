@@ -11,7 +11,8 @@ return [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:8000',
-        'https:managesuite.xyz' ,
+        'https://managesuite.xyz' ,
+        'https://api.managesuite.xyz',
     ],
 
     'allowed_origins_patterns' => [],
