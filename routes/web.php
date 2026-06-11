@@ -27,7 +27,7 @@ Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
 
 
 
-// Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
+Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
     //landing page
@@ -88,4 +88,4 @@ Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
 
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
-// });
+});
