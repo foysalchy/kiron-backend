@@ -110,7 +110,9 @@ use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\Saas\CustomerReviewController;
 use App\Http\Controllers\Api\Saas\MasterBrandController;
+use App\Http\Controllers\Api\Saas\MasterDemoController;
 use App\Http\Controllers\Api\Saas\MasterFeatureController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SalesReportController;
@@ -1536,6 +1538,26 @@ Route::prefix('v1')->group(function () {
             Route::post('toggle-status', [MasterFeatureController::class, 'toggleStatus']);
             Route::post('restore', [MasterFeatureController::class, 'restore']);
             Route::delete('force-delete', [MasterFeatureController::class, 'forceDestroy']);
+        });
+        Route::apiResource('master-demo', MasterFeatureController::class);
+        Route::prefix('master-demo/{id}')->group(function () {
+            Route::post('toggle-status', [MasterFeatureController::class, 'toggleStatus']);
+            Route::post('restore', [MasterFeatureController::class, 'restore']);
+            Route::delete('force-delete', [MasterFeatureController::class, 'forceDestroy']);
+        });
+        Route::apiResource('master-demos', MasterDemoController::class);
+        Route::prefix('master-demos/{id}')->group(function () {
+            Route::post('toggle-status', [MasterDemoController::class, 'toggleStatus']);
+            Route::post('restore', [MasterDemoController::class, 'restore']);
+            Route::delete('force-delete', [MasterDemoController::class, 'forceDestroy']);
+        });
+
+        // Customer Reviews (Added)
+        Route::apiResource('customer-reviews', CustomerReviewController::class);
+        Route::prefix('customer-reviews/{id}')->group(function () {
+            Route::post('toggle-status', [CustomerReviewController::class, 'toggleStatus']);
+            Route::post('restore', [CustomerReviewController::class, 'restore']);
+            Route::delete('force-delete', [CustomerReviewController::class, 'forceDestroy']);
         });
     });
 });

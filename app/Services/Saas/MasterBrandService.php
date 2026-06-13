@@ -78,7 +78,7 @@ class MasterBrandService
 
             $brand = MasterBrand::create($data);
 
-            LogHelper::created('master_brand', $brand->id, 0, $brand->name);
+            LogHelper::created('master_brand', $brand->id, null, $brand->name);
             DB::commit();
             Log::info('Master Brand created successfully', ['brand_id' => $brand->id]);
 
@@ -110,7 +110,7 @@ class MasterBrandService
 
             $brand->update($data);
 
-            LogHelper::updated('master_brand', $brand->id, 0, $brand->name);
+            LogHelper::updated('master_brand', $brand->id, null, $brand->name);
             DB::commit();
             Log::info('Master Brand Updated Successfully', ['brand_id' => $brand->id]);
 
@@ -135,7 +135,7 @@ class MasterBrandService
             $brand = $this->getBrandById($id);
             $brand->delete();
 
-            LogHelper::deleted('master_brand', $brand->id, 0, $brand->name);
+            LogHelper::deleted('master_brand', $brand->id, null, $brand->name);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -162,7 +162,7 @@ class MasterBrandService
 
             $brand->restore();
 
-            LogHelper::restored('master_brand', $brand->id, 0, $brand->name);
+            LogHelper::restored('master_brand', $brand->id, null, $brand->name);
             DB::commit();
             Log::info('Master Brand restored successfully', ['brand_id' => $id]);
 
@@ -196,7 +196,7 @@ class MasterBrandService
 
             $brand->forceDelete();
 
-            LogHelper::forceDeleted('master_brand', $id, 0, $brand->name);
+            LogHelper::forceDeleted('master_brand', $id, null, $brand->name);
             DB::commit();
             Log::info('Master Brand permanently deleted', ['brand_id' => $id]);
 
@@ -226,7 +226,7 @@ class MasterBrandService
 
             $brand->update(['status' => $newStatus]);
 
-            LogHelper::statusChanged('master_brand', $brand->id, 0, $brand->name . ' to ' . $newStatus);
+            LogHelper::statusChanged('master_brand', $brand->id, null, $brand->name . ' to ' . $newStatus);
             DB::commit();
             return $brand;
         } catch (\Exception $e) {

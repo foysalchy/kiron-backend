@@ -15,7 +15,7 @@ if (!function_exists('getCurrentCompany')) {
             ->first();
             return $store;
         }else{
-        
+
             $host = request()->getHost();
 
             if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {

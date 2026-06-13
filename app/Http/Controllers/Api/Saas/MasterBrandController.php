@@ -12,8 +12,7 @@ use Illuminate\Http\Request;
 
 class MasterBrandController extends Controller
 {
-    public function __construct(protected MasterBrandService $brandService)
-    {}
+    public function __construct(protected MasterBrandService $brandService) {}
 
     /**
      * list all master brands with optional filters (status, search, pagination)

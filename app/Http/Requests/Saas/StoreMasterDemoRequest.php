@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateMasterBrandRequest extends FormRequest
+class StoreMasterDemoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,37 +21,44 @@ class UpdateMasterBrandRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    /**
+     * Get the validation rules that apply to the request.
+     */
     public function rules(): array
     {
         return [
-            'name' => 'sometimes|required|string|max:255',
-            'logo' => 'sometimes|nullable|image|max:2048',
-            'link' => 'sometimes|nullable|url',
+            'title'  => 'required|string|max:255',
+            'image'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'link'   => 'nullable|url',
+            'status' => 'nullable|integer',
         ];
     }
+
     /**
      * Custom validation messages.
      */
     public function messages(): array
     {
         return [
-            'name.required' => 'The brand name cannot be empty.',
-            'logo.image'    => 'The logo must be a valid image file.',
-            'logo.mimes'    => 'Supported image formats are: jpeg, png, jpg, webp.',
-            'logo.max'      => 'The logo size must not exceed 2MB.',
-            'link.url'      => 'The link must be a valid URL format.',
+            'title.required' => 'The demo title is required.',
+            'title.string'   => 'The title must be a valid string.',
+            'image.image'    => 'The file must be an image (jpg, png, etc.).',
+            'image.max'      => 'The image size cannot exceed 2MB.',
+            'link.url'       => 'Please provide a valid URL (e.g., https://demo.example.com).',
         ];
     }
 
     /**
-     * Handle a failed validation attempt for API response.
+     * Handle a failed validation attempt.
+     *
+     * Returns a JSON response instead of a redirect.
      */
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(
             response()->json([
                 'success' => false,
-                'message' => 'Update validation failed',
+                'message' => 'Validation failed',
                 'errors'  => $validator->errors(),
             ], 422)
         );

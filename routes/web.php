@@ -27,7 +27,7 @@ Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
 
 
 
-Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
+Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
     //landing page
@@ -41,7 +41,7 @@ Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)
     Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
 
     Route::get('/support', [SupportController::class, 'index'])->name('support.index');
- 
+
 
     Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');
     Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
