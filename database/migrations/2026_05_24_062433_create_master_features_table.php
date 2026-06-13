@@ -22,6 +22,7 @@ return new class extends Migration
             $table->tinyInteger('placement')->comment('1=feature, 2=benefit');
             $table->tinyInteger('status')->default(Status::Active->value);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -111,6 +111,7 @@ use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\Saas\MasterBrandController;
+use App\Http\Controllers\Api\Saas\MasterFeatureController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\SalesReportController;
 use App\Http\Controllers\Api\SelectOptionController;
@@ -1525,6 +1526,16 @@ Route::prefix('v1')->group(function () {
     });
     Route::prefix('saas')->group(function () {
         Route::apiResource('master-brands', MasterBrandController::class);
-        Route::post('master-brands/{id}/toggle-status', [MasterBrandController::class, 'toggleStatus']);
+        Route::prefix('master-brands/{id}')->group(function () {
+            Route::post('toggle-status', [MasterBrandController::class, 'toggleStatus']);
+            Route::post('restore', [MasterBrandController::class, 'restore']);
+            Route::delete('force-delete', [MasterBrandController::class, 'forceDestroy']);
+        });
+        Route::apiResource('master-features', MasterFeatureController::class);
+        Route::prefix('master-features/{id}')->group(function () {
+            Route::post('toggle-status', [MasterFeatureController::class, 'toggleStatus']);
+            Route::post('restore', [MasterFeatureController::class, 'restore']);
+            Route::delete('force-delete', [MasterFeatureController::class, 'forceDestroy']);
+        });
     });
 });

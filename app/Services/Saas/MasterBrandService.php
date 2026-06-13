@@ -21,7 +21,6 @@ class MasterBrandService
     public function getAllBrands(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            // SaaS ল্যান্ডিং পেজের জন্য গ্লোবাল ডাটা হলে withoutCompanyScope ব্যবহার করতে পারেন
             $query = MasterBrand::query();
 
             if (isset($filters['status'])) {
@@ -146,6 +145,69 @@ class MasterBrandService
             DB::rollBack();
             Log::error('Master Brand deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to delete brand');
+        }
+    }
+    /**
+     * Restore soft deleted brand
+     */
+    public function restoreBrand(int $id): MasterBrand
+    {
+        DB::beginTransaction();
+        try {
+            $brand = MasterBrand::onlyTrashed()->find($id);
+
+            if (!$brand) {
+                throw ApiException::notFound('Master Brand');
+            }
+
+            $brand->restore();
+
+            LogHelper::restored('master_brand', $brand->id, 0, $brand->name);
+            DB::commit();
+            Log::info('Master Brand restored successfully', ['brand_id' => $id]);
+
+            return $brand;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Master Brand restoration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to restore master brand');
+        }
+    }
+
+    /**
+     * Permanently delete a brand (Force Delete)
+     */
+    public function forceDeleteBrand(int $id): bool
+    {
+        DB::beginTransaction();
+        try {
+            $brand = MasterBrand::withTrashed()->find($id);
+
+            if (!$brand) {
+                throw ApiException::notFound('Master Brand');
+            }
+
+            if ($brand->logo) {
+                FileUploadHelper::delete($brand->logo);
+            }
+
+            $brand->forceDelete();
+
+            LogHelper::forceDeleted('master_brand', $id, 0, $brand->name);
+            DB::commit();
+            Log::info('Master Brand permanently deleted', ['brand_id' => $id]);
+
+            return true;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Master Brand permanent deletion failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to permanently delete brand');
         }
     }
 
