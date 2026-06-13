@@ -225,7 +225,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+
         if (!app()->runningInConsole()) {
             if (request()->is('api/*')) {
                 return;
@@ -234,23 +234,38 @@ class AppServiceProvider extends ServiceProvider
 
             $currentStore = getCurrentCompany();
 
-            if ($currentStore) {
-                $companyId = $currentStore->company_id;
+            $data = [
+            'setup'             => null,
+            'headerCategories'  => collect(), // Empty collection
+            'footerFeatures'    => collect(),
+            'footerBottomRight' => collect(),
+            'socialLinks'       => collect(),
+            'popularSearches'   => collect(),
+            'relatedProducts'   => collect(),
+            'themeColor'        => null,
+            'footerPages'       => collect(),
+        ];
+             if ($currentStore) {
+            $companyId = $currentStore->company_id;
 
-                $data = cache()->remember("store_{$companyId}", 600, fn() => [
-                    'setup'            => SiteSetting::where('company_id', $companyId)->first(),
-                    'headerCategories' => MegaCategory::where('company_id', $companyId)->where('status', 1)->latest()->take(5)->get(),
-                    'footerFeatures'   => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::PAGE_ALL)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                    'footerBottomRight' => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                    'socialLinks'      => SocialSetting::where('company_id', $companyId)->where('status', Status::Active->value)->get(),
-                    'popularSearches'  => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
-                    'relatedProducts'  => Product::where('status', Status::Active->value)->where('company_id', $companyId)->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
-                    'themeColor' => Company::where('id', $companyId)->first(),
-                    'footerPages' => Page::where('company_id', $companyId)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                ]);
+            $cachedData = cache()->remember("store_{$companyId}", 600, fn() => [
+                'setup'            => SiteSetting::where('company_id', $companyId)->first(),
+                'headerCategories' => MegaCategory::where('company_id', $companyId)->where('status', 1)->latest()->take(5)->get(),
+                'footerFeatures'   => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::PAGE_ALL)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
+                'footerBottomRight' => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
+                'socialLinks'      => SocialSetting::where('company_id', $companyId)->where('status', Status::Active->value)->get(),
+                'popularSearches'  => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
+                'relatedProducts'  => Product::where('status', Status::Active->value)->where('company_id', $companyId)->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+                'themeColor'       => Company::where('id', $companyId)->first(),
+                'footerPages'      => Page::where('company_id', $companyId)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
+            ]);
+
+            // Merge cached data into our $data array
+            $data = array_merge($data, $cachedData);
+        }
 
                 View::share($data);
             }
         }
     }
-}
+

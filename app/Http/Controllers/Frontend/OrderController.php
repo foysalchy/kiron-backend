@@ -25,7 +25,7 @@ class OrderController extends FrontendController
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
-        $paymentMethods = CustomerPaymentMethod::where('status', Status::Active->value)
+        $paymentMethods = CustomerPaymentMethod::where('company_id', $this->company_id)->where('status', Status::Active->value)
             ->get();
 
         $existingDraftId = Session::get('current_draft_order_id');
@@ -494,7 +494,7 @@ class OrderController extends FrontendController
                     $path = FileUploadHelper::uploadImage(
                         $image,
                         'reviews',
-                       
+
                     );
                     $imagePaths[] = $path;
                 }
