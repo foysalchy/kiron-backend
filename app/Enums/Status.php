@@ -82,12 +82,13 @@ enum Status: int
       self::ReturnRequest => 'Return Request',
       self::Solved => 'Solved',
       self::WaitForResponse => 'Waiting for Response',
-      self::WaitingForClientResponse => 'Waiting for Client Response',  
+      self::WaitingForClientResponse => 'Waiting for Client Response',
       self::Open => 'Open',
       self::Resumed => 'Resumed',
     };
   }
   public const ORDER_FLOW = [
+    self::Draft,
     self::Pending,
     self::Processing,
     self::Confirmed,

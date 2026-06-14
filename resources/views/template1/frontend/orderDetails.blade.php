@@ -12,16 +12,8 @@
                 <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
-                @php
-                    $statusClasses = [
-                        'pending' => 'bg-orange-500',
-                        'delivered' => 'bg-green-500',
-                        'cancelled' => 'bg-red-500',
-                    ];
-                @endphp
-                <span
-                    class="px-4 py-1 {{ $statusClasses[$order->status] ?? 'primary-bg' }} text-primary text-md font-bold rounded-lg mb-1">
-                    {{ App\Enums\Status::from($order->status)->label() }}
+                <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
+                    {{ $order->status ? $order->status->label() : 'Draft' }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
@@ -76,11 +68,7 @@
 
                                 {{-- 3. Safe Review Button Logic --}}
                                 @php
-                                    // Check if product exists and if order is delivered
-                                    $canReview =
-                                        $item->product &&
-                                        ($order->status === \App\Enums\Status::Delivered->value ||
-                                            strtolower($order->status) == 'delivered');
+                                    $canReview = $item->product && $order->status === \App\Enums\Status::Delivered;
                                 @endphp
 
                                 @if ($canReview)
@@ -112,34 +100,30 @@
                         class="relative pl-8 space-y-8 before:content-[''] before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
 
                         @php
-                            $currentStatusValue = $order->status;
-                            $flow = \App\Enums\Status::ORDER_FLOW;
+                            $currentStatus = $order->status; // এটি একটি Enum Object
+                            $flow = \App\Enums\Status::ORDER_FLOW; // এটি Enum Objects এর এ্যারে
 
-                            // Find the index of the current status in the flow
-                            $currentIndex = 0;
+                            $currentIndex = -1;
                             foreach ($flow as $index => $status) {
-                                if ($status->value === $currentStatusValue) {
+                                if ($status === $currentStatus) {
                                     $currentIndex = $index;
                                     break;
                                 }
                             }
-
-                            // Special case: If order is cancelled, we only show steps up to the cancellation point or just the flow
-                            $isCancelled = $currentStatusValue === \App\Enums\Status::Cancelled->value;
                         @endphp
+
+                        {{-- // Special case: If order is cancelled, we only show steps up to the cancellation point or just the flow
+                            $isCancelled = $currentStatusValue === \App\Enums\Status::Cancelled->value;
+                        @endphp --}}
 
                         @foreach ($flow as $index => $status)
                             {{-- Skip Return/Cancel steps if they haven't happened yet to keep the UI clean --}}
-                            @if (
-                                ($status == \App\Enums\Status::Cancelled ||
-                                    $status == \App\Enums\Status::ReturntoCourier ||
-                                    $status == \App\Enums\Status::ReturnReceived) &&
-                                    $index > $currentIndex)
+                            {{-- @if (($status == \App\Enums\Status::Cancelled || $status == \App\Enums\Status::ReturntoCourier || $status == \App\Enums\Status::ReturnReceived) && $index > $currentIndex)
                                 @continue
-                            @endif
+                            @endif --}}
 
                             @php
-                                $isCompleted = $index <= $currentIndex;
+                                $isCompleted = $currentIndex !== -1 && $index <= $currentIndex;
                                 $isCurrent = $index === $currentIndex;
                             @endphp
 
