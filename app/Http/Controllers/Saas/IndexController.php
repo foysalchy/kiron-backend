@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Saas;
 
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Blog;
 use App\Models\CustomerReview;
 use App\Models\MasterBrand;
 use App\Models\MasterDemo;
@@ -15,12 +16,12 @@ class IndexController extends Controller
 {
     public function home()
     {
-        $slider = Slider::withoutCompanyScope()
-            ->where('status', Status::Active->value)
-            ->where('placement', 'hero')
-            ->whereNull('company_id')
-            ->latest()
-            ->first();
+        $sliders = Slider::withoutCompanyScope()
+        ->where('status', Status::Active->value)
+        ->where('placement', 'hero')
+        ->whereNull('company_id')
+        ->latest()
+        ->get();
         $brands = MasterBrand::where('status', Status::Active->value)
             ->latest()
             ->get();
@@ -41,14 +42,21 @@ class IndexController extends Controller
             ->latest()
             ->get();
 
+        $blogs = Blog::withoutCompanyScope()
+            ->with('company')
+            ->where('status', Status::Active->value)
+            ->latest()
+            ->take(3)
+            ->get();
         return view('saas.frontend.index', compact(
-            'slider',
+            'sliders',
             'brands',
             'features',
             'avgRating',
             'totalReviews',
             'demos',
-            'allReviews'
+            'allReviews',
+            'blogs'
         ));
     }
 }
