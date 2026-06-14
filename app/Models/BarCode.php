@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 
-class Barcode extends Model
+class BarCode extends Model
 {
     use CompanyScoped;
     protected $table = 'bar_codes';
