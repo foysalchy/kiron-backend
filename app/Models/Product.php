@@ -95,7 +95,7 @@ class Product extends Model
 
     public function barcode()
     {
-        return $this->morphOne(Barcode::class, 'barcodeable');
+        return $this->morphOne(BarCode::class, 'barcodeable');
     }
 
     public function orderDetails(): HasMany
