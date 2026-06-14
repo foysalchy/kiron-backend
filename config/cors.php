@@ -6,8 +6,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'https://managesuite.xyz' ,
-        'https://api.managesuite.xyz',
+        'https://managesuite.xyz',
     ],
 
     'allowed_origins_patterns' => [],
@@ -18,5 +17,5 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => true, // IMPORTANT!
+    'supports_credentials' => true,
 ];
