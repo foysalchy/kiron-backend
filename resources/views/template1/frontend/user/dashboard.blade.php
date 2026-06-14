@@ -139,7 +139,9 @@
                                         <p class="text-sm text-gray-500">{{ $order->created_at->format('Y-m-d') }}</p>
                                     </div>
                                     <span
-                                        class="px-3 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full uppercase">{{ $order->status }}</span>
+                                        class="px-3 py-1 {{ $order->status_color }} text-[10px] font-bold rounded-full uppercase">
+                                        {{ $order->status_label }}
+                                    </span>
                                     <div class="flex items-center gap-6">
                                         <p class="font-semibold text-gray-900">{{ $setup->currency }}
                                             {{ number_format($order->grand_total) }}
@@ -481,25 +483,25 @@
         }
     </script>
     <script>
-    // ১. ভ্যালিডেশন এররগুলো দেখানোর জন্য (যেমন: Transaction ID Already Used)
-    @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            toastr.error("{{ $error }}", "Error", {
-                positionClass: "toast-top-right",
-                progressBar: true,
-                timeOut: 5000
-            });
-        @endforeach
-    @endif
+        // ১. ভ্যালিডেশন এররগুলো দেখানোর জন্য (যেমন: Transaction ID Already Used)
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.error("{{ $error }}", "Error", {
+                    positionClass: "toast-top-right",
+                    progressBar: true,
+                    timeOut: 5000
+                });
+            @endforeach
+        @endif
 
-    // ২. সাকসেস মেসেজ দেখানোর জন্য
-    @if(session('success'))
-        toastr.success("{{ session('success') }}", "Success");
-    @endif
+        // ২. সাকসেস মেসেজ দেখানোর জন্য
+        @if (session('success'))
+            toastr.success("{{ session('success') }}", "Success");
+        @endif
 
-    // ৩. জেনারেল এরর মেসেজ দেখানোর জন্য
-    @if(session('error'))
-        toastr.error("{{ session('error') }}", "Error");
-    @endif
-</script>
+        // ৩. জেনারেল এরর মেসেজ দেখানোর জন্য
+        @if (session('error'))
+            toastr.error("{{ session('error') }}", "Error");
+        @endif
+    </script>
 @endpush

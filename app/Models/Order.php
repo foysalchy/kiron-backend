@@ -66,12 +66,13 @@ class Order extends Model
         'grand_total' => 'decimal:2',
         'payment_amount' => 'decimal:2',
         'payment_status' => 'integer',
-        'status' => 'integer',
         'courier_info' => 'array',
         'shipping_address' => 'array',
         'return_info' => 'array',
         'warehouse_info' => 'array',
         'assigned_to' => 'array',
+        'status' => Status::class,
+
     ];
 
     /**
@@ -219,26 +220,26 @@ class Order extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === Status::Pending->value;
+        return $this->status === Status::Pending;
     }
     public function isDraft(): bool
     {
-        return $this->status === Status::Draft->value;
+        return $this->status === Status::Draft;
     }
 
     public function isDelivered(): bool
     {
-        return $this->status === Status::Delivered->value;
+        return $this->status === Status::Delivered;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === Status::Cancelled->value;
+        return $this->status === Status::Cancelled;
     }
 
     public function isOnHold(): bool
     {
-        return $this->status === Status::Hold->value;
+        return $this->status === Status::Hold;
     }
 
     /**
@@ -324,7 +325,8 @@ class Order extends Model
     public function getStatusLabelAttribute(): string
     {
         // Uses the label() method you defined in your Status Enum
-        return Status::from($this->status)->label();
+        // return Status::from($this->status)->label();
+         return $this->status?->label() ?? 'Unknown';
     }
 
     /**
@@ -338,6 +340,7 @@ class Order extends Model
             Status::Delivered->value  => 'bg-green-100 text-green-700',
             Status::Cancelled->value  => 'bg-red-100 text-red-700',
             Status::ReturnRequest->value => 'bg-purple-100 text-purple-700',
+            Status::Draft      => 'bg-gray-100 text-gray-700',
             default                       => 'bg-gray-100 text-gray-700',
         };
     }

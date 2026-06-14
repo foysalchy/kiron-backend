@@ -33,17 +33,15 @@
     <!-- 2. Main Header -->
     <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-3 lg:gap-8">
 
-        <!-- Logo -->
+        <!-- Logo Section -->
         <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0">
             @if ($setup && $setup->logo)
                 <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}"
                     class="h-10 md:h-12 w-auto object-contain">
             @else
-                <div class="primary-bg w-9 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-lg shadow-sm">
-                    <span class="text-primary text-xl md:text-2xl font-bold">
-                        {{ substr($setup->shop_name ?? 'O', 0, 1) }}
-                    </span>
-                </div>
+                <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+                    {{ $setup->shop_name ?? 'Bhaiya Digital' }}
+                </span>
             @endif
         </a>
 
@@ -104,7 +102,7 @@
         <div class="flex items-center gap-3 lg:gap-6 text-[#1D2128]">
 
             <!-- Nav Links (XL only) -->
-          
+
 
             <!-- Mobile Search Toggle -->
             <button class="sm:hidden text-xl hover-text" onclick="toggleMobileSearch()">
@@ -223,33 +221,32 @@
     <!-- 3. Bottom Category Nav (Desktop) -->
     <div class="border-t border-gray-100 hidden md:block">
         <div class="container mx-auto px-2 flex items-center gap-6 py-2.5 overflow-x-auto no-scrollbar">
-             
-             <a  href="{{ route('home') }}"
-                  class=" text-[16px] hover-text whitespace-nowrap border-r border-gray-300  pr-[20px]">
-                    Home
-                </a>
-                  <a href="{{ route('brand.index') }}"
-                   class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
-                   Brands
-                </a>
-                <a href="{{ route('shop.index') }}"
-                  class=" text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
-                    All Products
-                </a>
-                <a href="{{ route('flash.sale') }}"
-                    class=" f text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
-                    Flash Sale 🔥
-                </a>
-              
-                
-                <a href="{{ route('order.track') }}"
-                    class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
-                    Track Order
-                </a>
-                <a href="{{ route('contact.index') }}"
-                    class=" text-[16px] hover-text whitespace-nowrap">
-                   Contact
-                </a>
+
+            <a href="{{ route('home') }}"
+                class=" text-[16px] hover-text whitespace-nowrap border-r border-gray-300  pr-[20px]">
+                Home
+            </a>
+            <a href="{{ route('brand.index') }}"
+                class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                Brands
+            </a>
+            <a href="{{ route('shop.index') }}"
+                class=" text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                All Products
+            </a>
+            <a href="{{ route('flash.sale') }}"
+                class=" f text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                Flash Sale 🔥
+            </a>
+
+
+            <a href="{{ route('order.track') }}"
+                class="  text-[16px] hover-text whitespace-nowrap  border-r border-gray-300  pr-[20px]">
+                Track Order
+            </a>
+            <a href="{{ route('contact.index') }}" class=" text-[16px] hover-text whitespace-nowrap">
+                Contact
+            </a>
         </div>
     </div>
 
