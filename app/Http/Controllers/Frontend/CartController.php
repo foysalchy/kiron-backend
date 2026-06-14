@@ -287,7 +287,7 @@ class CartController extends FrontendController
                     'variation_id' => $variationId,
                 ],
                 [
-                    'company_id'  => getCurrentCompany()->id,
+                    'company_id'  => getCurrentCompany()->company_id,
                     'customer_id' => $customerId,
                     'quantity'    => $qty,
                     'status'      => CartTrack::ADDED,
