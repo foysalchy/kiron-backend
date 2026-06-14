@@ -2,12 +2,20 @@
     <div class="container mx-auto px-4 md:px-10 h-20 flex items-center justify-between">
         <!-- Logo Section -->
         <div class="flex-shrink-0">
-            <a href="{{ route('saas.index') }}" class="flex items-center gap-2">
-                <img src="./assets/images/shopify-logo.png" alt="Shopify" class="h-8 md:h-9"
-                    onerror="
-                this.src =
-                  'https://upload.wikimedia.org/wikipedia/commons/e/e1/Shopify_Logo.png'
-              " />
+            <a href="{{ route('saas.index') }}" class="flex items-center gap-2"
+                aria-label="{{ $setup->shop_name ?? 'Home' }}">
+                @if ($setup && $setup->logo_url)
+                    <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 md:h-9 w-auto"
+                        fetchpriority="high" loading="eager"
+                        onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
+                @else
+                    @if (file_exists(public_path('images/saas/Shopify_Logo.png')))
+                        <img src="{{ asset('images/saas/Shopify_Logo.png') }}" alt="Default Logo"
+                            class="h-8 md:h-9 w-auto" fetchpriority="high">
+                    @else
+                        <span class="text-xl font-bold text-gray-900">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
+                    @endif
+                @endif
             </a>
         </div>
 

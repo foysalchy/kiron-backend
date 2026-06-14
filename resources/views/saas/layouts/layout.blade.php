@@ -8,9 +8,9 @@
     <meta name="description" content="Explore our shop for the best products. Fast delivery and quality guaranteed.">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
-    <title>New</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
+    <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
+
+   <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? asset('default-favicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

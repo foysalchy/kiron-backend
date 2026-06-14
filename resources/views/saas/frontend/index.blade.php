@@ -18,251 +18,161 @@
         }
     </style>
     <!-- HERO SECTION -->
-    <section class="hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
-        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <!-- Left Side: Content -->
-            <div class="text-center lg:text-left order-2 lg:order-1">
-                <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                    {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
-                </h1>
-                <p class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
-                    {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
-                </p>
+    @if ($slider)
+        <section class="hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
+            <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <!-- Left Side: Content -->
+                <div class="text-center lg:text-left order-2 lg:order-1">
+                    <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
+                        {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                    </h1>
+                    <p class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
+                        {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                    </p>
 
-                <!-- Action Buttons -->
-                <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start">
-                    <a href="#"
-                        class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                        ফ্রি ট্রায়াল শুরু করুন
-                    </a>
-                    <a href="#"
-                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
-                        ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
-                    </a>
-                </div>
-
-                <!-- Pagination Dots -->
-                <div class="flex items-center justify-center lg:justify-start gap-2 mt-12 md:mt-16">
-                    <span class="w-10 h-2.5 bg-white rounded-full"></span>
-                    <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                    <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                    <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                </div>
-            </div>
-
-            <!-- Right Side: Interactive Graphics -->
-            <div class="relative flex justify-center items-center order-1 lg:order-2 py-20">
-                <!-- Dashed Circles -->
-                <div
-                    class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
-                </div>
-                <div
-                    class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
-                </div>
-                <div
-                    class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
-                </div>
-
-                <!-- Central White Box Logo -->
-                <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
-                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                        class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
-                </div>
-
-                <!-- --- CUSTOMER REVIEW SECTION --- -->
-                <div class="absolute -bottom-10 md:-bottom-10 flex flex-col items-center">
-                    <svg class="w-12 h-16 md:w-16 md:h-24 text-white/40 mb-2" viewBox="0 0 50 100" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10 5C25 35 35 65 30 90" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" />
-                        <path d="M22 82L30 92L40 84" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
-                            stroke-linejoin="round" />
-                    </svg>
-                    <!-- Rating & Text -->
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#fde047] text-xl md:text-2xl">★</span>
-                        <span class="text-[#fde047] font-bold text-lg md:text-2xl">4.8</span>
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start">
                         <a href="#"
-                            class="text-gray-300 text-sm md:text-xl underline decoration-gray-500 underline-offset-8 hover:text-white transition font-medium">
-                            কাস্টমার রিভিউ
+                            class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                            ফ্রি ট্রায়াল শুরু করুন
+                        </a>
+                        <a href="#"
+                            class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
+                            ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
                         </a>
                     </div>
+
+                    <!-- Pagination Dots -->
+                    <div class="flex items-center justify-center lg:justify-start gap-2 mt-12 md:mt-16">
+                        <span class="w-10 h-2.5 bg-white rounded-full"></span>
+                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
+                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
+                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <!-- LOGO SHOWCASE SECTION -->
-    <section class="bg-black py-16 border-t border-white/5">
-        <div class="container mx-auto">
-            <div
-                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center justify-items-center gap-y-12 gap-x-8 grayscale hover:opacity-100 transition-all duration-500">
-                @forelse($brands as $brand)
-                    <div class="w-full flex justify-center text-white">
-                        {{-- @if ($brand->link) --}}
-                            <a href="{{ $brand->link }}" target="_blank" class="block">
-                                <img src="{{ $brand->logo_url ?? ''}}" alt="{{ $brand->name }}"
-                                    class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer"
-                                     />
+
+                <!-- Right Side: Interactive Graphics -->
+                <div class="relative flex justify-center items-center order-1 lg:order-2 py-20">
+                    <!-- Dashed Circles -->
+                    <div
+                        class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
+                    </div>
+                    <div
+                        class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
+                    </div>
+                    <div
+                        class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
+                    </div>
+
+                    <!-- Central White Box Logo -->
+                    <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
+                        <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
+                            class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
+                    </div>
+
+                    <!-- --- CUSTOMER REVIEW SECTION --- -->
+                    <div class="absolute -bottom-10 md:-bottom-10 flex flex-col items-center">
+                        <!-- SVG Arrow (Existing) -->
+                        <svg class="w-12 h-16 md:w-16 md:h-24 text-white/40 mb-2" viewBox="0 0 50 100" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 5C25 35 35 65 30 90" stroke="currentColor" stroke-width="4.5"
+                                stroke-linecap="round" />
+                            <path d="M22 82L30 92L40 84" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+
+                        <!-- Rating & Text -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-[#fde047] text-xl md:text-2xl">★</span>
+
+                            <span class="text-[#fde047] font-bold text-lg md:text-2xl">
+                                {{ number_format($avgRating, 1) }}
+                            </span>
+
+                            <a href="#reviews-section"
+                                class="text-gray-300 text-sm md:text-xl underline decoration-gray-500 underline-offset-8 hover:text-white transition font-medium">
+                                {{ $totalReviews }}+ কাস্টমার রিভিউ
                             </a>
-                        {{-- @else --}}
-                            {{-- <img src="{{ $brand->logo_url ?? ''}}" alt="{{ $brand->name }}"
-                                class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer"
-                               /> --}}
-                        {{-- @endif --}}
+                        </div>
                     </div>
-                @empty
-                    <div class="col-span-full text-gray-500 text-sm italic">No active brands available</div>
-                @endforelse
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
+    <!-- LOGO SHOWCASE SECTION -->
+    @if ($brands->isNotEmpty())
+        <section class="bg-black py-16 border-t border-white/5">
+            <div class="container mx-auto">
+                <div
+                    class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 items-center justify-items-center gap-y-12 gap-x-8 grayscale hover:opacity-100 transition-all duration-500">
+                    @forelse($brands as $brand)
+                        <div class="w-full flex justify-center text-white">
+                            <a href="{{ $brand->link }}" target="_blank" class="block">
+                                <img src="{{ $brand->logo_url ?? '' }}" alt="{{ $brand->name }}"
+                                    class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
+                            </a>
+                        </div>
+                    @empty
+                        <div class="col-span-full text-gray-500 text-sm italic">No active brands available</div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+    @endif
     <!-- FEATURES SECTION -->
-    <section class="bg-white py-20">
-        <div class="container mx-auto px-6 md:px-10">
-            <!-- Section Header -->
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-indigo-600 font-semibold text-sm md:text-lg mb-6">
-                    ফিচারসমূহ
-                </span>
-                <h2 class="text-2xl md:text-5xl font-bold text-gray-900 leading-tight">
-                    আপনার ব্যবসার জন্য <br class="hidden md:block" />
-                    দরকারি সব কিছু এখন এক জায়গায়
-                </h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
-                <!-- Feature Card 1 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <!-- Icon Area (Image এর মতো হুবহু বর্ডারসহ সার্কেল) -->
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-
-                    <!-- Content Area -->
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-
-                    <!-- Link Area -->
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
+    @if ($features->where('placement', 1)->isNotEmpty())
+        <section class="bg-white py-20">
+            <div class="container mx-auto px-6 md:px-10">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <span
+                        class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-indigo-600 font-semibold text-sm md:text-lg mb-6">
+                        ফিচারসমূহ
+                    </span>
+                    <h2 class="text-2xl md:text-5xl font-bold text-gray-900 leading-tight">
+                        আপনার ব্যবসার জন্য <br class="hidden md:block" />
+                        দরকারি সব কিছু এখন এক জায়গায়
+                    </h2>
                 </div>
 
-                <!-- Feature Card 2 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
-                </div>
-                <!-- Feature Card 2 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
-                </div>
-                <!-- Feature Card 2 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
-                </div>
-                <!-- Feature Card 2 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
+                    {{-- লজিক: যেখানে placement == 1 (Feature) --}}
+                    @foreach ($features->where('placement', 1) as $feature)
+                        <div
+                            class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
+                            <!-- Icon Area -->
+                            <div
+                                class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
+                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl text-[#5c46e5]"></i>
+                            </div>
+
+                            <!-- Content Area -->
+                            <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
+                                {{ $feature->title ?? '' }}
+                            </h3>
+                            <p class="text-gray-700 text-lg leading-relaxed mb-12">
+                                {{ $feature->subtitle ?? '' }}
+                            </p>
+
+                            <!-- Link Area -->
+                            <a href="#"
+                                class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
+                                বিস্তারিত জানুন
+                                <i class="fa-solid fa-arrow-right text-sm"></i>
+                            </a>
+                        </div>
+                    @endforeach
                 </div>
 
-                <!-- Feature Card 3 -->
-                <div
-                    class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                    <div
-                        class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-file-lines text-3xl text-[#5c46e5]"></i>
-                    </div>
-                    <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
-                        সেলস ও POS
-                    </h3>
-                    <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                        অর্ডার, ইনভয়েস, রিটার্ন, POS সিস্টেম ও লাইভ সেলস ড্যাশবোর্ড
-                    </p>
-                    <a href="#"
-                        class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
-                        বিস্তারিত জানুন
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
+                <div class="mt-16 text-center">
+                    <button
+                        class="bg-[#5c46e5] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        ফ্রি ট্রায়াল শুরু করুন
+                    </button>
                 </div>
             </div>
-
-            <!-- Bottom CTA Button -->
-            <div class="mt-16 text-center">
-                <button
-                    class="bg-[#5c46e5] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                    ফ্রি ট্রায়াল শুরু করুন
-                </button>
-            </div>
-        </div>
-    </section>
+        </section>
+    @endif
     <!-- INTEGRATION SECTION -->
     <section class="bg-[#f9faff] py-20 px-4 md:px-10 overflow-hidden">
         <div class="max-w-[1400px] mx-auto">
@@ -389,81 +299,58 @@
         </div>
     </section>
     <!-- DEMO & TEMPLATE SECTION -->
-    <section class="bg-white py-20 px-4 md:px-10">
-        <div class="max-w-[1400px] mx-auto">
-            <!-- Section Header -->
-            <div class="text-center mb-12">
-                <span
-                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
-                    ডেমো & টেমপ্লেট
-                </span>
-                <h2 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-10">
-                    এক প্ল্যাটফর্মে পুরো সিস্টেম লাইভ এক্সপেরিয়েন্স নিন
-                </h2>
+    @if ($demos->isNotEmpty())
+        <section class="bg-white py-20 px-4 md:px-10" id="demo-section">
+            <div class="max-w-[1400px] mx-auto">
+                <!-- Section Header -->
+                <div class="text-center mb-12">
+                    <span
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                        ডেমো & টেমপ্লেট
+                    </span>
+                    <h2 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-10">
+                        এক প্ল্যাটফর্মে পুরো সিস্টেম লাইভ এক্সপেরিয়েন্স নিন
+                    </h2>
 
-                <!-- Tabs Container -->
-                <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl">
-                    <button class="bg-[#5c46e5] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base">
-                        ল্যান্ডিং পেজ টেমপ্লেট
-                    </button>
-                    <button
-                        class="text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-gray-50 transition">
-                        ই-কমার্স টেমপ্লেট
-                    </button>
+                    <!-- Tabs Container (ক্লিকেবল ও হোভার ইফেক্ট ফিক্সড) -->
+                    <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
+                        <button onclick="filterDemos(1, this)"
+                            class="tab-btn bg-[#5c46e5] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
+                            ল্যান্ডিং পেজ টেমপ্লেট
+                        </button>
+                        <button onclick="filterDemos(2, this)"
+                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#5c46e5] transition-all">
+                            ই-কমার্স টেমপ্লেট
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Templates Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="demo-grid">
+                    @forelse($demos as $demo)
+                        <div class="demo-card group border border-indigo-100 rounded-xl overflow-hidden bg-white"
+                            data-type="{{ $demo->type }}">
+                            <div class="aspect-[4/3] overflow-hidden bg-gray-100">
+                                <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
+                                    class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
+                                    alt="{{ $demo->title }}" />
+                            </div>
+                            <div class="py-6 text-center border-t border-gray-100">
+                                <a href="{{ $demo->link ?? '#' }}" target="_blank"
+                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#5c46e5] hover:decoration-[#5c46e5]">
+                                    Live Preview
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full text-center py-10 text-gray-500">
+                            কোনো ডেমো টেমপ্লেট পাওয়া যায়নি।
+                        </div>
+                    @endforelse
                 </div>
             </div>
-
-            <!-- Templates Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Template Card 1 -->
-                <div class="group border border-indigo-100 rounded-xl overflow-hidden bg-white">
-                    <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                        <!-- Template Preview Image -->
-                        <img src="{{ asset('./images/saas/live1.png') }}"
-                            class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
-                            alt="Preview" />
-                    </div>
-                    <div class="py-6 text-center border-t border-gray-100">
-                        <a href="#"
-                            class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#5c46e5] hover:decoration-[#5c46e5]">
-                            Live Preview
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Template Card 2 -->
-                <div class="group border border-indigo-100 rounded-xl overflow-hidden bg-white">
-                    <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                        <!-- Template Preview Image -->
-                        <img src="{{ asset('./images/saas/live1.png') }}"
-                            class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
-                            alt="Preview" />
-                    </div>
-                    <div class="py-6 text-center border-t border-gray-100">
-                        <a href="#"
-                            class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#5c46e5] hover:decoration-[#5c46e5]">
-                            Live Preview
-                        </a>
-                    </div>
-                </div>
-                <!-- Template Card 3 -->
-                <div class="group border border-indigo-100 rounded-xl overflow-hidden bg-white">
-                    <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                        <!-- Template Preview Image -->
-                        <img src="{{ asset('./images/saas/live1.png') }}"
-                            class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
-                            alt="Preview" />
-                    </div>
-                    <div class="py-6 text-center border-t border-gray-100">
-                        <a href="#"
-                            class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#5c46e5] hover:decoration-[#5c46e5]">
-                            Live Preview
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
+    @endif
     <!-- INFINITY LOOP SECTION -->
     <section class="bg-white py-10 overflow-hidden scroll-container">
         <div class="space-y-6">
@@ -773,133 +660,45 @@
         </div>
     </section>
 
-    <!-- WHY CHOOSE US SECTION (Updated with All Cards) -->
-
-    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
-        <!-- Background Radial Glow -->
-        <div
-            class="absolute top-20 -left-20 w-[400px] h-[400px] bg-[#5c46e5]/10 blur-[100px] rounded-full pointer-events-none">
-        </div>
-        <div
-            class="absolute bottom-20 -right-20 w-[400px] h-[400px] bg-[#5c46e5]/10 blur-[100px] rounded-full pointer-events-none">
-        </div>
-
-        <div class="container mx-auto">
-            <!-- Section Title -->
-            <div class="text-center mb-20">
-                <h2 class="text-white text-3xl md:text-4xl font-extrabold">
-                    কেন আমাদের সিস্টেম বেছে নেবেন?
-                </h2>
-            </div>
-
-            <!-- Cards Container -->
-            <div class="flex flex-col gap-10">
-                <!-- Card 1: Super Fast Website -->
-                <div class="bg-white rounded-2xl p-8 md:p-14 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                    <div class="w-full lg:w-1/2 text-center lg:text-left">
-                        <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
-                            সুপার ফাস্ট ওয়েবসাইট
-                        </h3>
-                        <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
-                            আমাদের সিস্টেম হালকা ও অপ্টিমাইজড টেকনোলজিতে তৈরি, তাই আপনার
-                            ওয়েবসাইট ও সফটওয়্যার সবসময় দ্রুত লোড হয়। কাস্টমারদের জন্য
-                            স্মুথ এক্সপেরিয়েন্স নিশ্চিত করে এবং আপনার কনভার্সন রেট বাড়াতে
-                            সাহায্য করে।
-                        </p>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <img src="./assets/images/choose.jpg" class="w-full h-auto rounded-3xl shadow-lg"
-                            alt="Super Fast" />
-                    </div>
+    <!-- WHY CHOOSE US SECTION (Placement = 2) -->
+    @if ($features->where('placement', 2)->isNotEmpty())
+        <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
+            <div class="container mx-auto">
+                <div class="text-center mb-20">
+                    <h2 class="text-white text-3xl md:text-4xl font-extrabold">
+                        কেন আমাদের সিস্টেম বেছে নেবেন?
+                    </h2>
                 </div>
 
-                <!-- Card 2: Unlimited Landing Page -->
-                <div
-                    class="bg-white rounded-2xl p-8 md:p-14 flex flex-col lg:flex-row-reverse items-center gap-12 lg:gap-20">
-                    <div class="w-full lg:w-1/2 text-center lg:text-left">
-                        <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
-                            আনলিমিটেড ল্যান্ডিং পেজ
-                        </h3>
-                        <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
-                            আপনি চাইলে যত খুশি ল্যান্ডিং পেজ তৈরি করতে পারবেন—প্রতিটি
-                            প্রোডাক্ট, ক্যাম্পেইন বা অফারের জন্য আলাদা পেজ। কোনো লিমিট
-                            নেই, ফলে আপনার মার্কেটিং হবে আরও ফ্লেক্সিবল ও পাওয়ারফুল।
-                        </p>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <img src="./assets/images/choose.jpg" class="w-full h-auto rounded-3xl shadow-lg"
-                            alt="Landing Page" />
-                    </div>
+                <div class="flex flex-col gap-10">
+                    @foreach ($features->where('placement', 2) as $index => $benefit)
+                        <div
+                            class="bg-white rounded-2xl p-8 md:p-14 flex flex-col {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                            <div class="w-full lg:w-1/2 text-center lg:text-left">
+                                <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
+                                    {{ $benefit->title }}
+                                </h3>
+                                <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
+                                    {{ $benefit->description }}
+                                </p>
+                            </div>
+                            <div class="w-full lg:w-1/2">
+                                <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
+                                    class="w-full h-auto rounded-3xl shadow-lg" alt="{{ $benefit->title }}" />
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
 
-                <!-- Card 3: Easy Checkout System -->
-                <div class="bg-white rounded-2xl p-8 md:p-14 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                    <div class="w-full lg:w-1/2 text-center lg:text-left">
-                        <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
-                            ইজি চেকআউট সিস্টেম
-                        </h3>
-                        <p class="text-gray-600 text-lg leading-relaxed font-semibold max-w-xl">
-                            আপনি চাইলে যত খুশি ল্যান্ডিং পেজ তৈরি করতে পারবেন—প্রতিটি
-                            প্রোডাক্ট, ক্যাম্পেইন বা অফারের জন্য আলাদা পেজ। কোনো লিমিট
-                            নেই, ফলে আপনার মার্কেটিং হবে আরও ফ্লেক্সিবল ও পাওয়ারফুল।
-                        </p>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <img src="./assets/images/choose.jpg" class="w-full h-auto rounded-3xl shadow-lg"
-                            alt="Checkout" />
-                    </div>
-                </div>
-
-                <!-- NEW Card 4: Cost Effective Solution (Image Left, Text Right) -->
-                <div class="bg-white rounded-2xl p-8 md:p-14 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                    <div class="w-full lg:w-1/2">
-                        <img src="./assets/images/choose.jpg" class="w-full h-auto rounded-3xl shadow-lg"
-                            alt="Cost Effective" />
-                    </div>
-                    <div class="w-full lg:w-1/2 text-center lg:text-left">
-                        <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
-                            কস্ট ইফেক্টিভ সলিউশন
-                        </h3>
-                        <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
-                            আপনি চাইলে যত খুশি ল্যান্ডিং পেজ তৈরি করতে পারবেন—প্রতিটি
-                            প্রোডাক্ট, ক্যাম্পেইন বা অফারের জন্য আলাদা পেজ। কোনো লিমিট
-                            নেই, ফলে আপনার মার্কেটিং হবে আরও ফ্লেক্সিবল ও পাওয়ারফুল।
-                        </p>
-                    </div>
-                </div>
-
-                <!-- NEW Card 5: User-friendly Dashboard (Text Left, Image Right) -->
-                <div class="bg-white rounded-2xl p-8 md:p-14 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                    <div class="w-full lg:w-1/2 text-center lg:text-left">
-                        <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
-                            ইউজার-ফ্রেন্ডলি ড্যাশবোর্ড
-                        </h3>
-                        <p class="text-gray-600 text-lg leading-relaxed font-semibold max-w-xl">
-                            আপনি চাইলে যত খুশি ল্যান্ডিং পেজ তৈরি করতে পারবেন—প্রতিটি
-                            প্রোডাক্ট, ক্যাম্পেইন বা অফারের জন্য আলাদা পেজ। কোনো লিমিট
-                            নেই, ফলে আপনার মার্কেটিং হবে আরও ফ্লেক্সিবল ও পাওয়ারফুল।
-                        </p>
-                    </div>
-                    <div class="w-full lg:w-1/2">
-                        <img src="./assets/images/choose.jpg" class="w-full h-auto rounded-3xl shadow-lg"
-                            alt="Dashboard" />
-                    </div>
+                <div class="mt-28 text-center">
+                    <a href="#"
+                        class="inline-block bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
+                        ফ্রি ট্রায়াল শুরু করুন
+                    </a>
                 </div>
             </div>
-
-            <!-- FINAL CTA SECTION (ইমেজের নিচের টেক্সট এবং বাটন) -->
-            <div class="mt-28 text-center">
-                <h2 class="text-white text-2xl md:text-3xl font-semibold mb-10 leading-tight">
-                    একটি স্মার্ট সিস্টেম—যা আপনার ব্যবসাকে আরও দ্রুত, সহজ ও লাভজনক করে
-                    তোলে।
-                </h2>
-                <a href="#"
-                    class="inline-block bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
-                    ফ্রি ট্রায়াল শুরু করুন
-                </a>
-            </div>
-        </div>
-    </section>
+        </section>
+    @endif
     <!-- BLOG & INSIGHTS SECTION -->
     <section class="bg-white py-20 px-6 md:px-10">
         <div class="container mx-auto">
@@ -999,144 +798,109 @@
             </div>
         </div>
     </section>
-    <!-- TESTIMONIAL SECTION -->
-    <section class="bg-[#f9faff] py-20 px-6 md:px-10">
-        <div class="container mx-auto">
-            <!-- Section Header -->
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
-                    কাস্টমার রিভিউ
-                </span>
-                <h2 class="text-3xl md:text-5xl font-black text-gray-900">
-                    আমাদের গ্রাহকদের মতামত
-                </h2>
+    <!-- Review SECTION -->
+    @if ($allReviews->isNotEmpty())
+        <section class="bg-[#f9faff] py-20 px-6 md:px-10" id="reviews-section">
+            <div class="container mx-auto">
+                <div class="text-center mb-16">
+                    <span
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                        কাস্টমার রিভিউ
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-black text-gray-900">
+                        আমাদের গ্রাহকদের মতামত
+                    </h2>
+                </div>
+
+                <!-- Masonry Grid -->
+                <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="review-container">
+                    @foreach ($allReviews as $index => $review)
+                        {{-- শুরুতে ৬টার বেশি হলে 'hidden' ক্লাস পাবে --}}
+                        <div
+                            class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
+                            <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
+                                <div>
+                                    <h4 class="text-[#5c46e5] font-bold text-lg">
+                                        @ {{ $review->name }}
+                                    </h4>
+                                    <p class="text-gray-500 text-xs">{{ $review->designation }}</p>
+                                </div>
+                                <div class="flex items-center gap-1 text-gray-900 font-bold">
+                                    <i class="fa-solid fa-star text-[#fde047]"></i>
+                                    <span>{{ number_format($review->rating, 1) }}</span>
+                                </div>
+                            </div>
+
+                            @if ($review->review)
+                                <p class="text-gray-700 leading-relaxed text-[15px]">
+                                    “{{ $review->review }}”
+                                </p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- যদি রিভিউ ৬টার বেশি হয় তবেই বাটন দেখাবে --}}
+                @if ($allReviews->count() > 6)
+                    <div class="mt-16 text-center">
+                        <button id="load-more-reviews"
+                            class="inline-block bg-[#5c46e5] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                            আরও দেখুন
+                        </button>
+                    </div>
+                @endif
             </div>
-
-            <!-- Masonry Grid (ইমেজের মতো হুবহু লেআউট) -->
-            <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                <!-- Card 1 (Short) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 (Long - Content Added) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed text-[15px]">
-                        “এই সফটওয়্যার ব্যবহার করার পর আমার পুরো ব্যবসা অনেক সহজ হয়ে
-                        গেছে।” আগে আলাদা আলাদা সিস্টেম ব্যবহার করতাম, এখন সবকিছু এক
-                        জায়গায় পাচ্ছি— অর্ডার, স্টক, অ্যাকাউন্টিং সব। টাইম সেভ হচ্ছে
-                        আর ভুল কমে গেছে। “এই সফটওয়্যার ব্যবহার করার পর আমার পুরো ব্যবসা
-                        অনেক সহজ হয়ে গেছে।” আগে আলাদা আলাদা সিস্টেম ব্যবহার করতাম, এখন
-                        সবকিছু এক জায়গায় পাচ্ছি— অর্ডার, স্টক, অ্যাকাউন্টিং সব। টাইম
-                        সেভ হচ্ছে আর ভুল কমে গেছে।
-                    </p>
-                </div>
-
-                <!-- Card 3 (Short) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 (Medium) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed text-[15px]">
-                        অর্ডার, স্টক, অ্যাকাউন্টিং সব। টাইম সেভ হচ্ছে আর ভুল কমে গেছে।
-                        চমৎকার সিস্টেম!
-                    </p>
-                </div>
-
-                <!-- Card 5 (Long) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start mb-6">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                    <p class="text-gray-700 leading-relaxed text-[15px]">
-                        আগে আলাদা আলাদা সিস্টেম ব্যবহার করতাম, এখন সবকিছু এক জায়গায়
-                        পাচ্ছি— অর্ডার, স্টক, অ্যাকাউন্টিং সব। টাইম সেভ হচ্ছে আর ভুল কমে
-                        গেছে।
-                    </p>
-                </div>
-
-                <!-- Card 6 (Short) -->
-                <div
-                    class="break-inside-avoid bg-white border-1 border-indigo-100 p-8 rounded-2xl hover:shadow-md transition">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="text-[#5c46e5] font-bold text-lg">
-                                @ Foysal Mahmud
-                            </h4>
-                            <p class="text-gray-500 text-xs">CEO: uMart Bangladesh</p>
-                        </div>
-                        <div class="flex items-center gap-1 text-gray-900 font-bold">
-                            <i class="fa-regular fa-star"></i> <span>4.8</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom CTA Button -->
-            <div class="mt-16 text-center">
-                <a href="#"
-                    class="inline-block bg-[#5c46e5] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                    আরও দেখুন
-                </a>
-            </div>
-        </div>
-    </section>
+        </section>
+    @endif
 @endsection
+@push('scripts')
+    <script>
+        //review
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadMoreBtn = document.getElementById('load-more-reviews');
+            const itemsToShow = 6; // প্রতি ক্লিকে কয়টি করে নতুন রিভিউ দেখাবে
+
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', function() {
+                    // বর্তমানে লুকানো আছে এমন সব কার্ড খুঁজে বের করা
+                    const hiddenCards = document.querySelectorAll('.review-card.hidden');
+
+                    // পরবর্তী ৬টি কার্ড থেকে hidden ক্লাস সরিয়ে দেওয়া
+                    for (let i = 0; i < itemsToShow && i < hiddenCards.length; i++) {
+                        hiddenCards[i].classList.remove('hidden');
+                    }
+
+                    // যদি আর কোনো লুকানো কার্ড না থাকে, তবে বাটনটি হাইড করে দেওয়া
+                    if (document.querySelectorAll('.review-card.hidden').length === 0) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                });
+            }
+        });
+        //demo
+        function filterDemos(type, btn) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(b => {
+                b.classList.remove('bg-[#5c46e5]', 'text-white');
+                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#5c46e5]');
+            });
+
+            btn.classList.add('bg-[#5c46e5]', 'text-white');
+            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#5c46e5]');
+
+            const cards = document.querySelectorAll('.demo-card');
+            cards.forEach(card => {
+                if (card.getAttribute('data-type') == type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const firstTab = document.querySelector('.tab-btn');
+            if (firstTab) filterDemos(1, firstTab);
+        });
+    </script>
+@endpush

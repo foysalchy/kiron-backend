@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Saas;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreMasterBrandRequest extends FormRequest
 {
@@ -26,5 +28,33 @@ class StoreMasterBrandRequest extends FormRequest
             'logo' => 'nullable|image|max:2048',
             'link' => 'nullable|url',
         ];
+    }
+    /**
+     * Custom validation messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'The brand name is required.',
+            'name.string'   => 'The brand name must be a valid string.',
+            'logo.image'    => 'The logo must be an image file.',
+            'logo.mimes'    => 'The logo must be a file of type: jpeg, png, jpg, webp.',
+            'logo.max'      => 'The logo size should not exceed 2MB.',
+            'link.url'      => 'Please provide a valid URL for the brand link.',
+        ];
+    }
+
+    /**
+     * Handle a failed validation attempt for API response.
+     */
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422)
+        );
     }
 }

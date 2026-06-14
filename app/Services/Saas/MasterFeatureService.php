@@ -76,7 +76,7 @@ class MasterFeatureService
 
             $feature = MasterFeature::create($data);
 
-            LogHelper::created('master_feature', $feature->id, 0, $feature->title);
+            LogHelper::created('master_feature', $feature->id, null, $feature->title);
 
             DB::commit();
             Log::info('Master Feature created successfully', ['feature_id' => $feature->id]);
@@ -104,7 +104,7 @@ class MasterFeatureService
 
             $feature->update($data);
 
-            LogHelper::updated('master_feature', $feature->id, 0, $feature->title);
+            LogHelper::updated('master_feature', $feature->id, null, $feature->title);
             DB::commit();
             Log::info('Master Feature Updated Successfully', ['feature_id' => $feature->id]);
 
@@ -129,7 +129,7 @@ class MasterFeatureService
             $feature = $this->getFeatureById($id);
             $feature->delete();
 
-            LogHelper::deleted('master_feature', $feature->id, 0, $feature->title);
+            LogHelper::deleted('master_feature', $feature->id, null, $feature->title);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -155,7 +155,7 @@ class MasterFeatureService
             }
             $feature->restore();
 
-            LogHelper::restored('master_feature', $feature->id, 0, $feature->title);
+            LogHelper::restored('master_feature', $feature->id, null, $feature->title);
             DB::commit();
             return $feature;
         } catch (ApiException $e) {
@@ -185,7 +185,7 @@ class MasterFeatureService
             }
 
             $feature->forceDelete();
-            LogHelper::forceDeleted('master_feature', $id, 0, $feature->title);
+            LogHelper::forceDeleted('master_feature', $id, null, $feature->title);
             DB::commit();
             return true;
         } catch (ApiException $e) {
@@ -210,7 +210,7 @@ class MasterFeatureService
 
             $feature->update(['status' => $newStatus]);
 
-            LogHelper::statusChanged('master_feature', $feature->id, 0, $feature->title . ' to ' . $newStatus);
+            LogHelper::statusChanged('master_feature', $feature->id, null, $feature->title . ' to ' . $newStatus);
             DB::commit();
             return $feature;
         } catch (\Exception $e) {

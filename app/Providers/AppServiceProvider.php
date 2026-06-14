@@ -225,32 +225,66 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
-        if (!app()->runningInConsole()) {
-            if (request()->is('api/*')) {
-                return;
-            }
+        if (!app()->runningInConsole() && !request()->is('api/*')) {
 
+            $isSaasRoute = request()->routeIs('saas.*') || request()->is('saas*');
 
             $currentStore = getCurrentCompany();
 
-            if ($currentStore) {
-                $companyId = $currentStore->company_id;
+            $companyId = $isSaasRoute ? null : ($currentStore ? $currentStore->company_id : null);
 
-                $data = cache()->remember("store_{$companyId}", 600, fn() => [
-                    'setup'            => SiteSetting::where('company_id', $companyId)->first(),
-                    'headerCategories' => MegaCategory::where('company_id', $companyId)->where('status', 1)->latest()->take(5)->get(),
-                    'footerFeatures'   => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::PAGE_ALL)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                    'footerBottomRight' => ContentSetting::where('company_id', $companyId)->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                    'socialLinks'      => SocialSetting::where('company_id', $companyId)->where('status', Status::Active->value)->get(),
-                    'popularSearches'  => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
-                    'relatedProducts'  => Product::where('status', Status::Active->value)->where('company_id', $companyId)->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
-                    'themeColor' => Company::where('id', $companyId)->first(),
-                    'footerPages' => Page::where('company_id', $companyId)->where('status', Status::Active->value)->orderBy('sort_order')->get(),
-                ]);
+            $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
 
-                View::share($data);
-            }
+            $data = cache()->remember($cacheKey, 600, function () use ($companyId) {
+
+                /**
+                 * this function handle for all table
+                 */
+                $applyLogic = function ($model) use ($companyId) {
+                    if ($companyId) {
+                        //
+                        return $model::where(function ($q) use ($companyId) {
+                            $q->where('company_id', $companyId)->orWhereNull('company_id');
+                        })->orderByRaw('company_id IS NULL ASC');
+                    } else {
+                        // main page
+                        return $model::whereNull('company_id');
+                    }
+                };
+
+                return [
+                    'setup'             => $applyLogic(SiteSetting::class)->first(),
+
+                    'headerCategories'  => $applyLogic(MegaCategory::class)
+                        ->where('status', 1)->latest()->take(5)->get(),
+
+                    'footerFeatures'    => $applyLogic(ContentSetting::class)
+                        ->where('page_type', ContentSetting::PAGE_ALL)
+                        ->where('status', Status::Active->value)
+                        ->orderBy('sort_order')->get(),
+
+                    'footerBottomRight' => $applyLogic(ContentSetting::class)
+                        ->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)
+                        ->where('status', Status::Active->value)
+                        ->orderBy('sort_order')->get(),
+
+                    'socialLinks'       => $applyLogic(SocialSetting::class)
+                        ->where('status', Status::Active->value)->get(),
+
+                    'footerPages'       => $applyLogic(Page::class)
+                        ->where('status', Status::Active->value)
+                        ->orderBy('sort_order')->get(),
+
+                    // where is null company id
+                    'themeColor'        => $companyId ? Company::where('id', $companyId)->first() : null,
+
+                    // its for company
+                    'popularSearches'   => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
+                    'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+                ];
+            });
+
+            View::share($data);
         }
     }
 }

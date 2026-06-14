@@ -34,6 +34,9 @@ class SiteSetting extends Model
     ];
     protected $hidden = ['deleted_at'];
 
+
+    protected $appends = ['logo_url', 'favicon_url'];
+
     // Scopes
     public function scopeByCompany($query, int $companyId)
     {
