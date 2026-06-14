@@ -7,7 +7,7 @@ use App\Http\Requests\{HandleProductStockRequest, StoreProductRequest, UpdatePro
 use App\Services\ProductService;
 use App\Exceptions\ApiException;
 use App\Helpers\ResponseHelper;
-use App\Models\Barcode;
+use App\Models\BarCode as Barcode;
 use App\Models\Product;
 use App\Models\ProductVariation;
 use Illuminate\Http\{JsonResponse, Request};
