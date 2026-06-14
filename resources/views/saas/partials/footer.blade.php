@@ -29,12 +29,17 @@
          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
              <!-- Col 1: Logo & Socials -->
              <div class="space-y-6">
-                 <a href="/" class="flex items-center gap-2">
-                     <img src="{{ $setup->logo  ?? ''}}" alt="Shopify" class="h-8"
-                         onerror="
-                  this.src =
-                    'https://upload.wikimedia.org/wikipedia/commons/e/e1/Shopify_Logo.png'
-                " />
+                 <a href="{{ route('saas.index') }}" class="flex items-center gap-2"
+                     title="{{ $setup->shop_name ?? 'Home' }}">
+                     @if ($setup && $setup->logo_url)
+                         <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }} Logo"
+                             class="h-8 w-auto object-contain" fetchpriority="high" loading="eager"
+                             onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
+                     @else
+                         <span class="text-xl font-bold tracking-tight text-gray-900">
+                             {{ $setup->shop_name ?? 'Bhaiya Digital' }}
+                         </span>
+                     @endif
                  </a>
                  <p class="text-gray-400 leading-relaxed text-[15px]">
                      আপনার ব্যবসার সেলস, ইনভেন্টরি, অ্যাকাউন্টিং, CRM এবং
@@ -45,8 +50,7 @@
                          <a href="{{ $social->link ?? '#' }}" target="_blank"
                              class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
 
-                             <i
-                                 class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
+                             <i class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
                          </a>
                      @endforeach
                  </div>
@@ -107,8 +111,17 @@
                          <span>{{ $setup->email ?? 'hello@sopify.com' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-location-dot mt-1 text-[#5c46e5]"></i>
-                         <span>{{ $setup->corporate_address ?? 'প ২০৮/৩ দক্ষিণ বাড্ডা<br />ঢাকা -১২২২' }}</span>
+                         <div class="flex-shrink-0 w-5">
+                             <i class="fa-solid fa-location-dot mt-1.5 text-primary text-lg" aria-hidden="true"></i>
+                         </div>
+
+                         <address class="not-italic text-gray-400 leading-relaxed text-sm md:text-base">
+                             @if ($setup && $setup->corporate_address)
+                                 {!! $setup->corporate_address !!}
+                             @else
+                                 প ২০৮/৩ দক্ষিণ বাড্ডা <br /> ঢাকা -১২২২
+                             @endif
+                         </address>
                      </li>
                  </ul>
              </div>
@@ -116,7 +129,7 @@
 
          <!-- BOTTOM BAR -->
          <div
-             class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-500">
+             class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-500">
              <p>
                  © ২০২৬ <span class="text-white font-semibold"></span> সকল
                  স্বত্ব সংরক্ষিত।

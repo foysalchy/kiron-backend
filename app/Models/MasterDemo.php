@@ -11,7 +11,7 @@ class MasterDemo extends Model
 {
      use HasFactory, SoftDeletes;
 
-    protected $fillable = ['title', 'image', 'link', 'status'];
+    protected $fillable = ['title', 'image', 'link','type', 'status'];
 
     protected $hidden = ['deleted_at'];
 

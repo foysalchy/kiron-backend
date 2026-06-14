@@ -30,6 +30,7 @@ class StoreMasterDemoRequest extends FormRequest
             'title'  => 'required|string|max:255',
             'image'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'link'   => 'nullable|url',
+            'type'  => 'required|integer|in:1,2',
             'status' => 'nullable|integer',
         ];
     }
