@@ -31,15 +31,12 @@
              <div class="space-y-6">
                  <a href="{{ route('saas.index') }}" class="flex items-center gap-2"
                      title="{{ $setup->shop_name ?? 'Home' }}">
-                     @if ($setup && $setup->logo_url)
-                         <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }} Logo"
-                             class="h-8 w-auto object-contain" fetchpriority="high" loading="eager"
-                             onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
-                     @else
-                         <span class="text-xl font-bold tracking-tight text-gray-900">
-                             {{ $setup->shop_name ?? 'Bhaiya Digital' }}
-                         </span>
-                     @endif
+
+                     <img src="{{ $setup->logo_url ?? asset('images/saas/Shopify_Logo.png') }}"
+                         alt="{{ $setup->shop_name }} Logo" class="h-8 w-auto object-contain" fetchpriority="high"
+                         loading="eager"
+                         onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
+
                  </a>
                  <p class="text-gray-400 leading-relaxed text-[15px]">
                      আপনার ব্যবসার সেলস, ইনভেন্টরি, অ্যাকাউন্টিং, CRM এবং

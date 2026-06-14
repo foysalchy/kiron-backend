@@ -8,3 +8,5 @@ import 'swiper/css/bundle';
 window.$ = window.jQuery = $;
 window.toastr = toastr;
 window.Swiper = Swiper;
+
+

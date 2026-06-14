@@ -16,87 +16,108 @@
             background-size: 40px 40px;
             pointer-events: none;
         }
+
+        /* --- ডট ডিজাইনের কাস্টম CSS --- */
+        .hero-pagination .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3) !important;
+            opacity: 1 !important;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        /* একটিভ ডটটি বড় (লম্বা) হবে */
+        .hero-pagination .swiper-pagination-bullet-active {
+            width: 40px !important;
+            background: #ffffff !important;
+            border-radius: 20px;
+        }
     </style>
     <!-- HERO SECTION -->
-    @if ($slider)
-        <section class="hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
-            <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                <!-- Left Side: Content -->
-                <div class="text-center lg:text-left order-2 lg:order-1">
-                    <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                        {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
-                    </h1>
-                    <p class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
-                        {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
-                    </p>
-
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start">
-                        <a href="#"
-                            class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                            ফ্রি ট্রায়াল শুরু করুন
-                        </a>
-                        <a href="#"
-                            class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
-                            ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
-                        </a>
-                    </div>
-
-                    <!-- Pagination Dots -->
-                    <div class="flex items-center justify-center lg:justify-start gap-2 mt-12 md:mt-16">
-                        <span class="w-10 h-2.5 bg-white rounded-full"></span>
-                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                        <span class="w-2.5 h-2.5 bg-white/30 rounded-full"></span>
-                    </div>
-                </div>
-
-                <!-- Right Side: Interactive Graphics -->
-                <div class="relative flex justify-center items-center order-1 lg:order-2 py-20">
-                    <!-- Dashed Circles -->
+    @if ($sliders->isNotEmpty())
+        <section class="swiper heroSwiper relative overflow-hidden">
+            <div class="swiper-wrapper">
+                @foreach ($sliders as $slider)
                     <div
-                        class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
-                    </div>
-                    <div
-                        class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
-                    </div>
-                    <div
-                        class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
-                    </div>
+                        class="swiper-slide hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
+                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-                    <!-- Central White Box Logo -->
-                    <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
-                        <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                            class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
-                    </div>
+                            <!-- Left Side: Content -->
+                            <div class="text-center lg:text-left order-2 lg:order-1">
+                                <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
+                                    {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                                </h1>
+                                <p
+                                    class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
+                                    {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                                </p>
 
-                    <!-- --- CUSTOMER REVIEW SECTION --- -->
-                    <div class="absolute -bottom-10 md:-bottom-10 flex flex-col items-center">
-                        <!-- SVG Arrow (Existing) -->
-                        <svg class="w-12 h-16 md:w-16 md:h-24 text-white/40 mb-2" viewBox="0 0 50 100" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path d="M10 5C25 35 35 65 30 90" stroke="currentColor" stroke-width="4.5"
-                                stroke-linecap="round" />
-                            <path d="M22 82L30 92L40 84" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg>
+                                <!-- Action Buttons -->
+                                <div
+                                    class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
+                                    <a href="#"
+                                        class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                                        ফ্রি ট্রায়াল শুরু করুন
+                                    </a>
+                                    <a href="#"
+                                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
+                                        ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
+                                    </a>
+                                </div>
 
-                        <!-- Rating & Text -->
-                        <div class="flex items-center gap-2">
-                            <span class="text-[#fde047] text-xl md:text-2xl">★</span>
+                                <!-- এখান থেকে hero-pagination ডিভটি সরিয়ে নিচে নেওয়া হয়েছে -->
+                            </div>
 
-                            <span class="text-[#fde047] font-bold text-lg md:text-2xl">
-                                {{ number_format($avgRating, 1) }}
-                            </span>
+                            <!-- Right Side: Graphics -->
+                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-20">
+                                <div
+                                    class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
+                                </div>
 
-                            <a href="#reviews-section"
-                                class="text-gray-300 text-sm md:text-xl underline decoration-gray-500 underline-offset-8 hover:text-white transition font-medium">
-                                {{ $totalReviews }}+ কাস্টমার রিভিউ
-                            </a>
+                                <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
+                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
+                                        class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
+                                </div>
+
+                                <!-- CUSTOMER REVIEW -->
+                                <div class="absolute -bottom-10 md:-bottom-10 flex flex-col items-center">
+                                    <svg class="w-12 h-16 md:w-16 md:h-24 text-white/40 mb-2" viewBox="0 0 50 100"
+                                        fill="none">
+                                        <path d="M10 5C25 35 35 65 30 90" stroke="currentColor" stroke-width="4.5"
+                                            stroke-linecap="round" />
+                                        <path d="M22 82L30 92L40 84" stroke="currentColor" stroke-width="3.5"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[#fde047] text-xl md:text-2xl">★</span>
+                                        <span
+                                            class="text-[#fde047] font-bold text-lg md:text-2xl">{{ number_format($avgRating, 1) }}</span>
+                                        <a href="#reviews-section"
+                                            class="text-gray-300 text-sm md:text-xl underline decoration-gray-500 underline-offset-8 hover:text-white transition font-medium">
+                                            {{ $totalReviews }}+ কাস্টমার রিভিউ
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                @endforeach
+            </div>
+            <div class="container mx-auto px-6 relative">
+                <div
+                    class="hero-pagination absolute bottom-12 md:bottom-20 left-6 flex items-center justify-center lg:justify-start gap-2 z-50">
                 </div>
             </div>
+
+
         </section>
     @endif
     <!-- LOGO SHOWCASE SECTION -->
@@ -351,113 +372,53 @@
             </div>
         </section>
     @endif
+    @php
+        $badges = [
+            'ফিটনেস',
+            'গিফট আইটেম',
+            'অর্গানিক ফুড',
+            'গ্যাজেট',
+            'ইলেক্ট্রনিক্স',
+            'প্রসাধনী',
+            'হোম ডেকোর',
+            'ইসলামিক',
+        ];
+
+        $rows = [
+            ['class' => 'animate-scroll-left', 'data' => $badges, 'style' => ''],
+            ['class' => 'animate-scroll-right', 'data' => collect($badges)->reverse()->all(), 'style' => ''],
+            [
+                'class' => 'animate-scroll-left',
+                'data' => collect($badges)->shuffle()->all(),
+                'style' => 'animation-duration: 35s',
+            ],
+        ];
+    @endphp
+
     <!-- INFINITY LOOP SECTION -->
     <section class="bg-white py-10 overflow-hidden scroll-container">
         <div class="space-y-6">
-            <!-- Row 1: Moving Left -->
-            <div class="animate-scroll-left flex gap-4">
-                <!-- Badges (Repeat twice for seamless loop) -->
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
-                </div>
-                <!-- Duplicate for Loop -->
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
-                </div>
-            </div>
 
-            <!-- Row 2: Moving Right -->
-            <div class="animate-scroll-right flex gap-4">
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                </div>
-                <!-- Duplicate for Loop -->
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                </div>
-            </div>
+            @foreach ($rows as $row)
+                <div class="{{ $row['class'] }} flex gap-4" style="{{ $row['style'] }}">
 
-            <!-- Row 3: Moving Left (Faster) -->
-            <div class="animate-scroll-left flex gap-4" style="animation-duration: 35s">
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
+                    @foreach ([1, 2] as $repeat)
+                        <div class="flex gap-4">
+                            @foreach ($row['data'] as $item)
+                                <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">
+                                    {{ $item }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endforeach
+
                 </div>
-                <!-- Duplicate for Loop -->
-                <div class="flex gap-4">
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ফিটনেস</span>
-                    <span
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইলেক্ট্রনিক্স</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">প্রসাধনী</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">হোম
-                        ডেকোর</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গিফট
-                        আইটেম</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">অর্গানিক
-                        ফুড</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">গ্যাজেট</span>
-                    <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">ইসলামিক</span>
-                </div>
-            </div>
+            @endforeach
+
         </div>
     </section>
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
-        <!-- Background Radial Glow (ঐচ্ছিক: ইমেজের মতো ডান কোণায় হালকা আভা) -->
         <div
             class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5c46e5]/10 blur-[120px] rounded-full pointer-events-none">
         </div>
@@ -565,18 +526,19 @@
                     অপারেশন থেকে গ্রোথ — সবকিছু এক সিস্টেমে
                 </h2>
 
-                <!-- Segmented Tabs -->
-                <div
-                    class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-md">
-                    <button class="flex-1 bg-[#5c46e5] text-white px-4 py-2.5 rounded-xl font-bold text-sm md:text-base">
+                <!-- Segmented Tabs (ক্লিকেবল করা হয়েছে) -->
+                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-md"
+                    id="solution-tabs">
+                    <button onclick="switchSolution('ecommerce', this)"
+                        class="sol-tab-btn flex-1 bg-[#5c46e5] text-white px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all">
                         ই-কমার্স
                     </button>
-                    <button
-                        class="flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition">
+                    <button onclick="switchSolution('corporate', this)"
+                        class="sol-tab-btn flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
                         কর্পোরেট
                     </button>
-                    <button
-                        class="flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition">
+                    <button onclick="switchSolution('pos', this)"
+                        class="sol-tab-btn flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
                         POS
                     </button>
                 </div>
@@ -587,13 +549,12 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <!-- Left: Text Content -->
                     <div class="order-2 lg:order-1">
-                        <h3 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6">
+                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6">
                             ই-কমার্স সলিউশন
                         </h3>
-                        <p class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md">
-                            আপনার অনলাইন স্টোরের প্রতিটি ভিজিটরকে দিন প্রিমিয়াম
-                            এক্সপেরিয়েন্স। অটোমেটেড অর্ডার এবং ইনভেন্টরি ম্যানেজমেন্ট এখন
-                            হাতের মুঠোয়।
+                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md">
+                            আপনার অনলাইন স্টোরের প্রতিটি ভিজিটরকে দিন প্রিমিয়াম এক্সপেরিয়েন্স। অটোমেটেড অর্ডার এবং ইনভেন্টরি
+                            ম্যানেজমেন্ট এখন হাতের মুঠোয়।
                         </p>
 
                         <!-- Feature List -->
@@ -601,16 +562,16 @@
                             <div class="flex items-center gap-4 group">
                                 <div
                                     class="w-8 h-8 bg-[#5c46e5] rounded-lg flex items-center justify-center text-white shadow-sm">
-                                    <i class="fa-solid fa-display text-sm"></i>
+                                    <i id="sol-icon-1" class="fa-solid fa-display text-sm"></i>
                                 </div>
-                                <span class="font-bold text-gray-900 text-lg">ওয়েবসাইট ইন্টিগ্রেশন</span>
+                                <span id="sol-feat-1" class="font-bold text-gray-900 text-lg">ওয়েবসাইট ইন্টিগ্রেশন</span>
                             </div>
                             <div class="flex items-center gap-4 group">
                                 <div
                                     class="w-8 h-8 bg-[#5c46e5] rounded-lg flex items-center justify-center text-white shadow-sm">
-                                    <i class="fa-brands fa-apple text-lg"></i>
+                                    <i id="sol-icon-2" class="fa-brands fa-apple text-lg"></i>
                                 </div>
-                                <span class="font-bold text-gray-900 text-lg">মোবাইল অ্যাপ সাপোর্ট</span>
+                                <span id="sol-feat-2" class="font-bold text-gray-900 text-lg">মোবাইল অ্যাপ সাপোর্ট</span>
                             </div>
                         </div>
 
@@ -632,25 +593,21 @@
                                     <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
                                     <span class="w-3 h-3 bg-green-400 rounded-full"></span>
                                 </div>
-                                <div class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">
-                                    dashboard_preview_v2
+                                <div id="sol-mockup-header"
+                                    class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">
+                                    ecommerce_preview_v2
                                 </div>
                             </div>
 
-                            <!-- Browser Content (Dashboard Skeleton) -->
-                            <div class="p-6 bg-white min-h-[300px]">
-                                <div class="grid grid-cols-4 gap-4 mb-6">
-                                    <div class="h-20 bg-indigo-50 rounded-xl"></div>
-                                    <div class="h-20 bg-gray-50 rounded-xl"></div>
-                                    <div class="h-20 bg-gray-50 rounded-xl"></div>
-                                    <div class="h-20 bg-gray-50 rounded-xl"></div>
-                                </div>
-                                <div class="h-4 w-1/3 bg-gray-100 rounded mb-3"></div>
-                                <div class="h-4 w-1/2 bg-gray-50 rounded mb-8"></div>
+                            <!-- Browser Content: এখানে ইমেজ বসবে -->
+                            <div class="relative bg-gray-100 aspect-video overflow-hidden">
+                                <img id="sol-img" src="{{ asset('images/saas/ss.png') }}"
+                                    class="w-full h-full object-cover object-top transition-all duration-500 group-hover:scale-105"
+                                    alt="Dashboard Preview">
 
+                                <!-- ইমেজের ওপর হালকা ওভারলে (ঐচ্ছিক, প্রিভিউ সুন্দর দেখানোর জন্য) -->
                                 <div
-                                    class="border-2 border-dashed border-gray-100 rounded-2xl h-40 flex items-center justify-center">
-                                    <span class="text-gray-300 font-bold text-xl">Ecommerce Preview</span>
+                                    class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none">
                                 </div>
                             </div>
                         </div>
@@ -700,104 +657,64 @@
         </section>
     @endif
     <!-- BLOG & INSIGHTS SECTION -->
-    <section class="bg-white py-20 px-6 md:px-10">
-        <div class="container mx-auto">
-            <!-- Section Header -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
-                <h2 class="text-2xl md:text-4xl font-black text-gray-900">
-                    ব্লগ ও ইনসাইটস
-                </h2>
-                <a href="#"
-                    class="bg-[#5c46e5] text-white px-8 py-3 rounded-xl font-bold text-lg flex items-center gap-2 hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                    আরও পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
-                </a>
-            </div>
-
-            <!-- Blog Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Blog Card 1 -->
-                <div
-                    class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300">
-                    <!-- Image Placeholder -->
-                    <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
-                        <!-- আসল ইমেজ থাকলে এখানে বসাবেন -->
-                        <!-- <img src="your-image.jpg" class="w-full h-full object-cover"> -->
-                    </div>
-
-                    <!-- Content Area -->
-                    <div class="p-6 md:p-8">
-                        <!-- Meta info -->
-                        <div class="flex justify-between items-center mb-5">
-                            <span class="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-xs font-bold">
-                                ব্যবসা
-                            </span>
-                            <div class="flex items-center gap-2 text-[#5c46e5] text-sm font-bold">
-                                <i class="fa-regular fa-clock"></i>
-                                <span>৫ মিনিট</span>
-                            </div>
-                        </div>
-
-                        <!-- Headline -->
-                        <h3 class="text-xl md:text-2xl font-semibold text-gray-900 mb-8 leading-tight">
-                            কন্টেন্ট ওয়ার্কফ্লো: প্রসেস, স্টেপস এবং ব্যবসার জন্য এর
-                            সুবিধা।
-                        </h3>
-
-                        <!-- Read More Link -->
-                        <a href="#"
-                            class="inline-flex items-center gap-2 text-[#5c46e5] font-bold text-lg group-hover:gap-3 transition-all">
-                            বিস্তারিত পড়ুন
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
-                    </div>
+    @if ($blogs->isNotEmpty())
+        <section class="bg-white py-20 px-6 md:px-10">
+            <div class="container mx-auto">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
+                    <h2 class="text-2xl md:text-4xl font-black text-gray-900">ব্লগ ও ইনসাইটস</h2>
+                    <a href=""
+                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        আরও পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
                 </div>
 
-                <!-- Blog Card 2 (Same as Card 1) -->
-                <div
-                    class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300">
-                    <div class="aspect-[16/10] bg-[#eef2ff]"></div>
-                    <div class="p-6 md:p-8">
-                        <div class="flex justify-between items-center mb-5">
-                            <span class="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-xs font-bold">ব্যবসা</span>
-                            <div class="flex items-center gap-2 text-[#5c46e5] text-sm font-bold">
-                                <i class="fa-regular fa-clock"></i><span>৫ মিনিট</span>
-                            </div>
-                        </div>
-                        <h3 class="text-xl md:text-2xl font-semibold text-gray-900 mb-8 leading-tight">
-                            কন্টেন্ট ওয়ার্কফ্লো: প্রসেস, স্টেপস এবং ব্যবসার জন্য এর
-                            সুবিধা।
-                        </h3>
-                        <a href="#"
-                            class="inline-flex items-center gap-2 text-[#5c46e5] font-bold text-lg group-hover:gap-3 transition-all">
-                            বিস্তারিত পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
-                    </div>
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach ($blogs as $blog)
+                        <div
+                            class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
-                <!-- Blog Card 3 (Same as Card 1) -->
-                <div
-                    class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300">
-                    <div class="aspect-[16/10] bg-[#eef2ff]"></div>
-                    <div class="p-6 md:p-8">
-                        <div class="flex justify-between items-center mb-5">
-                            <span class="bg-gray-100 text-gray-700 px-4 py-1 rounded-full text-xs font-bold">ব্যবসা</span>
-                            <div class="flex items-center gap-2 text-[#5c46e5] text-sm font-bold">
-                                <i class="fa-regular fa-clock"></i><span>৫ মিনিট</span>
+                            <a href="" class="group block overflow-hidden rounded-xl">
+                                <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
+                                    <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}"
+                                        alt="{{ $blog->title }}"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                </div>
+                            </a>
+
+                            <div class="p-6 md:p-8 flex flex-col flex-grow">
+                                <div class="flex justify-between items-center mb-5">
+                                    <span
+                                        class="bg-indigo-50 text-[#5c46e5] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        {{ $blog->company->shop_name ?? 'অ্যাডমিন' }}
+                                    </span>
+                                    <div class="flex items-center gap-2 text-gray-400 text-sm font-bold">
+                                        <i class="fa-regular fa-clock"></i>
+                                        <span>{{ $blog->reading_time ?? '' }} মিনিট</span>
+                                    </div>
+                                </div>
+
+                                <h3
+                                    class="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight line-clamp-2">
+                                    {{ $blog->title ?? '' }}
+                                </h3>
+
+                                <p class="text-gray-500 text-sm mb-8 line-clamp-3">
+                                    {{ $blog->short ?? '' }}
+                                </p>
+
+                                <div class="mt-auto pt-5 border-t border-gray-50">
+                                    <a href=""
+                                        class="inline-flex items-center gap-2 text-[#5c46e5] font-bold text-lg group-hover:gap-3 transition-all">
+                                        বিস্তারিত পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                        <h3 class="text-xl md:text-2xl font-semibold text-gray-900 mb-8 leading-tight">
-                            কন্টেন্ট ওয়ার্কফ্লো: প্রসেস, স্টেপস এবং ব্যবসার জন্য এর
-                            সুবিধা।
-                        </h3>
-                        <a href="#"
-                            class="inline-flex items-center gap-2 text-[#5c46e5] font-bold text-lg group-hover:gap-3 transition-all">
-                            বিস্তারিত পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
-                    </div>
+                    @endforeach
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
     <!-- Review SECTION -->
     @if ($allReviews->isNotEmpty())
         <section class="bg-[#f9faff] py-20 px-6 md:px-10" id="reviews-section">
@@ -854,6 +771,87 @@
     @endif
 @endsection
 @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelector('.heroSwiper')) {
+                new Swiper('.heroSwiper', {
+                    loop: true,
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                    },
+                    speed: 1000,
+                    pagination: {
+                        el: '.hero-pagination',
+                        clickable: true, // ডটস ক্লিক করলে স্লাইড চেঞ্জ হবে
+                    },
+                });
+            }
+        });
+
+        function switchSolution(type, btn) {
+            // ১. বাটনের কালার পরিবর্তন
+            const buttons = document.querySelectorAll('.sol-tab-btn');
+            buttons.forEach(b => {
+                b.classList.remove('bg-[#5c46e5]', 'text-white');
+                b.classList.add('bg-indigo-100', 'text-gray-900', 'hover:bg-white');
+            });
+            btn.classList.add('bg-[#5c46e5]', 'text-white');
+            btn.classList.remove('bg-indigo-100', 'text-gray-900', 'hover:bg-white');
+
+            // ২. ডাইনামিক ডাটা (ইমেজসহ)
+            const data = {
+                ecommerce: {
+                    title: 'ই-কমার্স সলিউশন',
+                    desc: 'আপনার অনলাইন স্টোরের প্রতিটি ভিজিটরকে দিন প্রিমিয়াম এক্সপেরিয়েন্স। অটোমেটেড অর্ডার এবং ইনভেন্টরি ম্যানেজমেন্ট এখন হাতের মুঠোয়।',
+                    feat1: 'ওয়েবসাইট ইন্টিগ্রেশন',
+                    feat2: 'মোবাইল অ্যাপ সাপোর্ট',
+                    icon1: 'fa-solid fa-display',
+                    icon2: 'fa-brands fa-apple',
+                    mockupHeader: 'ecommerce_preview_v2',
+                    image: "{{ asset('images/saas/ss2.png') }}"
+                },
+                corporate: {
+                    title: 'কর্পোরেট সলিউশন',
+                    desc: 'বড় প্রতিষ্ঠানের জন্য ইন্টারনাল অপারেশন ম্যানেজমেন্ট সিস্টেম। এইচআর, পেরোল এবং অ্যাডভান্সড রিপোর্টিং এর কমপ্লিট সমাধান।',
+                    feat1: 'এমপ্লয়ি ম্যানেজমেন্ট',
+                    feat2: 'অ্যাডভান্সড অ্যানালিটিক্স',
+                    icon1: 'fa-solid fa-users-gear',
+                    icon2: 'fa-solid fa-chart-line',
+                    mockupHeader: 'corporate_system_v1',
+                    image: "{{ asset('images/saas/ss1.png') }}"
+                },
+                pos: {
+                    title: 'সুপার ফাস্ট POS',
+                    desc: 'অফলাইন এবং অনলাইন স্টোরের জন্য ক্লাউড বেসড পয়েন্ট অফ সেল। কয়েক সেকেন্ডে ইনভয়েস প্রিন্ট এবং স্টক আপডেট করুন।',
+                    feat1: 'ইনভেন্টরি ট্র্যাকিং',
+                    feat2: 'বারকোড স্ক্যানার সাপোর্ট',
+                    icon1: 'fa-solid fa-barcode',
+                    icon2: 'fa-solid fa-receipt',
+                    mockupHeader: 'pos_terminal_v3',
+                    image: "{{ asset('images/saas/ss.png') }}"
+                }
+            };
+
+            const content = data[type];
+            document.getElementById('sol-title').innerText = content.title;
+            document.getElementById('sol-desc').innerText = content.desc;
+            document.getElementById('sol-feat-1').innerText = content.feat1;
+            document.getElementById('sol-feat-2').innerText = content.feat2;
+            document.getElementById('sol-mockup-header').innerText = content.mockupHeader;
+
+            const imgElement = document.getElementById('sol-img');
+            imgElement.style.opacity = '0'; // ফেইড আউট
+            setTimeout(() => {
+                imgElement.src = content.image;
+                imgElement.style.opacity = '1'; // ফেইড ইন
+            }, 200);
+
+            // আইকন পরিবর্তন
+            document.getElementById('sol-icon-1').className = content.icon1 + " text-sm";
+            document.getElementById('sol-icon-2').className = content.icon2 + " text-lg";
+        }
+    </script>
     <script>
         //review
         document.addEventListener('DOMContentLoaded', function() {
