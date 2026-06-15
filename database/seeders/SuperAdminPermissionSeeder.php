@@ -81,8 +81,8 @@ class SuperAdminPermissionSeeder extends Seeder
 
         // ── Marketing ──────────────────────────────────────
         $addCrud('marketing_coupons',        'Marketing Coupons');
-        $addCrud('marketing_email',          'Marketing Email');
-        $addCrud('marketing_sms',            'Marketing SMS');
+        $addCrud('super_admin_email',          'Marketing Email');
+        $addCrud('super_admin_sms',            'Marketing SMS');
 
         // ── Settings (courier ❌ themes ❌ removed) ─────────
         $addCrud('site_settings',            'Site Settings');

@@ -130,6 +130,8 @@ use App\Http\Controllers\Api\StockAdjustmentController;
 use App\Http\Controllers\Api\StockMovementRequestController;
 use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\SuperAdminEmailSendController;
+use App\Http\Controllers\Api\SuperAdminSmsSendController;
 use App\Http\Controllers\Api\SupportDepartmentController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\Api\TaxGroupController;
@@ -1517,6 +1519,16 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/sms-packages', SmsPackageController::class);
         Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);
         Route::post('/sms-recharges/{id}/process', [SmsRechargeController::class, 'process']);
+
+        Route::middleware(['super_admin'])->group(function () {
+            Route::prefix('super-admin')->group(function () {
+                Route::get('/options/companies', [SelectOptionController::class, 'companies']);
+                Route::get('/email-sends',  [SuperAdminEmailSendController::class, 'index']);
+                Route::post('/email-sends', [SuperAdminEmailSendController::class, 'store']);
+                Route::get('/sms-sends',  [SuperAdminSmsSendController::class, 'index']);
+                Route::post('/sms-sends', [SuperAdminSmsSendController::class, 'store']);
+            });
+        });
     });
     //bkash route
     Route::prefix('bkash')->group(function () {
