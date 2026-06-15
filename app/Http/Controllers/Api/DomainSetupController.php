@@ -52,7 +52,6 @@ class DomainSetupController extends Controller
         // dd($request);
         $result = $this->domainService->saveMultiDomain($request->only('domain'));
 
-        // ✅ এই check টাই ছিল না
         if (!$result['success']) {
             return response()->json([
                 'message' => $result['message'],

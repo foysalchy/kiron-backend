@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/saas', [SaasIndexController::class,'home'])->name('saas.index');
 
 
 
@@ -89,3 +88,4 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
+Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');

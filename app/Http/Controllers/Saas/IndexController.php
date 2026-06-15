@@ -17,11 +17,11 @@ class IndexController extends Controller
     public function home()
     {
         $sliders = Slider::withoutCompanyScope()
-        ->where('status', Status::Active->value)
-        ->where('placement', 'hero')
-        ->whereNull('company_id')
-        ->latest()
-        ->get();
+            ->where('status', Status::Active->value)
+            ->where('placement', 'hero')
+            ->whereNull('company_id')
+            ->latest()
+            ->get();
         $brands = MasterBrand::where('status', Status::Active->value)
             ->latest()
             ->get();

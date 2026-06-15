@@ -1,4 +1,4 @@
-@props(['product'])
+@props(['product', 'company'])
 
 @php
     // 1. Wishlist logic
@@ -74,18 +74,18 @@
                 {{ $product->title }}
             </h3>
         </a>
-
-        <!-- Dynamic Star Rating -->
-        <div class="flex items-center gap-1 mb-2">
-            <div class="flex text-yellow-500 text-xs">
-                @for ($i = 1; $i <= 5; $i++)
-                    <i
-                        class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
-                @endfor
+        @if ($company->is_review == 1)
+            <!-- Dynamic Star Rating -->
+            <div class="flex items-center gap-1 mb-2">
+                <div class="flex text-yellow-500 text-xs">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <i
+                            class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
+                    @endfor
+                </div>
+                <span class="text-[10px] text-gray-400 font-medium">({{ $totalReviews }})</span>
             </div>
-            <span class="text-[10px] text-gray-400 font-medium">({{ $totalReviews }})</span>
-        </div>
-
+        @endif
         <!-- Price Section -->
         <div class="flex items-center gap-2 mb-3 ">
             @if ($regularPrice > $salePrice)
@@ -93,7 +93,7 @@
                     {{ $setup->currency }} {{ number_format($regularPrice) }}
                 </span>
             @endif
-            <span class="text-[var(--primary-color)] text-[18px]  hind-siliguri-bold">
+            <span class="text-primary text-[18px]  hind-siliguri-bold">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
         </div>
@@ -103,8 +103,9 @@
         <!-- Order Now Button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
-            class="flex-grow primary-bg text-primary py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
-            {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'primary-bg-hover' }}">
+            class="flex-grow py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer
+    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'primary-bg text-primary primary-bg-hover' }}">
+
             @if ($isOutOfStock)
                 Stock Out
             @else
@@ -162,7 +163,7 @@
             }
 
             function openVariationModal(id, isOrderNow = false) {
-                isOrderNowGlobal = isOrderNow; 
+                isOrderNowGlobal = isOrderNow;
 
                 const modal = document.getElementById('variation-modal');
                 const contentArea = document.getElementById('modal-content-area');

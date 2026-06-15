@@ -1,4 +1,4 @@
-@props(['product'])
+@props(['product', 'company'])
 
 @php
     $isWishlisted = false;
@@ -71,21 +71,23 @@
             $totalReviews = $product->reviews_count ?? 0;
 
         @endphp
-        <div class="flex items-center gap-1 mb-2">
-            <div class="flex text-yellow-500 text-xs">
-                @for ($i = 1; $i <= 5; $i++)
-                    <i
-                        class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
-                @endfor
+        @if ($company->is_review == 1)
+            <div class="flex items-center gap-1 mb-2">
+                <div class="flex text-yellow-500 text-xs">
+                    @for ($i = 1; $i <= 5; $i++)
+                        <i
+                            class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
+                    @endfor
+                </div>
+                <span class="text-xs text-gray-600 font-bold">({{ $totalReviews }})</span>
             </div>
-            <span class="text-xs text-gray-600 font-bold">({{ $totalReviews }})</span>
-        </div>
+        @endif
     </div>
 
     <!-- Price & Button -->
     <div class="mt-auto pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
-            <span class="text-md font-medium text-[var(--primary-color)] truncate">
+            <span class="text-md font-medium text-primary truncate">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
             @if ($regularPrice > $salePrice)
@@ -98,15 +100,15 @@
             $isOutOfStock = $product->available_stock <= 0;
         @endphp
 
-        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="out of stock"
+        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="flex-1 primary-bg text-primary px-3 py-2 rounded-lg text-sm font-medium transition-all shrink-0 whitespace-nowrap
-    {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00] cursor-pointer' }}">
+            class="flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all shrink-0 whitespace-nowrap
+    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'primary-bg text-primary hover:bg-[#BD4F00] cursor-pointer' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle mr-1"></i> Stock Out
             @else
-                Add to Cart
+                <i class="fas fa-shopping-cart mr-1 text-xs"></i> Add to Cart
             @endif
         </button>
 
