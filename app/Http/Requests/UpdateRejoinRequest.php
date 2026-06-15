@@ -22,7 +22,7 @@ class UpdateRejoinRequest extends UpdateBaseCompanyRequest
             [
                 'employee_id'        => ['sometimes', 'exists:employees,id'],
                 'rejoin_date'        => ['sometimes', 'date'],
-                'appointment_letter' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+                'appointment_letter' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:2048'],
             ]
         );
     }

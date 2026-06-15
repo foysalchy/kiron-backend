@@ -68,7 +68,32 @@ class FileUploadHelper
         }
     }
 
+    public static function copyFile(string $sourcePath, string $destinationFolder, string $disk = 'r2'): string
+    {
+        try {
+            $filename = 'copy_' . time() . '_' . uniqid() . '_' . basename($sourcePath);
+            $destinationPath = $destinationFolder . '/' . $filename;
 
+            $fileContent = Storage::disk($disk)->get($sourcePath);
+
+            if ($fileContent === null) {
+                throw ApiException::badRequest('Source file not found: ' . $sourcePath);
+            }
+
+            Storage::disk($disk)->put($destinationPath, $fileContent);
+
+            return $destinationPath;
+        } catch (ApiException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('File copy failed', [
+                'source'      => $sourcePath,
+                'destination' => $destinationFolder,
+                'error'       => $e->getMessage(),
+            ]);
+            throw ApiException::serverError('Failed to copy file');
+        }
+    }
     public static function uploadWithCustomName(
         UploadedFile $file,
         string $folder,

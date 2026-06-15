@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\{StoreCompanyRequest, UpdateCompanyRequest};
 use App\Services\CompanyService;
 use App\Exceptions\ApiException;
+use App\Helpers\FileUploadHelper;
 use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\CompanyUpdateRequest;
@@ -86,7 +87,7 @@ class CompanyController extends Controller
     {
         $data = $request->validate([
             'name'  => 'nullable|string|max:255',
-            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
             'note'  => 'nullable|string|max:500',
@@ -100,13 +101,13 @@ class CompanyController extends Controller
     {
         $data = $request->validate([
             'name'  => 'nullable|string|max:255',
-            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'email' => 'nullable|email',
             'phone' => 'nullable|string|max:20',
             'note'  => 'nullable|string|max:500',
         ]);
 
-        $company = $this->companyService->updateUpdateRequest($id,$data);
+        $company = $this->companyService->updateUpdateRequest($id, $data);
 
         return ResponseHelper::success($company, 'Company updated request successfully');
     }
@@ -143,7 +144,7 @@ class CompanyController extends Controller
 
         return response()->json(['message' => 'Request rejected.']);
     }
-    public function upgradeSubscription(Request $request, int $id): JsonResponse
+    public function upgradeSubscriptionSuperAdmin(Request $request, int $id): JsonResponse
     {
         $data = $request->validate([
             'pricing_package_id' => 'required|exists:pricing_packages,id',
@@ -188,6 +189,88 @@ class CompanyController extends Controller
             ]);
             $company->pricing_package_id = $package->id;
             $company->update();
+        });
+
+        return response()->json(['message' => 'Package upgraded successfully.']);
+    }
+    public function upgradeSubscription(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'pricing_package_id'  => 'required|exists:pricing_packages,id',
+            'billing_cycle'       => 'required|in:monthly,quarterly,yearly',
+            'account_holder_name' => 'nullable|string|max:255',
+            'payment_method'      => 'required|string|max:255',
+            'number'              => 'nullable|string|max:50',
+            'transaction_id'      => 'nullable|string|max:255|unique:subscription_payments,transaction_id',
+            'document'            => 'required|image|mimes:jpg,jpeg,png,pdf,webp|max:5120',
+        ]);
+
+        DB::transaction(function () use ($request, $data) {
+            $company = auth()->user()->company;
+            $package = PricingPackage::with([
+                'tiers' => fn($q) =>
+                $q->where('billing_cycle', $data['billing_cycle'])
+            ])->findOrFail($data['pricing_package_id']);
+
+            $tier = $package->tiers->first();
+            if (!$tier) throw new \Exception("No tier for this billing cycle.");
+
+            $amountPaid = $tier->discount_price > 0 && $tier->discount_price < $tier->regular_price
+                ? $tier->discount_price
+                : $tier->regular_price;
+
+            $now    = Carbon::now();
+            $endsAt = match ($data['billing_cycle']) {
+                'yearly'    => $now->copy()->addYear(),
+                'quarterly' => $now->copy()->addMonths(3),
+                default     => $now->copy()->addMonth(),
+            };
+
+            $company->subscriptions()->update(['status' => Status::Active->value]);
+
+            $subscription = CompanySubscription::create([
+                'company_id'         => $company->id,
+                'pricing_package_id' => $package->id,
+                'billing_cycle'      => $data['billing_cycle'],
+                'amount_paid'        => $amountPaid,
+                'payment_method'     => $data['payment_method'],
+                'payment_status'     => 'pending',
+                'starts_at'          => $now,
+                'ends_at'            => $endsAt,
+                'status'             => Status::Active->value,
+            ]);
+
+            // document upload
+            $documentPath = null;
+            if ($request->hasFile('document')) {
+                $documentPath = FileUploadHelper::uploadImage(
+                    $request->file('document'),
+                    'payment_documents'
+                );
+            }
+
+            // payment entry
+            DB::table('subscription_payments')->insert([
+                'subscription_id' => $subscription->id,
+                'company_id'      => $company->id,
+                'payment_method'  => $data['payment_method'],
+                'amount'          => $amountPaid,
+                'transaction_id'  => $data['transaction_id'] ?? null,
+                'sender_number'   => $data['number'] ?? null,
+                'account_number'  => null,
+                'bank_name'       => null,
+                'status'          => 'pending',
+                'meta'            => json_encode([
+                    'account_holder_name' => $data['account_holder_name'] ?? null,
+                    'document_path'       => $documentPath,
+                ]),
+                'paid_at'         => now(),
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            $company->pricing_package_id = $package->id;
+            $company->save();
         });
 
         return response()->json(['message' => 'Package upgraded successfully.']);

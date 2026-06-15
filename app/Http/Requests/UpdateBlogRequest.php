@@ -40,7 +40,7 @@ class UpdateBlogRequest extends UpdateBaseCompanyRequest
                 // Images (JSON array of files)
                 'images'   => ['sometimes', 'nullable', 'array'],
                 'existing_images'   => ['sometimes', 'nullable', 'array'],
-                'images.*' => ['image', 'mimes:jpeg,png,jpg', 'max:2048'],
+                'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
 
                 // SEO Metadata
                'meta_title' => ['nullable', 'string'],

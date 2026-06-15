@@ -27,7 +27,7 @@ class StoreTransactionJournalRequest extends BaseCompanyRequest
         return array_merge($this->companyRules(), [
             'date'        => ['required', 'date'],
             'description' => ['nullable', 'string'],
-            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'],
+            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'],
             'status'      => ['nullable', 'integer'],
 
             // Journal items validation

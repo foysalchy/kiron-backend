@@ -21,7 +21,7 @@ class StoreSubscriptionRequest extends FormRequest
             'transaction_id'      => 'required_if:payment_method,manual,bank|nullable|string|max:255',
             'number'              => 'required_if:payment_method,manual,bank|nullable|string|max:255',
             'account_holder_name' => 'required_if:payment_method,manual,bank|nullable|string|max:255',
-            'document'            => 'required_if:payment_method,manual,bank|nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'document'            => 'required_if:payment_method,manual,bank|nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
         ];
     }
 }

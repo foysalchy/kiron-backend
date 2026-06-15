@@ -27,7 +27,7 @@ class StoreRejoinRequest extends BaseCompanyRequest
             [
                 'employee_id'        => ['required', 'exists:employees,id'],
                 'rejoin_date'        => ['required', 'date'],
-                'appointment_letter' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+                'appointment_letter' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:2048'],
             ]
         );
     }

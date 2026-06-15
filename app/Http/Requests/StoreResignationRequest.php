@@ -31,7 +31,7 @@ class StoreResignationRequest extends BaseCompanyRequest
                 'type'                 => ['required', 'string', 'in:resignation,termination'],
                 'letter_received_date' => ['nullable', 'date'],
                 'resign_date'          => ['nullable', 'date'],
-                'letter'               => ['required', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:2048'],
+                'letter'               => ['required', 'file', 'mimes:jpeg,png,jpg,pdf,webp', 'max:2048'],
                 'resign_rule_ids'      => ['required', 'array'],
                 'resign_rule_ids.*'    => ['exists:resign_rules,id'],
                 'reason'               => ['required', 'string'],

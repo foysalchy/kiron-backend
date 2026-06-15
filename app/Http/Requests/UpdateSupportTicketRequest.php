@@ -30,7 +30,7 @@ class UpdateSupportTicketRequest extends UpdateBaseCompanyRequest
                 'support_department_id' => ['sometimes', 'required', 'exists:support_departments,id'],
                 'subject'               => ['sometimes', 'required', 'string', 'max:255'],
                 'description'           => ['sometimes', 'required', 'string'],
-                'image'                 => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+                'image'                 => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'status'                => ['sometimes', 'integer'], 
             ]
         );

@@ -21,7 +21,7 @@ class UpdateResignationRequest extends UpdateBaseCompanyRequest
                 'type'                 => ['sometimes', 'string', 'in:resignation,termination'],
                 'letter_received_date' => ['nullable', 'date'],
                 'resign_date'          => ['nullable', 'date'],
-                'letter'               => ['sometimes', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:2048'],
+                'letter'               => ['sometimes', 'file', 'mimes:jpeg,png,jpg,pdf,webp', 'max:2048'],
                 'resign_rule_ids'      => ['sometimes', 'array'],
                 'resign_rule_ids.*'    => ['exists:resign_rules,id'],
                 'reason'               => ['sometimes', 'string'],

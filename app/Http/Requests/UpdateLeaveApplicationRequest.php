@@ -35,7 +35,7 @@ class UpdateLeaveApplicationRequest extends UpdateBaseCompanyRequest
                 'is_half_day'     => ['nullable',],
                 'reason'          => ['nullable', 'string', 'max:1000'],
                 'documents'       => ['nullable', 'array'],
-                'documents.*'     => ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+                'documents.*'     => ['file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:2048'],
                 'status'          => ['sometimes', 'integer'],
             ]
         );

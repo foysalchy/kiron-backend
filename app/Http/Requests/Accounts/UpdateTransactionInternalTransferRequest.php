@@ -28,7 +28,7 @@ class UpdateTransactionInternalTransferRequest extends UpdateBaseCompanyRequest
             'date'                          => ['sometimes', 'required', 'date'],
             'from_account_id'               => ['sometimes', 'required', 'exists:chart_of_accounts,id'],
             'description'                   => ['nullable', 'string'],
-            'file'                          => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'], //5mb
+            'file'                          => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'], //5mb
             'status'                        => ['sometimes', 'integer'],
 
             'items'                         => ['sometimes', 'required', 'array', 'min:1'],

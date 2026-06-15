@@ -26,7 +26,7 @@ class UpdateProfileRequest extends BaseCompanyRequest
                 'email' => ['sometimes', 'required', 'email', Rule::unique('users', 'email')->ignore($userId)],
                 'phone' => ['sometimes', 'required', 'string', 'max:20'],
                 'alternative_phone' => ['nullable', 'string', 'max:20'],
-                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+                'profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             ]
         );
     }

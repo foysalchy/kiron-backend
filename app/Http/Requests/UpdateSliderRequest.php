@@ -32,7 +32,7 @@ class UpdateSliderRequest extends UpdateBaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'url' => ['nullable', 'url'],
                 'placement' => ['required', 'string'],
-                'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'status'      => ['sometimes', 'integer', 'in:0,1'],
             ]
         );

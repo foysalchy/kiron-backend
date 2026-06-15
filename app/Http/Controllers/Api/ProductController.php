@@ -44,6 +44,11 @@ class ProductController extends Controller
 
         return ResponseHelper::success($data, 'Product created successfully', 201);
     }
+    public function clone(Product $product): JsonResponse
+    {
+        $cloned = $this->productService->cloneProduct($product);
+        return ResponseHelper::success($cloned, 'Product created successfully', 201);
+    }
 
     public function show(int $id): JsonResponse
     {

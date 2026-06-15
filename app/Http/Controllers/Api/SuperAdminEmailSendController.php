@@ -19,6 +19,14 @@ class SuperAdminEmailSendController extends Controller
     {
         $emails = SuperAdminEmailSend::latest()->paginate(20);
 
+        $emails->getCollection()->transform(function ($email) {
+            $email->companies = $email->company_ids
+                ? Company::whereIn('id', $email->company_ids)->get(['id', 'name'])
+                : collect([]);
+
+            return $email;
+        });
+
         return response()->json([
             'success' => true,
             'data'    => $emails,
@@ -82,6 +90,28 @@ class SuperAdminEmailSendController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Email queued for {$recipientEmails->count()} recipient(s) successfully.",
+        ]);
+    }
+
+    public function show($id): JsonResponse
+    {
+        $email = SuperAdminEmailSend::findOrFail($id);
+
+        $companies = $email->company_ids
+            ? Company::whereIn('id', $email->company_ids)->get(['id', 'name'])
+            : collect([]);
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'id'               => $email->id,
+                'subject'          => $email->subject,
+                'body'             => $email->body,   
+                'companies'        => $companies,
+                'custom_emails'    => $email->custom_emails ?? [],
+                'total_recipients' => $email->total_recipients,
+                'created_at'       => $email->created_at,
+            ],
         ]);
     }
 }

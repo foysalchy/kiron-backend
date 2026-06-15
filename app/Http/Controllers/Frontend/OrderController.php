@@ -567,7 +567,7 @@ class OrderController extends FrontendController
             'branch_name'    => 'nullable|string|max:100',
             'card_type'      => 'nullable|string|max:50',
             'screenshots' => 'nullable|array|max:3',
-            'screenshots.*'  => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'screenshots.*'  => 'image|mimes:jpeg,png,jpg,gif,,webp|max:2048',
         ], [
             'transaction_id.unique' => 'This transaction ID has already been used. Please check and try again.',
             'transaction_id.required' => 'Transaction ID is required.',

@@ -34,7 +34,7 @@ class UpdatePageRequest extends UpdateBaseCompanyRequest
                 'meta_title' => ['nullable', 'string'],
                 'meta_description' => ['nullable', 'string'],
                 'meta_keywords' => ['nullable'],
-                'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
                 'status'      => ['sometimes', 'integer', 'in:0,1'],
             ]
         );

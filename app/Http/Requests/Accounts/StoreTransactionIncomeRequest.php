@@ -28,7 +28,7 @@ class StoreTransactionIncomeRequest extends BaseCompanyRequest
             'income_to_id'    => ['required', 'exists:chart_of_accounts,id'],
             'date'            => ['required', 'date'],
             'description'     => ['required', 'string'],
-            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'],
+            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,webp', 'max:5120'],
             'status'          => ['nullable', 'integer'],
 
             // Validation for the Dynamic Rows (Income Categories)
