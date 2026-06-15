@@ -258,7 +258,166 @@ class ProductService
             throw ApiException::serverError('Failed to create product: ' . $e->getMessage());
         }
     }
+    public function cloneProduct(Product $product): Product
+    {
+        DB::beginTransaction();
 
+        try {
+            $originalProduct = $product->load([
+                'galleries',
+                'variations.attributes',
+                'variations.stocks.warehouse',
+                'variations.stocks.bin',
+                'variations.galleries',
+            ]);
+
+            // Clone main product data
+            $newProductData = $originalProduct->toArray();
+
+            unset(
+                $newProductData['id'],
+                $newProductData['created_at'],
+                $newProductData['updated_at'],
+                $newProductData['galleries'],
+                $newProductData['variations'],
+            );
+
+
+            $baseSlug = $originalProduct->slug . '_2';
+            $newProductData['slug'] = $baseSlug;
+            $counter = 2;
+            while (Product::where('slug', $newProductData['slug'])->exists()) {
+                $newProductData['slug'] = $baseSlug . '_' . $counter;
+                $counter++;
+            }
+
+            // Thumbnail copy
+            if ($originalProduct->thumbnail) {
+                $newProductData['thumbnail'] = FileUploadHelper::copyFile(
+                    $originalProduct->thumbnail,
+                    'products/thumbnails'
+                );
+            }
+            if (!empty($newProductData['sku_code'])) {
+                $baseSku = $originalProduct->sku_code . '_copy';
+                $newProductData['sku_code'] = $baseSku;
+                $counter = 2;
+                while (Product::where('sku_code', $newProductData['sku_code'])
+                    ->where('company_id', $newProductData['company_id'])
+                    ->exists()
+                ) {
+                    $newProductData['sku_code'] = $baseSku . '_' . $counter;
+                    $counter++;
+                }
+            }
+            $newProduct = Product::create($newProductData);
+
+            // Galleries clone
+            foreach ($originalProduct->galleries as $gallery) {
+                $newPath = FileUploadHelper::copyFile($gallery->image, 'products/galleries');
+                $newProduct->galleries()->create(['image' => $newPath]);
+            }
+
+            // Variation product
+            if ($originalProduct->type === 'variation') {
+                foreach ($originalProduct->variations as $variation) {
+                    $variationData = $variation->toArray();
+                    unset(
+                        $variationData['id'],
+                        $variationData['product_id'],
+                        $variationData['created_at'],
+                        $variationData['updated_at'],
+                        $variationData['attributes'],
+                        $variationData['stocks'],
+                        $variationData['galleries'],
+                        $variationData['combination_hash'], // unset করুন
+                    );
+
+                    if (!empty($variation->image)) {
+                        $variationData['image'] = FileUploadHelper::copyFile(
+                            $variation->image,
+                            'products/variations'
+                        );
+                    }
+
+                    // Attributes থেকে hash এর জন্য data তৈরি করুন
+                    $attributesForHash = $variation->attributes->map(fn($attr) => [
+                        'attribute_group_id' => $attr->attribute_group_id,
+                        'attribute_value_id' => $attr->attribute_value_id,
+                    ])->toArray();
+
+                    // নতুন product id দিয়ে নতুন hash generate করুন
+                    $variationData['combination_hash'] = $this->generateCombinationHash(
+                        $newProduct->id,
+                        $attributesForHash
+                    );
+
+                    // Clone variation sku unique
+                    if (!empty($variationData['sku'])) {
+                        $baseSku = $variation->sku . '_copy';
+                        $variationData['sku'] = $baseSku;
+                        $counter = 2;
+                        while (ProductVariation::where('sku', $variationData['sku'])
+                            ->whereHas('product', fn($q) => $q->where('company_id', $newProduct->company_id))
+                            ->exists()
+                        ) {
+                            $variationData['sku'] = $baseSku . '_' . $counter;
+                            $counter++;
+                        }
+                    }
+
+                    $variationData['combination_hash'] = $this->generateCombinationHash(
+                        $newProduct->id,
+                        $attributesForHash
+                    );
+
+                    $newVariation = $newProduct->variations()->create($variationData);
+                    // Clone variation attributes
+                    foreach ($variation->attributes as $attribute) {
+                        $newVariation->attributes()->create([
+                            'attribute_group_id' => $attribute->attribute_group_id,
+                            'attribute_value_id' => $attribute->attribute_value_id,
+                        ]);
+                    }
+
+                    // Clone variation stocks
+                    foreach ($variation->stocks as $stock) {
+                        $newVariation->stocks()->create([
+                            'warehouse_id' => $stock->warehouse_id,
+                            'bin_id'       => $stock->bin_id,
+                            'quantity'     => $stock->quantity,
+                            'company_id'   => $stock->company_id,
+                        ]);
+                    }
+
+                    // Clone variation galleries
+                    foreach ($variation->galleries as $gallery) {
+                        $newPath = FileUploadHelper::copyFile(
+                            $gallery->image,
+                            'products/variations/galleries'
+                        );
+                        $newVariation->galleries()->create(['image' => $newPath]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            LogHelper::created('product', $newProduct->id, $newProduct->company_id);
+
+            return $newProduct->load([
+                'brand',
+                'galleries',
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+                'variations.stocks.warehouse',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Product clone failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to clone product: ' . $e->getMessage());
+        }
+    }
     /**
      * Create a single product (no variations)
      */

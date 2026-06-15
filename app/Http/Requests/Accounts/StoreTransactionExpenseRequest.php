@@ -28,7 +28,7 @@ class StoreTransactionExpenseRequest extends BaseCompanyRequest
             'expense_from_id' => ['required', 'exists:chart_of_accounts,id'],
             'date'            => ['required', 'date'],
             'description'     => ['required', 'string'],
-            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'], //5mb
+            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,webp', 'max:5120'], //5mb
             'status'          => ['nullable', 'integer'],
             'items'                         => ['required', 'array', 'min:1'],
             'items.*.chart_of_account_id'   => ['required', 'exists:chart_of_accounts,id'],

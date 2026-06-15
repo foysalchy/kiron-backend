@@ -99,6 +99,8 @@ class PricingPackageService
      */
     public function updatePricingPackage(int $id, array $data): PricingPackage
     {
+
+    \Log::info($data);
         DB::beginTransaction();
         try {
             $package = $this->getPricingPackageById($id);

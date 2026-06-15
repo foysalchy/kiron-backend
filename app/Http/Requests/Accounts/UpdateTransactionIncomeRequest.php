@@ -27,7 +27,7 @@ class UpdateTransactionIncomeRequest extends UpdateBaseCompanyRequest
             'income_to_id'    => ['sometimes', 'required', 'exists:chart_of_accounts,id'],
             'date'            => ['sometimes', 'required', 'date'],
             'description'     => ['nullable', 'string'],
-            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'],
+            'file'            => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'],
             'status'          => ['sometimes', 'integer'],
 
             // Validation for the Dynamic Rows (Income Categories)

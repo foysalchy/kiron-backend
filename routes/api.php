@@ -185,10 +185,12 @@ Route::prefix('v1')->group(function () {
             Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
             Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
         });
-        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addPayment']);
+        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addayment']);
+        Route::post('/subscriptions/upgrade-payment', [SubscriptionController::class, 'upgradePayment']);
         Route::patch('/subscription-payments/{id}/status', [SubscriptionController::class, 'updateStatus']);
         Route::get('/pricing-packages', [PricingPackageController::class, 'index']);
-        Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscription']);
+        Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscriptionSuperAdmin']);
+        Route::post('/subscriptions/upgrade', [CompanyController::class, 'upgradeSubscription']);
         Route::post('/companies/{id}/update-requests', [CompanyController::class, 'storeUpdateRequest']);
         Route::post('/companies/update-requests/{reqId}', [CompanyController::class, 'updateUpdateRequest']);
         Route::delete('/companies/update-requests/{reqId}', [CompanyController::class, 'deleteUpdateRequest']);
@@ -442,7 +444,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}/force', [CellController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [CellController::class, 'toggleStatus']);
             });
-
+            Route::post('clone/products/{product}', [ProductController::class, 'clone']);
             //prouducts
             Route::prefix('products')->group(function () {
                 Route::get('/', [ProductController::class, 'index']);
@@ -1522,8 +1524,10 @@ Route::prefix('v1')->group(function () {
                 Route::get('/options/companies', [SelectOptionController::class, 'companies']);
                 Route::get('/email-sends',  [SuperAdminEmailSendController::class, 'index']);
                 Route::post('/email-sends', [SuperAdminEmailSendController::class, 'store']);
+                Route::get('/email-sends/{id}', [SuperAdminEmailSendController::class, 'show']);
                 Route::get('/sms-sends',  [SuperAdminSmsSendController::class, 'index']);
                 Route::post('/sms-sends', [SuperAdminSmsSendController::class, 'store']);
+                Route::get('/sms-sends/{id}', [SuperAdminSmsSendController::class, 'show']);
             });
         });
     });

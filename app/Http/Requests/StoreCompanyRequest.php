@@ -18,7 +18,7 @@ class StoreCompanyRequest extends FormRequest
             'email' => ['required', 'email', 'unique:companies,email'],
             'phone' => ['required', 'string', 'max:20'],
             'alternative_phone' => ['nullable', 'string', 'max:20'],
-            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'address' => ['nullable', 'string'],
             'business_type' => ['required'],
             'status' => ['integer'],

@@ -21,7 +21,7 @@ class UpdateBrandRequest extends UpdateBaseCompanyRequest
             [
 
                 'name' => ['sometimes', 'required', 'string', 'max:255'],
-                'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
+                'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
                 'description' => ['nullable', 'string'],
                 'meta_title' => ['nullable', 'string'],
                 'meta_description' => ['nullable', 'string'],

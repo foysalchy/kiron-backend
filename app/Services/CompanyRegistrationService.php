@@ -16,6 +16,7 @@ use App\Models\PricingPackage;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Models\UserLoginHistory;
+use App\Models\Warehouse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -217,7 +218,29 @@ class CompanyRegistrationService
                     'currency' => $data['currency'],
                 ]);
 
+            if (isset($data['manage_warehouse'])) {
+                $manageWarehouse = (bool) $data['manage_warehouse'];
 
+                $company->update(['manage_warehouse' => $manageWarehouse]);
+
+                if (!$manageWarehouse) {
+                    $exists = Warehouse::where('company_id', $company->id)
+                        ->where('is_default', 1)
+                        ->exists();
+
+                    if (!$exists) {
+                        $warehouse = Warehouse::create([
+                            'company_id' => $company->id,
+                            'name'       => 'Default Warehouse',
+                            'location'   => null,
+                            'is_default' => 1,
+                            'status'     => Status::Active->value,
+                        ]);
+
+                        $company->update(['default_warehouse_id' => $warehouse->id]);
+                    }
+                }
+            }
 
             // Activate Company
             $company->update([
@@ -238,7 +261,7 @@ class CompanyRegistrationService
 
             return [
                 'permissions'          => $this->resolvePermissions($user),
-                 'company'     => $company->load('pricingPackage'),
+                'company'     => $company->load('pricingPackage'),
             ];
         } catch (\Exception $e) {
             DB::rollBack();

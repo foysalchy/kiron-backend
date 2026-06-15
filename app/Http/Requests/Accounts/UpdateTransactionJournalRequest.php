@@ -27,7 +27,7 @@ class UpdateTransactionJournalRequest extends UpdateBaseCompanyRequest
         return array_merge($this->companyRules(), [
             'date'        => ['sometimes', 'required', 'date'],
             'description' => ['nullable', 'string'],
-            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx', 'max:5120'],
+            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,webp,doc,docx,xls,xlsx', 'max:5120'],
             'status'      => ['sometimes', 'integer'],
 
             'items'                       => ['sometimes', 'array', 'min:1'],

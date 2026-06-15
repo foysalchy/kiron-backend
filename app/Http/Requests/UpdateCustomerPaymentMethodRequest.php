@@ -18,7 +18,7 @@ class UpdateCustomerPaymentMethodRequest extends FormRequest
         return [
             'name'           => ['sometimes', 'required', 'string', 'max:150'],
             'type'           => ['sometimes', 'required', 'string'],
-            'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg', 'max:2048'],
+            'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
             'method_details' => ['nullable', 'array'],
             'contact_name'   => ['sometimes', 'required', 'string', 'max:255'],
             'phone'          => ['sometimes', 'required', 'string', 'max:20'],

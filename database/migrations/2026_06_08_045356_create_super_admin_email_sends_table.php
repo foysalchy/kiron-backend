@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('super_admin_email_sends', function (Blueprint $table) {
             $table->id();
-            $table->text('message');
+            $table->text('body');
+            $table->string('subject');
             $table->json('company_ids')->nullable();
-            $table->json('custom_numbers')->nullable();
+            $table->json('custom_emails')->nullable();
             $table->integer('total_recipients')->default(0);
             $table->timestamps();
         });

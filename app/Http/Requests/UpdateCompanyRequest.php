@@ -24,7 +24,7 @@ class UpdateCompanyRequest extends FormRequest
             'email' => ['sometimes', 'required', 'email:dns', Rule::unique('companies', 'email')->ignore($companyId)],
             'phone' => ['sometimes', 'required', 'string', 'max:20'],
             'alternative_phone' => ['nullable', 'string', 'max:20'],
-            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'address' => ['nullable', 'string'],
             'business_type' => ['sometimes'],
             'status' => ['integer'],

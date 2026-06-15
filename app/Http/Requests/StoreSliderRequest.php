@@ -32,7 +32,7 @@ class StoreSliderRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'url' => ['nullable', 'url'],
                 'placement' => ['required', 'string'],
-                'image'       => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+                'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]
         );

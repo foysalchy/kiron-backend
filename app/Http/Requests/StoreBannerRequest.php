@@ -29,7 +29,7 @@ class StoreBannerRequest extends BaseCompanyRequest
             [
                 'title'       => ['required', 'string', 'max:255'],
                 'description' => ['nullable', 'string'],
-                'image'       => ['required', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+                'image'       => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]
         );
