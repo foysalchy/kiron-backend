@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->string('custom_domain')->nullable();
             $table->string('sub_domain')->nullable();
+            $table->boolean('is_review')->default(false);
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });

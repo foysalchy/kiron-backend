@@ -15,6 +15,8 @@ class DomainSetup extends Model
         'custom_domain',
         'sub_domain',
         'template_name',
+        'product_card_template',
+        'is_review',
         'status',
     ];
     /**

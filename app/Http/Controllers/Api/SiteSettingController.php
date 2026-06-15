@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSiteSettingRequest;
 use App\Http\Requests\UpdateSiteSettingRequest;
+use App\Models\DomainSetup;
 use App\Services\SiteSettingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -147,12 +148,15 @@ class SiteSettingController extends Controller
     }
     public function updateThemeTemplate(Request $request)
     {
+   
         $request->validate([
-            'theme_id'     => 'required',
-            'primary_color'   => 'nullable|string',
-            'secondary_color' => 'nullable|string',
-            'primary_text_color' => 'nullable|string',
+            'theme_id'             => 'required',
+            'primary_color'        => 'nullable|string',
+            'secondary_color'      => 'nullable|string',
+            'primary_text_color'   => 'nullable|string',
             'secondary_text_color' => 'nullable|string',
+            'card_id'              => 'nullable|string',
+            'is_review'            => 'nullable',
         ]);
 
         try {
@@ -168,22 +172,31 @@ class SiteSettingController extends Controller
 
             $company->update([
                 'theme_template' => [
-                    'id'              => $request->theme_id,
-                    'primary_color'   => $request->primary_color,
-                    'secondary_color' => $request->secondary_color,
-                    'primary_text_color' => $request->primary_text_color,
+                    'id'                   => $request->theme_id,
+                    'primary_color'        => $request->primary_color,
+                    'secondary_color'      => $request->secondary_color,
+                    'primary_text_color'   => $request->primary_text_color,
                     'secondary_text_color' => $request->secondary_text_color,
                 ]
             ]);
 
+            $domain = DomainSetup::where('company_id', $company->id)->first();
+     \Log::info($domain);
+            if ($domain && $request->has('is_review')) {
+                $domain->update([
+                    'is_review' => $request->is_review,
+                    'product_card_template'              => $request->card_id,
+
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Theme  settings updated successfully!',
-                'data'    => $company
+                'message' => 'Theme settings updated successfully!',
+                'data'    => $company->fresh()
             ], 200);
         } catch (\Exception $e) {
             Log::error('Invoice Template Update Error: ' . $e->getMessage());
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to update invoice settings.'
