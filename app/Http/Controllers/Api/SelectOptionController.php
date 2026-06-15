@@ -12,6 +12,7 @@ use App\Models\AttributeGroup;
 use App\Models\Bin;
 use App\Models\Cell;
 use App\Models\ChartOfAccount;
+use App\Models\Company;
 use App\Models\CustomerGroup;
 use App\Models\DisposalType;
 use App\Models\Domain;
@@ -370,5 +371,15 @@ class SelectOptionController extends Controller
         return response()->json([
             'data' => array_values($allDomains)
         ]);
+    }
+    public function companies()
+    {
+        $companies = Company::select('id', 'name', 'email')
+            ->where('status', 1)
+            ->whereNull('deleted_at')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json($companies);
     }
 }

@@ -441,6 +441,7 @@ class DashboardOverviewService
         DB::table('product_variation_stocks as pvs')
             ->join('product_variations as pv', "pvs.{$variationColumn}", '=', 'pv.id')
             ->join('products as p', 'pv.product_id', '=', 'p.id')
+            ->where('p.company_id', auth()->user()->company_id)
             ->select('pv.id as variation_id', 'pv.product_id', 'pv.sku', 'p.title as product_name', DB::raw('SUM(pvs.quantity) as total_stock'))
             ->groupBy('pv.id', 'pv.product_id', 'pv.sku', 'p.title')
             ->havingRaw('total_stock > 0 AND total_stock < ?', [$threshold])

@@ -6,19 +6,20 @@ use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Models\{SmsWallet, SmsPackage, SmsRecharge, SmsSend, SmsWalletTransaction};
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use PhpParser\Node\Stmt\StaticVar;
 
 class SmsWalletService
 {
-    public function getOrCreate(): SmsWallet
+    public function getOrCreate(?int $companyId = null): SmsWallet
     {
-        return SmsWallet::firstOrCreate(
-            [], // ✅ company scope already filter করে
-            ['sms_count' => 0]
-        );
+        $companyId = $companyId ?? auth()->user()->company_id;
+
+        return SmsWallet::withoutGlobalScopes()
+            ->firstOrCreate(
+                ['company_id' => $companyId],
+                ['sms_count' => 0]
+            );
     }
 
     // Recharge request create
@@ -28,7 +29,6 @@ class SmsWalletService
         try {
             $package = SmsPackage::findOrFail($data['sms_package_id']);
 
-            // ✅ Screenshot upload
             $screenshotPath = null;
             if (isset($data['screenshot'])) {
                 $screenshotPath = FileUploadHelper::uploadImage(
@@ -70,7 +70,7 @@ class SmsWalletService
     {
         DB::beginTransaction();
         try {
-            $recharge = SmsRecharge::findOrFail($rechargeId);
+            $recharge = SmsRecharge::withoutGlobalScopes()->findOrFail($rechargeId);
 
             if ($recharge->status != Status::Pending->value) {
                 throw ApiException::badRequest('Recharge already processed');
@@ -85,31 +85,33 @@ class SmsWalletService
                 'approved_at'   => now(),
             ]);
 
-            // Approve হলে wallet এ add করো 
             if ($status == Status::Approved->value) {
-                $wallet = $this->getOrCreate();
+                // recharge এর company_id pass করো
+                $wallet        = $this->getOrCreate($recharge->company_id);
                 $balanceBefore = $wallet->sms_count;
                 $balanceAfter  = $balanceBefore + $recharge->sms_count;
 
                 $wallet->update(['sms_count' => $balanceAfter]);
 
-                // Transaction log
                 SmsWalletTransaction::create([
-                    'company_id'    => $recharge->company_id,
-                    'sms_wallet_id' => $wallet->id,
-                    'type'          => 'recharge',
-                    'sms_count'     => $recharge->sms_count,
-                    'rate_per_sms'  => $recharge->rate_per_sms,
+                    'company_id'     => $recharge->company_id,
+                    'sms_wallet_id'  => $wallet->id,
+                    'type'           => 'recharge',
+                    'sms_count'      => $recharge->sms_count,
+                    'rate_per_sms'   => $recharge->rate_per_sms,
                     'reference_type' => SmsRecharge::class,
-                    'reference_id'  => $recharge->id,
+                    'reference_id'   => $recharge->id,
                     'balance_before' => $balanceBefore,
-                    'balance_after' => $balanceAfter,
-                    'note'          => 'Recharge approved',
+                    'balance_after'  => $balanceAfter,
+                    'note'           => 'Recharge approved',
                 ]);
             }
 
             DB::commit();
             return $recharge;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Recharge process failed: ' . $e->getMessage());
@@ -134,16 +136,16 @@ class SmsWalletService
             $wallet->update(['sms_count' => $balanceAfter]);
 
             SmsWalletTransaction::create([
-
-                'sms_wallet_id' => $wallet->id,
-                'type'          => 'deduct',
-                'sms_count'     => $smsCount,
-                'rate_per_sms'  => $ratePerSms,
+                'company_id'     => auth()->user()->company_id,
+                'sms_wallet_id'  => $wallet->id,
+                'type'           => 'deduct',
+                'sms_count'      => $smsCount,
+                'rate_per_sms'   => $ratePerSms,
                 'reference_type' => SmsSend::class,
-                'reference_id'  => $smsSendId,
+                'reference_id'   => $smsSendId,
                 'balance_before' => $balanceBefore,
-                'balance_after' => $balanceAfter,
-                'note'          => 'SMS sent',
+                'balance_after'  => $balanceAfter,
+                'note'           => 'SMS sent',
             ]);
 
             DB::commit();
@@ -159,7 +161,7 @@ class SmsWalletService
 
     private function generateReferenceNo(): string
     {
-        $last = SmsRecharge::withTrashed()->latest()->first();
+        $last = SmsRecharge::withoutGlobalScopes()->withTrashed()->latest()->first();
         $next = $last ? (int) substr($last->reference_no, 4) + 1 : 1;
         return 'SMS-' . str_pad($next, 4, '0', STR_PAD_LEFT);
     }
