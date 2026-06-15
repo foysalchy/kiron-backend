@@ -256,7 +256,7 @@ class AppServiceProvider extends ServiceProvider
                     'setup'             => $applyLogic(SiteSetting::class)->first(),
 
                     'headerCategories'  => $applyLogic(MegaCategory::class)
-                        ->where('status', 1)->latest()->take(5)->get(),
+                        ->where('status', 1)->latest()->get(),
 
                     'footerFeatures'    => $applyLogic(ContentSetting::class)
                         ->where('page_type', ContentSetting::PAGE_ALL)

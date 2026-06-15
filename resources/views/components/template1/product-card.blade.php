@@ -4,9 +4,9 @@
     $template = $company->product_card_template ?? 2;
 @endphp
 @if ($template == 1)
-    @include('components.template1.product-1', ['product' => $product])
+    @include('components.template1.product-1', ['product' => $product, 'company' => $company])
 @elseif($template == 2)
-    @include('components.template1.product-2', ['product' => $product])
+    @include('components.template1.product-2', ['product' => $product, 'company' => $company])
 @endif
 
 @once

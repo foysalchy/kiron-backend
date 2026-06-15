@@ -29,10 +29,12 @@ class HomeController extends FrontendController
             ->get()
             ->map(function ($group) {
                 $group->products = Product::whereIn('id', $group->product_ids ?? [])
+
+                    ->with(['variations'])
                     ->where('status', Status::Active->value)
                     ->withCount('reviews')
                     ->withAvg('reviews', 'rating')
-                    ->take(15)
+                    ->take(6)
                     ->get();
                 return $group;
             })
@@ -46,6 +48,10 @@ class HomeController extends FrontendController
             ->withAvg('reviews', 'rating')
             ->withSum('orderDetails as total_sales', 'quantity')
             ->orderByDesc('total_sales')
+            ->take(12)
+            ->get();
+        $allProducts = Product::with(['brand', 'variations'])
+            ->where('status', Status::Active->value)
             ->take(12)
             ->get();
 
@@ -65,7 +71,8 @@ class HomeController extends FrontendController
                 'allSliders',
                 'mainSliders',
                 'sidebarSliders',
-                'middleSliders'
+                'middleSliders',
+                'allProducts'
             )
         );
     }
