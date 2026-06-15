@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('company_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-            $table->foreignId('pricing_id')->constrained('pricings')->onDelete('restrict');
+            $table->unsignedBigInteger('pricing_package_id');
 
             // Billing
             $table->enum('billing_cycle', ['monthly', 'yearly'])->default('monthly');

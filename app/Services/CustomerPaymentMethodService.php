@@ -316,19 +316,7 @@ class CustomerPaymentMethodService
     public function getPublicCustomerPaymentMethods(): Collection
     {
         try {
-            return CustomerPaymentMethod::select([
-                'id',
-                'company_id',
-                'name',
-                'type',
-                'icon',
-                'account_holder',
-                'account_number',
-                'contact_name',
-                'phone',
-                'status'
-            ])
-                ->whereNull('company_id')
+            return CustomerPaymentMethod::whereNull('company_id')
                 ->where('status', Status::Active->value)
                 ->get();
         } catch (\Exception $e) {

@@ -11,10 +11,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CustomerPaymentMethodController extends Controller
-{ 
+{
     public function __construct(
         protected CustomerPaymentMethodService $paymentService
-    ) {} 
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -85,6 +85,6 @@ class CustomerPaymentMethodController extends Controller
     {
         $data = $this->paymentService->getPublicCustomerPaymentMethods();
 
-        return ResponseHelper::success($data, 'Status updated successfully');
+        return ResponseHelper::success($data, 'Payment retrive successfully');
     }
 }
