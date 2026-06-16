@@ -147,6 +147,7 @@ use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseInventoryController;
 use App\Http\Controllers\Api\WocommerceSettingController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 
@@ -172,7 +173,10 @@ Route::prefix('v1')->group(function () {
         Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
     });
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
-
+        Route::post('/clear-cache', function () {
+            Artisan::call('cache:clear');
+            return response()->json(['message' => 'Cache cleared successfully']);
+        });
         //auth
         Route::get('auth/login-history', [AuthController::class, 'historyLoginAll']);
         Route::get('auth/profile', [AuthController::class, 'profile']);

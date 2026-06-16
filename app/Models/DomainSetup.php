@@ -17,6 +17,7 @@ class DomainSetup extends Model
         'template_name',
         'product_card_template',
         'is_review',
+        'theme_template',
         'status',
     ];
     /**
