@@ -42,7 +42,12 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'corporate_address' => ['nullable', 'string'],
                 'store_address'     => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
-                'tags'              => ['nullable', 'string'], // SEO keywords
+                'tags'              => ['nullable', 'string'],
+                'manage_warehouse'     => ['nullable'],
+                'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
+                'founder_name'        => ['nullable', 'string', 'max:255'],
+                'founder_designation' => ['nullable', 'string', 'max:255'],
+                'established'         => ['nullable', 'date'],
             ]
         );
     }

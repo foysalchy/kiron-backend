@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('domain_setups', function (Blueprint $table) {
-            $table->string('template_name')->nullable()->after('sub_domain');
+            $table->string('template_name')->default('template1')->after('sub_domain');
         });
     }
 

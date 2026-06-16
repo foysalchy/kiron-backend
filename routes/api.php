@@ -1000,7 +1000,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}', [CustomerPaymentMethodController::class, 'destroy']);
                 Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
                 Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
-                Route::patch('/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
+                Route::patch('/customer-payments/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
             });
 
             //courier-methods routes

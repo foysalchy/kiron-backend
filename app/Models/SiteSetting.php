@@ -31,6 +31,10 @@ class SiteSetting extends Model
         'tags',
         'copy_right',
         'status',
+        'meta_image',
+        'founder_name',
+        'founder_designation',
+        'established',
     ];
     protected $hidden = ['deleted_at'];
 
