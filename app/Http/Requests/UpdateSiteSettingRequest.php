@@ -44,7 +44,10 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'tags'              => ['nullable', 'string'],
                 'copy_right'     => ['nullable', 'string'],
                 'manage_warehouse'     => ['nullable'],
-                'manage_warehouse'     => ['nullable'],
+                'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
+                'founder_name'        => ['nullable', 'string', 'max:255'],
+                'founder_designation' => ['nullable', 'string', 'max:255'],
+                'established'         => ['nullable', 'date'],
 
             ]
         );
