@@ -198,7 +198,7 @@ class ProductController extends FrontendController
 
         if (!session()->has($viewKey)) {
             ProductView::create([
-                'company_id'  => $this->company_id,
+                'company_id'  => getCurrentCompany()->company_id,
                 'product_id'  => $product->id,
                 'customer_id' => auth('customer')->id(),
                 'ip_address'  => request()->ip(),

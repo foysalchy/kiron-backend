@@ -87,7 +87,7 @@
     <!-- Price & Button -->
     <div class="mt-auto pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
-            <span class="text-md font-medium text-primary truncate">
+            <span class="text-md font-medium text-brand text-primary truncate">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
             @if ($regularPrice > $salePrice)

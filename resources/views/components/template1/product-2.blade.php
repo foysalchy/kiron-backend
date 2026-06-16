@@ -93,7 +93,7 @@
                     {{ $setup->currency }} {{ number_format($regularPrice) }}
                 </span>
             @endif
-            <span class="text-primary text-[18px]  hind-siliguri-bold">
+            <span class="text-brand  text-[18px]  hind-siliguri-bold">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
         </div>
