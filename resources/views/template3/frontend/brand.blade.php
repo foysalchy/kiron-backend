@@ -1,4 +1,7 @@
 @extends('template3.layouts.front')
+@section('meta')
+     <x-meta-info.meta />
+@endsection
 @section('content')
 <!-- ALL BRANDS GRID SECTION -->
 <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">

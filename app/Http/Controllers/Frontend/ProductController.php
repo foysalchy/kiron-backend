@@ -194,13 +194,11 @@ class ProductController extends FrontendController
             'reviews.variation.attributes.attributeGroup',
         ])->where('slug', $slug)->firstOrFail();
 
-        // dd($product->variations);
-
         $viewKey = 'viewed_product_' . $product->id;
 
         if (!session()->has($viewKey)) {
             ProductView::create([
-                'company_id'  => getCurrentCompany()->id,
+                'company_id'  => $this->company_id,
                 'product_id'  => $product->id,
                 'customer_id' => auth('customer')->id(),
                 'ip_address'  => request()->ip(),

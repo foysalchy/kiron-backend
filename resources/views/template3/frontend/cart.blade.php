@@ -1,5 +1,11 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+    <x-meta-info.meta
+        title="Shopping Cart"
+        description="Review your selected items and proceed to checkout for a secure shopping experience."
+    />
+    <meta name="robots" content="noindex, nofollow">
+@endsection
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
@@ -170,7 +176,7 @@
                         </div>
 
                         <!-- Checkout Button -->
-                        <a href="{{ url('/checkout') }}"
+                        <a href="{{ route('checkout.index') }}"
                             class="block w-full text-center primary-bg hover:bg-[#e65f00] text-primary py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
                             Checkout
                         </a>

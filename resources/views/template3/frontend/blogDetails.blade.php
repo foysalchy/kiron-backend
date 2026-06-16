@@ -1,5 +1,16 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+    @php
+        $bKeywords = is_array($blog->meta_keywords) ? implode(', ', $blog->meta_keywords) : $blog->meta_keywords;
+        $bImage = (!empty($blog->images) && isset($blog->images[0])) ? asset('storage/' . $blog->images[0]) : null;
+    @endphp
+    <x-meta-info.meta
+        :title="$blog->meta_title ?? $blog->title"
+        :description="$blog->meta_description ?? Str::limit(strip_tags($blog->body), 160)"
+        :keywords="$bKeywords"
+        :image="$bImage"
+    />
+@endsection
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
 

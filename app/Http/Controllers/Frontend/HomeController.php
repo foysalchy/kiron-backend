@@ -62,10 +62,11 @@ class HomeController extends FrontendController
         $sidebarSliders = $allSliders->where('placement', 'right');
         $middleSliders = $allSliders->where('placement', 'middle')->take(2);
 
-         $allReviews = ProductReview::with('customer')
-        ->where('status', Status::Active->value)
-        ->latest()
-        ->get();
+        $allReviews = ProductReview::where('company_id', $this->company_id)
+            ->where('status', Status::Active->value)
+            ->with('customer')
+            ->latest()
+            ->get();
         return  $this->view(
             'frontend.home',
             compact(

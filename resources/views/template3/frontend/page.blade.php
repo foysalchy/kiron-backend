@@ -1,5 +1,20 @@
 @extends('template3.layouts.front')
+@section('meta')
+    @php
+        $keywords = '';
+        if($page->meta_keywords){
+            $decodedKeywords = is_array($page->meta_keywords) ? $page->meta_keywords : json_decode($page->meta_keywords, true);
+            $keywords = is_array($decodedKeywords) ? implode(', ', $decodedKeywords) : $page->meta_keywords;
+        }
+    @endphp
 
+    <x-meta-info.meta
+        :title="$page->meta_title ?? $page->title"
+        :description="$page->meta_description ?? Str::limit(strip_tags($page->description), 160)"
+        :keywords="$keywords"
+        :image="$page->image ? asset('storage/' . $page->image) : null"
+    />
+@endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
 

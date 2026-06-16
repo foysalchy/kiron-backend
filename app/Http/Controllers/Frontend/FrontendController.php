@@ -15,7 +15,7 @@ class FrontendController extends Controller
     {
         $this->company  = getCurrentCompany();
         $this->template = $this->company->template_name;
-        $this->company_id = $this->company->company_id ?? $this->company->id;
+        $this->company_id = $this->company->company_id;
     }
 
     protected function view(string $view, array $data = [])

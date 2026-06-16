@@ -44,7 +44,7 @@ class WishlistController extends Controller
             $message = 'The item has been removed from the wishlist.';
         } else {
             Wishlist::create([
-                'company_id'  => $company->id,
+                'company_id'  => $company->company_id,
                 'customer_id' => $customerId,
                 'product_id'  => $productId,
             ]);

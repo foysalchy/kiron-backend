@@ -1,5 +1,7 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+     <x-meta-info.meta /> 
+@endsection
 @section('content')
     <!-- HERO SECTION (Full Width Slider) -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
