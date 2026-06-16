@@ -30,7 +30,10 @@ class StoreSliderRequest extends BaseCompanyRequest
                 'title'       => ['required', 'string', 'max:255'],
                 'subtitle'    => ['nullable', 'string', 'max:255'],
                 'description' => ['nullable', 'string'],
-                'url' => ['nullable', 'url'],
+                'url' => [
+                    'nullable',
+                    'regex:/^(#|https?:\/\/[^\s]+)$/i'
+                ],
                 'placement' => ['required', 'string'],
                 'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],

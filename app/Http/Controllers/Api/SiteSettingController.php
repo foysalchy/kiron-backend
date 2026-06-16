@@ -186,6 +186,7 @@ class SiteSettingController extends Controller
                 $domain->update([
                     'is_review' => $request->is_review,
                     'product_card_template'              => $request->card_id,
+                    'theme_template'              => $request->theme_id,
 
                 ]);
             }
