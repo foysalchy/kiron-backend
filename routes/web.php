@@ -26,7 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
+// Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
+Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
     //landing page
@@ -84,8 +85,6 @@ Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)
     Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
     Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
-
-    Route::get('/filter-subcategory-products', [HomeController::class, 'filterSubCategory'])->name('filter.subcategory');
 
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');

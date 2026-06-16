@@ -194,8 +194,6 @@ class ProductController extends FrontendController
             'reviews.variation.attributes.attributeGroup',
         ])->where('slug', $slug)->firstOrFail();
 
-        // dd($product->variations);
-
         $viewKey = 'viewed_product_' . $product->id;
 
         if (!session()->has($viewKey)) {

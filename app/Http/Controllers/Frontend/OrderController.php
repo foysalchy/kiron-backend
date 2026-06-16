@@ -314,6 +314,11 @@ class OrderController extends FrontendController
             DB::beginTransaction();
 
             foreach ($warehouseData as $info) {
+                 $warehouseId = isset($info['warehouse_id']) ? (int) $info['warehouse_id'] : 0;
+
+            if ($warehouseId === 0) {
+                throw new \Exception('Invalid Warehouse ID for product in order.');
+            }
                 $productId   = $info['product_id'];
                 $variationId = $info['variation_id'] ?? null;
                 $warehouseId = $info['warehouse_id'];

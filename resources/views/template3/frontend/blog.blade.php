@@ -1,5 +1,7 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+     <x-meta-info.meta />
+@endsection
 @section('content')
     <!-- 1. Hero & Search -->
     <section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 py-10 md:py-24">

@@ -1,5 +1,7 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+     <x-meta-info.meta />
+@endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="max-w-2xl mx-auto">

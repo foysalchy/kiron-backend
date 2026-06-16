@@ -1,5 +1,15 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+    @php
+        $pKeywords = is_array($product->meta_keywords) ? implode(', ', $product->meta_keywords) : $product->meta_keywords;
+    @endphp
+    <x-meta-info.meta
+        :title="$product->meta_title ?? $product->title"
+        :description="$product->meta_description ?? Str::limit(strip_tags($product->short_description), 160)"
+        :keywords="$pKeywords"
+        :image="$product->thumbnail_url"
+    />
+@endsection
 @section('content')
     @php
         $isWishlisted = false;

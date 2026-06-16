@@ -117,7 +117,7 @@ class ProductService
 
             Product::loadCategoriesForCollection($items);
 
-            // Single Product 
+            // Single Product
             $warehouseIds = [];
             $binIds = [];
 

@@ -1,5 +1,7 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+     <x-meta-info.meta />
+@endsection
 @section('content')
     <!-- CONTACT HEADER SECTION -->
     <section class="container py-6 mx-auto font-['Outfit'] px-4">
