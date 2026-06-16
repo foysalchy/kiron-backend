@@ -17,9 +17,10 @@
                 @endif
             </a>
 
-            <!-- Segmented Search Bar (Hidden on Mobile, Visible on Desktop) -->
-            <form action="{{ route('shop.index') }}" method="GET" class="hidden md:flex flex-1 max-w-2xl">
-                <div class="flex w-full border border-[#016738] rounded-sm overflow-hidden bg-white">
+            <!-- Segmented Search Bar with Suggestions -->
+            <form action="{{ route('shop.index') }}" method="GET" class="hidden md:flex flex-1 max-w-2xl relative"
+                id="header-search-container">
+                <div class="flex w-full border border-[#016738] rounded-sm overflow-hidden bg-white z-30 relative">
                     <!-- Category Dropdown -->
                     <div class="relative flex-shrink-0 border-r border-[#016738] min-w-[130px]">
                         <select name="category"
@@ -34,12 +35,52 @@
                         </div>
                     </div>
                     <!-- Input -->
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="প্রোডাক্ট খুঁজুন..."
+                    <input type="text" name="search" id="header-search-input" autocomplete="off"
+                        value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন..."
                         class="flex-1 px-4 py-2 text-base text-black outline-none placeholder:text-gray-500">
                     <!-- Search Button -->
                     <button type="submit"
                         class="primary-bg text-primary px-8 py-2 text-lg font-bold hover:bg-opacity-95 transition-colors">খুঁজুন</button>
+                </div>
+
+                <!-- Search Suggestions Dropdown -->
+                <div id="search-suggestions"
+                    class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-2">
+
+                    <!-- ডিফল্ট কন্টেন্ট (যখন কিছু টাইপ করা হবে না) -->
+                    <div id="suggestion-content">
+                        <div class="pb-2">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">জনপ্রিয়
+                                সার্চ</p>
+                            @forelse($popularSearches ?? [] as $item)
+                                <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                                    class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-history text-gray-300 text-xs"></i>
+                                        <span>{{ $item->keyword }}</span>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-trend-up text-[10px] text-gray-200"></i>
+                                </a>
+                            @empty
+                                <p class="px-5 py-2 text-xs text-gray-400 italic">কোনো সার্চ হিস্ট্রি নেই</p>
+                            @endforelse
+                        </div>
+                        <div class="border-t border-gray-50 pt-2 pb-2">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">ট্রেন্ডিং
+                                প্রোডাক্ট</p>
+                            @foreach ($relatedProducts ?? [] as $p)
+                                <a href="{{ route('shop.index', ['search' => $p->title]) }}"
+                                    class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <img src="{{ $p->thumbnail_url }}"
+                                        class="w-6 h-6 rounded object-cover border border-gray-100">
+                                    <span class="truncate">{{ $p->title }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- লাইভ সার্চ রেজাল্ট (টাইপ করলে এখানে দেখাবে) -->
+                    <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
                 </div>
             </form>
 
@@ -69,7 +110,8 @@
                                 {{ substr(auth('customer')->user()->name, 0, 1) }}
                             </div>
                             <div class="hidden lg:block text-left">
-                                <p class="text-sm font-bold truncate max-w-[100px]">{{ auth('customer')->user()->name }}</p>
+                                <p class="text-sm font-bold truncate max-w-[100px]">{{ auth('customer')->user()->name }}
+                                </p>
                             </div>
                             <i class="fas fa-chevron-down text-[10px] ml-1 transition-transform duration-300"
                                 id="account-chevron"></i>
@@ -122,7 +164,7 @@
                 </div>
 
                 <!-- Call Button (Desktop Only) -->
-                <a href="tel:{{ $setup->phone ?? ''}}"
+                <a href="tel:{{ $setup->phone ?? '' }}"
                     class="hidden lg:flex items-center gap-2 primary-bg text-primary px-4 py-2.5 rounded-md font-medium">
                     <i class="fas fa-phone-alt text-sm"></i>
                     <span>কল করুন</span>
@@ -131,16 +173,48 @@
         </div>
     </div>
 
-    <!-- Mobile Search Bar (Visible only on Mobile, matches your image) -->
-    <div class="md:hidden px-4 pb-4">
+    <!-- Mobile Search Bar (Updated with Segment and Suggestions) -->
+    <div class="md:hidden px-4 pb-4 relative" id="mobile-search-container">
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-[#016738] rounded-sm overflow-hidden bg-white">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন.."
+            <!-- Category Segment for Mobile -->
+            <div class="relative flex-shrink-0 border-r border-[#016738] bg-gray-50">
+                <select name="category"
+                    class="h-full pl-2 pr-6 py-2 text-xs text-[#016738] font-bold bg-transparent outline-none appearance-none cursor-pointer">
+                    <option value="">সব</option>
+                    @foreach ($headerCategories as $cat)
+                        <option value="{{ $cat->slug }}">{{ $cat->name }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-1 flex items-center pointer-events-none">
+                    <i class="fas fa-chevron-down text-[10px] text-[#016738]"></i>
+                </div>
+            </div>
+
+            <input type="text" name="search" id="mobile-search-input" autocomplete="off"
+                value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন.."
                 class="flex-1 px-3 py-2 text-sm outline-none">
-            <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm transition-colors">
-                খুঁজুন
+
+            <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
+                <i class="fas fa-search"></i>
             </button>
         </form>
+
+        <!-- Mobile Search Suggestions -->
+        <div id="mobile-search-suggestions"
+            class="hidden absolute top-full left-4 right-4 bg-white mt-1 rounded-b-lg shadow-2xl border border-gray-100 z-[3500] overflow-hidden pt-2">
+            <div id="mobile-suggestion-content">
+                <!-- পপুলার ও ট্রেন্ডিং ডাটা এখানে ডেক্সটপের মতোই থাকবে -->
+                <div class="pb-2">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase px-4 py-2">জনপ্রিয় সার্চ</p>
+                    @foreach ($popularSearches ?? [] as $item)
+                        <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                            class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">{{ $item->keyword }}</a>
+                    @endforeach
+                </div>
+            </div>
+            <div id="mobile-live-results" class="hidden py-2 border-t border-gray-50"></div>
+        </div>
     </div>
 
     <!-- 2. Desktop Bottom Nav (Hidden on Mobile) -->
@@ -237,7 +311,7 @@
             @endauth
 
             <!-- কল করুন বাটন (সব সময় থাকবে) -->
-            <a href="tel:{{ $setup->phone ?? ''}}"
+            <a href="tel:{{ $setup->phone ?? '' }}"
                 class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                 <i class="fas fa-phone-alt"></i>
                 <span>কল করুন</span>
@@ -313,7 +387,88 @@
         </div>
     @endif
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // সার্চ ফাংশনালিটি সেটআপ করার জন্য একটি কমন ফাংশন
+        function setupSearch(inputId, suggestionBoxId, contentId, resultsId, containerId) {
+            const input = document.getElementById(inputId);
+            const suggestionBox = document.getElementById(suggestionBoxId);
+            const defaultContent = document.getElementById(contentId);
+            const liveResults = document.getElementById(resultsId);
+            const container = document.getElementById(containerId);
 
+            if (!input) return;
+
+            let debounceTimer;
+            let abortController = null;
+
+            input.addEventListener('focus', () => {
+                suggestionBox.classList.remove('hidden');
+            });
+
+            input.addEventListener('input', function() {
+                const query = this.value.trim();
+                clearTimeout(debounceTimer);
+                if (abortController) abortController.abort();
+
+                if (query.length > 1) {
+                    debounceTimer = setTimeout(() => {
+                        abortController = new AbortController();
+                        defaultContent.classList.add('hidden');
+                        liveResults.classList.remove('hidden');
+                        liveResults.innerHTML =
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>খোঁজা হচ্ছে...</div>';
+
+                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
+                                signal: abortController.signal
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                liveResults.innerHTML = '';
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        const link = document.createElement('a');
+                                        link.href = "{{ url('product') }}/" + item
+                                            .slug;
+                                        link.className =
+                                            "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
+                                        link.innerHTML = `
+                                        <img src="${item.thumbnail_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                        <span class="truncate">${item.title}</span>
+                                    `;
+                                        liveResults.appendChild(link);
+                                    });
+                                } else {
+                                    liveResults.innerHTML =
+                                        '<div class="px-5 py-3 text-xs text-gray-400">পাওয়া যায়নি।</div>';
+                                }
+                            })
+                            .catch(err => {
+                                if (err.name !== 'AbortError') console.error(err);
+                            });
+                    }, 500);
+                } else {
+                    defaultContent.classList.remove('hidden');
+                    liveResults.classList.add('hidden');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (container && !container.contains(e.target)) {
+                    suggestionBox.classList.add('hidden');
+                }
+            });
+        }
+
+        // ডেক্সটপ সার্চ অ্যাক্টিভেট করুন
+        setupSearch('header-search-input', 'search-suggestions', 'suggestion-content', 'live-search-results',
+            'header-search-container');
+
+        // মোবাইল সার্চ অ্যাক্টিভেট করুন
+        setupSearch('mobile-search-input', 'mobile-search-suggestions', 'mobile-suggestion-content',
+            'mobile-live-results', 'mobile-search-container');
+    });
+</script>
 <script>
     function toggleMobileMenu() {
         const menu = document.getElementById('mobile-menu');

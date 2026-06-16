@@ -45,7 +45,7 @@
         </a>
 
         <!-- Wishlist Button -->
-        <button type="button" onclick="toggleWishlist({{ $product->id }})"
+        <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="Add to Wishlist"
             class="absolute top-2 left-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm z-20 cursor-pointer transition-all {{ $isWishlisted ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
             <svg id="wish-icon-{{ $product->id }}" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                 viewBox="0 0 24 24" fill="{{ $isWishlisted ? '#ef4444' : 'none' }}"
@@ -114,7 +114,7 @@
         </button>
 
         <!-- Cart Icon Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }}
+        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="Add to Cart"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id, false)" }}"
             class="primary-bg text-primary p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center
             {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">

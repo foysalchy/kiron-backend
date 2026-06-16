@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\MegaCategory;
 use App\Models\Product;
 use App\Models\ProductGroup;
+use App\Models\ProductReview;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
@@ -52,6 +53,7 @@ class HomeController extends FrontendController
             ->get();
         $allProducts = Product::with(['brand', 'variations'])
             ->where('status', Status::Active->value)
+            ->latest()
             ->take(12)
             ->get();
 
@@ -60,6 +62,10 @@ class HomeController extends FrontendController
         $sidebarSliders = $allSliders->where('placement', 'right');
         $middleSliders = $allSliders->where('placement', 'middle')->take(2);
 
+         $allReviews = ProductReview::with('customer')
+        ->where('status', Status::Active->value)
+        ->latest()
+        ->get();
         return  $this->view(
             'frontend.home',
             compact(
@@ -72,8 +78,29 @@ class HomeController extends FrontendController
                 'mainSliders',
                 'sidebarSliders',
                 'middleSliders',
-                'allProducts'
+                'allProducts',
+                'allReviews'
             )
         );
+    }
+    public function filterSubCategory(Request $request)
+    {
+        $subId = (int)$request->sub_id;
+
+        $products = Product::where('status', Status::Active->value)
+            ->whereJsonContains('sub_category_ids', $subId)
+            ->with(['variations'])
+            ->latest()->take(6)->get();
+
+        $html = '';
+        foreach ($products as $product) {
+            $html .= view('components.template1.product-card', compact('product'))->render();
+        }
+
+        if ($html == '') {
+            return '<div class="col-span-full py-10 text-center text-gray-400">এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি।</div>';
+        }
+
+        return $html;
     }
 }

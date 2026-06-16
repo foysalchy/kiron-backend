@@ -14,6 +14,11 @@
 
 
 }
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+}
+
 
 #toast-container {
     top: 100px !important;
@@ -47,9 +52,7 @@
 button:hover{
 cursor: pointer;
 }
-*{
-    font-family: "Hind Siliguri", Sans-serif;
-}
+
 #cat-slider a:hover img {
     transform: scale(1.1);
 }
