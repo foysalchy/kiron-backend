@@ -85,6 +85,8 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
 
+    Route::get('/filter-subcategory-products', [HomeController::class, 'filterSubCategory'])->name('filter.subcategory');
+
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
