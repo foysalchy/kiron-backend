@@ -1,9 +1,7 @@
 @extends('template3.layouts.front')
 @section('meta')
-    <x-meta-info.meta
-        :title="$page_title ?? 'Checkout'"
-        description="Securely complete your order by providing shipping and payment details."
-    />
+    <x-meta-info.meta :title="$page_title ?? 'Checkout'"
+        description="Securely complete your order by providing shipping and payment details." />
     <meta name="robots" content="noindex, nofollow">
 @endsection
 @section('content')
@@ -252,14 +250,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const firstRadio = document.querySelector('input[name="payment_method"]');
             if (firstRadio) {
+                firstRadio.checked = true;
+                _checkoutSlug = firstRadio.value;
                 const slug = firstRadio.value;
-                const nameEl = firstRadio.closest('label')?.querySelector('span.text-md');
-                _checkoutSlug = slug;
-                highlightMethod(slug, nameEl?.innerText?.trim() ?? slug);
-                document.getElementById('selected-payment-method').value = slug;
+                handlePaymentSelection(slug, firstRadio.closest('label')?.querySelector('span.text-md')?.innerText
+                    ?.trim() ?? slug);
             }
-
-
         });
 
         // ── Radio label click → open modal ──
@@ -309,9 +305,10 @@
             const badge = document.getElementById('badge-' + slug);
             if (badge) badge.classList.remove('hidden');
 
-            // Display bar
-            document.getElementById('selected-method-name').innerText = name;
-            document.getElementById('selected-method-display').classList.remove('hidden');
+            const methodName = document.getElementById('selected-method-name');
+            const methodDisplay = document.getElementById('selected-method-display');
+            if (methodName) methodName.innerText = name ?? slug;
+            if (methodDisplay) methodDisplay.classList.remove('hidden');
         }
 
         function applyCoupon() {
@@ -330,7 +327,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': token,
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
@@ -380,7 +377,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': token
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             },
                             body: JSON.stringify({
                                 phone: phone,
@@ -415,7 +412,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({

@@ -22,46 +22,6 @@
         </div>
     </section>
 
-      <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="max-w-5xl mx-auto relative">
-
-            <!-- Left Fade -->
-            <div
-                class="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none">
-            </div>
-            <div
-                class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none">
-            </div>
-
-            @php $currentTag = request('tag'); @endphp
-
-            <div id="tag-scroll" class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-4"
-                style="flex-wrap: nowrap;">
-
-                {{-- All button --}}
-                <a href="{{ url()->current() }}"
-                    class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
-                {{ empty($currentTag)
-                    ? 'primary-bg text-primary border-[#1D2128] shadow-md'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
-                    All
-                </a>
-
-                {{-- Dynamic Tags --}}
-                @foreach ($availableTags as $tag)
-                    <a href="{{ url()->current() . '?tag=' . urlencode($tag) }}"
-                        class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
-                    {{ $currentTag == $tag
-                        ? 'primary-bg text-primary border-[#1D2128] shadow-md'
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
-                        {{ $tag }}
-                    </a>
-                @endforeach
-
-            </div>
-        </div>
-    </section>
-
     <!-- 3. Blog Grid -->
     <section class="container mx-auto py-6 px-4">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

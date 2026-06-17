@@ -37,7 +37,7 @@ class AuthController extends FrontendController
         $company = getCurrentCompany();
 
         $user = Party::create([
-            'company_id' => $company->id,
+            'company_id' => $company->company_id,
             'type'       => Party::TYPE_CUSTOMER,
             'name'       => $request->name,
             'email'      => $request->email,

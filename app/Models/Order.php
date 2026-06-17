@@ -326,7 +326,7 @@ class Order extends Model
     {
         // Uses the label() method you defined in your Status Enum
         // return Status::from($this->status)->label();
-         return $this->status?->label() ?? 'Unknown';
+        return $this->status?->label() ?? 'Unknown';
     }
 
     /**
@@ -335,13 +335,13 @@ class Order extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
-            Status::Pending->value    => 'bg-orange-100 text-orange-700',
-            Status::Processing->value => 'bg-blue-100 text-blue-700',
-            Status::Delivered->value  => 'bg-green-100 text-green-700',
-            Status::Cancelled->value  => 'bg-red-100 text-red-700',
-            Status::ReturnRequest->value => 'bg-purple-100 text-purple-700',
+            Status::Pending    => 'bg-orange-100 text-orange-700',
+            Status::Processing => 'bg-blue-100 text-blue-700',
+            Status::Delivered  => 'bg-green-100 text-green-700',
+            Status::Cancelled  => 'bg-red-100 text-red-700',
+            Status::ReturnRequest => 'bg-purple-100 text-purple-700',
             Status::Draft      => 'bg-gray-100 text-gray-700',
-            default                       => 'bg-gray-100 text-gray-700',
+            default            => 'bg-gray-100 text-gray-700',
         };
     }
 

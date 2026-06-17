@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Brand extends Model
 {
@@ -56,6 +57,8 @@ class Brand extends Model
     // Accessors
     public function getLogoUrlAttribute(): ?string
     {
-        return $this->logo ? asset('storage/' . $this->logo) : null;
+        return $this->logo
+            ? Storage::disk('r2')->url($this->logo)
+            : null;
     }
 }

@@ -11,14 +11,52 @@
     @endphp
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
-        <!-- 1. Breadcrumb -->
-        <nav
-            class="flex items-center space-x-2 text-sm text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
-            <a href="/" class="hover:text-[#FF6A00]">Home</a>
-            <i class="fas fa-chevron-right text-[8px]"></i>
-            <a href="#" class="hover:text-[#FF6A00]">{{ $category->name ?? 'Product Details' }}</a>
-            <i class="fas fa-chevron-right text-[8px]"></i>
-            <span class="text-[#F97316]">{{ $product->title ?? 'Product' }}</span>
+        <!-- 1. Dynamic Breadcrumb -->
+        <nav class="flex items-center space-x-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-4 no-scrollbar">
+            {{-- Home --}}
+            <a href="/" class="hover:text-[var(--primary-color)] flex items-center gap-1">
+                <i class="fas fa-home text-xs"></i> Home
+            </a>
+
+            {{-- ১. Mega Category --}}
+            @php $mega = $product->mega_categories?->first(); @endphp
+            @if ($mega)
+                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
+                <a href="{{ route('category.products', $mega->slug) }}" class="hover:text-[var(--primary-color)]">
+                    {{ $mega->name ?? '' }}
+                </a>
+            @endif
+
+            {{-- ২. Sub Category --}}
+            @php $sub = $product->sub_categories?->first(); @endphp
+            @if ($sub)
+                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
+                <a href="{{ route('category.products', $sub->slug) }}" class="hover:text-[var(--primary-color)]">
+                    {{ $sub->name ?? '' }}
+                </a>
+            @endif
+
+            {{-- ৩. Mini Category --}}
+            @php $mini = $product->mini_categories?->first(); @endphp
+            @if ($mini)
+                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
+                <a href="{{ route('category.products', $mini->slug) }}" class="hover:text-[var(--primary-color)]">
+                    {{ $mini->name ?? '' }}
+                </a>
+            @endif
+            @php $extra = $product->extra_categories?->first(); @endphp
+            @if ($extra)
+                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
+                <a href="{{ route('category.products', $extra->slug) }}" class="hover:text-[var(--primary-color)]">
+                    {{ $extra->name ?? '' }}
+                </a>
+            @endif
+
+            {{-- ৪. Product Title --}}
+            <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
+            <span class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">
+                {{ $product->title ?? '' }}
+            </span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -29,18 +67,21 @@
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp')}}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
                         <button onclick="changeImage('{{ $product->thumbnail_url }}')"
-                            class="aspect-square rounded-lg border-2 border-[#FF6A00] p-1 bg-white overflow-hidden">
+                            class="aspect-square rounded-lg border-2 border-[var(--primary-color)] p-1 bg-white overflow-hidden">
                             <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-contain">
                         </button>
                         @foreach ($product->galleries as $gallery)
-                            <button onclick="changeImage('{{ asset('storage/' . $gallery->image) }}')"
-                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
-                                <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-contain">
+                            <button onclick="changeImage('{{ $gallery->image_url }}')"
+                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden">
+
+                                <img src="{{ $gallery->image_url }}"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                    class="w-full h-full object-contain" alt="Product Gallery Image">
                             </button>
                         @endforeach
                     </div>
@@ -125,7 +166,7 @@
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
-    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+    {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -154,52 +195,56 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                     @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                        @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
-                            <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                                <div class="text-orange-500 shrink-0">
-                                    @if ($card->icon_file)
-                                        <img src="{{ asset('storage/' . $card->icon_file) }}"
-                                            class="h-5 w-5 object-contain">
-                                    @else
-                                        <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
-                                    @endif
+                    @if ($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
+                                <div
+                                    class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
+                                    <div class="text-orange-500 shrink-0">
+                                        @if ($card->icon_file)
+                                            <img src="{{ asset('storage/' . $card->icon_file) }}"
+                                                class="h-5 w-5 object-contain">
+                                        @else
+                                            <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
+                                        @endif
+                                    </div>
+                                    <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
                                 </div>
-                                <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
                     @endif
 
                     <div class="bg-gray-100 py-3 px-3 rounded">
-                    <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
+                        <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
-                    <div class="grid grid-cols-2 gap-2 md:gap-3">
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
 
-                        <a href="tel:{{ $setup->phone }}"
-                            class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                </path>
-                            </svg>
-                            Call Now
-                        </a>
+                            <a href="tel:{{ $setup->phone }}"
+                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-phone h-5 w-5 mr-2">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                    </path>
+                                </svg>
+                                Call Now
+                            </a>
 
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
-                            target="_blank"
-                            class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
-                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                            </svg>
-                            WhatsApp
-                        </a>
-                    </div></div>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                                target="_blank"
+                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round"
+                                    class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                </svg>
+                                WhatsApp
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,7 +255,7 @@
             <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
                 id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
-                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
+                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[var(--primary-color)] text-gray-900 bg-white font-bold">Description</button>
 
                 <button onclick="switchTab('specification')" id="tab-btn-specification"
                     class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
@@ -308,7 +353,7 @@
 
                     <!-- Review Summary Card -->
                     <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
-                        <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
+                        <div class="text-4xl font-bold text-[var(--primary-color)] mb-2">{{ number_format($avgRating, 1) }}</div>
                         <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
                             @for ($i = 1; $i <= 5; $i++)
                                 <i
@@ -366,7 +411,7 @@
                                             <div class="flex flex-wrap gap-3 mb-4">
                                                 @foreach ($review->images as $img)
                                                     <div
-                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
+                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[var(--primary-color)] transition-all cursor-pointer">
                                                         <img src="{{ asset('storage/' . $img) }}"
                                                             onclick="expandReviewImage(this.src, '{{ $review->id }}')"
                                                             class="w-full h-full object-cover" alt="Review Image">
@@ -455,10 +500,10 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-content-' + tabId).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-gray-900', 'border-[#FF6A00]', 'bg-white');
+                b.classList.remove('text-gray-900', 'border-[var(--primary-color)]', 'bg-white');
                 b.classList.add('text-gray-500', 'border-transparent');
             });
-            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[#FF6A00]', 'bg-white');
+            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[var(--primary-color)]', 'bg-white');
         }
 
         // variation and gallery data
@@ -495,7 +540,7 @@
                     `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const activeClass = (userSelections[groupName] == valId) ?
-                        'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
+                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' : 'border-gray-200 bg-white text-gray-700';
                     groupHtml +=
                         `<button type="button" onclick="selectOption('${groupName}', ${valId})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
                 }
@@ -519,13 +564,13 @@
                     // variation main image
                     if (final.image) {
                         galleryHtml +=
-                            `<button onclick="changeImage('${final.image}')" class="aspect-square rounded-lg border-2 border-[#FF6A00] p-1 bg-white overflow-hidden"><img src="${final.image}" class="w-full h-full object-contain"></button>`;
+                            `<button onclick="changeImage('${final.image}')" class="aspect-square rounded-lg border-2 border-[var(--primary-color)] p-1 bg-white overflow-hidden"><img src="${final.image}" class="w-full h-full object-contain"></button>`;
                     }
                     // variation others image
                     if (final.galleries && final.galleries.length > 0) {
                         final.galleries.forEach(imgUrl => {
                             galleryHtml +=
-                                `<button onclick="changeImage('${imgUrl}')" class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-contain"></button>`;
+                                `<button onclick="changeImage('${imgUrl}')" class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-contain"></button>`;
                         });
                     }
                     thumbContainer.innerHTML = galleryHtml;
@@ -624,14 +669,14 @@
                         // temporary disable button to prevent multiple clicks
                         if (data.status === 'added') {
                             // added to change to active style and 'Wishlisted' text
-                            btnWish.classList.add('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
+                            btnWish.classList.add('bg-orange-50', 'text-[var(--primary-color)]', 'border-[var(--primary-color)]');
                             btnWish.classList.remove('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'fas fa-heart text-red-500';
                             wishText.innerText = 'Wishlisted';
                             toastr.success(data.message);
                         } else {
                             // removed to change to default style and 'Wishlist' text
-                            btnWish.classList.remove('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
+                            btnWish.classList.remove('bg-orange-50', 'text-[var(--primary-color)]', 'border-[var(--primary-color)]');
                             btnWish.classList.add('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'far fa-heart';
                             wishText.innerText = 'Wishlist';

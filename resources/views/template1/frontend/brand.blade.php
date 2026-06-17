@@ -8,7 +8,7 @@
         <!-- Brands Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             @forelse($brands as $brand)
-                <a href="{{ route('brand.products', ['slug' => $brand->slug]) }}" class="group block h-full">
+             <a href="{{ route('brand.products', ['slug' => $brand->slug ?? $brand->id]) }}" class="group block h-full">
                     <div class="p-3 md:p-6 bg-white border border-gray-200 rounded-lg shadow-xs group-hover:shadow-xl group-hover:border-orange-100 transition-all duration-300">
                         <div class="flex items-start gap-4">
                             <!-- Logo Section -->
@@ -19,8 +19,8 @@
 
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="text-sm md:text-lg font-semibold text-gray-900 group-hover:text-[#FF6A00] truncate transition-colors">
-                                        {{ $brand->name }}
+                                    <h3 class="text-sm md:text-lg font-semibold text-gray-900 group-hover:text-[var(--primary-color)] truncate transition-colors">
+                                        {{ $brand->name ?? ''}}
                                     </h3>
                                     <!-- You can add a 'is_featured' check here if you add that column to your DB -->
                                     @if($loop->iteration <= 3)
@@ -30,11 +30,11 @@
 
                                 <p class="hidden md:block text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed">
                                     {{-- Use a description field if you have one, otherwise a placeholder --}}
-                                    Quality products from {{ $brand->name }}.
+                                    Quality products from {{ $brand->name ?? ''}}.
                                 </p>
 
                                 <div class="flex flex-wrap items-center justify-between gap-1">
-                                    <span class="px-2.5 py-1 secondary-bg text-secondary text-xs font-semibold rounded-lg group-hover:bg-orange-100 group-hover:text-[#FF6A00] transition-colors uppercase">
+                                    <span class="px-2.5 py-1 secondary-bg text-secondary text-xs font-semibold rounded-lg group-hover:bg-orange-100 group-hover:text-[var(--primary-color)] transition-colors uppercase">
                                         Official Brand
                                     </span>
                                     <span class="text-sm text-gray-500 tracking-tight">

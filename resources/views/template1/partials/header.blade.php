@@ -269,7 +269,7 @@
             <!-- User Info -->
             @auth('customer')
                 <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-orange-50">
-                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#FF6A00]">
+                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--primary-color)]">
                         <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                             class="w-full h-full object-cover">
                     </div>
@@ -281,7 +281,7 @@
             @else
                 <div class="flex gap-3 px-5 py-4 border-b border-gray-100">
                     <a href="{{ route('user.login') }}"
-                        class="flex-1 text-center py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-sm font-bold">Login</a>
+                        class="flex-1 text-center py-2 border border-[var(--primary-color)] text-[var(--primary-color)] rounded-lg text-sm font-bold">Login</a>
                     <a href="{{ route('user.register') }}"
                         class="flex-1 text-center py-2 primary-bg text-primary text-primary rounded-lg text-sm font-bold">Register</a>
                 </div>
