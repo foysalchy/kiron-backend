@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('domain_setups', function (Blueprint $table) {
-            $table->string('theme_template')
-                ->nullable()
-                ->after('is_review');
+        Schema::table('product_variations', function (Blueprint $table) {
+            $table->decimal('purchase_price', 10, 2)->nullable()->change();
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('domain_setups', function (Blueprint $table) {
-            $table->dropColumn('theme_template');
+        Schema::table('product_variations', function (Blueprint $table) {
+            $table->decimal('purchase_price', 10, 2)->nullable(false)->change();
         });
     }
 };

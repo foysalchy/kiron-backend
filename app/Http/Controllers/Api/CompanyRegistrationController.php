@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CompanyRegistration\{StoreBasicRegistrationRequest, StoreSubscriptionRequest, VerifyOtpRequest, ResendOtpRequest,StoreBasicSettingsRequest};
 use App\Services\CompanyRegistrationService;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\UnifiedSellerRegistrationRequest;
 use Illuminate\Http\JsonResponse;
 
 class CompanyRegistrationController extends Controller
@@ -56,5 +57,10 @@ class CompanyRegistrationController extends Controller
         );
 
         return ResponseHelper::success(null, "New OTP sent to your email.");
+    }
+      public function register(UnifiedSellerRegistrationRequest $request): JsonResponse
+    {
+        $result = $this->registrationService->registerSeller($request->all(), $request);
+        return ResponseHelper::success($result, 'Seller registration and store configuration completed successfully.');
     }
 }

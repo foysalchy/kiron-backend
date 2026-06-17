@@ -100,7 +100,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'purpose' => ['sometimes', 'required', 'string', 'max:255'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string'],
-                'meta_keywords' => ['nullable', 'array'],
+                'meta_keywords' => ['nullable'],
                 'meta_keywords.*' => ['nullable', 'string',],
             ]
         );
