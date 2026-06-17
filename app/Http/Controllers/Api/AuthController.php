@@ -171,6 +171,89 @@ class AuthController extends Controller
             $this->generateLoginResponse($user, $request)
         );
     }
+
+      public function me(Request $request): JsonResponse
+    {
+        // Load relationships matching your login setup
+        $user = $request->user()->load(['company.pricingPackage', 'roles.permissions']);
+
+        // Calculate dynamic permissions using the helper method
+        $effectivePermissions = $this->getEffectivePermissions($user);
+
+        $primaryRoleName = $user->is_super_admin
+            ? 'Super Admin'
+            : ($user->roles->first()?->name ?? 'User');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile retrieved successfully',
+            'user' => [
+                'id'             => $user->id,
+                'name'           => $user->name,
+                'email'          => $user->email,
+                'company_id'     => $user->company_id,
+                'role'           => $primaryRoleName,
+                'is_super_admin' => $user->is_super_admin,
+                'status'         => $user->status,
+                'profile'        => $user->profile,
+                'profile_url'    => $user->profile_url,
+                'company'        => $user->company,
+            ],
+            'permissions' => $effectivePermissions,
+        ]);
+    }
+ private function getEffectivePermissions(User $user): array
+    {
+        $effectivePermissions = [];
+
+        if ($user->is_super_admin) {
+            if ($user->roles->isNotEmpty()) {
+                foreach ($user->roles as $role) {
+                    foreach ($role->permissions as $permission) {
+                        $effectivePermissions[] = $permission->name;
+                    }
+                }
+                $effectivePermissions = array_values(array_unique($effectivePermissions));
+            } else {
+                $effectivePermissions = Permission::where('type', 'superadmin')
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } else {
+            $featureKeys = [];
+            $company = $user->company;
+
+            if ($company && $company->pricingPackage) {
+                $featureKeys = $company->pricingPackage->features ?? [];
+                if (is_string($featureKeys)) {
+                    $featureKeys = json_decode($featureKeys, true) ?? [];
+                }
+            }
+
+            if (!empty($featureKeys)) {
+                if ($user->roles->isNotEmpty()) {
+                    $roleIds = $user->roles->pluck('id')->toArray();
+
+                    $effectivePermissions = Permission::where('type', 'company')
+                        ->whereIn('feature_dependency', $featureKeys)
+                        ->whereHas('roles', fn($q) => $q->whereIn('roles.id', $roleIds))
+                        ->pluck('name')
+                        ->toArray();
+                } else {
+                    $effectivePermissions = Permission::where('type', 'company')
+                        ->whereIn('feature_dependency', $featureKeys)
+                        ->pluck('name')
+                        ->toArray();
+                }
+            }
+        }
+
+        return $effectivePermissions;
+    }
+    /**
+     * Refactored login handler
+     */
+  
     public function impersonateCompany($companyId, Request $request): JsonResponse
     {
         DB::beginTransaction();

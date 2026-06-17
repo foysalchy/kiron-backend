@@ -20,7 +20,8 @@ class SocialSettingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'icon_name'  => 'nullable|string|max:100',
+            'icon_name'  => 'required|string|max:100',
+            'icon_class'  => 'nullable|string|max:100',
             'icon_image' => 'nullable|image|max:2048',
             'link'       => 'required|url',
             'hover_bg'   => 'required|string|max:20',
@@ -33,7 +34,8 @@ class SocialSettingController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'icon_name'  => 'nullable|string|max:100',
+            'icon_name'  => 'required|string|max:100',
+            'icon_class'  => 'nullable|string|max:100',
             'icon_image' => 'nullable|image|max:2048',
             'link'       => 'required|url',
             'hover_bg'   => 'required|string|max:20',

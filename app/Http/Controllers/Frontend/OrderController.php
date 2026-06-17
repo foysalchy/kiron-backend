@@ -514,7 +514,7 @@ class OrderController extends FrontendController
             }
 
             ProductReview::create([
-                'company_id'   => $this->company_id,
+                'company_id'   => getCurrentCompany()->company_id,
                 'product_id'   => $request->product_id,
                 'variation_id' => $request->filled('variation_id') ? (int)$request->variation_id : null,
                 'customer_id'  => auth('customer')->id(),

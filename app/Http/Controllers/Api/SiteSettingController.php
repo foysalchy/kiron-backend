@@ -148,7 +148,7 @@ class SiteSettingController extends Controller
     }
     public function updateThemeTemplate(Request $request)
     {
-   
+
         $request->validate([
             'theme_id'             => 'required',
             'primary_color'        => 'nullable|string',
@@ -181,11 +181,12 @@ class SiteSettingController extends Controller
             ]);
 
             $domain = DomainSetup::where('company_id', $company->id)->first();
-     \Log::info($domain);
+
             if ($domain && $request->has('is_review')) {
                 $domain->update([
                     'is_review' => $request->is_review,
                     'product_card_template'              => $request->card_id,
+                    'template_name'              => 'template' . $request->theme_id,
 
                 ]);
             }

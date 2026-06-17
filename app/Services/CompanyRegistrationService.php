@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
+use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Mail\VerifyOtpEmail;
 use App\Models\Company;
@@ -269,7 +270,186 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to save basic settings.');
         }
     }
+  /**
+     * Unified Seller Registration - Merging all registration phases into one single atomic transaction.
+     */
+    public function registerSeller(array $data, $request): array
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Create the Company
+            $company = Company::create([
+                'name'          => $data['name'],
+                'email'         => $data['email'],
+                'phone'         => $data['phone'],
+                'business_type' => $data['business_type'] ?? 1,
+                'status'        => Status::Active->value, // Account activated immediately on success
+            ]);
 
+            LogHelper::created('company', $company->id, $company->id);
+
+            // 2. Create the User (Marked as Primary Super-Admin)
+            $user = User::create([
+                'company_id' => $company->id,
+                'name'       => $data['name'],
+                'email'      => $data['email'],
+                'phone'      => $data['phone'],
+                'password'   => Hash::make($data['password']),
+                'status'     => Status::Active->value,
+                'is_primary' => 1,
+            ]);
+
+            LogHelper::created('user', $user->id, $company->id);
+
+  
+
+            // 4. Process Subscription pricing tier details and durations
+            $billing = $data['billing_cycle'] ?? 'monthly';
+
+            $pricing = PricingPackage::with(['tiers' => function ($q) use ($billing) {
+                $q->where('billing_cycle', $billing);
+            }])->findOrFail($data['pricing_package_id']);
+
+            $tier = $pricing->tiers->first();
+
+            if (!$tier) {
+                throw new \Exception("No pricing tier found for billing cycle: {$billing}");
+            }
+
+            $amountPaid = $tier->discount_price > 0 && $tier->discount_price < $tier->regular_price
+                ? $tier->discount_price
+                : $tier->regular_price;
+
+            $now       = Carbon::now();
+            $trialDays = (int) $pricing->trial_days;
+
+            $trialEnds = $trialDays > 0
+                ? $now->copy()->addDays($trialDays)
+                : null;
+
+            $endsAt = match ($billing) {
+                'yearly'    => $now->copy()->addYear(),
+                'quarterly' => $now->copy()->addMonths(3),
+                default     => $now->copy()->addMonth(),
+            };
+
+            // 5. Create Company Subscription using correct pricing_tier_id relation
+            $subscription = CompanySubscription::create([
+                'company_id'         => $company->id,
+                'pricing_package_id' => $pricing->id,
+                'pricing_tier_id'    => $tier->id,
+                'amount_paid'        => $amountPaid,
+                'payment_method'     => $data['payment_method'] ?? 'card',
+                'payment_status'     => 'pending',
+                'trial_ends_at'      => $trialEnds,
+                'starts_at'          => $now,
+                'ends_at'            => $endsAt,
+                'status'             => Status::Active->value,
+            ]);
+
+            // 6. Handle Manual / Bank receipt upload using FileUploadHelper
+            if (in_array($data['payment_method'], ['manual', 'bank'])) {
+                $documentPath = null;
+
+                if (isset($data['document']) && $data['document'] instanceof \Illuminate\Http\UploadedFile) {
+                    $documentPath = FileUploadHelper::uploadImage(
+                        $data['document'],
+                        'payment_documents'
+                    );
+                }
+
+                DB::table('subscription_payments')->insert([
+                    'subscription_id' => $subscription->id,
+                    'company_id'      => $company->id,
+                    'payment_method'  => $data['payment_method'],
+                    'amount'          => $amountPaid,
+                    'transaction_id'  => $data['transaction_id'] ?? null,
+                    'sender_number'   => $data['number'] ?? null,
+                    'account_number'  => null,
+                    'bank_name'       => null,
+                    'status'          => 'pending',
+                    'meta'            => json_encode([
+                        'account_holder_name' => $data['account_holder_name'] ?? null,
+                        'document_path'       => $documentPath
+                    ]),
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
+                ]);
+            }
+
+            // Sync subscription changes back to company profile
+            $company->pricing_package_id = $subscription->pricing_package_id;
+            $company->update();
+
+            // 7. Create SiteSetting Entry (with language and currency parameters embedded)
+            SiteSetting::create([
+                'company_id' => $company->id,
+                'shop_name'  => $company->name,
+                'email'      => $company->email,
+                'phone'      => $company->phone,
+                'lang'       => $data['lang'],
+                'currency'   => $data['currency'],
+            ]);
+
+            // 8. Create DomainSetup Entry
+            DomainSetup::create([
+                'company_id' => $company->id,
+                'sub_domain' => $data['sub_domain'],
+            ]);
+
+            // 9. Process Warehouse Setup
+            if (isset($data['manage_warehouse'])) {
+                $manageWarehouse = (bool) $data['manage_warehouse'];
+                $company->update(['manage_warehouse' => $manageWarehouse]);
+
+                if (!$manageWarehouse) {
+                    $exists = Warehouse::where('company_id', $company->id)
+                        ->where('is_default', 1)
+                        ->exists();
+
+                    if (!$exists) {
+                        $warehouse = Warehouse::create([
+                            'company_id' => $company->id,
+                            'name'       => 'Default Warehouse',
+                            'location'   => null,
+                            'is_default' => 1,
+                            'status'     => Status::Active->value,
+                        ]);
+
+                        $company->update(['default_warehouse_id' => $warehouse->id]);
+                    }
+                }
+            }
+
+  
+
+            DB::commit();
+
+            Log::info("Unified registration complete for company_id: {$company->id} and user_id: {$user->id}");
+
+            // Load and resolve freshly registered relationships and permissions
+            $freshUser = User::where('company_id', $company->id)
+                ->with(['company.pricingPackage', 'roles.permissions'])
+                ->first();
+
+            return [
+               
+                'user' => [
+                    'id'          => $freshUser->id,
+                    'name'        => $freshUser->name,
+                    'email'       => $freshUser->email,
+                    'company_id'  => $freshUser->company_id,
+                
+                    'company'     => $company->load('pricingPackage'),
+                ],
+                'permissions' => $this->resolvePermissions($freshUser),
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Unified registration failed: ' . $e->getMessage());
+            throw ApiException::serverError($e->getMessage() ?: 'Registration failed. Please try again.');
+        }
+    }
     private function resolvePermissions(User $user): array
     {
         if ($user->is_super_admin) {

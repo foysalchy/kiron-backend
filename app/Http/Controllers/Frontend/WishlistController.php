@@ -23,7 +23,7 @@ class WishlistController extends Controller
         $customerId = auth('customer')->id();
 
         $product = Product::where('id', $productId)
-                ->where('company_id', $company->id)
+                ->where('company_id', $company->company_id)
                 ->first();
 
     if (!$product) {
@@ -33,7 +33,7 @@ class WishlistController extends Controller
         ]);
     }
 
-        $exists = Wishlist::where('company_id', $company->id)
+        $exists = Wishlist::where('company_id', $company->company_id)
             ->where('customer_id', $customerId)
             ->where('product_id', $productId)
             ->first();

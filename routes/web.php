@@ -26,8 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
-Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
+Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
+// Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
     //landing page

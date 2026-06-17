@@ -482,7 +482,7 @@ class ProductService
         $data['regular_price'] = null;
         $data['purchase_price'] = null;
         $data['discount_type'] = null;
-        $data['discount'] = null;
+        $data['discount'] = 0;
         $data['warehouse_info'] = null; // Don't use JSON for variations
 
         // Calculate total stock (will be updated after creating variations)
