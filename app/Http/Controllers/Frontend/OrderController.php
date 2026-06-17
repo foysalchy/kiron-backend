@@ -18,7 +18,7 @@ class OrderController extends FrontendController
         parent::__construct();
     }
 
-    public function index($store)
+    public function index()
     {
 
 
@@ -34,10 +34,9 @@ class OrderController extends FrontendController
             ->where('status', Status::Draft->value)
             ->first()
             : null;
-
         // Auto-create draft for logged in users
         if (auth('customer')->check() && !$existingDraft) {
-            $this->createDraftOrder($store, [
+            $this->createDraftOrder([
                 'phone'   => auth('customer')->user()->phone,
                 'name'    => auth('customer')->user()->name,
                 'address' => auth('customer')->user()->address,
@@ -70,35 +69,43 @@ class OrderController extends FrontendController
         ));
     }
 
-    public function partialSave($store, Request $request)
+    public function partialSave(Request $request)
     {
         if (!$request->phone || strlen($request->phone) < 11) {
             return response()->json(['success' => false, 'message' => 'Invalid phone number']);
         }
-        $res = $this->createDraftOrder($store, $request->all());
+        $res = $this->createDraftOrder($request->all());
         return response()->json($res);
     }
 
-    private function createDraftOrder($store, $data)
+    private function createDraftOrder($data)
     {
         $cartContent = Cart::content();
 
         if ($cartContent->isEmpty()) {
             return ['success' => false, 'error' => 'Cart is empty'];
         }
-
+        //  Log::info('Cart content', ['count' => $cartContent->count()]);
         $warehouseInfo = [];
         $warehouseIds = [];
 
         foreach ($cartContent as $item) {
-            $vId = $item->options->variation_id ?? null;
-            $wId = $item->options->warehouse_id ?? null;
-            $bId = $item->options->bin_id ?? null;
+            // Fluent object থেকে সঠিকভাবে data নাও
+            $vId = $item->options->get('variation_id') ?? $item->options->variation_id ?? null;
+            $wId = $item->options->get('warehouse_id') ?? $item->options->warehouse_id ?? null;
+            $bId = $item->options->get('bin_id') ?? $item->options->bin_id ?? null;
+
+            $wId = $wId ? (int) $wId : null;
+
+            Log::info('Cart item options fixed', [
+                'item_id'      => $item->id,
+                'variation_id' => $vId,
+                'warehouse_id' => $wId,
+            ]);
 
             if ($wId) {
                 $warehouseIds[] = $wId;
             }
-
 
             $warehouseInfo[] = [
                 'product_id'   => $vId ? (ProductVariation::find($vId)?->product_id) : (int) $item->id,
@@ -106,7 +113,6 @@ class OrderController extends FrontendController
                 'warehouse_id' => $wId,
                 'bin_id'       => $bId,
                 'quantity'     => (int) $item->qty,
-
             ];
         }
 
@@ -130,12 +136,17 @@ class OrderController extends FrontendController
 
             $items = [];
             foreach ($cartContent as $item) {
-                $vId = $item->options->variation_id ?? null;
+                $vId = $item->options->get('variation_id') ?? $item->options->variation_id ?? null;
+                $wId = $item->options->get('warehouse_id') ?? $item->options->warehouse_id ?? null;
+                $bId = $item->options->get('bin_id') ?? $item->options->bin_id ?? null;
+
                 $items[] = [
                     'product_id'   => $vId ? ProductVariation::find($vId)?->product_id : (int) $item->id,
                     'variation_id' => $vId,
                     'quantity'     => (int) $item->qty,
                     'unit_price'   => (float) $item->price,
+                    'warehouse_id' => $wId ? (int)$wId : null, // ⚡ নিশ্চিত করুন এখানে $wId ব্যবহার হয়েছে
+                    'bin_id'       => $bId,
                 ];
             }
 
@@ -173,6 +184,10 @@ class OrderController extends FrontendController
                 'other_charges'    => session()->get('shipping_cost', 60),
                 'shipping_address' => $shippingAddress,
             ];
+            Log::info('Order data before create', [
+                'status' => $orderData['status'],
+                'status_draft_value' => Status::Draft->value,
+            ]);
 
             $order = $this->orderService->createSalesOrder($orderData);
             Session::put('current_draft_order_id', $order->id);
@@ -185,7 +200,7 @@ class OrderController extends FrontendController
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
-    public function storeOrder($store, Request $request)
+    public function storeOrder(Request $request)
     {
         $pm = strtolower($request->payment_method);
         $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
@@ -204,12 +219,12 @@ class OrderController extends FrontendController
         // 1. Try to find the draft order
         $orderId = Session::get('current_draft_order_id');
         $order = Order::where('company_id', $this->company_id)
-            ->where('status', Status::Draft->value)
+            ->where('status', Status::Draft->value ?? Status::Draft)
             ->find($orderId);
 
         // 2. Fallback
         if (!$order) {
-            $draftResult = $this->createDraftOrder($store, $request->all());
+            $draftResult = $this->createDraftOrder($request->all());
             if ($draftResult['success']) {
                 $order = Order::find(Session::get('current_draft_order_id'));
             } else {
@@ -232,7 +247,11 @@ class OrderController extends FrontendController
                 'address'        => $request->address,
                 'payment_method' => $request->payment_method,
             ];
-            $order->update(['shipping_address' => $finalAddress]);
+            $order->status = Status::Pending;
+            $order->shipping_address = $finalAddress;
+            $order->save();
+            $order->refresh(); // এটা যোগ করো
+
 
             if ($order->customer) {
                 $order->customer->update(['name' => $request->name, 'address' => $request->address]);
@@ -277,7 +296,7 @@ class OrderController extends FrontendController
             ]);
 
             Log::info("Payment recorded for Order ID: {$order->id}, Transaction ID: {$transactionId}, Amount: {$request->amount}");
-            $order->update(['payment_status' => Order::PAYMENT_PENDING]);
+            $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
 
 
             // ৫. Cart Tracking Update
@@ -311,21 +330,25 @@ class OrderController extends FrontendController
         }
 
         try {
-            DB::beginTransaction();
-
             foreach ($warehouseData as $info) {
-                 $warehouseId = isset($info['warehouse_id']) ? (int) $info['warehouse_id'] : 0;
-
-            if ($warehouseId === 0) {
-                throw new \Exception('Invalid Warehouse ID for product in order.');
-            }
+                // ⚡ ফিক্স: আগে ডাটাগুলো ভ্যারিয়েবলে নিন (এটি আপনার কোডে নিচে ছিল)
                 $productId   = $info['product_id'];
                 $variationId = $info['variation_id'] ?? null;
-                $warehouseId = $info['warehouse_id'];
+                $warehouseId = isset($info['warehouse_id']) ? (int) $info['warehouse_id'] : 0;
                 $binId       = $info['bin_id'] ?? null;
                 $qty         = (int) ($info['quantity'] ?? 0);
 
                 if ($qty <= 0) continue;
+
+                // এখন এই চেকটি আর এরর দিবে না
+                if (!$warehouseId || $warehouseId === 0) {
+                    $product = Product::find($productId);
+                    if ($product) {
+                        $product->decrement('stock_quantity', $qty);
+                        $product->decrement('available_stock', $qty);
+                    }
+                    continue;
+                }
 
                 if ($variationId) {
                     // --- VARIATION PRODUCT STOCK DEDUCTION ---
@@ -333,8 +356,6 @@ class OrderController extends FrontendController
                     if (!$variation) continue;
 
                     $product = $variation->product;
-
-                    // ১. Variation Stock Table Update
                     $varStock = ProductVariationStock::where('product_variation_id', $variationId)
                         ->where('warehouse_id', $warehouseId)
                         ->where('bin_id', $binId)
@@ -345,7 +366,6 @@ class OrderController extends FrontendController
                         $varStock->decrement('quantity', $qty);
                         $qtyAfter = $varStock->quantity;
 
-                        // ২. Variation Stock Ledger Entry
                         ProductVariationStockLedger::create([
                             'product_id'       => $product->id,
                             'variation_id'     => $variationId,
@@ -360,8 +380,6 @@ class OrderController extends FrontendController
                             'notes'            => 'Stock deducted for Order #' . $order->id,
                         ]);
                     }
-
-                    // ৩. Main Product Table Global Stock Update
                     $product->decrement('stock_quantity', $qty);
                     $product->decrement('available_stock', $qty);
                 } else {
@@ -370,7 +388,6 @@ class OrderController extends FrontendController
                     if (!$product) continue;
 
                     $qtyBeforeGlobal = $product->stock_quantity;
-
                     $productWarehouseInfo = $product->warehouse_info ?? [];
                     $updatedProductInfo = [];
 
@@ -388,7 +405,6 @@ class OrderController extends FrontendController
                         'warehouse_info'  => $updatedProductInfo
                     ]);
 
-                    // ৩. Product Stock Ledger Entry
                     ProductStockLedger::create([
                         'product_id'       => $product->id,
                         'warehouse_id'     => $warehouseId,
@@ -403,17 +419,9 @@ class OrderController extends FrontendController
                     ]);
                 }
             }
-
-            $order->update(['status' => Status::Pending->value]);
-
-            DB::commit();
-
-            Cart::destroy();
-            Session::forget('current_draft_order_id');
-
+            $order->update(['status' => Status::Pending]);
             return ['success' => true];
         } catch (\Exception $e) {
-            DB::rollBack();
             Log::error('Stock Deduction Failed: ' . $e->getMessage());
             return ['success' => false, 'error' => $e->getMessage()];
         }
@@ -523,7 +531,7 @@ class OrderController extends FrontendController
         }
     }
     //return order
-    public function requestReturn(Request $request, $store, $id)
+    public function requestReturn(Request $request, $id)
     {
         $request->validate([
             'reason'   => 'required|string|max:1000',

@@ -12,7 +12,7 @@
                 Unit Price: <span id="modal-unit-price">৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}</span>
             </p>
             <!-- total price -->
-            <p class="text-[#FF6A00] font-semibold text-xl mt-0.5" id="modal-total-price-display">
+            <p class="text-[var(--primary-color)] font-semibold text-xl mt-0.5" id="modal-total-price-display">
                 ৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}
             </p>
         </div>
@@ -30,9 +30,9 @@
                            onchange="updateModalTotal()"
                            class="peer hidden" {{ $loop->first ? 'checked' : '' }}>
 
-                    <div class="flex justify-between items-center border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-[#FF6A00] peer-checked:bg-orange-50 transition-all">
+                    <div class="flex justify-between items-center border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-[var(--primary-color)] peer-checked:bg-orange-50 transition-all">
                         <span class="text-sm font-bold text-gray-700">{{ $variation->display_name }}</span>
-                        <span class="text-[#FF6A00] ">৳{{ number_format($variation->final_price) }}</span>
+                        <span class="text-[var(--primary-color)] ">৳{{ number_format($variation->final_price) }}</span>
                     </div>
                 </label>
             @endforeach
@@ -48,7 +48,7 @@
         </div>
 
         <button type="button" onclick="processAddVariation()"
-            class="flex-1 bg-[#1D2128] text-primary py-3 rounded-xl font-bold hover:bg-[#FF6A00] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+            class="flex-1 bg-[#1D2128] text-primary py-3 rounded-xl font-bold hover:bg-[var(--primary-color)] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
             <i id="modal-btn-icon" class="fas fa-shopping-cart text-sm"></i>
             <span id="modal-btn-text">Add to Cart</span>
         </button>

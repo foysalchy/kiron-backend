@@ -5,7 +5,7 @@
         <div class="max-w-3xl mx-auto text-center">
 
             <!-- Icon Circle -->
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-orange-100 text-[#FF6A00] rounded-full mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-orange-100 text-[var(--primary-color)] rounded-full mb-8">
                 <!-- Question Mark Icon (Lucide/FontAwesome style) -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -55,7 +55,7 @@
             @endforelse
         </div>
     </section>
-   
+
 @endsection
 @push('scripts')
     <script>

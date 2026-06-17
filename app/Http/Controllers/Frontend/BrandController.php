@@ -10,10 +10,12 @@ class BrandController extends FrontendController
 {
     public function index()
     {
-       $brands = Brand::active()
+        $brands = Brand::active()
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->withCount('products')
             ->get();
-        return  $this->view('frontend.brand',compact('brands'));
-    }
 
+        return $this->view('frontend.brand', compact('brands'));
+    }
 }

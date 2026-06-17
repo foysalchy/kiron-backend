@@ -193,9 +193,6 @@ class CartController extends FrontendController
                 $warehouseId = $stockRecord->warehouse_id;
                 $binId       = $stockRecord->bin_id;
 
-                $thumb = $variation->image
-                    ? asset('storage/' . $variation->image)
-                    : $variation->product->thumbnail_url;
 
                 Cart::add([
                     'id'      => 'var_' . $variation->id,
@@ -204,8 +201,9 @@ class CartController extends FrontendController
                     'price'   => $variation->final_price,
                     'weight'  => 0,
                     'options' => [
+                        'slug'          => $variation->product->slug,
                         'variation_id'  => $variation->id,
-                        'thumbnail'     => $thumb,
+                        'thumbnail'     => $variation->product->thumbnail_url,
                         'variant'       => $variation->display_name,
                         'regular_price' => $variation->regular_price,
                         'warehouse_id'  => $warehouseId,
@@ -259,6 +257,7 @@ class CartController extends FrontendController
                     'price'   => $product->sale_price,
                     'weight'  => 0,
                     'options' => [
+                        'slug'          => $product->slug,
                         'thumbnail'     => $product->thumbnail_url,
                         'regular_price' => $product->regular_price,
                         'warehouse_id'  => $warehouseId,
@@ -267,33 +266,37 @@ class CartController extends FrontendController
                 ]);
                 Log::info("Cart Add (Single Product); Product ID: {$productId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
             }
-            $customerId = null;
+            $customerId = auth('customer')->check() ? auth('customer')->id() : null;
 
-            if (auth('customer')->check()) {
-                $user = auth('customer')->user();
-                if ($user) {
-                    $customerId = $user->id;
+            $finalCompanyId = $this->company_id;
+
+            if (!$finalCompanyId) {
+                if (auth('customer')->check()) {
+                    $finalCompanyId = auth('customer')->user()->company_id;
                 } else {
-                    auth('customer')->logout();
+                    $productForId = Product::find($productId);
+                    $finalCompanyId = $productForId ? $productForId->company_id : null;
                 }
             }
 
 
-            // Database tracking
-            CartTrack::updateOrCreate(
-                [
-                    'session_id'   => session()->getId(),
-                    'product_id'   => $productId,
-                    'variation_id' => $variationId,
-                ],
-                [
-                    'company_id'  => getCurrentCompany()->company_id,
-                    'customer_id' => $customerId,
-                    'quantity'    => $qty,
-                    'status'      => CartTrack::ADDED,
-                ]
-            );
-            Log::info("Cart Update; Product ID: {$productId}, Variation ID: {$variationId}, Quantity: {$qty}");
+            if ($finalCompanyId) {
+                CartTrack::updateOrCreate(
+                    [
+                        'session_id'   => session()->getId(),
+                        'product_id'   => $productId,
+                        'variation_id' => $variationId,
+                    ],
+                    [
+                        'company_id'  => $finalCompanyId,
+                        'customer_id' => $customerId,
+                        'quantity'    => $qty,
+                        'status'      => CartTrack::ADDED,
+                    ]
+                );
+            } else {
+                Log::error("Cart Tracking Error: Could not determine company_id for product {$productId}");
+            }
 
             return response()->json([
                 'status'     => 'success',

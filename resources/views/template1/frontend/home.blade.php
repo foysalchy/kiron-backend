@@ -33,7 +33,7 @@
                                     <!-- sub category -->
                                     <div class="group/sub">
                                         <a href="{{ route('category.products', $subCategory->slug) }}"
-                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[#FF6A00] transition-colors">
+                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[var(--primary-color)] transition-colors">
                                             <span>{{ $subCategory->name }}</span>
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
                                                 <i class="fas fa-chevron-right text-[9px]"></i>
@@ -46,7 +46,7 @@
                                                 class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
                                                 @foreach ($subCategory->miniCategories as $miniCategory)
                                                     <a href="{{ route('category.products', $miniCategory->slug) }}"
-                                                        class="block px-4 py-2 text-sm text-gray-600 hover:text-[#FF6A00] hover:bg-orange-50 transition-colors">
+                                                        class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
                                                         {{ $miniCategory->name }}
                                                     </a>
                                                 @endforeach
@@ -82,7 +82,7 @@
                     <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
                         @foreach ($mainSliders as $index => $slider)
                             <div onclick="goToSlide({{ $index }})"
-                                class="main-dot cursor-pointer {{ $index == 0 ? 'w-6 bg-[#FF6A00]' : 'w-2 bg-white/50' }} h-1 rounded-full transition-all">
+                                class="main-dot cursor-pointer {{ $index == 0 ? 'w-6 bg-[var(--primary-color)]' : 'w-2 bg-white/50' }} h-1 rounded-full transition-all">
                             </div>
                         @endforeach
                     </div>
@@ -110,6 +110,7 @@
     </section>
 
     <!-- TOP CATEGORIES SECTION -->
+    @if ($categories->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main Card Container -->
         <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
@@ -154,7 +155,9 @@
             </div>
         </div>
     </section>
+    @endif
     <!-- NEW ARRIVALS SECTION -->
+    @if ($newArrivals->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
@@ -209,6 +212,7 @@
 
         </div>
     </section>
+    @endif
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -260,15 +264,16 @@
         <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
             @foreach ($middleSliders as $slider)
-                <div
-                    class="flex-1 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer">
-                    <a href="{{ $slider->url ?? '#' }}">
-                        <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
-                            alt="{{ $slider->title }}" loading="lazy"
-                            class="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-500">
-                    </a>
-                </div>
-            @endforeach
+    {{-- এখানে h-40 (মোবাইলে) এবং md:h-64 (ডেস্কটপে) বা আপনার পছন্দমতো হাইট দিন --}}
+    <div class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
+        <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
+            <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
+                alt="{{ $slider->title }}"
+                loading="lazy"
+                class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
+        </a>
+    </div>
+@endforeach
 
             @if ($middleSliders->count() == 0)
                 <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
@@ -321,7 +326,7 @@
                                 <!-- Brand Name -->
                                 <span
                                     class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
-                                    {{ $brand->name }}
+                                    {{ $brand->name ?? ''}}
                                 </span>
                             </a>
                         @endif
@@ -419,9 +424,9 @@
                 mainDots.forEach((dot, i) => {
                     if (i === mainIdx) {
                         dot.classList.remove('w-2', 'bg-white/50');
-                        dot.classList.add('w-6', 'bg-[#FF6A00]');
+                        dot.classList.add('w-6', 'bg-[var(--primary-color)]');
                     } else {
-                        dot.classList.remove('w-6', 'bg-[#FF6A00]');
+                        dot.classList.remove('w-6', 'bg-[var(--primary-color)]');
                         dot.classList.add('w-2', 'bg-white/50');
                     }
                 });

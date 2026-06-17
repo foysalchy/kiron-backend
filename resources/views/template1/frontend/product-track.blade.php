@@ -23,7 +23,7 @@
                                 </span>
                                 <input type="text" name="order_no" id="orderId" placeholder="e.g. SALE-20240115-0001"
                                     required value="{{ request('order_no') }}"
-                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#FF6A00]/20 focus:border-[#016738] outline-none transition-all">
+                                    class="w-full pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[var(--primary-color)]/20 focus:border-[#016738] outline-none transition-all">
                             </div>
                         </div>
                         <button type="submit"
@@ -36,11 +36,11 @@
 
             {{-- Tracking Result --}}
             @if ($order)
-                <div class="bg-white rounded-2xl border border-[#FF6A00]/20 shadow-xl p-6 mb-8">
+                <div class="bg-white rounded-2xl border border-[var(--primary-color)]/20 shadow-xl p-6 mb-8">
                     <div class="flex flex-wrap justify-between items-start gap-3 mb-6 border-b pb-4">
                         <div>
                             <h3 class="font-bold text-gray-900">Current Status:
-                                <span class="text-[#FF6A00]">{{ $order->status_label }}</span>
+                                <span class="text-[var(--primary-color)]">{{ $order->status_label }}</span>
                             </h3>
                             <p class="text-sm text-gray-500">#{{ $order->order_no }}</p>
                         </div>
@@ -108,7 +108,7 @@
                         </div>
                     </div>
                     <div class="flex items-start gap-3">
-                        <div class="text-[#FF6A00] mt-1 shrink-0"><i class="fas fa-cube h-5 w-5"></i></div>
+                        <div class="text-[var(--primary-color)] mt-1 shrink-0"><i class="fas fa-cube h-5 w-5"></i></div>
                         <div>
                             <h4 class="text-md font-bold text-gray-900">Processing</h4>
                             <p class="text-sm text-gray-600 font-medium">Your order is being prepared</p>

@@ -7,6 +7,7 @@ use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Blog extends Model
 {
@@ -60,10 +61,9 @@ class Blog extends Model
     // Accessors
     public function getThumbnailUrlAttribute(): ?string
     {
-        if ($this->images && is_array($this->images) && count($this->images) > 0) {
-            return asset('storage/' . $this->images[0]);
-        }
-        return null;
+        return $this->thumbnail
+            ? Storage::disk('r2')->url($this->thumbnail)
+            : null;
     }
     //read time
     public function getReadingTimeAttribute()

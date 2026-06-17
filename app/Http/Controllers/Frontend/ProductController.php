@@ -223,7 +223,7 @@ class ProductController extends FrontendController
                 }
 
                 $varGalleries = $variation->galleries->map(function ($g) {
-                    return asset('storage/' . $g->image);
+                    return $g->image_url;
                 })->toArray();
 
                 $formattedVariations[] = [

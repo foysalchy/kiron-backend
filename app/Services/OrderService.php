@@ -283,6 +283,7 @@ class OrderService
             // Create order
             $order = Order::create($data);
             // Create order details and deduct stock
+
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
 
@@ -300,9 +301,9 @@ class OrderService
                 ]);
 
                 // Deduct stock using ProductService (for completed/pending orders, not hold)
-                if ($order->status != Status::Hold->value && $order->status != Status::Draft->value) {
-                    $this->deductOrderStock($order, $item);
-                }
+                if ($order->status !== Status::Hold && $order->status !== Status::Draft) {
+    $this->deductOrderStock($order, $item);
+}
             }
             if ($order->type === Order::TYPE_SALES || $order->type === Order::TYPE_LANDING) {
                 $productIds = collect($items)->pluck('product_id')->filter();
@@ -478,7 +479,7 @@ class OrderService
             }
 
             // Deduct new stock (only if not on hold)
-            if ($order->status != Status::Hold->value) {
+            if ($order->status != Status::Hold->value && $order->status != Status::Draft->value) {
                 foreach ($items as $item) {
                     $this->deductOrderStock($order, $item);
                 }
@@ -559,7 +560,7 @@ class OrderService
             $oldStatus = $order->status;
 
             // If order was pending/completed (not on hold), restore stock
-            if ($oldStatus !== Status::Hold->value) {
+            if ($oldStatus !== Status::Hold->value && $order->status != Status::Draft->value) {
                 $this->restoreOrderStock($order);
             }
 
@@ -602,7 +603,7 @@ class OrderService
             $oldStatus = $order->status;
 
             // If order was on hold, deduct stock now
-            if ($oldStatus == Status::Hold->value) {
+            if ($oldStatus == Status::Hold->value && $order->status != Status::Draft->value) {
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id' => $detail->product_id,
@@ -886,8 +887,13 @@ class OrderService
             'variation_id' => $item['variation_id'] ?? null,
             'quantity' => $item['quantity']
         ]);
+        $warehouseId = $order->warehouse_id ?? ($item['warehouse_id'] ?? null);
+        if (!$warehouseId) {
+            Log::warning("Skipping stock deduction: Warehouse ID is missing for Order #{$order->id}");
+            return;
+        }
         $stockData = [
-            'warehouse_id' => $order->warehouse_id,
+            'warehouse_id' => $warehouseId,
             'bin_id' => $item['bin_id'] ?? null,
             'quantity' => $item['quantity'],
             'batch_number' => null,
@@ -937,7 +943,7 @@ class OrderService
         }
     }
 
-  
+
     // CALCULATION METHODS
 
     /**

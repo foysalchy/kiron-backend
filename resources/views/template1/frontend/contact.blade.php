@@ -100,7 +100,7 @@
                                     {{ $setup->phone }}
                                 </a>
 
-                              
+
 
                                 {{-- অল্টারনেটিভ ফোন নম্বর --}}
                                 @if ($setup->alt_phone)
@@ -173,7 +173,7 @@
                                 <p class="text-gray-700">{!! nl2br(e($setup->store_address)) ?? 'Address not found' !!}</p>
                             </div>
                         </div>
-                         
+
                     </div>
                 </div>
                 <div class="lg:col-span-2 bg-white rounded-lg shadow-xs p-6 ">
@@ -204,10 +204,10 @@
                 </div>
 
                 <!-- WhatsApp Card -->
-               
+
 
                 <!-- Social Media -->
-                
+
 
             </div>
         </div>
@@ -230,12 +230,12 @@
                     <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
                         <button onclick="toggleFAQ(this)"
                             class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                            <span class="text-md font-medium text-gray-800">{{ $faq->title }}</span>
+                            <span class="text-md font-medium text-gray-800">{{ $faq->title ?? ''}}</span>
                             <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
                         </button>
                         <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
                             <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
-                                {!! nl2br(e($faq->content)) !!}
+                                {!! $faq->content !!}
                             </div>
                         </div>
                     </div>
@@ -266,7 +266,7 @@
 
                 <div class="absolute bottom-4 right-4 z-10">
                     <a href="https://maps.app.goo.gl/9uT5Qx5Y8hX6q8yX9" target="_blank"
-                        class="bg-white text-gray-800 px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 hover:bg-[#FF6A00] hover:text-white transition-all">
+                        class="bg-white text-gray-800 px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2 hover:bg-[var(--primary-color)] hover:text-white transition-all">
                         <i class="fas fa-external-link-alt"></i>
                         View Zoom on Google Maps
                     </a>
