@@ -195,7 +195,7 @@ Route::prefix('v1')->group(function () {
             Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
             Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
         });
-        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addayment']);
+        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addpayment']);
         Route::post('/subscriptions/upgrade-payment', [SubscriptionController::class, 'upgradePayment']);
         Route::patch('/subscription-payments/{id}/status', [SubscriptionController::class, 'updateStatus']);
         Route::get('/pricing-packages', [PricingPackageController::class, 'index']);
