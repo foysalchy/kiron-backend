@@ -76,6 +76,7 @@ use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\Api\OrderReturnController;
+use App\Http\Controllers\Api\PackageUpgradeController;
 use App\Http\Controllers\Api\PackageUsageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
@@ -168,6 +169,7 @@ Route::prefix('v1')->group(function () {
         Route::post('subscription', [CompanyRegistrationController::class, 'storeSubscription']);
         Route::post('basic-settings', [CompanyRegistrationController::class, 'storeBasicSettings']);
 
+
         // OTP actions
         Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
         Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
@@ -178,6 +180,7 @@ Route::prefix('v1')->group(function () {
             return response()->json(['message' => 'Cache cleared successfully']);
         });
         //auth
+        Route::get('/auth/me', [AuthController::class, 'me']);
         Route::get('auth/login-history', [AuthController::class, 'historyLoginAll']);
         Route::get('auth/profile', [AuthController::class, 'profile']);
         Route::post('auth/profile/update', [AuthController::class, 'updateProfile']);
@@ -192,12 +195,13 @@ Route::prefix('v1')->group(function () {
             Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
             Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
         });
-        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addayment']);
+        Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addpayment']);
         Route::post('/subscriptions/upgrade-payment', [SubscriptionController::class, 'upgradePayment']);
         Route::patch('/subscription-payments/{id}/status', [SubscriptionController::class, 'updateStatus']);
         Route::get('/pricing-packages', [PricingPackageController::class, 'index']);
         Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscriptionSuperAdmin']);
-        Route::post('/subscriptions/upgrade', [CompanyController::class, 'upgradeSubscription']);
+        Route::post('/subscriptions/upgrade/prev', [CompanyController::class, 'upgradeSubscription']);
+        Route::post('/subscriptions/upgrade', [PackageUpgradeController::class, 'store']);
         Route::post('/companies/{id}/update-requests', [CompanyController::class, 'storeUpdateRequest']);
         Route::post('/companies/update-requests/{reqId}', [CompanyController::class, 'updateUpdateRequest']);
         Route::delete('/companies/update-requests/{reqId}', [CompanyController::class, 'deleteUpdateRequest']);
@@ -1004,7 +1008,7 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}', [CustomerPaymentMethodController::class, 'destroy']);
                 Route::get('{id}/restore', [CustomerPaymentMethodController::class, 'restore']);
                 Route::delete('{id}/force', [CustomerPaymentMethodController::class, 'forceDestroy']);
-                Route::patch('/customer-payments/{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
+                Route::patch('{id}/toggle-status', [CustomerPaymentMethodController::class, 'toggleStatus']);
             });
 
             //courier-methods routes
@@ -1536,6 +1540,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('/sms-sends', [SuperAdminSmsSendController::class, 'store']);
                 Route::get('/sms-sends/{id}', [SuperAdminSmsSendController::class, 'show']);
             });
+            Route::get('/package-upgrades', [PackageUpgradeController::class, 'index']);
+            Route::post('/package-upgrades/{id}/status-update', [PackageUpgradeController::class, 'updateStatus']);
+            Route::post('/registration/register-seller', [CompanyRegistrationController::class, 'register']);
         });
     });
     //bkash route

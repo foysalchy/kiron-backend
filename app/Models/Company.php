@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Exceptions\ApiException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,6 +39,25 @@ class Company extends Model
         'theme_template' => 'array',
         'manage_warehouse' => 'boolean',
     ];
+    protected static function booted()
+    {
+        static::created(function ($company) {
+            CustomerPaymentMethod::create([
+                'company_id'     => $company->id,
+                'name'           => 'Cash on Delivery',
+                'type'           => 'Manual',
+                'contact_name'   => 'System',
+                'phone'          => $company->phone,
+                'is_deletable'   => false,
+                'status'         => Status::Active->value,
+            ]);
+        });
+        static::deleting(function ($paymentMethod) {
+            if (!$paymentMethod->is_deletable) {
+                throw ApiException::forbidden("System default payment methods cannot be deleted.");
+            }
+        });
+    }
     public function users()
     {
         return $this->hasMany(User::class);
