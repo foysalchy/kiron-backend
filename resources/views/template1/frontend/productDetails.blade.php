@@ -67,7 +67,8 @@
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp')}}"
+                        <img id="mainImage"
+                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -166,7 +167,7 @@
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             {{ $product->available_stock <= 0 ? 'disabled' : '' }}
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
-    {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
+                            {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -353,7 +354,8 @@
 
                     <!-- Review Summary Card -->
                     <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
-                        <div class="text-4xl font-bold text-[var(--primary-color)] mb-2">{{ number_format($avgRating, 1) }}</div>
+                        <div class="text-4xl font-bold text-[var(--primary-color)] mb-2">
+                            {{ number_format($avgRating, 1) }}</div>
                         <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
                             @for ($i = 1; $i <= 5; $i++)
                                 <i
@@ -503,117 +505,107 @@
                 b.classList.remove('text-gray-900', 'border-[var(--primary-color)]', 'bg-white');
                 b.classList.add('text-gray-500', 'border-transparent');
             });
-            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[var(--primary-color)]', 'bg-white');
+            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[var(--primary-color)]',
+                'bg-white');
         }
 
-        // variation and gallery data
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
-        let userSelections = {};
-        let originalGalleryHtml = ''; // save main gallery
+
+        let activeFilters = {}; // বর্তমানে স্ক্রিনে কোন গ্রুপে কি সিলেক্ট হয়ে আছে
+        attributeGroups.forEach(group => activeFilters[group] = null);
+
+        let finalSelectedVariationIds = []; // যেগুলো কার্টে যাবে
 
         function renderAttributes() {
             const container = document.getElementById('dynamic-attributes-container');
-            const thumbContainer = document.getElementById('thumbnail-container');
             if (!container) return;
-
-            // main gallery
-            if (!originalGalleryHtml && thumbContainer) {
-                originalGalleryHtml = thumbContainer.innerHTML;
-            }
-
             container.innerHTML = '';
+
             let currentlyValidVariations = allVariations;
 
-            // button
             for (let i = 0; i < attributeGroups.length; i++) {
                 const groupName = attributeGroups[i];
-                let availableValues = {};
+                const isLastGroup = (i === attributeGroups.length - 1);
 
-                currentlyValidVariations.forEach(variation => {
-                    if (variation.attributes[groupName]) {
-                        availableValues[variation.attributes[groupName].id] = variation.attributes[groupName].name;
-                    }
+                let availableValues = {};
+                currentlyValidVariations.forEach(v => {
+                    if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[
+                        groupName].name;
                 });
 
                 let groupHtml =
                     `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+
                 for (const [valId, valName] of Object.entries(availableValues)) {
-                    const activeClass = (userSelections[groupName] == valId) ?
-                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' : 'border-gray-200 bg-white text-gray-700';
+                    // ডিজাইন ঠিক রাখতে বাটন চেক
+                    const isFilterActive = (activeFilters[groupName] == valId);
+                    const isVariationSelected = checkIsSelected(groupName, valId);
+
+                    const activeClass = (isFilterActive || isVariationSelected) ?
+                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
+                        'border-gray-200 bg-white text-gray-700';
+
                     groupHtml +=
-                        `<button type="button" onclick="selectOption('${groupName}', ${valId})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
+                        `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
                 }
                 groupHtml += `</div></div>`;
                 container.innerHTML += groupHtml;
 
-                if (!userSelections[groupName]) break;
-                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName] && v.attributes[
-                    groupName].id == userSelections[groupName]);
+                if (!activeFilters[groupName]) break; // সাইজ সিলেক্ট না করলে কালার আসবে না
+
+                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[
+                    groupName]);
             }
-
-            // update galleries
-            if (currentlyValidVariations.length === 1 && Object.keys(userSelections).length === attributeGroups.length) {
-                let final = currentlyValidVariations[0];
-
-                if (final.image) changeImage(final.image);
-
-                // show variatin image
-                if (thumbContainer) {
-                    let galleryHtml = '';
-                    // variation main image
-                    if (final.image) {
-                        galleryHtml +=
-                            `<button onclick="changeImage('${final.image}')" class="aspect-square rounded-lg border-2 border-[var(--primary-color)] p-1 bg-white overflow-hidden"><img src="${final.image}" class="w-full h-full object-contain"></button>`;
-                    }
-                    // variation others image
-                    if (final.galleries && final.galleries.length > 0) {
-                        final.galleries.forEach(imgUrl => {
-                            galleryHtml +=
-                                `<button onclick="changeImage('${imgUrl}')" class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-contain"></button>`;
-                        });
-                    }
-                    thumbContainer.innerHTML = galleryHtml;
-                }
-
-                document.getElementById('sale-price').innerText = '{{ $setup->currency }} ' + final.price.toLocaleString();
-                document.getElementById('selected-variation-id').value = final.id;
-            } else {
-                // back main galleries
-                if (thumbContainer && originalGalleryHtml) {
-                    thumbContainer.innerHTML = originalGalleryHtml;
-                    changeImage("{{ $product->thumbnail_url }}");
-                }
-                document.getElementById('sale-price').innerText =
-                    '{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price ?? 0) }}';
-                document.getElementById('selected-variation-id').value = '';
-            }
+            document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
-        function selectOption(group, valId) {
-            userSelections[group] = valId;
+        function handleSelection(group, valId, isLastGroup) {
+            if (!isLastGroup) {
+                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+                let idx = attributeGroups.indexOf(group);
+                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+            } else {
+                activeFilters[group] = valId;
+                let matched = allVariations.find(v => {
+                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                });
+                if (matched) {
+                    const index = finalSelectedVariationIds.indexOf(matched.id);
+                    if (index > -1) finalSelectedVariationIds.splice(index, 1); // Toggle Off
+                    else {
+                        finalSelectedVariationIds.push(matched.id); // Toggle On
+                        if (matched.image) changeImage(matched.image);
+                    }
+                }
+            }
             renderAttributes();
         }
 
-        // add to cart
+        function checkIsSelected(groupName, valId) {
+            return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
+        }
+
         function handleAddToCart(isOrderNow = false) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const qty = document.getElementById('main-qty').value;
-            const productType = '{{ $product->type }}';
+            let items = [];
 
-            let postData = {
-                qty: qty
-            };
-
-            if (productType === 'single') {
-                postData.id = {{ $product->id }};
-            } else {
-                let varId = document.getElementById('selected-variation-id').value;
-                if (!varId) {
-                    toastr.warning('Please select all options (color/size)');
+            let varIds = document.getElementById('selected-variation-id').value;
+            if ('{{ $product->type }}' === 'variation') {
+                if (!varIds) {
+                    toastr.warning('Please select options');
                     return;
                 }
-                postData.variation_id = varId;
+                varIds.split(',').forEach(id => items.push({
+                    variation_id: id,
+                    qty: qty
+                }));
+            } else {
+                items.push({
+                    id: {{ $product->id }},
+                    qty: qty
+                });
             }
 
             fetch("{{ route('cart.add') }}", {
@@ -623,22 +615,18 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
-                    body: JSON.stringify(postData)
+                    body: JSON.stringify({
+                        items: items
+                    })
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
                         document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-
-                        if (isOrderNow) {
-                            window.location.href = "{{ route('checkout.index') }}";
-                        } else {
-                            toastr.success(data.message);
-                        }
-                    } else {
-                        toastr.error(data.message);
-                    }
-                }).catch(err => toastr.error("Server error occurred."));
+                        if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
+                        else toastr.success(data.message);
+                    } else toastr.error(data.message);
+                });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -669,14 +657,16 @@
                         // temporary disable button to prevent multiple clicks
                         if (data.status === 'added') {
                             // added to change to active style and 'Wishlisted' text
-                            btnWish.classList.add('bg-orange-50', 'text-[var(--primary-color)]', 'border-[var(--primary-color)]');
+                            btnWish.classList.add('bg-orange-50', 'text-[var(--primary-color)]',
+                                'border-[var(--primary-color)]');
                             btnWish.classList.remove('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'fas fa-heart text-red-500';
                             wishText.innerText = 'Wishlisted';
                             toastr.success(data.message);
                         } else {
                             // removed to change to default style and 'Wishlist' text
-                            btnWish.classList.remove('bg-orange-50', 'text-[var(--primary-color)]', 'border-[var(--primary-color)]');
+                            btnWish.classList.remove('bg-orange-50', 'text-[var(--primary-color)]',
+                                'border-[var(--primary-color)]');
                             btnWish.classList.add('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'far fa-heart';
                             wishText.innerText = 'Wishlist';

@@ -202,7 +202,9 @@ class OrderController extends FrontendController
     }
     public function storeOrder(Request $request)
     {
-        $pm = strtolower($request->payment_method);
+        Log::info('storeOrder called', ['payment_method' => $request->payment_method]);
+
+        $pm = strtolower($request->payment_method ?? '');
         $isCOD = (str_contains($pm, 'cash') || str_contains($pm, 'delivery') || $pm == 'cod');
 
         $request->validate([
@@ -216,13 +218,15 @@ class OrderController extends FrontendController
             'screenshots.*'  => 'image|max:2048',
         ]);
 
-        // 1. Try to find the draft order
+        // 1. Draft order find
         $orderId = Session::get('current_draft_order_id');
         $order = Order::where('company_id', $this->company_id)
-            ->where('status', Status::Draft->value ?? Status::Draft)
+            ->where('status', Status::Draft->value)
             ->find($orderId);
 
-        // 2. Fallback
+        Log::info('Draft order search', ['session_order_id' => $orderId, 'found' => $order ? $order->id : null]);
+
+        // 2. Fallback — draft না থাকলে create করো
         if (!$order) {
             $draftResult = $this->createDraftOrder($request->all());
             if ($draftResult['success']) {
@@ -232,7 +236,9 @@ class OrderController extends FrontendController
             }
         }
 
-        if ($order->status !== Status::Draft->value) {
+        // 3. Status check
+        $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
+        if ($currentStatus !== Status::Draft->value) {
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
             return redirect()->route('order.invoice', $order->id)->with('success', 'Order already placed.');
@@ -241,28 +247,28 @@ class OrderController extends FrontendController
         try {
             DB::beginTransaction();
 
-            $finalAddress = [
-                'name'           => $request->name,
-                'phone'          => $request->phone,
-                'address'        => $request->address,
-                'payment_method' => $request->payment_method,
-            ];
-            $order->status = Status::Pending;
-            $order->shipping_address = $finalAddress;
-            $order->save();
-            $order->refresh(); // এটা যোগ করো
-
+            // 4. Address update
+            $order->update([
+                'shipping_address' => [
+                    'name'    => $request->name,
+                    'phone'   => $request->phone,
+                    'address' => $request->address,
+                    'payment_method' => $request->payment_method,
+                ],
+                'status' => Status::Pending->value,
+            ]);
 
             if ($order->customer) {
                 $order->customer->update(['name' => $request->name, 'address' => $request->address]);
             }
 
+            // 5. Stock deduct
             $stockResult = $this->finalizeOrderAndDeductStock($order);
             if (!$stockResult['success']) {
                 throw new \Exception($stockResult['error']);
             }
 
-
+            // 6. Payment create
             $transactionId = $request->transaction_id;
             if ($isCOD) {
                 $transactionId = 'COD-' . ($order->order_no ?? $order->id) . '-' . time();
@@ -271,8 +277,7 @@ class OrderController extends FrontendController
             $screenshotPaths = [];
             if ($request->hasFile('screenshots')) {
                 foreach ($request->file('screenshots') as $image) {
-                    $path = FileUploadHelper::uploadImage($image, 'payments/screenshots');
-                    $screenshotPaths[] = $path;
+                    $screenshotPaths[] = FileUploadHelper::uploadImage($image, 'payments/screenshots');
                 }
             }
 
@@ -289,17 +294,16 @@ class OrderController extends FrontendController
                 'payment_method' => $request->payment_method,
                 'transaction_id' => $transactionId,
                 'reference_no'   => $request->reference_no,
-                'amount'         => $request->amount ?? $order->total_amount ?? 0,
+                'sender_number'   => $request->sender_number,
+                'amount'         => $request->amount ?? $order->grand_total ?? 0,
                 'change_amount'  => 0,
                 'sender_info'    => $senderInfo,
                 'note'           => $request->note,
             ]);
 
-            Log::info("Payment recorded for Order ID: {$order->id}, Transaction ID: {$transactionId}, Amount: {$request->amount}");
             $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
 
-
-            // ৫. Cart Tracking Update
+            // 7. Cart tracking
             foreach (Cart::content() as $item) {
                 $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
                 CartTrack::where('session_id', session()->getId())
@@ -312,6 +316,8 @@ class OrderController extends FrontendController
 
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
+
+            Log::info('Order confirmed', ['order_id' => $order->id, 'status' => $order->status]);
 
             return redirect()->route('order.invoice', $order->id)->with('success', 'Your order has been successfully placed.');
         } catch (\Exception $e) {
@@ -329,102 +335,101 @@ class OrderController extends FrontendController
             return ['success' => false, 'error' => 'Warehouse info not found in order.'];
         }
 
-        try {
-            foreach ($warehouseData as $info) {
-                // ⚡ ফিক্স: আগে ডাটাগুলো ভ্যারিয়েবলে নিন (এটি আপনার কোডে নিচে ছিল)
-                $productId   = $info['product_id'];
-                $variationId = $info['variation_id'] ?? null;
-                $warehouseId = isset($info['warehouse_id']) ? (int) $info['warehouse_id'] : 0;
-                $binId       = $info['bin_id'] ?? null;
-                $qty         = (int) ($info['quantity'] ?? 0);
+        // try {
+        foreach ($warehouseData as $info) {
+            $productId   = $info['product_id'];
+            $variationId = $info['variation_id'] ?? null;
+            $warehouseId = isset($info['warehouse_id']) ? (int) $info['warehouse_id'] : 0;
+            $binId       = $info['bin_id'] ?? null;
+            $qty         = (int) ($info['quantity'] ?? 0);
 
-                if ($qty <= 0) continue;
+            if ($qty <= 0) continue;
 
-                // এখন এই চেকটি আর এরর দিবে না
-                if (!$warehouseId || $warehouseId === 0) {
-                    $product = Product::find($productId);
-                    if ($product) {
-                        $product->decrement('stock_quantity', $qty);
-                        $product->decrement('available_stock', $qty);
-                    }
-                    continue;
-                }
-
-                if ($variationId) {
-                    // --- VARIATION PRODUCT STOCK DEDUCTION ---
-                    $variation = ProductVariation::with('product')->find($variationId);
-                    if (!$variation) continue;
-
-                    $product = $variation->product;
-                    $varStock = ProductVariationStock::where('product_variation_id', $variationId)
-                        ->where('warehouse_id', $warehouseId)
-                        ->where('bin_id', $binId)
-                        ->first();
-
-                    if ($varStock) {
-                        $qtyBefore = $varStock->quantity;
-                        $varStock->decrement('quantity', $qty);
-                        $qtyAfter = $varStock->quantity;
-
-                        ProductVariationStockLedger::create([
-                            'product_id'       => $product->id,
-                            'variation_id'     => $variationId,
-                            'warehouse_id'     => $warehouseId,
-                            'bin_id'           => $binId,
-                            'transaction_type' => 'Sale',
-                            'reference_type'   => 'Order',
-                            'reference_id'     => $order->id,
-                            'quantity_before'  => $qtyBefore,
-                            'quantity_change'  => -$qty,
-                            'quantity_after'   => $qtyAfter,
-                            'notes'            => 'Stock deducted for Order #' . $order->id,
-                        ]);
-                    }
+            // এখন এই চেকটি আর এরর দিবে না
+            if (!$warehouseId || $warehouseId === 0) {
+                $product = Product::find($productId);
+                if ($product) {
                     $product->decrement('stock_quantity', $qty);
                     $product->decrement('available_stock', $qty);
-                } else {
-                    // --- SINGLE PRODUCT STOCK DEDUCTION ---
-                    $product = Product::find($productId);
-                    if (!$product) continue;
+                }
+                continue;
+            }
 
-                    $qtyBeforeGlobal = $product->stock_quantity;
-                    $productWarehouseInfo = $product->warehouse_info ?? [];
-                    $updatedProductInfo = [];
+            if ($variationId) {
+                // --- VARIATION PRODUCT STOCK DEDUCTION ---
+                $variation = ProductVariation::with('product')->find($variationId);
+                if (!$variation) continue;
 
-                    foreach ($productWarehouseInfo as $pWInfo) {
-                        $currentBin = $pWInfo['bin_id'] ?? null;
-                        if ($pWInfo['warehouse_id'] == $warehouseId && $currentBin == $binId) {
-                            $pWInfo['quantity'] = (int)$pWInfo['quantity'] - $qty;
-                        }
-                        $updatedProductInfo[] = $pWInfo;
-                    }
+                $product = $variation->product;
+                $varStock = ProductVariationStock::where('product_variation_id', $variationId)
+                    ->where('warehouse_id', $warehouseId)
+                    ->where('bin_id', $binId)
+                    ->first();
 
-                    $product->update([
-                        'stock_quantity'  => $product->stock_quantity - $qty,
-                        'available_stock' => $product->available_stock - $qty,
-                        'warehouse_info'  => $updatedProductInfo
-                    ]);
+                if ($varStock) {
+                    $qtyBefore = $varStock->quantity;
+                    $varStock->decrement('quantity', $qty);
+                    $qtyAfter = $varStock->quantity;
 
-                    ProductStockLedger::create([
+                    ProductVariationStockLedger::create([
                         'product_id'       => $product->id,
+                        'variation_id'     => $variationId,
                         'warehouse_id'     => $warehouseId,
                         'bin_id'           => $binId,
                         'transaction_type' => 'Sale',
                         'reference_type'   => 'Order',
                         'reference_id'     => $order->id,
-                        'quantity_before'  => $qtyBeforeGlobal,
+                        'quantity_before'  => $qtyBefore,
                         'quantity_change'  => -$qty,
-                        'quantity_after'   => $product->stock_quantity,
-                        'notes'            => 'Single product stock deducted for Order #' . $order->id,
+                        'quantity_after'   => $qtyAfter,
+                        'notes'            => 'Stock deducted for Order #' . $order->id,
                     ]);
                 }
+                $product->decrement('stock_quantity', $qty);
+                $product->decrement('available_stock', $qty);
+            } else {
+                // --- SINGLE PRODUCT STOCK DEDUCTION ---
+                $product = Product::find($productId);
+                if (!$product) continue;
+
+                $qtyBeforeGlobal = $product->stock_quantity;
+                $productWarehouseInfo = $product->warehouse_info ?? [];
+                $updatedProductInfo = [];
+
+                foreach ($productWarehouseInfo as $pWInfo) {
+                    $currentBin = $pWInfo['bin_id'] ?? null;
+                    if ($pWInfo['warehouse_id'] == $warehouseId && $currentBin == $binId) {
+                        $pWInfo['quantity'] = (int)$pWInfo['quantity'] - $qty;
+                    }
+                    $updatedProductInfo[] = $pWInfo;
+                }
+
+                $product->update([
+                    'stock_quantity'  => $product->stock_quantity - $qty,
+                    'available_stock' => $product->available_stock - $qty,
+                    'warehouse_info'  => $updatedProductInfo
+                ]);
+
+                ProductStockLedger::create([
+                    'product_id'       => $product->id,
+                    'warehouse_id'     => $warehouseId,
+                    'bin_id'           => $binId,
+                    'transaction_type' => 'Sale',
+                    'reference_type'   => 'Order',
+                    'reference_id'     => $order->id,
+                    'quantity_before'  => $qtyBeforeGlobal,
+                    'quantity_change'  => -$qty,
+                    'quantity_after'   => $product->stock_quantity,
+                    'notes'            => 'Single product stock deducted for Order #' . $order->id,
+                ]);
             }
-            $order->update(['status' => Status::Pending]);
-            return ['success' => true];
-        } catch (\Exception $e) {
-            Log::error('Stock Deduction Failed: ' . $e->getMessage());
-            return ['success' => false, 'error' => $e->getMessage()];
         }
+        $order->update(['status' => Status::Pending->value]);
+        return ['success' => true];
+        // } catch (\Exception $e) {
+        //     Log::error('Stock Deduction Failed: ' . $e->getMessage());
+        //     return ['success' => false, 'error' => $e->getMessage()];
+        // }
     }
     public function orderDetails($store, $id)
     {

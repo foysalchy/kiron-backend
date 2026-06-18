@@ -46,7 +46,8 @@
                             @guest('customer')
                                 <div class="space-y-3 pt-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="create_account" class="w-4 h-4 accent-[var(--primary-color)]">
+                                        <input type="checkbox" name="create_account"
+                                            class="w-4 h-4 accent-[var(--primary-color)]">
                                         <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Create an
                                             account?</span>
                                     </label>
@@ -246,14 +247,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             const firstRadio = document.querySelector('input[name="payment_method"]');
             if (firstRadio) {
-                const slug = firstRadio.value;
-                const nameEl = firstRadio.closest('label')?.querySelector('span.text-md');
-                _checkoutSlug = slug;
-                highlightMethod(slug, nameEl?.innerText?.trim() ?? slug);
-                document.getElementById('selected-payment-method').value = slug;
+                firstRadio.checked = true;
+                _checkoutSlug = firstRadio.value;
+                handlePaymentSelection(
+                    firstRadio.value,
+                    firstRadio.closest('label')?.querySelector('span.text-md')?.innerText?.trim() ?? firstRadio
+                    .value
+                );
             }
-
-
         });
 
         // ── Radio label click → open modal ──
@@ -303,9 +304,10 @@
             const badge = document.getElementById('badge-' + slug);
             if (badge) badge.classList.remove('hidden');
 
-            // Display bar
-            document.getElementById('selected-method-name').innerText = name;
-            document.getElementById('selected-method-display').classList.remove('hidden');
+            const methodName = document.getElementById('selected-method-name');
+            const methodDisplay = document.getElementById('selected-method-display');
+            if (methodName) methodName.innerText = name ?? slug;
+            if (methodDisplay) methodDisplay.classList.remove('hidden');
         }
 
         function applyCoupon() {

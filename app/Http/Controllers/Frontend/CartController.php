@@ -148,168 +148,278 @@ class CartController extends FrontendController
         return back()->with('success', 'The coupon has been removed.');
     }
     // product add to cart
-
     public function add($store, Request $request)
     {
         try {
-            $qty         = (int) ($request->qty ?? 1);
-            $productId   = null;
-            $variationId = null;
-            $warehouseId = null;
-            $binId       = null;
+            //
+            $items = $request->items;
+            if (empty($items)) {
+                return response()->json(['status' => 'error', 'message' => 'No items selected.'], 422);
+            }
 
-            if ($request->filled('variation_id')) {
+            foreach ($items as $item) {
+                //
+                $qty         = (int) ($item['qty'] ?? 1);
+                $productId   = null;
+                $variationId = null;
+                $warehouseId = null;
+                $binId       = null;
 
-                // ── VARIATION PRODUCT ──
-                $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($request->variation_id);
+                if (isset($item['variation_id'])) {
+                    // ── VARIATION PRODUCT  ──
+                    $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($item['variation_id']);
+                    $stockRecord = $variation->stocks->where('quantity', '>=', $qty)->sortByDesc('quantity')->first();
 
-                //  warehouse-
-                $stockRecord = $variation->stocks
-                    ->where('quantity', '>=', $qty)
-                    ->sortByDesc('quantity') //stock
-                    ->first();
+                    if (!$stockRecord) continue; //
 
-                if (!$stockRecord) {
-                    $alreadyInCart = $this->getCartQty(null, $variation->id);
-                    $msg = $alreadyInCart > 0
-                        ? "Only cart qty available. (Already {$alreadyInCart} in cart)"
-                        : 'Sorry, this variation is currently out of stock.';
-                    return response()->json(['status' => 'error', 'message' => $msg], 422);
-                }
+                    $productId   = $variation->product_id;
+                    $variationId = $variation->id;
+                    $warehouseId = $stockRecord->warehouse_id;
+                    $binId       = $stockRecord->bin_id;
 
-                // Cart-এ already থাকা qty বাদ দিয়ে check
-                $alreadyInCart    = $this->getCartQty(null, $variation->id);
-                $availableForCart = $stockRecord->quantity - $alreadyInCart;
+                    Cart::add([
+                        'id'      => 'var_' . $variation->id,
+                        'name'    => $variation->product->title,
+                        'qty'     => $qty,
+                        'price'   => $variation->final_price,
+                        'weight'  => 0,
+                        'options' => [
+                            'slug'          => $variation->product->slug,
+                            'variation_id'  => $variation->id,
+                            'thumbnail'     => $variation->product->thumbnail_url,
+                            'variant'       => $variation->display_name,
+                            'regular_price' => $variation->regular_price,
+                            'warehouse_id'  => $warehouseId,
+                            'bin_id'        => $binId ?? null,
+                        ],
+                    ]);
+                } else {
+                    // ── SINGLE PRODUCT  ──
+                    $product = Product::findOrFail($item['id']);
+                    $bestWarehouse = null;
+                    $bestBinId = null;
+                    $bestQty = 0;
 
-                if ($availableForCart < $qty) {
-                    $msg = $alreadyInCart > 0
-                        ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
-                        : 'Sorry, this variation is currently out of stock.';
-                    return response()->json(['status' => 'error', 'message' => $msg], 422);
-                }
-
-                $productId   = $variation->product_id;
-                $variationId = $variation->id;
-                $warehouseId = $stockRecord->warehouse_id;
-                $binId       = $stockRecord->bin_id;
-
-
-                Cart::add([
-                    'id'      => 'var_' . $variation->id,
-                    'name'    => $variation->product->title,
-                    'qty'     => $qty,
-                    'price'   => $variation->final_price,
-                    'weight'  => 0,
-                    'options' => [
-                        'slug'          => $variation->product->slug,
-                        'variation_id'  => $variation->id,
-                        'thumbnail'     => $variation->product->thumbnail_url,
-                        'variant'       => $variation->display_name,
-                        'regular_price' => $variation->regular_price,
-                        'warehouse_id'  => $warehouseId,
-                        'bin_id'        => $binId ?? null,
-                    ],
-                ]);
-                Log::info("Cart Add (Variation); Product ID: {$productId}, Variation ID: {$variationId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
-            } else {
-
-                // ── SINGLE PRODUCT ──
-                $product = Product::findOrFail($request->id);
-
-                // warehouse_info
-                $bestWarehouse = null;
-                $bestBinId     = null;
-                $bestQty       = 0;
-
-                if (!empty($product->warehouse_info)) {
-                    foreach ($product->warehouse_info as $info) {
-                        $q   = (int) ($info['quantity'] ?? 0);
-                        $wId = (int) ($info['warehouse_id'] ?? 0);
-                        $bId = $info['bin_id'] ?? null;
-
-                        if ($wId > 0 && $q > $bestQty) {
-                            $bestQty       = $q;
-                            $bestWarehouse = $wId;
-                            $bestBinId     = $bId;
+                    if (!empty($product->warehouse_info)) {
+                        foreach ($product->warehouse_info as $info) {
+                            $q = (int) ($info['quantity'] ?? 0);
+                            $wId = (int) ($info['warehouse_id'] ?? 0);
+                            if ($wId > 0 && $q > $bestQty) {
+                                $bestQty = $q;
+                                $bestWarehouse = $wId;
+                                $bestBinId = $info['bin_id'] ?? null;
+                            }
                         }
+                    }
+
+                    if ($bestQty < $qty) continue;
+
+                    $productId   = $product->id;
+                    $warehouseId = $bestWarehouse;
+                    $binId       = $bestBinId;
+
+                    Cart::add([
+                        'id'      => $product->id,
+                        'name'    => $product->title,
+                        'qty'     => $qty,
+                        'price'   => $product->sale_price,
+                        'weight'  => 0,
+                        'options' => [
+                            'slug'          => $product->slug,
+                            'thumbnail'     => $product->thumbnail_url,
+                            'regular_price' => $product->regular_price,
+                            'warehouse_id'  => $warehouseId,
+                            'bin_id'        => $binId ?? null,
+                        ],
+                    ]);
+                }
+
+                // ── COMPANY ID & TRACKING  ──
+                $customerId = auth('customer')->check() ? auth('customer')->id() : null;
+                $finalCompanyId = $this->company_id;
+                if (!$finalCompanyId) {
+                    if (auth('customer')->check()) {
+                        $finalCompanyId = auth('customer')->user()->company_id;
+                    } else {
+                        $productForId = Product::find($productId);
+                        $finalCompanyId = $productForId ? $productForId->company_id : null;
                     }
                 }
 
-                $alreadyInCart    = $this->getCartQty($product->id, null);
-                $availableForCart = $bestQty - $alreadyInCart;
-
-                if ($bestQty < $qty || $availableForCart < $qty) {
-                    $msg = $alreadyInCart > 0
-                        ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
-                        : 'Sorry, this product is currently out of stock.';
-                    return response()->json(['status' => 'error', 'message' => $msg], 422);
-                }
-
-                $productId   = $product->id;
-                $variationId = null;
-                $warehouseId = $bestWarehouse;
-                $binId       = $bestBinId;
-
-                Cart::add([
-                    'id'      => $product->id,
-                    'name'    => $product->title,
-                    'qty'     => $qty,
-                    'price'   => $product->sale_price,
-                    'weight'  => 0,
-                    'options' => [
-                        'slug'          => $product->slug,
-                        'thumbnail'     => $product->thumbnail_url,
-                        'regular_price' => $product->regular_price,
-                        'warehouse_id'  => $warehouseId,
-                        'bin_id'        => $binId ?? null,
-                    ],
-                ]);
-                Log::info("Cart Add (Single Product); Product ID: {$productId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
-            }
-            $customerId = auth('customer')->check() ? auth('customer')->id() : null;
-
-            $finalCompanyId = $this->company_id;
-
-            if (!$finalCompanyId) {
-                if (auth('customer')->check()) {
-                    $finalCompanyId = auth('customer')->user()->company_id;
-                } else {
-                    $productForId = Product::find($productId);
-                    $finalCompanyId = $productForId ? $productForId->company_id : null;
+                if ($finalCompanyId) {
+                    CartTrack::updateOrCreate(
+                        ['session_id' => session()->getId(), 'product_id' => $productId, 'variation_id' => $variationId],
+                        ['company_id' => $finalCompanyId, 'customer_id' => $customerId, 'quantity' => $qty, 'status' => CartTrack::ADDED]
+                    );
                 }
             }
 
-
-            if ($finalCompanyId) {
-                CartTrack::updateOrCreate(
-                    [
-                        'session_id'   => session()->getId(),
-                        'product_id'   => $productId,
-                        'variation_id' => $variationId,
-                    ],
-                    [
-                        'company_id'  => $finalCompanyId,
-                        'customer_id' => $customerId,
-                        'quantity'    => $qty,
-                        'status'      => CartTrack::ADDED,
-                    ]
-                );
-            } else {
-                Log::error("Cart Tracking Error: Could not determine company_id for product {$productId}");
-            }
-
-            return response()->json([
-                'status'     => 'success',
-                'cart_count' => Cart::count(),
-                'message'    => 'Successfully added to cart!',
-            ]);
+            return response()->json(['status' => 'success', 'cart_count' => Cart::count(), 'message' => 'Successfully added to cart!']);
         } catch (\Exception $e) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Sorry, there was an issue: ' . $e->getMessage(),
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+    // public function add($store, Request $request)
+    // {
+    //     try {
+    //         $qty         = (int) ($request->qty ?? 1);
+    //         $productId   = null;
+    //         $variationId = null;
+    //         $warehouseId = null;
+    //         $binId       = null;
+
+    //         if ($request->filled('variation_id')) {
+
+    //             // ── VARIATION PRODUCT ──
+    //             $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($request->variation_id);
+
+    //             //  warehouse-
+    //             $stockRecord = $variation->stocks
+    //                 ->where('quantity', '>=', $qty)
+    //                 ->sortByDesc('quantity') //stock
+    //                 ->first();
+
+    //             if (!$stockRecord) {
+    //                 $alreadyInCart = $this->getCartQty(null, $variation->id);
+    //                 $msg = $alreadyInCart > 0
+    //                     ? "Only cart qty available. (Already {$alreadyInCart} in cart)"
+    //                     : 'Sorry, this variation is currently out of stock.';
+    //                 return response()->json(['status' => 'error', 'message' => $msg], 422);
+    //             }
+
+    //             // Cart-এ already থাকা qty বাদ দিয়ে check
+    //             $alreadyInCart    = $this->getCartQty(null, $variation->id);
+    //             $availableForCart = $stockRecord->quantity - $alreadyInCart;
+
+    //             if ($availableForCart < $qty) {
+    //                 $msg = $alreadyInCart > 0
+    //                     ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
+    //                     : 'Sorry, this variation is currently out of stock.';
+    //                 return response()->json(['status' => 'error', 'message' => $msg], 422);
+    //             }
+
+    //             $productId   = $variation->product_id;
+    //             $variationId = $variation->id;
+    //             $warehouseId = $stockRecord->warehouse_id;
+    //             $binId       = $stockRecord->bin_id;
+
+
+    //             Cart::add([
+    //                 'id'      => 'var_' . $variation->id,
+    //                 'name'    => $variation->product->title,
+    //                 'qty'     => $qty,
+    //                 'price'   => $variation->final_price,
+    //                 'weight'  => 0,
+    //                 'options' => [
+    //                     'slug'          => $variation->product->slug,
+    //                     'variation_id'  => $variation->id,
+    //                     'thumbnail'     => $variation->product->thumbnail_url,
+    //                     'variant'       => $variation->display_name,
+    //                     'regular_price' => $variation->regular_price,
+    //                     'warehouse_id'  => $warehouseId,
+    //                     'bin_id'        => $binId ?? null,
+    //                 ],
+    //             ]);
+    //             Log::info("Cart Add (Variation); Product ID: {$productId}, Variation ID: {$variationId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
+    //         } else {
+
+    //             // ── SINGLE PRODUCT ──
+    //             $product = Product::findOrFail($request->id);
+
+    //             // warehouse_info
+    //             $bestWarehouse = null;
+    //             $bestBinId     = null;
+    //             $bestQty       = 0;
+
+    //             if (!empty($product->warehouse_info)) {
+    //                 foreach ($product->warehouse_info as $info) {
+    //                     $q   = (int) ($info['quantity'] ?? 0);
+    //                     $wId = (int) ($info['warehouse_id'] ?? 0);
+    //                     $bId = $info['bin_id'] ?? null;
+
+    //                     if ($wId > 0 && $q > $bestQty) {
+    //                         $bestQty       = $q;
+    //                         $bestWarehouse = $wId;
+    //                         $bestBinId     = $bId;
+    //                     }
+    //                 }
+    //             }
+
+    //             $alreadyInCart    = $this->getCartQty($product->id, null);
+    //             $availableForCart = $bestQty - $alreadyInCart;
+
+    //             if ($bestQty < $qty || $availableForCart < $qty) {
+    //                 $msg = $alreadyInCart > 0
+    //                     ? "Only {$availableForCart} more can be added. (Already {$alreadyInCart} in cart)"
+    //                     : 'Sorry, this product is currently out of stock.';
+    //                 return response()->json(['status' => 'error', 'message' => $msg], 422);
+    //             }
+
+    //             $productId   = $product->id;
+    //             $variationId = null;
+    //             $warehouseId = $bestWarehouse;
+    //             $binId       = $bestBinId;
+
+    //             Cart::add([
+    //                 'id'      => $product->id,
+    //                 'name'    => $product->title,
+    //                 'qty'     => $qty,
+    //                 'price'   => $product->sale_price,
+    //                 'weight'  => 0,
+    //                 'options' => [
+    //                     'slug'          => $product->slug,
+    //                     'thumbnail'     => $product->thumbnail_url,
+    //                     'regular_price' => $product->regular_price,
+    //                     'warehouse_id'  => $warehouseId,
+    //                     'bin_id'        => $binId ?? null,
+    //                 ],
+    //             ]);
+    //             Log::info("Cart Add (Single Product); Product ID: {$productId}, Warehouse ID: {$warehouseId}, Bin ID: {$binId}, Qty: {$qty}");
+    //         }
+    //         $customerId = auth('customer')->check() ? auth('customer')->id() : null;
+
+    //         $finalCompanyId = $this->company_id;
+
+    //         if (!$finalCompanyId) {
+    //             if (auth('customer')->check()) {
+    //                 $finalCompanyId = auth('customer')->user()->company_id;
+    //             } else {
+    //                 $productForId = Product::find($productId);
+    //                 $finalCompanyId = $productForId ? $productForId->company_id : null;
+    //             }
+    //         }
+
+
+    //         if ($finalCompanyId) {
+    //             CartTrack::updateOrCreate(
+    //                 [
+    //                     'session_id'   => session()->getId(),
+    //                     'product_id'   => $productId,
+    //                     'variation_id' => $variationId,
+    //                 ],
+    //                 [
+    //                     'company_id'  => $finalCompanyId,
+    //                     'customer_id' => $customerId,
+    //                     'quantity'    => $qty,
+    //                     'status'      => CartTrack::ADDED,
+    //                 ]
+    //             );
+    //         } else {
+    //             Log::error("Cart Tracking Error: Could not determine company_id for product {$productId}");
+    //         }
+
+    //         return response()->json([
+    //             'status'     => 'success',
+    //             'cart_count' => Cart::count(),
+    //             'message'    => 'Successfully added to cart!',
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status'  => 'error',
+    //             'message' => 'Sorry, there was an issue: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * Return how much quantity of this product/variation is already in the cart.
