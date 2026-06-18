@@ -1,8 +1,10 @@
-@extends('template2.layouts.front')
+@extends('template1.layouts.front')
 
 @section('content')
     <!-- 1. Hero & Search -->
-    <section class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 py-10 md:py-24">
+    <section class="py-10 md:py-24"
+        style="background: linear-gradient(to right, var(--primary-color), var(--secondary-color));">
+
         <div class="container mx-auto px-4 text-center text-primary">
             <h1 class="text-2xl md:text-5xl font-bold mb-3 tracking-tight">Our Blog</h1>
             <p class="text-lg md:text-xl mb-8 opacity-90">Latest insights, styles, and shopping tips just for you</p>
@@ -20,45 +22,6 @@
         </div>
     </section>
 
-      <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="max-w-5xl mx-auto relative">
-
-            <!-- Left Fade -->
-            <div
-                class="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none">
-            </div>
-            <div
-                class="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none">
-            </div>
-
-            @php $currentTag = request('tag'); @endphp
-
-            <div id="tag-scroll" class="flex items-center gap-3 overflow-x-auto no-scrollbar pb-4"
-                style="flex-wrap: nowrap;">
-
-                {{-- All button --}}
-                <a href="{{ url()->current() }}"
-                    class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
-                {{ empty($currentTag)
-                    ? 'primary-bg text-primary border-[#1D2128] shadow-md'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
-                    All
-                </a>
-
-                {{-- Dynamic Tags --}}
-                @foreach ($availableTags as $tag)
-                    <a href="{{ url()->current() . '?tag=' . urlencode($tag) }}"
-                        class="flex-shrink-0 px-6 py-2.5 rounded-full text-sm font-bold transition-all border
-                    {{ $currentTag == $tag
-                        ? 'primary-bg text-primary border-[#1D2128] shadow-md'
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400' }}">
-                        {{ $tag }}
-                    </a>
-                @endforeach
-
-            </div>
-        </div>
-    </section>
 
     <!-- 3. Blog Grid -->
     <section class="container mx-auto py-6 px-4">
@@ -69,13 +32,8 @@
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
                     <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        @if ($blog->thumbnail_url)
-                            <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        @else
-                            <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="Default Image"
-                                class="w-full h-full object-cover">
-                        @endif
+                        <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                            alt="{{ $blog->title }}" class="w-full h-full object-cover">
 
                         @php
                             $badgeText = is_array($blog->meta_keywords)
@@ -99,7 +57,8 @@
                         </p>
 
                         <!-- Metadata -->
-                        <div class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 mb-5 font-medium pb-4">
+                        <div
+                            class="flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500 mb-5 font-medium pb-4">
                             <div class="flex items-center gap-4">
                                 <span class="flex items-center gap-1.5"><i class="fa-regular fa-user text-sm"></i>
                                     {{ $blog->user->name ?? 'Admin' }} </span>

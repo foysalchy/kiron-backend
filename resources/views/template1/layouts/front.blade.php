@@ -65,7 +65,8 @@
 
         .primary-bg-hover:hover {
             background-color: var(--primary-hover-color) !important;
-        }.no-scrollbar::-webkit-scrollbar {
+        }
+        .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
 

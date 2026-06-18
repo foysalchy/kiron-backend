@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductGroup;
 use App\Models\ProductReview;
 use App\Models\Slider;
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 
 class HomeController extends FrontendController
@@ -103,5 +104,27 @@ class HomeController extends FrontendController
         }
 
         return $html;
+    }
+    public function subscribe(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|max:255',
+        ]);
+
+        $exists = Subscription::where('email', $request->email)
+            ->where('company_id', $this->company_id)
+            ->first();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'You are already subscribed!'], 422);
+        }
+
+        Subscription::create([
+            'company_id' => $this->company_id,
+            'email' => $request->email,
+            'status' => Status::Active->value,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Thanks for subscribing!']);
     }
 }

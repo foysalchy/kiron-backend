@@ -7,7 +7,7 @@
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
-            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden overflow-scroll lg:block">
+            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden  lg:block">
                 <div class="primary-bg text-primary py-3 text-[18px] text-center font-semibold position-sticky sticky top-0">
                     Explore Categories</div>
                 @foreach ($categories as $category)
@@ -126,12 +126,12 @@
 
                     <!-- Navigation Buttons -->
                     <button onclick="scrollCats(-200)" aria-label="Scroll left"
-                        class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                     </button>
 
                     <button onclick="scrollCats(200)" aria-label="Scroll right"
-                        class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                     </button>
 

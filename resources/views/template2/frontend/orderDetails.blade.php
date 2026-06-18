@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+@extends('template1.layouts.front')
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -61,7 +61,7 @@
                                     <p class="text-gray-900 font-medium">
                                         <span class="text-sm">{{ $setup->currency }} {{ number_format($item->unit_price) }}
                                             × {{ $item->quantity }}</span>
-                                        <span class="text-lg font-bold text-[#FF6A00] ml-3">{{ $setup->currency }}
+                                        <span class="text-lg font-bold text-[var(--primary-color)] ml-3">{{ $setup->currency }}
                                             {{ number_format($item->total) }}</span>
                                     </p>
                                 </div>
@@ -74,7 +74,7 @@
                                 @if ($canReview)
                                     <button type="button"
                                         onclick="openReviewModal('{{ $item->product->id }}', '{{ $item->product->title }}', '{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}', '{{ $item->variation->display_name ?? '' }}', '{{ $item->variation_id }}')"
-                                        class="w-full sm:w-auto px-4 py-2 border border-[#FF6A00] text-[#FF6A00] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2 cursor-pointer">
+                                        class="w-full sm:w-auto px-4 py-2 border border-[var(--primary-color)] text-[var(--primary-color)] rounded-lg text-xs font-bold hover:bg-orange-50 transition-all flex items-center gap-2 cursor-pointer">
                                         <i class="far fa-star"></i> Write Review
                                     </button>
                                 @else
@@ -283,7 +283,7 @@
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[#FF6A00]">{{ $setup->currency }}
+                            <span class="text-xl font-black text-[var(--primary-color)]">{{ $setup->currency }}
                                 {{ number_format($order->grand_total) }}</span>
                         </div>
                         <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
@@ -296,7 +296,7 @@
                     <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h3>
                     <div class="space-y-3">
                         <a href="{{ route('invoice.download', $order->id) }}"
-                            class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
+                            class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-download h-4 w-4 mr-2">
@@ -307,7 +307,7 @@
                             Invoice Download
                         </a>
                         <a href="{{ route('support.index') }}"
-                            class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
+                            class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="lucide lucide-message-square h-4 w-4 mr-2">

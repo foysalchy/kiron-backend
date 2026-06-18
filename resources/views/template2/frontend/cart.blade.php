@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+@extends('template1.layouts.front')
 
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
@@ -36,12 +36,16 @@
 
                                     <!-- Details -->
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1">
-                                            {{ $item->name }}
-                                        </h3>
+                                        <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
+                                            class="group/title">
+                                            <h3
+                                                class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
+                                                {{ $item->name ?? '' }}
+                                            </h3>
+                                        </a>
                                         <div class="flex items-center gap-2 mb-2">
                                             <span
-                                                class="bg-orange-50 text-[#FF6A00] text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                                class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
                                                 {{ $item->options->variant ?? 'Product' }}
                                             </span>
                                         </div>
@@ -63,15 +67,16 @@
                                     <div
                                         class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
                                         <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[#FF6A00] hover:bg-gray-50 transition-colors">-</button>
+                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                         <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
                                         <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[#FF6A00] hover:bg-gray-50 transition-colors">+</button>
+                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                     </div>
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-black text-base md:text-xl text-[#FF6A00]">{{ $setup->currency }}
+                                        <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
+                                            {{ $setup->currency }}
                                             {{ number_format($item->subtotal, 0) }}</p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
                                             class="text-red-400 hover:text-red-600 transition-colors">
@@ -97,9 +102,10 @@
                                 <div class="space-y-2">
                                     {{-- ১. Inside Charge (Dynamic) --}}
                                     <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="inside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                            {{ $shipping_area == 'inside' ? 'checked' : '' }}
+                                            class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
                                             Inside Dhaka ({{ $setup->currency }}
                                             {{ number_format($setup->inside_charge, 0) }})
@@ -108,9 +114,10 @@
 
                                     {{-- ২. Outside Charge (Dynamic) --}}
                                     <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="outside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                            {{ $shipping_area == 'outside' ? 'checked' : '' }}
+                                            class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
                                             Outside Dhaka ({{ $setup->currency }}
                                             {{ number_format($setup->outside_charge, 0) }})
@@ -165,7 +172,7 @@
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
                             <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[#FF6A00]">{{ $setup->currency }}
+                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ $setup->currency }}
                                 {{ number_format($total, 0) }}</span>
                         </div>
 
@@ -202,7 +209,8 @@
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">Your cart is currently empty!</h2>
                 <a href="{{ route('shop.index') }}"
-                    class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold">Start shopping</a>
+                    class="inline-block mt-8 bg-[var(--primary-color)] text-primary px-10 py-3 rounded-xl font-bold">Start
+                    shopping</a>
             </div>
         @endif
     </section>
