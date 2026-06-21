@@ -148,7 +148,7 @@
                                         onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
                                 </div>
                                 <span class="md:text-md text-sm   text-gray-800 text-center   w-full px-1">
-                                    {{ $category->name ?? ''}}
+                                    {{ $category->name ?? '' }}
                                 </span>
                             </a>
                         @endforeach
@@ -339,33 +339,77 @@
         </section>
     @endif
 
-    <!-- YOU MAY LIKE SECTION -->
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
+    @if ($popularProducts->count() > 0)
+        <!-- YOU MAY LIKE SECTION -->
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
-            <!-- Header -->
-            <div class="mb-6">
-                <h2 class="text-md md:text-lg font-bold mb-4 md:mb-6 uppercase tracking-tight">You May Like</h2>
+                <!-- Header -->
+                <div class="mb-6">
+                    <h2 class="text-md md:text-lg font-bold mb-4 md:mb-6 uppercase tracking-tight">You May Like</h2>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
+                    @foreach ($popularProducts as $product)
+                        <x-template1.product-card :product="$product" />
+                    @endforeach
+
+                </div>
+
+                <!-- View More Button -->
+                <div class="flex justify-center mt-10">
+                    <a href="{{ route('shop.index') }}"
+                        class="primary-bg text-primary hover:bg-gray-50 primary-bg-hover hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                        View More
+                    </a>
+                </div>
+
             </div>
+        </section>
+    @endif
+    @if ($faqs->count() > 0)
+        <!-- FAQ SECTION (Styled like You May Like) -->
+        <section class="py-6 md:py-10 container mx-auto px-4 lg:px-0">
+            <div class="bg-white rounded-lg shadow-xs p-4 md:p-10 border border-gray-50">
 
-            <!-- Product Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
-                @foreach ($popularProducts as $product)
-                    <x-template1.product-card :product="$product" />
-                @endforeach
+                <!-- Section Header -->
+                <div class="mb-10 border-b border-gray-100 pb-4">
+                    <h2 class="text-xl md:text-3xl font-black uppercase tracking-tight text-gray-900">
+                        Frequently Asked Questions
+                    </h2>
+                </div>
+
+                <!-- FAQ Items Container -->
+                <div class="space-y-10">
+                    @forelse($faqs as $faq)
+                        <div class="faq-item">
+                            <!-- Question -->
+                            <h3
+                                class="text-lg md:text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide flex items-start gap-3">
+                                <span class="text-blue-600">Q.</span>
+                                {{ $faq->title ?? '' }}
+                            </h3>
+
+                            <!-- Answer -->
+                            <div class="text-gray-600 text-sm md:text-base leading-relaxed blog-content-area pl-0 md:pl-8">
+                                {!! $faq->content !!}
+                            </div>
+
+                            @if (!$loop->last)
+                                <hr class="mt-10 border-gray-200">
+                            @endif
+                        </div>
+                    @empty
+                        <div class="text-center py-10">
+                            <p class="text-gray-600 italic">No information found.</p>
+                        </div>
+                    @endforelse
+                </div>
 
             </div>
-
-            <!-- View More Button -->
-            <div class="flex justify-center mt-10">
-                <a href="{{ route('shop.index') }}"
-                    class="primary-bg text-primary hover:bg-gray-50 primary-bg-hover hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
-                    View More
-                </a>
-            </div>
-
-        </div>
-    </section>
+        </section>
+    @endif
 @endsection
 @push('scripts')
     <script>

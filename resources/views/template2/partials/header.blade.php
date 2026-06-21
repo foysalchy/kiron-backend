@@ -4,7 +4,8 @@
         <div class="flex items-center justify-between gap-4 lg:gap-8">
 
             <!-- Mobile Menu Toggle (Visible only on Mobile) -->
-            <button onclick="toggleMobileMenu()" class="md:hidden text-[#016738] text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()"
+                class="md:hidden text-[var(--primary-color)] text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
 
@@ -13,25 +14,29 @@
                 @if ($setup && $setup->logo)
                     <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
-                    <span class="text-xl md:text-2xl font-bold text-[#016738]">খাঁটি ভাই</span>
+                    <span class="text-xl md:text-2xl font-bold text-[var(--primary-color)]">খাঁটি ভাই</span>
                 @endif
             </a>
 
             <!-- Segmented Search Bar with Suggestions -->
             <form action="{{ route('shop.index') }}" method="GET" class="hidden md:flex flex-1 max-w-2xl relative"
                 id="header-search-container">
-                <div class="flex w-full border border-[#016738] rounded-sm overflow-hidden bg-white z-30 relative">
+                <div
+                    class="flex w-full border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white z-30 relative">
                     <!-- Category Dropdown -->
-                    <div class="relative flex-shrink-0 border-r border-[#016738] min-w-[130px]">
-                        <select name="category"
-                            class="w-full h-full pl-6 py-2 text-base text-[#016738] font-bold bg-transparent outline-none appearance-none cursor-pointer">
+                    <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px]">
+                        <select name="category" id="header-category-select"
+                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-[var(--primary-color)] font-bold bg-transparent outline-none appearance-none cursor-pointer">
                             <option value="">সব দেখুন</option>
                             @foreach ($headerCategories as $cat)
-                                <option value="{{ $cat->slug }}">{{ $cat->name }}</option>
+                                <option value="{{ $cat->slug }}"
+                                    {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                                    {{ $cat->name }}
+                                </option>
                             @endforeach
                         </select>
-                        <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-base text-[#016738]"></i>
+                        <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-[10px] text-[var(--primary-color)]"></i>
                         </div>
                     </div>
                     <!-- Input -->
@@ -47,7 +52,6 @@
                 <div id="search-suggestions"
                     class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-2">
 
-                    <!-- ডিফল্ট কন্টেন্ট (যখন কিছু টাইপ করা হবে না) -->
                     <div id="suggestion-content">
                         <div class="pb-2">
                             <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">জনপ্রিয়
@@ -88,8 +92,8 @@
             <div class="flex items-center gap-3 sm:gap-4 lg:gap-6">
                 <!-- Cart Icon -->
                 <button onclick="toggleCartDrawer()" class="relative group outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-[#016738]" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-[var(--primary-color)]"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
@@ -104,7 +108,7 @@
                     @auth('customer')
                         <!-- Logged In User Trigger -->
                         <button onclick="toggleDesktopAccount()"
-                            class="flex items-center gap-2 text-[#016738] outline-none cursor-pointer select-none">
+                            class="flex items-center gap-2 text-[var(--primary-color)] outline-none cursor-pointer select-none">
                             <div
                                 class="w-8 h-8 md:w-9 md:h-9 rounded-full primary-bg text-primary flex items-center justify-center font-bold border-2 border-white shadow-sm">
                                 {{ substr(auth('customer')->user()->name, 0, 1) }}
@@ -127,15 +131,15 @@
                             </div>
 
                             <a href="{{ route('user.dashboard') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[#016738] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
                                 <i class="fas fa-th-large w-4 text-gray-400"></i> ড্যাশবোর্ড
                             </a>
                             <a href="{{ route('user.dashboard') }}?section=orders"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[#016738] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
                                 <i class="fas fa-box w-4 text-gray-400"></i> আমার অর্ডারসমূহ
                             </a>
                             <a href="{{ route('user.profile') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[#016738] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
                                 <i class="fas fa-user-edit w-4 text-gray-400"></i> প্রোফাইল আপডেট
                             </a>
 
@@ -151,7 +155,8 @@
                         </div>
                     @else
                         <!-- Guest User Icon -->
-                        <a href="{{ route('user.login') }}" class="flex items-center gap-2 text-[#016738] group/login">
+                        <a href="{{ route('user.login') }}"
+                            class="flex items-center gap-2 text-[var(--primary-color)] group/login">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -176,18 +181,21 @@
     <!-- Mobile Search Bar (Updated with Segment and Suggestions) -->
     <div class="md:hidden px-4 pb-4 relative" id="mobile-search-container">
         <form action="{{ route('shop.index') }}" method="GET"
-            class="flex border border-[#016738] rounded-sm overflow-hidden bg-white">
+            class="flex border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white">
             <!-- Category Segment for Mobile -->
-            <div class="relative flex-shrink-0 border-r border-[#016738] bg-gray-50">
-                <select name="category"
-                    class="h-full pl-2 pr-6 py-2 text-xs text-[#016738] font-bold bg-transparent outline-none appearance-none cursor-pointer">
+            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[80px]">
+                <select name="category" id="mobile-category-select"
+                    class="h-full pl-2 pr-6 py-2 text-xs text-[var(--primary-color)] font-bold bg-transparent outline-none appearance-none cursor-pointer">
                     <option value="">সব</option>
                     @foreach ($headerCategories as $cat)
-                        <option value="{{ $cat->slug }}">{{ $cat->name }}</option>
+                        <option value="{{ $cat->slug }}"
+                            {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                            {{ $cat->name }}
+                        </option>
                     @endforeach
                 </select>
                 <div class="absolute inset-y-0 right-1 flex items-center pointer-events-none">
-                    <i class="fas fa-chevron-down text-[10px] text-[#016738]"></i>
+                    <i class="fas fa-chevron-down text-[10px] text-[var(--primary-color)]"></i>
                 </div>
             </div>
 
@@ -248,9 +256,9 @@
             @if ($setup && $setup->logo)
                 <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold text-[#016738]">খাঁটি ভাই</span>
+                <span class="text-xl font-bold text-[var(--primary-color)]">খাঁটি ভাই</span>
             @endif
-            <button onclick="toggleMobileMenu()" class="text-[#016738] text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="text-[var(--primary-color)] text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -271,13 +279,13 @@
         <!-- Navigation Links -->
         <nav class="flex flex-col p-6 gap-5">
             <a href="{{ route('home') }}"
-                class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">হোমপেজ</a>
+                class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">হোমপেজ</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">অফার</a>
+                class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">অফার</a>
 
             @foreach ($headerCategories as $cat)
                 <a href="{{ route('category.products', $cat->slug) }}"
-                    class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">
+                    class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">
                     {{ $cat->name }}
                 </a>
             @endforeach
@@ -287,14 +295,12 @@
         <div class="mt-auto p-5 flex flex-col gap-3 mb-6">
 
             @auth('customer')
-                <!-- ড্যাশবোর্ড বাটন (লগইন থাকলে) -->
                 <a href="{{ route('user.dashboard') }}"
                     class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>আমার ড্যাশবোর্ড</span>
                 </a>
 
-                <!-- লগআউট বাটন (লগইন থাকলে) -->
                 <form action="{{ route('user.logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full text-center text-red-500 font-bold text-sm py-2 hover:underline">
@@ -336,42 +342,19 @@
     </div>
 
     <!-- Products List -->
-    <div class="flex-1 overflow-y-auto p-4">
-        @php $cartItems = \Gloudemans\Shoppingcart\Facades\Cart::content(); @endphp
-
-        @forelse($cartItems as $item)
-            <div class="flex gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0">
-                <div class="w-20 h-20 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
-                    <img src="{{ $item->options->image ?? asset('images/no-image.png') }}" alt="{{ $item->name }}"
-                        class="w-full h-full object-contain">
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">পরিমাণ: {{ $item->options->variant ?? 'N/A' }}</p>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-sm font-bold text-[#016738]">{{ $item->qty }} ×
-                            {{ number_format($item->price, 0) }}৳</span>
-                        <a href="{{ route('cart.remove', $item->rowId) }}" class="text-gray-400 hover:text-red-500">
-                            <i class="fa-regular fa-circle-xmark"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="h-full flex flex-col items-center justify-center text-gray-400">
-                <i class="fas fa-shopping-basket text-5xl mb-3"></i>
-                <p>আপনার কার্ট খালি</p>
-            </div>
-        @endforelse
+    <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
+        <!-- কম্পোনেন্ট কল করা হলো -->
+        <x-template1.cart-drawer-items />
     </div>
 
     <!-- Footer -->
-    @if (count($cartItems) > 0)
-        <div class="p-4 border-t bg-gray-50">
+    @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
+        <div class="p-4 border-t bg-gray-50" id="mini-cart-footer">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-                <span
-                    class="text-lg font-bold text-gray-900">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳</span>
+                <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
+                    {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
+                </span>
             </div>
 
             <div class="space-y-3">
@@ -389,9 +372,9 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // সার্চ ফাংশনালিটি সেটআপ করার জন্য একটি কমন ফাংশন
-        function setupSearch(inputId, suggestionBoxId, contentId, resultsId, containerId) {
+        function setupSearch(inputId, categorySelectId, suggestionBoxId, contentId, resultsId, containerId) {
             const input = document.getElementById(inputId);
+            const categorySelect = document.getElementById(categorySelectId); // ক্যাটাগরি সিলেক্ট আইডি
             const suggestionBox = document.getElementById(suggestionBoxId);
             const defaultContent = document.getElementById(contentId);
             const liveResults = document.getElementById(resultsId);
@@ -408,6 +391,8 @@
 
             input.addEventListener('input', function() {
                 const query = this.value.trim();
+                const selectedCategory = categorySelect.value; // বর্তমান সিলেক্ট করা ক্যাটাগরি নিন
+
                 clearTimeout(debounceTimer);
                 if (abortController) abortController.abort();
 
@@ -419,7 +404,8 @@
                         liveResults.innerHTML =
                             '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>খোঁজা হচ্ছে...</div>';
 
-                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
+                        // ক্যাটাগরি স্লাগটি প্যারামিটার হিসেবে পাঠানো হচ্ছে
+                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}&category=${selectedCategory}`, {
                                 signal: abortController.signal
                             })
                             .then(res => res.json())
@@ -433,14 +419,14 @@
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                         link.innerHTML = `
-                                        <img src="${item.thumbnail_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'">
-                                        <span class="truncate">${item.title}</span>
-                                    `;
+                                            <img src="${item.thumbnail_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                            <span class="truncate">${item.title}</span>
+                                        `;
                                         liveResults.appendChild(link);
                                     });
                                 } else {
                                     liveResults.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">পাওয়া যায়নি।</div>';
+                                        '<div class="px-5 py-3 text-xs text-gray-400">পণ্য পাওয়া যায়নি।</div>';
                                 }
                             })
                             .catch(err => {
@@ -453,6 +439,7 @@
                 }
             });
 
+            // বাইরে ক্লিক করলে বন্ধ করা
             document.addEventListener('click', (e) => {
                 if (container && !container.contains(e.target)) {
                     suggestionBox.classList.add('hidden');
@@ -460,13 +447,13 @@
             });
         }
 
-        // ডেক্সটপ সার্চ অ্যাক্টিভেট করুন
-        setupSearch('header-search-input', 'search-suggestions', 'suggestion-content', 'live-search-results',
-            'header-search-container');
+        // ডেক্সটপ সার্চ অ্যাক্টিভেট
+        setupSearch('header-search-input', 'header-category-select', 'search-suggestions', 'suggestion-content',
+            'live-search-results', 'header-search-container');
 
-        // মোবাইল সার্চ অ্যাক্টিভেট করুন
-        setupSearch('mobile-search-input', 'mobile-search-suggestions', 'mobile-suggestion-content',
-            'mobile-live-results', 'mobile-search-container');
+        // মোবাইল সার্চ অ্যাক্টিভেট
+        setupSearch('mobile-search-input', 'mobile-category-select', 'mobile-search-suggestions',
+            'mobile-suggestion-content', 'mobile-live-results', 'mobile-search-container');
     });
 </script>
 <script>
@@ -476,22 +463,6 @@
         document.body.classList.toggle('overflow-hidden');
     }
 
-    function toggleCartDrawer() {
-        const drawer = document.getElementById('cart-drawer');
-        const overlay = document.getElementById('cart-overlay');
-
-        if (drawer.classList.contains('translate-x-full')) {
-            // Open
-            drawer.classList.remove('translate-x-full');
-            overlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // স্ক্রল বন্ধ করবে
-        } else {
-            // Close
-            drawer.classList.add('translate-x-full');
-            overlay.classList.add('hidden');
-            document.body.style.overflow = ''; // স্ক্রল চালু করবে
-        }
-    }
     // Toggle Desktop Account Dropdown
     function toggleDesktopAccount() {
         const menu = document.getElementById('desktop-account-menu');

@@ -74,6 +74,7 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::post('/coupon/apply', [CartController::class, 'applyCoupon'])->name('coupon.apply');
     Route::get('/coupon/remove', [CartController::class, 'removeCoupon'])->name('coupon.remove');
     Route::post('/cart/shipping', [CartController::class, 'updateShipping'])->name('cart.shipping');
+    Route::get('/cart-drawer-items', [CartController::class, 'getCartDrawerItems'])->name('cart.drawer.items');
 
     Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index');
     Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('order.store');

@@ -180,7 +180,7 @@
                 }
             }
 
-            // 1. Function to add variation
+            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন (Variation Modal এর জন্য)
             function processAddVariation() {
                 const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
                 const qtyInput = document.getElementById('modal-qty');
@@ -191,58 +191,73 @@
                     return;
                 }
 
+                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
+                const postData = {
+                    items: [{
+                        variation_id: selectedVariant.value,
+                        qty: qtyInput ? qtyInput.value : 1
+                    }]
+                };
+
                 fetch("{{ route('cart.add') }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json', // এটি যোগ করা জরুরি
                             'X-CSRF-TOKEN': token
                         },
-                        body: JSON.stringify({
-                            variation_id: selectedVariant.value,
-                            qty: qtyInput ? qtyInput.value : 1
-                        })
+                        body: JSON.stringify(postData)
                     })
                     .then(res => res.json())
                     .then(data => {
-                        // If success
                         if (data.status === 'success') {
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                             closeModal();
-                            toastr.success(data.message);
-                        }
-                        // If error (like: stock out)
-                        else {
+                            if (typeof isOrderNowGlobal !== 'undefined' && isOrderNowGlobal) {
+                                window.location.href = "{{ route('checkout.index') }}";
+                            } else {
+                                toastr.success(data.message);
+                            }
+                        } else {
                             toastr.error(data.message || "Something went wrong.");
                         }
-                    })
-                    .catch(err => {
-                        console.error('Error:', err);
-                        toastr.error("There was a problem with the server, please try again.");
-                    });
+                    }).catch(err => toastr.error("Server error."));
             }
 
-            // 2. Function to add single product
-            function addSingleToCart(id) {
+            // ২. সরাসরি সিঙ্গেল প্রোডাক্ট অ্যাড করার ফাংশন
+            function addSingleToCart(id, isOrderNow = false) {
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+
+                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
+                const postData = {
+                    items: [{
+                        id: id,
+                        qty: 1
+                    }]
+                };
+
                 fetch("{{ route('cart.add') }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json', // এটি যোগ করা জরুরি
                             'X-CSRF-TOKEN': token
                         },
-                        body: JSON.stringify({
-                            id: id,
-                            qty: 1
-                        })
+                        body: JSON.stringify(postData)
                     })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                            toastr.success(data.message);
+                            if (isOrderNow) {
+                                window.location.href = "{{ route('checkout.index') }}";
+                            } else {
+                                toastr.success(data.message);
+                            }
                         } else {
-                            toastr.error(data.message); // Stock out message will be shown here
+                            toastr.error(data.message);
                         }
-                    });
+                    }).catch(err => toastr.error("Server error."));
             }
         </script>
     @endpush

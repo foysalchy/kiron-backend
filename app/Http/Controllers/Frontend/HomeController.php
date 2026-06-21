@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
+use App\Models\KnowledgeBase;
 use App\Models\MegaCategory;
 use App\Models\Product;
 use App\Models\ProductGroup;
@@ -17,6 +18,8 @@ class HomeController extends FrontendController
 {
     public function index()
     {
+         $faqs = KnowledgeBase::active()
+            ->get();
 
         $categories = MegaCategory::with('subCategories.miniCategories')->get();
 
@@ -81,7 +84,8 @@ class HomeController extends FrontendController
                 'sidebarSliders',
                 'middleSliders',
                 'allProducts',
-                'allReviews'
+                'allReviews',
+                'faqs'
             )
         );
     }

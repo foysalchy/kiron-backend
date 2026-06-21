@@ -467,6 +467,13 @@ class CartController extends FrontendController
                 ->update(['status' => CartTrack::REMOVED]);
         }
         Cart::remove($rowId);
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['status' => 'success', 'cart_count' => Cart::count()]);
+        }
         return back()->with('success', 'The item has been successfully removed from your cart!');
+    }
+    public function getCartDrawerItems()
+    {
+        return view('components.template1.cart-drawer-items')->render();
     }
 }
