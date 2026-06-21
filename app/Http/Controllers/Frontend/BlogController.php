@@ -10,15 +10,6 @@ class BlogController extends FrontendController
 {
     public function index(Request $request, $store)
     {
-        $availableTags = Blog::active()
-            ->whereNotNull('meta_keywords')
-            ->get()
-            ->pluck('meta_keywords')
-            ->flatten()
-            ->unique()
-            ->filter()
-            ->values();
-
         $query = Blog::with('user')->active();
 
         if ($request->filled('search')) {
@@ -36,7 +27,7 @@ class BlogController extends FrontendController
 
         $blogs = $query->latest()->paginate(6)->withQueryString();
 
-        return  $this->view('frontend.blog', compact('blogs', 'availableTags'));
+        return  $this->view('frontend.blog', compact('blogs'));
     }
     public function blogDetails($store, $slug)
     {

@@ -3,6 +3,7 @@
     <!-- 1. Top Bar (Orange Row) -->
     <div class="primary-bg text-primary py-2 text-sm hidden sm:block">
         <div class="container mx-auto px-4 flex justify-between items-center">
+
             <div class="flex items-center gap-6">
                 <span class="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -34,16 +35,24 @@
     <div class="container mx-auto px-4 py-3 flex items-center justify-between gap-3 lg:gap-8">
 
         <!-- Logo Section -->
-        <a href="{{ route('home') }}" class="flex items-center gap-2 flex-shrink-0">
-            @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}"
-                    class="h-10 md:h-12 w-auto object-contain">
-            @else
-                <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
-                    {{ $setup->shop_name ?? 'Bhaiya Digital' }}
-                </span>
-            @endif
-        </a>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <button class="lg:hidden text-2xl text-gray-700 focus:outline-none" onclick="toggleMobileMenu()"
+                aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Logo Section -->
+            <a href="{{ route('home') }}" class="flex items-center gap-2">
+                @if ($setup && $setup->logo)
+                    <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}"
+                        class="h-8 md:h-12 w-auto object-contain">
+                @else
+                    <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+                        {{ $setup->shop_name ?? 'Bhaiya Digital' }}
+                    </span>
+                @endif
+            </a>
+        </div>
 
         <!-- Search Bar (Desktop + Tablet) -->
         <form action="{{ route('shop.index') }}" method="GET" class="hidden sm:flex flex-1 max-w-2xl relative"
@@ -202,18 +211,61 @@
         </div>
     </div>
 
-    <!-- Mobile Search Bar (hidden by default) -->
-    <div id="mobile-search-bar" class="hidden sm:hidden px-4 pb-3">
-        <form action="{{ route('shop.index') }}" method="GET">
-            <div class="flex items-center bg-white border border-gray-200 rounded-md p-1">
-                <label for="search-input" class="sr-only">Search Products</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Find products..."
+    <!-- Mobile Search Bar (Full Professional Design) -->
+    <div id="mobile-search-bar" class="hidden sm:hidden px-4 pb-3 relative" id="mobile-search-container">
+        <form action="{{ route('shop.index') }}" method="GET" class="relative">
+            <div class="flex items-center bg-white border border-gray-200 rounded-md p-1 relative z-30 shadow-sm">
+                <label for="mobile-search-input" class="sr-only">Search Products</label>
+                <input type="text" name="search" id="mobile-search-input" autocomplete="off"
+                    value="{{ request('search') }}" placeholder="Find products..."
                     class="flex-1 bg-transparent px-3 py-2 text-sm text-gray-600 outline-none">
                 <button type="submit"
-                    class="primary-bg text-primary h-9 w-10 flex items-center justify-center rounded-md"
-                    aria-label="Open Search">
+                    class="primary-bg text-primary h-9 w-10 flex items-center justify-center rounded-md">
                     <i class="fas fa-search text-sm"></i>
                 </button>
+            </div>
+
+            <!-- Mobile Search Suggestions Dropdown (Matches Desktop Style) -->
+            <div id="mobile-search-suggestions"
+                class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[100] overflow-hidden pt-2">
+
+                <div id="mobile-suggestion-content">
+                    <!-- Popular Searches -->
+                    <div class="pb-2">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular
+                            Searches</p>
+                        @forelse($popularSearches as $item)
+                            <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                                class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-history text-gray-300 text-xs"></i>
+                                    <span>{{ $item->keyword }}</span>
+                                </div>
+                                <i class="fa-solid fa-arrow-trend-up text-[10px] text-gray-200"></i>
+                            </a>
+                        @empty
+                            <p class="px-5 py-2 text-xs text-gray-400 italic">No search history</p>
+                        @endforelse
+                    </div>
+
+                    <!-- Trending Products -->
+                    <div class="border-t border-gray-50 pt-2 pb-2">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
+                            Products</p>
+                        @foreach ($relatedProducts as $p)
+                            <a href="{{ route('shop.index', ['search' => $p->title]) }}"
+                                class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                                <img src="{{ $p->thumbnail_url }}"
+                                    class="w-6 h-6 rounded object-cover border border-gray-100"
+                                    onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                <span class="truncate">{{ $p->title }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Live Search Results (Shows when typing) -->
+                <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
             </div>
         </form>
     </div>
@@ -251,7 +303,7 @@
     </div>
 
     <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-[1100] flex">
+    <div id="mobile-menu" class="hidden  lg:hidden fixed inset-0 z-[1100] flex">
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/50" onclick="toggleMobileMenu()"></div>
 
@@ -412,107 +464,110 @@
 
 @push('scripts')
     <script>
-        // Mobile Search Toggle
+        // মোবাইল মেনু এবং সার্চ টগল ফাংশন (আগের মতোই থাকবে)
         function toggleMobileSearch() {
             const bar = document.getElementById('mobile-search-bar');
             bar.classList.toggle('hidden');
             if (!bar.classList.contains('hidden')) {
-                bar.querySelector('input').focus();
+                document.getElementById('mobile-search-input').focus();
             }
         }
 
-        // Mobile Menu Toggle
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
             document.body.classList.toggle('overflow-hidden');
         }
 
-        // Account Dropdown
         function toggleAccount() {
             document.getElementById('account-dropdown').classList.toggle('hidden');
         }
-
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('account-menu');
-            const dropdown = document.getElementById('account-dropdown');
-            if (menu && !menu.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
-        // Search Suggestions
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('header-search-input');
-            const suggestionBox = document.getElementById('search-suggestions');
-            const defaultContent = document.getElementById('suggestion-content');
-            const liveResults = document.getElementById('live-search-results');
-            const container = document.getElementById('header-search-container');
-
-            if (!searchInput) return;
+            const searchConfigs = [{
+                    input: document.getElementById('header-search-input'),
+                    suggestions: document.getElementById('search-suggestions'),
+                    results: document.getElementById('live-search-results'),
+                    defaultContent: document.getElementById('suggestion-content'),
+                    container: document.getElementById('header-search-container')
+                },
+                {
+                    input: document.getElementById('mobile-search-input'),
+                    suggestions: document.getElementById('mobile-search-suggestions'),
+                    results: document.getElementById('mobile-live-search-results'),
+                    defaultContent: document.getElementById('mobile-suggestion-content'),
+                    container: document.getElementById('mobile-search-container')
+                }
+            ];
 
             let debounceTimer;
             let abortController = null;
 
-            searchInput.addEventListener('focus', () => {
-                suggestionBox.classList.remove('hidden');
-            });
+            searchConfigs.forEach(config => {
+                if (!config.input) return;
 
-            searchInput.addEventListener('input', function() {
-                const query = this.value.trim();
-                clearTimeout(debounceTimer);
-                if (abortController) abortController.abort();
+                config.input.addEventListener('focus', () => {
+                    config.suggestions.classList.remove('hidden');
+                });
 
-                if (query.length > 1) {
-                    debounceTimer = setTimeout(() => {
-                        abortController = new AbortController();
-                        defaultContent.classList.add('hidden');
-                        liveResults.classList.remove('hidden');
-                        liveResults.innerHTML =
-                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+                config.input.addEventListener('input', function() {
+                    const query = this.value.trim();
+                    clearTimeout(debounceTimer);
+                    if (abortController) abortController.abort();
 
-                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
-                                signal: abortController.signal
-                            })
-                            .then(res => res.json())
-                            .then(data => {
-                                liveResults.innerHTML = '';
-                                if (data.length > 0) {
-                                    data.forEach(item => {
-                                        const link = document.createElement('a');
-                                        link.href = "{{ url('product') }}/" + item
-                                            .slug;
-                                        link.className =
-                                            "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
+                    if (query.length > 1) {
+                        debounceTimer = setTimeout(() => {
+                            abortController = new AbortController();
 
-                                        link.innerHTML = `
-                                            <img src="${item.thumbnail_url}"
-                                                class="w-6 h-6 rounded object-cover border border-gray-100"
-                                                onerror="this.src='{{ asset('images/no-image.png') }}'">
+                            if (config.defaultContent) config.defaultContent.classList.add(
+                                'hidden');
+                            config.results.classList.remove('hidden');
+                            config.suggestions.classList.remove('hidden');
+                            config.results.innerHTML =
+                                '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+
+                            fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
+                                    signal: abortController.signal
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    config.results.innerHTML = '';
+                                    if (data.length > 0) {
+                                        data.forEach(item => {
+                                            const link = document.createElement(
+                                                'a');
+                                            link.href =
+                                                "{{ url('product') }}/" + item
+                                                .slug;
+                                            link.className =
+                                                "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
+                                            link.innerHTML = `
+                                            <img src="${item.thumbnail_url}" class="w-7 h-7 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/no-image.png') }}'">
                                             <span class="truncate">${item.title}</span>
                                         `;
-                                        liveResults.appendChild(link);
-                                    });
-                                } else {
-                                    liveResults.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
-                                }
-                            })
-                            .catch(error => {
-                                if (error.name !== 'AbortError') console.error('Search error:',
-                                    error);
-                            });
-                    }, 500);
-                } else {
-                    defaultContent.classList.remove('hidden');
-                    liveResults.classList.add('hidden');
-                }
+                                            config.results.appendChild(link);
+                                        });
+                                    } else {
+                                        config.results.innerHTML =
+                                            '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                                    }
+                                });
+                        }, 400);
+                    } else {
+                        if (config.defaultContent) config.defaultContent.classList.remove('hidden');
+                        config.results.classList.add('hidden');
+                    }
+                });
             });
 
             document.addEventListener('click', (e) => {
-                if (container && !container.contains(e.target)) {
-                    suggestionBox.classList.add('hidden');
-                }
+                searchConfigs.forEach(config => {
+                    if (config.input && !config.input.contains(e.target) && !config.suggestions
+                        .contains(e.target)) {
+                        config.suggestions.classList.add('hidden');
+                    }
+                });
             });
         });
     </script>

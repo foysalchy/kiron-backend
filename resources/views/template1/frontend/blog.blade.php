@@ -32,13 +32,8 @@
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
                     <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        @if ($blog->thumbnail_url)
-                            <img src="{{ $blog->thumbnail_url ?? ''}}" alt="{{ $blog->title }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        @else
-                            <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="Default Image"
-                                class="w-full h-full object-cover">
-                        @endif
+                        <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                            alt="{{ $blog->title }}" class="w-full h-full object-cover">
 
                         @php
                             $badgeText = is_array($blog->meta_keywords)

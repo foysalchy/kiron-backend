@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+@extends('template1.layouts.front')
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -8,7 +8,7 @@
 
             <!-- Breadcrumb -->
             <nav class="flex items-center gap-2 mb-8 text-sm text-gray-400">
-                <a href="{{ route('home') }}" class="hover:text-[#FF6A00]">Home</a>
+                <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)]">Home</a>
                 <i class="fas fa-chevron-right text-[8px]"></i>
                 <span class="text-gray-800 font-medium">{{ $page->title }}</span>
             </nav>
@@ -21,7 +21,7 @@
                     <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
                         {{ $page->title }}
                     </h1>
-                    <div class="w-16 h-1.5 bg-[#FF6A00] rounded-full"></div>
+                    <div class="w-16 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
                 </div>
 
                 <!-- Body -->

@@ -58,13 +58,21 @@ class Blog extends Model
         return $query->where('company_id', $companyId);
     }
 
-    // Accessors
-    public function getThumbnailUrlAttribute(): ?string
-    {
-        return $this->thumbnail
-            ? Storage::disk('r2')->url($this->thumbnail)
-            : null;
+public function getThumbnailUrlAttribute(): ?string
+{
+    $images = $this->images;
+
+    if (is_array($images) && count($images) > 0) {
+        $localPath = storage_path('app/public/' . $images[0]);
+        if (file_exists($localPath)) {
+            return asset('storage/' . $images[0]);
+        }
+
+        return Storage::disk('r2')->url($images[0]);
     }
+
+    return null;
+}
     //read time
     public function getReadingTimeAttribute()
     {

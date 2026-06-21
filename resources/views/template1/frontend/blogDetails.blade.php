@@ -37,16 +37,9 @@
 
                     <!-- Featured Image: Dynamic -->
                     <div class="relative">
-                        @if (!empty($$blog->thumbnail_url) && isset($blog->images[0]))
-                            <img src="{{ $blog->thumbnail ?? '' }}" alt="{{ $blog->title }}"
-                                class="w-full h-64 md:h-[450px] object-cover">
-                        @else
-                            <div
-                                class="w-full h-64 md:h-[450px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $blog->title }}"
-                                    class="w-full h-64 md:h-[450px] object-cover">
-                            </div>
-                        @endif
+                        <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                            alt="{{ $blog->title }}" class="w-full h-auto max-h-[550px] object-cover"
+                            onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
 
                         @php
                             $keywords = is_array($blog->meta_keywords)
@@ -208,14 +201,10 @@
                         @foreach ($relatedPosts as $rp)
                             <a href="{{ route('blog.details', ['slug' => $rp->slug]) }}" class="flex gap-4 group">
                                 <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                                    @if ($rp->thumbnail_url)
-                                        <img src="{{ $rp->thumbnail_url }}" alt="blog image"
-                                            onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform">
-                                    @else
-                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="blog image"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform">
-                                    @endif
+                                    <img src="{{ $rp->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                                        alt="blog image"
+                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                 </div>
                                 <div>
                                     <h4

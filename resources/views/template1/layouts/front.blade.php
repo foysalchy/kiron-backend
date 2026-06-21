@@ -66,6 +66,14 @@
         .primary-bg-hover:hover {
             background-color: var(--primary-hover-color) !important;
         }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
     @stack('styles')
 </head>

@@ -7,8 +7,9 @@
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
-            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden overflow-scroll lg:block">
-                <div class="primary-bg text-primary py-3 text-[18px] text-center font-semibold position-sticky sticky top-0">Explore Categories</div>
+            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden  lg:block">
+                <div class="primary-bg text-primary py-3 text-[18px] text-center font-semibold position-sticky sticky top-0">
+                    Explore Categories</div>
                 @foreach ($categories as $category)
                     <div class="group border-b border-gray-200">
                         <a href="{{ url('category/' . $category->slug) }}"
@@ -111,107 +112,107 @@
 
     <!-- TOP CATEGORIES SECTION -->
     @if ($categories->count() > 0)
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <!-- Main Card Container -->
+            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
-            <!-- Section Heading -->
-            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
-                Top Categories
-            </h2>
+                <!-- Section Heading -->
+                <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
+                    Top Categories
+                </h2>
 
-            <!-- Carousel Wrapper -->
-            <div class="relative group">
+                <!-- Carousel Wrapper -->
+                <div class="relative group">
 
-                <!-- Navigation Buttons -->
-                <button onclick="scrollCats(-200)" aria-label="Scroll left"
-                    class="absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
-                </button>
+                    <!-- Navigation Buttons -->
+                    <button onclick="scrollCats(-200)" aria-label="Scroll left"
+                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
 
-                <button onclick="scrollCats(200)" aria-label="Scroll right"
-                    class="absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
-                </button>
+                    <button onclick="scrollCats(200)" aria-label="Scroll right"
+                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
 
-                <!-- Categories Scroll Area (Dynamic) -->
-                <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
-                    @foreach ($categories as $category)
-                        <a href="{{ url('category/' . $category->slug) }}"
-                            class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
-                            <div
-                                class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
-                                <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
-                                    onerror="this.onerror=null;this.src='{{ asset('./images/template1/frontend/default.webp') }}';"
-                                    class="w-full h-full object-cover   transition-transform duration-500"
-                                    alt="{{ $category->name }}">
-                            </div>
-                            <span class="md:text-md text-sm   text-gray-800 text-center   w-full px-1">
-                                {{ $category->name }}
-                            </span>
-                        </a>
-                    @endforeach
+                    <!-- Categories Scroll Area (Dynamic) -->
+                    <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
+                        @foreach ($categories as $category)
+                            <a href="{{ url('category/' . $category->slug) }}"
+                                class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
+                                <div
+                                    class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
+                                    <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                        alt="{{ $category->name }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
+                                </div>
+                                <span class="md:text-md text-sm   text-gray-800 text-center   w-full px-1">
+                                    {{ $category->name ?? ''}}
+                                </span>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     @endif
     <!-- NEW ARRIVALS SECTION -->
     @if ($newArrivals->count() > 0)
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
-            <!-- Header -->
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">New Arrivals</h2>
-                <a href="{{ route('shop.index') }}">
-                    <button aria-label="View all new arrivals"
-                        class="primary-bg primary-bg-hover font-semibold text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
-                        View all
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">New Arrivals</h2>
+                    <a href="{{ route('shop.index') }}">
+                        <button aria-label="View all new arrivals"
+                            class="primary-bg primary-bg-hover font-semibold text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
+                    </a>
+                </div>
+
+                <!-- Carousel Wrapper -->
+                <div class="relative">
+
+                    <!-- Left Arrow -->
+                    <button onclick="scrollNA(-280)" aria-label="left arrow"
+                        class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
                     </button>
-                </a>
+
+                    <!-- Track -->
+                    <div id="na-track" class="flex md:gap-4 gap-2 overflow-x-auto scroll-smooth no-scrollbar pb-4"
+                        style="-ms-overflow-style:none; scrollbar-width:none;">
+
+                        <!-- NEW ARRIVALS -->
+                        @foreach ($newArrivals as $product)
+                            <div class="flex-shrink-0 w-[165px] md:w-[240px] h-auto">
+                                <x-template1.product-card :product="$product" />
+                            </div>
+                        @endforeach
+
+                    </div><!-- /#na-track -->
+
+                    <!-- Right Arrow -->
+                    <button onclick="scrollNA(280)" aria-label="Scroll right"
+                        class="cursor-pointer hidden md:flex absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                            stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+
+                </div><!-- /.relative -->
+
+
+
             </div>
-
-            <!-- Carousel Wrapper -->
-            <div class="relative">
-
-                <!-- Left Arrow -->
-                <button onclick="scrollNA(-280)" aria-label="left arrow"
-                    class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
-                </button>
-
-                <!-- Track -->
-                <div id="na-track" class="flex md:gap-4 gap-2 overflow-x-auto scroll-smooth no-scrollbar pb-4"
-                    style="-ms-overflow-style:none; scrollbar-width:none;">
-
-                    <!-- NEW ARRIVALS -->
-                    @foreach ($newArrivals as $product)
-                        <div class="flex-shrink-0 w-[165px] md:w-[240px] h-auto">
-                            <x-template1.product-card :product="$product" />
-                        </div>
-                    @endforeach
-
-                </div><!-- /#na-track -->
-
-                <!-- Right Arrow -->
-                <button onclick="scrollNA(280)" aria-label="Scroll right"
-                    class="cursor-pointer hidden md:flex absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" class="w-4 h-4">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                    </svg>
-                </button>
-
-            </div><!-- /.relative -->
-
-
-
-        </div>
-    </section>
+        </section>
     @endif
     <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
@@ -259,82 +260,83 @@
     @endforeach
 
     <!-- DUAL BANNER SECTION -->
-     @if($middleSliders->count() > 0)
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <div class="flex flex-col md:flex-row gap-3 md:gap-5">
+    @if ($middleSliders->count() > 0)
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
-            @foreach ($middleSliders as $slider)
-    {{-- এখানে h-40 (মোবাইলে) এবং md:h-64 (ডেস্কটপে) বা আপনার পছন্দমতো হাইট দিন --}}
-    <div class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
-        <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
-            <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
-                alt="{{ $slider->title }}"
-                loading="lazy"
-                class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
-        </a>
-    </div>
-@endforeach
+                @foreach ($middleSliders as $slider)
+                    {{-- এখানে h-40 (মোবাইলে) এবং md:h-64 (ডেস্কটপে) বা আপনার পছন্দমতো হাইট দিন --}}
+                    <div
+                        class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
+                        <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
+                            <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                alt="{{ $slider->title }}" loading="lazy"
+                                class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
+                        </a>
+                    </div>
+                @endforeach
 
-            @if ($middleSliders->count() == 0)
-                <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
-                <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
-            @endif
+                @if ($middleSliders->count() == 0)
+                    <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
+                    <div class="flex-1 bg-gray-100 h-48 rounded-lg animate-pulse"></div>
+                @endif
 
-        </div>
-    </section>
+            </div>
+        </section>
     @endif
     <!-- POPULAR BRANDS SECTION -->
-     @if($brands->count() > 0)
-    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <!-- Main Card Container -->
-        <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
+    @if ($brands->count() > 0)
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <!-- Main Card Container -->
+            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
 
-            <!-- Section Heading -->
-            <h2 class="text-md md:text-lg font-bold text-gray-900 uppercase tracking-tight mb-6 px-2">
-                Popular Brands
-            </h2>
+                <!-- Section Heading -->
+                <h2 class="text-md md:text-lg font-bold text-gray-900 uppercase tracking-tight mb-6 px-2">
+                    Popular Brands
+                </h2>
 
-            <!-- Carousel Wrapper -->
-            <div class="relative group">
+                <!-- Carousel Wrapper -->
+                <div class="relative group">
 
-                <!-- Navigation Buttons -->
-                <button onclick="scrollBrands(-200)" aria-label="Scroll left"
-                    class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
-                </button>
+                    <!-- Navigation Buttons -->
+                    <button onclick="scrollBrands(-200)" aria-label="Scroll left"
+                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
 
-                <button onclick="scrollBrands(200)" aria-label="Scroll right"
-                    class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
-                    <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
-                </button>
+                    <button onclick="scrollBrands(200)" aria-label="Scroll right"
+                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
 
-                <!-- Brands Scroll Area -->
-                <div id="brand-track" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
-                    @foreach ($brands as $brand)
-                        @if (!empty($brand->slug))
-                            <a href="{{ route('brand.products', ['slug' => $brand->slug]) }}"
-                                class="flex flex-col items-center min-w-[80px] md:min-w-[105px] group">
+                    <!-- Brands Scroll Area -->
+                    <div id="brand-track"
+                        class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
+                        @foreach ($brands as $brand)
+                            @if (!empty($brand->slug))
+                                <a href="{{ route('brand.products', ['slug' => $brand->slug]) }}"
+                                    class="flex flex-col items-center min-w-[80px] md:min-w-[105px] group">
 
-                                <!-- Circular Image Wrapper -->
-                                <div
-                                    class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-3 border border-gray-100 bg-white flex items-center justify-center p-2">
-                                    <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                        class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                                        alt="{{ $brand->name }}">
-                                </div>
+                                    <!-- Circular Image Wrapper -->
+                                    <div
+                                        class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-3 border border-gray-100 bg-white flex items-center justify-center p-2">
+                                        <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                                            alt="{{ $brand->name }}">
+                                    </div>
 
-                                <!-- Brand Name -->
-                                <span
-                                    class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
-                                    {{ $brand->name ?? ''}}
-                                </span>
-                            </a>
-                        @endif
-                    @endforeach
+                                    <!-- Brand Name -->
+                                    <span
+                                        class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
+                                        {{ $brand->name ?? '' }}
+                                    </span>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     @endif
 
     <!-- YOU MAY LIKE SECTION -->

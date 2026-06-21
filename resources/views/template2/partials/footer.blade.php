@@ -2,32 +2,32 @@
 <footer class="text-primary">
 
     <!-- 1. Top Features Row -->
-     @if($footerFeatures->count() > 0)
-    <div class="bg-[#1A2937] p-6">
-        <div class="container mx-auto">
-            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach ($footerFeatures as $feature)
-                    <div class="flex items-center gap-3">
-                        <div
-                            class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
-                            @if ($feature->icon_file)
-                                <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
-                                    class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
-                            @else
-                                <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-primary text-lg"></i>
-                            @endif
+    @if ($footerFeatures->count() > 0)
+        <div class="bg-[#1A2937] p-6">
+            <div class="container mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($footerFeatures as $feature)
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
+                                @if ($feature->icon_file)
+                                    <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
+                                        class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
+                                @else
+                                    <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-primary text-lg"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-sm md:text-[16px] text-primary leading-tight">
+                                    {{ $feature->title }}</h4>
+                                <p class="text-gray-400 text-xs md:text-sm mt-0.5">
+                                    {{ $feature->subtitle ?? $feature->text_content }}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="font-medium text-sm md:text-[16px] text-primary leading-tight">
-                                {{ $feature->title }}</h4>
-                            <p class="text-gray-400 text-xs md:text-sm mt-0.5">
-                                {{ $feature->subtitle ?? $feature->text_content }}</p>
-                        </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
     @endif
 
     <div class="bg-gray-900">
@@ -73,8 +73,8 @@
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                 </path>
                             </svg>
-                            <a href="tel:{{ $setup->phone ?? ''}}" class="hover:text-orange-500 transition-colors">
-                                {{ $setup->phone ?? ''}}
+                            <a href="tel:{{ $setup->phone }}" class="hover:text-orange-500 transition-colors">
+                                {{ $setup->phone }}
                             </a>
                         </li>
                         <li class="flex items-center gap-3 text-gray-200">
@@ -84,8 +84,8 @@
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
-                            <a href="mailto:{{ $setup->email ?? ''}}" class="hover:text-orange-500 transition-colors">
-                                {{ $setup->email ?? ''}}
+                            <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                {{ $setup->email }}
                             </a>
                         </li>
                     </ul>
@@ -113,7 +113,7 @@
                         @foreach ($footerPages as $page)
                             <li>
                                 <a href="{{ url('page', ['slug' => $page->slug]) }}"
-                                    class="text-[16px] text-gray-400 hover:text-[#FF6A00] transition-colors">
+                                    class="text-[16px] text-gray-400 hover:text-[var(--primary-color)] transition-colors">
                                     {{ $page->title }}
                                 </a>
                             </li>
@@ -124,16 +124,21 @@
                 <!-- Column 4: Newsletter -->
                 <div>
                     <h4 class="text-base text-primary md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
-                    <p class="text-gray-300 text-[16px] mb-4">Subscribe to get updates on new products and exclusive offers.
+                    <p class="text-gray-300 text-[16px] mb-4">Subscribe to get updates on new products and exclusive
+                        offers.
                     </p>
-                    <div class="flex mb-5">
-                        <input type="email" placeholder="Enter your email"
-                            class="bg-[#1A222F] border border-gray-700 text-primary px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
-                        <button
-                            class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
-                            Subscribe
-                        </button>
-                    </div>
+                    <form id="newsletter-form">
+                        @csrf
+                        <div class="flex mb-5">
+                            <input type="email" name="email" id="subscriber-email" placeholder="Enter your email"
+                                required
+                                class="bg-[#1A222F] border border-gray-700 text-primary px-3 py-2.5 rounded-l-md w-full text-sm outline-none focus:border-[#BD4F00]">
+                            <button type="submit" id="subscribe-btn"
+                                class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap text-white">
+                                Subscribe
+                            </button>
+                        </div>
+                    </form>
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
                             <a href="{{ $social->link }}" target="_blank"
@@ -183,3 +188,44 @@
     </div>
 
 </footer>
+<script>
+    document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('subscriber-email').value;
+        const btn = document.getElementById('subscribe-btn');
+        const originalText = btn.innerHTML;
+
+        // লোডিং স্টেট
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch("{{ route('newsletter.subscribe') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (response.ok) {
+                    toastr.success(data.message);
+                    document.getElementById('subscriber-email').value = ''; // ইনপুট ক্লিয়ার
+                } else {
+                    toastr.error(data.message || 'Validation error');
+                }
+            })
+            .catch(error => {
+                toastr.error('Something went wrong. Please try again.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+    });
+</script>
