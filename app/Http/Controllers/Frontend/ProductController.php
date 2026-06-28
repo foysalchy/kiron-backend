@@ -310,13 +310,24 @@ class ProductController extends FrontendController
     public function searchSuggestions(Request $request)
     {
         $query = $request->get('q');
+        $categorySlug = $request->get('category');
+
         if (!$query || strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $products = Product::where('status', Status::Active->value)
-            ->where('title', 'LIKE', "%{$query}%")
-            ->select('id', 'title', 'slug', 'thumbnail')
+        $productQuery = Product::where('status', Status::Active->value)
+            ->where('title', 'LIKE', "%{$query}%");
+
+        if (!empty($categorySlug)) {
+            $category = MegaCategory::where('slug', $categorySlug)->first();
+
+            if ($category) {
+                $productQuery->whereJsonContains('mega_category_ids', (int)$category->id);
+            }
+        }
+
+        $products = $productQuery->select('id', 'title', 'slug', 'thumbnail')
             ->take(10)
             ->get();
 

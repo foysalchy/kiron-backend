@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template2.layouts.front')
 @section('content')
 <!-- ALL BRANDS GRID SECTION -->
 <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">

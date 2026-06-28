@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template2.layouts.front')
 
 @section('content')
     <!-- 1. Hero & Search -->

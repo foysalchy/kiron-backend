@@ -202,6 +202,7 @@
                 }
             }
 
+            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন (Variation Modal এর জন্য)
             function processAddVariation() {
                 const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
                 const qtyInput = document.getElementById('modal-qty');
@@ -212,24 +213,29 @@
                     return;
                 }
 
+                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
+                const postData = {
+                    items: [{
+                        variation_id: selectedVariant.value,
+                        qty: qtyInput ? qtyInput.value : 1
+                    }]
+                };
+
                 fetch("{{ route('cart.add') }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json', // এটি যোগ করা জরুরি
                             'X-CSRF-TOKEN': token
                         },
-                        body: JSON.stringify({
-                            variation_id: selectedVariant.value,
-                            qty: qtyInput ? qtyInput.value : 1
-                        })
+                        body: JSON.stringify(postData)
                     })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                             closeModal();
-
-                            if (isOrderNowGlobal) {
+                            if (typeof isOrderNowGlobal !== 'undefined' && isOrderNowGlobal) {
                                 window.location.href = "{{ route('checkout.index') }}";
                             } else {
                                 toastr.success(data.message);
@@ -240,19 +246,26 @@
                     }).catch(err => toastr.error("Server error."));
             }
 
-            // --- Single Product Function ---
+            // ২. সরাসরি সিঙ্গেল প্রোডাক্ট অ্যাড করার ফাংশন
             function addSingleToCart(id, isOrderNow = false) {
                 const token = document.querySelector('meta[name="csrf-token"]').content;
+
+                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
+                const postData = {
+                    items: [{
+                        id: id,
+                        qty: 1
+                    }]
+                };
+
                 fetch("{{ route('cart.add') }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Accept': 'application/json', // এটি যোগ করা জরুরি
                             'X-CSRF-TOKEN': token
                         },
-                        body: JSON.stringify({
-                            id: id,
-                            qty: 1
-                        })
+                        body: JSON.stringify(postData)
                     })
                     .then(res => res.json())
                     .then(data => {
@@ -266,7 +279,7 @@
                         } else {
                             toastr.error(data.message);
                         }
-                    });
+                    }).catch(err => toastr.error("Server error."));
             }
         </script>
     @endpush
