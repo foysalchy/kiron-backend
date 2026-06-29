@@ -230,10 +230,10 @@
         </form>
 
         {{-- hidden form for shipping update --}}
-        <form id="shipping-update-form" action="{{ route('cart.shipping') }}" method="POST" style="display:none;">
+        {{-- <form id="shipping-update-form" action="{{ route('cart.shipping') }}" method="POST" style="display:none;">
             @csrf
             <input type="hidden" name="area" id="shipping-area-input">
-        </form>
+        </form> --}}
     </section>
     <x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
 @endsection
