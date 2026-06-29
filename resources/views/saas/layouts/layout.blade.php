@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
     <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
-
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? asset('default-favicon.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
