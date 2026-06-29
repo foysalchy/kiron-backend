@@ -253,7 +253,6 @@ class CartController extends FrontendController
                     );
                 }
             }
-
             return response()->json(['status' => 'success', 'cart_count' => Cart::count(), 'message' => 'Successfully added to cart!']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
