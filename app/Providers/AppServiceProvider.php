@@ -236,8 +236,7 @@ class AppServiceProvider extends ServiceProvider
             $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
 
             $data = cache()->remember($cacheKey, 600, function () use ($companyId) {
-echo $companyId;
-                die();
+ 
                 /**
                  * this function handle for all table
                  */
