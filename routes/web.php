@@ -90,6 +90,7 @@ use Illuminate\Support\Facades\Route;
     Route::post('/newsletter-subscribe', [HomeController::class, 'subscribe'])->name('newsletter.subscribe');
 
     Route::get('/sitemap.xml', [SitemapController::class, 'index']);
+    Route::get('/robots.txt', [SitemapController::class, 'robots']);
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });

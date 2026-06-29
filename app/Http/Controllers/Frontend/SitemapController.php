@@ -15,6 +15,27 @@ use Illuminate\Http\Response;
 
 class SitemapController extends Controller
 {
+    public function robots()
+    {
+        $currentStore = getCurrentCompany();
+
+        if (!$currentStore) {
+            abort(404);
+        }
+
+        $companyId = $currentStore->company_id;
+        $robotsContent = Cache::remember(
+            "robots_{$companyId}",
+            now()->addHours(6),
+            function () use ($companyId) {
+                // Customize the robots.txt content based on your requirements
+                return "User-agent: *\nDisallow: /admin/\nSitemap: " . route('sitemap.index');
+            }
+        );
+
+        return response($robotsContent, 200)
+            ->header('Content-Type', 'text/plain');
+    }
     public function index()
     {
         $currentStore = getCurrentCompany();
