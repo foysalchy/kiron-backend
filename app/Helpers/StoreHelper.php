@@ -6,6 +6,10 @@ if (!function_exists('getCurrentCompany')) {
 
     function getCurrentCompany()
     {
+        $host = request()->getHost();
+        if (in_array($host, ['dorja.io', 'www.dorja.io'])) {
+            return null;
+        }
         if (request()->is('api/*')) {
             return null;
         }
