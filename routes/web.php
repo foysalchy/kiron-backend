@@ -14,6 +14,7 @@ use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Saas\IndexController as SaasIndexController;
 use App\Http\Controllers\Saas\MasterBrandController;
