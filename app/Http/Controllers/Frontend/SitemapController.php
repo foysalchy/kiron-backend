@@ -75,7 +75,7 @@ class SitemapController extends Controller
                     : collect();
 
                 return response()
-                    ->view('frontend.sitemap.index', compact(
+                    ->view('sitemap.index', compact(
                         'products',
                         'categories',
                         'brands',
