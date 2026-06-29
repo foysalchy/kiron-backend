@@ -89,8 +89,8 @@ use Illuminate\Support\Facades\Route;
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
     Route::post('/newsletter-subscribe', [HomeController::class, 'subscribe'])->name('newsletter.subscribe');
 
-    Route::get('/sitemap.xml', [SitemapController::class, 'index']);
-    Route::get('/robots.txt', [SitemapController::class, 'robots']);
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
