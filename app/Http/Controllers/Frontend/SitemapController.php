@@ -24,68 +24,63 @@ class SitemapController extends Controller
         }
 
         $companyId = $currentStore->company_id;
+        $data = Cache::remember(
+    "sitemap_{$companyId}",
+    now()->addHours(6),
+    function () use ($companyId) {
 
-            return Cache::remember(
-                "sitemap_{$companyId}",
-                now()->addHours(6),
-                function () use ($companyId) {
+        return [
+            'products' => Product::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->select('slug', 'updated_at')
+                ->get(),
 
-                $products = Product::where('company_id', $companyId)
+            'categories' => MegaCategory::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)
+                      ->orWhereNull('company_id');
+                })
+                ->where('status', Status::Active->value)
+                ->select('slug', 'updated_at')
+                ->get(),
+
+            'brands' => Brand::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)
+                      ->orWhereNull('company_id');
+                })
+                ->where('status', Status::Active->value)
+                ->select('slug', 'updated_at')
+                ->get(),
+
+            'blogs' => Blog::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)
+                      ->orWhereNull('company_id');
+                })
+                ->where('status', Status::Active->value)
+                ->select('slug', 'updated_at')
+                ->get(),
+
+            'pages' => Page::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)
+                      ->orWhereNull('company_id');
+                })
+                ->where('status', Status::Active->value)
+                ->select('slug', 'updated_at')
+                ->get(),
+
+            'landingPages' => class_exists(LandingPage::class)
+                ? LandingPage::where('company_id', $companyId)
                     ->where('status', Status::Active->value)
                     ->select('slug', 'updated_at')
-                    ->get();
+                    ->get()
+                : collect(),
+        ];
+    }
+);
 
-                $categories = MegaCategory::where(function ($q) use ($companyId) {
-                        $q->where('company_id', $companyId)
-                        ->orWhereNull('company_id');
-                    })
-                    ->where('status', Status::Active->value)
-                    ->select('slug', 'updated_at')
-                    ->get();
-
-                $brands = Brand::where(function ($q) use ($companyId) {
-                        $q->where('company_id', $companyId)
-                        ->orWhereNull('company_id');
-                    })
-                    ->where('status', Status::Active->value)
-                    ->select('slug', 'updated_at')
-                    ->get();
-
-                $blogs = Blog::where(function ($q) use ($companyId) {
-                        $q->where('company_id', $companyId)
-                        ->orWhereNull('company_id');
-                    })
-                    ->where('status', Status::Active->value)
-                    ->select('slug', 'updated_at')
-                    ->get();
-
-                $pages = Page::where(function ($q) use ($companyId) {
-                        $q->where('company_id', $companyId)
-                        ->orWhereNull('company_id');
-                    })
-                    ->where('status', Status::Active->value)
-                    ->select('slug', 'updated_at')
-                    ->get();
-
-                $landingPages = class_exists(LandingPage::class)
-                    ? LandingPage::where('company_id', $companyId)
-                        ->where('status', Status::Active->value)
-                        ->select('slug', 'updated_at')
-                        ->get()
-                    : collect();
-
-                return response()
-                    ->view('sitemap.index', compact(
-                        'products',
-                        'categories',
-                        'brands',
-                        'blogs',
-                        'pages',
-                        'landingPages'
-                    ))
-                    ->header('Content-Type', 'application/xml');
-                }
-            );
-        }
+return response()
+    ->view('sitemap.index', $data)
+    ->header('Content-Type', 'application/xml');
+            
+    }
     
 }
