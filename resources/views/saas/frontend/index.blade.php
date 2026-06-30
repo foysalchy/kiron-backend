@@ -802,7 +802,7 @@
         @endphp
 
         <!-- FAQ List -->
-        <div class=" space-y-4" id="faq-container">
+        <div class=" space-y-4 h-[400px] overflow-y-auto" id="faq-container">
 
             @foreach ($faqs as $faq)
                 <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl ">
