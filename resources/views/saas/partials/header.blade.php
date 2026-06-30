@@ -21,22 +21,22 @@
 
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
-            <a href="{{ route('saas.index') }}" class="text-[#5c46e5] font-semibold text-lg">হোম</a>
-            <a href="#" class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">ফিচারসমূহ</a>
+            <a href="{{ route('saas.index') }}" class="text-[#34a487] font-semibold text-lg">হোম</a>
+            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ফিচারসমূহ</a>
             <a href="#"
-                class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">ইন্টিগ্রেশন</a>
-            <a href="#" class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">প্রাইসিং</a>
-            <a href="#" class="text-gray-700 hover:text-[#5c46e5] font-semibold text-lg transition">যোগাযোগ</a>
+                class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ইন্টিগ্রেশন</a>
+            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">প্রাইসিং</a>
+            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">যোগাযোগ</a>
         </nav>
 
         <!-- Right Side Buttons -->
         <div class="flex items-center space-x-3 md:space-x-6">
-            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#5c46e5]">
+            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#34a487]">
                 লগইন
             </a>
             <!-- CTA Button (Responsive Padding & Font) -->
             <a href="https://app.dorja.io/register"
-                class="bg-[#5c46e5] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
+                class="bg-[#34a487] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
                 ফ্রি ট্রায়াল <span class="hidden sm:inline">শুরু করুন</span>
             </a>
 
@@ -62,7 +62,7 @@
             </div>
 
             <nav class="flex flex-col space-y-5">
-                <a href="#" class="text-[#5c46e5] font-bold text-lg">হোম</a>
+                <a href="#" class="text-[#34a487] font-bold text-lg">হোম</a>
                 <a href="#" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ফিচারসমূহ</a>
                 <a href="#"
                     class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ইন্টিগ্রেশন</a>

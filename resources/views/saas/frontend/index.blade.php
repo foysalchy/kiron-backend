@@ -58,7 +58,7 @@
                                 <div
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
                                     <a href="#"
-                                        class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                                        class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
                                         ফ্রি ট্রায়াল শুরু করুন
                                     </a>
                                     <a href="#"
@@ -164,11 +164,11 @@
                             <!-- Icon Area -->
                             <div
                                 class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl text-[#5c46e5]"></i>
+                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl text-[#34a487]"></i>
                             </div>
 
                             <!-- Content Area -->
-                            <h3 class="text-2xl md:text-3xl font-bold text-[#5c46e5] mb-5">
+                            <h3 class="text-2xl md:text-3xl font-bold text-[#34a487] mb-5">
                                 {{ $feature->title ?? '' }}
                             </h3>
                             <p class="text-gray-700 text-lg leading-relaxed mb-12">
@@ -177,7 +177,7 @@
 
                             <!-- Link Area -->
                             <a href="#"
-                                class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#5c46e5] transition-colors text-lg">
+                                class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
                                 বিস্তারিত জানুন
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
                             </a>
@@ -187,7 +187,7 @@
 
                 <div class="mt-16 text-center">
                     <button
-                        class="bg-[#5c46e5] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         ফ্রি ট্রায়াল শুরু করুন
                     </button>
                 </div>
@@ -199,7 +199,7 @@
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-[15px] mb-6">
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-[15px] mb-6">
                     ইন্টিগ্রেশন
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight max-w-4xl mx-auto">
@@ -216,39 +216,39 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#5c46e5] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
                         <!-- Line down to Middle Box -->
-                        <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
 
                         <!-- Middle Node Box -->
                         <div
-                            class="px-8 py-3 border-2 border-[#5c46e5] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             পেমেন্ট মেথড
                         </div>
 
                         <!-- The Fork Connection Line -->
                         <div class="w-full relative flex flex-col items-center">
                             <!-- Vertical line from middle box to horizontal bar -->
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
 
                             <!-- Horizontal Bar: Exactly connects the centers of 1st and 3rd box -->
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#5c46e5]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
                         </div>
 
                         <!-- 3 Vertical Lines down to logos -->
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
                         </div>
 
                         <!-- Logo Row -->
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Nagad"
                                     onerror="
@@ -257,12 +257,12 @@
                       " />
                             </div>
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/bkash.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="bKash" />
                             </div>
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/sslcommerz.png') }}" class="h-5 md:h-7 object-contain"
                                     alt="SSL" />
                             </div>
@@ -275,41 +275,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#5c46e5] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#5c46e5] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             কুরিয়ার ম্যানেজমেন্ট
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#5c46e5]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
-                            <div class="w-[2px] h-10 bg-[#5c46e5]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#5c46e5] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -326,7 +326,7 @@
                 <!-- Section Header -->
                 <div class="text-center mb-12">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                         ডেমো & টেমপ্লেট
                     </span>
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-10">
@@ -336,11 +336,11 @@
                     <!-- Tabs Container (ক্লিকেবল ও হোভার ইফেক্ট ফিক্সড) -->
                     <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
                         <button onclick="filterDemos(1, this)"
-                            class="tab-btn bg-[#5c46e5] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
+                            class="tab-btn bg-[#34a487] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
                             ল্যান্ডিং পেজ টেমপ্লেট
                         </button>
                         <button onclick="filterDemos(2, this)"
-                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#5c46e5] transition-all">
+                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#34a487] transition-all">
                             ই-কমার্স টেমপ্লেট
                         </button>
                     </div>
@@ -358,7 +358,7 @@
                             </div>
                             <div class="py-6 text-center border-t border-gray-100">
                                 <a href="{{ $demo->link ?? '#' }}" target="_blank"
-                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#5c46e5] hover:decoration-[#5c46e5]">
+                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#34a487] hover:decoration-[#34a487]">
                                     Live Preview
                                 </a>
                             </div>
@@ -405,7 +405,7 @@
                     @foreach ([1, 2] as $repeat)
                         <div class="flex gap-4">
                             @foreach ($row['data'] as $item)
-                                <span class="bg-[#5c46e5] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">
+                                <span class="bg-[#34a487] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">
                                     {{ $item }}
                                 </span>
                             @endforeach
@@ -420,7 +420,7 @@
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
         <div
-            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5c46e5]/10 blur-[120px] rounded-full pointer-events-none">
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#34a487]/10 blur-[120px] rounded-full pointer-events-none">
         </div>
 
         <div class="container mx-auto">
@@ -446,7 +446,7 @@
                 <!-- CTA Button -->
                 <div class="flex-shrink-0">
                     <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
+                        class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
                         ফ্রি ট্রায়াল শুরু করুন
                     </a>
                 </div>
@@ -519,7 +519,7 @@
             <!-- Section Header -->
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                     অল-ইন-ওয়ান সলিউশন
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
@@ -530,15 +530,15 @@
                 <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-md"
                     id="solution-tabs">
                     <button onclick="switchSolution('ecommerce', this)"
-                        class="sol-tab-btn flex-1 bg-[#5c46e5] text-white px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all">
+                        class="sol-tab-btn flex-1 bg-[#34a487] text-white px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all">
                         ই-কমার্স
                     </button>
                     <button onclick="switchSolution('corporate', this)"
-                        class="sol-tab-btn flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
+                        class="sol-tab-btn flex-1 bg-[#34a48730] text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
                         কর্পোরেট
                     </button>
                     <button onclick="switchSolution('pos', this)"
-                        class="sol-tab-btn flex-1 bg-indigo-100 text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
+                        class="sol-tab-btn flex-1 bg-[#34a48730] text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
                         POS
                     </button>
                 </div>
@@ -561,14 +561,14 @@
                         <div class="space-y-5 mb-12">
                             <div class="flex items-center gap-4 group">
                                 <div
-                                    class="w-8 h-8 bg-[#5c46e5] rounded-lg flex items-center justify-center text-white shadow-sm">
+                                    class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white shadow-sm">
                                     <i id="sol-icon-1" class="fa-solid fa-display text-sm"></i>
                                 </div>
                                 <span id="sol-feat-1" class="font-bold text-gray-900 text-lg">ওয়েবসাইট ইন্টিগ্রেশন</span>
                             </div>
                             <div class="flex items-center gap-4 group">
                                 <div
-                                    class="w-8 h-8 bg-[#5c46e5] rounded-lg flex items-center justify-center text-white shadow-sm">
+                                    class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white shadow-sm">
                                     <i id="sol-icon-2" class="fa-brands fa-apple text-lg"></i>
                                 </div>
                                 <span id="sol-feat-2" class="font-bold text-gray-900 text-lg">মোবাইল অ্যাপ সাপোর্ট</span>
@@ -576,7 +576,7 @@
                         </div>
 
                         <a href="#"
-                            class="inline-flex items-center gap-3 bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-indigo-100">
+                            class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-indigo-100">
                             বিস্তারিত জানুন
                             <i class="fa-solid fa-arrow-right text-sm"></i>
                         </a>
@@ -632,7 +632,7 @@
                         <div
                             class="bg-white rounded-2xl p-8 md:p-14 flex flex-col {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="text-[#5c46e5] text-3xl md:text-4xl font-extrabold mb-6">
+                                <h3 class="text-[#34a487] text-3xl md:text-4xl font-extrabold mb-6">
                                     {{ $benefit->title }}
                                 </h3>
                                 <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
@@ -649,7 +649,7 @@
 
                 <div class="mt-28 text-center">
                     <a href="#"
-                        class="inline-block bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
+                        class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
                         ফ্রি ট্রায়াল শুরু করুন
                     </a>
                 </div>
@@ -663,7 +663,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">ব্লগ ও ইনসাইটস</h2>
                     <a href=""
-                        class="bg-[#5c46e5] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="bg-[#34a487] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         আরও পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
@@ -684,7 +684,7 @@
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
                                     <span
-                                        class="bg-indigo-50 text-[#5c46e5] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        class="bg-indigo-50 text-[#34a487] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                                         {{ $blog->company->shop_name ?? 'অ্যাডমিন' }}
                                     </span>
                                     <div class="flex items-center gap-2 text-gray-400 text-sm font-bold">
@@ -704,7 +704,7 @@
 
                                 <div class="mt-auto pt-5 border-t border-gray-50">
                                     <a href=""
-                                        class="inline-flex items-center gap-2 text-[#5c46e5] font-bold text-lg group-hover:gap-3 transition-all">
+                                        class="inline-flex items-center gap-2 text-[#34a487] font-bold text-lg group-hover:gap-3 transition-all">
                                         বিস্তারিত পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </a>
                                 </div>
@@ -721,7 +721,7 @@
             <div class="container mx-auto">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                         কাস্টমার রিভিউ
                     </span>
                     <h2 class="text-3xl md:text-5xl font-black text-gray-900">
@@ -737,7 +737,7 @@
                             class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
                                 <div>
-                                    <h4 class="text-[#5c46e5] font-bold text-lg">
+                                    <h4 class="text-[#34a487] font-bold text-lg">
                                         @ {{ $review->name }}
                                     </h4>
                                     <p class="text-gray-500 text-xs">{{ $review->designation }}</p>
@@ -761,7 +761,7 @@
                 @if ($allReviews->count() > 6)
                     <div class="mt-16 text-center">
                         <button id="load-more-reviews"
-                            class="inline-block bg-[#5c46e5] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                            class="inline-block bg-[#34a487] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                             আরও দেখুন
                         </button>
                     </div>
@@ -775,7 +775,7 @@
         <!-- Header -->
         <div class="text-center mb-10">
             <span
-                class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                 প্রায়শই জিজ্ঞাসিত প্রশ্ন
             </span>
 
@@ -881,11 +881,11 @@
             // ১. বাটনের কালার পরিবর্তন
             const buttons = document.querySelectorAll('.sol-tab-btn');
             buttons.forEach(b => {
-                b.classList.remove('bg-[#5c46e5]', 'text-white');
-                b.classList.add('bg-indigo-100', 'text-gray-900', 'hover:bg-white');
+                b.classList.remove('bg-[#34a487]', 'text-white');
+                b.classList.add('bg-[#34a48730]', 'text-gray-900', 'hover:bg-white');
             });
-            btn.classList.add('bg-[#5c46e5]', 'text-white');
-            btn.classList.remove('bg-indigo-100', 'text-gray-900', 'hover:bg-white');
+            btn.classList.add('bg-[#34a487]', 'text-white');
+            btn.classList.remove('bg-[#34a48730]', 'text-gray-900', 'hover:bg-white');
 
             // ২. ডাইনামিক ডাটা (ইমেজসহ)
             const data = {
@@ -967,12 +967,12 @@
         function filterDemos(type, btn) {
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(b => {
-                b.classList.remove('bg-[#5c46e5]', 'text-white');
-                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#5c46e5]');
+                b.classList.remove('bg-[#34a487]', 'text-white');
+                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#34a487]');
             });
 
-            btn.classList.add('bg-[#5c46e5]', 'text-white');
-            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#5c46e5]');
+            btn.classList.add('bg-[#34a487]', 'text-white');
+            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#34a487]');
 
             const cards = document.querySelectorAll('.demo-card');
             cards.forEach(card => {
