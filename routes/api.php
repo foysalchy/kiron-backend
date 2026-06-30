@@ -347,7 +347,38 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/{id}/force', [BrandController::class, 'forceDestroy']);
                 Route::patch('/{id}/toggle-status', [BrandController::class, 'toggleStatus']);
             });
+            Route::prefix('master-brands')->group(function () {
+                Route::get('/', [MasterBrandController::class, 'index']);
+                Route::post('/', [MasterBrandController::class, 'store']);
+                Route::get('/{id}', [MasterBrandController::class, 'show']);
+                Route::post('/update/{id}', [MasterBrandController::class, 'update']);
+                Route::delete('/{id}', [MasterBrandController::class, 'destroy']);
+                Route::get('/{id}/restore', [MasterBrandController::class, 'restore']);
+                Route::delete('/{id}/force', [MasterBrandController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [MasterBrandController::class, 'toggleStatus']);
+            });
 
+            Route::prefix('features')->group(function () {
+                Route::get('/', [MasterFeatureController::class, 'index']);
+                Route::post('/', [MasterFeatureController::class, 'store']);
+                Route::get('/{id}', [MasterFeatureController::class, 'show']);
+                Route::post('/update/{id}', [MasterFeatureController::class, 'update']);
+                Route::delete('/{id}', [MasterFeatureController::class, 'destroy']);
+                Route::get('/{id}/restore', [MasterFeatureController::class, 'restore']);
+                Route::delete('/{id}/force', [MasterFeatureController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [MasterFeatureController::class, 'toggleStatus']);
+            });
+
+            Route::prefix('demos')->group(function () {
+                Route::get('/', [MasterDemoController::class, 'index']);
+                Route::post('/', [MasterDemoController::class, 'store']);
+                Route::get('/{id}', [MasterDemoController::class, 'show']);
+                Route::post('/update/{id}', [MasterDemoController::class, 'update']);
+                Route::delete('/{id}', [MasterDemoController::class, 'destroy']);
+                Route::get('/{id}/restore', [MasterDemoController::class, 'restore']);
+                Route::delete('/{id}/force', [MasterDemoController::class, 'forceDestroy']);
+                Route::patch('/{id}/toggle-status', [MasterDemoController::class, 'toggleStatus']);
+            });
             // Mega Category Routes
             Route::prefix('mega-categories')->group(function () {
 
@@ -1553,38 +1584,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/success', [BkashController::class, 'successPayment'])->name('bkash.success');
         Route::get('/failure', [BkashController::class, 'failurePayment'])->name('bkash.failure');
     });
-    Route::prefix('saas')->group(function () {
-        Route::apiResource('master-brands', MasterBrandController::class);
-        Route::prefix('master-brands/{id}')->group(function () {
-            Route::post('toggle-status', [MasterBrandController::class, 'toggleStatus']);
-            Route::post('restore', [MasterBrandController::class, 'restore']);
-            Route::delete('force-delete', [MasterBrandController::class, 'forceDestroy']);
-        });
-        Route::apiResource('master-features', MasterFeatureController::class);
-        Route::prefix('master-features/{id}')->group(function () {
-            Route::post('toggle-status', [MasterFeatureController::class, 'toggleStatus']);
-            Route::post('restore', [MasterFeatureController::class, 'restore']);
-            Route::delete('force-delete', [MasterFeatureController::class, 'forceDestroy']);
-        });
-        Route::apiResource('master-demo', MasterFeatureController::class);
-        Route::prefix('master-demo/{id}')->group(function () {
-            Route::post('toggle-status', [MasterFeatureController::class, 'toggleStatus']);
-            Route::post('restore', [MasterFeatureController::class, 'restore']);
-            Route::delete('force-delete', [MasterFeatureController::class, 'forceDestroy']);
-        });
-        Route::apiResource('master-demos', MasterDemoController::class);
-        Route::prefix('master-demos/{id}')->group(function () {
-            Route::post('toggle-status', [MasterDemoController::class, 'toggleStatus']);
-            Route::post('restore', [MasterDemoController::class, 'restore']);
-            Route::delete('force-delete', [MasterDemoController::class, 'forceDestroy']);
-        });
 
-        // Customer Reviews (Added)
-        Route::apiResource('customer-reviews', CustomerReviewController::class);
-        Route::prefix('customer-reviews/{id}')->group(function () {
-            Route::post('toggle-status', [CustomerReviewController::class, 'toggleStatus']);
-            Route::post('restore', [CustomerReviewController::class, 'restore']);
-            Route::delete('force-delete', [CustomerReviewController::class, 'forceDestroy']);
-        });
+
+
+    // Customer Reviews (Added)
+    Route::apiResource('customer-reviews', CustomerReviewController::class);
+    Route::prefix('customer-reviews/{id}')->group(function () {
+        Route::post('toggle-status', [CustomerReviewController::class, 'toggleStatus']);
+        Route::post('restore', [CustomerReviewController::class, 'restore']);
+        Route::delete('force-delete', [CustomerReviewController::class, 'forceDestroy']);
     });
 });
