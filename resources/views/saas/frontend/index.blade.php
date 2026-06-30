@@ -418,7 +418,17 @@
         </div>
     </section>
     <!-- SUCCESS SECTION (Dark Theme) -->
-    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
+    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
+        <style>
+            .hook-2::before {
+              content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+            }
+        </style>
         <div
             class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#34a487]/10 blur-[120px] rounded-full pointer-events-none">
         </div>
