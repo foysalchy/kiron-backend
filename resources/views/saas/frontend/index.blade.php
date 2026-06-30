@@ -944,68 +944,43 @@ $solutions = [
             }
         });
 
-        function switchSolution(type, btn) {
-            // ১. বাটনের কালার পরিবর্তন
-            const buttons = document.querySelectorAll('.sol-tab-btn');
-            buttons.forEach(b => {
-                b.classList.remove('bg-[#34a487]', 'text-white');
-                b.classList.add('bg-[#34a48730]', 'text-gray-900', 'hover:bg-white');
-            });
-            btn.classList.add('bg-[#34a487]', 'text-white');
-            btn.classList.remove('bg-[#34a48730]', 'text-gray-900', 'hover:bg-white');
+       const solutions = @json($solutions);
 
-            // ২. ডাইনামিক ডাটা (ইমেজসহ)
-            const data = {
-                ecommerce: {
-                    title: 'ই-কমার্স সলিউশন',
-                    desc: 'আপনার অনলাইন স্টোরের প্রতিটি ভিজিটরকে দিন প্রিমিয়াম এক্সপেরিয়েন্স। অটোমেটেড অর্ডার এবং ইনভেন্টরি ম্যানেজমেন্ট এখন হাতের মুঠোয়।',
-                    feat1: 'ওয়েবসাইট ইন্টিগ্রেশন',
-                    feat2: 'মোবাইল অ্যাপ সাপোর্ট',
-                    icon1: 'fa-solid fa-display',
-                    icon2: 'fa-brands fa-apple',
-                    mockupHeader: 'ecommerce_preview_v2',
-                    image: "{{ asset('images/saas/ss2.png') }}"
-                },
-                corporate: {
-                    title: 'কর্পোরেট সলিউশন',
-                    desc: 'বড় প্রতিষ্ঠানের জন্য ইন্টারনাল অপারেশন ম্যানেজমেন্ট সিস্টেম। এইচআর, পেরোল এবং অ্যাডভান্সড রিপোর্টিং এর কমপ্লিট সমাধান।',
-                    feat1: 'এমপ্লয়ি ম্যানেজমেন্ট',
-                    feat2: 'অ্যাডভান্সড অ্যানালিটিক্স',
-                    icon1: 'fa-solid fa-users-gear',
-                    icon2: 'fa-solid fa-chart-line',
-                    mockupHeader: 'corporate_system_v1',
-                    image: "{{ asset('images/saas/ss1.png') }}"
-                },
-                pos: {
-                    title: 'সুপার ফাস্ট POS',
-                    desc: 'অফলাইন এবং অনলাইন স্টোরের জন্য ক্লাউড বেসড পয়েন্ট অফ সেল। কয়েক সেকেন্ডে ইনভয়েস প্রিন্ট এবং স্টক আপডেট করুন।',
-                    feat1: 'ইনভেন্টরি ট্র্যাকিং',
-                    feat2: 'বারকোড স্ক্যানার সাপোর্ট',
-                    icon1: 'fa-solid fa-barcode',
-                    icon2: 'fa-solid fa-receipt',
-                    mockupHeader: 'pos_terminal_v3',
-                    image: "{{ asset('images/saas/ss.png') }}"
-                }
-            };
+function switchSolution(key, btn) {
+    const data = solutions[key];
 
-            const content = data[type];
-            document.getElementById('sol-title').innerText = content.title;
-            document.getElementById('sol-desc').innerText = content.desc;
-            document.getElementById('sol-feat-1').innerText = content.feat1;
-            document.getElementById('sol-feat-2').innerText = content.feat2;
-            document.getElementById('sol-mockup-header').innerText = content.mockupHeader;
+    document.getElementById('sol-title').innerText = data.title;
+    document.getElementById('sol-desc').innerText = data.desc;
+    document.getElementById('sol-img').src = data.img;
+    document.getElementById('sol-mockup').innerText = data.mockup;
 
-            const imgElement = document.getElementById('sol-img');
-            imgElement.style.opacity = '0'; // ফেইড আউট
-            setTimeout(() => {
-                imgElement.src = content.image;
-                imgElement.style.opacity = '1'; // ফেইড ইন
-            }, 200);
+    let featureHtml = '';
+    data.features.forEach(f => {
+        featureHtml += `
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white">
+                    <i class="fa-solid ${f.icon} text-sm"></i>
+                </div>
+                <span class="font-bold text-gray-900 text-lg">${f.text}</span>
+            </div>
+        `;
+    });
 
-            // আইকন পরিবর্তন
-            document.getElementById('sol-icon-1').className = content.icon1 + " text-sm";
-            document.getElementById('sol-icon-2').className = content.icon2 + " text-lg";
-        }
+    document.getElementById('sol-features').innerHTML = featureHtml;
+
+    document.querySelectorAll('.sol-tab-btn').forEach(b => {
+        b.classList.remove('bg-[#34a487]', 'text-white');
+        b.classList.add('bg-[#34a48730]', 'text-gray-900');
+    });
+
+    btn.classList.add('bg-[#34a487]', 'text-white');
+    btn.classList.remove('bg-[#34a48730]', 'text-gray-900');
+}
+
+// default load
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".sol-tab-btn").click();
+});
     </script>
     <script>
         //review
