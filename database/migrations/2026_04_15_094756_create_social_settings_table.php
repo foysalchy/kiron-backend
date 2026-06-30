@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->nullable()->constrained('companies')->onDelete('cascade');
             $table->string('icon_name')->nullable();
             $table->string('icon_image')->nullable();
+            $table->string('icon_class')->nullable();
             $table->string('link');
             $table->string('hover_bg'); // color code e.g. #1DA1F2
             $table->tinyInteger('status')->default(1);

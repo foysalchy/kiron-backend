@@ -88,9 +88,7 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('site_settings',            'Site Settings');
         $addCrud('settings_payment',         'Payment Settings');
         $addCrud('settings_sms',             'SMS Settings');
-        $addCrud('settings_domain',          'Domain Settings');
         $addCrud('settings_ip',              'IP Restriction Settings');
-        $addCrud('woocommerce_integration',  'WooCommerce Integration');
 
         // ── Roles & Permissions ────────────────────────────
         $addCrud('settings_roles',           'Roles');
