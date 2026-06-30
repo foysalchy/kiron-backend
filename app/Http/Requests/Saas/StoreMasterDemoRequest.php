@@ -31,6 +31,7 @@ class StoreMasterDemoRequest extends FormRequest
             'image'  => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'link'   => 'nullable|url',
             'type'  => 'required',
+            'slug' => 'required|string',
             'status' => 'nullable|integer',
             'description' => 'nullable|string',
             'meta_title' => 'nullable| string',

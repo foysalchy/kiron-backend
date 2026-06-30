@@ -16,6 +16,7 @@ class MasterDemo extends Model
         'title',
         'image',
         'link',
+           'slug',
         'type',
         'status',
         'meta_title',

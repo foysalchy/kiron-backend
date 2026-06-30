@@ -14,6 +14,7 @@ class MasterFeature extends Model
         'subtitle',
         'image',
         'icon',
+        'slug',
         'meta_title',
         'meta_description',
         'meta_keywords',
@@ -30,5 +31,4 @@ class MasterFeature extends Model
             ? Storage::disk('r2')->url($this->image)
             : null;
     }
-   
 }

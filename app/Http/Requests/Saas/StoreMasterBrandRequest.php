@@ -28,6 +28,8 @@ class StoreMasterBrandRequest extends FormRequest
             'logo' => 'nullable|image|max:2048',
             'link' => 'nullable|url',
             'meta_title' => 'nullable| string',
+            'description' => 'nullable|string',
+            'slug' => 'required|string',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable',
         ];
