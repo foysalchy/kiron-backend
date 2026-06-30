@@ -1,6 +1,99 @@
 @extends('saas.layouts.layout')
 
 @section('content')
+
+
+@php
+$solutions = [
+    'ecommerce' => [
+        'title' => 'E-Commerce',
+        'desc' => 'Power your online store with automated order processing, inventory sync, and seamless customer experience.',
+        'mockup' => 'ecommerce_dashboard_preview',
+        'img' => 'https://via.placeholder.com/900x600?text=Ecommerce+Dashboard',
+        'features' => [
+            ['icon' => 'fa-display', 'text' => 'Website Integration'],
+            ['icon' => 'fa-cart-shopping', 'text' => 'Order Management'],
+        ]
+    ],
+
+    'pos' => [
+        'title' => 'POS System',
+        'desc' => 'Fast and reliable POS system for retail and wholesale billing with barcode support.',
+        'mockup' => 'pos_system_preview',
+        'img' => 'https://via.placeholder.com/900x600?text=POS+System',
+        'features' => [
+            ['icon' => 'fa-barcode', 'text' => 'Barcode Billing'],
+            ['icon' => 'fa-receipt', 'text' => 'Instant Invoice'],
+        ]
+    ],
+
+    'erp' => [
+        'title' => 'ERP Core',
+        'desc' => 'Manage your entire business operations including sales, purchase, inventory and warehouse.',
+        'mockup' => 'erp_core_system',
+        'img' => 'https://via.placeholder.com/900x600?text=ERP+System',
+        'features' => [
+            ['icon' => 'fa-layer-group', 'text' => 'Centralized Control'],
+            ['icon' => 'fa-sitemap', 'text' => 'Multi Module System'],
+        ]
+    ],
+
+    'crm' => [
+        'title' => 'CRM',
+        'desc' => 'Manage leads, customers, and improve sales conversion with smart tracking.',
+        'mockup' => 'crm_dashboard',
+        'img' => 'https://via.placeholder.com/900x600?text=CRM+System',
+        'features' => [
+            ['icon' => 'fa-user', 'text' => 'Lead Management'],
+            ['icon' => 'fa-chart-line', 'text' => 'Sales Tracking'],
+        ]
+    ],
+
+    'accounting' => [
+        'title' => 'Accounting',
+        'desc' => 'Complete financial management with profit, loss, cash flow and reporting tools.',
+        'mockup' => 'accounting_system',
+        'img' => 'https://via.placeholder.com/900x600?text=Accounting',
+        'features' => [
+            ['icon' => 'fa-coins', 'text' => 'Income & Expense'],
+            ['icon' => 'fa-file-invoice', 'text' => 'Financial Reports'],
+        ]
+    ],
+
+    'hrm' => [
+        'title' => 'HRM',
+        'desc' => 'Employee management, attendance, payroll and leave tracking system.',
+        'mockup' => 'hrm_system',
+        'img' => 'https://via.placeholder.com/900x600?text=HRM',
+        'features' => [
+            ['icon' => 'fa-users', 'text' => 'Employee Records'],
+            ['icon' => 'fa-clock', 'text' => 'Attendance System'],
+        ]
+    ],
+
+    'inventory' => [
+        'title' => 'Inventory',
+        'desc' => 'Real-time stock management with warehouse control and alerts.',
+        'mockup' => 'inventory_system',
+        'img' => 'https://via.placeholder.com/900x600?text=Inventory',
+        'features' => [
+            ['icon' => 'fa-boxes', 'text' => 'Stock Control'],
+            ['icon' => 'fa-truck', 'text' => 'Warehouse Transfer'],
+        ]
+    ],
+
+    'analytics' => [
+        'title' => 'Analytics',
+        'desc' => 'Get real-time business insights with charts, reports and performance tracking.',
+        'mockup' => 'analytics_dashboard',
+        'img' => 'https://via.placeholder.com/900x600?text=Analytics',
+        'features' => [
+            ['icon' => 'fa-chart-pie', 'text' => 'Business Insights'],
+            ['icon' => 'fa-bolt', 'text' => 'Real-time Data'],
+        ]
+    ],
+];
+@endphp
     <style>
         .hero-bg {
             background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #0a061e 60%);
@@ -520,108 +613,76 @@
         </div>
     </section>
     <!-- SOLUTION SECTION -->
-    <section class="bg-white py-20 px-4 md:px-10">
-        <div class="container mx-auto">
-            <!-- Section Header -->
-            <div class="text-center mb-16">
-                <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                    অল-ইন-ওয়ান সলিউশন
-                </span>
-                <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
-                    অপারেশন থেকে গ্রোথ — সবকিছু এক সিস্টেমে
-                </h2>
+  <section class="bg-white py-20 px-4 md:px-10">
+    <div class="container mx-auto">
 
-                <!-- Segmented Tabs (ক্লিকেবল করা হয়েছে) -->
-                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-md"
-                    id="solution-tabs">
-                    <button onclick="switchSolution('ecommerce', this)"
-                        class="sol-tab-btn flex-1 bg-[#34a487] text-white px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all">
-                        ই-কমার্স
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <span class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                All-in-One Solution
+            </span>
+
+            <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
+                From Operations to Growth — Everything in One System
+            </h2>
+
+            <!-- Tabs -->
+            <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-2xl"
+                id="solution-tabs">
+
+                @foreach($solutions as $key => $sol)
+                    <button
+                        onclick="switchSolution('{{ $key }}', this)"
+                        class="sol-tab-btn flex-1 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                        {{ $loop->first ? 'bg-[#34a487] text-white' : 'bg-[#34a48730] text-gray-900 hover:bg-white' }}">
+                        {{ $sol['title'] }}
                     </button>
-                    <button onclick="switchSolution('corporate', this)"
-                        class="sol-tab-btn flex-1 bg-[#34a48730] text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
-                        কর্পোরেট
-                    </button>
-                    <button onclick="switchSolution('pos', this)"
-                        class="sol-tab-btn flex-1 bg-[#34a48730] text-gray-900 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base hover:bg-white transition-all">
-                        POS
-                    </button>
-                </div>
-            </div>
+                @endforeach
 
-            <!-- Content Card -->
-            <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    <!-- Left: Text Content -->
-                    <div class="order-2 lg:order-1">
-                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6">
-                            ই-কমার্স সলিউশন
-                        </h3>
-                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md">
-                            আপনার অনলাইন স্টোরের প্রতিটি ভিজিটরকে দিন প্রিমিয়াম এক্সপেরিয়েন্স। অটোমেটেড অর্ডার এবং ইনভেন্টরি
-                            ম্যানেজমেন্ট এখন হাতের মুঠোয়।
-                        </p>
-
-                        <!-- Feature List -->
-                        <div class="space-y-5 mb-12">
-                            <div class="flex items-center gap-4 group">
-                                <div
-                                    class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white shadow-sm">
-                                    <i id="sol-icon-1" class="fa-solid fa-display text-sm"></i>
-                                </div>
-                                <span id="sol-feat-1" class="font-bold text-gray-900 text-lg">ওয়েবসাইট ইন্টিগ্রেশন</span>
-                            </div>
-                            <div class="flex items-center gap-4 group">
-                                <div
-                                    class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white shadow-sm">
-                                    <i id="sol-icon-2" class="fa-brands fa-apple text-lg"></i>
-                                </div>
-                                <span id="sol-feat-2" class="font-bold text-gray-900 text-lg">মোবাইল অ্যাপ সাপোর্ট</span>
-                            </div>
-                        </div>
-
-                        <a href="#"
-                            class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg shadow-indigo-100">
-                            বিস্তারিত জানুন
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
-                    </div>
-
-                    <!-- Right: Browser Mockup -->
-                    <div class="order-1 lg:order-2">
-                        <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden group">
-                            <!-- Browser Header -->
-                            <div
-                                class="bg-gray-50/50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-                                <div class="flex gap-2">
-                                    <span class="w-3 h-3 bg-red-400 rounded-full"></span>
-                                    <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
-                                    <span class="w-3 h-3 bg-green-400 rounded-full"></span>
-                                </div>
-                                <div id="sol-mockup-header"
-                                    class="text-[10px] text-gray-400 font-mono tracking-widest uppercase">
-                                    ecommerce_preview_v2
-                                </div>
-                            </div>
-
-                            <!-- Browser Content: এখানে ইমেজ বসবে -->
-                            <div class="relative bg-gray-100 aspect-video overflow-hidden">
-                                <img id="sol-img" src="{{ asset('images/saas/ss.png') }}"
-                                    class="w-full h-full object-cover object-top transition-all duration-500 group-hover:scale-105"
-                                    alt="Dashboard Preview">
-
-                                <!-- ইমেজের ওপর হালকা ওভারলে (ঐচ্ছিক, প্রিভিউ সুন্দর দেখানোর জন্য) -->
-                                <div
-                                    class="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-    </section>
+
+        <!-- Content Card -->
+        <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <!-- Left Content -->
+                <div>
+                    <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
+
+                    <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
+
+                    <!-- Features -->
+                    <div id="sol-features" class="space-y-5 mb-12"></div>
+
+                    <a href="#"
+                        class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
+                        Explore More
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+
+                <!-- Right Image -->
+                <div>
+                    <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+                        <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-400 font-mono">
+                            <span id="sol-mockup"></span>
+                        </div>
+
+                        <div class="aspect-video bg-gray-100">
+                            <img id="sol-img"
+                                src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
+                                class="w-full h-full object-cover object-top"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
 
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
     @if ($features->where('placement', 2)->isNotEmpty())
@@ -667,10 +728,10 @@
         <section class="bg-white py-20 px-6 md:px-10">
             <div class="container mx-auto">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
-                    <h2 class="text-2xl md:text-4xl font-black text-gray-900">ব্লগ ও ইনসাইটস</h2>
+                    <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href=""
                         class="bg-[#34a487] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                        আরও পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
+                        View All <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
 
@@ -691,11 +752,11 @@
                                 <div class="flex justify-between items-center mb-5">
                                     <span
                                         class="bg-indigo-50 text-[#34a487] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                                        {{ $blog->company->shop_name ?? 'অ্যাডমিন' }}
+                                        {{ $blog->company->shop_name ?? 'Admin' }}
                                     </span>
                                     <div class="flex items-center gap-2 text-gray-400 text-sm font-bold">
                                         <i class="fa-regular fa-clock"></i>
-                                        <span>{{ $blog->reading_time ?? '' }} মিনিট</span>
+                                        <span>{{ $blog->reading_time ?? '' }} minutes</span>
                                     </div>
                                 </div>
 
@@ -711,7 +772,7 @@
                                 <div class="mt-auto pt-5 border-t border-gray-50">
                                     <a href=""
                                         class="inline-flex items-center gap-2 text-[#34a487] font-bold text-lg group-hover:gap-3 transition-all">
-                                        বিস্তারিত পড়ুন <i class="fa-solid fa-arrow-right text-sm"></i>
+                                        Read More <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </a>
                                 </div>
                             </div>
@@ -782,7 +843,7 @@
         <div class="text-center mb-10">
             <span
                 class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                প্রায়শই জিজ্ঞাসিত প্রশ্ন
+               Frequently Asked Questions
             </span>
 
             <h2 class="text-3xl md:text-5xl font-black text-gray-900">
