@@ -430,16 +430,15 @@
                     <!-- Badge Tag -->
                     <span
                         class="inline-block px-5 py-2 rounded-full border border-white/40 text-gray-300 text-sm md:text-lg font-medium mb-6">
-                        আপনার অনলাইন ব্যবসার
+                        Your Business Growth Partner
                     </span>
                     <!-- Heading -->
                     <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-6">
-                        সাফল্যের মূল কারিগর
+                       The key driver of your online business success
                     </h2>
                     <!-- Description -->
                     <p class="text-gray-300 text-lg leading-relaxed max-w-2xl">
-                        আমাদের অ্যাডভান্সড ইন্টিগ্রেশন আপনার ব্যবসায়িক কার্যক্রমকে করবে
-                        আরও সহজ, স্মার্ট এবং কয়েকগুণ বেশি শক্তিশালী।
+                     Our advanced integrations make your business operations easier, smarter, and significantly more powerful.
                     </p>
                 </div>
 
@@ -447,7 +446,7 @@
                 <div class="flex-shrink-0">
                     <a href="https://app.dorja.io/register"
                         class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
-                        ফ্রি ট্রায়াল শুরু করুন
+                       Start Free Trial
                     </a>
                 </div>
             </div>
@@ -460,15 +459,14 @@
                         <i class="fa-solid fa-table-cells-large text-[#bfff3c] text-4xl"></i>
                     </div>
                     <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
-                        সাশ্রয়ী প্রাইসিং
+                        Affordable Pricing
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                        আপনার ব্যবসার পরিধি অনুযায়ী বেছে নিন সঠিক প্ল্যান। কোনো লুকানো
-                        চার্জ ছাড়াই পাচ্ছেন প্রিমিয়াম সব ফিচার।
+                      Select a pricing plan that fits your business size and goals. Whether you're a startup or an enterprise, dorja.io offers flexible packages designed to scale with your growth.
                     </p>
                     <a href="#"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
-                        প্ল্যাটফর্মের সুবিধা দেখুন
+                        Explore Our Pricing
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
@@ -479,15 +477,14 @@
                         <i class="fa-solid fa-layer-group text-[#bfff3c] text-4xl"></i>
                     </div>
                     <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
-                        ফিচারসমূহ এক্সপ্লোর করুন
+                       Explore Features
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                        আপনার ব্যবসার পরিধি অনুযায়ী বেছে নিন সঠিক প্ল্যান। কোনো লুকানো
-                        চার্জ ছাড়াই পাচ্ছেন প্রিমিয়াম সব ফিচার।
+                Discover a complete suite of business tools designed to automate operations, improve efficiency, and help you make faster data-driven decisions.
                     </p>
                     <a href="#"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
-                        এক্সপ্লোর করুন
+                        Explore Features
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
@@ -498,15 +495,14 @@
                         <i class="fa-solid fa-bolt text-[#bfff3c] text-4xl"></i>
                     </div>
                     <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
-                        যাত্রা শুরু করুন আজই
+                       Start Your Journey Today
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                        আপনার ব্যবসার পরিধি অনুযায়ী বেছে নিন সঠিক প্ল্যান। কোনো লুকানো
-                        চার্জ ছাড়াই পাচ্ছেন প্রিমিয়াম সব ফিচার।
+                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way you manage and grow your business.
                     </p>
                     <a href="https://app.dorja.io/register"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
-                        শুরু করুন
+                        Get Started
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
                 </div>
