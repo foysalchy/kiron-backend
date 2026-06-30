@@ -456,16 +456,16 @@
                 <!-- Feature 1 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-table-cells-large text-[#bfff3c] text-4xl"></i>
+                        <i class="fa-solid fa-table-cells-large text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                         Affordable Pricing
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
                      Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups to enterprises that grow with you.
                     </p>
                     <a href="#"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Our Pricing
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -474,16 +474,16 @@
                 <!-- Feature 2 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-layer-group text-[#bfff3c] text-4xl"></i>
+                        <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                        Explore Features
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
                 Discover a complete suite of business tools designed to automate operations, improve efficiency, and help you make faster data-driven decisions.
                     </p>
                     <a href="#"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Features
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -492,16 +492,16 @@
                 <!-- Feature 3 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-bolt text-[#bfff3c] text-4xl"></i>
+                        <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#bfff3c] text-2xl font-bold mb-5">
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                        Start Your Journey Today
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
                         Join thousands of businesses already using dorja.io. Start your journey today and transform the way you manage and grow your business.
                     </p>
                     <a href="https://app.dorja.io/register"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Get Started
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
