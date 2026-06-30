@@ -30,8 +30,12 @@ class UpdateMasterDemoRequest extends FormRequest
             'title'  => 'sometimes|required|string|max:255',
             'image'  => 'sometimes|nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'link'   => 'sometimes|nullable|url',
-            'type'   => 'sometimes|required|integer|in:1,2',
+            'type'   => 'sometimes|required',
             'status' => 'sometimes|required|integer',
+            'description' => 'nullable|string',
+            'meta_title' => 'nullable| string',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable',
         ];
     }
 
