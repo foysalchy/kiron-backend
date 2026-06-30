@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+//  php artisan db:seed --class=SuperAdminSeeder
+//          php artisan db:seed --class=PermissionSeeder
+//         php artisan db:seed --class=SuperAdminPermissionSeeder
+
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',

@@ -231,7 +231,7 @@ class AppServiceProvider extends ServiceProvider
 
             $currentStore = getCurrentCompany();
 
-            $companyId = $isSaasRoute ? 1 : ($currentStore ? $currentStore->company_id : 1);
+            $companyId = $isSaasRoute ? Null : ($currentStore ? $currentStore->company_id : Null);
 
             $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
 
