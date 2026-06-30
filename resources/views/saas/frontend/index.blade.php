@@ -773,7 +773,7 @@
     <div class="container mx-auto">
 
         <!-- Header -->
-        <div class="text-center mb-16">
+        <div class="text-center mb-10">
             <span
                 class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
                 প্রায়শই জিজ্ঞাসিত প্রশ্ন
@@ -782,6 +782,16 @@
             <h2 class="text-3xl md:text-5xl font-black text-gray-900">
                 dorja.io FAQ
             </h2>
+
+            <!-- Search Box -->
+            <div class="mt-8 max-w-xl mx-auto">
+                <input
+                    type="text"
+                    id="faqSearch"
+                    placeholder="Search FAQ..."
+                    class="w-full px-5 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+            </div>
         </div>
 
         @php
@@ -792,15 +802,15 @@
         @endphp
 
         <!-- FAQ List -->
-        <div class="max-w-4xl mx-auto space-y-4" id="faq-container">
+        <div class=" space-y-4" id="faq-container">
 
-            @foreach ($faqs as $index => $faq)
-                <div class="bg-[#f9faff] border border-indigo-100 rounded-2xl p-6">
+            @foreach ($faqs as $faq)
+                <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl p-6">
 
                     <!-- Question -->
                     <button
                         class="w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
-                        <span>{{ $faq->title }}</span>
+                        <span class="faq-question">{{ $faq->title }}</span>
 
                         <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
                     </button>
@@ -809,6 +819,7 @@
                     <div class="faq-content mt-4 text-gray-600 leading-relaxed hidden">
                         {!! $faq->content !!}
                     </div>
+
                 </div>
             @endforeach
 
@@ -816,11 +827,12 @@
     </div>
 </section>
 
-<!-- Simple Accordion Script -->
-
 @endsection
 @push('scripts')
+
+<!-- Accordion + Search Script -->
 <script>
+    // Accordion
     document.querySelectorAll('.faq-toggle').forEach((btn) => {
         btn.addEventListener('click', () => {
             const content = btn.nextElementSibling;
@@ -828,6 +840,22 @@
 
             content.classList.toggle('hidden');
             icon.classList.toggle('rotate-180');
+        });
+    });
+
+    // Search Filter
+    document.getElementById('faqSearch').addEventListener('input', function () {
+        let value = this.value.toLowerCase();
+        let items = document.querySelectorAll('.faq-item');
+
+        items.forEach(item => {
+            let text = item.querySelector('.faq-question').innerText.toLowerCase();
+
+            if (text.includes(value)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
         });
     });
 </script>
