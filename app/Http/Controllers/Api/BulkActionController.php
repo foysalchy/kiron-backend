@@ -53,8 +53,12 @@ class BulkActionController extends Controller
         'kb'        => \App\Models\KnowledgeBase::class,
         'asset-categories'        => \App\Models\AssetCategory::class,
         'assets'        => \App\Models\Asset::class,
+        'brands'        => \App\Models\Brand::class,
         'asset-purchases'        => \App\Models\AssetPurchase::class,
         'disposal-types'        => \App\Models\DisposalType::class,
+        'master-brands'        => \App\Models\MasterBrand::class,
+        'master-demos'        => \App\Models\MasterDemo::class,
+        'master-features'        => \App\Models\MasterFeature::class,
     ];
 
     /**
