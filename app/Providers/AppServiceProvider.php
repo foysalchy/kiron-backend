@@ -256,7 +256,17 @@ class AppServiceProvider extends ServiceProvider
                     'setup'             => $applyLogic(SiteSetting::class)->first(),
 
                     'headerCategories'  => $applyLogic(MegaCategory::class)
-                        ->where('status', 1)->latest()->get(),
+                        ->with([
+                            'subCategories' => function ($q) {
+                                $q->where('status', 1);
+                            },
+                            'subCategories.miniCategories' => function ($q) {
+                                $q->where('status', 1);
+                            }
+                        ])
+                        ->where('status', 1)
+                        ->latest()
+                        ->get(),
 
                     'footerFeatures'    => $applyLogic(ContentSetting::class)
                         ->where('page_type', ContentSetting::PAGE_ALL)
@@ -281,6 +291,8 @@ class AppServiceProvider extends ServiceProvider
                     // its for company
                     'popularSearches'   => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
                     'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+
+                    'allHeaderProducts' => Product::where('status', Status::Active->value)->get(),
                 ];
             });
 

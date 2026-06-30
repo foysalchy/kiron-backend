@@ -88,6 +88,9 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
     Route::post('/newsletter-subscribe', [HomeController::class, 'subscribe'])->name('newsletter.subscribe');
 
+    Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
+    Route::get('/subcategory/{mega_slug}/{sub_slug}', [ProductController::class, 'subcategoryProducts'])->name('subcategory.products');
+    Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductController::class, 'minicategoryProducts'])->name('minicategory.products');
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
