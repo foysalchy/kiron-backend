@@ -805,18 +805,18 @@
         <div class=" space-y-4" id="faq-container">
 
             @foreach ($faqs as $faq)
-                <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl p-6">
+                <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl ">
 
                     <!-- Question -->
                     <button
-                        class="w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                        class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
                         <span class="faq-question">{{ $faq->title }}</span>
 
                         <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
                     </button>
 
                     <!-- Answer -->
-                    <div class="faq-content mt-4 text-gray-600 leading-relaxed hidden">
+                    <div class="px-6 faq-content mt-4 text-gray-600 leading-relaxed hidden">
                         {!! $faq->content !!}
                     </div>
 
