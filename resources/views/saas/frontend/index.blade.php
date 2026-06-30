@@ -445,7 +445,7 @@
 
                 <!-- CTA Button -->
                 <div class="flex-shrink-0">
-                    <a href="#"
+                    <a href="https://app.dorja.io/register"
                         class="inline-block bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
                         ফ্রি ট্রায়াল শুরু করুন
                     </a>
@@ -504,7 +504,7 @@
                         আপনার ব্যবসার পরিধি অনুযায়ী বেছে নিন সঠিক প্ল্যান। কোনো লুকানো
                         চার্জ ছাড়াই পাচ্ছেন প্রিমিয়াম সব ফিচার।
                     </p>
-                    <a href="#"
+                    <a href="https://app.dorja.io/register"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
                         শুরু করুন
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>

@@ -31,11 +31,11 @@
 
         <!-- Right Side Buttons -->
         <div class="flex items-center space-x-3 md:space-x-6">
-            <a href="#" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#5c46e5]">
+            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#5c46e5]">
                 লগইন
             </a>
             <!-- CTA Button (Responsive Padding & Font) -->
-            <a href="#"
+            <a href="https://app.dorja.io/register"
                 class="bg-[#5c46e5] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
                 ফ্রি ট্রায়াল <span class="hidden sm:inline">শুরু করুন</span>
             </a>
