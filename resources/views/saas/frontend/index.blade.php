@@ -769,8 +769,68 @@
             </div>
         </section>
     @endif
+    <section class="bg-white py-20 px-6 md:px-10" id="faq-section">
+    <div class="container mx-auto">
+
+        <!-- Header -->
+        <div class="text-center mb-16">
+            <span
+                class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#5c46e5] font-semibold text-sm md:text-lg mb-6">
+                প্রায়শই জিজ্ঞাসিত প্রশ্ন
+            </span>
+
+            <h2 class="text-3xl md:text-5xl font-black text-gray-900">
+                dorja.io FAQ
+            </h2>
+        </div>
+
+        @php
+            $faqs = App\Models\KnowledgeBase::where('status', 1)
+                ->where('company_id', null)
+                ->orderBy('id', 'asc')
+                ->get();
+        @endphp
+
+        <!-- FAQ List -->
+        <div class="max-w-4xl mx-auto space-y-4" id="faq-container">
+
+            @foreach ($faqs as $index => $faq)
+                <div class="bg-[#f9faff] border border-indigo-100 rounded-2xl p-6">
+
+                    <!-- Question -->
+                    <button
+                        class="w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                        <span>{{ $faq->title }}</span>
+
+                        <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+
+                    <!-- Answer -->
+                    <div class="faq-content mt-4 text-gray-600 leading-relaxed hidden">
+                        {!! $faq->content !!}
+                    </div>
+                </div>
+            @endforeach
+
+        </div>
+    </div>
+</section>
+
+<!-- Simple Accordion Script -->
+
 @endsection
 @push('scripts')
+<script>
+    document.querySelectorAll('.faq-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const content = btn.nextElementSibling;
+            const icon = btn.querySelector('i');
+
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        });
+    });
+</script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (document.querySelector('.heroSwiper')) {
