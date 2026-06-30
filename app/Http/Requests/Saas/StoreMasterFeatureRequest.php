@@ -28,7 +28,7 @@ class StoreMasterFeatureRequest extends FormRequest
             'subtitle'    => 'nullable|string|max:255',
             'image'       => 'nullable|image|max:2048',
             'icon'        => 'nullable',
-
+            'slug' => 'required|string',
             'description' => 'nullable|string',
             'meta_title' => 'nullable| string',
             'meta_description' => 'nullable|string',

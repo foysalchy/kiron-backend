@@ -14,6 +14,8 @@ class MasterBrand extends Model
         'logo',
         'link',
         'status',
+        'slug',
+        'description',
         'meta_title',
         'meta_description',
         'meta_keywords',
