@@ -652,13 +652,13 @@
             </h2>
 
             <!-- Tabs -->
-            <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full max-w-2xl"
+            <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full "
                 id="solution-tabs">
 
                 @foreach($solutions as $key => $sol)
                     <button
                         onclick="switchSolution('{{ $key }}', this)"
-                        class="sol-tab-btn flex-1 px-4 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                        class="sol-tab-btn flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
                         {{ $loop->first ? 'bg-[#34a487] text-white' : 'bg-[#34a48730] text-gray-900 hover:bg-white' }}">
                         {{ $sol['title'] }}
                     </button>
