@@ -642,7 +642,7 @@
     <div class="container mx-auto">
 
         <!-- Header -->
-        <div class="text-center mb-16">
+        <div class="text-center mb-8">
             <span class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                 All-in-One Solution
             </span>
