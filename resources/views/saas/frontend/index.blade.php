@@ -462,7 +462,7 @@
                         Affordable Pricing
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                      Select a pricing plan that fits your business size and goals. Whether you're a startup or an enterprise, dorja.io offers flexible packages designed to scale with your growth.
+                     Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups to enterprises that grow with you.
                     </p>
                     <a href="#"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#bfff3c] transition group">
