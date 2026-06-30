@@ -809,7 +809,7 @@
 
                     <!-- Question -->
                     <button
-                        class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                        class="p-6 pb-0 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
                         <span class="faq-question">{{ $faq->title }}</span>
 
                         <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
