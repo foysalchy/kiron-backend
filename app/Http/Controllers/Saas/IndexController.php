@@ -28,7 +28,6 @@ class IndexController extends Controller
 
         $topFeatures = MasterFeature::where('status', Status::Active->value)
             ->where('placement', 1)
-            ->latest()
             ->take(6)
             ->select('title', 'subtitle', 'icon','slug')
             ->get();
