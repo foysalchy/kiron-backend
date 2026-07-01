@@ -13,14 +13,12 @@
 
             <!-- Login/Register Link -->
             @auth('customer')
-                <!-- লগইন থাকলে ইউজারের নাম এবং ড্যাশবোর্ড লিঙ্ক -->
                 <a href="{{ route('user.dashboard') }}"
                     class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition" aria-label="Go to Dashboard">
                     <i class="fa-regular fa-circle-user" aria-hidden="true"></i>
                     <span>{{ auth('customer')->user()->name }}</span>
                 </a>
             @else
-                <!-- লগইন না থাকলে লগইন লিঙ্ক -->
                 <a href="{{ route('user.login') }}"
                     class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
                     aria-label="Log in or register">
@@ -33,13 +31,11 @@
 
     <div class="bg-[#66267b] text-white py-4 px-4 md:px-10 border-b border-purple-800">
         <div class="container mx-auto flex items-center justify-between gap-4">
-            <!-- মোবাইল মেনু বাটন (Accessible Button) -->
             <button id="menu-toggle" class="lg:hidden text-2xl focus:outline-none" aria-label="Open navigation menu"
                 aria-expanded="false" aria-controls="mobile-sidebar">
                 <i class="fa-solid fa-bars-staggered" aria-hidden="true"></i>
             </button>
 
-            <!-- লোগো (With SEO Alt Text) -->
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
                     <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}"
@@ -48,22 +44,45 @@
                 </a>
             </div>
 
-            <!-- ডেস্কটপ সার্চ বার -->
-            <form action="{{ route('search.suggestions') }}" method="GET" role="search"
-                class="hidden lg:block flex-1 max-w-3xl mx-10">
-                <div class="relative">
-                    <input type="text" name="q" placeholder="Search by product name"
-                        aria-label="Search for baby products"
-                        class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm" />
-                    <button type="submit"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-800"
-                        aria-label="Submit search">
-                        <i class="fa-solid fa-magnifying-glass text-lg" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </form>
+            <form action="{{ route('shop.index') }}" method="GET" class="hidden lg:block flex-1 max-w-3xl mx-10 relative" id="header-search-container">
+    <div class="relative z-30">
+        <input type="text" name="search" id="header-search-input" autocomplete="off"
+            placeholder="Search by product name" aria-label="Search for baby products"
+            class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
+        <button type="submit" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-800">
+            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+        </button>
+    </div>
 
-            <!-- আইকন সেকশন (Wishlist & Cart) -->
+    <!-- Suggestions Dropdown -->
+    <div id="search-suggestions" class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
+        <div id="suggestion-content">
+            <div class="pb-2">
+                <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
+                @foreach($popularSearches as $item)
+                    <a href="{{ route('shop.index', ['search' => $item->keyword]) }}" class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-history text-gray-300 text-xs"></i>
+                            <span>{{ $item->keyword }}</span>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+            <div class="border-t border-gray-50 pt-2 pb-2">
+                <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending Products</p>
+                @foreach($relatedProducts as $p)
+                    <a href="{{ route('product.details', $p->slug) }}" class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                        <img src="{{ $p->thumbnail_url }}" class="w-8 h-8 rounded object-cover border border-gray-100">
+                        <span class="truncate">{{ $p->title }}</span>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+        <!-- Live Results (typed by user) -->
+        <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+    </div>
+</form>
+
             <div class="flex items-center gap-4 md:gap-8">
                 <!-- Wishlist Link -->
                 <a href="/wishlist" class="flex items-center gap-3 cursor-pointer group"
@@ -99,17 +118,27 @@
             </div>
         </div>
 
-        <!-- মোবাইল সার্চ বার -->
-        <form action="/search" method="GET" role="search" class="lg:hidden mt-4">
-            <div class="relative">
-                <input type="text" name="q" placeholder="Search..." aria-label="Search products"
-                    class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white" />
-                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                    aria-label="Search button">
-                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                </button>
-            </div>
-        </form>
+        <form action="{{ route('shop.index') }}" method="GET" class="lg:hidden mt-4 relative" id="mobile-search-container">
+    <div class="relative z-30">
+        <input type="text" name="search" id="mobile-search-input" autocomplete="off"
+            placeholder="Search..." aria-label="Search products"
+            class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
+        <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </div>
+
+    <!-- Mobile Suggestions Dropdown -->
+    <div id="mobile-search-suggestions" class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[100] overflow-hidden pt-4 pb-2">
+        <div id="mobile-suggestion-content">
+             <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
+             @foreach($popularSearches as $item)
+                <a href="{{ route('shop.index', ['search' => $item->keyword]) }}" class="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ $item->keyword }}</a>
+             @endforeach
+        </div>
+        <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+    </div>
+</form>
     </div>
 
     <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100 font-manrope">
@@ -118,7 +147,6 @@
 
                 @foreach ($headerCategories->take(5) as $mega)
                     <li class="group relative">
-                        {{-- ১. মেগা ক্যাটাগরি লিঙ্ক --}}
                         <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
                             class="flex items-center gap-2 px-5 py-4 hover:text-[#66267b] transition-all cursor-pointer uppercase">
                             {{ $mega->name }} <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
@@ -131,7 +159,6 @@
                                     @foreach ($mega->subCategories as $sub)
                                         <li
                                             class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                            {{-- ২. সাব-ক্যাটাগরি লিঙ্ক (এখানে আপনার ব্র্যাকেট ভুল ছিল, ঠিক করা হয়েছে) --}}
                                             <a href="{{ route('subcategory.products', [$mega->slug ?? $mega->id, $sub->slug ?? $sub->id]) }}"
                                                 class="group-hover/sub:text-[#66267b] uppercase">
                                                 {{ $sub->name }}
@@ -144,7 +171,6 @@
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <li
                                                             class="group/mini px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                                            {{-- ৩. মিনি-ক্যাটাগরি লিঙ্ক (URL এর বদলে Route ব্যবহার করা হয়েছে) --}}
                                                             <a href="{{ route('minicategory.products', [$mega->slug ?? $mega->id, $sub->slug ?? $sub->id, $mini->slug ?? $mini->id]) }}"
                                                                 class="group-hover/mini:text-[#66267b]">
                                                                 {{ $mini->name }}
@@ -152,11 +178,9 @@
                                                             <i
                                                                 class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
 
-                                                            <!-- ধাপ ৪: প্রোডাক্টস -->
                                                             <ul
                                                                 class="absolute left-full top-0 w-72 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/mini:block">
                                                                 @php
-                                                                    // প্রোডাক্ট ফিল্টারিং লজিক
                                                                     $miniProds = $allHeaderProducts
                                                                         ->filter(function ($p) use ($mini) {
                                                                             return is_array($p->mini_category_ids) &&
@@ -180,20 +204,19 @@
                                                                                 alt="">
                                                                             <div class="flex flex-col min-w-0">
                                                                                 <span
-                                                                                    class="text-[11px] font-bold text-gray-700 truncate">{{ $product->title }}</span>
+                                                                                    class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
                                                                             </div>
                                                                         </a>
                                                                     </li>
                                                                 @empty
                                                                     <li
-                                                                        class="px-5 py-4 text-center text-[11px] text-gray-400 italic">
+                                                                        class="px-5 py-4 text-center text-xs text-gray-400 italic">
                                                                         No products</li>
                                                                 @endforelse
                                                             </ul>
                                                         </li>
                                                     @endforeach
                                                 @else
-                                                    {{-- সরাসরি সাব-ক্যাটাগরির প্রোডাক্টস --}}
                                                     @php
                                                         $subProds = $allHeaderProducts
                                                             ->filter(function ($p) use ($sub) {
@@ -215,14 +238,14 @@
                                                                     alt="">
                                                                 <div class="flex flex-col min-w-0">
                                                                     <span
-                                                                        class="text-[11px] font-bold text-gray-700 truncate">{{ $product->title }}</span>
+                                                                        class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
 
                                                                 </div>
                                                             </a>
                                                         </li>
                                                     @empty
                                                         <li
-                                                            class="px-5 py-4 text-center text-[11px] text-gray-400 italic">
+                                                            class="px-5 py-4 text-center text-xs text-gray-400 italic">
                                                             No products</li>
                                                     @endforelse
                                                 @endif
@@ -230,7 +253,6 @@
                                         </li>
                                     @endforeach
                                 @else
-                                    {{-- সরাসরি মেগা ক্যাটাগরির প্রোডাক্টস --}}
                                     @php
                                         $megaProds = $allHeaderProducts
                                             ->filter(function ($p) use ($mega) {
@@ -250,13 +272,13 @@
                                                     class="w-10 h-10 object-cover rounded border" alt="">
                                                 <div class="flex flex-col min-w-0">
                                                     <span
-                                                        class="text-[11px] font-bold text-gray-700 truncate">{{ $product->title }}</span>
-                                                    
+                                                        class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
+
                                                 </div>
                                             </a>
                                         </li>
                                     @empty
-                                        <li class="px-5 py-4 text-center text-[11px] text-gray-400 italic">No products
+                                        <li class="px-5 py-4 text-center text-xs text-gray-400 italic">No products
                                         </li>
                                     @endforelse
                                 @endif
@@ -302,7 +324,6 @@
                 </div>
                 <div class="border-t border-gray-100 mt-2">
                     @auth('customer')
-                        <!-- লগইন থাকলে ড্যাশবোর্ড এবং লগআউট -->
                         <a href="{{ route('user.dashboard') }}"
                             class="flex items-center gap-3 px-5 py-4 text-[#0f172a] font-bold hover:bg-gray-50 transition-all">
                             <i class="fa-regular fa-circle-user text-lg text-[#66267b]"></i>
@@ -317,7 +338,6 @@
                             </button>
                         </form>
                     @else
-                        <!-- লগইন না থাকলে -->
                         <a href="{{ route('user.login') }}"
                             class="flex items-center gap-3 px-5 py-4 text-[#0f172a] font-bold hover:bg-gray-50 transition-all">
                             <i class="fa-regular fa-user text-lg text-[#66267b]"></i>
@@ -336,3 +356,78 @@
     </div>
     <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-[55]" aria-hidden="true"></div>
 </header>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchConfigs = [
+        {
+            input: document.getElementById('header-search-input'),
+            suggestions: document.getElementById('search-suggestions'),
+            results: document.getElementById('live-search-results'),
+            defaultContent: document.getElementById('suggestion-content'),
+        },
+        {
+            input: document.getElementById('mobile-search-input'),
+            suggestions: document.getElementById('mobile-search-suggestions'),
+            results: document.getElementById('mobile-live-search-results'),
+            defaultContent: document.getElementById('mobile-suggestion-content'),
+        }
+    ];
+
+    let debounceTimer;
+
+    searchConfigs.forEach(config => {
+        if (!config.input) return;
+
+        // ইনপুটে ক্লিক করলে সাজেশন দেখাবে
+        config.input.addEventListener('focus', () => {
+            config.suggestions.classList.remove('hidden');
+        });
+
+        // টাইপ করলে লাইভ রেজাল্ট আনবে
+        config.input.addEventListener('input', function() {
+            const query = this.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (query.length > 1) {
+                debounceTimer = setTimeout(() => {
+                    if (config.defaultContent) config.defaultContent.classList.add('hidden');
+                    config.results.classList.remove('hidden');
+                    config.results.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+
+                    fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            config.results.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(item => {
+                                    const link = document.createElement('a');
+                                    link.href = "{{ url('product') }}/" + item.slug;
+                                    link.className = "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
+                                    link.innerHTML = `
+                                        <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='/images/no-image.png'">
+                                        <span class="truncate">${item.title}</span>
+                                    `;
+                                    config.results.appendChild(link);
+                                });
+                            } else {
+                                config.results.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                            }
+                        });
+                }, 400);
+            } else {
+                if (config.defaultContent) config.defaultContent.classList.remove('hidden');
+                config.results.classList.add('hidden');
+            }
+        });
+    });
+
+    // সাজেশন বক্সের বাইরে ক্লিক করলে হাইড হবে
+    document.addEventListener('click', (e) => {
+        searchConfigs.forEach(config => {
+            if (config.input && !config.input.contains(e.target) && !config.suggestions.contains(e.target)) {
+                config.suggestions.classList.add('hidden');
+            }
+        });
+    });
+});
+</script>

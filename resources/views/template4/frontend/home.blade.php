@@ -82,246 +82,143 @@
 @endpush
 @section('content')
     <!-- hero section -->
-    <section class="container mx-auto mt-6 px-4">
+    <section class="container mx-auto mt-6 px-4 font-manrope">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
-            <!-- LEFT: Main Swiper Slider (লাল দাগ দেওয়া অংশ) -->
+
+            <!-- LEFT: Dynamic Swiper Slider -->
             <div
                 class="lg:col-span-3 relative group overflow-hidden shadow-lg [&_.swiper-pagination-bullet]:!w-4 [&_.swiper-pagination-bullet]:!h-4 [&_.swiper-pagination-bullet]:!rounded-full [&_.swiper-pagination-bullet]:!bg-white [&_.swiper-pagination-bullet]:!opacity-100 [&_.swiper-pagination-bullet]:mx-2 [&_.swiper-pagination-bullet]:shadow-md [&_.swiper-pagination-bullet]:transition-all [&_.swiper-pagination-bullet-active]:!bg-[#66267b] [&_.swiper-pagination-bullet-active]:scale-110">
                 <div class="swiper mainHeroSwiper w-full h-[300px] md:h-[450px] lg:h-[450px]">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="{{ asset('images/babyshop/images/hero1.jpg') }}" alt="Banner 1"
-                                class="w-full h-full object-cover" />
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{{ asset('images/babyshop/images/hero2.jpg') }}" alt="Banner 2"
-                                class="w-full h-full object-cover" />
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="{{ asset('images/babyshop/images/hero3.jpg') }}" alt="Banner 2"
-                                class="w-full h-full object-cover" />
-                        </div>
+                        @forelse($mainSliders as $slider)
+                            <div class="swiper-slide">
+                                <a href="{{ $slider->url ?? '#' }}">
+                                    <img src="{{ $slider->image_url }}" alt="{{ $slider->title }}"
+                                        class="w-full h-full object-cover" />
+                                </a>
+                            </div>
+                        @empty
+                            <div class="swiper-slide">
+                                <img src="{{ asset('images/babyshop/images/hero1.jpg') }}"
+                                    class="w-full h-full object-cover" />
+                            </div>
+                        @endforelse
                     </div>
 
                     <div class="swiper-pagination !bottom-8"></div>
                 </div>
             </div>
 
-            <!-- RIGHT: Static Image Banner (স্লাইডার না) -->
-            <div class="hidden lg:block lg:col-span-1 h-[450px] overflow-hidden shadow-lg border border-gray-100">
-                <img src="{{asset('images/babyshop/images/right1.jpg')}}" alt="Side Promotion"
-                    class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+            <!-- RIGHT: Side Banner (Dynamic but Static Image) -->
+            <div
+                class="hidden lg:block lg:col-span-1 h-[450px] overflow-hidden shadow-lg border border-gray-100 rounded-2xl">
+                @php $sideBanner = $sidebarSliders->first(); @endphp
+                @if ($sideBanner)
+                    <a href="{{ $sideBanner->url ?? '#' }}">
+                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}"
+                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                    </a>
+                @else
+                    <img src="{{ asset('images/babyshop/images/right1.jpg') }}" class="w-full h-full object-cover" />
+                @endif
             </div>
         </div>
 
-        <div class="mt-8 mb-10 overflow-hidden bg-white py-4 relative">
+        <!-- TICKER: Announcement Bar -->
+        <div class="mt-8 mb-10 overflow-hidden bg-white py-4 relative border-y border-gray-50">
             <div class="flex items-center whitespace-nowrap animate-marquee-fast hover:[animation-play-state:paused]">
-                <!-- Ticker Content 1 -->
+                <!-- Ticker Content -->
                 <div
                     class="flex items-center gap-6 md:gap-10 px-4 text-sm md:text-base text-gray-800 tracking-tight font-medium">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-percent text-[#313bc9]"></i>
-                        <span>Use Code BABYOS</span>
+                        <span>Use Code {{ $setup->promo_code ?? 'BABYOS' }}</span>
                     </div>
-                    <!-- ডট এবং লেখার মাঝখানের গ্যাপ এখন কম দেখাবে -->
                     <span class="text-gray-900 font-black text-2xl">•</span>
-                    <div>Last Order Outside Dhaka : 18th May.</div>
+                    <div>Call to Order: {{ $setup->phone ?? '+880 00000000' }}</div>
 
                     <span class="text-gray-900 font-black text-2xl">•</span>
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-truck-fast text-[#66267b]"></i>
-                        <span>Free Delivery Over 2000+</span>
+                        <span>Inside Charge: {{ $setup->currency?? 'BDT' }}{{ $setup->inside_charge ?? '0' }} | Outside:
+                            {{ $setup->currency?? 'BDT' }}{{ $setup->outside_charge ?? '0' }}</span>
                     </div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
                 </div>
 
-                <!-- Repeat for loop (Seamless Loop এর জন্য) -->
+                <!-- Loop (রিপিট কন্টেন্ট) -->
                 <div class="flex items-center gap-6 md:gap-10 px-4 text-sm md:text-base text-gray-800 tracking-tight font-medium"
                     aria-hidden="true">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-percent text-[#313bc9]"></i>
-                        <span>Use Code BABYOS</span>
+                        <span>Use Code {{ $setup->promo_code ?? 'BABYOS' }}</span>
                     </div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
-                    <div>Last Order Outside Dhaka : 18th May.</div>
-
+                    <div>Call to Order: {{ $setup->phone ?? '' }}</div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-truck-fast text-[#66267b]"></i>
-                        <span>Free Delivery Over 2000+</span>
+                        <span>Delivery Charges Apply</span>
                     </div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
                 </div>
             </div>
         </div>
     </section>
-    <!-- PRODUCT CATEGORIES SECTION -->
-    <section class="w-full mx-auto bg-[#fcfcfc] px-4">
-        <div class="container mx-auto py-4 md:py-10">
-            <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
-                Product Categories
-            </h2>
+<!-- PRODUCT CATEGORIES SECTION -->
+<section class="w-full mx-auto bg-[#fcfcfc] px-4 font-manrope">
+    <div class="container mx-auto py-4 md:py-10">
+        <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
+            Product Categories
+        </h2>
 
-            <!-- Categories Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-6 gap-x-6">
-                <!--  Image Left, Notch Bottom-Right -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-bottom-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-right mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
+        <!-- Categories Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-8 gap-x-6">
+            @foreach($headerCategories as $category)
+                @php
+                    $index = $loop->index; // ০ থেকে শুরু
+
+                    // ১. ইমেজ কি ডানে হবে নাকি বামে? (জোড় সংখ্যায় বামে, বিজোড় সংখ্যায় ডানে)
+                    $isReverse = ($index % 2 != 0);
+
+                    // ২. নচ কি উপরে হবে নাকি নিচে? (প্রথম ৬টি নিচে, পরের গুলো উপরে)
+                    $isTopNotch = ($index >= 6);
+
+                    // ৩. সঠিক ক্লাস সিলেক্ট করা
+                    if (!$isTopNotch) {
+                        $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
+                    } else {
+                        $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
+                    }
+                @endphp
+
+                <!-- Dynamic Category Card -->
+                <a href="" class="notch-border hover:-translate-y-1 transition-transform block group">
+                    <div class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+
+                        {{-- ক্যাটাগরি ইমেজ --}}
+                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
+                            <img src="{{ $category->image_url ?? asset('images/babyshop/images/card.png') }}"
+                                 alt="{{ $category->name }}"
+                                 class="w-full h-full object-contain">
+                        </div>
+
+                        {{-- টেক্সট ডিটেইলস --}}
+                        <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
+                            <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
+                                {{ $category->name }}
                             </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
+                            <p class="text-[11px] text-gray-500 mt-1">
+                                {{-- যদি আপনার রিলেশন থাকে তবে আইটেম সংখ্যা দেখাবে --}}
+                                {{ $category->products_count ?? '12,203' }} Items
+                            </p>
                         </div>
                     </div>
-                </div>
-
-                <!--  Image Right, Notch Bottom-Left -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-bottom-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-left mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- (Repeat) -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-bottom-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-right mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!--  (Repeat) -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-bottom-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-left mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-bottom-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-right mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ৬. ২য় আইটেমের মতো -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-bottom-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mb-4" />
-                        <div class="text-left mb-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ৭. Image Left, Notch Top-Right -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-top-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-right mt-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ৮. Image Right, Notch Top-Left -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-top-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-left mt-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-base">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ৯. ৭ম আইটেমের মতো (Repeat) -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-top-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-right mt-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-lg">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ১০. ৮ম আইটেমের মতো (Repeat) -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-top-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-left mt-6">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-lg">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ১১. ৭ম আইটেমের মতো -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex items-center justify-between notch-top-right">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-right mt-6">
-                            <h3 class="font-semibold text-[#0f172a] text-sm md:text-lg">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ১২. ৮ম আইটেমের মতো -->
-                <div class="notch-border hover:-translate-y-1 transition-transform">
-                    <div class="bg-white p-4 h-28 flex flex-row-reverse items-center justify-between notch-top-left">
-                        <img src="{{ asset('images/babyshop/images/card.png') }}" class="w-18 h-18 object-contain mt-4" />
-                        <div class="text-left mt-6">
-                            <h3 class="font-semibold text-[#0f172a] text-sm md:text-lg">
-                                Baby Fashion
-                            </h3>
-                            <p class="text-sm text-gray-600">12,203 Items</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </a>
+            @endforeach
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- LATEST OFFERS SECTION -->
     <section class="container mx-auto py-4 md:py-10  px-4">
@@ -337,7 +234,8 @@
                 class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
                 <!-- Left Part: Image -->
                 <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image" class="max-h-full object-contain" />
+                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
+                        class="max-h-full object-contain" />
                 </div>
 
                 <!-- Right Part: Product Details -->
@@ -367,7 +265,8 @@
                 class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
                 <!-- Left Part: Image -->
                 <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image" class="max-h-full object-contain" />
+                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
+                        class="max-h-full object-contain" />
                 </div>
 
                 <!-- Right Part: Product Details -->
@@ -396,7 +295,8 @@
                 class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
                 <!-- Left Part: Image -->
                 <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image" class="max-h-full object-contain" />
+                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
+                        class="max-h-full object-contain" />
                 </div>
 
                 <!-- Right Part: Product Details -->
@@ -425,7 +325,8 @@
                 class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
                 <!-- Left Part: Image -->
                 <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image" class="max-h-full object-contain" />
+                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
+                        class="max-h-full object-contain" />
                 </div>
 
                 <!-- Right Part: Product Details -->
@@ -491,8 +392,8 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
+                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
+                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -537,8 +438,8 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
+                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
+                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -583,8 +484,8 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
+                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
+                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -629,8 +530,8 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
+                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
+                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 

@@ -15,16 +15,18 @@
                         No need to worry, we'll help you make sense of it all...
                     </p>
 
-                    <!-- Newsletter Box (Same as Image) -->
-                    <div class="relative max-w-[320px]">
-                        <input type="email" placeholder="Email Address" aria-label="Email address for newsletter"
-                            class="w-full bg-white text-gray-800 py-3 px-5 rounded-lg focus:outline-none placeholder:text-gray-400 font-medium" />
-                        <button type="submit"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-[#3b143c] hover:scale-110 transition-transform"
+                    <!-- Newsletter Form (Design Same, Logic Dynamic) -->
+                    <form id="newsletter-form" class="relative max-w-[320px]">
+                        @csrf
+                        <input type="email" name="email" id="subscriber-email" placeholder="Email Address"
+                            aria-label="Email address for newsletter" required
+                            class="w-full bg-white text-gray-800 py-3 px-5 rounded-lg focus:outline-none placeholder:text-gray-400 font-medium border border-transparent focus:border-purple-200 transition-all" />
+                        <button type="submit" id="subscribe-btn"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-[#3b143c] hover:scale-110 transition-transform cursor-pointer"
                             aria-label="Subscribe">
                             <i class="fa-solid fa-paper-plane text-xl"></i>
                         </button>
-                    </div>
+                    </form>
                 </div>
 
                 <!-- Column 2: SOLUTIONS -->
@@ -74,10 +76,15 @@
                         Social
                     </h3>
                     <ul class="space-y-4 text-white/90 text-base">
-                        <li><a href="#" class="hover:underline">Twitter</a></li>
-                        <li><a href="#" class="hover:underline">Facebook</a></li>
-                        <li><a href="#" class="hover:underline">Linkedin</a></li>
-                        <li><a href="#" class="hover:underline">Instagram</a></li>
+                        @foreach ($socialLinks as $social)
+                            <li>
+                                <a href="{{ $social->link }}" target="_blank" rel="noopener noreferrer"
+                                    class="flex items-center gap-3 hover:underline group transition-all"
+                                    aria-label="{{ $social->icon_name ?? 'Social Link' }}">
+                                    <span>{{ $social->icon_name }}</span>
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
             </div>
@@ -85,8 +92,49 @@
             <!-- Bottom Part: Divider & Copyright -->
             <div class="border-t border-white/40 pt-8 mt-10">
                 <p class="text-center text-white/90 text-base tracking-wide">
-                    @ 2025. All Rights Reserved
+                    @ {{ $setup->shop_name }} 2025. All Rights Reserved
                 </p>
             </div>
         </div>
     </footer>
+    <script>
+        document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('subscriber-email').value;
+            const btn = document.getElementById('subscribe-btn');
+            const originalText = btn.innerHTML;
+
+            // লোডিং স্টেট
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            fetch("{{ route('newsletter.subscribe') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                })
+                .then(async response => {
+                    const data = await response.json();
+                    if (response.ok) {
+                        toastr.success(data.message);
+                        document.getElementById('subscriber-email').value = ''; // ইনপুট ক্লিয়ার
+                    } else {
+                        toastr.error(data.message || 'Validation error');
+                    }
+                })
+                .catch(error => {
+                    toastr.error('Something went wrong. Please try again.');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+        });
+    </script>
