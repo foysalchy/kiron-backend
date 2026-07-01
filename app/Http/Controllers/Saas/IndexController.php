@@ -26,9 +26,17 @@ class IndexController extends Controller
             ->latest()
             ->get();
 
-        $features = MasterFeature::where('status', Status::Active->value)
-            ->orderBy('placement')
+        $topFeatures = MasterFeature::where('status', Status::Active->value)
+            ->where('placement', 1)
             ->latest()
+            ->take(6)
+            ->select('title', 'subtitle', 'icon','slug')
+            ->get();
+
+        $whyChooseUs = MasterFeature::where('status', Status::Active->value)
+            ->where('placement', 2)
+            ->latest()
+            ->select('title', 'description', 'image')
             ->get();
 
         $reviewsQuery = CustomerReview::where('status', Status::Active->value);
@@ -51,12 +59,36 @@ class IndexController extends Controller
         return view('saas.frontend.index', compact(
             'sliders',
             'brands',
-            'features',
+            'topFeatures',
+            'whyChooseUs',
             'avgRating',
             'totalReviews',
             'demos',
             'allReviews',
             'blogs'
         ));
+    }
+    public function features()
+    {
+        $allFeatures = MasterFeature::where('status', Status::Active->value)
+            ->where('placement', 1)
+            ->latest()
+            ->paginate(12);
+
+        return view('saas.frontend.featureList', compact('allFeatures'));
+    }
+    public function featureDetails($slug)
+    {
+        $feature = MasterFeature::where('slug', $slug)
+            ->where('status', Status::Active->value)
+            ->firstOrFail();
+
+        $otherFeatures = MasterFeature::where('status', Status::Active->value)
+            ->where('id', '!=', $feature->id)
+            ->where('placement', 1)
+            ->take(4)
+            ->get();
+
+        return view('saas.frontend.featureDetails', compact('feature', 'otherFeatures'));
     }
 }

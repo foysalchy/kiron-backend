@@ -95,3 +95,5 @@ use Illuminate\Support\Facades\Route;
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
 Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
+Route::get('/feature-list', [SaasIndexController::class, 'features'])->name('saas.feature.list');
+Route::get('/feature/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');

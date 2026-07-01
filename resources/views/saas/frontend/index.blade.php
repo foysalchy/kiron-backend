@@ -2,123 +2,122 @@
 
 @section('content')
 
-@php
-    $solutions = [
+    @php
+        $solutions = [
+            'ecommerce' => [
+                'title' => 'E-Commerce',
+                'desc' =>
+                    'Power your online store with automated order processing, inventory sync, and seamless customer experience.',
+                'mockup' => 'ecommerce_dashboard_preview',
+                'img' => 'https://via.placeholder.com/900x600?text=Ecommerce+Dashboard',
+                'features' => [
+                    ['icon' => 'fa-globe', 'text' => 'Website Integration'],
+                    ['icon' => 'fa-cart-shopping', 'text' => 'Order Management'],
+                    ['icon' => 'fa-box', 'text' => 'Product Catalog'],
+                    ['icon' => 'fa-truck', 'text' => 'Shipping Integration'],
+                    ['icon' => 'fa-credit-card', 'text' => 'Online Payments'],
+                ],
+            ],
 
-        'ecommerce' => [
-            'title' => 'E-Commerce',
-            'desc' => 'Power your online store with automated order processing, inventory sync, and seamless customer experience.',
-            'mockup' => 'ecommerce_dashboard_preview',
-            'img' => 'https://via.placeholder.com/900x600?text=Ecommerce+Dashboard',
-            'features' => [
-                ['icon' => 'fa-globe', 'text' => 'Website Integration'],
-                ['icon' => 'fa-cart-shopping', 'text' => 'Order Management'],
-                ['icon' => 'fa-box', 'text' => 'Product Catalog'],
-                ['icon' => 'fa-truck', 'text' => 'Shipping Integration'],
-                ['icon' => 'fa-credit-card', 'text' => 'Online Payments'],
-            ]
-        ],
+            'pos' => [
+                'title' => 'POS System',
+                'desc' => 'Fast and reliable POS system for retail and wholesale billing with barcode support.',
+                'mockup' => 'pos_system_preview',
+                'img' => 'https://via.placeholder.com/900x600?text=POS+System',
+                'features' => [
+                    ['icon' => 'fa-barcode', 'text' => 'Barcode Scanning'],
+                    ['icon' => 'fa-receipt', 'text' => 'Instant Invoice'],
+                    ['icon' => 'fa-cash-register', 'text' => 'Fast Billing'],
+                    ['icon' => 'fa-credit-card', 'text' => 'Multiple Payments'],
+                    ['icon' => 'fa-rotate-left', 'text' => 'Sales Return'],
+                ],
+            ],
 
-        'pos' => [
-            'title' => 'POS System',
-            'desc' => 'Fast and reliable POS system for retail and wholesale billing with barcode support.',
-            'mockup' => 'pos_system_preview',
-            'img' => 'https://via.placeholder.com/900x600?text=POS+System',
-            'features' => [
-                ['icon' => 'fa-barcode', 'text' => 'Barcode Scanning'],
-                ['icon' => 'fa-receipt', 'text' => 'Instant Invoice'],
-                ['icon' => 'fa-cash-register', 'text' => 'Fast Billing'],
-                ['icon' => 'fa-credit-card', 'text' => 'Multiple Payments'],
-                ['icon' => 'fa-rotate-left', 'text' => 'Sales Return'],
-            ]
-        ],
+            'erp' => [
+                'title' => 'ERP Core',
+                'desc' => 'Manage your entire business operations including sales, purchase, inventory and warehouse.',
+                'mockup' => 'erp_core_system',
+                'img' => 'https://via.placeholder.com/900x600?text=ERP+System',
+                'features' => [
+                    ['icon' => 'fa-layer-group', 'text' => 'Centralized System'],
+                    ['icon' => 'fa-sitemap', 'text' => 'Multi Module Control'],
+                    ['icon' => 'fa-boxes-stacked', 'text' => 'Inventory Management'],
+                    ['icon' => 'fa-cart-plus', 'text' => 'Sales & Purchase'],
+                    ['icon' => 'fa-warehouse', 'text' => 'Warehouse Control'],
+                ],
+            ],
 
-        'erp' => [
-            'title' => 'ERP Core',
-            'desc' => 'Manage your entire business operations including sales, purchase, inventory and warehouse.',
-            'mockup' => 'erp_core_system',
-            'img' => 'https://via.placeholder.com/900x600?text=ERP+System',
-            'features' => [
-                ['icon' => 'fa-layer-group', 'text' => 'Centralized System'],
-                ['icon' => 'fa-sitemap', 'text' => 'Multi Module Control'],
-                ['icon' => 'fa-boxes-stacked', 'text' => 'Inventory Management'],
-                ['icon' => 'fa-cart-plus', 'text' => 'Sales & Purchase'],
-                ['icon' => 'fa-warehouse', 'text' => 'Warehouse Control'],
-            ]
-        ],
+            'crm' => [
+                'title' => 'CRM',
+                'desc' => 'Manage leads, customers, and improve sales conversion with smart tracking.',
+                'mockup' => 'crm_dashboard',
+                'img' => 'https://via.placeholder.com/900x600?text=CRM+System',
+                'features' => [
+                    ['icon' => 'fa-user', 'text' => 'Lead Management'],
+                    ['icon' => 'fa-users', 'text' => 'Customer Profiles'],
+                    ['icon' => 'fa-bullseye', 'text' => 'Sales Tracking'],
+                    ['icon' => 'fa-bell', 'text' => 'Follow-up Reminders'],
+                    ['icon' => 'fa-chart-line', 'text' => 'Conversion Analytics'],
+                ],
+            ],
 
-        'crm' => [
-            'title' => 'CRM',
-            'desc' => 'Manage leads, customers, and improve sales conversion with smart tracking.',
-            'mockup' => 'crm_dashboard',
-            'img' => 'https://via.placeholder.com/900x600?text=CRM+System',
-            'features' => [
-                ['icon' => 'fa-user', 'text' => 'Lead Management'],
-                ['icon' => 'fa-users', 'text' => 'Customer Profiles'],
-                ['icon' => 'fa-bullseye', 'text' => 'Sales Tracking'],
-                ['icon' => 'fa-bell', 'text' => 'Follow-up Reminders'],
-                ['icon' => 'fa-chart-line', 'text' => 'Conversion Analytics'],
-            ]
-        ],
+            'accounting' => [
+                'title' => 'Accounting',
+                'desc' => 'Complete financial management with profit, loss, cash flow and reporting tools.',
+                'mockup' => 'accounting_system',
+                'img' => 'https://via.placeholder.com/900x600?text=Accounting',
+                'features' => [
+                    ['icon' => 'fa-coins', 'text' => 'Income Tracking'],
+                    ['icon' => 'fa-money-bill', 'text' => 'Expense Management'],
+                    ['icon' => 'fa-file-invoice', 'text' => 'Profit & Loss'],
+                    ['icon' => 'fa-wallet', 'text' => 'Cash Flow'],
+                    ['icon' => 'fa-chart-pie', 'text' => 'Financial Reports'],
+                ],
+            ],
 
-        'accounting' => [
-            'title' => 'Accounting',
-            'desc' => 'Complete financial management with profit, loss, cash flow and reporting tools.',
-            'mockup' => 'accounting_system',
-            'img' => 'https://via.placeholder.com/900x600?text=Accounting',
-            'features' => [
-                ['icon' => 'fa-coins', 'text' => 'Income Tracking'],
-                ['icon' => 'fa-money-bill', 'text' => 'Expense Management'],
-                ['icon' => 'fa-file-invoice', 'text' => 'Profit & Loss'],
-                ['icon' => 'fa-wallet', 'text' => 'Cash Flow'],
-                ['icon' => 'fa-chart-pie', 'text' => 'Financial Reports'],
-            ]
-        ],
+            'hrm' => [
+                'title' => 'HRM',
+                'desc' => 'Employee management, attendance, payroll and leave tracking system.',
+                'mockup' => 'hrm_system',
+                'img' => 'https://via.placeholder.com/900x600?text=HRM',
+                'features' => [
+                    ['icon' => 'fa-users', 'text' => 'Employee Records'],
+                    ['icon' => 'fa-clock', 'text' => 'Attendance System'],
+                    ['icon' => 'fa-calendar-check', 'text' => 'Leave Management'],
+                    ['icon' => 'fa-money-check', 'text' => 'Payroll System'],
+                    ['icon' => 'fa-id-card', 'text' => 'Staff Profiles'],
+                ],
+            ],
 
-        'hrm' => [
-            'title' => 'HRM',
-            'desc' => 'Employee management, attendance, payroll and leave tracking system.',
-            'mockup' => 'hrm_system',
-            'img' => 'https://via.placeholder.com/900x600?text=HRM',
-            'features' => [
-                ['icon' => 'fa-users', 'text' => 'Employee Records'],
-                ['icon' => 'fa-clock', 'text' => 'Attendance System'],
-                ['icon' => 'fa-calendar-check', 'text' => 'Leave Management'],
-                ['icon' => 'fa-money-check', 'text' => 'Payroll System'],
-                ['icon' => 'fa-id-card', 'text' => 'Staff Profiles'],
-            ]
-        ],
+            'inventory' => [
+                'title' => 'Inventory',
+                'desc' => 'Real-time stock management with warehouse control and alerts.',
+                'mockup' => 'inventory_system',
+                'img' => 'https://via.placeholder.com/900x600?text=Inventory',
+                'features' => [
+                    ['icon' => 'fa-boxes', 'text' => 'Stock Tracking'],
+                    ['icon' => 'fa-truck', 'text' => 'Warehouse Transfer'],
+                    ['icon' => 'fa-bell', 'text' => 'Low Stock Alerts'],
+                    ['icon' => 'fa-qrcode', 'text' => 'Barcode System'],
+                    ['icon' => 'fa-warehouse', 'text' => 'Multi Warehouse'],
+                ],
+            ],
 
-        'inventory' => [
-            'title' => 'Inventory',
-            'desc' => 'Real-time stock management with warehouse control and alerts.',
-            'mockup' => 'inventory_system',
-            'img' => 'https://via.placeholder.com/900x600?text=Inventory',
-            'features' => [
-                ['icon' => 'fa-boxes', 'text' => 'Stock Tracking'],
-                ['icon' => 'fa-truck', 'text' => 'Warehouse Transfer'],
-                ['icon' => 'fa-bell', 'text' => 'Low Stock Alerts'],
-                ['icon' => 'fa-qrcode', 'text' => 'Barcode System'],
-                ['icon' => 'fa-warehouse', 'text' => 'Multi Warehouse'],
-            ]
-        ],
-
-        'analytics' => [
-            'title' => 'Analytics',
-            'desc' => 'Get real-time business insights with charts, reports and performance tracking.',
-            'mockup' => 'analytics_dashboard',
-            'img' => 'https://via.placeholder.com/900x600?text=Analytics',
-            'features' => [
-                ['icon' => 'fa-chart-line', 'text' => 'Sales Analytics'],
-                ['icon' => 'fa-chart-pie', 'text' => 'Performance Reports'],
-                ['icon' => 'fa-bolt', 'text' => 'Real-time Data'],
-                ['icon' => 'fa-eye', 'text' => 'Product Insights'],
-                ['icon' => 'fa-bullseye', 'text' => 'Business KPIs'],
-            ]
-        ],
-
-    ];
-@endphp
+            'analytics' => [
+                'title' => 'Analytics',
+                'desc' => 'Get real-time business insights with charts, reports and performance tracking.',
+                'mockup' => 'analytics_dashboard',
+                'img' => 'https://via.placeholder.com/900x600?text=Analytics',
+                'features' => [
+                    ['icon' => 'fa-chart-line', 'text' => 'Sales Analytics'],
+                    ['icon' => 'fa-chart-pie', 'text' => 'Performance Reports'],
+                    ['icon' => 'fa-bolt', 'text' => 'Real-time Data'],
+                    ['icon' => 'fa-eye', 'text' => 'Product Insights'],
+                    ['icon' => 'fa-bullseye', 'text' => 'Business KPIs'],
+                ],
+            ],
+        ];
+    @endphp
     <style>
         .hero-bg {
             background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #0a061e 60%);
@@ -135,7 +134,6 @@
             pointer-events: none;
         }
 
-        /* --- ডট ডিজাইনের কাস্টম CSS --- */
         .hero-pagination .swiper-pagination-bullet {
             width: 10px;
             height: 10px;
@@ -144,18 +142,57 @@
             border-radius: 50%;
             transition: all 0.4s ease;
             cursor: pointer;
+            margin: 0 !important;
         }
 
-        /* একটিভ ডটটি বড় (লম্বা) হবে */
         .hero-pagination .swiper-pagination-bullet-active {
-            width: 40px !important;
+            width: 45px !important;
             background: #ffffff !important;
             border-radius: 20px;
         }
+
+        @media (max-width: 1023px) {
+            .hero-pagination {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .pt-\[380px\] {
+                pt-64;
+            }
+        }
     </style>
+    <style>
+    @keyframes marqueeLeft {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    @keyframes marqueeRight {
+        0% { transform: translateX(-50%); }
+        100% { transform: translateX(0); }
+    }
+
+    .animate-marquee-left {
+        display: flex;
+        width: max-content;
+        animation: marqueeLeft var(--duration, 30s) linear infinite;
+    }
+
+    .animate-marquee-right {
+        display: flex;
+        width: max-content;
+        animation: marqueeRight var(--duration, 30s) linear infinite;
+    }
+
+    .scroll-container:hover .animate-marquee-left,
+    .scroll-container:hover .animate-marquee-right {
+        animation-play-state: paused;
+    }
+</style>
     <!-- HERO SECTION -->
     @if ($sliders->isNotEmpty())
-        <section class="swiper heroSwiper relative overflow-hidden">
+        <section class="swiper heroSwiper relative overflow-hidden h-[90vh] min-h-[500px]">
             <div class="swiper-wrapper">
                 @foreach ($sliders as $slider)
                     <div
@@ -185,7 +222,6 @@
                                     </a>
                                 </div>
 
-                                <!-- এখান থেকে hero-pagination ডিভটি সরিয়ে নিচে নেওয়া হয়েছে -->
                             </div>
 
                             <!-- Right Side: Graphics -->
@@ -205,36 +241,19 @@
                                         class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
                                 </div>
 
-                                <!-- CUSTOMER REVIEW -->
-                                <div class="absolute -bottom-10 md:-bottom-10 flex flex-col items-center">
-                                    <svg class="w-12 h-16 md:w-16 md:h-24 text-white/40 mb-2" viewBox="0 0 50 100"
-                                        fill="none">
-                                        <path d="M10 5C25 35 35 65 30 90" stroke="currentColor" stroke-width="4.5"
-                                            stroke-linecap="round" />
-                                        <path d="M22 82L30 92L40 84" stroke="currentColor" stroke-width="3.5"
-                                            stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[#fde047] text-xl md:text-2xl">★</span>
-                                        <span
-                                            class="text-[#fde047] font-bold text-lg md:text-2xl">{{ number_format($avgRating, 1) }}</span>
-                                        <a href="#reviews-section"
-                                            class="text-gray-300 text-sm md:text-xl underline decoration-gray-500 underline-offset-8 hover:text-white transition font-medium">
-                                            {{ $totalReviews }}+ কাস্টমার রিভিউ
-                                        </a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
-            <div class="container mx-auto px-6 relative">
-                <div
-                    class="hero-pagination absolute bottom-12 md:bottom-20 left-6 flex items-center justify-center lg:justify-start gap-2 z-50">
+            <div class="absolute inset-0 pointer-events-none z-50">
+                <div class="container mx-auto px-6 h-full flex flex-col justify-center">
+                    {{-- এই pt-[450px] বা mt-[150px] দিয়ে আপনি ডটগুলোকে নিখুঁতভাবে বাটনের নিচে বসাতে পারবেন --}}
+                    <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[380px] md:pt-[320px]">
+                        <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
+                    </div>
                 </div>
             </div>
-
 
         </section>
     @endif
@@ -259,7 +278,7 @@
         </section>
     @endif
     <!-- FEATURES SECTION -->
-    @if ($features->where('placement', 1)->isNotEmpty())
+    @if ($topFeatures->isNotEmpty())
         <section class="bg-white py-20">
             <div class="container mx-auto px-6 md:px-10">
                 <!-- Section Header -->
@@ -276,7 +295,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
                     {{-- লজিক: যেখানে placement == 1 (Feature) --}}
-                    @foreach ($features->where('placement', 1) as $feature)
+                    @foreach ($topFeatures as $feature)
                         <div
                             class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
                             <!-- Icon Area -->
@@ -294,7 +313,7 @@
                             </p>
 
                             <!-- Link Area -->
-                            <a href="#"
+                            <a href="{{ route('saas.feature.details', $feature->slug) }}"
                                 class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
                                 বিস্তারিত জানুন
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
@@ -304,10 +323,10 @@
                 </div>
 
                 <div class="mt-16 text-center">
-                    <button
-                        class="bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                        ফ্রি ট্রায়াল শুরু করুন
-                    </button>
+                    <a href="{{ route('saas.feature.list') }}"
+                        class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        আরও ফিচার দেখুন
+                    </a>
                 </div>
             </div>
         </section>
@@ -490,40 +509,36 @@
             </div>
         </section>
     @endif
-    @php
-        $badges = [
-            'ফিটনেস',
-            'গিফট আইটেম',
-            'অর্গানিক ফুড',
-            'গ্যাজেট',
-            'ইলেক্ট্রনিক্স',
-            'প্রসাধনী',
-            'হোম ডেকোর',
-            'ইসলামিক',
-        ];
+   @php
+    $badges = [
+        'ফিটনেস', 'গিফট আইটেম', 'অর্গানিক ফুড', 'গ্যাজেট',
+        'ইলেক্ট্রনিক্স', 'প্রসাধনী', 'হোম ডেকোর', 'ইসলামিক',
+    ];
 
-        $rows = [
-            ['class' => 'animate-scroll-left', 'data' => $badges, 'style' => ''],
-            ['class' => 'animate-scroll-right', 'data' => collect($badges)->reverse()->all(), 'style' => ''],
-            [
-                'class' => 'animate-scroll-left',
-                'data' => collect($badges)->shuffle()->all(),
-                'style' => 'animation-duration: 35s',
-            ],
-        ];
-    @endphp
+    $rows = [
+        ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
 
-    <!-- INFINITY LOOP SECTION -->
-    <section class="bg-white py-10 overflow-hidden scroll-container">
-        <div class="space-y-6">
+        ['class' => 'animate-marquee-right', 'data' => collect($badges)->reverse()->all(), 'duration' => '35s'],
 
-            @foreach ($rows as $row)
-                <div class="{{ $row['class'] }} flex gap-4" style="{{ $row['style'] }}">
+        ['class' => 'animate-marquee-left', 'data' => collect($badges)->shuffle()->all(), 'duration' => '40s'],
+    ];
+@endphp
 
+
+<!-- INFINITY LOOP SECTION -->
+<section class="bg-white py-14 overflow-hidden scroll-container">
+    <div class="flex flex-col gap-8">
+
+        @foreach ($rows as $row)
+            <div class="relative flex overflow-hidden">
+                {{-- কন্টেইনার যেটির ওপর অ্যানিমেশন কাজ করবে --}}
+                <div class="{{ $row['class'] }}" style="--duration: {{ $row['duration'] }}">
+
+                    {{-- একই কন্টেন্ট দুইবার দেওয়া হয়েছে যাতে লুপটি নিরবচ্ছিন্ন হয় --}}
                     @foreach ([1, 2] as $repeat)
-                        <div class="flex gap-4">
+                        <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                             @foreach ($row['data'] as $item)
-                                <span class="bg-[#34a487] text-white px-8 py-3 rounded-2xl font-bold whitespace-nowrap">
+                                <span class="bg-[#34a487] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
                                     {{ $item }}
                                 </span>
                             @endforeach
@@ -531,20 +546,21 @@
                     @endforeach
 
                 </div>
-            @endforeach
+            </div>
+        @endforeach
 
-        </div>
-    </section>
+    </div>
+</section>
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
         <style>
             .hook-2::before {
-              content: "";
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+                background-size: 40px 40px;
+                pointer-events: none;
             }
         </style>
         <div
@@ -562,11 +578,12 @@
                     </span>
                     <!-- Heading -->
                     <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-6">
-                       The key driver of your online business success
+                        The key driver of your online business success
                     </h2>
                     <!-- Description -->
                     <p class="text-gray-300 text-lg leading-relaxed max-w-2xl">
-                     Our advanced integrations make your business operations easier, smarter, and significantly more powerful.
+                        Our advanced integrations make your business operations easier, smarter, and significantly more
+                        powerful.
                     </p>
                 </div>
 
@@ -574,7 +591,7 @@
                 <div class="flex-shrink-0">
                     <a href="https://app.dorja.io/register"
                         class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
-                       Start Free Trial
+                        Start Free Trial
                     </a>
                 </div>
             </div>
@@ -590,7 +607,8 @@
                         Affordable Pricing
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                     Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups to enterprises that grow with you.
+                        Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
+                        to enterprises that grow with you.
                     </p>
                     <a href="#"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
@@ -605,10 +623,11 @@
                         <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
                     </div>
                     <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
-                       Explore Features
+                        Explore Features
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                Discover a complete suite of business tools designed to automate operations, improve efficiency, and help you make faster data-driven decisions.
+                        Discover a complete suite of business tools designed to automate operations, improve efficiency, and
+                        help you make faster data-driven decisions.
                     </p>
                     <a href="#"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
@@ -623,10 +642,11 @@
                         <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
                     </div>
                     <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
-                       Start Your Journey Today
+                        Start Your Journey Today
                     </h3>
                     <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
-                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way you manage and grow your business.
+                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way
+                        you manage and grow your business.
                     </p>
                     <a href="https://app.dorja.io/register"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
@@ -638,79 +658,77 @@
         </div>
     </section>
     <!-- SOLUTION SECTION -->
-  <section class="bg-white py-20 px-4 md:px-10">
-    <div class="container mx-auto">
+    <section class="bg-white py-20 px-4 md:px-10">
+        <div class="container mx-auto">
 
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <span class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                All-in-One Solution
-            </span>
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <span
+                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                    All-in-One Solution
+                </span>
 
-            <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
-                From Operations to Growth — Everything in One System
-            </h2>
+                <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
+                    From Operations to Growth — Everything in One System
+                </h2>
 
-            <!-- Tabs -->
-            <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full "
-                id="solution-tabs">
+                <!-- Tabs -->
+                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full "
+                    id="solution-tabs">
 
-                @foreach($solutions as $key => $sol)
-                    <button
-                        onclick="switchSolution('{{ $key }}', this)"
-                        class="sol-tab-btn flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                    @foreach ($solutions as $key => $sol)
+                        <button onclick="switchSolution('{{ $key }}', this)"
+                            class="sol-tab-btn flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
                         {{ $loop->first ? 'bg-[#34a487] text-white' : 'bg-[#34a48730] text-gray-900 hover:bg-white' }}">
-                        {{ $sol['title'] }}
-                    </button>
-                @endforeach
+                            {{ $sol['title'] }}
+                        </button>
+                    @endforeach
 
-            </div>
-        </div>
-
-        <!-- Content Card -->
-        <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-
-                <!-- Left Content -->
-                <div>
-                    <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
-
-                    <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
-
-                    <!-- Features -->
-                    <div id="sol-features" class="space-y-5 mb-12"></div>
-
-                    <a href="#"
-                        class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
-                        Explore More
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
-                    </a>
                 </div>
+            </div>
 
-                <!-- Right Image -->
-                <div>
-                    <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                        <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-400 font-mono">
-                            <span id="sol-mockup"></span>
-                        </div>
+            <!-- Content Card -->
+            <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-                        <div class="aspect-video bg-gray-100">
-                            <img id="sol-img"
-                                src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
-                                class="w-full h-full object-cover object-top"
-                            />
+                    <!-- Left Content -->
+                    <div>
+                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
+
+                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
+
+                        <!-- Features -->
+                        <div id="sol-features" class="space-y-5 mb-12"></div>
+
+                        <a href="#"
+                            class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
+                            Explore More
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
+                    </div>
+
+                    <!-- Right Image -->
+                    <div>
+                        <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-400 font-mono">
+                                <span id="sol-mockup"></span>
+                            </div>
+
+                            <div class="aspect-video bg-gray-100">
+                                <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
+                                    class="w-full h-full object-cover object-top" />
+                            </div>
                         </div>
                     </div>
+
                 </div>
-
             </div>
-        </div>
 
-    </div>
-</section>
+        </div>
+    </section>
 
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
-    @if ($features->where('placement', 2)->isNotEmpty())
+    @if ($whyChooseUs->isNotEmpty())
         <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
             <div class="container mx-auto">
                 <div class="text-center mb-20">
@@ -720,7 +738,7 @@
                 </div>
 
                 <div class="flex flex-col gap-10">
-                    @foreach ($features->where('placement', 2) as $index => $benefit)
+                    @foreach ($whyChooseUs as $index => $benefit)
                         <div
                             class="bg-white rounded-2xl p-8 md:p-14 flex flex-col {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
@@ -862,95 +880,90 @@
         </section>
     @endif
     <section class="bg-white py-20 px-6 md:px-10" id="faq-section">
-    <div class="container mx-auto">
+        <div class="container mx-auto">
 
-        <!-- Header -->
-        <div class="text-center mb-10">
-            <span
-                class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-               Frequently Asked Questions
-            </span>
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <span
+                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                    Frequently Asked Questions
+                </span>
 
-            <h2 class="text-3xl md:text-5xl font-black text-gray-900">
-                dorja.io FAQ
-            </h2>
+                <h2 class="text-3xl md:text-5xl font-black text-gray-900">
+                    dorja.io FAQ
+                </h2>
 
-            <!-- Search Box -->
-            <div class="mt-8 max-w-xl mx-auto">
-                <input
-                    type="text"
-                    id="faqSearch"
-                    placeholder="Search FAQ..."
-                    class="w-full px-5 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                />
+                <!-- Search Box -->
+                <div class="mt-8 max-w-xl mx-auto">
+                    <input type="text" id="faqSearch" placeholder="Search FAQ..."
+                        class="w-full px-5 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+                </div>
+            </div>
+
+            @php
+                $faqs = App\Models\KnowledgeBase::where('status', 1)
+                    ->where('company_id', null)
+                    ->orderBy('id', 'asc')
+                    ->get();
+            @endphp
+
+            <!-- FAQ List -->
+            <div class=" space-y-4 h-[400px] overflow-y-auto" id="faq-container">
+
+                @foreach ($faqs as $faq)
+                    <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl ">
+
+                        <!-- Question -->
+                        <button
+                            class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                            <span class="faq-question">{{ $faq->title }}</span>
+
+                            <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                        </button>
+
+                        <!-- Answer -->
+                        <div class="px-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
+                            {!! $faq->content !!}
+                        </div>
+
+                    </div>
+                @endforeach
+
             </div>
         </div>
-
-        @php
-            $faqs = App\Models\KnowledgeBase::where('status', 1)
-                ->where('company_id', null)
-                ->orderBy('id', 'asc')
-                ->get();
-        @endphp
-
-        <!-- FAQ List -->
-        <div class=" space-y-4 h-[400px] overflow-y-auto" id="faq-container">
-
-            @foreach ($faqs as $faq)
-                <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl ">
-
-                    <!-- Question -->
-                    <button
-                        class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
-                        <span class="faq-question">{{ $faq->title }}</span>
-
-                        <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
-                    </button>
-
-                    <!-- Answer -->
-                    <div class="px-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
-                        {!! $faq->content !!}
-                    </div>
-
-                </div>
-            @endforeach
-
-        </div>
-    </div>
-</section>
+    </section>
 
 @endsection
 @push('scripts')
+    <!-- Accordion + Search Script -->
+    <script>
+        // Accordion
+        document.querySelectorAll('.faq-toggle').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const content = btn.nextElementSibling;
+                const icon = btn.querySelector('i');
 
-<!-- Accordion + Search Script -->
-<script>
-    // Accordion
-    document.querySelectorAll('.faq-toggle').forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const content = btn.nextElementSibling;
-            const icon = btn.querySelector('i');
-
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-180');
+                content.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            });
         });
-    });
 
-    // Search Filter
-    document.getElementById('faqSearch').addEventListener('input', function () {
-        let value = this.value.toLowerCase();
-        let items = document.querySelectorAll('.faq-item');
+        // Search Filter
+        document.getElementById('faqSearch').addEventListener('input', function() {
+            let value = this.value.toLowerCase();
+            let items = document.querySelectorAll('.faq-item');
 
-        items.forEach(item => {
-            let text = item.querySelector('.faq-question').innerText.toLowerCase();
+            items.forEach(item => {
+                let text = item.querySelector('.faq-question').innerText.toLowerCase();
 
-            if (text.includes(value)) {
-                item.style.display = 'block';
-            } else {
-                item.style.display = 'none';
-            }
+                if (text.includes(value)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         });
-    });
-</script>
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             if (document.querySelector('.heroSwiper')) {
@@ -969,19 +982,19 @@
             }
         });
 
-       const solutions = @json($solutions);
+        const solutions = @json($solutions);
 
-function switchSolution(key, btn) {
-    const data = solutions[key];
+        function switchSolution(key, btn) {
+            const data = solutions[key];
 
-    document.getElementById('sol-title').innerText = data.title;
-    document.getElementById('sol-desc').innerText = data.desc;
-    document.getElementById('sol-img').src = data.img;
-    document.getElementById('sol-mockup').innerText = data.mockup;
+            document.getElementById('sol-title').innerText = data.title;
+            document.getElementById('sol-desc').innerText = data.desc;
+            document.getElementById('sol-img').src = data.img;
+            document.getElementById('sol-mockup').innerText = data.mockup;
 
-    let featureHtml = '';
-    data.features.forEach(f => {
-        featureHtml += `
+            let featureHtml = '';
+            data.features.forEach(f => {
+                featureHtml += `
             <div class="flex items-center gap-4">
                 <div class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white">
                     <i class="fa-solid ${f.icon} text-sm"></i>
@@ -989,23 +1002,23 @@ function switchSolution(key, btn) {
                 <span class="font-bold text-gray-900 text-lg">${f.text}</span>
             </div>
         `;
-    });
+            });
 
-    document.getElementById('sol-features').innerHTML = featureHtml;
+            document.getElementById('sol-features').innerHTML = featureHtml;
 
-    document.querySelectorAll('.sol-tab-btn').forEach(b => {
-        b.classList.remove('bg-[#34a487]', 'text-white');
-        b.classList.add('bg-[#34a48730]', 'text-gray-900');
-    });
+            document.querySelectorAll('.sol-tab-btn').forEach(b => {
+                b.classList.remove('bg-[#34a487]', 'text-white');
+                b.classList.add('bg-[#34a48730]', 'text-gray-900');
+            });
 
-    btn.classList.add('bg-[#34a487]', 'text-white');
-    btn.classList.remove('bg-[#34a48730]', 'text-gray-900');
-}
+            btn.classList.add('bg-[#34a487]', 'text-white');
+            btn.classList.remove('bg-[#34a48730]', 'text-gray-900');
+        }
 
-// default load
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelector(".sol-tab-btn").click();
-});
+        // default load
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".sol-tab-btn").click();
+        });
     </script>
     <script>
         //review
