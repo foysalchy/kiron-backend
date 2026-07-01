@@ -746,7 +746,7 @@
                                     {{ $benefit->title }}
                                 </h3>
                                 <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
-                                    {{ $benefit->description }}
+                                    {!! $benefit->description !!}
                                 </p>
                             </div>
                             <div class="w-full lg:w-1/2">
