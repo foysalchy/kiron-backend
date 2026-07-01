@@ -16,9 +16,9 @@
 
                  <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-3">
                      <input type="email" placeholder="ই-মেইল"
-                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#5c46e5] transition text-lg" />
+                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#34a487] transition text-lg" />
                      <button
-                         class="w-full sm:w-auto bg-[#5c46e5] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
+                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
                          সাবস্ক্রাইব করুন
                      </button>
                  </div>
@@ -45,7 +45,7 @@
                  <div class="flex items-center gap-3">
                      @foreach ($socialLinks as $social)
                          <a href="{{ $social->link ?? '#' }}" target="_blank"
-                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#5c46e5] hover:border-[#5c46e5] transition group">
+                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#34a487] hover:border-[#34a487] transition group">
 
                              <i class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
                          </a>
@@ -57,7 +57,7 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      গুরুত্বপূর্ণ লিংক
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#5c46e5] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
                      @foreach ($footerPages as $page)
@@ -74,7 +74,7 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      কোম্পানি
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#5c46e5] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
                      <li>
@@ -96,15 +96,15 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      হেল্প & সাপোর্ট
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#5c46e5] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-5 text-gray-400 text-[15px]">
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-phone mt-1 text-[#5c46e5]"></i>
+                         <i class="fa-solid fa-phone mt-1 text-[#34a487]"></i>
                          <span>{{ $setup->phone ?? '0188-8888888' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-envelope mt-1 text-[#5c46e5]"></i>
+                         <i class="fa-solid fa-envelope mt-1 text-[#34a487]"></i>
                          <span>{{ $setup->email ?? 'hello@sopify.com' }}</span>
                      </li>
                      <li class="flex items-start gap-3">

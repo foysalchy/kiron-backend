@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="description" content="Explore our shop for the best products. Fast delivery and quality guaranteed.">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 
     <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
     <!-- Favicon -->

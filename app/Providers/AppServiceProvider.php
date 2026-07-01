@@ -231,12 +231,12 @@ class AppServiceProvider extends ServiceProvider
 
             $currentStore = getCurrentCompany();
 
-            $companyId = $isSaasRoute ? null : ($currentStore ? $currentStore->company_id : null);
+            $companyId = $isSaasRoute ? Null : ($currentStore ? $currentStore->company_id : Null);
 
             $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
 
             $data = cache()->remember($cacheKey, 600, function () use ($companyId) {
-
+ 
                 /**
                  * this function handle for all table
                  */

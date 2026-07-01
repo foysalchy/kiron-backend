@@ -6,12 +6,24 @@ use App\Enums\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class MasterDemo extends Model
 {
-     use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['title', 'image', 'link','type', 'status'];
+    protected $fillable = [
+        'title',
+        'image',
+        'link',
+           'slug',
+        'type',
+        'status',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'description',
+    ];
 
     protected $hidden = ['deleted_at'];
 
@@ -23,6 +35,8 @@ class MasterDemo extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
     }
 }

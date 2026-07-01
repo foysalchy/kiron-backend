@@ -55,6 +55,7 @@ class MasterDemoController extends Controller
      */
     public function update(UpdateMasterDemoRequest $request, int $id): JsonResponse
     {
+        \Log::info($request);
         $data = $this->demoService->updateDemo($id, $request->validated());
         return ResponseHelper::success($data, 'Master demo updated successfully');
     }

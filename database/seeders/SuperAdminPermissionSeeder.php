@@ -78,6 +78,9 @@ class SuperAdminPermissionSeeder extends Seeder
 
         // ── Pricing ────────────────────────────────────────
         $addCrud('pricing_packages',         'Pricing Packages');
+        $addCrud('master_brands',         'Master Brand');
+        $addCrud('master_demos',         'Master Demos');
+        $addCrud('master_features',         'Master Features');
 
         // ── Marketing ──────────────────────────────────────
         $addCrud('marketing_coupons',        'Marketing Coupons');
@@ -86,11 +89,10 @@ class SuperAdminPermissionSeeder extends Seeder
 
         // ── Settings (courier ❌ themes ❌ removed) ─────────
         $addCrud('site_settings',            'Site Settings');
+        $addCrud('settings_content',      'Content Settings');
         $addCrud('settings_payment',         'Payment Settings');
         $addCrud('settings_sms',             'SMS Settings');
-        $addCrud('settings_domain',          'Domain Settings');
         $addCrud('settings_ip',              'IP Restriction Settings');
-        $addCrud('woocommerce_integration',  'WooCommerce Integration');
 
         // ── Roles & Permissions ────────────────────────────
         $addCrud('settings_roles',           'Roles');

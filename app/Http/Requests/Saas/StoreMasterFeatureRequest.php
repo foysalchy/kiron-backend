@@ -27,13 +27,17 @@ class StoreMasterFeatureRequest extends FormRequest
             'title'       => 'required|string|max:255',
             'subtitle'    => 'nullable|string|max:255',
             'image'       => 'nullable|image|max:2048',
-            'icon'        => 'nullable|string|max:100',
-            'description' => 'nullable|string|max:1000',
+            'icon'        => 'nullable',
+            'slug' => 'required|string',
+            'description' => 'nullable|string',
+            'meta_title' => 'nullable| string',
+            'meta_description' => 'nullable|string',
+            'meta_keywords' => 'nullable',
             'placement'   => 'required|in:1,2', // 1=feature, 2=benefit
             'status'      => 'nullable|integer',
         ];
     }
-     /**
+    /**
      * Custom validation messages.
      */
     public function messages(): array

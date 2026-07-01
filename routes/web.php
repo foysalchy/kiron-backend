@@ -14,6 +14,7 @@ use App\Http\Controllers\Frontend\ProductController;
 use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
+use App\Http\Controllers\Frontend\SitemapController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Saas\IndexController as SaasIndexController;
 use App\Http\Controllers\Saas\MasterBrandController;
@@ -26,8 +27,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
-// Route::domain('{store}.managesuite.xyz')->middleware(SubdomainMiddleware::class)->group(function () {
-Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
+ Route::domain('{store}.dorja.io')->middleware(SubdomainMiddleware::class)->group(function () {
+// Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
     //landing page
@@ -91,6 +92,8 @@ Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::cla
     Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
     Route::get('/subcategory/{mega_slug}/{sub_slug}', [ProductController::class, 'subcategoryProducts'])->name('subcategory.products');
     Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductController::class, 'minicategoryProducts'])->name('minicategory.products');
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
