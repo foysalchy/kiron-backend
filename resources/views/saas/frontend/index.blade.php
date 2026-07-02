@@ -346,71 +346,171 @@
     @endphp
 
     <!-- HERO SECTION -->
-    @if ($sliders->isNotEmpty())
-        <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
-            <div class="swiper-wrapper">
-                @foreach ($sliders as $slider)
-                    <div class="swiper-slide min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
-                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+ @if ($sliders->isNotEmpty())
+    <!-- প্রধান সেকশন (bg-black এবং relative নিশ্চিত করা হয়েছে) -->
+    <section class="swiper heroSwiper bg-black relative overflow-hidden h-[90vh] min-h-[500px]">
+        
+        <!-- অ্যানিমেটেড মরফিং ব্যাকগ্রাউন্ড লেয়ার -->
+        <div class="hero-morph-bg absolute inset-0 overflow-hidden pointer-events-none z-0">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+            <div class="blob blob-4"></div>
+        </div>
 
-                            <div class="text-center lg:text-left order-2 lg:order-1 pt-14 md:pt-0">
+        <!-- কন্টেন্ট লেয়ার (z-10 দিয়ে উপরে রাখা হয়েছে) -->
+        <div class="swiper-wrapper relative z-10">
+            @foreach ($sliders as $slider)
+                <div class="swiper-slide min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
+                    <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-                                <h1
-                                    class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
-                                    {{ $slider->title }}
-                                </h1>
+                        <div class="text-center lg:text-left order-2 lg:order-1 pt-14 md:pt-0">
+                            <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                {{ $slider->title }}
+                            </h1>
 
-                                <p
-                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
-                                    {{ $slider->description }}
-                                </p>
+                            <p class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
+                                {{ $slider->description }}
+                            </p>
 
-                                <!-- Action Buttons -->
-                                <div
-                                    class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
-                                    <a href="#"
-                                        class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                                        ফ্রি ট্রায়াল শুরু করুন
-                                    </a>
-                                    <a href="#"
-                                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
-                                        ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Right Side: Graphics -->
-                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-10">
-                                <div
-                                    class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
-                                </div>
-                                <div
-                                    class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
-                                </div>
-                                <div
-                                    class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
-                                </div>
-
-                                <div class="relative z-10 p-6 md:p-10   float-anim">
-                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class=" w-[90%] max-w-[90%]" alt="Core Platform" />
-                                </div>
-
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
+                                <a href="#" class="w-full sm:w-auto bg-[#34a487] hover:bg-[#28836b] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-[#34a487]/20 text-center">
+                                    ফ্রি ট্রায়াল শুরু করুন
+                                </a>
+                                <a href="#" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
+                                    ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
+                                </a>
                             </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-            <div class="absolute inset-0 pointer-events-none z-50">
-                <div class="container mx-auto px-6 h-full flex flex-col justify-center">
-                    <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[580px] md:pt-[420px]">
-                        <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
+
+                        <!-- Right Side: Graphics -->
+                        <div class="relative flex justify-center items-center order-1 lg:order-2 py-10">
+                            <div class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full"></div>
+                            <div class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full"></div>
+                            <div class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full"></div>
+
+                            <div class="relative z-10 p-6 md:p-10 float-anim">
+                                <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" class="w-[90%] max-w-[90%]" alt="Core Platform" />
+                            </div>
+                        </div>
+
                     </div>
                 </div>
-            </div>
+            @endforeach
+        </div>
 
-        </section>
-    @endif
+        <!-- Pagination -->
+        <div class="absolute inset-0 pointer-events-none z-50">
+            <div class="container mx-auto px-6 h-full flex flex-col justify-center">
+                <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[580px] md:pt-[420px]">
+                    <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endif
+
+
+<!-- ২. CSS স্টাইল (থিম ম্যাচিং ৪টি শেড সহ) -->
+<style>
+    /* মেইন ব্যাকগ্রাউন্ড কন্টেইনার */
+    .hero-morph-bg {
+        background: radial-gradient(circle at 50% 50%, #0a0f12, #000000);
+    }
+
+    /* ব্লব বা কালার শেডগুলোর কমন কনফিগারেশন */
+    .blob {
+        position: absolute;
+        filter: blur(80px);
+        opacity: 0.35;
+        mix-blend-mode: plus-lighter;
+        will-change: transform, border-radius;
+        animation: morphing 15s ease-in-out infinite alternate;
+    }
+
+    /* শেড ১: আপনার মেইন থিম কালার (#34a487) */
+    .blob-1 {
+        top: -10%;
+        left: -5%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, #34a487 0%, rgba(52, 164, 135, 0) 70%);
+        animation-duration: 18s;
+    }
+
+    /* শেড ২: ডার্ক ইনডিগো/ডার্ক ব্লু (ব্ল্যাকের সাথে লাক্সারি লুক দেয়) */
+    .blob-2 {
+        bottom: -15%;
+        right: -5%;
+        width: 650px;
+        height: 650px;
+        background: radial-gradient(circle, #1e1b4b 0%, rgba(30, 27, 75, 0) 70%);
+        animation-duration: 22s;
+        animation-delay: -4s;
+    }
+
+    /* শেড ৩: লাইট মিন্ট/এমারেল্ড গ্রিন (থিম কালারকে গ্লো করানোর জন্য) */
+    .blob-3 {
+        top: 20%;
+        right: 25%;
+        width: 450px;
+        height: 450px;
+        background: radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%);
+        animation-duration: 14s;
+        animation-delay: -2s;
+    }
+
+    /* শেড ৪: ডিপ গ্রে/ডার্ক স্লেট (স্মুথ ট্রানজিশনের জন্য) */
+    .blob-4 {
+        bottom: 10%;
+        left: 20%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, #0f172a 0%, rgba(15, 23, 42, 0) 70%);
+        animation-duration: 25s;
+        animation-delay: -6s;
+    }
+
+    /* লিকুইড বা মরফিং অ্যানিমেশন ইফেক্ট */
+    @keyframes morphing {
+        0% {
+            border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+            transform: translate(0px, 0px) rotate(0deg) scale(1);
+        }
+        33% {
+            border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+            transform: translate(30px, -40px) rotate(45deg) scale(1.05);
+        }
+        66% {
+            border-radius: 28% 72% 37% 63% / 52% 43% 57% 48%;
+            transform: translate(-20px, 30px) rotate(90deg) scale(0.95);
+        }
+        100% {
+            border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+            transform: translate(0px, 0px) rotate(135deg) scale(1);
+        }
+    }
+</style>
+
+
+<!-- ৩. JavaScript কোড (স্মুথ মাউস প্যারালাক্স মুভমেন্ট) -->
+<script>
+    document.addEventListener('mousemove', (e) => {
+        const blobs = document.querySelectorAll('.blob');
+        // মাউস পজিশন অনুযায়ী কতটুকু সরবে (বেশি বড় সংখ্যা দিলে বেশি নড়বে)
+        const moveFactor = 35; 
+        
+        const x = (window.innerWidth / 2 - e.clientX) / moveFactor;
+        const y = (window.innerHeight / 2 - e.clientY) / moveFactor;
+
+        blobs.forEach((blob, index) => {
+            // একেকটি ব্লব একেক স্পিডে নড়বে যাতে রিয়েলস্টিক থ্রিডি ইফেক্ট আসে
+            const speed = (index + 1) * 0.3; 
+            blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+        });
+    });
+</script>
     <!-- LOGO SHOWCASE SECTION -->
     @if ($brands->isNotEmpty())
         <section class="bg-black py-16 border-t border-white/5">
