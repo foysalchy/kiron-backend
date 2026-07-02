@@ -188,9 +188,9 @@
             left: 48.9%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 95px;
-            height: 95px;
-            border-radius: 9999px;
+            width: 120px;
+            height: 60px;
+            border-radius: 5px;
             background: linear-gradient(145deg, #34a487, #2c8a71);
             border: 2px solid #ffffff;
             box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
