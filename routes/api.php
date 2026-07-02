@@ -270,7 +270,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/products', [SelectOptionController::class, 'productOptions']);
                 Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
                 Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
-                Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
+                Route::get('/v1/options/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
                 Route::get('/nested-categories', [SelectOptionController::class, 'nestedCategoryOptions']);
                 Route::get('/users', [SelectOptionController::class, 'userOptions']);
                 Route::get('/super-admin-users', [SelectOptionController::class, 'superAdminUserOptions']);
