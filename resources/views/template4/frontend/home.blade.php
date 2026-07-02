@@ -140,8 +140,8 @@
                     <span class="text-gray-900 font-black text-2xl">•</span>
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-truck-fast text-[#66267b]"></i>
-                        <span>Inside Charge: {{ $setup->currency?? 'BDT' }}{{ $setup->inside_charge ?? '0' }} | Outside:
-                            {{ $setup->currency?? 'BDT' }}{{ $setup->outside_charge ?? '0' }}</span>
+                        <span>Inside Charge: {{ $setup->currency ?? 'BDT' }}{{ $setup->inside_charge ?? '0' }} | Outside:
+                            {{ $setup->currency ?? 'BDT' }}{{ $setup->outside_charge ?? '0' }}</span>
                     </div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
                 </div>
@@ -165,60 +165,57 @@
             </div>
         </div>
     </section>
-<!-- PRODUCT CATEGORIES SECTION -->
-<section class="w-full mx-auto bg-[#fcfcfc] px-4 font-manrope">
-    <div class="container mx-auto py-4 md:py-10">
-        <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
-            Product Categories
-        </h2>
+    <!-- PRODUCT CATEGORIES SECTION -->
+    <section class="w-full mx-auto bg-[#fcfcfc] px-4 font-manrope">
+        <div class="container mx-auto py-4 md:py-10">
+            <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
+                Product Categories
+            </h2>
 
-        <!-- Categories Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-8 gap-x-6">
-            @foreach($headerCategories as $category)
-                @php
-                    $index = $loop->index; // ০ থেকে শুরু
+            <!-- Categories Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-8 gap-x-6">
+                @foreach ($headerCategories as $category)
+                    @php
+                        $index = $loop->index;
 
-                    // ১. ইমেজ কি ডানে হবে নাকি বামে? (জোড় সংখ্যায় বামে, বিজোড় সংখ্যায় ডানে)
-                    $isReverse = ($index % 2 != 0);
+                        $isReverse = $index % 2 != 0;
 
-                    // ২. নচ কি উপরে হবে নাকি নিচে? (প্রথম ৬টি নিচে, পরের গুলো উপরে)
-                    $isTopNotch = ($index >= 6);
+                        $isTopNotch = $index >= 6;
 
-                    // ৩. সঠিক ক্লাস সিলেক্ট করা
-                    if (!$isTopNotch) {
-                        $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
-                    } else {
-                        $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
-                    }
-                @endphp
+                        if (!$isTopNotch) {
+                            $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
+                        } else {
+                            $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
+                        }
+                    @endphp
 
-                <!-- Dynamic Category Card -->
-                <a href="" class="notch-border hover:-translate-y-1 transition-transform block group">
-                    <div class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+                    <!-- Dynamic Category Card -->
+                    <a href="" class="notch-border hover:-translate-y-1 transition-transform block group">
+                        <div
+                            class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
 
-                        {{-- ক্যাটাগরি ইমেজ --}}
-                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
-                            <img src="{{ $category->image_url ?? asset('images/babyshop/images/card.png') }}"
-                                 alt="{{ $category->name }}"
-                                 class="w-full h-full object-contain">
+                            {{-- ক্যাটাগরি ইমেজ --}}
+                            <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
+                                <img src="{{ $category->image_url ?? asset('images/babyshop/images/card.png') }}"
+                                    alt="{{ $category->name }}" class="w-full h-full object-contain">
+                            </div>
+
+                            {{-- টেক্সট ডিটেইলস --}}
+                            <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
+                                <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
+                                    {{ $category->name }}
+                                </h3>
+                                <p class="text-[11px] text-gray-500 mt-1">
+                                    {{-- যদি আপনার রিলেশন থাকে তবে আইটেম সংখ্যা দেখাবে --}}
+                                    {{ $category->products_count ?? '12,203' }} Items
+                                </p>
+                            </div>
                         </div>
-
-                        {{-- টেক্সট ডিটেইলস --}}
-                        <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
-                                {{ $category->name }}
-                            </h3>
-                            <p class="text-[11px] text-gray-500 mt-1">
-                                {{-- যদি আপনার রিলেশন থাকে তবে আইটেম সংখ্যা দেখাবে --}}
-                                {{ $category->products_count ?? '12,203' }} Items
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            @endforeach
+                    </a>
+                @endforeach
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- LATEST OFFERS SECTION -->
     <section class="container mx-auto py-4 md:py-10  px-4">
@@ -392,8 +389,10 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
+                            <span
+                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
+                            <span
+                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -438,8 +437,10 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
+                            <span
+                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
+                            <span
+                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -484,8 +485,10 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
+                            <span
+                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
+                            <span
+                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
@@ -530,8 +533,10 @@
                         <!-- Price Section inspired by the image -->
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
                             <!-- Prices -->
-                            <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency?? 'BDT' }}1,040</span>
-                            <span class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency?? 'BDT' }}1,340</span>
+                            <span
+                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
+                            <span
+                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
 
                             <div class="basis-full h-0 sm:hidden"></div>
 
