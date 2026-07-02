@@ -995,22 +995,80 @@
     @endif
     @php
         $badges = [
-            'ফিটনেস',
-            'গিফট আইটেম',
-            'অর্গানিক ফুড',
-            'গ্যাজেট',
-            'ইলেক্ট্রনিক্স',
-            'প্রসাধনী',
-            'হোম ডেকোর',
-            'ইসলামিক',
+              'ERP',
+                'Business Management',
+                'Cloud ERP',
+                'Business Software',
+                'SaaS',
+                'Business Automation',
+                'Enterprise Software',
+                'Digital Business',
+                'Business Solution',
+                'Workflow Automation',
+                'Business Dashboard',
+                'Business Analytics',
+                'Reports',
+                'Financial Management',
+                'Business Intelligence',
+                'Organization Management',
+                'Operations Management',
+                'Productivity',
+                'SME Software',
+                'Enterprise Resource Planning',
+        ];
+                $badges2 = [
+               
+                'POS System',
+        'Point of Sale',
+        'Sales Management',
+        'Order Management',
+        'Inventory Management',
+        'Stock Management',
+        'Warehouse Management',
+        'Product Management',
+        'SKU Management',
+        'Barcode Management',
+        'Purchase Management',
+        'Supplier Management',
+        'Invoice Management',
+        'Quotation',
+        'Billing Software',
+        'eCommerce',
+        'WooCommerce',
+        'Courier Integration',
+        'Payment Gateway',
+        'Multi Warehouse',
+        ];
+         $badges3 = [
+               
+            'CRM',
+        'Customer Management',
+        'Customer Analytics',
+        'Lead Management',
+        'HRM',
+        'Payroll',
+        'Employee Management',
+        'Attendance Management',
+        'Marketing Automation',
+        'Email Marketing',
+        'SMS Marketing',
+        'Landing Page Builder',
+        'CMS',
+        'Website Management',
+        'Multi Branch',
+        'Profit & Loss',
+        'Accounting',
+        'Expense Management',
+        'Income Management',
+        'Cloud Software',
         ];
 
         $rows = [
             ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
 
-            ['class' => 'animate-marquee-right', 'data' => collect($badges)->reverse()->all(), 'duration' => '35s'],
+            ['class' => 'animate-marquee-right', 'data' => collect($badges2)->reverse()->all(), 'duration' => '35s'],
 
-            ['class' => 'animate-marquee-left', 'data' => collect($badges)->shuffle()->all(), 'duration' => '40s'],
+            ['class' => 'animate-marquee-left', 'data' => collect($badges3)->shuffle()->all(), 'duration' => '40s'],
         ];
     @endphp
 
