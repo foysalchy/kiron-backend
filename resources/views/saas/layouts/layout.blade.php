@@ -25,6 +25,19 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
+    <style>
+    /* এটি আপনার পুরো সাইটের যেকোনো সাইড স্ক্রল চিরতরে বন্ধ করে দিবে */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* মারকিউ কন্টেইনারকে ফিক্স করার জন্য */
+    .scroll-container {
+        width: 100%;
+        overflow-x: hidden;
+    }
+</style>
 </head>
 
 <body>
@@ -55,6 +68,7 @@
         menuToggle.addEventListener("click", toggleMenu);
         menuClose.addEventListener("click", toggleMenu);
         menuOverlay.addEventListener("click", toggleMenu);
+
     </script>
 
 </body>

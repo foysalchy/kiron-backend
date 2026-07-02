@@ -22,7 +22,7 @@
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
             <a href="{{ route('saas.index') }}" class="text-[#34a487] font-semibold text-lg">হোম</a>
-            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ফিচারসমূহ</a>
+            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ফিচারসমূহ</a>
             <a href="#"
                 class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ইন্টিগ্রেশন</a>
             <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">প্রাইসিং</a>
@@ -62,8 +62,8 @@
             </div>
 
             <nav class="flex flex-col space-y-5">
-                <a href="#" class="text-[#34a487] font-bold text-lg">হোম</a>
-                <a href="#" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ফিচারসমূহ</a>
+                <a href="{{ route('saas.index') }}" class="text-[#34a487] font-bold text-lg">হোম</a>
+                <a href="{{ route('saas.feature.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ফিচারসমূহ</a>
                 <a href="#"
                     class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ইন্টিগ্রেশন</a>
                 <a href="#" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">প্রাইসিং</a>

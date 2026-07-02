@@ -100,3 +100,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
 Route::get('/feature-list', [SaasIndexController::class, 'features'])->name('saas.feature.list');
 Route::get('/feature/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');
+Route::get('/blog-list', [SaasIndexController::class, 'blogPosts'])->name('saas.blog.list');
+Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');

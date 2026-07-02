@@ -139,3 +139,33 @@
          </div>
      </div>
  </footer>
+<!-- Scroll to Top Button -->
+<button
+    id="backToTop"
+    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#34a487] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-black hover:-translate-y-1 focus:outline-none"
+    aria-label="Scroll to Top"
+>
+    <i class="fa-solid fa-chevron-up text-xl"></i>
+</button>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.add('opacity-0', 'invisible');
+                backToTop.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>

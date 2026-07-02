@@ -2,6 +2,7 @@
 
 @push('styles')
     <style>
+        /* আপনার দেওয়া ব্লগ ডিজাইনের হুবহু সিএসএস */
         table {
             width: 100%;
         }
@@ -80,7 +81,7 @@
                 <span class="text-gray-300">›</span>
                 <a href="{{ route('saas.feature.list') }}" class="text-gray-600 hover:text-black transition">Features</a>
                 <span class="text-gray-300">›</span>
-                <span class="text-black font-semibold">{{ $feature->title }}</span>
+                <span class="text-black font-semibold">{{ $blogPost->title }}</span>
             </div>
         </div>
     </section>
@@ -95,7 +96,6 @@
                 <div class="hidden lg:flex lg:col-span-1 justify-center">
                     <div class="sticky top-52 flex flex-col gap-6 h-fit pt-2">
                         @if (isset($socialLinks))
-                            {{-- সেফটি চেক --}}
                             @foreach ($socialLinks as $social)
                                 <a href="{{ $social->link ?? $social->url }}" target="_blank"
                                     class="w-10 h-10 rounded-full bg-[#34a487] flex items-center justify-center hover:bg-black hover:text-[#34a487] transition-all shadow-sm text-white">
@@ -117,32 +117,32 @@
                     <div class="flex flex-wrap justify-between items-center pb-6 gap-4">
                         <span
                             class="bg-[#1A1A1A] text-white px-5 py-1.5 text-xs font-bold uppercase tracking-[0.2em] rounded-sm">
-                            FEATURE
+                            {{ $blogPost->company->shop_name ?? 'Admin' }}
                         </span>
                         <div class="text-gray-500 text-xs font-bold uppercase tracking-widest flex items-center">
-                            Last Updated: {{ $feature->updated_at->format('F d, Y') }}
+                            Last Updated: {{ $blogPost->updated_at->format('F d, Y') }}
                         </div>
                     </div>
 
-                    @if ($feature->image)
-                        <img src="{{ $feature->image_url }}" class="w-full rounded-xl shadow-lg mb-8"
-                            alt="{{ $feature->title }}" />
+                    @if ($blogPost->image)
+                        <img src="{{ $blogPost->image_url }}" class="w-full rounded-xl shadow-lg mb-8"
+                            alt="{{ $blogPost->title }}" />
                     @endif
 
                     <h1 class="text-3xl md:text-[36px] font-black text-gray-900 leading-[1.1] mb-6">
-                        {{ $feature->title }}
+                        {{ $blogPost->title }}
                     </h1>
 
                     <div class="feature-content">
                         {{-- Subtitle / Short Description --}}
                         <div
                             class="text-lg text-gray-600 font-medium mb-8 leading-relaxed italic border-l-4 border-gray-200 pl-5">
-                            {{ $feature->subtitle }}
+                            {{ $blogPost->subtitle }}
                         </div>
 
                         {{-- Main Description (Rich Text) --}}
                         <div class="prose prose-slate max-w-none">
-                            {!! $feature->description !!}
+                            {!! $blogPost->description !!}
                         </div>
                     </div>
 
@@ -154,11 +154,11 @@
                     <div class="sticky top-52 lg:pl-4 h-fit">
                         <h3
                             class="text-sm font-bold text-gray-900 mb-8 uppercase tracking-[0.2em] border-l-4 border-[#34a487] pl-4">
-                            More Features
+                            More Blog Posts
                         </h3>
                         <div class="flex flex-col gap-10">
-                            @foreach ($otherFeatures as $other)
-                                <a href="{{ route('saas.feature.details', $other->slug ?? $other->id) }}"
+                            @foreach ($otherBlogPosts as $other)
+                                <a href="{{ route('saas.blog.details', $other->slug ?? $other->id) }}"
                                     class="flex items-start gap-4 group" style="text-decoration: none;">
                                     <div
                                         class="w-24 h-24 flex-shrink-0 overflow-hidden bg-gray-100 rounded-lg shadow-sm border border-gray-50">

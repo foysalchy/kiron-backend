@@ -163,33 +163,43 @@
         }
     </style>
     <style>
-    @keyframes marqueeLeft {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-50%); }
-    }
+        @keyframes marqueeLeft {
+            0% {
+                transform: translateX(0);
+            }
 
-    @keyframes marqueeRight {
-        0% { transform: translateX(-50%); }
-        100% { transform: translateX(0); }
-    }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
 
-    .animate-marquee-left {
-        display: flex;
-        width: max-content;
-        animation: marqueeLeft var(--duration, 30s) linear infinite;
-    }
+        @keyframes marqueeRight {
+            0% {
+                transform: translateX(-50%);
+            }
 
-    .animate-marquee-right {
-        display: flex;
-        width: max-content;
-        animation: marqueeRight var(--duration, 30s) linear infinite;
-    }
+            100% {
+                transform: translateX(0);
+            }
+        }
 
-    .scroll-container:hover .animate-marquee-left,
-    .scroll-container:hover .animate-marquee-right {
-        animation-play-state: paused;
-    }
-</style>
+        .animate-marquee-left {
+            display: flex;
+            width: max-content;
+            animation: marqueeLeft var(--duration, 30s) linear infinite;
+        }
+
+        .animate-marquee-right {
+            display: flex;
+            width: max-content;
+            animation: marqueeRight var(--duration, 30s) linear infinite;
+        }
+
+        .scroll-container:hover .animate-marquee-left,
+        .scroll-container:hover .animate-marquee-right {
+            animation-play-state: paused;
+        }
+    </style>
     <!-- HERO SECTION -->
     @if ($sliders->isNotEmpty())
         <section class="swiper heroSwiper relative overflow-hidden h-[90vh] min-h-[500px]">
@@ -225,7 +235,7 @@
                             </div>
 
                             <!-- Right Side: Graphics -->
-                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-20">
+                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-10">
                                 <div
                                     class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
                                 </div>
@@ -248,8 +258,7 @@
             </div>
             <div class="absolute inset-0 pointer-events-none z-50">
                 <div class="container mx-auto px-6 h-full flex flex-col justify-center">
-                    {{-- এই pt-[450px] বা mt-[150px] দিয়ে আপনি ডটগুলোকে নিখুঁতভাবে বাটনের নিচে বসাতে পারবেন --}}
-                    <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[380px] md:pt-[320px]">
+                    <div class="lg:w-1/2 hidden lg:flex justify-center lg:justify-start md:pt-[320px]">
                         <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
                     </div>
                 </div>
@@ -279,7 +288,7 @@
     @endif
     <!-- FEATURES SECTION -->
     @if ($topFeatures->isNotEmpty())
-        <section class="bg-white py-20">
+        <section class="bg-white py-10">
             <div class="container mx-auto px-6 md:px-10">
                 <!-- Section Header -->
                 <div class="text-center mb-16">
@@ -332,7 +341,7 @@
         </section>
     @endif
     <!-- INTEGRATION SECTION -->
-    <section class="bg-[#f9faff] py-20 px-4 md:px-10 overflow-hidden">
+    <section class="bg-[#f9faff] py-10 px-4 md:px-10 overflow-hidden">
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
                 <span
@@ -458,7 +467,7 @@
     </section>
     <!-- DEMO & TEMPLATE SECTION -->
     @if ($demos->isNotEmpty())
-        <section class="bg-white py-20 px-4 md:px-10" id="demo-section">
+        <section class="bg-white py-10 px-4 md:px-10" id="demo-section">
             <div class="max-w-[1400px] mx-auto">
                 <!-- Section Header -->
                 <div class="text-center mb-12">
@@ -509,48 +518,55 @@
             </div>
         </section>
     @endif
-   @php
-    $badges = [
-        'ফিটনেস', 'গিফট আইটেম', 'অর্গানিক ফুড', 'গ্যাজেট',
-        'ইলেক্ট্রনিক্স', 'প্রসাধনী', 'হোম ডেকোর', 'ইসলামিক',
-    ];
+    @php
+        $badges = [
+            'ফিটনেস',
+            'গিফট আইটেম',
+            'অর্গানিক ফুড',
+            'গ্যাজেট',
+            'ইলেক্ট্রনিক্স',
+            'প্রসাধনী',
+            'হোম ডেকোর',
+            'ইসলামিক',
+        ];
 
-    $rows = [
-        ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
+        $rows = [
+            ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
 
-        ['class' => 'animate-marquee-right', 'data' => collect($badges)->reverse()->all(), 'duration' => '35s'],
+            ['class' => 'animate-marquee-right', 'data' => collect($badges)->reverse()->all(), 'duration' => '35s'],
 
-        ['class' => 'animate-marquee-left', 'data' => collect($badges)->shuffle()->all(), 'duration' => '40s'],
-    ];
-@endphp
+            ['class' => 'animate-marquee-left', 'data' => collect($badges)->shuffle()->all(), 'duration' => '40s'],
+        ];
+    @endphp
 
 
-<!-- INFINITY LOOP SECTION -->
-<section class="bg-white py-14 overflow-hidden scroll-container">
-    <div class="flex flex-col gap-8">
+    <!-- INFINITY LOOP SECTION -->
+    <section class="bg-white py-14 overflow-hidden scroll-container">
+        <div class="flex flex-col gap-8">
 
-        @foreach ($rows as $row)
-            <div class="relative flex overflow-hidden">
-                {{-- কন্টেইনার যেটির ওপর অ্যানিমেশন কাজ করবে --}}
-                <div class="{{ $row['class'] }}" style="--duration: {{ $row['duration'] }}">
+            @foreach ($rows as $row)
+                <div class="relative flex overflow-hidden">
+                    {{-- কন্টেইনার যেটির ওপর অ্যানিমেশন কাজ করবে --}}
+                    <div class="{{ $row['class'] }}" style="--duration: {{ $row['duration'] }}">
 
-                    {{-- একই কন্টেন্ট দুইবার দেওয়া হয়েছে যাতে লুপটি নিরবচ্ছিন্ন হয় --}}
-                    @foreach ([1, 2] as $repeat)
-                        <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
-                            @foreach ($row['data'] as $item)
-                                <span class="bg-[#34a487] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
-                                    {{ $item }}
-                                </span>
-                            @endforeach
-                        </div>
-                    @endforeach
+                        {{-- একই কন্টেন্ট দুইবার দেওয়া হয়েছে যাতে লুপটি নিরবচ্ছিন্ন হয় --}}
+                        @foreach ([1, 2] as $repeat)
+                            <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
+                                @foreach ($row['data'] as $item)
+                                    <span
+                                        class="bg-[#34a487] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
+                                        {{ $item }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endforeach
 
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
 
-    </div>
-</section>
+        </div>
+    </section>
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
         <style>
@@ -658,7 +674,7 @@
         </div>
     </section>
     <!-- SOLUTION SECTION -->
-    <section class="bg-white py-20 px-4 md:px-10">
+    <section class="bg-white py-10 px-4 md:px-10">
         <div class="container mx-auto">
 
             <!-- Header -->
@@ -768,11 +784,11 @@
     @endif
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
-        <section class="bg-white py-20 px-6 md:px-10">
+        <section class="bg-white py-10 px-6 md:px-10">
             <div class="container mx-auto">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
-                    <a href=""
+                    <a href="{{ route('saas.blog.list') }}"
                         class="bg-[#34a487] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         View All <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
@@ -813,7 +829,7 @@
                                 </p>
 
                                 <div class="mt-auto pt-5 border-t border-gray-50">
-                                    <a href=""
+                                    <a href="{{ route('saas.blog.details', $blog->slug) }}"
                                         class="inline-flex items-center gap-2 text-[#34a487] font-bold text-lg group-hover:gap-3 transition-all">
                                         Read More <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </a>
@@ -827,7 +843,7 @@
     @endif
     <!-- Review SECTION -->
     @if ($allReviews->isNotEmpty())
-        <section class="bg-[#f9faff] py-20 px-6 md:px-10" id="reviews-section">
+        <section class="bg-[#f9faff] py-10 px-6 md:px-10" id="reviews-section">
             <div class="container mx-auto">
                 <div class="text-center mb-16">
                     <span
@@ -867,7 +883,6 @@
                     @endforeach
                 </div>
 
-                {{-- যদি রিভিউ ৬টার বেশি হয় তবেই বাটন দেখাবে --}}
                 @if ($allReviews->count() > 6)
                     <div class="mt-16 text-center">
                         <button id="load-more-reviews"
@@ -879,7 +894,7 @@
             </div>
         </section>
     @endif
-    <section class="bg-white py-20 px-6 md:px-10" id="faq-section">
+    <section class="bg-white py-10 px-6 md:px-10" id="faq-section">
         <div class="container mx-auto">
 
             <!-- Header -->
@@ -969,14 +984,18 @@
             if (document.querySelector('.heroSwiper')) {
                 new Swiper('.heroSwiper', {
                     loop: true,
+                    effect: 'fade',
+                    fadeEffect: {
+                        crossFade: true
+                    },
                     autoplay: {
-                        delay: 5000,
+                        delay: 3000,
                         disableOnInteraction: false,
                     },
                     speed: 1000,
                     pagination: {
                         el: '.hero-pagination',
-                        clickable: true, // ডটস ক্লিক করলে স্লাইড চেঞ্জ হবে
+                        clickable: true,
                     },
                 });
             }
