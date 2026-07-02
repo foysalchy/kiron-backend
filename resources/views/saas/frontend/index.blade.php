@@ -372,7 +372,7 @@
                         <!-- Middle Node Box -->
                         <div
                             class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
-                            পেমেন্ট মেথড
+                            Payment Methods
                         </div>
 
                         <!-- The Fork Connection Line -->
@@ -429,7 +429,97 @@
 
                         <div
                             class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
-                            কুরিয়ার ম্যানেজমেন্ট
+                            Courier Management
+                        </div>
+
+                        <div class="w-full relative flex flex-col items-center">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="flex justify-between w-full px-[16.6%]">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 w-full">
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Steadfast" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Pathao" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
+                                        class="text-[#000]">Bee</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                    <div class="flex flex-col items-center w-full">
+                        <!-- Top Shopify Icon -->
+                        <div
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            <i class="fa-brands fa-shopify text-white text-4xl"></i>
+                        </div>
+
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+
+                        <div
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            Omni Channel Chat
+                        </div>
+
+                        <div class="w-full relative flex flex-col items-center">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="flex justify-between w-full px-[16.6%]">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 w-full">
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Steadfast" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Pathao" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
+                                        class="text-[#000]">Bee</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                    <div class="flex flex-col items-center w-full">
+                        <!-- Top Shopify Icon -->
+                        <div
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            <i class="fa-brands fa-shopify text-white text-4xl"></i>
+                        </div>
+
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+
+                        <div
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                           Order Source
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
