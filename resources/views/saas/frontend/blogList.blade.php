@@ -5,9 +5,9 @@
     <section class="bg-[#34a487] pt-32 pb-20 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#34a487]/10 blur-[120px] rounded-full"></div>
         <div class="container mx-auto px-6 text-center relative z-10">
-            <h1 class="text-white text-4xl md:text-6xl font-black mb-6">আমাদের ব্লগ ও আর্টিকেল</h1>
+            <h1 class="text-white text-4xl md:text-6xl font-black mb-6">Our Blogs and Articles</h1>
             <p class="text-gray-800 text-lg md:text-xl max-w-2xl mx-auto">
-                 ব্যবসা বৃদ্ধি, আধুনিক প্রযুক্তি এবং ই-কমার্স সলিউশন নিয়ে আমাদের নিয়মিত আপডেট, টিপস এবং গাইডলাইন।
+                Stay updated with the latest trends, tips, and guides on business growth, modern technology, and e-commerce solutions.
             </p>
         </div>
     </section>
