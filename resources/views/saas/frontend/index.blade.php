@@ -361,7 +361,7 @@
                                 </h1>
 
                                 <p
-                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0 min-h-[4.5em] md:min-h-[6em] line-clamp-3 md:line-clamp-4 overflow-hidden text-ellipsis">
+                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
                                     {{ $slider->description }}
                                 </p>
 
