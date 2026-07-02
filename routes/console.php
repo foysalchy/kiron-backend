@@ -11,6 +11,9 @@ Artisan::command('inspire', function () {
 
 Schedule::command('billing:generate daily')->dailyAt('00:00');
 
-Schedule::command('billing:generate weekly')->weeklyOn(1, '00:00'); // Monday
+Schedule::command('billing:generate weekly')->weeklyOn(1, '00:00');
 
 Schedule::command('billing:generate monthly')->monthlyOn(1, '00:00');
+
+Schedule::command('subscriptions:send-expiry-reminders')
+    ->dailyAt('08:00');

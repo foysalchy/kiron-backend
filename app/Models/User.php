@@ -15,7 +15,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable,HasPackageLimits;
+    use HasApiTokens, HasFactory, Notifiable, HasPackageLimits;
     public string $limitKey = 'user';
     protected $fillable = [
         'name',
@@ -29,6 +29,7 @@ class User extends Authenticatable
         'is_super_admin',
         'is_primary',
         'password',
+        'setup_complete',
     ];
 
     /**
@@ -53,6 +54,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
             'is_primary' => 'boolean',
+            'setup_complete' => 'boolean',
+
         ];
     }
 
