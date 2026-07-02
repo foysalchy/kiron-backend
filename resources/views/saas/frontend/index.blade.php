@@ -415,13 +415,13 @@
     <!-- প্রধান সেকশন (bg-black এবং relative নিশ্চিত করা হয়েছে) -->
     <section class="swiper heroSwiper bg-black relative overflow-hidden h-[90vh] min-h-[500px]">
         
-        <!-- অ্যানিমেটেড মরফিং ব্যাকগ্রাউন্ড লেয়ার -->
-        <div class="hero-morph-bg absolute inset-0 overflow-hidden pointer-events-none z-0">
-            <div class="blob blob-1"></div>
-            <div class="blob blob-2"></div>
-            <div class="blob blob-3"></div>
-            <div class="blob blob-4"></div>
-        </div>
+      <!-- অ্যানিমেটেড মরফিং ব্যাকগ্রাউন্ড লেয়ার -->
+<div class="hero-morph-bg absolute inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="blob-wrapper bw-1"><div class="blob blob-1"></div></div>
+    <div class="blob-wrapper bw-2"><div class="blob blob-2"></div></div>
+    <div class="blob-wrapper bw-3"><div class="blob blob-3"></div></div>
+    <div class="blob-wrapper bw-4"><div class="blob blob-4"></div></div>
+</div>
 
         <!-- কন্টেন্ট লেয়ার (z-10 দিয়ে উপরে রাখা হয়েছে) -->
         <div class="swiper-wrapper relative z-10">
@@ -479,83 +479,63 @@
 
 <!-- ২. CSS স্টাইল (থিম ম্যাচিং ৪টি শেড সহ) -->
 <style>
-    /* মেইন ব্যাকগ্রাউন্ড কন্টেইনার */
-    .hero-morph-bg {
-        background: radial-gradient(circle at 50% 50%, #0a0f12, #000000);
-    }
+   /* মেইন ব্যাকগ্রাউন্ড কন্টেইনার */
+.hero-morph-bg {
+    background: radial-gradient(circle at 50% 50%, #0a0f12, #000000);
+}
 
-    /* ব্লব বা কালার শেডগুলোর কমন কনফিগারেশন */
-    .blob {
-        position: absolute;
-        filter: blur(80px);
-        opacity: 0.35;
-        mix-blend-mode: plus-lighter;
-        will-change: transform, border-radius;
-        animation: morphing 15s ease-in-out infinite alternate;
-    }
+/* অ্যানিমেশন কন্টেইনারের কমন স্টাইল */
+.blob-wrapper {
+    position: absolute;
+    will-change: transform, border-radius;
+    animation: morphing 15s ease-in-out infinite alternate;
+}
 
-    /* শেড ১: আপনার মেইন থিম কালার (#34a487) */
-    .blob-1 {
-        top: -10%;
-        left: -5%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, #34a487 0%, rgba(52, 164, 135, 0) 70%);
-        animation-duration: 18s;
-    }
+/* আসল ব্লব কালার শেড (যা মাউসের সাথে সরবে) */
+.blob {
+    width: 100%;
+    height: 100%;
+    filter: blur(80px);
+    opacity: 0.35;
+    mix-blend-mode: plus-lighter;
+    transition: transform 0.3s ease-out; /* মাউস মুভমেন্ট স্মুথ করার জন্য */
+}
 
-    /* শেড ২: ডার্ক ইনডিগো/ডার্ক ব্লু (ব্ল্যাকের সাথে লাক্সারি লুক দেয়) */
-    .blob-2 {
-        bottom: -15%;
-        right: -5%;
-        width: 650px;
-        height: 650px;
-        background: radial-gradient(circle, #1e1b4b 0%, rgba(30, 27, 75, 0) 70%);
-        animation-duration: 22s;
-        animation-delay: -4s;
-    }
+/* শেড ১: আপনার মেইন থিম কালার (#34a487) */
+.bw-1 { top: -10%; left: -5%; width: 600px; height: 600px; animation-duration: 18s; }
+.blob-1 { background: radial-gradient(circle, #34a487 0%, rgba(52, 164, 135, 0) 70%); }
 
-    /* শেড ৩: লাইট মিন্ট/এমারেল্ড গ্রিন (থিম কালারকে গ্লো করানোর জন্য) */
-    .blob-3 {
-        top: 20%;
-        right: 25%;
-        width: 450px;
-        height: 450px;
-        background: radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%);
-        animation-duration: 14s;
-        animation-delay: -2s;
-    }
+/* শেড ২: ডার্ক ইনডিগো/ডার্ক ব্লু */
+.bw-2 { bottom: -15%; right: -5%; width: 650px; height: 650px; animation-duration: 22s; animation-delay: -4s; }
+.blob-2 { background: radial-gradient(circle, #1e1b4b 0%, rgba(30, 27, 75, 0) 70%); }
 
-    /* শেড ৪: ডিপ গ্রে/ডার্ক স্লেট (স্মুথ ট্রানজিশনের জন্য) */
-    .blob-4 {
-        bottom: 10%;
-        left: 20%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, #0f172a 0%, rgba(15, 23, 42, 0) 70%);
-        animation-duration: 25s;
-        animation-delay: -6s;
-    }
+/* শেড ৩: লাইট মিন্ট/এমারেল্ড গ্রিন */
+.bw-3 { top: 20%; right: 25%; width: 450px; height: 450px; animation-duration: 14s; animation-delay: -2s; }
+.blob-3 { background: radial-gradient(circle, #10b981 0%, rgba(16, 185, 129, 0) 70%); }
 
-    /* লিকুইড বা মরফিং অ্যানিমেশন ইফেক্ট */
-    @keyframes morphing {
-        0% {
-            border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
-            transform: translate(0px, 0px) rotate(0deg) scale(1);
-        }
-        33% {
-            border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
-            transform: translate(30px, -40px) rotate(45deg) scale(1.05);
-        }
-        66% {
-            border-radius: 28% 72% 37% 63% / 52% 43% 57% 48%;
-            transform: translate(-20px, 30px) rotate(90deg) scale(0.95);
-        }
-        100% {
-            border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
-            transform: translate(0px, 0px) rotate(135deg) scale(1);
-        }
+/* শেড ৪: ডিপ গ্রে/ডার্ক স্লেট */
+.bw-4 { bottom: 10%; left: 20%; width: 500px; height: 500px; animation-duration: 25s; animation-delay: -6s; }
+.blob-4 { background: radial-gradient(circle, #0f172a 0%, rgba(15, 23, 42, 0) 70%); }
+
+/* লিকুইড বা মরফিং অ্যানিমেশন ইফেক্ট (এখন এটি স্টিকি হবে না) */
+@keyframes morphing {
+    0% {
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+        transform: translate(0px, 0px) rotate(0deg) scale(1);
     }
+    33% {
+        border-radius: 70% 30% 52% 48% / 60% 40% 60% 40%;
+        transform: translate(40px, -30px) rotate(45deg) scale(1.05);
+    }
+    66% {
+        border-radius: 28% 72% 37% 63% / 52% 43% 57% 48%;
+        transform: translate(-30px, 40px) rotate(90deg) scale(0.95);
+    }
+    100% {
+        border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+        transform: translate(0px, 0px) rotate(135deg) scale(1);
+    }
+}
 </style>
 
     <!-- LOGO SHOWCASE SECTION -->
@@ -1624,20 +1604,19 @@
 
 <!-- ৩. JavaScript কোড (স্মুথ মাউস প্যারালাক্স মুভমেন্ট) -->
 <script>
-    document.addEventListener('mousemove', (e) => {
-        const blobs = document.querySelectorAll('.blob');
-        // মাউস পজিশন অনুযায়ী কতটুকু সরবে (বেশি বড় সংখ্যা দিলে বেশি নড়বে)
-        const moveFactor = 35; 
-        
-        const x = (window.innerWidth / 2 - e.clientX) / moveFactor;
-        const y = (window.innerHeight / 2 - e.clientY) / moveFactor;
+   document.addEventListener('mousemove', (e) => {
+    const blobs = document.querySelectorAll('.blob');
+    const moveFactor = 40; // মাউস মুভমেন্টের রেঞ্জ নিয়ন্ত্রণ করার জন্য
+    
+    const x = (window.innerWidth / 2 - e.clientX) / moveFactor;
+    const y = (window.innerHeight / 2 - e.clientY) / moveFactor;
 
-        blobs.forEach((blob, index) => {
-            // একেকটি ব্লব একেক স্পিডে নড়বে যাতে রিয়েলস্টিক থ্রিডি ইফেক্ট আসে
-            const speed = (index + 1) * 0.3; 
-            blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
-        });
+    blobs.forEach((blob, index) => {
+        const speed = (index + 1) * 0.4; 
+        // এবার এই transform সরাসরি CSS অ্যানিমেশনের সাথে কনফ্লিক্ট করবে না
+        blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
     });
+});
 </script>
     <script>
         // Accordion
