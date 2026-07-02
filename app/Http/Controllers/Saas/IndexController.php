@@ -90,4 +90,32 @@ class IndexController extends Controller
 
         return view('saas.frontend.featureDetails', compact('feature', 'otherFeatures'));
     }
+    public function blogPosts()
+    {
+        $blogPosts = Blog::withoutCompanyScope()
+            ->with('company')
+            ->where('status', Status::Active->value)
+            ->latest()
+            ->paginate(3);
+
+        return view('saas.frontend.blogList', compact('blogPosts'));
+    }
+    public function blogPostDetails($slug)
+    {
+        $blogPost = Blog::withoutCompanyScope()
+            ->with('company')
+            ->where('slug', $slug)
+            ->where('status', Status::Active->value)
+            ->firstOrFail();
+
+        $otherBlogPosts = Blog::withoutCompanyScope()
+            ->with('company')
+            ->where('status', Status::Active->value)
+            ->where('id', '!=', $blogPost->id)
+            ->latest()
+            ->take(4)
+            ->get();
+
+        return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
+    }
 }
