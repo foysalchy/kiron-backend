@@ -29,6 +29,7 @@ class Company extends Model
         'default_warehouse_id',
     ];
 
+    protected $appends = ['theme_settings'];
 
 
     protected $hidden = [
@@ -57,6 +58,30 @@ class Company extends Model
                 throw ApiException::forbidden("System default payment methods cannot be deleted.");
             }
         });
+    }
+
+    public function domainSetup()
+    {
+        return $this->hasOne(DomainSetup::class);
+    }
+
+    public function getThemeSettingsAttribute()
+    {   
+        $domain = $this->domainSetup;
+
+        if (! $domain) {
+            return null;
+        }
+
+        return [
+            'theme_id'             => $domain->template_name,
+            'card_id'              => $domain->product_card_template,
+            'primary_color'        => $domain->primary_color,
+            'primary_text_color'   => $domain->primary_text_color,
+            'secondary_color'      => $domain->secondary_color,
+            'secondary_text_color' => $domain->secondary_text_color,
+            'is_review'            => $domain->is_review,
+        ];
     }
     public function users()
     {
@@ -127,6 +152,22 @@ class Company extends Model
     public function subscriptions()
     {
         return $this->hasMany(CompanySubscription::class);
+    }
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(CompanySubscription::class)->latestOfMany();
+    }
+
+    public function hasActiveAccess(): bool
+    {
+        $subscription = $this->latestSubscription;
+
+        if (! $subscription) {
+            return false;
+        }
+
+        return $subscription->isActive() || $subscription->isOnTrial();
     }
     public function currentSubscription()
     {

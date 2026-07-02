@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\SubscriptionPayment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -157,7 +159,6 @@ class SubscriptionController extends Controller
 
         return response()->json(['message' => 'Upgrade payment submitted successfully.']);
     }
-    // SubscriptionPaymentController.php
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -165,11 +166,58 @@ class SubscriptionController extends Controller
         ]);
 
         $payment = SubscriptionPayment::findOrFail($id);
+        $sourceSubscription = $payment->subscription; 
+
         $payment->update([
-            'status'  => $request->status,
+            'status' => $request->status,
         ]);
 
-        return response()->json(['message' => 'Payment status updated.']);
+        if ($request->status === 'success') {
+
+            if (! $sourceSubscription) {
+                return response()->json([
+                    'message' => 'Payment updated but no related subscription found to activate.',
+                    'data'    => ['payment' => $payment->fresh()],
+                ], 422);
+            }
+
+            $startsAt = Carbon::now();
+            $endsAt   = $sourceSubscription->billing_cycle === 'yearly'
+                ? $startsAt->copy()->addYear()
+                : $startsAt->copy()->addMonth();
+
+            $newSubscription = CompanySubscription::create([
+                'company_id'          => $sourceSubscription->company_id,
+                'pricing_package_id'  => $sourceSubscription->pricing_package_id,
+                'billing_cycle'       => $sourceSubscription->billing_cycle,
+                'amount_paid'         => $payment->amount ?? $sourceSubscription->amount_paid,
+                'currency'            => $sourceSubscription->currency,
+                'payment_method'      => $payment->payment_method ?? $sourceSubscription->payment_method,
+                'payment_status'      => 'paid',
+                'discount_amount'     => $sourceSubscription->discount_amount,
+                'discount_note'       => $sourceSubscription->discount_note,
+                'transaction_id'      => $payment->transaction_id ?? $sourceSubscription->transaction_id,
+                'trial_ends_at'       => null, // ekhon paid, ar trial na
+                'starts_at'           => $startsAt,
+                'ends_at'             => $endsAt,
+                'status'              => Status::Active->value,
+            ]);
+
+            $payment->update(['subscription_id' => $newSubscription->id]);
+
+            return response()->json([
+                'message' => 'Payment marked successful and subscription activated.',
+                'data'    => [
+                    'payment'      => $payment->fresh(),
+                    'subscription' => $newSubscription,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Payment marked as failed.',
+            'data'    => ['payment' => $payment->fresh()],
+        ]);
     }
     public function billing(Request $request): JsonResponse
     {

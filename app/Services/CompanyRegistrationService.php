@@ -200,76 +200,80 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to process subscription.');
         }
     }
-    public function registerBasicSettings(array $data): array
-    {
-        DB::beginTransaction();
-        try {
-            $company = Company::findOrFail($data['registration_id']);
+public function registerBasicSettings(array $data): array
+{
+    DB::beginTransaction();
+    try {
+        $company = Company::findOrFail($data['registration_id']);
 
-            // Insert subdomain into DomainSetup
-            DomainSetup::create([
-                'company_id' => $company->id,
-                'sub_domain' => $data['sub_domain'],
+        // Insert subdomain into DomainSetup
+        DomainSetup::create([
+            'company_id' => $company->id,
+            'sub_domain' => $data['sub_domain'],
+        ]);
+
+        // Update language & currency in SiteSettings
+        SiteSetting::where('company_id', $company->id)
+            ->update([
+                'lang'     => $data['lang'],
+                'currency' => $data['currency'],
             ]);
 
-            // Update language & currency in SiteSettings
-            SiteSetting::where('company_id', $company->id)
-                ->update([
-                    'lang'     => $data['lang'],
-                    'currency' => $data['currency'],
-                ]);
+        if (isset($data['manage_warehouse'])) {
+            $manageWarehouse = (bool) $data['manage_warehouse'];
 
-            if (isset($data['manage_warehouse'])) {
-                $manageWarehouse = (bool) $data['manage_warehouse'];
+            $company->update(['manage_warehouse' => $manageWarehouse]);
 
-                $company->update(['manage_warehouse' => $manageWarehouse]);
+            if (!$manageWarehouse) {
+                $exists = Warehouse::where('company_id', $company->id)
+                    ->where('is_default', 1)
+                    ->exists();
 
-                if (!$manageWarehouse) {
-                    $exists = Warehouse::where('company_id', $company->id)
-                        ->where('is_default', 1)
-                        ->exists();
+                if (!$exists) {
+                    $warehouse = Warehouse::create([
+                        'company_id' => $company->id,
+                        'name'       => 'Default Warehouse',
+                        'location'   => null,
+                        'is_default' => 1,
+                        'status'     => Status::Active->value,
+                    ]);
 
-                    if (!$exists) {
-                        $warehouse = Warehouse::create([
-                            'company_id' => $company->id,
-                            'name'       => 'Default Warehouse',
-                            'location'   => null,
-                            'is_default' => 1,
-                            'status'     => Status::Active->value,
-                        ]);
-
-                        $company->update(['default_warehouse_id' => $warehouse->id]);
-                    }
+                    $company->update(['default_warehouse_id' => $warehouse->id]);
                 }
             }
+        }
 
-            // Activate Company
-            $company->update([
-                'status'               => Status::Active->value,
+        // Activate Company
+        $company->update([
+            'status' => Status::Active->value,
+        ]);
+
+        // Activate the Company's primary User + mark setup complete
+        User::where('company_id', $company->id)
+            ->update([
+                'status'         => Status::Active->value,
+                'setup_complete' => true, // ⚠️ ei column na thakle migration lagbe, note niche
             ]);
 
-            // Activate the Company's primary User
-            User::where('company_id', $company->id)
-                ->update(['status' => Status::Active->value]);
+        DB::commit();
 
-            DB::commit();
+        Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
 
-            Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
+        $user = User::where('company_id', $company->id)
+            ->with(['company.pricingPackage', 'roles.permissions'])
+            ->first();
 
-            $user = User::where('company_id', $company->id)
-                ->with(['company.pricingPackage', 'roles.permissions'])
-                ->first();
-
-            return [
-                'permissions'          => $this->resolvePermissions($user),
-                'company'     => $company->load('pricingPackage'),
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Basic settings registration failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to save basic settings.');
-        }
+        return [
+            'user'        => $user,
+            'permissions' => $this->resolvePermissions($user),
+            'company'     => $company->load('pricingPackage'),
+        ];
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Basic settings registration failed: ' . $e->getMessage());
+        throw ApiException::serverError('Failed to save basic settings.');
     }
+}
   /**
      * Unified Seller Registration - Merging all registration phases into one single atomic transaction.
      */

@@ -25,6 +25,7 @@ class CompanySubscription extends Model
         'trial_ends_at',
         'starts_at',
         'ends_at',
+        'reminder_sent_at',
         'status',
     ];
 
@@ -33,6 +34,8 @@ class CompanySubscription extends Model
         'starts_at'     => 'datetime',
         'ends_at'       => 'datetime',
         'amount_paid'   => 'decimal:2',
+        'reminder_sent_at' => 'datetime', 
+
     ];
 
     public function company(): BelongsTo
