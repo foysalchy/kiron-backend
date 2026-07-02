@@ -156,11 +156,11 @@
         .node-circle {
             position: absolute;
             transform: translate(-50%, -50%);
-            border-radius: 9999px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #171B22;
+            background: #ffffff;
             border: 1.4px solid #2A303B;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -173,7 +173,7 @@
         }
 
         .node-circle.small {
-            width: 52px;
+            width: 90px;
             height: 52px;
         }
 
@@ -501,14 +501,175 @@
                 <p class="text-gray-200 mt-6 text-lg">দেশি-বিদেশি সব গেটওয়ে এখন একটি প্ল্যাটফর্মে।</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2  ">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 ">
 
                 <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                <div class="bg-black border border-r-[#1f1f1f] border-b-[#1f1f1f]   p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">সার্বক্ষণিক
-                        পেমেন্ট ফ্লো</h3>
+                <div class="  border     shadow-sm relative group">
+                     
 
-                    <div class="relative">
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/ssl.png') }}"
+                                alt="Rocket"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">     Multiple Payment Gateways </h3>
+                        Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept secure online payments, automate payment confirmation, and manage every transaction from a single platform. 
+                    </div>
+                </div>
+                
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/sslcommerz.png') }}" alt="SSL"></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}"
+                                alt="Rocket"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">   Ship Orders with Multiple Courier Partners </h3>
+                       Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
+                    </div>
+                </div>
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                  <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}"
+                                alt="Rocket"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/ssl.png') }}" alt="SSL"></div>
+                      
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">  Manage Customer Conversations from Every Channel </h3>
+                  Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified inbox. Respond faster, manage conversations efficiently, and deliver a better customer experience.
+                    </div>
+                </div>
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
                         <svg viewBox="0 0 460 300" class="w-full h-auto">
                             <!-- ৪টি ইনপুট পাথ -->
                             <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -550,165 +711,17 @@
                         <!-- মেইন সেন্টার নোড -->
                         <div class="center-node">
                             <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">পেমেন্ট<br>হাব</span>
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- গ্রাফ ২: কুরিয়ার সার্ভিস (4 Paths) -->
-                <div class="bg-black border border-b-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
-                        শিপিং ফ্লো</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- আউটপুট লোগো -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- মেইন সেন্টার নোড -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
-                        </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel </h3>
+                 Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other connected sales channels through a single dashboard. Process, fulfill, and track every order from one centralized platform.
                     </div>
                 </div>
+                
 
-
-                <div class="bg-black border border-r-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
-                        শিপিং ফ্লো</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- আউটপুট লোগো -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- মেইন সেন্টার নোড -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-black border p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
-                        শিপিং ফ্লো</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- আউটপুট লোগো -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- মেইন সেন্টার নোড -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </section>
