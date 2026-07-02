@@ -522,7 +522,7 @@
                             <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
                             <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
                             <!-- আউটপুট পাথ -->
@@ -577,7 +577,7 @@
                             <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
                             <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
                             <!-- আউটপুট পাথ -->
@@ -630,7 +630,7 @@
                             <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
                             <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
                             <!-- আউটপুট পাথ -->
@@ -684,7 +684,7 @@
                             <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
                             <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
                             <!-- আউটপুট পাথ -->
