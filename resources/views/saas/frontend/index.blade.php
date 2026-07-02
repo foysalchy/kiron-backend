@@ -1,7 +1,233 @@
 @extends('saas.layouts.layout')
+@push('styles')
+    <style>
+        .hero-bg {
+            background: radial-gradient(circle at 70% 30%, #124738 0%, #030f0c 60%);
+        }
 
+        .hero-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .hero-pagination .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3) !important;
+            opacity: 1 !important;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            margin: 0 !important;
+        }
+
+        .hero-pagination .swiper-pagination-bullet-active {
+            width: 45px !important;
+            background: #ffffff !important;
+            border-radius: 20px;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-4 {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+            .heroSwiper {
+                height: 100vh !important;
+                min-height: 800px !important;
+            }
+
+            .hero-pagination {
+                bottom: 15% !important;
+                justify-content: center !important;
+            }
+        }
+
+        .hook-2::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+    </style>
+    <style>
+        @keyframes marqueeLeft {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @keyframes marqueeRight {
+            0% {
+                transform: translateX(-50%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .animate-marquee-left {
+            display: flex;
+            width: max-content;
+            animation: marqueeLeft var(--duration, 30s) linear infinite;
+        }
+
+        .animate-marquee-right {
+            display: flex;
+            width: max-content;
+            animation: marqueeRight var(--duration, 30s) linear infinite;
+        }
+
+        .scroll-container:hover .animate-marquee-left,
+        .scroll-container:hover .animate-marquee-right {
+            animation-play-state: paused;
+        }
+
+        .integrate-bg {
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.075) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.075) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .flow-line {
+            stroke: #e2e8f0;
+            stroke-width: 1.8;
+            fill: none;
+            opacity: 0.4;
+        }
+
+        .flow-pulse {
+            stroke: #34a487;
+            stroke-width: 2.2;
+            fill: none;
+            stroke-dasharray: 8 200;
+            stroke-dashoffset: 0;
+            animation: pulse-flow 3.5s linear infinite;
+        }
+
+        @keyframes pulse-flow {
+            to {
+                stroke-dashoffset: -208;
+            }
+        }
+
+        .ring-pulse {
+            animation: ring-grow 2.8s ease-out infinite;
+            transform-origin: center;
+        }
+
+        @keyframes ring-grow {
+            0% {
+                r: 35;
+                opacity: 0.6;
+            }
+
+            100% {
+                r: 65;
+                opacity: 0;
+            }
+        }
+
+        .node-circle {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #171B22;
+            border: 1.4px solid #2A303B;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .node-circle:hover {
+            border-color: #34a487;
+            box-shadow: 0 0 0 6px rgba(52, 164, 135, 0.1);
+            transform: translate(-50%, -50%) scale(1.15);
+        }
+
+        .node-circle.small {
+            width: 52px;
+            height: 52px;
+        }
+
+        .node-circle img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .center-node {
+            position: absolute;
+            left: 48.9%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 95px;
+            height: 95px;
+            border-radius: 9999px;
+            background: linear-gradient(145deg, #34a487, #2c8a71);
+            border: 2px solid #ffffff;
+            box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+            animation: node-breathe 3s ease-in-out infinite;
+        }
+
+        @keyframes node-breathe {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.06);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .node-circle.small {
+                width: 42px;
+                height: 42px;
+            }
+
+            .center-node {
+                width: 75px;
+                height: 75px;
+            }
+        }
+    </style>
+@endpush
 @section('content')
-
     @php
         $solutions = [
             'ecommerce' => [
@@ -118,105 +344,25 @@
             ],
         ];
     @endphp
-    <style>
-        .hero-bg {
-            background: radial-gradient(circle at 70% 30%, #1e1b4b 0%, #0a061e 60%);
-        }
 
-        .hero-bg::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
-        }
-
-        .hero-pagination .swiper-pagination-bullet {
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.3) !important;
-            opacity: 1 !important;
-            border-radius: 50%;
-            transition: all 0.4s ease;
-            cursor: pointer;
-            margin: 0 !important;
-        }
-
-        .hero-pagination .swiper-pagination-bullet-active {
-            width: 45px !important;
-            background: #ffffff !important;
-            border-radius: 20px;
-        }
-
-        @media (max-width: 1023px) {
-            .hero-pagination {
-                justify-content: center;
-                width: 100%;
-            }
-
-            .pt-\[380px\] {
-                pt-64;
-            }
-        }
-    </style>
-    <style>
-        @keyframes marqueeLeft {
-            0% {
-                transform: translateX(0);
-            }
-
-            100% {
-                transform: translateX(-50%);
-            }
-        }
-
-        @keyframes marqueeRight {
-            0% {
-                transform: translateX(-50%);
-            }
-
-            100% {
-                transform: translateX(0);
-            }
-        }
-
-        .animate-marquee-left {
-            display: flex;
-            width: max-content;
-            animation: marqueeLeft var(--duration, 30s) linear infinite;
-        }
-
-        .animate-marquee-right {
-            display: flex;
-            width: max-content;
-            animation: marqueeRight var(--duration, 30s) linear infinite;
-        }
-
-        .scroll-container:hover .animate-marquee-left,
-        .scroll-container:hover .animate-marquee-right {
-            animation-play-state: paused;
-        }
-    </style>
     <!-- HERO SECTION -->
     @if ($sliders->isNotEmpty())
-        <section class="swiper heroSwiper relative overflow-hidden h-[90vh] min-h-[500px]">
+        <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
             <div class="swiper-wrapper">
                 @foreach ($sliders as $slider)
-                    <div
-                        class="swiper-slide hero-bg min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
+                    <div class="swiper-slide min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
                         <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
-                            <!-- Left Side: Content -->
-                            <div class="text-center lg:text-left order-2 lg:order-1">
-                                <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-6">
-                                    {{ $slider->title ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                            <div class="text-center lg:text-left order-2 lg:order-1 pt-14 md:pt-0">
+
+                                <h1
+                                    class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                    {{ $slider->title }}
                                 </h1>
+
                                 <p
-                                    class="text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0">
-                                    {{ $slider->description ?? 'আপনার ব্যবসার জন্য দরকারি সব কিছু এখন এক জায়গায়' }}
+                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0 min-h-[4.5em] md:min-h-[6em] line-clamp-3 md:line-clamp-4 overflow-hidden text-ellipsis">
+                                    {{ $slider->description }}
                                 </p>
 
                                 <!-- Action Buttons -->
@@ -231,7 +377,6 @@
                                         ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
                                     </a>
                                 </div>
-
                             </div>
 
                             <!-- Right Side: Graphics -->
@@ -246,7 +391,7 @@
                                     class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
                                 </div>
 
-                                <div class="relative z-10 p-6 md:p-10 rounded-[35px] shadow-2xl float-anim">
+                                <div class="relative z-10 p-6 md:p-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
                                         class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
                                 </div>
@@ -258,7 +403,7 @@
             </div>
             <div class="absolute inset-0 pointer-events-none z-50">
                 <div class="container mx-auto px-6 h-full flex flex-col justify-center">
-                    <div class="lg:w-1/2 hidden lg:flex justify-center lg:justify-start md:pt-[320px]">
+                    <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[580px] md:pt-[420px]">
                         <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
                     </div>
                 </div>
@@ -305,7 +450,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
                     {{-- লজিক: যেখানে placement == 1 (Feature) --}}
                     @foreach ($topFeatures as $feature)
-                        <div
+                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
                             class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
                             <!-- Icon Area -->
                             <div
@@ -322,12 +467,12 @@
                             </p>
 
                             <!-- Link Area -->
-                            <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                            <div
                                 class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
                                 বিস্তারিত জানুন
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
-                            </a>
-                        </div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
 
@@ -341,6 +486,233 @@
         </section>
     @endif
     <!-- INTEGRATION SECTION -->
+    <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden font-manrope">
+        <div class="max-w-[1400px] mx-auto">
+
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <span
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-bold text-[14px] mb-6 uppercase tracking-wider">
+                    স্মার্ট ইন্টিগ্রেশন
+                </span>
+                <h2 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
+                    আপনার পুরো ব্যবসা ট্র্যাক করুন এবং অটোমেট করুন
+                </h2>
+                <p class="text-gray-200 mt-6 text-lg">দেশি-বিদেশি সব গেটওয়ে এখন একটি প্ল্যাটফর্মে।</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2  ">
+
+                <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
+                <div class="bg-black border border-r-[#1f1f1f] border-b-[#1f1f1f]   p-6 md:p-12 shadow-sm relative group">
+                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">সার্বক্ষণিক
+                        পেমেন্ট ফ্লো</h3>
+
+                    <div class="relative">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/sslcommerz.png') }}" alt="SSL"></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="https://logowik.com/content/uploads/images/rocket-mobile-banking4547.jpg"
+                                alt="Rocket"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">পেমেন্ট<br>হাব</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- গ্রাফ ২: কুরিয়ার সার্ভিস (4 Paths) -->
+                <div class="bg-black border border-b-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
+                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
+                        শিপিং ফ্লো</h3>
+
+                    <div class="relative">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                style="animation-delay:1.2s" />
+
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
+                                stroke="#34a487" stroke-width="1.5" />
+
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
+                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
+                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="bg-black border border-r-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
+                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
+                        শিপিং ফ্লো</h3>
+
+                    <div class="relative">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                style="animation-delay:1.2s" />
+
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
+                                stroke="#34a487" stroke-width="1.5" />
+
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
+                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
+                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-black border p-6 md:p-12 shadow-sm relative group">
+                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">অটোমেটেড
+                        শিপিং ফ্লো</h3>
+
+                    <div class="relative">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                style="animation-delay:1.2s" />
+
+                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
+                                stroke="#34a487" stroke-width="1.5" />
+
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি কুরিয়ার সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
+                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
+                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
+
+                        <!-- আউটপুট লোগো -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- মেইন সেন্টার নোড -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">শিপিং<br>হাব</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {{-- <!-- INTEGRATION SECTION -->
     <section class="bg-[#f9faff] py-10 px-4 md:px-10 overflow-hidden">
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
@@ -464,7 +836,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
     <!-- DEMO & TEMPLATE SECTION -->
     @if ($demos->isNotEmpty())
         <section class="bg-white py-10 px-4 md:px-10" id="demo-section">
@@ -539,7 +911,6 @@
         ];
     @endphp
 
-
     <!-- INFINITY LOOP SECTION -->
     <section class="bg-white py-14 overflow-hidden scroll-container">
         <div class="flex flex-col gap-8">
@@ -569,16 +940,6 @@
     </section>
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
-        <style>
-            .hook-2::before {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-                background-size: 40px 40px;
-                pointer-events: none;
-            }
-        </style>
         <div
             class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#34a487]/10 blur-[120px] rounded-full pointer-events-none">
         </div>
@@ -756,7 +1117,7 @@
                 <div class="flex flex-col gap-10">
                     @foreach ($whyChooseUs as $index => $benefit)
                         <div
-                            class="bg-white rounded-2xl p-8 md:p-14 flex flex-col {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                            class="bg-white rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
                                 <h3 class="text-[#34a487] text-3xl md:text-4xl font-extrabold mb-6">
                                     {{ $benefit->title }}
@@ -796,16 +1157,16 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     @foreach ($blogs as $blog)
-                        <div
+                        <a href="{{ route('saas.blog.details', $blog->slug) }}"
                             class="bg-white border border-gray-100 rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full">
 
-                            <a href="" class="group block overflow-hidden rounded-xl">
+                            <div class="group block overflow-hidden rounded-xl">
                                 <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
                                     <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}"
                                         alt="{{ $blog->title }}"
                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 </div>
-                            </a>
+                            </div>
 
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
@@ -829,13 +1190,13 @@
                                 </p>
 
                                 <div class="mt-auto pt-5 border-t border-gray-50">
-                                    <a href="{{ route('saas.blog.details', $blog->slug) }}"
+                                    <div
                                         class="inline-flex items-center gap-2 text-[#34a487] font-bold text-lg group-hover:gap-3 transition-all">
                                         Read More <i class="fa-solid fa-arrow-right text-sm"></i>
-                                    </a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             </div>

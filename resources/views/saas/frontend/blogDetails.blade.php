@@ -2,7 +2,6 @@
 
 @push('styles')
     <style>
-        /* আপনার দেওয়া ব্লগ ডিজাইনের হুবহু সিএসএস */
         table {
             width: 100%;
         }
@@ -78,8 +77,8 @@
         <div class="container mx-auto px-6 md:px-10">
             <div class="flex gap-2 text-sm  px-4 py-3 ">
                 <a href="{{ route('saas.index') }}" class="text-gray-600 hover:text-black transition">Home</a>
-                <span class="text-gray-300">›</span>
-                <a href="{{ route('saas.feature.list') }}" class="text-gray-600 hover:text-black transition">Features</a>
+                <span class="text-gray-300"></span>
+                <a href="{{ route('saas.blog.list') }}" class="text-gray-600 hover:text-black transition">Blog</a>
                 <span class="text-gray-300">›</span>
                 <span class="text-black font-semibold">{{ $blogPost->title }}</span>
             </div>
@@ -137,7 +136,7 @@
                         {{-- Subtitle / Short Description --}}
                         <div
                             class="text-lg text-gray-600 font-medium mb-8 leading-relaxed italic border-l-4 border-gray-200 pl-5">
-                            {{ $blogPost->subtitle }}
+                            {{ $blogPost->short ?? 'No short description available.' }}
                         </div>
 
                         {{-- Main Description (Rich Text) --}}

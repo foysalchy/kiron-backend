@@ -102,3 +102,5 @@ Route::get('/feature-list', [SaasIndexController::class, 'features'])->name('saa
 Route::get('/feature/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');
 Route::get('/blog-list', [SaasIndexController::class, 'blogPosts'])->name('saas.blog.list');
 Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');
+Route::get('/faq-list', [SaasIndexController::class, 'faqList'])->name('saas.faq.list');
+

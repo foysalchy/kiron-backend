@@ -6,6 +6,7 @@ use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\CustomerReview;
+use App\Models\KnowledgeBase;
 use App\Models\MasterBrand;
 use App\Models\MasterDemo;
 use App\Models\MasterFeature;
@@ -117,5 +118,12 @@ class IndexController extends Controller
             ->get();
 
         return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
+    }
+    public function faqList()
+    {
+        $faqs = KnowledgeBase::where('status', Status::Active->value)
+            ->latest()
+            ->get();
+        return view('saas.frontend.faqList', compact('faqs'));
     }
 }
