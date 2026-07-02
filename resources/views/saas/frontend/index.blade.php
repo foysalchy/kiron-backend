@@ -346,7 +346,72 @@
     @endphp
 
     <!-- HERO SECTION -->
- @if ($sliders->isNotEmpty())
+    @if ($sliders->isNotEmpty())
+        <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
+            <div class="swiper-wrapper">
+                @foreach ($sliders as $slider)
+                    <div class="swiper-slide min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
+                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+                            <div class="text-center lg:text-left order-2 lg:order-1 pt-14 md:pt-0">
+
+                                <h1
+                                    class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                    {{ $slider->title }}
+                                </h1>
+
+                                <p
+                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
+                                    {{ $slider->description }}
+                                </p>
+
+                                <!-- Action Buttons -->
+                                <div
+                                    class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
+                                    <a href="#"
+                                        class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                                        ফ্রি ট্রায়াল শুরু করুন
+                                    </a>
+                                    <a href="#"
+                                        class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
+                                        ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Right Side: Graphics -->
+                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-10">
+                                <div
+                                    class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute w-[200px] h-[200px] sm:w-[260px] sm:h-[260px] md:w-[320px] md:h-[320px] border border-white/10 rounded-full">
+                                </div>
+                                <div
+                                    class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
+                                </div>
+
+                                <div class="relative z-10 p-6 md:p-10   float-anim">
+                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
+                                        class=" w-[90%] max-w-[90%]" alt="Core Platform" />
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <div class="absolute inset-0 pointer-events-none z-50">
+                <div class="container mx-auto px-6 h-full flex flex-col justify-center">
+                    <div class="lg:w-1/2 flex justify-center lg:justify-start pt-[580px] md:pt-[420px]">
+                        <div class="hero-pagination pointer-events-auto flex items-center gap-2"></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    @endif
+    @if ($sliders->isNotEmpty())
     <!-- প্রধান সেকশন (bg-black এবং relative নিশ্চিত করা হয়েছে) -->
     <section class="swiper heroSwiper bg-black relative overflow-hidden h-[90vh] min-h-[500px]">
         
@@ -493,24 +558,6 @@
     }
 </style>
 
-
-<!-- ৩. JavaScript কোড (স্মুথ মাউস প্যারালাক্স মুভমেন্ট) -->
-<script>
-    document.addEventListener('mousemove', (e) => {
-        const blobs = document.querySelectorAll('.blob');
-        // মাউস পজিশন অনুযায়ী কতটুকু সরবে (বেশি বড় সংখ্যা দিলে বেশি নড়বে)
-        const moveFactor = 35; 
-        
-        const x = (window.innerWidth / 2 - e.clientX) / moveFactor;
-        const y = (window.innerHeight / 2 - e.clientY) / moveFactor;
-
-        blobs.forEach((blob, index) => {
-            // একেকটি ব্লব একেক স্পিডে নড়বে যাতে রিয়েলস্টিক থ্রিডি ইফেক্ট আসে
-            const speed = (index + 1) * 0.3; 
-            blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
-        });
-    });
-</script>
     <!-- LOGO SHOWCASE SECTION -->
     @if ($brands->isNotEmpty())
         <section class="bg-black py-16 border-t border-white/5">
@@ -1573,6 +1620,25 @@
 @endsection
 @push('scripts')
     <!-- Accordion + Search Script -->
+     
+
+<!-- ৩. JavaScript কোড (স্মুথ মাউস প্যারালাক্স মুভমেন্ট) -->
+<script>
+    document.addEventListener('mousemove', (e) => {
+        const blobs = document.querySelectorAll('.blob');
+        // মাউস পজিশন অনুযায়ী কতটুকু সরবে (বেশি বড় সংখ্যা দিলে বেশি নড়বে)
+        const moveFactor = 35; 
+        
+        const x = (window.innerWidth / 2 - e.clientX) / moveFactor;
+        const y = (window.innerHeight / 2 - e.clientY) / moveFactor;
+
+        blobs.forEach((blob, index) => {
+            // একেকটি ব্লব একেক স্পিডে নড়বে যাতে রিয়েলস্টিক থ্রিডি ইফেক্ট আসে
+            const speed = (index + 1) * 0.3; 
+            blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
+        });
+    });
+</script>
     <script>
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
