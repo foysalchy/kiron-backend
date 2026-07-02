@@ -23,7 +23,6 @@ class CompanyRegistrationController extends Controller
 
     public function storeBasic(StoreBasicRegistrationRequest $request): JsonResponse
     {
-        return 0;
         $result = $this->registrationService->registerBasic($request->validated());
         return ResponseHelper::created($result, 'Account created successfully.');
     }
