@@ -393,7 +393,7 @@
 
                                 <div class="relative z-10 p-6 md:p-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
+                                        class=" w-[100%]" alt="Core Platform" />
                                 </div>
 
                             </div>
