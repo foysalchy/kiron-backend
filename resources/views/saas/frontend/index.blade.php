@@ -1148,7 +1148,7 @@
                         Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
                         to enterprises that grow with you.
                     </p>
-                    <a href="#"
+                    <a href="{{route('saas.package.list')}}"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Our Pricing
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
@@ -1167,7 +1167,7 @@
                         Discover a complete suite of business tools designed to automate operations, improve efficiency, and
                         help you make faster data-driven decisions.
                     </p>
-                    <a href="#"
+                    <a href="{{route('saas.feature.list')}}"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Features
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>

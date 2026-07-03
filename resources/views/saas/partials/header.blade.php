@@ -23,7 +23,7 @@
         <nav class="hidden lg:flex items-center space-x-8">
             <a href="{{ route('saas.index') }}" class="text-[#34a487] font-semibold text-lg">Home</a>
             <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Features</a>
-            <a href="#"
+            <a href="{{ route('saas.index') }}#intergation"
                 class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Integration</a>
             <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Pricing</a>
             <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Contact</a>
@@ -64,7 +64,7 @@
             <nav class="flex flex-col space-y-5">
                 <a href="{{ route('saas.index') }}" class="text-[#34a487] font-bold text-lg">Home</a>
                 <a href="{{ route('saas.feature.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Features</a>
-                <a href="#"
+                <a href="{{ route('saas.index') }}#intergation"
                     class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Integration</a>
                 <a href="{{ route('saas.package.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Pricing</a>
                 <a href="{{ route('saas.contact') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Contact</a>
