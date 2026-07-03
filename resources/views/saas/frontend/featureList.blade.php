@@ -17,9 +17,11 @@
         <div class="container mx-auto px-6 md:px-10">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($allFeatures as $feature)
-                        <div
+                        <a 
+                        href="{{ route('saas.feature.details', $feature->slug) }}"
                             class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
                             <!-- Icon Area -->
+                             
                             <div
                                 class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
                                 <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl text-[#34a487]"></i>
@@ -34,12 +36,12 @@
                             </p>
 
                             <!-- Link Area -->
-                            <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                            <div 
                                 class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
                                 Read More
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
-                            </a>
-                        </div>
+</div>
+</a>
                     @endforeach
             </div>
 
