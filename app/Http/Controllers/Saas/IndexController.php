@@ -78,7 +78,7 @@ class IndexController extends Controller
     {
         $allFeatures = MasterFeature::where('status', Status::Active->value)
             ->where('placement', 1)
-            ->latest()
+             
             ->paginate(12);
 
         return view('saas.frontend.featureList', compact('allFeatures'));

@@ -58,13 +58,23 @@
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
-                     @foreach ($footerPages as $page)
-                         <li>
-                             <a href="{{ url('/page/' . $page->slug) }}" class="hover:text-white transition">
-                                 {{ $page->title }}
-                             </a>
-                         </li>
-                     @endforeach
+                     <li>
+                         <a href="{{route('saas.package.list')}}" class="hover:text-white transition">Pricing</a>
+                     </li>
+                     <li>
+                         <a href="{{route('saas.feature.list')}}" class="hover:text-white transition">Feathures</a>
+                     </li>
+                     
+                     
+                     <li>
+                         <a href="{{route('saas.blog.list')}}" class="hover:text-white transition">Blog</a>
+                     </li>
+                      <li>
+                         <a href="https://app.dorja.io/register" class="hover:text-white transition">Register</a>
+                     </li>
+                      <li>
+                         <a href="https://app.dorja.io/" class="hover:text-white transition">Login</a>
+                     </li>
                  </ul>
              </div>
 
@@ -75,17 +85,15 @@
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
-                     <li>
-                         <a href="#" class="hover:text-white transition">Our Mission</a>
-                     </li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">Career</a>
-                     </li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">Partnership</a>
-                     </li>
-                     <li>
-                         <a href="#" class="hover:text-white transition">Privacy Center</a>
+                    @foreach ($footerPages as $page)
+                         <li>
+                             <a href="{{ url('/page/' . $page->slug) }}" class="hover:text-white transition">
+                                 {{ $page->title }}
+                             </a>
+                         </li>
+                     @endforeach
+                      <li>
+                         <a href="{{route('saas.faq.list')}}" class="hover:text-white transition">Faq</a>
                      </li>
                  </ul>
              </div>
