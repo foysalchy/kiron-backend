@@ -643,10 +643,10 @@
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
                                 src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
                                   <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/inst.png') }}"
-                                alt="Instagram"></div>
+                                src="{{ asset('./images/saas/live.png') }}"
+                                alt="Live Support"></div>
                         <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
+                                src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
                       
 
                         <!-- Output Logo -->
