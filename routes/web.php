@@ -103,4 +103,6 @@ Route::get('/feature/{slug}', [SaasIndexController::class, 'featureDetails'])->n
 Route::get('/blog-list', [SaasIndexController::class, 'blogPosts'])->name('saas.blog.list');
 Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');
 Route::get('/faq-list', [SaasIndexController::class, 'faqList'])->name('saas.faq.list');
-
+Route::get('/package-list', [SaasIndexController::class, 'packageList'])->name('saas.package.list');
+Route::get('/contact', [SaasIndexController::class, 'contact'])->name('saas.contact');
+Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');

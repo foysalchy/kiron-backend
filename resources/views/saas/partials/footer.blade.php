@@ -6,20 +6,19 @@
              <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
                  <div class="text-center lg:text-left">
                      <h2 class="text-2xl md:text-3xl font-bold mb-3">
-                         আপনার ব্যবসা কি অনলাইনে নিতে প্রস্তুত?
+                         Is your business ready to go online?
                      </h2>
                      <p class="text-gray-400 text-lg md:text-base">
-                         আমাদের নিউজলেটার সাবস্ক্রাইব করুন এবং ই-কমার্স টিপস পান সরাসরি
-                         আপনার ইনবক্সে।
+                         Subscribe to our newsletter and get e-commerce tips directly to your inbox.
                      </p>
                  </div>
 
                  <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-3">
-                     <input type="email" placeholder="ই-মেইল"
+                     <input type="email" placeholder="Email"
                          class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#34a487] transition text-lg" />
                      <button
                          class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
-                         সাবস্ক্রাইব করুন
+                         Subscribe
                      </button>
                  </div>
              </div>
@@ -39,8 +38,7 @@
 
                  </a>
                  <p class="text-gray-400 leading-relaxed text-[15px]">
-                     আপনার ব্যবসার সেলস, ইনভেন্টরি, অ্যাকাউন্টিং, CRM এবং
-                     ই-কমার্স—সবকিছু এখন একটি শক্তিশালী প্ল্যাটফর্মে।
+                     Sales, inventory, accounting, CRM, and e-commerce for your business—all now on one powerful platform.
                  </p>
                  <div class="flex items-center gap-3">
                      @foreach ($socialLinks as $social)
@@ -56,7 +54,7 @@
              <!-- Col 2: Important Links -->
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
-                     গুরুত্বপূর্ণ লিংক
+                     Important Links
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
@@ -73,21 +71,21 @@
              <!-- Col 3: Company -->
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
-                     কোম্পানি
+                     Company
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-[15px]">
                      <li>
-                         <a href="#" class="hover:text-white transition">আমাদের লক্ষ্য</a>
+                         <a href="#" class="hover:text-white transition">Our Mission</a>
                      </li>
                      <li>
-                         <a href="#" class="hover:text-white transition">ক্যারিয়ার</a>
+                         <a href="#" class="hover:text-white transition">Career</a>
                      </li>
                      <li>
-                         <a href="#" class="hover:text-white transition">পার্টনারশিপ</a>
+                         <a href="#" class="hover:text-white transition">Partnership</a>
                      </li>
                      <li>
-                         <a href="#" class="hover:text-white transition">প্রাইভেসি সেন্টার</a>
+                         <a href="#" class="hover:text-white transition">Privacy Center</a>
                      </li>
                  </ul>
              </div>
@@ -95,7 +93,7 @@
              <!-- Col 4: Help & Support -->
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
-                     হেল্প & সাপোর্ট
+                     Help & Support
                      <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
                  </h3>
                  <ul class="space-y-5 text-gray-400 text-[15px]">
@@ -116,7 +114,7 @@
                              @if ($setup && $setup->corporate_address)
                                  {!! $setup->corporate_address !!}
                              @else
-                                 প ২০৮/৩ দক্ষিণ বাড্ডা <br /> ঢাকা -১২২২
+                                 P 208/3 South Baridhara <br /> Dhaka -1222
                              @endif
                          </address>
                      </li>
@@ -128,13 +126,12 @@
          <div
              class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-500">
              <p>
-                 © ২০২৬ <span class="text-white font-semibold"></span> সকল
-                 স্বত্ব সংরক্ষিত।
+                 © 2026 <span class="text-white font-semibold"></span> All rights reserved.
              </p>
              {{-- <div class="flex items-center gap-6">
-                 <a href="#" class="hover:text-white transition">শর্তাবলী</a>
-                 <a href="#" class="hover:text-white transition">গোপনীয়তা</a>
-                 <a href="#" class="hover:text-white transition">কুকি পলিসি</a>
+                 <a href="#" class="hover:text-white transition">Terms</a>
+                 <a href="#" class="hover:text-white transition">Privacy</a>
+                 <a href="#" class="hover:text-white transition">Cookie Policy</a>
              </div> --}}
          </div>
      </div>

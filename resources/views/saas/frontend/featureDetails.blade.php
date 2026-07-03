@@ -95,7 +95,6 @@
                 <div class="hidden lg:flex lg:col-span-1 justify-center">
                     <div class="sticky top-52 flex flex-col gap-6 h-fit pt-2">
                         @if (isset($socialLinks))
-                            {{-- সেফটি চেক --}}
                             @foreach ($socialLinks as $social)
                                 <a href="{{ $social->link ?? $social->url }}" target="_blank"
                                     class="w-10 h-10 rounded-full bg-[#34a487] flex items-center justify-center hover:bg-black hover:text-[#34a487] transition-all shadow-sm text-white">

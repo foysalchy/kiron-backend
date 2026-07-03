@@ -370,11 +370,11 @@
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
                                     <a href="#"
                                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                                        ফ্রি ট্রায়াল শুরু করুন
+                                        Free Trial Start
                                     </a>
                                     <a href="#"
                                         class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
-                                        ডেমো দেখুন <i class="fa-solid fa-play text-xs"></i>
+                                        Watch Demo <i class="fa-solid fa-play text-xs"></i>
                                     </a>
                                 </div>
                             </div>
@@ -439,16 +439,16 @@
                 <div class="text-center mb-16">
                     <span
                         class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-indigo-600 font-semibold text-sm md:text-lg mb-6">
-                        ফিচারসমূহ
+                        Features
                     </span>
                     <h2 class="text-2xl md:text-5xl font-bold text-gray-900 leading-tight">
-                        আপনার ব্যবসার জন্য <br class="hidden md:block" />
-                        দরকারি সব কিছু এখন এক জায়গায়
+                        Everything you need for your business <br class="hidden md:block" />
+                        now in one place
                     </h2>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
-                    {{-- লজিক: যেখানে placement == 1 (Feature) --}}
+                    {{-- Logic: Where placement == 1 (Feature) --}}
                     @foreach ($topFeatures as $feature)
                         <a href="{{ route('saas.feature.details', $feature->slug) }}"
                             class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
@@ -469,7 +469,7 @@
                             <!-- Link Area -->
                             <div
                                 class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
-                                বিস্তারিত জানুন
+                                Learn More
                                 <i class="fa-solid fa-arrow-right text-sm"></i>
                             </div>
                         </a>
@@ -479,24 +479,24 @@
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.feature.list') }}"
                         class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                        আরও ফিচার দেখুন
+                        See More Features
                     </a>
                 </div>
             </div>
         </section>
     @endif
     <!-- INTEGRATION SECTION -->
-    <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden font-manrope">
+    <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden ">
         <div class="max-w-[1400px] mx-auto">
 
             <!-- Section Header -->
             <div class="text-center mb-16">
                 <span
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-bold text-[14px] mb-6 uppercase tracking-wider">
-                    স্মার্ট ইন্টিগ্রেশন
+                    Smart Integration
                 </span>
                 <h2 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
-                    আপনার পুরো ব্যবসা ট্র্যাক করুন এবং অটোমেট করুন
+                    Track and automate your entire business
                 </h2>
                 <p class="text-gray-200 mt-6 text-lg">দেশি-বিদেশি সব গেটওয়ে এখন একটি প্ল্যাটফর্মে।</p>
             </div>
@@ -509,13 +509,13 @@
 
                     <div class="relative border-[#262626] border-[20px]">
                         <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <!-- ৪টি ইনপুট পাথ -->
+                            <!-- 4 Input Paths -->
                             <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
                             <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
                             <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
                             <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <!-- Pulse Animation (4 Paths) -->
                             <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
                             <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
                             <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
@@ -525,12 +525,12 @@
                             <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
-                            <!-- আউটপুট পাথ -->
+                            <!-- Output Path -->
                             <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
                             <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
                         </svg>
 
-                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <!-- 4 Payment Source Logos -->
                         <div class="node-circle small" style="left:13%; top:13.3%;"><img
                                 src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
@@ -542,12 +542,12 @@
                                 src="{{ asset('./images/saas/ssl.png') }}"
                                 alt="Rocket"></div>
 
-                        <!-- আউটপুট লোগো -->
+                        <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
                             <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
                         </div>
 
-                        <!-- মেইন সেন্টার নোড -->
+                        <!-- Main Center Node -->
                         <div class="center-node">
                             <span
                                 class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
@@ -596,12 +596,12 @@
                                 src="{{ asset('./images/saas/rocket.png') }}"
                                 alt="Rocket"></div>
 
-                        <!-- আউটপুট লোগো -->
+                        <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
                             <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
                         </div>
 
-                        <!-- মেইন সেন্টার নোড -->
+                        <!-- Main Center Node -->
                         <div class="center-node">
                             <span
                                 class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
@@ -650,12 +650,12 @@
                                 src="{{ asset('./images/saas/ssl.png') }}" alt="SSL"></div>
                       
 
-                        <!-- আউটপুট লোগো -->
+                        <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
                             <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
                         </div>
 
-                        <!-- মেইন সেন্টার নোড -->
+                        <!-- Main Center Node -->
                         <div class="center-node">
                             <span
                                 class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
@@ -703,12 +703,12 @@
                                 src="https://logowik.com/content/uploads/images/rocket-mobile-banking4547.jpg"
                                 alt="Rocket"></div>
 
-                        <!-- আউটপুট লোগো -->
+                        <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
                             <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
                         </div>
 
-                        <!-- মেইন সেন্টার নোড -->
+                        <!-- Main Center Node -->
                         <div class="center-node">
                             <span
                                 class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
@@ -731,12 +731,12 @@
             <div class="text-center mb-16">
                 <span
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-[15px] mb-6">
-                    ইন্টিগ্রেশন
+                    Integration
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight max-w-4xl mx-auto">
-                    আপনার পুরো ব্যবসা ট্র্যাক করুন, অটোমেট করুন
+                    Track and automate your entire business
                     <br class="hidden md:block" />
-                    এবং দ্রুত গ্রো করুন — একটি স্মার্ট সিস্টেম দিয়ে।
+                    and grow fast — with one smart system. — একটি স্মার্ট সিস্টেম দিয়ে।
                 </h2>
             </div>
 
@@ -948,21 +948,21 @@
                 <div class="text-center mb-12">
                     <span
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                        ডেমো & টেমপ্লেট
+                        Demo & Template
                     </span>
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-10">
-                        এক প্ল্যাটফর্মে পুরো সিস্টেম লাইভ এক্সপেরিয়েন্স নিন
+                        Get a complete system live experience on one platform
                     </h2>
 
-                    <!-- Tabs Container (ক্লিকেবল ও হোভার ইফেক্ট ফিক্সড) -->
+                    <!-- Tabs Container (Clickable and Hover Effect Fixed) -->
                     <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
                         <button onclick="filterDemos(1, this)"
                             class="tab-btn bg-[#34a487] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
-                            ল্যান্ডিং পেজ টেমপ্লেট
+                            Landing Page Template
                         </button>
                         <button onclick="filterDemos(2, this)"
                             class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#34a487] transition-all">
-                            ই-কমার্স টেমপ্লেট
+                            E-Commerce Template
                         </button>
                     </div>
                 </div>
@@ -1078,7 +1078,7 @@
 
             @foreach ($rows as $row)
                 <div class="relative flex overflow-hidden">
-                    {{-- কন্টেইনার যেটির ওপর অ্যানিমেশন কাজ করবে --}}
+                    {{-- Container that animation will work on --}}
                     <div class="{{ $row['class'] }}" style="--duration: {{ $row['duration'] }}">
 
                         {{-- একই কন্টেন্ট দুইবার দেওয়া হয়েছে যাতে লুপটি নিরবচ্ছিন্ন হয় --}}
@@ -1264,14 +1264,162 @@
 
         </div>
     </section>
+    @if ($pricingPlans->isNotEmpty())
+        <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
+            <div class="container mx-auto">
 
+                <div class="text-center mb-20">
+                    <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan
+                    </h1>
+                    <p class="text-gray-500 text-lg">Here are the best packages for your business below.</p>
+                </div>
+
+                @php
+                    $sortedPlans = $pricingPlans->sortBy(function ($plan) {
+                        $m = strtolower($plan->mode);
+                        if ($m === 'regular') {
+                            return 1;
+                        }
+                        if ($m === 'popular') {
+                            return 2;
+                        }
+                        return 3;
+                    });
+                @endphp
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+
+                    @foreach ($sortedPlans as $plan)
+                        @php
+                            $mode = strtolower($plan->mode);
+                            $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
+                            $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
+
+                            $themeColor = '#1e1b4b'; // Default color for 'contact' mode
+                            $isSpecialMode = false;
+
+                            if ($mode === 'regular') {
+                                $themeColor = '#a855f7'; // Purple
+                                $isSpecialMode = true;
+                            } elseif ($mode === 'popular') {
+                                $themeColor = '#0073ea'; // Blue
+                                $isSpecialMode = true;
+                            }
+                        @endphp
+
+                        <!-- Card Container -->
+                        <div class="bg-white border border-gray-200 flex flex-col h-full p-7 transition-all duration-300 relative border-t-[6px] shadow-sm hover:shadow-xl"
+                            style="border-top-color: {{ $themeColor }};">
+
+                            <!-- Header: Title and Most Popular Badge -->
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
+
+                                @if ($mode === 'popular')
+                                    <div
+                                        class="relative bg-[#0073ea] text-white text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
+                                        <span>Most Popular</span>
+                                        <div
+                                            class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Price Section -->
+                            <div class="mb-8">
+                                <div class="flex items-start gap-1">
+                                    <span class="text-3xl font-bold"
+                                        style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
+                                        {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }}
+                                    </span>
+                                    <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
+                                        <span>seat /</span><br>
+                                        <span>month</span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <p class="text-gray-900 font-bold text-sm">Total
+                                        {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / month</p>
+                                    <p class="text-gray-400 text-xs">Billed annually</p>
+                                </div>
+                            </div>
+
+                            <!-- CTA Button -->
+                            <div class="mb-8">
+                                <a href=""
+                                    class="block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all hover:bg-gray-50"
+                                    style="border-color: {{ $themeColor }}; color: {{ $themeColor }};">
+                                    {{ $mode === 'regular' || $mode === 'popular' ? 'Try for Free' : 'Contact Us' }}
+                                </a>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-10">
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    {{ $plan->description ?? 'Manage all your work in one place with our smart system.' }}
+                                </p>
+                            </div>
+
+                            <!-- Features/Limits Section (Fixed at bottom) -->
+                            <div class="mt-auto">
+                                <hr class="border-gray-200 border-1 mb-8">
+
+                                <div class="space-y-4">
+                                    <p class="font-bold text-gray-900 text-sm">{{ $plan->name }} includes:</p>
+
+                                    <div class="flex justify-between items-center text-gray-700 text-sm">
+                                        <span>User Limit: {{ $plan->user_limit ?: 'Unlimited' }}</span>
+                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                    </div>
+
+                                    <div class="flex justify-between items-center text-gray-700 text-sm">
+                                        <span>Product Limit: {{ $plan->product_limit ?: 'Unlimited' }}</span>
+                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                    </div>
+
+                                    <div class="flex justify-between items-center text-gray-700 text-sm">
+                                        <span>Order Limit: {{ $plan->order_limit ?: 'Unlimited' }}</span>
+                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                    </div>
+
+                                    <div class="flex justify-between items-center text-gray-700 text-sm">
+                                        <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
+                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                    </div>
+
+                                    {{-- কাস্টম মাল্টিপল ইনপুট লুপ --}}
+                                    @if (!empty($plan->multiple_input))
+                                        @foreach ($plan->multiple_input as $extraDetail)
+                                            <div class="flex justify-between items-center text-gray-700 text-sm">
+                                                <span>{{ $extraDetail }}</span>
+                                                <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                </div>
+                <div class="mt-16 text-center">
+                    <a href="{{ route('saas.package.list') }}"
+                        class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        More Packages <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
     @if ($whyChooseUs->isNotEmpty())
         <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
             <div class="container mx-auto">
                 <div class="text-center mb-20">
                     <h2 class="text-white text-3xl md:text-4xl font-extrabold">
-                        কেন আমাদের সিস্টেম বেছে নেবেন?
+                        Why Choose Our System?
                     </h2>
                 </div>
 
@@ -1298,7 +1446,7 @@
                 <div class="mt-28 text-center">
                     <a href="#"
                         class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
-                        ফ্রি ট্রায়াল শুরু করুন
+                        Free Trial Start
                     </a>
                 </div>
             </div>
@@ -1370,17 +1518,16 @@
                 <div class="text-center mb-16">
                     <span
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                        কাস্টমার রিভিউ
+                        Customer Reviews
                     </span>
                     <h2 class="text-3xl md:text-5xl font-black text-gray-900">
-                        আমাদের গ্রাহকদের মতামত
+                        What our customers say
                     </h2>
                 </div>
 
                 <!-- Masonry Grid -->
                 <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="review-container">
                     @foreach ($allReviews as $index => $review)
-                        {{-- শুরুতে ৬টার বেশি হলে 'hidden' ক্লাস পাবে --}}
                         <div
                             class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
@@ -1409,7 +1556,7 @@
                     <div class="mt-16 text-center">
                         <button id="load-more-reviews"
                             class="inline-block bg-[#34a487] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                            আরও দেখুন
+                            See More
                         </button>
                     </div>
                 @endif
@@ -1565,19 +1712,16 @@
         //review
         document.addEventListener('DOMContentLoaded', function() {
             const loadMoreBtn = document.getElementById('load-more-reviews');
-            const itemsToShow = 6; // প্রতি ক্লিকে কয়টি করে নতুন রিভিউ দেখাবে
+            const itemsToShow = 6;
 
             if (loadMoreBtn) {
                 loadMoreBtn.addEventListener('click', function() {
-                    // বর্তমানে লুকানো আছে এমন সব কার্ড খুঁজে বের করা
                     const hiddenCards = document.querySelectorAll('.review-card.hidden');
 
-                    // পরবর্তী ৬টি কার্ড থেকে hidden ক্লাস সরিয়ে দেওয়া
                     for (let i = 0; i < itemsToShow && i < hiddenCards.length; i++) {
                         hiddenCards[i].classList.remove('hidden');
                     }
 
-                    // যদি আর কোনো লুকানো কার্ড না থাকে, তবে বাটনটি হাইড করে দেওয়া
                     if (document.querySelectorAll('.review-card.hidden').length === 0) {
                         loadMoreBtn.style.display = 'none';
                     }

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Saas;
 use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\ContactMessage;
 use App\Models\CustomerReview;
 use App\Models\KnowledgeBase;
 use App\Models\MasterBrand;
 use App\Models\MasterDemo;
 use App\Models\MasterFeature;
+use App\Models\PricingPackage;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
@@ -30,7 +32,7 @@ class IndexController extends Controller
         $topFeatures = MasterFeature::where('status', Status::Active->value)
             ->where('placement', 1)
             ->take(6)
-            ->select('title', 'subtitle', 'icon','slug')
+            ->select('title', 'subtitle', 'icon', 'slug')
             ->get();
 
         $whyChooseUs = MasterFeature::where('status', Status::Active->value)
@@ -56,6 +58,9 @@ class IndexController extends Controller
             ->latest()
             ->take(3)
             ->get();
+        $pricingPlans = PricingPackage::where('status', Status::Active->value)
+            ->take(4)
+            ->get();
         return view('saas.frontend.index', compact(
             'sliders',
             'brands',
@@ -65,7 +70,8 @@ class IndexController extends Controller
             'totalReviews',
             'demos',
             'allReviews',
-            'blogs'
+            'blogs',
+            'pricingPlans'
         ));
     }
     public function features()
@@ -125,5 +131,39 @@ class IndexController extends Controller
             ->latest()
             ->get();
         return view('saas.frontend.faqList', compact('faqs'));
+    }
+    public function packageList()
+    {
+        $pricingPlans = PricingPackage::where('status', Status::Active->value)
+            ->latest()
+            ->get();
+        return view('saas.frontend.pricingList', compact('pricingPlans'));
+    }
+    public function contact()
+    {
+        return view('saas.frontend.contact');
+    }
+    public function send(Request $request)
+    {
+        // ১. ভ্যালিডেশন
+        $validated = $request->validate([
+            'name'    => 'required|string|max:255',
+            'email'   => 'required|email|max:255',
+            'phone'   => 'required|string|max:20',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string',
+        ]);
+
+        ContactMessage::create([
+            'company_id' => null,
+            'name'       => $request->name,
+            'email'      => $request->email,
+            'phone'      => $request->phone,
+            'subject'    => $request->subject,
+            'message'    => $request->message,
+            'is_read'    => 0,
+        ]);
+
+        return back()->with('success', 'Your message has been received. Thank you!');
     }
 }

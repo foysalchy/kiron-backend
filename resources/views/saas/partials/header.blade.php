@@ -21,23 +21,23 @@
 
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
-            <a href="{{ route('saas.index') }}" class="text-[#34a487] font-semibold text-lg">হোম</a>
-            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ফিচারসমূহ</a>
+            <a href="{{ route('saas.index') }}" class="text-[#34a487] font-semibold text-lg">Home</a>
+            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Features</a>
             <a href="#"
-                class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">ইন্টিগ্রেশন</a>
-            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">প্রাইসিং</a>
-            <a href="#" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">যোগাযোগ</a>
+                class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Integration</a>
+            <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Pricing</a>
+            <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Contact</a>
         </nav>
 
         <!-- Right Side Buttons -->
         <div class="flex items-center space-x-3 md:space-x-6">
             <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#34a487]">
-                লগইন
+                Login
             </a>
             <!-- CTA Button (Responsive Padding & Font) -->
             <a href="https://app.dorja.io/register"
                 class="bg-[#34a487] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
-                ফ্রি ট্রায়াল <span class="hidden sm:inline">শুরু করুন</span>
+                Free Trial <span class="hidden sm:inline">Start</span>
             </a>
 
             <!-- Mobile Menu Toggle Button -->
@@ -55,22 +55,22 @@
         <!-- Sidebar Content -->
         <div class="absolute right-0 top-0 h-full w-[280px] bg-white shadow-2xl p-6">
             <div class="flex items-center justify-between mb-8">
-                <span class="font-bold text-xl">মেনু</span>
+                <span class="font-bold text-xl">Menu</span>
                 <button id="menu-close" class="text-gray-700 text-2xl">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <nav class="flex flex-col space-y-5">
-                <a href="{{ route('saas.index') }}" class="text-[#34a487] font-bold text-lg">হোম</a>
-                <a href="{{ route('saas.feature.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ফিচারসমূহ</a>
+                <a href="{{ route('saas.index') }}" class="text-[#34a487] font-bold text-lg">Home</a>
+                <a href="{{ route('saas.feature.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Features</a>
                 <a href="#"
-                    class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">ইন্টিগ্রেশন</a>
-                <a href="#" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">প্রাইসিং</a>
-                <a href="#" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">যোগাযোগ</a>
+                    class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Integration</a>
+                <a href="{{ route('saas.package.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Pricing</a>
+                <a href="{{ route('saas.contact') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Contact</a>
                 <div class="pt-4">
-                    <a href="#"
-                        class="block text-center bg-gray-100 text-gray-900 py-3 rounded-xl font-bold">লগইন</a>
+                    <a href="https://app.dorja.io"
+                        class="block text-center bg-gray-100 text-gray-900 py-3 rounded-xl font-bold">Login</a>
                 </div>
             </nav>
         </div>
