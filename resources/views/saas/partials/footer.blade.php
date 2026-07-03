@@ -92,6 +92,9 @@
                              </a>
                          </li>
                      @endforeach
+                     <li>
+                         <a href="{{route('saas.contact')}}" class="hover:text-white transition">Contact Us</a>
+                     </li>
                       <li>
                          <a href="{{route('saas.faq.list')}}" class="hover:text-white transition">Faq</a>
                      </li>
