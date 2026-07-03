@@ -125,7 +125,7 @@
                     </div>
 
                    
-                        <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}" class="w-full rounded-xl shadow-lg mb-8"
+                        <img src="{{ $blogPost->thumbnail_url ? asset($blogPost->thumbnail_url) : asset('images/saas/live1.png') }}" class="w-full rounded-xl shadow-lg mb-8"
                             alt="{{ $blogPost->title }}" />
              
 
