@@ -585,17 +585,16 @@
                             <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
                         </svg>
 
-                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
+                                  <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/carrybee.png') }}"
+                                alt="carrybee"></div>
                         <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/sslcommerz.png') }}" alt="SSL"></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/rocket.png') }}"
-                                alt="Rocket"></div>
-
+                                src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
+                      
                         <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
                             <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
@@ -640,14 +639,14 @@
 
                         <!-- ৪টি পেমেন্ট সোর্স লোগো -->
                         <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                                src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
                                   <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/rocket.png') }}"
-                                alt="Rocket"></div>
+                                src="{{ asset('./images/saas/inst.png') }}"
+                                alt="Instagram"></div>
                         <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/ssl.png') }}" alt="SSL"></div>
+                                src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
                       
 
                         <!-- Output Logo -->
@@ -694,14 +693,14 @@
 
                         <!-- ৪টি পেমেন্ট সোর্স লোগো -->
                         <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                                src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
                         <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/sslcommerz.png') }}" alt="SSL"></div>
+                                src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
                         <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://logowik.com/content/uploads/images/rocket-mobile-banking4547.jpg"
-                                alt="Rocket"></div>
+                                src="{{ asset('./images/saas/daraz.png') }}"
+                                alt="Daraz"></div>
 
                         <!-- Output Logo -->
                         <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
