@@ -72,6 +72,7 @@
 @endpush
 
 @section('content')
+
     <!-- ১. Breadcrumb Section (Same design as your blog) -->
     <section class="">
         <div class="container mx-auto px-6 md:px-10">
