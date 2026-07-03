@@ -107,10 +107,10 @@ class SiteSettingController extends Controller
     }
     public function updateInvoiceTemplate(Request $request)
     {
-        $request->validate([
-            'template_id'     => 'required',
-            'primary_color'   => 'nullable|string',
-            'secondary_color' => 'nullable|string',
+        $validated = $request->validate([
+            'template_id'     => 'required|string',
+            'primary_color'   => 'nullable|string|max:20',
+            'secondary_color' => 'nullable|string|max:20',
         ]);
 
         try {
@@ -126,16 +126,16 @@ class SiteSettingController extends Controller
 
             $company->update([
                 'invoice_template' => [
-                    'id'              => $request->template_id,
-                    'primary_color'   => $request->primary_color,
-                    'secondary_color' => $request->secondary_color,
+                    'id'              => $validated['template_id'],
+                    'primary_color'   => $validated['primary_color'] ?? null,
+                    'secondary_color' => $validated['secondary_color'] ?? null,
                 ]
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Invoice settings updated successfully!',
-                'data'    => $company
+                'data'    => $company->fresh()
             ], 200);
         } catch (\Exception $e) {
             Log::error('Invoice Template Update Error: ' . $e->getMessage());
@@ -148,15 +148,14 @@ class SiteSettingController extends Controller
     }
     public function updateThemeTemplate(Request $request)
     {
-
-        $request->validate([
-            'theme_id'             => 'required',
-            'primary_color'        => 'nullable|string',
-            'secondary_color'      => 'nullable|string',
-            'primary_text_color'   => 'nullable|string',
-            'secondary_text_color' => 'nullable|string',
-            'card_id'              => 'nullable|string',
-            'is_review'            => 'nullable',
+        $validated = $request->validate([
+            'theme_id'             => 'required|string',
+            'primary_color'        => 'nullable|string|max:20',
+            'secondary_color'      => 'nullable|string|max:20',
+            'primary_text_color'   => 'nullable|string|max:20',
+            'secondary_text_color' => 'nullable|string|max:20',
+            'card_id'              => 'nullable|string|max:100',
+            'is_review'            => 'nullable|boolean',
         ]);
 
         try {
@@ -172,35 +171,36 @@ class SiteSettingController extends Controller
 
             $company->update([
                 'theme_template' => [
-                    'id'                   => $request->theme_id,
-                    'primary_color'        => $request->primary_color,
-                    'secondary_color'      => $request->secondary_color,
-                    'primary_text_color'   => $request->primary_text_color,
-                    'secondary_text_color' => $request->secondary_text_color,
+                    'id'                   => $validated['theme_id'],
+                    'primary_color'        => $validated['primary_color'] ?? null,
+                    'secondary_color'      => $validated['secondary_color'] ?? null,
+                    'primary_text_color'   => $validated['primary_text_color'] ?? null,
+                    'secondary_text_color' => $validated['secondary_text_color'] ?? null,
                 ]
             ]);
 
             $domain = DomainSetup::where('company_id', $company->id)->first();
 
-            if ($domain && $request->has('is_review')) {
+            if ($domain) {
                 $domain->update([
-                    'is_review' => $request->is_review,
-                    'product_card_template'              => $request->card_id,
-                    'template_name'              => 'template' . $request->theme_id,
-
+                    'template_name'          => 'template' . $validated['theme_id'],
+                    'product_card_template'  => $validated['card_id'] ?? $domain->product_card_template,
+                    'is_review'              => array_key_exists('is_review', $validated)
+                        ? $validated['is_review']
+                        : $domain->is_review,
                 ]);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Theme settings updated successfully!',
-                'data'    => $company->fresh()
+                'data'    => $company->fresh()->load('domainSetup') // 👈 relation load kora holo
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Invoice Template Update Error: ' . $e->getMessage());
+            Log::error('Theme Template Update Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update invoice settings.'
+                'message' => 'Failed to update theme settings.'
             ], 500);
         }
     }

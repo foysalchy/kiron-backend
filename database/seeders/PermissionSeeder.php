@@ -217,6 +217,7 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_content',      'Content Settings',        'settings_content');
         $addCrud('settings_invoice',      'Invoice Settings',        'settings_invoice');
         $addCrud('settings_theme',         'Theme Settings',        'settings_theme');
+        $addCrud('settings_menu',         'Menu Settings',        'settings_menu');
 
         //21. Subscriptions
         $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');

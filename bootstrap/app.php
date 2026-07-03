@@ -30,14 +30,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'company.access' => \App\Http\Middleware\CheckCompanyAccess::class,
             'super_admin' => CheckSuperAdmin::class,
             'check.user.status' => CheckUserAccessStatus::class,
+            'subscription.active' => \App\Http\Middleware\EnsureSubscriptionActive::class,
+
 
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/*', // Disable CSRF for API routes
         ]);
-    //     $middleware->web(append: [
-    //     \App\Http\Middleware\ClearOrderSession::class,
-    // ]);
+        //     $middleware->web(append: [
+        //     \App\Http\Middleware\ClearOrderSession::class,
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

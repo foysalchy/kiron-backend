@@ -10,6 +10,7 @@ use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AttributeGroup;
 use App\Models\Bin;
+use App\Models\Brand;
 use App\Models\Cell;
 use App\Models\ChartOfAccount;
 use App\Models\Company;
@@ -239,7 +240,11 @@ class SelectOptionController extends Controller
     }
     public function megaCategoryOptions()
     {
-        return MegaCategory::select('id', 'name')->orderBy('name', 'asc')->get();
+        return MegaCategory::select('id', 'name','slug')->orderBy('name', 'asc')->get();
+    }
+    public function brandOptions()
+    {
+        return Brand::select('id', 'name','slug')->orderBy('name', 'asc')->get();
     }
     public function nestedCategoryOptions()
     {

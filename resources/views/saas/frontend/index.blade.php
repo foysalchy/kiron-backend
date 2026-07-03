@@ -156,11 +156,11 @@
         .node-circle {
             position: absolute;
             transform: translate(-50%, -50%);
-            border-radius: 9999px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #171B22;
+            background: #ffffff;
             border: 1.4px solid #2A303B;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
             transition: all .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -173,7 +173,7 @@
         }
 
         .node-circle.small {
-            width: 52px;
+            width: 90px;
             height: 52px;
         }
 
@@ -188,9 +188,9 @@
             left: 48.9%;
             top: 50%;
             transform: translate(-50%, -50%);
-            width: 95px;
-            height: 95px;
-            border-radius: 9999px;
+            width: 120px;
+            height: 60px;
+            border-radius: 5px;
             background: linear-gradient(145deg, #34a487, #2c8a71);
             border: 2px solid #ffffff;
             box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
@@ -361,7 +361,7 @@
                                 </h1>
 
                                 <p
-                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0 min-h-[4.5em] md:min-h-[6em] line-clamp-3 md:line-clamp-4 overflow-hidden text-ellipsis">
+                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
                                     {{ $slider->description }}
                                 </p>
 
@@ -393,7 +393,7 @@
 
                                 <div class="relative z-10 p-6 md:p-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class="w-16 h-16 md:w-[55vh] md:h-[40vh] object-contain" alt="Core Platform" />
+                                        class=" w-[90%] max-w-[90%]" alt="Core Platform" />
                                 </div>
 
                             </div>
@@ -501,14 +501,13 @@
                 <p class="text-gray-200 mt-6 text-lg">দেশি-বিদেশি সব গেটওয়ে এখন একটি প্ল্যাটফর্মে।</p>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2  ">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 ">
 
-                <!-- Graph 1: Payment Method (4 Paths) -->
-                <div class="bg-black border border-r-[#1f1f1f] border-b-[#1f1f1f]   p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">Real-time
-                        Payment Flow</h3>
+                <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
+                <div class="  border     shadow-sm relative group">
+                     
 
-                    <div class="relative">
+                    <div class="relative border-[#262626] border-[20px]">
                         <svg viewBox="0 0 460 300" class="w-full h-auto">
                             <!-- 4 Input Paths -->
                             <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
@@ -522,8 +521,8 @@
                             <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
                             <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
-                            <!-- Central Pulse Ring -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none" stroke="#34a487"
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
                                 stroke-width="1.5" />
 
                             <!-- Output Path -->
@@ -532,6 +531,168 @@
                         </svg>
 
                         <!-- 4 Payment Source Logos -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/ssl.png') }}"
+                                alt="Rocket"></div>
+
+                        <!-- Output Logo -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- Main Center Node -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">     Multiple Payment Gateways </h3>
+                        Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept secure online payments, automate payment confirmation, and manage every transaction from a single platform. 
+                    </div>
+                </div>
+                
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/sslcommerz.png') }}" alt="SSL"></div>
+                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}"
+                                alt="Rocket"></div>
+
+                        <!-- Output Logo -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- Main Center Node -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">   Ship Orders with Multiple Courier Partners </h3>
+                       Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
+                    </div>
+                </div>
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+                                  <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                src="{{ asset('./images/saas/rocket.png') }}"
+                                alt="Rocket"></div>
+                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                src="{{ asset('./images/saas/ssl.png') }}" alt="SSL"></div>
+                      
+
+                        <!-- Output Logo -->
+                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
+                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                        </div>
+
+                        <!-- Main Center Node -->
+                        <div class="center-node">
+                            <span
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">  Manage Customer Conversations from Every Channel </h3>
+                  Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified inbox. Respond faster, manage conversations efficiently, and deliver a better customer experience.
+                    </div>
+                </div>
+                <div class="  border     shadow-sm relative group">
+                     
+
+                    <div class="relative border-[#262626] border-[20px]">
+                        <svg viewBox="0 0 460 300" class="w-full h-auto">
+                            <!-- ৪টি ইনপুট পাথ -->
+                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
+                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
+                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+
+                            <!-- সেন্ট্রাল পালস রিং -->
+                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
+                                stroke-width="1.5" />
+
+                            <!-- আউটপুট পাথ -->
+                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
+                        </svg>
+
+                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
                         <div class="node-circle small" style="left:13%; top:13.3%;"><img
                                 src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
                         <div class="node-circle small" style="left:13%; top:37.6%;"><img
@@ -550,165 +711,17 @@
                         <!-- Main Center Node -->
                         <div class="center-node">
                             <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment<br>Hub</span>
+                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- Graph 2: Courier Service (4 Paths) -->
-                <div class="bg-black border border-b-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">Automated
-                        Shipping Flow</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- 4 Courier Source Logos -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Shipping<br>Hub</span>
-                        </div>
+                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel </h3>
+                 Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other connected sales channels through a single dashboard. Process, fulfill, and track every order from one centralized platform.
                     </div>
                 </div>
+                
 
-
-                <div class="bg-black border border-r-[#1f1f1f] p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">Automated
-                        Shipping Flow</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- 4 Courier Source Logos -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Shipping<br>Hub</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-black border p-6 md:p-12 shadow-sm relative group">
-                    <h3 class="text-center font-black text-gray-400 uppercase tracking-widest text-lg mb-10">Automated
-                        Shipping Flow</h3>
-
-                    <div class="relative">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
-                                style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
-                                style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
-                                style="animation-delay:1.2s" />
-
-                            <circle class="ring-pulse" cx="225" cy="150" r="34" fill="none"
-                                stroke="#34a487" stroke-width="1.5" />
-
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
-                                style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- 4 Courier Source Logos -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.png') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.png') }}" alt="Pathao"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><span
-                                class="font-black text-orange-500 text-[9px]">CarryBee</span></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="https://static.redx.com.bd/redx-logo.png" alt="RedX"
-                                onerror="this.src='https://via.placeholder.com/50?text=RedX'"></div>
-
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Shipping<br>Hub</span>
-                        </div>
-                    </div>
-                </div>
+                
             </div>
         </div>
     </section>
@@ -744,7 +757,7 @@
                         <!-- Middle Node Box -->
                         <div
                             class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
-                            Payment Method
+                            Payment Methods
                         </div>
 
                         <!-- The Fork Connection Line -->
@@ -802,6 +815,96 @@
                         <div
                             class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Courier Management
+                        </div>
+
+                        <div class="w-full relative flex flex-col items-center">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="flex justify-between w-full px-[16.6%]">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 w-full">
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Steadfast" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Pathao" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
+                                        class="text-[#000]">Bee</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                    <div class="flex flex-col items-center w-full">
+                        <!-- Top Shopify Icon -->
+                        <div
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            <i class="fa-brands fa-shopify text-white text-4xl"></i>
+                        </div>
+
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+
+                        <div
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            Omni Channel Chat
+                        </div>
+
+                        <div class="w-full relative flex flex-col items-center">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="flex justify-between w-full px-[16.6%]">
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 w-full">
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Steadfast" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
+                                    alt="Pathao" />
+                            </div>
+                            <div
+                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
+                                        class="text-[#000]">Bee</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-14">
+                    <div class="flex flex-col items-center w-full">
+                        <!-- Top Shopify Icon -->
+                        <div
+                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            <i class="fa-brands fa-shopify text-white text-4xl"></i>
+                        </div>
+
+                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+
+                        <div
+                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                           Order Source
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
@@ -892,22 +995,80 @@
     @endif
     @php
         $badges = [
-            'Fitness',
-            'Gift Items',
-            'Organic Food',
-            'Gadgets',
-            'Electronics',
-            'Cosmetics',
-            'Home Decor',
-            'Islamic',
+              'ERP',
+                'Business Management',
+                'Cloud ERP',
+                'Business Software',
+                'SaaS',
+                'Business Automation',
+                'Enterprise Software',
+                'Digital Business',
+                'Business Solution',
+                'Workflow Automation',
+                'Business Dashboard',
+                'Business Analytics',
+                'Reports',
+                'Financial Management',
+                'Business Intelligence',
+                'Organization Management',
+                'Operations Management',
+                'Productivity',
+                'SME Software',
+                'Enterprise Resource Planning',
+        ];
+                $badges2 = [
+               
+                'POS System',
+        'Point of Sale',
+        'Sales Management',
+        'Order Management',
+        'Inventory Management',
+        'Stock Management',
+        'Warehouse Management',
+        'Product Management',
+        'SKU Management',
+        'Barcode Management',
+        'Purchase Management',
+        'Supplier Management',
+        'Invoice Management',
+        'Quotation',
+        'Billing Software',
+        'eCommerce',
+        'WooCommerce',
+        'Courier Integration',
+        'Payment Gateway',
+        'Multi Warehouse',
+        ];
+         $badges3 = [
+               
+            'CRM',
+        'Customer Management',
+        'Customer Analytics',
+        'Lead Management',
+        'HRM',
+        'Payroll',
+        'Employee Management',
+        'Attendance Management',
+        'Marketing Automation',
+        'Email Marketing',
+        'SMS Marketing',
+        'Landing Page Builder',
+        'CMS',
+        'Website Management',
+        'Multi Branch',
+        'Profit & Loss',
+        'Accounting',
+        'Expense Management',
+        'Income Management',
+        'Cloud Software',
         ];
 
         $rows = [
             ['class' => 'animate-marquee-left', 'data' => $badges, 'duration' => '30s'],
 
-            ['class' => 'animate-marquee-right', 'data' => collect($badges)->reverse()->all(), 'duration' => '35s'],
+            ['class' => 'animate-marquee-right', 'data' => collect($badges2)->reverse()->all(), 'duration' => '35s'],
 
-            ['class' => 'animate-marquee-left', 'data' => collect($badges)->shuffle()->all(), 'duration' => '40s'],
+            ['class' => 'animate-marquee-left', 'data' => collect($badges3)->shuffle()->all(), 'duration' => '40s'],
         ];
     @endphp
 

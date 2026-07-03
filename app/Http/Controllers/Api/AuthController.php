@@ -119,6 +119,11 @@ class AuthController extends Controller
             ? 'Super Admin'
             : ($user->roles->first()?->name ?? 'User');
 
+        $billingRequired = false;
+        if (! $user->is_super_admin && $user->company) {
+            $billingRequired = ! $user->company->hasActiveAccess();
+        }
+
         return [
             'success' => true,
             'message' => 'Login successful',
@@ -132,10 +137,12 @@ class AuthController extends Controller
                 'company_id' => $user->company_id,
                 'role' => $primaryRoleName,
                 'is_super_admin' => $user->is_super_admin,
+                'setup_complete'    => (bool) $user->setup_complete,
                 'status' => $user->status,
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
                 'company' => $user->company,
+                'billing_required' => $billingRequired,
             ],
             'permissions' => $effectivePermissions,
         ];
@@ -172,37 +179,42 @@ class AuthController extends Controller
         );
     }
 
-      public function me(Request $request): JsonResponse
+    public function me(Request $request): JsonResponse
     {
-        // Load relationships matching your login setup
         $user = $request->user()->load(['company.pricingPackage', 'roles.permissions']);
 
-        // Calculate dynamic permissions using the helper method
         $effectivePermissions = $this->getEffectivePermissions($user);
 
         $primaryRoleName = $user->is_super_admin
             ? 'Super Admin'
             : ($user->roles->first()?->name ?? 'User');
 
+        $billingRequired = false;
+        if (! $user->is_super_admin && $user->company) {
+            $billingRequired = ! $user->company->hasActiveAccess();
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Profile retrieved successfully',
             'user' => [
-                'id'             => $user->id,
-                'name'           => $user->name,
-                'email'          => $user->email,
-                'company_id'     => $user->company_id,
-                'role'           => $primaryRoleName,
-                'is_super_admin' => $user->is_super_admin,
-                'status'         => $user->status,
-                'profile'        => $user->profile,
-                'profile_url'    => $user->profile_url,
-                'company'        => $user->company,
+                'id'                => $user->id,
+                'name'              => $user->name,
+                'email'             => $user->email,
+                'company_id'        => $user->company_id,
+                'role'              => $primaryRoleName,
+                'is_super_admin'    => $user->is_super_admin,
+                'setup_complete'    => (bool) $user->setup_complete,
+                'status'            => $user->status,
+                'profile'           => $user->profile,
+                'profile_url'       => $user->profile_url,
+                'company'           => $user->company,
+                'billing_required'  => $billingRequired,
             ],
             'permissions' => $effectivePermissions,
         ]);
     }
- private function getEffectivePermissions(User $user): array
+    private function getEffectivePermissions(User $user): array
     {
         $effectivePermissions = [];
 
@@ -253,7 +265,7 @@ class AuthController extends Controller
     /**
      * Refactored login handler
      */
-  
+
     public function impersonateCompany($companyId, Request $request): JsonResponse
     {
         DB::beginTransaction();
