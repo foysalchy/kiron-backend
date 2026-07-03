@@ -4,6 +4,66 @@
         .hero-bg {
             background: radial-gradient(circle at 70% 30%, #124738 0%, #030f0c 60%);
         }
+        
+.pin-wrap{
+    display:flex;
+    gap:24px;
+    /* width:max-content; */
+}
+.animated-border {
+    position: relative;
+   
+    color: #fff;
+    border: 5px solid transparent;
+    border-radius: 12px;
+    background:
+        linear-gradient(#ffff,rgb(255, 255, 255)) padding-box,
+        linear-gradient(
+            90deg,
+            #34a487,
+            #fff,
+            #fff,
+            #fff,
+            #fff
+        ) border-box;
+    background-size: 100% 100%, 300% 100%;
+    animation: borderAnimation 5s linear infinite;
+}
+
+@keyframes borderAnimation {
+    0% {
+        background-position: 0 0, 0% 50%;
+    }
+    100% {
+        background-position: 0 0, 300% 50%;
+    }
+}
+.animated-text {
+    background: linear-gradient(
+        90deg,
+        #34a487,
+        #4fd1c5,
+        #7c3aed,
+        #34a487
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: textGradient 4s linear infinite;
+}
+
+@keyframes textGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 300% 50%;
+    }
+}
+.integration-card{
+    flex:0 0 calc(50% - 12px);
+}
 
         .hero-bg::before {
             content: "";
@@ -370,7 +430,7 @@
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
                                     <a href="#"
                                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
-                                        Free Trial Start
+                                        Start Free Trial
                                     </a>
                                     <a href="#"
                                         class="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition text-center">
@@ -380,7 +440,7 @@
                             </div>
 
                             <!-- Right Side: Graphics -->
-                            <div class="relative flex justify-center items-center order-1 lg:order-2 py-10">
+                            <div class="relative flex justify-center items-center order-1 lg:order-2 ">
                                 <div
                                     class="absolute w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] border border-white/10 rounded-full">
                                 </div>
@@ -391,7 +451,7 @@
                                     class="absolute w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] md:w-[240px] md:h-[240px] border border-white/10 rounded-full">
                                 </div>
 
-                                <div class="relative z-10 p-6 md:p-10   float-anim">
+                                <div class="relative z-10 px-6 md:px-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
                                         class=" w-[90%] max-w-[90%]" alt="Core Platform" />
                                 </div>
@@ -441,7 +501,7 @@
                         class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-indigo-600 font-semibold text-sm md:text-lg mb-6">
                         Features
                     </span>
-                    <h2 class="text-2xl md:text-5xl font-bold text-gray-900 leading-tight">
+                    <h2 class="text-2xl animated-text  md:text-5xl font-bold text-gray-900 leading-tight">
                         Everything you need for your business <br class="hidden md:block" />
                         now in one place
                     </h2>
@@ -455,7 +515,7 @@
                             <!-- Icon Area -->
                             <div
                                 class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl text-[#34a487]"></i>
+                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl animated-text  text-[#34a487]"></i>
                             </div>
 
                             <!-- Content Area -->
@@ -490,21 +550,21 @@
         <div class="max-w-[1400px] mx-auto">
 
             <!-- Section Header -->
-            <div class="text-center mb-16">
+            <div class="text-center mb-8">
                 <span
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
-                <h2 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
+                <h2 class="text-3xl animated-text  md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
                     Track and automate your entire business
                 </h2>
-                <p class="text-gray-200 mt-6 text-lg">One platform for all your integrations.</p>
+               
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 ">
+        <div class="integration-section pt-10">
+            <div class="pin-wrap">
 
                 <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                <div class="  border     shadow-sm relative group">
+                <div class="  border integration-card    shadow-sm relative group">
                      
 
                     <div class="relative border-[#262626] border-[20px]">
@@ -559,7 +619,7 @@
                     </div>
                 </div>
                 
-                <div class="  border     shadow-sm relative group">
+                <div class="  border  integration-card   shadow-sm relative group">
                      
 
                     <div class="relative border-[#262626] border-[20px]">
@@ -611,7 +671,7 @@
                        Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
                     </div>
                 </div>
-                <div class="  border     shadow-sm relative group">
+                <div class="  border  integration-card   shadow-sm relative group">
                      
 
                     <div class="relative border-[#262626] border-[20px]">
@@ -665,7 +725,7 @@
                   Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified inbox. Respond faster, manage conversations efficiently, and deliver a better customer experience.
                     </div>
                 </div>
-                <div class="  border     shadow-sm relative group">
+                <div class="  border  integration-card   shadow-sm relative group">
                      
 
                     <div class="relative border-[#262626] border-[20px]">
@@ -720,7 +780,7 @@
                 </div>
                 
 
-                
+                </div>
             </div>
         </div>
     </section>
@@ -949,7 +1009,7 @@
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
                         Demo & Template
                     </span>
-                    <h2 class="text-2xl md:text-4xl font-black text-gray-900 leading-tight mb-10">
+                    <h2 class="text-2xl animated-text  md:text-4xl font-black text-gray-900 leading-tight mb-10">
                         Get a complete system live experience on one platform
                     </h2>
 
@@ -1205,7 +1265,7 @@
                     All-in-One Solution
                 </span>
 
-                <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-10">
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
                     From Operations to Growth — Everything in One System
                 </h2>
 
@@ -1414,29 +1474,34 @@
     @endif
     <!-- WHY CHOOSE US SECTION (Placement = 2) -->
     @if ($whyChooseUs->isNotEmpty())
-        <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden">
+        <section class="bg-[#f9fafb] py-24 px-6 md:px-10 relative overflow-hidden">
             <div class="container mx-auto">
                 <div class="text-center mb-20">
-                    <h2 class="text-white text-3xl md:text-4xl font-extrabold">
-                        Why Choose Our System?
-                    </h2>
+                   <span
+                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                   Why Chose Us
+                </span>
+
+                <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
+                    From Operations to Growth — Everything in One System
+                </h2>
                 </div>
 
                 <div class="flex flex-col gap-10">
                     @foreach ($whyChooseUs as $index => $benefit)
                         <div
-                            class="bg-white rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                            class="bg-white  animated-border border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
                                 <h3 class="text-[#34a487] text-3xl md:text-4xl font-extrabold mb-6">
                                     {{ $benefit->title }}
                                 </h3>
-                                <p class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
+                                <div class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
                                     {!! $benefit->description !!}
-                                </p>
+                        </div>
                             </div>
                             <div class="w-full lg:w-1/2">
                                 <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
-                                    class="w-full h-auto rounded-3xl shadow-lg" alt="{{ $benefit->title }}" />
+                                    class="w-full h-auto rounded-3xl  " alt="{{ $benefit->title }}" />
                             </div>
                         </div>
                     @endforeach
@@ -1445,7 +1510,7 @@
                 <div class="mt-28 text-center">
                     <a href="#"
                         class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
-                        Free Trial Start
+                        Start Free Trial
                     </a>
                 </div>
             </div>
@@ -1572,7 +1637,7 @@
                     Frequently Asked Questions
                 </span>
 
-                <h2 class="text-3xl md:text-5xl font-black text-gray-900">
+                <h2 class="text-3xl md:text-5xl font-black text-gray-900 animated-text ">
                     dorja.io FAQ
                 </h2>
 
@@ -1618,8 +1683,65 @@
 
 @endsection
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+
     <!-- Accordion + Search Script -->
     <script>
+       gsap.registerPlugin(ScrollTrigger);
+
+window.addEventListener("load", () => {
+
+    const wrap = document.querySelector(".pin-wrap");
+    const section = document.querySelector(".integration-section");
+
+    if (!wrap || !section) return;
+
+    function createAnimation() {
+
+        ScrollTrigger.getAll().forEach(st => st.kill());
+
+        gsap.set(wrap, { x: 0 });
+
+        const totalWidth = wrap.scrollWidth;
+        const visibleWidth = section.clientWidth;
+
+        const maxTranslate = totalWidth - visibleWidth;
+
+        gsap.to(wrap, {
+            x: -maxTranslate,
+            ease: "none",
+            scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: "+=" + maxTranslate,
+                pin: true,
+                scrub: 1,
+                invalidateOnRefresh: true,
+                anticipatePin: 1,
+                snap: {
+                    snapTo: (value) => {
+
+                        const cards = gsap.utils.toArray(".integration-card");
+                        const gap = 24;
+
+                        const step = cards[0].offsetWidth + gap;
+
+                        return Math.round((value * maxTranslate) / step) * step / maxTranslate;
+                    },
+                    duration: 0.25
+                }
+            }
+        });
+
+        ScrollTrigger.refresh();
+    }
+
+    createAnimation();
+
+    window.addEventListener("resize", createAnimation);
+
+});
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {

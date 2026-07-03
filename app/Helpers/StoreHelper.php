@@ -7,7 +7,7 @@ if (!function_exists('getCurrentCompany')) {
     function getCurrentCompany()
     {
         $host = request()->getHost();
-        if (in_array($host, ['dorja.io', 'www.dorja.io'])) {
+        if (in_array($host, ['dorja.io', 'www.dorja.io','127.0.0.1','127.0.0.1:8000','localhost'])) {
             return null;
         }
         if (request()->is('api/*')) {

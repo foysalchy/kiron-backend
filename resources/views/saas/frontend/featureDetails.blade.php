@@ -159,17 +159,13 @@
                             @foreach ($otherFeatures as $other)
                                 <a href="{{ route('saas.feature.details', $other->slug ?? $other->id) }}"
                                     class="flex items-start gap-4 group" style="text-decoration: none;">
-                                    <div
-                                        class="w-24 h-24 flex-shrink-0 overflow-hidden bg-gray-100 rounded-lg shadow-sm border border-gray-50">
-                                        <img src="{{ $other->image_url ?? asset('images/saas/live1.png') }}"
-                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                            alt="{{ $other->title }}" />
-                                    </div>
+                                     
                                     <div class="flex flex-col pt-1">
                                         <h4
                                             class="text-gray-900 font-bold leading-snug text-sm transition-colors group-hover:text-[#34a487]">
-                                            {{ Str::limit($other->title, 50) }}
+                                            {{ $other->title }}
                                         </h4>
+                                        <p> {{ Str::limit($other->subtitle, 50) }}</p>
                                         <span
                                             class="text-[10px] text-gray-400 font-bold uppercase mt-2 tracking-widest">Read
                                             More ›</span>

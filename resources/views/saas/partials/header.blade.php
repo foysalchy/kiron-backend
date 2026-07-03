@@ -37,7 +37,7 @@
             <!-- CTA Button (Responsive Padding & Font) -->
             <a href="https://app.dorja.io/register"
                 class="bg-[#34a487] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
-                Free Trial <span class="hidden sm:inline">Start</span>
+                Start Free Trial
             </a>
 
             <!-- Mobile Menu Toggle Button -->
