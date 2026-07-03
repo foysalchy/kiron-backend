@@ -62,7 +62,7 @@
                          <a href="{{route('saas.package.list')}}" class="hover:text-white transition">Pricing</a>
                      </li>
                      <li>
-                         <a href="{{route('saas.feature.list')}}" class="hover:text-white transition">Feathures</a>
+                         <a href="{{route('saas.feature.list')}}" class="hover:text-white transition">Features</a>
                      </li>
                      
                      
