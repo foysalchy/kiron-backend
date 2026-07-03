@@ -498,7 +498,7 @@
                 <h2 class="text-3xl md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
                     Track and automate your entire business
                 </h2>
-                <p class="text-gray-200 mt-6 text-lg">দেশি-বিদেশি সব গেটওয়ে এখন একটি প্ল্যাটফর্মে।</p>
+                <p class="text-gray-200 mt-6 text-lg">One platform for all your integrations.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-1 ">
