@@ -122,7 +122,7 @@ class IndexController extends Controller
             ->latest()
             ->take(4)
             ->get();
-dd($blogPost);
+ 
         return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
     }
     public function faqList()

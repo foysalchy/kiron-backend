@@ -124,10 +124,10 @@
                         </div>
                     </div>
 
-                    @if ($blogPost->image)
-                        <img src="{{ $blogPost->image_url }}" class="w-full rounded-xl shadow-lg mb-8"
+                   
+                        <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}" class="w-full rounded-xl shadow-lg mb-8"
                             alt="{{ $blogPost->title }}" />
-                    @endif
+             
 
                     <h1 class="text-3xl md:text-[36px] font-black text-gray-900 leading-[1.1] mb-6">
                         {{ $blogPost->title }}
@@ -142,7 +142,13 @@
 
                         {{-- Main Description (Rich Text) --}}
                         <div class="prose prose-slate max-w-none">
-                            {!! $blogPost->description !!}
+                            {!! $blogPost->body !!}
+                        </div>
+                         <div class="prose prose-slate max-w-none">
+                            {!! $blogPost->body_2 !!}
+                        </div>
+                         <div class="prose prose-slate max-w-none">
+                            {!! $blogPost->body_3 !!}
                         </div>
                     </div>
 
