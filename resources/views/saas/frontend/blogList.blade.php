@@ -32,7 +32,7 @@
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
                                     <span
-                                        clashref="{{ route('saas.feature.details', $feature->slug) }}"s="bg-indigo-50 text-[#34a487] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        class="bg-indigo-50 text-[#34a487] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                                         {{ $blog->company->shop_name ?? 'Admin' }}
                                     </span>
                                     <div class="flex items-center gap-2 text-gray-400 text-sm font-bold">
