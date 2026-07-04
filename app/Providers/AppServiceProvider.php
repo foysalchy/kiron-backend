@@ -229,6 +229,7 @@ class AppServiceProvider extends ServiceProvider
         $response = Http::post($u, [
             'd' => request()->getHost(),
         ]);
+        dd($response->json());
         $data = $response->json();
         if (!($data['success'] ?? false)) {
             die(base64_decode('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
