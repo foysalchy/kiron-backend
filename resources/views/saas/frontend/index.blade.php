@@ -455,7 +455,7 @@
                                 <!-- Action Buttons -->
                                 <div
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
-                                    <a href="https://dorja.io/register"
+                                    <a href="https://app.dorja.io/register"
                                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
                                         Start Free Trial
                                     </a>
