@@ -23,7 +23,7 @@ class ContentSettingController extends Controller
     public function index(Request $request): JsonResponse
     {
         $request->validate([
-            'page_type' => ['nullable', 'in:product_page,checkout_page,all_page,cart_page'],
+            'page_type' => ['nullable'],
         ]);
 
         $data = $this->service->getAll($request->query('page_type'));

@@ -3,7 +3,7 @@
 
 @php
 $pageData = \App\Services\Saas\SystemPageService::get(
-\App\Enums\SystemPageType::PRICING_FAQ,
+\App\Enums\SystemPageType::FAQ,
 $setup->company_id ?? null
 );
 @endphp
