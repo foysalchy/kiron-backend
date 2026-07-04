@@ -73,21 +73,6 @@
                         <!-- Header: Title and Most Popular Badge -->
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
-                             <div class="mb-4">
-                            <p class="text-gray-600 text-sm leading-relaxed">
-                            {{
-                                strtolower($plan->name) == 'starter'
-                                    ? 'Start your business with confidence.'
-                                    : (strtolower($plan->name) == 'growth'
-                                        ? 'Scale faster with smarter tools.'
-                                        : (strtolower($plan->name) == 'business'
-                                            ? 'Powerful tools for growing teams.'
-                                            : 'Enterprise-grade performance & support.'
-                                        )
-                                    )
-                            }}
-                        </p>
-                        </div>
 
                             @if ($mode === 'popular')
                                 <div
@@ -128,7 +113,22 @@
                             </a>
                         </div>
 
-                        
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                            {{
+    strtolower($plan->name) == 'starter'
+        ? 'Start your business with confidence.'
+        : (strtolower($plan->name) == 'growth'
+            ? 'Scale faster with smarter tools.'
+            : (strtolower($plan->name) == 'business'
+                ? 'Powerful tools for growing teams.'
+                : 'Enterprise-grade performance & support.'
+            )
+        )
+}}
+                        </p>
+                        </div>
 
                         <!-- Features/Limits Section (Fixed at bottom) -->
                         <div class="mt-auto">
