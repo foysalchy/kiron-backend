@@ -73,6 +73,21 @@
                         <!-- Header: Title and Most Popular Badge -->
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
+                             <div class="mb-4">
+                            <p class="text-gray-600 text-sm leading-relaxed">
+                            {{
+                                strtolower($plan->name) == 'starter'
+                                    ? 'Start your business with confidence.'
+                                    : (strtolower($plan->name) == 'growth'
+                                        ? 'Scale faster with smarter tools.'
+                                        : (strtolower($plan->name) == 'business'
+                                            ? 'Powerful tools for growing teams.'
+                                            : 'Enterprise-grade performance & support.'
+                                        )
+                                    )
+                            }}
+                        </p>
+                        </div>
 
                             @if ($mode === 'popular')
                                 <div
@@ -97,11 +112,11 @@
                                 </div>
                             </div>
 
-                            <div class="mt-4">
+                            <!-- <div class="mt-4">
                                 <p class="text-gray-900 font-bold text-sm">Total
                                     {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
                                 <p class="text-gray-400 text-xs">Billed annually</p>
-                            </div>
+                            </div> -->
                         </div>
 
                         <!-- CTA Button -->
@@ -113,22 +128,7 @@
                             </a>
                         </div>
 
-                        <!-- Description -->
-                        <div class="mb-4">
-                            <p class="text-gray-600 text-sm leading-relaxed">
-                            {{
-                                strtolower($plan->name) == 'starter'
-                                    ? 'Launch your business with everything you need to manage sales, inventory, and customers—all in one platform.'
-                                    : (strtolower($plan->name) == 'growth'
-                                        ? 'Scale your business faster with higher limits, smarter automation, and powerful business insights.'
-                                        : (strtolower($plan->name) == 'business'
-                                            ? 'Optimize every department with advanced tools designed for growing and multi-team businesses.'
-                                            : 'Unlock the full power of Dorja with unlimited scalability, premium support, and enterprise-ready performance.'
-                                        )
-                                    )
-                            }}
-                        </p>
-                        </div>
+                        
 
                         <!-- Features/Limits Section (Fixed at bottom) -->
                         <div class="mt-auto">
