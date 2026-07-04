@@ -24,7 +24,7 @@ if (!function_exists('getCurrentCompany')) {
         if(env('APP_ENV')=='local'){
              $store = DomainSetup::withoutGlobalScopes()
             ->where('sub_domain', 'shop')
-            ->first();
+            ->first(); 
             return $store;
         }else{
 
