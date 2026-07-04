@@ -142,7 +142,7 @@
                                     ['User Limit', $plan->user_limit],
                                     ['Product Limit', $plan->product_limit],
                                     ['Order Limit', $plan->order_limit],
-                                    ['Invoice Templates', $plan->invoice_limit],
+                                    <!-- ['Invoice Templates', $plan->invoice_limit], -->
                                 ] as [$label, $value])
 
                                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
