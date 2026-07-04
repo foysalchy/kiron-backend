@@ -195,5 +195,50 @@
 
             </div>
         </div>
+        <!-- Corporate / Custom Plan CTA Card -->
+<div class="col-span-1 md:col-span-2 lg:col-span-4 mt-10">
+    <div class="relative bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] text-white p-10 rounded-xl shadow-lg overflow-hidden">
+
+        <!-- Glow Effect -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple-500 opacity-20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500 opacity-20 rounded-full blur-3xl"></div>
+
+        <div class="relative flex flex-col lg:flex-row items-center justify-between gap-6">
+
+            <!-- Left Content -->
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">
+                    Need a Custom / Corporate Plan?
+                </h2>
+
+                <p class="text-gray-300 text-sm md:text-base leading-relaxed max-w-xl">
+                    We provide tailored ERP solutions for large businesses, enterprises, and organizations.
+                    Get custom limits, dedicated support, API access, and white-label options based on your needs.
+                </p>
+
+                <div class="mt-4 flex flex-wrap gap-3 text-xs text-gray-300">
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Custom Users</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Unlimited Scale</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Dedicated Support</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">API & Integration</span>
+                </div>
+            </div>
+
+            <!-- Right Button -->
+            <div class="flex flex-col gap-3">
+                <a href="https://dorja.io/contact"
+                   class="bg-white text-[#1e1b4b] font-bold px-6 py-3 rounded-full text-sm text-center hover:bg-gray-200 transition">
+                    Contact Sales
+                </a>
+
+                <a href="https://app.dorja.io/demo"
+                   class="border border-white text-white font-semibold px-6 py-3 rounded-full text-sm text-center hover:bg-white/10 transition">
+                    Request Demo
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
     </section>
 @endsection
