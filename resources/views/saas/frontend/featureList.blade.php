@@ -4,7 +4,6 @@
     $pageData = \App\Services\Saas\SystemPageService::get(
         \App\Enums\SystemPageType::FEATURE,$setup->company_id ?? null
     );
-    dd($pageData);
 @endphp
 
 @include('components.meta-info.saas-meta', [
