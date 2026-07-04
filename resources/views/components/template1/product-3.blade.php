@@ -31,7 +31,7 @@
             <div class="w-full h-full p-6 flex items-center justify-center">
                 <img
                     src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
-                    alt="{{ $product->title }}"
+                    alt="{{ $product->title }}" height="300" width="300" loading="lazy"
                     class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-110"
                 />
             </div>
@@ -63,7 +63,7 @@
                     {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
                 </span>
                 @if ($regularPrice > $salePrice)
-                    <span class="text-[#999999] text-xs md:text-sm line-through font-medium">
+                    <span class="text-[#52525b] text-xs md:text-sm line-through font-medium">
                         {{ $setup->currency ?? '৳' }}{{ number_format($regularPrice) }}
                     </span>
                 @endif

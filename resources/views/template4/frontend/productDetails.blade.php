@@ -39,10 +39,10 @@
                     <!-- Thumbnails -->
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
-                        <button
+                        <button  aria-label="View product image {{ $loop->iteration ?? '' }}"
                             class="thumb-btn border-2 border-[#632085] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('{{ $product->thumbnail_url }}', this)">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover" />
+                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover" alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
                         </button>
                         @foreach ($product->galleries as $gallery)
                             <button
@@ -168,15 +168,15 @@
                 <!-- Sticky Navigation Bar (৩টি ট্যাব) -->
                 <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
                     <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
-                        <button onclick="scrollToSection('section-description', this)"
+                        <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true" aria-controls="section-description" {}
                             class="tab-nav-btn flex-1 bg-white text-[#632085] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[#632085]">
                             Description
                         </button>
-                        <button onclick="scrollToSection('section-features', this)"
+                        <button onclick="scrollToSection('section-features', this)" role="tab"  aria-selected="false" aria-controls="section-features"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Features
                         </button>
-                        <button onclick="scrollToSection('section-specifications', this)"
+                        <button onclick="scrollToSection('section-specifications', this)" role="tab"  aria-selected="false"  aria-controls="section-specifications"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Specifications
                         </button>

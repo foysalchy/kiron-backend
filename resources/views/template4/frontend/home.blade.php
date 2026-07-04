@@ -92,16 +92,16 @@
                     <div class="swiper-wrapper">
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
-                                <a href="{{ $slider->url ?? '#' }}">
-                                    <img src="{{ $slider->image_url }}" alt="{{ $slider->title }}"
-                                        class="w-full h-full object-cover" />
+                                <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
+                                    <img src="{{ $slider->image_url }}" alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
+                                        height="400" width="1200" class="w-full h-full object-cover"
+                                        @if ($loop->first) fetchpriority="high"
+                        loading="eager"
+                     @else
+                        loading="lazy" @endif />
                                 </a>
                             </div>
                         @empty
-                            <div class="swiper-slide">
-                                <img src="{{ asset('images/babyshop/images/hero1.jpg') }}"
-                                    class="w-full h-full object-cover" />
-                            </div>
                         @endforelse
                     </div>
 
@@ -114,12 +114,11 @@
                 class="hidden lg:block lg:col-span-1 h-[450px] overflow-hidden shadow-lg border border-gray-100 rounded-2xl">
                 @php $sideBanner = $sidebarSliders->first(); @endphp
                 @if ($sideBanner)
-                    <a href="{{ $sideBanner->url ?? '#' }}">
-                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}"
+                    <a href="{{ $sideBanner->url ?? '#' }}" aria-label="{{ $sideBanner->title ?? 'banner Image' }}">
+                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}" height="" width=""
+                            loading="lazy"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
-                @else
-                    <img src="{{ asset('images/babyshop/images/right1.jpg') }}" class="w-full h-full object-cover" />
                 @endif
             </div>
         </div>
@@ -190,23 +189,21 @@
                     @endphp
 
                     <!-- Dynamic Category Card -->
-                    <a href="" class="notch-border hover:-translate-y-1 transition-transform block group">
+                    <a href="{{ route('category.products', $category->slug) }}" class="notch-border hover:-translate-y-1 transition-transform block group">
                         <div
                             class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
 
-                            {{-- ক্যাটাগরি ইমেজ --}}
                             <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
-                                <img src="{{ $category->image_url ?? asset('images/babyshop/images/card.png') }}"
-                                    alt="{{ $category->name }}" class="w-full h-full object-contain">
+                                <img src="{{ $category->image_url ?? '' }}" height="" width=""
+                                    aria-label="category image" loading="lazy" alt="{{ $category->name }}"
+                                    class="w-full h-full object-contain">
                             </div>
 
-                            {{-- টেক্সট ডিটেইলস --}}
                             <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
                                 <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
                                     {{ $category->name }}
                                 </h3>
                                 <p class="text-[11px] text-gray-500 mt-1">
-                                    {{-- যদি আপনার রিলেশন থাকে তবে আইটেম সংখ্যা দেখাবে --}}
                                     {{ $category->products_count ?? '12,203' }} Items
                                 </p>
                             </div>
@@ -234,8 +231,8 @@
                         <!-- Left Part: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                            <img src="{{ $product->thumbnail_url ?? asset('images/no-image.png') }}"
-                                alt="{{ $product->title }}"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="" width=""
+                                alt="{{ $product->title }}" loading="lazy"
                                 class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                         </div>
 
@@ -244,19 +241,19 @@
                             <!-- Price Section (Dynamic) -->
                             <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
                                 {{-- বর্তমান অফার প্রাইস --}}
-                                <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">
+                                <span class="text-[#9d174d] font-bold text-[13px] md:text-xl leading-none">
                                     {{ $setup->currency ?? 'BDT' }} {{ number_format($product->sale_price) }}
                                 </span>
 
                                 {{-- আগের রেগুলার প্রাইস --}}
-                                <span class="text-[#999999] line-through text-[10px] md:text-sm font-semibold leading-none">
+                                <span class="text-[#52525b] line-through text-[10px] md:text-sm font-semibold leading-none">
                                     {{ $setup->currency ?? 'BDT' }} {{ number_format($product->regular_price) }}
                                 </span>
                             </div>
 
                             <!-- Title (Dynamic) -->
                             <h3
-                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#f1468b] transition-colors">
+                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#9d174d] transition-colors">
                                 {{ $product->title }}
                             </h3>
 
@@ -281,9 +278,9 @@
             <!-- Products Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-                @foreach($popularProducts as $product)
-                <x-template1.product-card :product="$product" />
-            @endforeach
+                @foreach ($popularProducts as $product)
+                    <x-template1.product-card :product="$product" />
+                @endforeach
 
             </div>
         </div>
@@ -305,8 +302,8 @@
                         <!-- Left side: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-1 md:p-4 bg-white relative overflow-hidden">
-                            <img src="{{ $product->thumbnail_url ?? asset('images/no-image.png') }}"
-                                alt="{{ $product->title }}"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="" width=""
+                                alt="{{ $product->title }}" loading="lazy"
                                 class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
                         </div>
 
@@ -397,6 +394,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (document.querySelector('.mainHeroSwiper')) {
                 new Swiper('.mainHeroSwiper', {
+                    modules: [SwiperModules.Pagination, SwiperModules.Autoplay, SwiperModules.EffectFade],
                     loop: true,
                     effect: 'fade',
                     speed: 1000,

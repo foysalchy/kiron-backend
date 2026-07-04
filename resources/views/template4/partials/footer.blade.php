@@ -7,8 +7,8 @@
                 <div class="lg:col-span-2 space-y-8">
                     <div>
                         <a href="{{ route('home') }}" aria-label="Little Joy Home">
-                            <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}"
-                                alt="Little Joy Baby Shop Logo" height="" width="" class="h-20">
+                            <img src="{{ $setup->logo_url ?? '' }}"
+                            loading="lazy"    alt="Little Joy Baby Shop Logo" height="80" width="200" class="h-20">
                         </a>
                     </div>
                     <p class="text-base font-light leading-relaxed max-w-[280px]">
@@ -20,9 +20,9 @@
                         @csrf
                         <input type="email" name="email" id="subscriber-email" placeholder="Email Address"
                             aria-label="Email address for newsletter" required
-                            class="w-full bg-white text-gray-800 py-3 px-5 rounded-lg focus:outline-none placeholder:text-gray-400 font-medium border border-transparent focus:border-purple-200 transition-all" />
+                            class="w-full bg-white text-gray-800 py-3 px-5 rounded-lg focus:outline-none placeholder:text-gray-600 font-medium border border-transparent focus:border-purple-200 transition-all" />
                         <button type="submit" id="subscribe-btn"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-[#3b143c] hover:scale-110 transition-transform cursor-pointer"
+                            class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-[#3b143c] hover:scale-110 transition-transform cursor-pointer"
                             aria-label="Subscribe">
                             <i class="fa-solid fa-paper-plane text-xl"></i>
                         </button>

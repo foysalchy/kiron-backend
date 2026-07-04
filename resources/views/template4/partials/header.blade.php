@@ -36,14 +36,14 @@
 
     <div class="bg-[#66267b] text-white py-4 px-4 md:px-10 border-b border-purple-800">
         <div class="container mx-auto flex items-center justify-between gap-4">
-            <button id="menu-toggle" class="lg:hidden text-2xl focus:outline-none" aria-label="Open navigation menu"
-                aria-expanded="false" aria-controls="mobile-sidebar">
+            <button id="menu-toggle" aria-label="Open Menu" class="lg:hidden text-2xl focus:outline-none"
+                aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-sidebar">
                 <i class="fa-solid fa-bars-staggered" aria-hidden="true"></i>
             </button>
 
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
-                    <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}"
+                    <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}" height="80" width="200"
                         alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
                         class="h-16 md:h-20 w-auto object-contain" />
                 </a>
@@ -55,8 +55,8 @@
                     <input type="text" name="search" id="header-search-input" autocomplete="off"
                         placeholder="Search by product name" aria-label="Search for baby products"
                         class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
-                    <button type="submit"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-800">
+                    <button type="submit" aria-label="Search Products"
+                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-purple-800">
                         <i class="fa-solid fa-magnifying-glass text-lg"></i>
                     </button>
                 </div>
@@ -66,7 +66,7 @@
                     class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
                     <div id="suggestion-content">
                         <div class="pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular
+                            <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular
                                 Searches</p>
                             @foreach ($popularSearches as $item)
                                 <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
@@ -79,12 +79,12 @@
                             @endforeach
                         </div>
                         <div class="border-t border-gray-50 pt-2 pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
+                            <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Trending
                                 Products</p>
                             @foreach ($relatedProducts as $p)
                                 <a href="{{ route('product.details', $p->slug) }}"
                                     class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <img src="{{ $p->thumbnail_url }}"
+                                    <img src="{{ $p->thumbnail_url }}" height="" width="" alt="product iamge"
                                         class="w-8 h-8 rounded object-cover border border-gray-100">
                                     <span class="truncate">{{ $p->title }}</span>
                                 </a>
@@ -140,8 +140,9 @@
                 <input type="text" name="search" id="mobile-search-input" autocomplete="off"
                     placeholder="Search..." aria-label="Search products"
                     class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
-                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                <button type="submit" aria-label="Search"
+                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-purple-800 transition-colors">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
             </div>
 
@@ -149,7 +150,7 @@
             <div id="mobile-search-suggestions"
                 class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[100] overflow-hidden pt-4 pb-2">
                 <div id="mobile-suggestion-content">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches
+                    <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular Searches
                     </p>
                     @foreach ($popularSearches as $item)
                         <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
@@ -183,7 +184,7 @@
                                                 class="group-hover/sub:text-[#66267b] uppercase">
                                                 {{ $sub->name }}
                                             </a>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                                            <i class="fa-solid fa-chevron-right text-xs text-gray-600"></i>
 
                                             <ul
                                                 class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
@@ -196,7 +197,7 @@
                                                                 {{ $mini->name }}
                                                             </a>
                                                             <i
-                                                                class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                                                                class="fa-solid fa-chevron-right text-xs text-gray-600"></i>
 
                                                             <ul
                                                                 class="absolute left-full top-0 w-72 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/mini:block">
@@ -219,7 +220,7 @@
                                                                         class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
                                                                         <a href="{{ route('product.details', $product->slug) }}"
                                                                             class="flex items-center gap-3">
-                                                                            <img src="{{ $product->thumbnail_url }}"
+                                                                            <img src="{{ $product->thumbnail_url }}" height="" width=""
                                                                                 class="w-10 h-10 object-cover rounded border"
                                                                                 alt="">
                                                                             <div class="flex flex-col min-w-0">
@@ -230,7 +231,7 @@
                                                                     </li>
                                                                 @empty
                                                                     <li
-                                                                        class="px-5 py-4 text-center text-xs text-gray-400 italic">
+                                                                        class="px-5 py-4 text-center text-xs text-gray-600 italic">
                                                                         No products</li>
                                                                 @endforelse
                                                             </ul>
@@ -253,7 +254,7 @@
                                                             class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
                                                             <a href="{{ route('product.details', $product->slug) }}"
                                                                 class="flex items-center gap-3">
-                                                                <img src="{{ $product->thumbnail_url }}"
+                                                                <img src="{{ $product->thumbnail_url }}" height="" width=""
                                                                     class="w-10 h-10 object-cover rounded border"
                                                                     alt="">
                                                                 <div class="flex flex-col min-w-0">
@@ -264,7 +265,7 @@
                                                             </a>
                                                         </li>
                                                     @empty
-                                                        <li class="px-5 py-4 text-center text-xs text-gray-400 italic">
+                                                        <li class="px-5 py-4 text-center text-xs text-gray-600 italic">
                                                             No products</li>
                                                     @endforelse
                                                 @endif
@@ -287,7 +288,7 @@
                                         <li class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
                                             <a href="{{ route('product.details', $product->slug) }}"
                                                 class="flex items-center gap-3">
-                                                <img src="{{ $product->thumbnail_url }}"
+                                                <img src="{{ $product->thumbnail_url }}" height="" width=""
                                                     class="w-10 h-10 object-cover rounded border" alt="">
                                                 <div class="flex flex-col min-w-0">
                                                     <span
@@ -297,7 +298,7 @@
                                             </a>
                                         </li>
                                     @empty
-                                        <li class="px-5 py-4 text-center text-xs text-gray-400 italic">No products
+                                        <li class="px-5 py-4 text-center text-xs text-gray-600 italic">No products
                                         </li>
                                     @endforelse
                                 @endif
@@ -306,8 +307,8 @@
                     </li>
                 @endforeach
 
-                <li><a href="/about" class="px-5 py-4 block hover:text-[#66267b] transition-colors">About Us</a></li>
-                <li><a href="/contact" class="px-5 py-4 block hover:text-[#66267b] transition-colors">Contact</a></li>
+                <li><a href="{{ route('contact.index') }}"
+                        class="px-5 py-4 block hover:text-[#66267b] transition-colors">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -316,7 +317,7 @@
         class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col">
         <div class="p-4 flex justify-between items-center border-b bg-[#66267b] text-white">
             <h2 class="font-bold text-lg">All Categories</h2>
-            <button id="close-sidebar" class="text-2xl">&times;</button>
+            <button id="close-sidebar" aria-label="Close Menu" class="text-2xl">&times;</button>
         </div>
         <nav class="flex-1 overflow-y-auto font-manrope">
             <!-- Diapering -->
@@ -410,11 +411,11 @@
                             'hidden');
                         config.results.classList.remove('hidden');
                         config.results.innerHTML =
-                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+                            '<div class="px-5 py-3 text-xs text-gray-600"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
 
                         fetch(
                                 `{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`
-                                )
+                            )
                             .then(res => res.json())
                             .then(data => {
                                 config.results.innerHTML = '';
@@ -428,14 +429,14 @@
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
                                         link.innerHTML = `
-                                        <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='/images/no-image.png'">
+                                        <img src="${item.thumbnail_url}" height="" width="" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='{item.thumbnail_url}'">
                                         <span class="truncate">${item.title}</span>
                                     `;
                                         config.results.appendChild(link);
                                     });
                                 } else {
                                     config.results.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                                        '<div class="px-5 py-3 text-xs text-gray-600">No products found.</div>';
                                 }
                             });
                     }, 400);
