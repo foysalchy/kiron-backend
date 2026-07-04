@@ -1,49 +1,49 @@
 @extends('saas.layouts.layout')
 @php
-$pageData = \App\Services\Saas\SystemPageService::get(
-\App\Enums\SystemPageType::PRICING,
-$setup->company_id ?? null
-);
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::PRICING,
+        $setup->company_id ?? null
+    );
 @endphp
 
 @include('components.meta-info.saas-meta', [
-'setup' => $setup,
+    'setup' => $setup,
 
-'type' => 'WebPage',
+    'type' => 'WebPage',
 
-'title' => $pageData?->meta_title ?? ('Pricing Plans | ' . $setup->shop_name),
+    'title' => $pageData?->meta_title ?? ('Pricing Plans | ' . $setup->shop_name),
 
-'description' => $pageData?->meta_description ?? ('Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.'),
+    'description' => $pageData?->meta_description ?? ('Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.'),
 
-'keywords' => $pageData?->meta_keywords
-? implode(',', $pageData->meta_keywords)
-: 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
+    'keywords' => $pageData?->meta_keywords 
+        ? implode(',', $pageData->meta_keywords) 
+        : 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
 
-'image' => $setup->meta_image
-? asset('storage/' . $setup->meta_image)
-: asset('storage/' . $setup->logo),
+    'image' => $setup->meta_image
+        ? asset('storage/' . $setup->meta_image)
+        : asset('storage/' . $setup->logo),
 
-'canonical' => route('saas.package.list'),
+    'canonical' => route('saas.package.list'),
 
-'breadcrumb' => [
-[
-'name' => 'Home',
-'url' => url('/'),
-],
-[
-'name' => 'Pricing',
-'url' => route('saas.package.list'),
-],
-],
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Pricing',
+            'url' => route('saas.package.list'),
+        ],
+    ],
 ])
 @section('content')
-<section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
-    <div class="container mx-auto">
+    <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
+        <div class="container mx-auto">
 
-        <div class="text-center mb-20">
-            <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan</h1>
-            <p class="text-gray-500 text-lg">The best packages for your business are listed below.</p>
-        </div>
+            <div class="text-center mb-20">
+                <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan</h1>
+                <p class="text-gray-500 text-lg">The best packages for your business are listed below.</p>
+            </div>
 
               
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
@@ -194,14 +194,56 @@ $setup->company_id ?? null
                                 @endif
                             </div>
                         </div>
-                        @endforeach
-                        @endif
                     </div>
+                @endforeach
+
+            </div>
+            <!-- Corporate / Custom Plan CTA Card -->
+<div class="col-span-1 md:col-span-2 lg:col-span-4 mt-10">
+    <div class="relative bg-gradient-to-r from-[#0f172a] to-[#1e1b4b] text-white p-10 rounded-xl shadow-lg overflow-hidden">
+
+        <!-- Glow Effect -->
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-purple-500 opacity-20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500 opacity-20 rounded-full blur-3xl"></div>
+
+        <div class="relative flex flex-col lg:flex-row items-center justify-between gap-6">
+
+            <!-- Left Content -->
+            <div>
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">
+                    Need a Custom / Corporate Plan?
+                </h2>
+
+                <p class="text-gray-300 text-sm md:text-base leading-relaxed max-w-xl">
+                    We provide tailored ERP solutions for large businesses, enterprises, and organizations.
+                    Get custom limits, dedicated support, API access, and white-label options based on your needs.
+                </p>
+
+                <div class="mt-4 flex flex-wrap gap-3 text-xs text-gray-300">
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Custom Users</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Unlimited Scale</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">Dedicated Support</span>
+                    <span class="bg-white/10 px-3 py-1 rounded-full">API & Integration</span>
                 </div>
             </div>
-            @endforeach
+
+            <!-- Right Button -->
+            <div class="flex flex-col gap-3">
+                <a href="https://dorja.io/contact"
+                   class="bg-white text-[#1e1b4b] font-bold px-6 py-3 rounded-full text-sm text-center hover:bg-gray-200 transition">
+                    Contact Sales
+                </a>
+
+                
+            </div>
 
         </div>
     </div>
-</section>
+</div>
+  <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
+            {!! $pageData->description!!}
+        </div>
+        </div>
+        
+    </section>
 @endsection
