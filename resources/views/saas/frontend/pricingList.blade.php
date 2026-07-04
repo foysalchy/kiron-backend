@@ -45,22 +45,10 @@
                 <p class="text-gray-500 text-lg">The best packages for your business are listed below.</p>
             </div>
 
-            @php
-                $sortedPlans = $pricingPlans->sortBy(function ($plan) {
-                    $m = strtolower($plan->mode);
-                    if ($m === 'regular') {
-                        return 1;
-                    }
-                    if ($m === 'popular') {
-                        return 2;
-                    }
-                    return 3;
-                });
-            @endphp
-
+              
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
 
-                @foreach ($sortedPlans as $plan)
+                @foreach ($pricingPlans as $plan)
                     @php
                         $mode = strtolower($plan->mode);
                         $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
@@ -97,36 +85,36 @@
                         </div>
 
                         <!-- Price Section -->
-                        <div class="mb-8">
+                        <div class="mb-4">
                             <div class="flex items-start gap-1">
                                 <span class="text-3xl font-bold"
                                     style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
                                     {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }}
                                 </span>
                                 <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
-                                    <span>seat /</span><br>
-                                    <span>month</span>
+                                    
+                                    <span>/month</span>
                                 </div>
                             </div>
 
                             <div class="mt-4">
                                 <p class="text-gray-900 font-bold text-sm">Total
-                                    {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / month</p>
+                                    {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
                                 <p class="text-gray-400 text-xs">Billed annually</p>
                             </div>
                         </div>
 
                         <!-- CTA Button -->
-                        <div class="mb-8">
-                            <a href=""
+                        <div class="mb-4">
+                            <a href="https://app.dorja.io/register?plan={{ $plan->id }}"
                                 class="block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all hover:bg-gray-50"
                                 style="border-color: {{ $themeColor }}; color: {{ $themeColor }};">
-                                {{ $mode === 'regular' || $mode === 'popular' ? 'Try for free' : 'Contact Us' }}
+                                Start Free Trial
                             </a>
                         </div>
 
                         <!-- Description -->
-                        <div class="mb-10">
+                        <div class="mb-4">
                             <p class="text-gray-600 text-sm leading-relaxed">
                                 {{ $plan->description ?? 'Manage all your work in one place with our smart system.' }}
                             </p>
@@ -134,11 +122,10 @@
 
                         <!-- Features/Limits Section (Fixed at bottom) -->
                         <div class="mt-auto">
-                            <hr class="border-gray-200 border-1 mb-8">
+                            <hr class="border-gray-200 border-1 mb-4">
 
                             <div class="space-y-4">
-                                <p class="font-bold text-gray-900 text-sm">{{ $plan->name }} includes:</p>
-
+                                
                                 <div class="flex justify-between items-center text-gray-700 text-sm">
                                     <span>User Limit: {{ $plan->user_limit ?: 'Unlimited' }}</span>
                                     <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
