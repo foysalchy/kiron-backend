@@ -134,9 +134,9 @@
                         <div class="mt-auto">
                             <hr class="border-gray-200 border-1 mb-4">
 
-                            <div class="space-y-4">
+                            <div class="space-y-2">
                                 
-                               <div class="space-y-3">
+                               <div class="space-y-2">
 
                                 @foreach ([
                                     ['User Limit', $plan->user_limit],
@@ -173,11 +173,18 @@
                                 {{-- Custom multiple input loop --}}
                                 @if (!empty($plan->multiple_input))
                                     @foreach ($plan->multiple_input as $extraDetail)
-                                        <div class="flex justify-between items-center text-gray-700 text-sm">
-                                              <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
-                                            <span>{{ $extraDetail }}</span>
-                                         
+                                        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                    <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+                                                </div>
+
+                                                <span class="text-sm text-gray-600">
+                                                    {{ $extraDetail }} 
+                                                </span>
+                                            </div>
                                         </div>
+                                       
                                     @endforeach
                                 @endif
                             </div>
