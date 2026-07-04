@@ -174,8 +174,9 @@
                                 @if (!empty($plan->multiple_input))
                                     @foreach ($plan->multiple_input as $extraDetail)
                                         <div class="flex justify-between items-center text-gray-700 text-sm">
+                                              <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
                                             <span>{{ $extraDetail }}</span>
-                                            <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                         
                                         </div>
                                     @endforeach
                                 @endif
