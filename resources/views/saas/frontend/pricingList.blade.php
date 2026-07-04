@@ -53,6 +53,7 @@
                         $mode = strtolower($plan->mode);
                         $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
                         $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
+                        
 
                         $themeColor = '#1e1b4b'; // Default Navy (For all other modes)
                         $isSpecialMode = false;
@@ -89,7 +90,10 @@
                             <div class="flex items-start gap-1">
                                 <span class="text-3xl font-bold"
                                     style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
-                                    {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }}
+                                    {{ $setup->currency ?? '$' }} {{ number_format($price, 0) }} 
+                                    <span class="inline-block text-gray-400 text-[20px] font-semibold line-through ml-[-5px]">
+                                        <del>{{ number_format( $monthlyTier['regular_price'] ?? 0, 0) }}</del>
+                                    </span>
                                 </span>
                                 <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
                                     
