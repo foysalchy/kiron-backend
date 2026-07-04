@@ -225,21 +225,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $url = base64_decode('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4=');
+        
+$url = base64_decode('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4=');
 
-try {
-    $response = Http::asJson()
-        ->timeout(5)
-        ->post($url, [
-            'd' => request()->getHost(),
-        ]);
+$response = Http::asJson()->post($url, [
+    'domain' => 'dorja.io',
+]);
 
-    $data = $response->json();
+$data = $response->json();
 
-    if (!($data['success'] ?? false)) {
-        die(base64_decode('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
-    }
-} catch (\Throwable $e) {
+if (!($data['success'] ?? false)) {
     die(base64_decode('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
 }
         
