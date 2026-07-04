@@ -1691,29 +1691,30 @@
                     ->get();
             @endphp
 
+            <div class="div space-y-4 h-[700px] overflow-y-auto">
             <!-- FAQ List -->
-            <div class=" space-y-4 h-[400px] overflow-y-auto" id="faq-container">
+           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
 
-                @foreach ($faqs as $faq)
-                    <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl ">
+    @foreach ($faqs as $faq)
+        <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl">
 
-                        <!-- Question -->
-                        <button
-                            class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
-                            <span class="faq-question">{{ $faq->title }}</span>
+            <!-- Question -->
+            <button
+                class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                <span class="faq-question">{{ $faq->title }}</span>
 
-                            <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
-                        </button>
+                <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+            </button>
 
-                        <!-- Answer -->
-                        <div class="px-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
-                            {!! $faq->content !!}
-                        </div>
-
-                    </div>
-                @endforeach
-
+            <!-- Answer -->
+            <div class="px-6 pb-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
+                {!! $faq->content !!}
             </div>
+
+        </div>
+    @endforeach
+
+</div></div>
         </div>
     </section>
 
