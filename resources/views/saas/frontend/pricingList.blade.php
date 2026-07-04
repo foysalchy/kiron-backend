@@ -142,6 +142,7 @@
                                     ['User Limit', $plan->user_limit],
                                     ['Product Limit', $plan->product_limit],
                                     ['Order Limit', $plan->order_limit],
+                                    ['Extra Order', $plan->extra_order_charge],
                                      
                                 ] as [$label, $value])
 
@@ -157,7 +158,7 @@
                                         </div>
 
                                         <span class="text-sm font-semibold text-[#a855f7]">
-                                            {{ $value ?: 'Unlimited' }}
+                                            {{ $label === 'Extra Order' ? '৳' : '' }}.{{ $value ?: 'Unlimited' }} {{ $label === 'Extra Order' ? '/order' : '' }}
                                         </span>
                                     </div>
 
