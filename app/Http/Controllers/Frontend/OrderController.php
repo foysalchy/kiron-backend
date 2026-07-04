@@ -130,9 +130,9 @@ class OrderController extends FrontendController
                         'status'   => Status::Active->value
                     ]
                 );
-            if (!auth('customer')->check()) {
-                auth('customer')->login($customer);
-            }
+            // if (!auth('customer')->check()) {
+            //     auth('customer')->login($customer);
+            // }
 
             $items = [];
             foreach ($cartContent as $item) {

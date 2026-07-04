@@ -376,7 +376,7 @@
                     <p class="text-[10px] font-bold text-gray-400 uppercase px-2 py-2 mt-3 tracking-wider">Categories
                     </p>
                     @foreach ($headerCategories as $cat)
-                        <a href="{{ route('category.products', $cat->slug) }}"
+                        <a href="{{ route('category.products', $cat->slug ?? $cat->id ) }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-orange-50 text-sm font-medium text-gray-700 hover-text transition-colors">
                             <i class="fas fa-chevron-right text-[10px] text-gray-300 w-4"></i>
                             {{ $cat->name }}

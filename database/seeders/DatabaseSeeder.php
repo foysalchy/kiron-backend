@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
 //  php artisan db:seed --class=SuperAdminSeeder
 //          php artisan db:seed --class=PermissionSeeder
 //         php artisan db:seed --class=SuperAdminPermissionSeeder
+//         php artisan db:seed --class=SystemPageSeeder 
 
         User::factory()->create([
             'name' => 'Test User',

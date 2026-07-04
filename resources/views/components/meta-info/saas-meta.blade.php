@@ -13,7 +13,8 @@
 ])
 
 <?php
-    $title = $title ?: ($setup->title ?? $setup->shop_name);
+    $titlex = $title ?: ($setup->title ?? $setup->shop_name);
+    $title = $titlex.' | dorja.io';
     $description = $description ?: ($setup->description ?? '');
     $keywords = is_array($keywords)
         ? implode(',', $keywords)

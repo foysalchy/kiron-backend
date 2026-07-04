@@ -135,7 +135,7 @@ class IndexController extends Controller
     public function packageList()
     {
         $pricingPlans = PricingPackage::where('status', Status::Active->value)
-            ->latest()
+          
             ->get();
         return view('saas.frontend.pricingList', compact('pricingPlans'));
     }

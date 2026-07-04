@@ -8,7 +8,7 @@
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
             <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden  lg:block">
-                <div class="primary-bg text-primary py-3 text-[18px] text-center font-semibold position-sticky sticky top-0">
+                <div class="primary-bg text-primary py-3 text-lg text-center font-semibold position-sticky sticky top-0">
                     Explore Categories</div>
                 @foreach ($categories as $category)
                     <div class="group border-b border-gray-200">
@@ -18,7 +18,7 @@
                                 <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
                                     class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                     alt="{{ $category->name }}">
-                                <span class="text-[18px] text-gray-800">{{ $category->name }}</span>
+                                <span class="text-lg text-gray-800">{{ $category->name }}</span>
                             </div>
                             @if ($category->subCategories->count() > 0)
                                 <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
