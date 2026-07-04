@@ -1,7 +1,7 @@
 @extends('saas.layouts.layout')
 @php
     $pageData = \App\Services\Saas\SystemPageService::get(
-        \App\Enums\SystemPageType::PRICING_FAQ,
+        \App\Enums\SystemPageType::PRICING,
         $setup->company_id ?? null
     );
 @endphp
