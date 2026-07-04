@@ -152,7 +152,7 @@
                                             </div>
 
                                             <span class="text-sm text-gray-600">
-                                                {{ $label }}
+                                                {{ $label }} 
                                             </span>
                                         </div>
 
