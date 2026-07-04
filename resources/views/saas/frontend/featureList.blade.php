@@ -88,7 +88,7 @@
             <div class="mt-16">
                 {{ $allFeatures->links() }}
             </div>
-              <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate">
+              <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate w-full min-w-full">
             {!! $pageData->description!!}
         </div>
         </div>
