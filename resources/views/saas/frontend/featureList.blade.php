@@ -88,7 +88,7 @@
                 {{ $allFeatures->links() }}
             </div>
             <div class="mt-5">
-            {!! $pageData->content !!}
+            {!! $pageData->description!!}
         </div>
         </div>
     </section>
