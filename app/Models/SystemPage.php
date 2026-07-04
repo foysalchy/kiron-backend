@@ -29,4 +29,13 @@ class SystemPage extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function scopeForCompany($query, $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
+
+    public function scopeGlobal($query)
+    {
+        return $query->whereNull('company_id');
+    }
 }

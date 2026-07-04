@@ -1,16 +1,23 @@
 @extends('saas.layouts.layout')
+
+@php
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::FEATURE,$setup->company_id ?? null
+    );
+@endphp
+
 @include('components.meta-info.saas-meta', [
     'setup' => $setup,
 
     'type' => 'CollectionPage',
 
-    'title' => 'Features | ' . $setup->shop_name,
+    'title' => $pageData->meta_title ?? ('Features | ' . $setup->shop_name),
 
-    'description' => 'Explore all features of our ERP, POS, Inventory, CRM, Accounting, HRM and Business Management Software.',
+    'description' => $pageData->meta_description ?? 'Explore all features of our ERP, POS, Inventory, CRM, Accounting, HRM and Business Management Software.',
 
-    'keywords' => 'ERP Features, POS Features, Inventory Features, CRM Features',
+    'keywords' => $pageData->meta_keywords ? implode(',', $pageData->meta_keywords) : 'ERP Features, POS Features, Inventory Features, CRM Features',
 
-    'image' => asset('storage/' . $setup->logo),
+    'image' => $pageData->meta_image ?? asset('storage/' . $setup->logo),
 
     'canonical' => route('saas.feature.list'),
 

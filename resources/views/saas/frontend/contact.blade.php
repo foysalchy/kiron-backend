@@ -1,16 +1,31 @@
 @extends('saas.layouts.layout')
+
+@php
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::CONTACT_US,
+        $setup->company_id ?? null
+    );
+@endphp
+
 @include('components.meta-info.saas-meta', [
     'setup' => $setup,
     'type' => 'ContactPage',
-    'title' => 'Contact Us | ' . $setup->shop_name,
-    'description' => 'Contact ' . $setup->shop_name . ' for sales, support, product demos, or any business inquiries. We are here to help you grow your business.',
-    'keywords' => 'contact, support, sales, customer service, business software',
+
+    'title' => $pageData?->meta_title ?? ('Contact Us | ' . $setup->shop_name),
+
+    'description' => $pageData?->meta_description ?? ('Contact ' . $setup->shop_name . ' for sales, support, product demos, or any business inquiries. We are here to help you grow your business.'),
+
+    'keywords' => $pageData?->meta_keywords
+        ? implode(',', $pageData->meta_keywords)
+        : 'contact, support, sales, customer service, business software',
+
     'image' => $setup->meta_image
         ? asset('storage/' . $setup->meta_image)
         : asset('storage/' . $setup->logo),
 
     'canonical' => route('saas.contact'),
-      'breadcrumb' => [
+
+    'breadcrumb' => [
         [
             'name' => 'Home',
             'url' => url('/'),
@@ -24,7 +39,7 @@
 @section('content')
 <!-- CONTACT US SECTION WITH DOT GRID BACKGROUND -->
 <section class="relative py-24 px-6 md:px-10 font-manrope overflow-hidden"
-    style="background-color: #ffffff; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1px); background-size: 30px 30px;">
+  style="background-color: #ffffff; background-image: radial-gradient(#e5e7eb 1.5px, transparent 1px); background-size: 30px 30px;">
 
   <div class="container mx-auto max-w-6xl relative z-10">
 
@@ -40,43 +55,43 @@
 
         {{-- সাকসেস মেসেজ --}}
         @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 shadow-sm font-bold">
-                {{ session('success') }}
-            </div>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-6 shadow-sm font-bold">
+          {{ session('success') }}
+        </div>
         @endif
 
         <form action="{{ route('saas.contact.send') }}" method="POST" class="space-y-8">
           @csrf
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {{-- Name --}}
-              <div class="relative">
-                <input type="text" name="name" value="{{ old('name') }}" placeholder="Full name *" required
-                  class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('name') border-red-500 @enderror">
-                @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-              </div>
+            {{-- Name --}}
+            <div class="relative">
+              <input type="text" name="name" value="{{ old('name') }}" placeholder="Full name *" required
+                class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('name') border-red-500 @enderror">
+              @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
-              {{-- Email --}}
-              <div class="relative">
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="Your email *" required
-                  class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('email') border-red-500 @enderror">
-                @error('email') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-              </div>
+            {{-- Email --}}
+            <div class="relative">
+              <input type="email" name="email" value="{{ old('email') }}" placeholder="Your email *" required
+                class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('email') border-red-500 @enderror">
+              @error('email') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {{-- Phone (আপনার কন্ট্রোলারের রিকোয়ারমেন্ট অনুযায়ী যোগ করা হয়েছে) --}}
-              <div class="relative">
-                <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Phone Number *" required
-                  class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('phone') border-red-500 @enderror">
-                @error('phone') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-              </div>
+            {{-- Phone (আপনার কন্ট্রোলারের রিকোয়ারমেন্ট অনুযায়ী যোগ করা হয়েছে) --}}
+            <div class="relative">
+              <input type="text" name="phone" value="{{ old('phone') }}" placeholder="Phone Number *" required
+                class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg @error('phone') border-red-500 @enderror">
+              @error('phone') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
 
-              {{-- Subject (আপনার কন্ট্রোলারের রিকোয়ারমেন্ট অনুযায়ী যোগ করা হয়েছে) --}}
-              <div class="relative">
-                <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Subject"
-                  class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg">
-              </div>
+            {{-- Subject (আপনার কন্ট্রোলারের রিকোয়ারমেন্ট অনুযায়ী যোগ করা হয়েছে) --}}
+            <div class="relative">
+              <input type="text" name="subject" value="{{ old('subject') }}" placeholder="Subject"
+                class="w-full border-b border-gray-200 py-3 bg-transparent focus:border-[#34a487] focus:outline-none transition-all duration-300 placeholder:text-gray-400 text-lg">
+            </div>
           </div>
 
           {{-- Message --}}
@@ -114,10 +129,10 @@
       <!-- Location Item -->
       <div class="flex items-center gap-6 group">
         <div class="flex-shrink-0">
-            <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
+          <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
         </div>
         <div class="space-y-1">
           <h4 class="font-bold text-gray-900 text-xl leading-none">Location:</h4>
@@ -130,9 +145,9 @@
       <!-- Email Item -->
       <div class="flex items-center gap-6 group">
         <div class="flex-shrink-0">
-            <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
+          <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+          </svg>
         </div>
         <div class="space-y-1">
           <h4 class="font-bold text-gray-900 text-xl leading-none">Email:</h4>
@@ -145,9 +160,9 @@
       <!-- Phone Item -->
       <div class="flex items-center gap-6 group">
         <div class="flex-shrink-0">
-            <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 011.94.445l-.992 3.472a1 1 0 01-1.1.714l-2.008-.338a16.03 16.03 0 006.51 6.51l.338-2.008a1 1 0 01.714-1.1l3.472.992a1 1 0 01.445 1.94V19a2 2 0 01-2 2h-12a2 2 0 01-2-2V5z"></path>
-            </svg>
+          <svg class="w-12 h-12 text-[#34a487] transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 011.94.445l-.992 3.472a1 1 0 01-1.1.714l-2.008-.338a16.03 16.03 0 006.51 6.51l.338-2.008a1 1 0 01.714-1.1l3.472.992a1 1 0 01.445 1.94V19a2 2 0 01-2 2h-12a2 2 0 01-2-2V5z"></path>
+          </svg>
         </div>
         <div class="space-y-1">
           <h4 class="font-bold text-gray-900 text-xl leading-none">Phone:</h4>
