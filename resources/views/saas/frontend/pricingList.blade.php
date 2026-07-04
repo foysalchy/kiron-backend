@@ -236,7 +236,7 @@
         </div>
     </div>
 </div>
-<div class="mt-5">
+  <div class="mt-5 mt-5 bg-white px-8 py-8 rounded prose prose-slate">
             {!! $pageData->description!!}
         </div>
         </div>
