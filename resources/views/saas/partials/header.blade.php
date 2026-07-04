@@ -26,6 +26,7 @@
             <a href="{{ route('saas.index') }}#intergation"
                 class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Integration</a>
             <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Pricing</a>
+            <a href="{{ route('saas.faq.list') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">FAQ</a>
             <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#34a487] font-semibold text-lg transition">Contact</a>
         </nav>
 

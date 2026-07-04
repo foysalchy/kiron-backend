@@ -450,7 +450,7 @@
                                 <!-- Action Buttons -->
                                 <div
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
-                                    <a href="#"
+                                    <a href="https://dorja.io/register"
                                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
                                         Start Free Trial
                                     </a>
@@ -529,39 +529,45 @@
                     </h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 cursor-pointer">
-                    {{-- Logic: Where placement == 1 (Feature) --}}
-                    @foreach ($topFeatures as $feature)
-                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                            class="bg-[#f9faff] p-8 md:p-12 rounded-[40px] border border-indigo-100 transition-all duration-300 group hover:shadow-xl hover:shadow-indigo-500/5">
-                            <!-- Icon Area -->
-                            <div
-                                class="w-20 h-20 rounded-full border border-indigo-300 bg-white flex items-center justify-center mb-8">
-                                <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-3xl animated-text  text-[#34a487]"></i>
-                            </div>
+               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    @foreach ($topFeatures as $feature)
+        <a href="{{ route('saas.feature.details', $feature->slug) }}"
+            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#34a487] transition-all duration-300">
 
-                            <!-- Content Area -->
-                            <h3 class="text-2xl md:text-3xl font-bold text-[#34a487] mb-5">
-                                {{ $feature->title ?? '' }}
-                            </h3>
-                            <p class="text-gray-700 text-lg leading-relaxed mb-12">
-                                {{ $feature->subtitle ?? '' }}
-                            </p>
+            <!-- Left Icon -->
+            <div class="flex-shrink-0">
+                  <div
+            class="w-12 h-12  bg-[#34a48721] rounded
+                   border border-white/20
+                   flex items-center justify-center">
+            <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#34a487]"></i>
+        </div>
+            </div>
 
-                            <!-- Link Area -->
-                            <div
-                                class="inline-flex items-center gap-3 font-bold text-gray-900 group-hover:text-[#34a487] transition-colors text-lg">
-                                Learn More
-                                <i class="fa-solid fa-arrow-right text-sm"></i>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
+            <!-- Right Content -->
+            <div class="flex-1 min-w-0">
+    <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#34a487]">
+        {{ $feature->title }}
+    </div>
+ 
+               
+
+                <!-- <span
+                    class="inline-flex items-center gap-2 font-semibold text-[#34a487]">
+                    Learn More
+                    <i
+                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </span> -->
+            </div>
+
+        </a>
+    @endforeach
+</div>
 
                 <div class="mt-16 text-center">
-                    <a href="{{ route('saas.feature.list') }}"
+                    <a href="https://app.dorja.io/register"
                         class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                        See More Features
+                        Start Free Trial
                     </a>
                 </div>
             </div>
@@ -582,8 +588,11 @@
                 </h2>
                
             </div>
-        <div class="integration-section pt-10">
-            <div class="pin-wrap">
+
+             <!-- <div class="integration-section pt-10">
+            <div class="pin-wrap"> -->
+        <div class="  pt-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
                 <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
                 <div class="  border integration-card    shadow-sm relative group">
