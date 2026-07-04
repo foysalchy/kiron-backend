@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EditorImagesController extends Controller
 {
@@ -17,10 +18,9 @@ class EditorImagesController extends Controller
         $path = FileUploadHelper::upload(
             file: $request->file('image'),
             folder: 'editor/images',
-
         );
 
-        $url = asset('storage/' . $path);
+        $url = Storage::disk('r2')->url($path);
 
         return response()->json([
             'url' => $url,

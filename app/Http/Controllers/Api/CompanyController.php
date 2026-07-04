@@ -277,7 +277,7 @@ class CompanyController extends Controller
     }
     public function destroy(int $id): JsonResponse
     {
-        $this->companyDelationService->softDelete($id);
+        $this->companyDelationService->forceDelete($id);
 
         return ResponseHelper::success(null, 'Company deleted successfully');
     }

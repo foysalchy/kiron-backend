@@ -68,7 +68,7 @@ return [
             'url' => 'https://pub-a17d46c849f84ef782ddae78162e6197.r2.dev',
             'endpoint' => 'https://3dde6820133185f55d19f2424f7df71a.r2.cloudflarestorage.com',
             'use_path_style_endpoint' => true,
-            'throw' => false,
+            'throw' => true,
         ],
 
     ],

@@ -22,6 +22,7 @@ class PricingPackageRequest extends FormRequest
             'product_limit' => 'nullable|integer',
             'invoice_limit' => 'nullable|integer',
             'user_limit' => 'nullable|integer',
+            'employee_limit' => 'nullable|integer',
 
             'primary_domain' => 'nullable|string|max:255',
             'domain_limit' => 'nullable|integer',

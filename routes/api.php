@@ -153,7 +153,30 @@ use App\Http\Controllers\Api\WocommerceSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
+Route::get('/test-delete', function () {
+    $path = 'categories/mega/2RUQXbEh0PmdyBSrDbpA8r7wkxpIHNgY9Vze6X43.jpg';
+
+    // ১. ফাইলটি আসলেই R2 ডিস্কের এই পাথে খুঁজে পাওয়া যাচ্ছে কি না
+    $exists = Storage::disk('r2')->exists($path);
+    
+    if ($exists) {
+        // ২. ফাইল ডিলিট করার চেষ্টা
+        $deleted = Storage::disk('r2')->delete($path);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'ফাইলটি খুঁজে পাওয়া গেছে এবং ডিলিট করা হয়েছে।',
+            'path' => $path
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'failed',
+        'message' => 'R2 বাকেটের এই পাথে ফাইলটি খুঁজে পাওয়া যায়নি! সম্ভবত পাথ প্রিফিক্স বা স্পেলিং ভুল আছে।',
+        'path' => $path
+    ]);
+});
 
 Route::prefix('v1')->group(function () {
 
