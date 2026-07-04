@@ -11,18 +11,23 @@
                 </span>
             </div>
 
-            <!-- Login/Register Link -->
+            <!-- Desktop Top Bar login/logout section -->
             @auth('customer')
-                <a href="{{ route('user.dashboard') }}"
-                    class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition" aria-label="Go to Dashboard">
-                    <i class="fa-regular fa-circle-user" aria-hidden="true"></i>
-                    <span>{{ auth('customer')->user()->name }}</span>
-                </a>
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('user.dashboard') }}" class="flex items-center gap-2 hover:opacity-80 transition">
+                        <i class="fa-regular fa-circle-user"></i>
+                        <span>{{ auth('customer')->user()->name }}</span>
+                    </a>
+                    <form action="{{ route('user.logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-xs font-bold hover:text-red-300 transition cursor-pointer">
+                            <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
+                        </button>
+                    </form>
+                </div>
             @else
-                <a href="{{ route('user.login') }}"
-                    class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
-                    aria-label="Log in or register">
-                    <i class="fa-regular fa-user" aria-hidden="true"></i>
+                <a href="{{ route('user.login') }}" class="flex items-center gap-2 hover:opacity-80 transition">
+                    <i class="fa-regular fa-user"></i>
                     <span>Log In / Register</span>
                 </a>
             @endauth
@@ -44,57 +49,67 @@
                 </a>
             </div>
 
-            <form action="{{ route('shop.index') }}" method="GET" class="hidden lg:block flex-1 max-w-3xl mx-10 relative" id="header-search-container">
-    <div class="relative z-30">
-        <input type="text" name="search" id="header-search-input" autocomplete="off"
-            placeholder="Search by product name" aria-label="Search for baby products"
-            class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
-        <button type="submit" class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-800">
-            <i class="fa-solid fa-magnifying-glass text-lg"></i>
-        </button>
-    </div>
+            <form action="{{ route('shop.index') }}" method="GET"
+                class="hidden lg:block flex-1 max-w-3xl mx-10 relative" id="header-search-container">
+                <div class="relative z-30">
+                    <input type="text" name="search" id="header-search-input" autocomplete="off"
+                        placeholder="Search by product name" aria-label="Search for baby products"
+                        class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
+                    <button type="submit"
+                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-800">
+                        <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                    </button>
+                </div>
 
-    <!-- Suggestions Dropdown -->
-    <div id="search-suggestions" class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
-        <div id="suggestion-content">
-            <div class="pb-2">
-                <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
-                @foreach($popularSearches as $item)
-                    <a href="{{ route('shop.index', ['search' => $item->keyword]) }}" class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-history text-gray-300 text-xs"></i>
-                            <span>{{ $item->keyword }}</span>
+                <!-- Suggestions Dropdown -->
+                <div id="search-suggestions"
+                    class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
+                    <div id="suggestion-content">
+                        <div class="pb-2">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular
+                                Searches</p>
+                            @foreach ($popularSearches as $item)
+                                <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                                    class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <i class="fas fa-history text-gray-300 text-xs"></i>
+                                        <span>{{ $item->keyword }}</span>
+                                    </div>
+                                </a>
+                            @endforeach
                         </div>
-                    </a>
-                @endforeach
-            </div>
-            <div class="border-t border-gray-50 pt-2 pb-2">
-                <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending Products</p>
-                @foreach($relatedProducts as $p)
-                    <a href="{{ route('product.details', $p->slug) }}" class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                        <img src="{{ $p->thumbnail_url }}" class="w-8 h-8 rounded object-cover border border-gray-100">
-                        <span class="truncate">{{ $p->title }}</span>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-        <!-- Live Results (typed by user) -->
-        <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
-    </div>
-</form>
+                        <div class="border-t border-gray-50 pt-2 pb-2">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
+                                Products</p>
+                            @foreach ($relatedProducts as $p)
+                                <a href="{{ route('product.details', $p->slug) }}"
+                                    class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <img src="{{ $p->thumbnail_url }}"
+                                        class="w-8 h-8 rounded object-cover border border-gray-100">
+                                    <span class="truncate">{{ $p->title }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- Live Results (typed by user) -->
+                    <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+                </div>
+            </form>
 
             <div class="flex items-center gap-4 md:gap-8">
                 <!-- Wishlist Link -->
-                <a href="/wishlist" class="flex items-center gap-3 cursor-pointer group"
+                <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 cursor-pointer group"
                     aria-label="View your wishlist, currently 0 items">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
                         <i class="fa-regular fa-heart text-xl text-[#66267b]" aria-hidden="true"></i>
                     </div>
                     <div class="hidden xl:block">
                         <p class="text-sm font-medium leading-tight">My Wishlist</p>
-                        <p class="text-[12px] opacity-80">
+                        <p class="text-xs opacity-80">
                             ( @auth('customer')
-                                {{ \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count() }}
+                                <span class="wishlist-count-val">
+                                    {{ auth('customer')->check() ? \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count() : 0 }}
+                                </span>
                             @else
                                 0
                             @endauth items )
@@ -111,34 +126,39 @@
                     <div class="hidden xl:block">
                         <p class="text-sm font-medium leading-tight">Shopping Card</p>
                         <p class="text-xs opacity-80">
-                            ( {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} items )
+                            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span>
+                            items )
                         </p>
                     </div>
                 </a>
             </div>
         </div>
 
-        <form action="{{ route('shop.index') }}" method="GET" class="lg:hidden mt-4 relative" id="mobile-search-container">
-    <div class="relative z-30">
-        <input type="text" name="search" id="mobile-search-input" autocomplete="off"
-            placeholder="Search..." aria-label="Search products"
-            class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
-        <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-            <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
-    </div>
+        <form action="{{ route('shop.index') }}" method="GET" class="lg:hidden mt-4 relative"
+            id="mobile-search-container">
+            <div class="relative z-30">
+                <input type="text" name="search" id="mobile-search-input" autocomplete="off"
+                    placeholder="Search..." aria-label="Search products"
+                    class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
+                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
 
-    <!-- Mobile Suggestions Dropdown -->
-    <div id="mobile-search-suggestions" class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[100] overflow-hidden pt-4 pb-2">
-        <div id="mobile-suggestion-content">
-             <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
-             @foreach($popularSearches as $item)
-                <a href="{{ route('shop.index', ['search' => $item->keyword]) }}" class="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ $item->keyword }}</a>
-             @endforeach
-        </div>
-        <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
-    </div>
-</form>
+            <!-- Mobile Suggestions Dropdown -->
+            <div id="mobile-search-suggestions"
+                class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[100] overflow-hidden pt-4 pb-2">
+                <div id="mobile-suggestion-content">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular Searches
+                    </p>
+                    @foreach ($popularSearches as $item)
+                        <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                            class="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ $item->keyword }}</a>
+                    @endforeach
+                </div>
+                <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+            </div>
+        </form>
     </div>
 
     <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100 font-manrope">
@@ -244,8 +264,7 @@
                                                             </a>
                                                         </li>
                                                     @empty
-                                                        <li
-                                                            class="px-5 py-4 text-center text-xs text-gray-400 italic">
+                                                        <li class="px-5 py-4 text-center text-xs text-gray-400 italic">
                                                             No products</li>
                                                     @endforelse
                                                 @endif
@@ -357,77 +376,83 @@
     <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-[55]" aria-hidden="true"></div>
 </header>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchConfigs = [
-        {
-            input: document.getElementById('header-search-input'),
-            suggestions: document.getElementById('search-suggestions'),
-            results: document.getElementById('live-search-results'),
-            defaultContent: document.getElementById('suggestion-content'),
-        },
-        {
-            input: document.getElementById('mobile-search-input'),
-            suggestions: document.getElementById('mobile-search-suggestions'),
-            results: document.getElementById('mobile-live-search-results'),
-            defaultContent: document.getElementById('mobile-suggestion-content'),
-        }
-    ];
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchConfigs = [{
+                input: document.getElementById('header-search-input'),
+                suggestions: document.getElementById('search-suggestions'),
+                results: document.getElementById('live-search-results'),
+                defaultContent: document.getElementById('suggestion-content'),
+            },
+            {
+                input: document.getElementById('mobile-search-input'),
+                suggestions: document.getElementById('mobile-search-suggestions'),
+                results: document.getElementById('mobile-live-search-results'),
+                defaultContent: document.getElementById('mobile-suggestion-content'),
+            }
+        ];
 
-    let debounceTimer;
+        let debounceTimer;
 
-    searchConfigs.forEach(config => {
-        if (!config.input) return;
+        searchConfigs.forEach(config => {
+            if (!config.input) return;
 
-        // ইনপুটে ক্লিক করলে সাজেশন দেখাবে
-        config.input.addEventListener('focus', () => {
-            config.suggestions.classList.remove('hidden');
-        });
+            config.input.addEventListener('focus', () => {
+                config.suggestions.classList.remove('hidden');
+            });
 
-        // টাইপ করলে লাইভ রেজাল্ট আনবে
-        config.input.addEventListener('input', function() {
-            const query = this.value.trim();
-            clearTimeout(debounceTimer);
+            config.input.addEventListener('input', function() {
+                const query = this.value.trim();
+                clearTimeout(debounceTimer);
 
-            if (query.length > 1) {
-                debounceTimer = setTimeout(() => {
-                    if (config.defaultContent) config.defaultContent.classList.add('hidden');
-                    config.results.classList.remove('hidden');
-                    config.results.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+                if (query.length > 1) {
+                    debounceTimer = setTimeout(() => {
+                        if (config.defaultContent) config.defaultContent.classList.add(
+                            'hidden');
+                        config.results.classList.remove('hidden');
+                        config.results.innerHTML =
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
 
-                    fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            config.results.innerHTML = '';
-                            if (data.length > 0) {
-                                data.forEach(item => {
-                                    const link = document.createElement('a');
-                                    link.href = "{{ url('product') }}/" + item.slug;
-                                    link.className = "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
-                                    link.innerHTML = `
+                        fetch(
+                                `{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`
+                                )
+                            .then(res => res.json())
+                            .then(data => {
+                                config.results.innerHTML = '';
+                                if (data.length > 0) {
+                                    data.forEach(item => {
+                                        const link = document.createElement(
+                                            'a');
+                                        link.href =
+                                            "{{ url('product') }}/" + item
+                                            .slug;
+                                        link.className =
+                                            "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
+                                        link.innerHTML = `
                                         <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='/images/no-image.png'">
                                         <span class="truncate">${item.title}</span>
                                     `;
-                                    config.results.appendChild(link);
-                                });
-                            } else {
-                                config.results.innerHTML = '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
-                            }
-                        });
-                }, 400);
-            } else {
-                if (config.defaultContent) config.defaultContent.classList.remove('hidden');
-                config.results.classList.add('hidden');
-            }
+                                        config.results.appendChild(link);
+                                    });
+                                } else {
+                                    config.results.innerHTML =
+                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                                }
+                            });
+                    }, 400);
+                } else {
+                    if (config.defaultContent) config.defaultContent.classList.remove('hidden');
+                    config.results.classList.add('hidden');
+                }
+            });
         });
-    });
 
-    // সাজেশন বক্সের বাইরে ক্লিক করলে হাইড হবে
-    document.addEventListener('click', (e) => {
-        searchConfigs.forEach(config => {
-            if (config.input && !config.input.contains(e.target) && !config.suggestions.contains(e.target)) {
-                config.suggestions.classList.add('hidden');
-            }
+        document.addEventListener('click', (e) => {
+            searchConfigs.forEach(config => {
+                if (config.input && !config.input.contains(e.target) && !config.suggestions
+                    .contains(e.target)) {
+                    config.suggestions.classList.add('hidden');
+                }
+            });
         });
     });
-});
 </script>

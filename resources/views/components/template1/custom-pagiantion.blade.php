@@ -26,7 +26,7 @@
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
                             {{-- Active Page (আপনার ছবির মতো হাইলাইটেড বক্স) --}}
-                            <span aria-current="page" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-[#FF6A00] text-white rounded-lg text-sm font-black shadow-lg shadow-orange-100">
+                            <span aria-current="page" class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center primary-bg text-white rounded-lg text-sm font-black shadow-lg shadow-orange-100">
                                 {{ $page }}
                             </span>
                         @else

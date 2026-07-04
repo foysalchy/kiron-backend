@@ -90,7 +90,7 @@
                                 <input type="password" name="password" id="password" placeholder="••••••••" required
                                     class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password', this)"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#66267b]">
                                     <i class="far fa-eye text-[14px]"></i>
                                 </button>
                             </div>
@@ -111,7 +111,7 @@
                                     placeholder="Re-enter password" required
                                     class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password_confirmation', this)"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#66267b]">
                                     <i class="far fa-eye text-sm"></i>
                                 </button>
                             </div>
@@ -120,19 +120,19 @@
                         <!-- Terms & Conditions -->
                         <div class="flex items-start gap-3 py-2">
                             <input type="checkbox" name="terms" id="terms" required
-                                class="mt-1 w-4 h-4 accent-[#FF6A00] cursor-pointer">
+                                class="mt-1 w-4 h-4 accent-[#66267b] cursor-pointer">
                             <label for="terms" class="text-sm font-medium text-gray-600 cursor-pointer">
                                 I accept the <a href=" "
-                                    class="text-[#FF6A00] hover:underline">Terms and
+                                    class="text-[#66267b] hover:underline">Terms and
                                     Conditions</a> and <a href=" "
-                                    class="text-[#FF6A00] hover:underline">Privacy
+                                    class="text-[#66267b] hover:underline">Privacy
                                     Policy</a>
                             </label>
                         </div>
 
                         <!-- Submit Button -->
                         <button type="submit"
-                            class="w-full primary-bg text-primary font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full bg-[#66267b] text-primary font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
                             Register
                         </button>
 
@@ -140,7 +140,7 @@
                         <div class="text-center pt-4 text-sm">
                             <p class="text-gray-500 font-medium">
                                 Already have an account? <a href="{{ route('user.login') }}"
-                                    class="text-[#FF6A00] font-medium hover:underline ml-1">Login</a>
+                                    class="text-[#66267b] font-medium hover:underline ml-1">Login</a>
                             </p>
                         </div>
 

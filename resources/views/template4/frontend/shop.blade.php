@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template4.layouts.front')
 
 @section('content')
     <!-- Mobile Filter Overlay (Right Drawer) -->
@@ -6,12 +6,13 @@
         aria-hidden="true"></div>
 
     <!-- ════════════════════════════════════════
-             RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
-            ════════════════════════════════════════ -->
+                         RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
+                        ════════════════════════════════════════ -->
     <aside id="right-filter-drawer"
-        class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden px-4 py-5 flex flex-col">
+        class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden flex flex-col font-manrope">
+
         <!-- Drawer Header -->
-        <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-5">
+        <div class="flex items-center justify-between border-b border-gray-100 px-4 py-5 mb-2">
             <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wide">
                 Filter Products
             </h2>
@@ -21,280 +22,307 @@
             </button>
         </div>
 
-        <!-- Mobile Filter Options (Desktop filters moved here for mobile) -->
-        <div class="space-y-5 flex-1">
-            <!-- Age Group -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Age Group</label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085]">
-                    <option value="">All Ages</option>
-                    <option value="0m">0 Months+</option>
-                    <option value="0-6m">0-6 Month</option>
-                    <option value="7-12m">7-12 Month</option>
-                    <option value="1-1.5y">1-1.5 Years</option>
-                    <option value="1.6-2y">1.6-2 Years</option>
-                    <option value="2-2.5y">2-2.5 Years</option>
-                    <option value="2.5-3y">2.5-3 Years</option>
-                </select>
+        <!-- Mobile Filter Form -->
+        <form action="{{ url()->current() }}" method="GET" class="flex flex-col flex-1">
+            <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
+
+            <div class="px-4 py-2 space-y-6 flex-1">
+
+                <!-- ① Filter By Price (Min/Max Input) -->
+                <div>
+                    <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-3">Price Range
+                        ({{ $setup->currency }})</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price', 0) }}"
+                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#632085]">
+                        <span class="text-gray-300">-</span>
+                        <input type="number" name="max_price" placeholder="Max"
+                            value="{{ request('max_price', (int) $maxPriceLimit) }}"
+                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#632085]">
+                    </div>
+                </div>
+
+                <!-- ② Filter By Brand (Select Dropdown) -->
+                @if ($brands->isNotEmpty())
+                    <div>
+                        <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Select
+                            Brand</label>
+                        <select name="brand[]"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
+                            <option value="">All Brands</option>
+                            @foreach ($brands as $brand)
+                                <option value="{{ $brand->id }}"
+                                    {{ in_array($brand->id, (array) request('brand')) ? 'selected' : '' }}>
+                                    {{ $brand->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                <!-- ③ Dynamic Attributes (Size, Color, etc. from $attributeGroups) -->
+                @foreach ($attributeGroups as $group)
+                    <div>
+                        <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Filter By
+                            {{ $group->name }}</label>
+                        <select name="attributes[{{ $group->id }}][]"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
+                            <option value="">All {{ $group->name }}s</option>
+                            @foreach ($group->values as $value)
+                                <option value="{{ $value->id }}"
+                                    {{ isset(request('attributes')[$group->id]) && in_array($value->id, request('attributes')[$group->id]) ? 'selected' : '' }}>
+                                    {{ $value->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endforeach
+
+                <!-- Clear All Option -->
+                <div class="pt-2">
+                    <a href="{{ url()->current() }}"
+                        class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest">
+                        Clear All Filters
+                    </a>
+                </div>
             </div>
 
-            <!-- Size -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Size</label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085]">
-                    <option value="">All Sizes</option>
-                    <option value="s">Small</option>
-                    <option value="m">Medium</option>
-                    <option value="l">Large</option>
-                </select>
+            <!-- Apply Button (Fixed at Bottom) -->
+            <div class="mt-auto p-4 border-t border-gray-100 bg-gray-50">
+                <button type="submit" id="apply-filters-btn"
+                    class="w-full bg-[#632085] hover:bg-[#52166d] text-white font-bold py-3.5 rounded-xl text-base shadow-lg transition active:scale-95">
+                    Apply Filters
+                </button>
             </div>
-
-            <!-- Color -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Color</label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085]">
-                    <option value="">All Colors</option>
-                    <option value="red">Red</option>
-                    <option value="pink">Pink</option>
-                    <option value="blue">Blue</option>
-                </select>
-            </div>
-
-            <!-- Brand -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Brand</label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085]">
-                    <option value="">All Brands</option>
-                    <option value="ponds">Ponds</option>
-                    <option value="huggies">Huggies</option>
-                </select>
-            </div>
-
-            <!-- Price Range -->
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-1.5">Price Range</label>
-                <select
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085]">
-                    <option value="">Any Price</option>
-                    <option value="low-high">Low to High</option>
-                    <option value="high-low">High to Low</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Apply Button -->
-        <div class="mt-6 border-t border-gray-100 pt-4">
-            <button id="apply-filters-btn"
-                class="w-full bg-[#632085] hover:bg-[#52166d] text-white font-bold py-3 rounded-lg text-base shadow-sm transition">
-                Apply Filters
-            </button>
-        </div>
+        </form>
     </aside>
 
     <div class="container mx-auto px-3 sm:px-4 py-4 md:py-8" style="font-family: &quot;Manrope&quot;, sans-serif">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             <!-- ════════════════════════════════════════
-                 LEFT SIDEBAR: CATEGORIES (Desktop Only)
-                ════════════════════════════════════════ -->
+                             LEFT SIDEBAR: CATEGORIES (Desktop Only)
+                            ════════════════════════════════════════ -->
             <aside
-                class="hidden lg:block lg:col-span-3 bg-white px-4 py-4 pr-4 border border-gray-100 rounded-lg shadow-sm">
-                <h2 class="text-xl font-bold text-gray-900 border-b border-gray-100 pb-3 mb-4">
-                    All Products
+                class="hidden lg:block lg:col-span-3 bg-white px-5 py-6 border border-gray-100 rounded-2xl shadow-sm h-fit sticky top-24 font-manrope">
+                <h2 class="text-xl font-bold text-[#0f172a] border-b border-gray-50 pb-4 mb-6 uppercase tracking-wider">
+                    All Categories
                 </h2>
 
-                <div class="space-y-1.5">
-                    <!-- Footwear Category -->
-                    <div class="category-item">
-                        <button
-                            class="category-header w-full flex justify-between items-center py-2 text-lg font-semibold text-gray-700 hover:text-[#632085] transition focus:outline-none"
-                            data-target="footwear-sub">
-                            <span>Footwear</span>
-                            <span class="icon text-lg font-normal">+</span>
-                        </button>
-                        <div id="footwear-sub" class="category-content hidden pl-3 space-y-1 mt-1 pb-2">
-                            <a href="#" class="block text-base text-gray-500 hover:text-[#632085] py-1">Baby Shoes</a>
-                            <a href="#" class="block text-base text-gray-500 hover:text-[#632085] py-1">Sandals</a>
-                        </div>
-                    </div>
+                <div class="space-y-2">
+                    {{-- ১. মেগা ক্যাটাগরি লুপ --}}
+                    @foreach ($headerCategories as $mega)
+                        <div class="category-item border-b border-gray-50 last:border-0 pb-1">
+                            <div class="flex justify-between items-center py-2 group">
+                                <a href="{{ route('category.products', $mega->slug) }}"
+                                    class="text-[15px] font-bold text-gray-700 hover:text-[#632085] transition-colors uppercase">
+                                    {{ $mega->name }}
+                                </a>
 
-                    <!-- Clothes Category (Default Expanded) -->
-                    <div class="category-item">
-                        <button
-                            class="category-header w-full flex justify-between items-center py-2 text-lg font-bold text-[#632085] transition focus:outline-none"
-                            data-target="clothes-sub">
-                            <span>Clothes</span>
-                            <span class="icon text-lg font-normal">-</span>
-                        </button>
-                        <div id="clothes-sub" class="category-content pl-3 space-y-2 mt-1 pb-2">
-                            <div class="sub-category-item">
-                                <button
-                                    class="subcategory-header w-full flex justify-between items-center py-1.5 text-base font-bold text-[#632085] transition focus:outline-none"
-                                    data-target="newborn-sub">
-                                    <span>Newborn Essentials</span>
-                                    <span class="sub-icon text-xl font-normal">-</span>
-                                </button>
-                                <div id="newborn-sub" class="subcategory-content pl-3 space-y-2 mt-2">
-                                    <a href="#"
-                                        class="block text-sm text-gray-600 hover:text-[#632085] transition">Onesies Bodysuit
-                                        &amp; Vest</a>
-                                    <a href="#"
-                                        class="block text-sm text-gray-600 hover:text-[#632085] transition">Rompers &amp;
-                                        Sleepsuits</a>
-                                    <a href="#"
-                                        class="block text-sm text-gray-600 hover:text-[#632085] transition">Newborn Set
-                                        &amp; Suit</a>
-                                    <a href="#"
-                                        class="block text-sm text-gray-600 hover:text-[#632085] transition">Cap Mitten &amp;
-                                        Booties</a>
-                                </div>
+                                @if ($mega->subCategories->count() > 0)
+                                    <button
+                                        class="toggle-btn w-8 h-8 flex items-center justify-center rounded-lg hover:bg-purple-50 transition cursor-pointer"
+                                        onclick="toggleAccordion('cat-{{ $mega->id }}', this)">
+                                        <span class="icon text-lg text-gray-400 font-light">+</span>
+                                    </button>
+                                @endif
                             </div>
-                            <div class="sub-category-item">
-                                <button
-                                    class="subcategory-header w-full flex justify-between items-center py-1.5 text-base font-semibold text-gray-700 hover:text-[#632085] transition focus:outline-none"
-                                    data-target="boys-sub">
-                                    <span>Boys Fashion</span>
-                                    <span class="sub-icon text-xl font-normal">+</span>
-                                </button>
-                                <div id="boys-sub" class="subcategory-content hidden pl-3 space-y-2 mt-2">
-                                    <a href="#" class="block text-sm text-gray-600 hover:text-[#632085]">T-Shirts</a>
-                                    <a href="#" class="block text-sm text-gray-600 hover:text-[#632085]">Jeans</a>
+
+                            {{-- ২. সাব-ক্যাটাগরি লিস্ট --}}
+                            @if ($mega->subCategories->count() > 0)
+                                <div id="cat-{{ $mega->id }}"
+                                    class="hidden pl-4 space-y-2 mt-1 pb-4 transition-all duration-300">
+                                    @foreach ($mega->subCategories as $sub)
+                                        <div class="sub-category-item">
+                                            <div class="flex justify-between items-center py-1.5 group/sub">
+                                                <a href="{{ route('category.products', $sub->slug) }}"
+                                                    class="text-[14px] font-semibold text-gray-600 hover:text-[#632085] transition-colors">
+                                                    {{ $sub->name }}
+                                                </a>
+
+                                                @if ($sub->miniCategories->count() > 0)
+                                                    <button
+                                                        class="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-[#632085] cursor-pointer"
+                                                        onclick="toggleAccordion('sub-{{ $sub->id }}', this)">
+                                                        <span class="sub-icon text-base font-light">+</span>
+                                                    </button>
+                                                @endif
+                                            </div>
+
+                                            {{-- ৩. মিনি ক্যাটাগরি লিস্ট --}}
+                                            @if ($sub->miniCategories->count() > 0)
+                                                <div id="sub-{{ $sub->id }}"
+                                                    class="hidden pl-4 space-y-1.5 mt-1 pb-2 border-l border-gray-100 ml-1">
+                                                    @foreach ($sub->miniCategories as $mini)
+                                                        <a href="{{ route('category.products', $mini->slug) }}"
+                                                            class="block text-[13px] text-gray-500 hover:text-[#632085] py-1 transition-all hover:pl-1">
+                                                            {{ $mini->name }}
+                                                        </a>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endforeach
                                 </div>
-                            </div>
+                            @endif
                         </div>
-                    </div>
-
-                    <!-- Nursing -->
-                    <div class="category-item">
-                        <button
-                            class="category-header w-full flex justify-between items-center py-2 text-lg font-semibold text-gray-700 hover:text-[#632085] transition focus:outline-none"
-                            data-target="nursing-sub">
-                            <span>Nursing</span>
-                            <span class="icon text-lg font-normal">+</span>
-                        </button>
-                        <div id="nursing-sub" class="category-content hidden pl-3 space-y-2 mt-1 pb-2">
-                            <a href="#" class="block text-base text-gray-600 hover:text-[#632085]">Nursing Pillows</a>
-                        </div>
-                    </div>
-
-                    <!-- Diapers -->
-                    <div class="category-item">
-                        <button
-                            class="category-header w-full flex justify-between items-center py-2 text-lg font-semibold text-gray-700 hover:text-[#632085] transition focus:outline-none"
-                            data-target="diapers-sub">
-                            <span>Diapers</span>
-                            <span class="icon text-lg font-normal">+</span>
-                        </button>
-                        <div id="diapers-sub" class="category-content hidden pl-3 space-y-2 mt-1 pb-2">
-                            <a href="#" class="block text-base text-gray-600 hover:text-[#632085]">Disposable
-                                Diapers</a>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
             </aside>
 
+
+
             <!-- ════════════════════════════════════════
-                 RIGHT SIDE: TOP FILTER BAR & CARD GRID CONTAINER (col-span-9)
-                ════════════════════════════════════════ -->
+                             RIGHT SIDE: TOP FILTER BAR & CARD GRID CONTAINER (col-span-9)
+                            ════════════════════════════════════════ -->
             <div class="lg:col-span-9 w-full overflow-hidden">
                 <!-- Top Filter Bar & Sorting (Side-by-Side on Mobile) -->
                 <div class="bg-[#F5F5F5] rounded-lg px-2 sm:px-4 py-2 sm:py-4 mb-4 md:mb-6">
                     <div class="flex flex-row items-center justify-between gap-2 sm:gap-4">
-                        <!-- Mobile Filter Button (Visible only on mobile/tablet) -->
                         <!-- flex-1 ensures it shares 50% width on mobile -->
-                        <button id="open-right-filter-btn"
-                            class="flex-1 lg:hidden border border-gray-300 rounded-lg px-2 sm:px-4 py-2 sm:py-2.5 bg-[#632085] text-white text-[12px] sm:text-sm font-bold uppercase tracking-wide flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm focus:outline-none active:scale-95 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                                </path>
-                            </svg>
-                            <span>Filter By</span>
-                        </button>
+                        <form action="{{ url()->current() }}" method="GET" id="desktop-filter-form">
+                            <input type="hidden" name="sort" value="{{ request('sort', 'default') }}">
+                            <input type="hidden" name="min_price" value="{{ request('min_price') }}">
+                            <input type="hidden" name="max_price" value="{{ request('max_price') }}">
 
-                        <!-- Left Side: Desktop Inline Filters (Visible only on lg) -->
-                        <div class="hidden lg:flex flex-wrap items-center gap-3">
-                            <!-- 1. AGE GROUP Filter -->
-                            <div class="relative filter-dropdown-container">
-                                <button
-                                    class="filter-dropdown-btn border border-gray-300 rounded px-4 py-2 bg-white text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition">
-                                    <span>Age</span>
-                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                <div
-                                    class="filter-menu hidden absolute left-0 mt-1.5 w-36 bg-white border border-gray-200 rounded shadow-lg z-30 overflow-hidden divide-y divide-gray-50">
-                                    <a href="#"
-                                        class="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">0
-                                        Months+</a>
-                                    <a href="#"
-                                        class="block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">0-6
-                                        Month</a>
+                            <div class="flex items-center gap-3 font-manrope">
+
+                                <div class="hidden lg:flex flex-wrap items-center gap-3">
+
+                                    {{-- ১. ডাইনামিক অ্যাট্রিবিউট লুপ --}}
+                                    @foreach ($attributeGroups as $group)
+                                        @php
+                                            $selectedIds = request('attributes')[$group->id] ?? [];
+                                            // সিলেক্ট করা আইডিগুলো থেকে নামগুলো বের করা হচ্ছে
+                                            $selectedNames = $group->values
+                                                ->whereIn('id', $selectedIds)
+                                                ->pluck('name')
+                                                ->toArray();
+                                            // যদি কিছু সিলেক্ট থাকে তবে নামগুলো দেখাবে, নাহলে মেইন গ্রুপ নেম
+                                            $displayText =
+                                                count($selectedNames) > 0
+                                                    ? implode(', ', $selectedNames)
+                                                    : $group->name;
+                                            $isActive = count($selectedNames) > 0;
+                                        @endphp
+
+                                        <div class="relative group">
+                                            <button type="button"
+                                                class="border {{ $isActive ? 'border-[#632085] bg-purple-50 text-[#632085]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
+
+                                                {{-- নাম এখানে দেখানো হচ্ছে এবং বেশি বড় হলে ডট ডট হবে --}}
+                                                <span class="truncate">{{ $displayText }}</span>
+
+                                                <svg class="w-3.5 h-3.5 {{ $isActive ? 'text-[#632085]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
+                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+
+                                            <div class="absolute left-0 mt-0 pt-2 w-48 hidden group-hover:block z-[100]">
+                                                <div
+                                                    class="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden divide-y divide-gray-50 max-h-64 overflow-y-auto">
+                                                    @foreach ($group->values as $value)
+                                                        @php $isSelected = in_array($value->id, $selectedIds); @endphp
+                                                        <label
+                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isSelected ? 'text-[#632085] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
+                                                            <span>{{ $value->name }}</span>
+                                                            <input type="checkbox"
+                                                                name="attributes[{{ $group->id }}][]"
+                                                                value="{{ $value->id }}" onchange="this.form.submit()"
+                                                                {{ $isSelected ? 'checked' : '' }}
+                                                                class="w-4 h-4 accent-[#632085] cursor-pointer">
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+
+                                    {{-- ২. ডাইনামিক ব্র্যান্ড ফিল্টার --}}
+                                    @if ($brands->isNotEmpty())
+                                        @php
+                                            $selectedBrandIds = (array) request('brand');
+                                            $selectedBrandNames = $brands
+                                                ->whereIn('id', $selectedBrandIds)
+                                                ->pluck('name')
+                                                ->toArray();
+                                            $brandText =
+                                                count($selectedBrandNames) > 0
+                                                    ? implode(', ', $selectedBrandNames)
+                                                    : 'Brand';
+                                            $isBrandActive = count($selectedBrandNames) > 0;
+                                        @endphp
+                                        <div class="relative group">
+                                            <button type="button"
+                                                class="border {{ $isBrandActive ? 'border-[#632085] bg-purple-50 text-[#632085]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
+                                                <span class="truncate">{{ $brandText }}</span>
+                                                <svg class="w-3.5 h-3.5 {{ $isBrandActive ? 'text-[#632085]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
+                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </button>
+                                            <div class="absolute left-0 mt-0 pt-2 w-56 hidden group-hover:block z-[100]">
+                                                <div
+                                                    class="bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden divide-y divide-gray-50 max-h-64 overflow-y-auto">
+                                                    @foreach ($brands as $brand)
+                                                        @php $isBrandSelected = in_array($brand->id, $selectedBrandIds); @endphp
+                                                        <label
+                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isBrandSelected ? 'text-[#632085] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
+                                                            <span>{{ $brand->name }}</span>
+                                                            <input type="checkbox" name="brand[]"
+                                                                value="{{ $brand->id }}" onchange="this.form.submit()"
+                                                                {{ $isBrandSelected ? 'checked' : '' }}
+                                                                class="w-4 h-4 accent-[#632085] cursor-pointer">
+                                                        </label>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    @if (request()->has('attributes') || request()->has('brand'))
+                                        <a href="{{ url()->current() }}"
+                                            class="text-[11px] font-black text-red-500 hover:underline uppercase tracking-widest ml-2">
+                                            Clear All
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
-                            <!-- 2. Size Filter -->
-                            <div class="relative filter-dropdown-container">
-                                <button
-                                    class="filter-dropdown-btn border border-gray-300 rounded px-4 py-2 bg-white text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition">
-                                    <span>Size</span>
-                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <!-- 3. COLOR Filter -->
-                            <div class="relative filter-dropdown-container">
-                                <button
-                                    class="filter-dropdown-btn border border-gray-300 rounded px-4 py-2 bg-white text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition">
-                                    <span>Color</span>
-                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <!-- 4. BRAND Filter -->
-                            <div class="relative filter-dropdown-container">
-                                <button
-                                    class="filter-dropdown-btn border border-gray-300 rounded px-4 py-2 bg-white text-sm font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition">
-                                    <span>Brand</span>
-                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
+                        </form>
 
-                        <!-- Right Side: Native Sort By Dropdown (Always Visible, shares 50% on mobile) -->
+                        <!-- Right Side: Native Sort By Dropdown -->
                         <div class="flex-1 lg:flex-none flex items-center justify-end">
                             <label for="input-sort"
-                                class="hidden xl:block text-sm font-bold text-gray-700 uppercase mr-3 shrink-0">Sort By
-                                :</label>
+                                class="hidden xl:block text-sm font-bold text-gray-700 uppercase mr-3 shrink-0">
+                                Sort By :
+                            </label>
+
                             <div class="relative w-full lg:w-56">
-                                <select id="input-sort" onchange="location = this.value"
-                                    class="w-full appearance-none border border-gray-300 rounded-lg pl-2 sm:pl-3 pr-7 py-2 sm:py-2.5 bg-white text-[12px] sm:text-sm font-semibold text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#632085] focus:border-[#632085] transition shadow-sm cursor-pointer hover:bg-gray-50 truncate">
-                                    <option value="" selected="selected">
-                                        Default Sorting
-                                    </option>
-                                    <option value="a-z">Name (A - Z)</option>
-                                    <option value="z-a">Name (Z - A)</option>
-                                    <option value="low-high">Price (Low &gt; High)</option>
-                                    <option value="high-low">Price (High &gt; Low)</option>
-                                    <option value="highest">Rating (Highest)</option>
-                                    <option value="lowest">Rating (Lowest)</option>
-                                </select>
+                                <form action="" method="GET" id="sortForm">
+                                    <select name="sort" onchange="document.getElementById('sortForm').submit()"
+                                        aria-label="Sort products"
+                                        class="w-full appearance-none bg-white border border-gray-200 text-gray-600 text-sm md:text-base rounded-md pr-10 pl-3 py-2 outline-none focus:ring-1 focus:ring-[#632085] cursor-pointer shadow-sm">
+                                        <option value="default" class=""
+                                            {{ request('sort') == 'default' ? 'selected' : '' }}>
+                                            Default Sorting</option>
+                                        <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>
+                                            Price: Low to High</option>
+                                        <option value="price_high"
+                                            {{ request('sort') == 'price_high' ? 'selected' : '' }}>
+                                            Price: High to Low</option>
+                                        <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest
+                                            First</option>
+                                    </select>
+                                </form>
+
                                 <div
-                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 sm:px-3 text-gray-500">
-                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor"
-                                        stroke-width="2" viewBox="0 0 24 24">
+                                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
@@ -304,242 +332,47 @@
                 </div>
 
                 <!-- ════════════════════════════════════════
-                     PRODUCT CARD GRID (2 per row on Mobile, 3 on Desktop)
-                    ════════════════════════════════════════ -->
-                <div class="bg-white py-2 md:py-4 px-0">
+                                 PRODUCT CARD GRID (2 per row on Mobile, 3 on Desktop)
+                                ════════════════════════════════════════ -->
+                <div class=" py-2 md:py-4 px-0">
                     <div
                         class="grid grid-cols-2 md:grid-cols-3 gap-x-2 sm:gap-x-4 lg:gap-x-6 gap-y-6 sm:gap-y-8 lg:gap-y-10">
-                        <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                            <div class="relative">
-                                <div
-                                    class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                                    <div class="w-full h-full p-8 flex items-center justify-center">
-                                        <img src="assets/images/girl.png" alt="Product Image"
-                                            class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                                    </div>
-                                </div>
-
-                                <!-- উইশলিস্ট বাটন -->
-                                <div class="absolute -top-1 -right-1">
-                                    <div class="bg-white p-1 rounded-full">
-                                        <button
-                                            class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                            aria-label="Add to Wishlist">
-                                            <i class="fa-regular fa-heart text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                        @forelse($products as $product)
+                            <x-template1.product-card :product="$product" />
+                        @empty
+                            <div class="col-span-full py-20 text-center">
+                                <i class="fas fa-box-open text-5xl text-gray-200 mb-4"></i>
+                                <p class="text-gray-500 font-medium">No products found in this category.</p>
                             </div>
-
-                            <div class="space-y-1 p-4">
-                                <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                                    Luxury Essentials for Growing Families
-                                </h3>
-
-                                <!-- Price Section inspired by the image -->
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                                    <!-- Prices -->
-                                    <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                                    <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
-
-                                    <div class="basis-full h-0 sm:hidden"></div>
-
-                                    <!-- Discount Percentage Badge -->
-                                    <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                        -22%
-                                    </span>
-                                </div>
-                                <button
-                                    class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                                    Add To Cart
-                                </button>
-                            </div>
-                        </div>
-                        <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                            <div class="relative">
-                                <div
-                                    class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                                    <div class="w-full h-full p-8 flex items-center justify-center">
-                                        <img src="assets/images/girl.png" alt="Product Image"
-                                            class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                                    </div>
-                                </div>
-
-                                <!-- উইশলিস্ট বাটন -->
-                                <div class="absolute -top-1 -right-1">
-                                    <div class="bg-white p-1 rounded-full">
-                                        <button
-                                            class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                            aria-label="Add to Wishlist">
-                                            <i class="fa-regular fa-heart text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1 p-4">
-                                <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                                    Luxury Essentials for Growing Families
-                                </h3>
-
-                                <!-- Price Section inspired by the image -->
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                                    <!-- Prices -->
-                                    <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                                    <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
-
-                                    <div class="basis-full h-0 sm:hidden"></div>
-
-                                    <!-- Discount Percentage Badge -->
-                                    <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                        -22%
-                                    </span>
-                                </div>
-                                <button
-                                    class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                                    Add To Cart
-                                </button>
-                            </div>
-                        </div>
-                        <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                            <div class="relative">
-                                <div
-                                    class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                                    <div class="w-full h-full p-8 flex items-center justify-center">
-                                        <img src="assets/images/girl.png" alt="Product Image"
-                                            class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                                    </div>
-                                </div>
-
-                                <!-- উইশলিস্ট বাটন -->
-                                <div class="absolute -top-1 -right-1">
-                                    <div class="bg-white p-1 rounded-full">
-                                        <button
-                                            class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                            aria-label="Add to Wishlist">
-                                            <i class="fa-regular fa-heart text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1 p-4">
-                                <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                                    Luxury Essentials for Growing Families
-                                </h3>
-
-                                <!-- Price Section inspired by the image -->
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                                    <!-- Prices -->
-                                    <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                                    <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
-
-                                    <div class="basis-full h-0 sm:hidden"></div>
-
-                                    <!-- Discount Percentage Badge -->
-                                    <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                        -22%
-                                    </span>
-                                </div>
-                                <button
-                                    class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                                    Add To Cart
-                                </button>
-                            </div>
-                        </div>
-                        <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                            <div class="relative">
-                                <div
-                                    class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                                    <div class="w-full h-full p-8 flex items-center justify-center">
-                                        <img src="assets/images/girl.png" alt="Product Image"
-                                            class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                                    </div>
-                                </div>
-
-                                <!-- উইশলিস্ট বাটন -->
-                                <div class="absolute -top-1 -right-1">
-                                    <div class="bg-white p-1 rounded-full">
-                                        <button
-                                            class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                            aria-label="Add to Wishlist">
-                                            <i class="fa-regular fa-heart text-xl"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1 p-4">
-                                <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                                    Luxury Essentials for Growing Families
-                                </h3>
-
-                                <!-- Price Section inspired by the image -->
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                                    <!-- Prices -->
-                                    <span class="text-[#005c7a] text-xl md:text-2xl font-semibold">৳1,040</span>
-                                    <span class="text-[#999999] text-sm md:text-base line-through">৳1,340</span>
-
-                                    <div class="basis-full h-0 sm:hidden"></div>
-
-                                    <!-- Discount Percentage Badge -->
-                                    <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                        -22%
-                                    </span>
-                                </div>
-                                <button
-                                    class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                                    Add To Cart
-                                </button>
-                            </div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Pagination -->
-        <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6"
-            style="font-family: &quot;Manrope&quot;, sans-serif">
-            <nav class="flex items-center gap-1.5 md:gap-2" aria-label="Pagination">
-                <!-- Previous Button -->
-                <button id="prev-page"
-                    class="px-2.5 sm:px-3 md:px-4 h-8 md:h-10 flex items-center justify-center border border-gray-300 rounded text-xs sm:text-sm md:text-base font-bold text-gray-700 hover:bg-gray-50 focus:outline-none transition">
-                    Prev
-                </button>
-                <!-- Page Numbers -->
-                <div id="page-numbers" class="flex items-center gap-1.5 md:gap-2">
-                    <button
-                        class="page-num-btn w-8 h-8 md:w-10 md:h-10 flex items-center justify-center bg-[#632085] hover:bg-[#52166d] rounded text-white font-bold text-xs sm:text-sm md:text-base focus:outline-none transition"
-                        data-page="1">
-                        1
-                    </button>
-                    <button
-                        class="page-num-btn w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:bg-gray-50 font-bold text-xs sm:text-sm md:text-base focus:outline-none transition"
-                        data-page="2">
-                        2
-                    </button>
-                    <button
-                        class="page-num-btn w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border border-gray-300 rounded text-gray-700 hover:bg-gray-50 font-bold text-xs sm:text-sm md:text-base focus:outline-none transition"
-                        data-page="3">
-                        3
-                    </button>
-                    <button
-                        class="hidden sm:flex page-num-btn w-10 h-10 items-center justify-center border border-gray-300 rounded text-gray-700 hover:bg-gray-50 font-bold text-base focus:outline-none transition"
-                        data-page="4">
-                        4
-                    </button>
-                </div>
-                <!-- Next Button -->
-                <button id="next-page"
-                    class="px-2.5 sm:px-3 md:px-4 h-8 md:h-10 flex items-center justify-center border border-gray-300 rounded text-xs sm:text-sm md:text-base font-bold text-gray-700 hover:bg-gray-50 focus:outline-none transition">
-                    Next
-                </button>
-            </nav>
+        <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6">
+            {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
         </div>
     </div>
 @endsection
 @push('scripts')
+    <script>
+        function toggleAccordion(id, btn) {
+            const content = document.getElementById(id);
+            const icon = btn.querySelector('.icon, .sub-icon');
+
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '-';
+                btn.closest('.flex').querySelector('a').classList.add('text-[#632085]');
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '+';
+                btn.closest('.flex').querySelector('a').classList.remove('text-[#632085]');
+            }
+        }
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const filterDrawer = document.getElementById("right-filter-drawer");

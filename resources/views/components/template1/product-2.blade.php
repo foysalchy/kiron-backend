@@ -126,7 +126,20 @@
         </button>
     </div>
 </div>
+<style>
+    /* আপনার দেওয়া নতুন এবং নিখুঁত মাস্কিং স্টাইল */
+    .product-card-notch {
+        -webkit-mask-image: radial-gradient(circle 50px at 100% 0%, transparent 50px, black 51px);
+        mask-image: radial-gradient(circle 50px at 100% 0%, transparent 50px, black 51px);
+    }
 
+    @media (max-width: 640px) {
+        .product-card-notch {
+            -webkit-mask-image: radial-gradient(circle 45px at 100% 0%, transparent 45px, black 46px);
+            mask-image: radial-gradient(circle 45px at 100% 0%, transparent 45px, black 46px);
+        }
+    }
+</style>
 @once
     @push('scripts')
         <script>

@@ -39,11 +39,11 @@
                                 <i class="fas fa-lock text-sm"></i>
                             </span>
                             <input type="password" name="password" id="password" placeholder="••••••••" required
-                                class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#66267b] focus:ring-4 focus:ring-green-50 transition-all text-sm">
 
                             <!-- Toggle Visibility Button -->
                             <button type="button" onclick="togglePassword()"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#FF6A00]">
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#66267b]">
                                 <i id="eye-icon" class="far fa-eye text-[14px]"></i>
                             </button>
                         </div>
@@ -51,12 +51,12 @@
 
                     <!-- Forgot Password Link -->
                     <div class="text-left">
-                        <a href="#"  style="color:var(--primary-color)"  class="  text-sm font-medium hover:underline">Forgot Your Password?</a>
+                        <a href="#"  style="color:#66267b"  class="  text-sm font-medium hover:underline">Forgot Your Password?</a>
                     </div>
 
                     <!-- Login Button -->
                     <button type="submit"
-                        class="w-full  primary-bg text-primary font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
+                        class="w-full  bg-[#66267b] text-primary font-black py-3 rounded-lg shadow-xs text-md transition-all active:scale-[0.98]">
                         Login
                     </button>
 
@@ -64,7 +64,7 @@
                     <div class="text-center pt-2">
                         <p class="text-gray-500 font-medium">
                            Don't have an account?<a href="{{url('/register')}}"
-                                style="color:var(--primary-color)"   class=" font-medium hover:underline ml-1">Register</a>
+                                style="color:#66267b"   class=" font-medium hover:underline ml-1">Register</a>
                         </p>
                     </div>
                 </form>

@@ -23,10 +23,17 @@ class HomeController extends FrontendController
 
         $categories = MegaCategory::with('subCategories.miniCategories')->get();
 
+        $latestOffers = Product::with(['brand', 'variations'])
+        ->where('discount', '>', 0)
+        ->where('status', Status::Active->value)
+        ->latest()
+        ->take(12)
+        ->get();
+
         $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
             ->where('status', Status::Active->value)
             ->withCount('reviews')
-            ->withAvg('reviews', 'rating')->latest()->take(10)->get();
+            ->withAvg('reviews', 'rating')->latest()->take(8)->get();
         // \Log::info($newArrivals);
         //for product groups
         $productGroups = ProductGroup::where('status', Status::Active->value)
@@ -85,7 +92,8 @@ class HomeController extends FrontendController
                 'middleSliders',
                 'allProducts',
                 'allReviews',
-                'faqs'
+                'faqs',
+                'latestOffers'
             )
         );
     }

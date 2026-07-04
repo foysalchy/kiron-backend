@@ -236,7 +236,7 @@ class AppServiceProvider extends ServiceProvider
             $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
 
             $data = cache()->remember($cacheKey, 600, function () use ($companyId) {
- 
+
                 /**
                  * this function handle for all table
                  */
@@ -257,14 +257,12 @@ class AppServiceProvider extends ServiceProvider
 
                     'headerCategories'  => $applyLogic(MegaCategory::class)
                         ->with([
-                            'subCategories' => function ($q) {
-                                $q->where('status', 1);
-                            },
-                            'subCategories.miniCategories' => function ($q) {
-                                $q->where('status', 1);
-                            }
+                            'subCategories' => fn($q) => $q->where('status', 1),
+                            'subCategories.miniCategories' => fn($q) => $q->where('status', 1)
                         ])
                         ->where('status', 1)
+                        ->whereNotNull('slug')
+                        ->where('slug', '!=', '')
                         ->latest()
                         ->get(),
 
