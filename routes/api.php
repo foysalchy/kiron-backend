@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
 use App\Http\Controllers\Api\ChartOfAccountController;
 use App\Http\Controllers\Api\CompanyController;
+use App\Http\Controllers\Api\SystemPageController;
 use App\Http\Controllers\Api\CompanyRegistrationController;
 use App\Http\Controllers\Api\ContentSettingController;
 use App\Http\Controllers\Api\DepartmentController;
@@ -107,6 +108,7 @@ use App\Http\Controllers\Api\QuotationController;
 use App\Http\Controllers\Api\RackController;
 use App\Http\Controllers\Api\RecurringJournalController;
 use App\Http\Controllers\Api\RejoinController;
+use App\Http\Controllers\Api\ReminderSettingController;
 use App\Http\Controllers\Api\ResignationController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
@@ -232,7 +234,9 @@ Route::prefix('v1')->group(function () {
         Route::post('/companies/update-requests/{reqId}', [CompanyController::class, 'updateUpdateRequest']);
         Route::delete('/companies/update-requests/{reqId}', [CompanyController::class, 'deleteUpdateRequest']);
         Route::get('/companies/{id}/extra-charges', [CompanyController::class, 'extraCharges']);
-
+        Route::get('/system-pages', [SystemPageController::class, 'index']);
+        Route::get('/system-pages/{pageType}', [SystemPageController::class, 'show']);
+        Route::put('/system-pages/{pageType}', [SystemPageController::class, 'update']);
         Route::middleware('subscription.active')->group(function () {
             Route::middleware(['super_admin'])->group(function () {
                 Route::post('/impersonate/company/{company}', [AuthController::class, 'impersonateCompany']);
@@ -1567,6 +1571,10 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/{id}/toggle-status', [PricingPackageController::class, 'toggleStatus']);
             });
 
+            Route::get('/reminder-settings', [ReminderSettingController::class, 'index']);
+            Route::post('/reminder-settings', [ReminderSettingController::class, 'store']);
+            Route::put('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'update']);
+            Route::delete('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'destroy']);
 
             Route::apiResource('/sms-packages', SmsPackageController::class);
             Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);

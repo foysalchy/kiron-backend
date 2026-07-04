@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
+use App\Enums\SystemPageType;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
@@ -15,6 +16,7 @@ use App\Models\Permission;
 use App\Models\Pricing;
 use App\Models\PricingPackage;
 use App\Models\SiteSetting;
+use App\Models\SystemPage;
 use App\Models\User;
 use App\Models\UserLoginHistory;
 use App\Models\Warehouse;
@@ -35,7 +37,6 @@ class CompanyRegistrationService
     /**
      * Step 1: Create company and admin user
      */
-
     public function registerBasic(array $data): array
     {
         DB::beginTransaction();
@@ -58,14 +59,10 @@ class CompanyRegistrationService
                 'company_id' => $company->id,
                 'status'     => Status::Draft->value,
                 'is_primary' => 1,
-
             ]);
 
             LogHelper::created('user', $user->id, $company->id);
 
-            // ==========================================
-            // 🟢 NEW: LOGIN THE USER IMMEDIATELY
-            // ==========================================
             $history = UserLoginHistory::create([
                 'company_id' => $user->company_id,
                 'user_id'    => $user->id,
@@ -73,25 +70,34 @@ class CompanyRegistrationService
                 'user_agent' => request()->userAgent(),
                 'login_at'   => now(),
             ]);
+            foreach (SystemPageType::companyScoped() as $type) {
+                SystemPage::create([
+                    'company_id' => $company->id,
+                    'page_type'  => $type,
+                ]);
+            }
 
             $token = $user->createToken('auth_token')->plainTextToken;
 
             DB::commit();
 
-            // Return Token & User data just like standard login
             return [
                 'registration_id' => $company->id,
                 'token'           => $token,
                 'login_id'        => $history->id,
                 'user'            => [
-                    'id'          => $user->id,
-                    'name'        => $user->name,
-                    'email'       => $user->email,
-                    'company_id'  => $user->company_id,
-                    'role'        => $user->role,
-                    'status'      => $user->status,
-                    'profile'     => $user->profile,
-                    'profile_url' => $user->profile_url,
+                    'id'                => $user->id,
+                    'name'              => $user->name,
+                    'email'             => $user->email,
+                    'company_id'        => $user->company_id,
+                    'role'              => 'User', // primary role, roles relation eventually assign hobe
+                    'is_super_admin'    => false,
+                    'status'            => $user->status,
+                    'setup_complete'    => false,   // 👈 notun account, setup baki
+                    'billing_required'  => false,   // 👈 registration flow-e, billing check ekhono na
+                    'profile'           => $user->profile,
+                    'profile_url'       => $user->profile_url,
+                    'company'           => $company,
                 ],
             ];
         } catch (\Exception $e) {
@@ -100,7 +106,6 @@ class CompanyRegistrationService
             throw ApiException::serverError('Account creation failed. Please try again.');
         }
     }
-
     /**
      * Step 3: Create subscription, site settings, and send OTP
      */
@@ -200,81 +205,81 @@ class CompanyRegistrationService
             throw ApiException::serverError('Failed to process subscription.');
         }
     }
-public function registerBasicSettings(array $data): array
-{
-    DB::beginTransaction();
-    try {
-        $company = Company::findOrFail($data['registration_id']);
+    public function registerBasicSettings(array $data): array
+    {
+        DB::beginTransaction();
+        try {
+            $company = Company::findOrFail($data['registration_id']);
 
-        // Insert subdomain into DomainSetup
-        DomainSetup::create([
-            'company_id' => $company->id,
-            'sub_domain' => $data['sub_domain'],
-        ]);
-
-        // Update language & currency in SiteSettings
-        SiteSetting::where('company_id', $company->id)
-            ->update([
-                'lang'     => $data['lang'],
-                'currency' => $data['currency'],
+            // Insert subdomain into DomainSetup
+            DomainSetup::create([
+                'company_id' => $company->id,
+                'sub_domain' => $data['sub_domain'],
             ]);
 
-        if (isset($data['manage_warehouse'])) {
-            $manageWarehouse = (bool) $data['manage_warehouse'];
+            // Update language & currency in SiteSettings
+            SiteSetting::where('company_id', $company->id)
+                ->update([
+                    'lang'     => $data['lang'],
+                    'currency' => $data['currency'],
+                ]);
 
-            $company->update(['manage_warehouse' => $manageWarehouse]);
+            if (isset($data['manage_warehouse'])) {
+                $manageWarehouse = (bool) $data['manage_warehouse'];
 
-            if (!$manageWarehouse) {
-                $exists = Warehouse::where('company_id', $company->id)
-                    ->where('is_default', 1)
-                    ->exists();
+                $company->update(['manage_warehouse' => $manageWarehouse]);
 
-                if (!$exists) {
-                    $warehouse = Warehouse::create([
-                        'company_id' => $company->id,
-                        'name'       => 'Default Warehouse',
-                        'location'   => null,
-                        'is_default' => 1,
-                        'status'     => Status::Active->value,
-                    ]);
+                if (!$manageWarehouse) {
+                    $exists = Warehouse::where('company_id', $company->id)
+                        ->where('is_default', 1)
+                        ->exists();
 
-                    $company->update(['default_warehouse_id' => $warehouse->id]);
+                    if (!$exists) {
+                        $warehouse = Warehouse::create([
+                            'company_id' => $company->id,
+                            'name'       => 'Default Warehouse',
+                            'location'   => null,
+                            'is_default' => 1,
+                            'status'     => Status::Active->value,
+                        ]);
+
+                        $company->update(['default_warehouse_id' => $warehouse->id]);
+                    }
                 }
             }
-        }
 
-        // Activate Company
-        $company->update([
-            'status' => Status::Active->value,
-        ]);
-
-        // Activate the Company's primary User + mark setup complete
-        User::where('company_id', $company->id)
-            ->update([
-                'status'         => Status::Active->value,
-                'setup_complete' => true, // ⚠️ ei column na thakle migration lagbe, note niche
+            // Activate Company
+            $company->update([
+                'status' => Status::Active->value,
             ]);
 
-        DB::commit();
+            // Activate the Company's primary User + mark setup complete
+            User::where('company_id', $company->id)
+                ->update([
+                    'status'         => Status::Active->value,
+                    'setup_complete' => true, // ⚠️ ei column na thakle migration lagbe, note niche
+                ]);
 
-        Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
+            DB::commit();
 
-        $user = User::where('company_id', $company->id)
-            ->with(['company.pricingPackage', 'roles.permissions'])
-            ->first();
+            Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
 
-        return [
-            'user'        => $user,
-            'permissions' => $this->resolvePermissions($user),
-            'company'     => $company->load('pricingPackage'),
-        ];
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Basic settings registration failed: ' . $e->getMessage());
-        throw ApiException::serverError('Failed to save basic settings.');
+            $user = User::where('company_id', $company->id)
+                ->with(['company.pricingPackage', 'roles.permissions'])
+                ->first();
+
+            return [
+                'user'        => $user,
+                'permissions' => $this->resolvePermissions($user),
+                'company'     => $company->load('pricingPackage'),
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Basic settings registration failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to save basic settings.');
+        }
     }
-}
-  /**
+    /**
      * Unified Seller Registration - Merging all registration phases into one single atomic transaction.
      */
     public function registerSeller(array $data, $request): array
@@ -305,7 +310,7 @@ public function registerBasicSettings(array $data): array
 
             LogHelper::created('user', $user->id, $company->id);
 
-  
+
 
             // 4. Process Subscription pricing tier details and durations
             $billing = $data['billing_cycle'] ?? 'monthly';
@@ -425,7 +430,7 @@ public function registerBasicSettings(array $data): array
                 }
             }
 
-  
+
 
             DB::commit();
 
@@ -437,13 +442,13 @@ public function registerBasicSettings(array $data): array
                 ->first();
 
             return [
-               
+
                 'user' => [
                     'id'          => $freshUser->id,
                     'name'        => $freshUser->name,
                     'email'       => $freshUser->email,
                     'company_id'  => $freshUser->company_id,
-                
+
                     'company'     => $company->load('pricingPackage'),
                 ],
                 'permissions' => $this->resolvePermissions($freshUser),
@@ -496,7 +501,7 @@ public function registerBasicSettings(array $data): array
             ->toArray();
     }
 
-    public function verifyOtp(int $registrationId, string $type, string $otp): void
+    public function verifyOtp(int $registrationId, string $type, string $otp): User
     {
         $record = EmailVerification::where('company_id', $registrationId)
             ->where('type', $type)
@@ -520,6 +525,11 @@ public function registerBasicSettings(array $data): array
         Company::where('id', $registrationId)->update(['status' => Status::Pending->value]);
 
         Log::info("Email verified for company_id: {$registrationId} and email: {$record->email}");
+
+        return User::where('company_id', $registrationId)
+            ->where('email', $record->email)
+            ->with('company')
+            ->firstOrFail();
     }
 
     public function resendOtp(int $registrationId, string $type): void
