@@ -116,8 +116,18 @@
                         <!-- Description -->
                         <div class="mb-4">
                             <p class="text-gray-600 text-sm leading-relaxed">
-                                {{ $plan->description ?? 'Manage all your work in one place with our smart system.' }}
-                            </p>
+                            {{
+                                strtolower($plan->name) == 'starter'
+                                    ? 'Launch your business with everything you need to manage sales, inventory, and customers—all in one platform.'
+                                    : (strtolower($plan->name) == 'growth'
+                                        ? 'Scale your business faster with higher limits, smarter automation, and powerful business insights.'
+                                        : (strtolower($plan->name) == 'business'
+                                            ? 'Optimize every department with advanced tools designed for growing and multi-team businesses.'
+                                            : 'Unlock the full power of Dorja with unlimited scalability, premium support, and enterprise-ready performance.'
+                                        )
+                                    )
+                            }}
+                        </p>
                         </div>
 
                         <!-- Features/Limits Section (Fixed at bottom) -->
@@ -126,25 +136,39 @@
 
                             <div class="space-y-4">
                                 
-                                <div class="flex justify-between items-center text-gray-700 text-sm">
-                                    <span>User Limit: {{ $plan->user_limit ?: 'Unlimited' }}</span>
-                                    <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                </div>
+                               <div class="space-y-3">
 
-                                <div class="flex justify-between items-center text-gray-700 text-sm">
-                                    <span>Product Limit: {{ $plan->product_limit ?: 'Unlimited' }}</span>
-                                    <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                </div>
+                                @foreach ([
+                                    ['User Limit', $plan->user_limit],
+                                    ['Product Limit', $plan->product_limit],
+                                    ['Order Limit', $plan->order_limit],
+                                    ['Invoice Templates', $plan->invoice_limit],
+                                ] as [$label, $value])
 
-                                <div class="flex justify-between items-center text-gray-700 text-sm">
-                                    <span>Order Limit: {{ $plan->order_limit ?: 'Unlimited' }}</span>
-                                    <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                </div>
+                                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+                                            </div>
 
-                                <div class="flex justify-between items-center text-gray-700 text-sm">
+                                            <span class="text-sm text-gray-600">
+                                                {{ $label }}
+                                            </span>
+                                        </div>
+
+                                        <span class="text-sm font-semibold text-gray-900">
+                                            {{ $value ?: 'Unlimited' }}
+                                        </span>
+                                    </div>
+
+                                @endforeach
+
+                            </div>
+
+                                <!-- <div class="flex justify-between items-center text-gray-700 text-sm">
                                     <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
                                     <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                </div>
+                                </div> -->
 
                                 {{-- Custom multiple input loop --}}
                                 @if (!empty($plan->multiple_input))
