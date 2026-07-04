@@ -557,12 +557,12 @@
  
                
 
-                <!-- <span
+                <span
                     class="inline-flex items-center gap-2 font-semibold text-[#34a487]">
-                    Learn More
+                    Read More
                     <i
                         class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </span> -->
+                </span>
             </div>
 
         </a>
