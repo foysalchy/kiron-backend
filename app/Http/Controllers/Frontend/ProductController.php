@@ -95,7 +95,7 @@ class ProductController extends FrontendController
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(12)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $brands = Brand::get();
@@ -340,5 +340,45 @@ class ProductController extends FrontendController
         });
 
         return response()->json($results);
+    }
+    public function subcategoryProducts(Request $request, $store, $mega_slug, $sub_slug)
+    {
+        $category = SubCategory::where('slug', $sub_slug)->firstOrFail();
+
+        $query = Product::where('status', Status::Active->value)
+            ->whereJsonContains('sub_category_ids', (int)$category->id) 
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
+
+        return $this->renderShopView($request, $query, $category);
+    }
+
+    public function minicategoryProducts(Request $request, $store, $mega_slug, $sub_slug, $mini_slug)
+    {
+        $category = MiniCategory::where('slug', $mini_slug)->firstOrFail();
+
+        $query = Product::where('status', Status::Active->value)
+            ->whereJsonContains('mini_category_ids', (int)$category->id)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
+
+        return $this->renderShopView($request, $query, $category);
+    }
+
+    private function renderShopView($request, $query, $category)
+    {
+        $this->applyFiltersAndSorting($query, $request);
+        $maxPriceLimit = $this->getMaxPriceLimit();
+
+        $products = $query->paginate(12)->appends($request->query());
+        $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
+
+        $brands = Brand::get();
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+            ->with('values')->active()->get()->unique('name');
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+            'allProducts' => $products
+        ]);
     }
 }

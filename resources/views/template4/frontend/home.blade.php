@@ -217,136 +217,57 @@
         </div>
     </section>
 
-    <!-- LATEST OFFERS SECTION -->
-    <section class="container mx-auto py-4 md:py-10  px-4">
+    <!-- LATEST OFFERS SECTION  -->
+    <section class="container mx-auto py-4 md:py-10 px-4 font-manrope">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-semibold text-[#041533] mb-6 md:mb-10 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             Latest Offers
         </h2>
 
-        <!-- Offers Grid (2 columns on mobile, 3 columns on desktop) -->
+        <!-- Offers Grid -->
         <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-            <!-- Single Offer Card (Repeated) -->
-            <div
-                class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
-                <!-- Left Part: Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
-                        class="max-h-full object-contain" />
-                </div>
+            @foreach ($latestOffers as $product)
+                <a href="{{ route('product.details', $product->slug) }}" class="block group">
+                    <div
+                        class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
 
-                <!-- Right Part: Product Details -->
-                <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
-                    <!-- Price Section -->
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
-                        <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">BDT 2056</span>
-                        <span class="text-[#999999] line-through text-xs md:text-base font-semibold leading-none">BDT
-                            3000</span>
+                        <!-- Left Part: Product Image -->
+                        <div
+                            class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
+                            <img src="{{ $product->thumbnail_url ?? asset('images/no-image.png') }}"
+                                alt="{{ $product->title }}"
+                                class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
+                        </div>
+
+                        <!-- Right Part: Product Details -->
+                        <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
+                            <!-- Price Section (Dynamic) -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
+                                {{-- বর্তমান অফার প্রাইস --}}
+                                <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">
+                                    {{ $setup->currency ?? 'BDT' }} {{ number_format($product->sale_price) }}
+                                </span>
+
+                                {{-- আগের রেগুলার প্রাইস --}}
+                                <span class="text-[#999999] line-through text-[10px] md:text-sm font-semibold leading-none">
+                                    {{ $setup->currency ?? 'BDT' }} {{ number_format($product->regular_price) }}
+                                </span>
+                            </div>
+
+                            <!-- Title (Dynamic) -->
+                            <h3
+                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#f1468b] transition-colors">
+                                {{ $product->title }}
+                            </h3>
+
+                            <!-- Subtitle/Short Description (Dynamic) -->
+                            <p class="text-[#777777] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
+                                {{ $product->short_description ?? 'Quality Product' }}
+                            </p>
+                        </div>
                     </div>
-
-                    <!-- Title -->
-                    <h3
-                        class="text-[#041533] font-medium text-[11px] md:text-base leading-tight md:leading-[1.3] mb-1 line-clamp-2">
-                        Luxury Essentials for Growing Families
-                    </h3>
-
-                    <!-- Subtitle/Category (Hidden on small mobile to save space) -->
-                    <p class="text-[#777777] text-[9px] md:text-sm font-medium truncate hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
-
-            <!-- Single Offer Card (Repeated) -->
-            <div
-                class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
-                <!-- Left Part: Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
-                        class="max-h-full object-contain" />
-                </div>
-
-                <!-- Right Part: Product Details -->
-                <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
-                    <!-- Price Section -->
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
-                        <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">BDT 2056</span>
-                        <span class="text-[#999999] line-through text-xs md:text-base font-semibold leading-none">BDT
-                            3000</span>
-                    </div>
-
-                    <!-- Title -->
-                    <h3
-                        class="text-[#041533] font-medium text-[11px] md:text-base leading-tight md:leading-[1.3] mb-1 line-clamp-2">
-                        Luxury Essentials for Growing Families
-                    </h3>
-
-                    <!-- Subtitle/Category (Hidden on small mobile to save space) -->
-                    <p class="text-[#777777] text-[9px] md:text-sm font-medium truncate hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
-            <!-- Single Offer Card (Repeated) -->
-            <div
-                class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
-                <!-- Left Part: Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
-                        class="max-h-full object-contain" />
-                </div>
-
-                <!-- Right Part: Product Details -->
-                <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
-                    <!-- Price Section -->
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
-                        <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">BDT 2056</span>
-                        <span class="text-[#999999] line-through text-xs md:text-base font-semibold leading-none">BDT
-                            3000</span>
-                    </div>
-
-                    <!-- Title -->
-                    <h3
-                        class="text-[#041533] font-medium text-[11px] md:text-base leading-tight md:leading-[1.3] mb-1 line-clamp-2">
-                        Luxury Essentials for Growing Families
-                    </h3>
-
-                    <!-- Subtitle/Category (Hidden on small mobile to save space) -->
-                    <p class="text-[#777777] text-[9px] md:text-sm font-medium truncate hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
-            <!-- Single Offer Card (Repeated) -->
-            <div
-                class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md md:shadow-xl transition-shadow duration-300 rounded-sm overflow-hidden">
-                <!-- Left Part: Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="Product Image"
-                        class="max-h-full object-contain" />
-                </div>
-
-                <!-- Right Part: Product Details -->
-                <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
-                    <!-- Price Section -->
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
-                        <span class="text-[#f1468b] font-bold text-[13px] md:text-xl leading-none">BDT 2056</span>
-                        <span class="text-[#999999] line-through text-xs md:text-base font-semibold leading-none">BDT
-                            3000</span>
-                    </div>
-
-                    <!-- Title -->
-                    <h3
-                        class="text-[#041533] font-medium text-[11px] md:text-base leading-tight md:leading-[1.3] mb-1 line-clamp-2">
-                        Luxury Essentials for Growing Families
-                    </h3>
-
-                    <!-- Subtitle/Category (Hidden on small mobile to save space) -->
-                    <p class="text-[#777777] text-[9px] md:text-sm font-medium truncate hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
+                </a>
+            @endforeach
         </div>
     </section>
     <!-- OUR FEATURED PRODUCTS SECTION -->
@@ -359,292 +280,59 @@
 
             <!-- Products Grid -->
             <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                    <div class="relative">
-                        <div
-                            class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                            <div class="w-full h-full p-8 flex items-center justify-center">
-                                <img src="{{ asset('images/babyshop/images/girl.png') }}" alt="Product Image"
-                                    class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                            </div>
-                        </div>
 
-                        <!-- উইশলিস্ট বাটন -->
-                        <div class="absolute -top-1 -right-1">
-                            <div class="bg-white p-1 rounded-full">
-                                <button
-                                    class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                    aria-label="Add to Wishlist">
-                                    <i class="fa-regular fa-heart text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                @foreach($popularProducts as $product)
+                <x-template1.product-card :product="$product" />
+            @endforeach
 
-                    <div class="space-y-1 p-4">
-                        <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                            Luxury Essentials for Growing Families
-                        </h3>
-
-                        <!-- Price Section inspired by the image -->
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                            <!-- Prices -->
-                            <span
-                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
-                            <span
-                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
-
-                            <div class="basis-full h-0 sm:hidden"></div>
-
-                            <!-- Discount Percentage Badge -->
-                            <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                -22%
-                            </span>
-                        </div>
-                        <button
-                            class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-                <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                    <div class="relative">
-                        <div
-                            class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                            <div class="w-full h-full p-8 flex items-center justify-center">
-                                <img src="{{ asset('images/babyshop/images/girl.png') }}" alt="Product Image"
-                                    class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                            </div>
-                        </div>
-
-                        <!-- উইশলিস্ট বাটন -->
-                        <div class="absolute -top-1 -right-1">
-                            <div class="bg-white p-1 rounded-full">
-                                <button
-                                    class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                    aria-label="Add to Wishlist">
-                                    <i class="fa-regular fa-heart text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 p-4">
-                        <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                            Luxury Essentials for Growing Families
-                        </h3>
-
-                        <!-- Price Section inspired by the image -->
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                            <!-- Prices -->
-                            <span
-                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
-                            <span
-                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
-
-                            <div class="basis-full h-0 sm:hidden"></div>
-
-                            <!-- Discount Percentage Badge -->
-                            <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                -22%
-                            </span>
-                        </div>
-                        <button
-                            class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-                <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                    <div class="relative">
-                        <div
-                            class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                            <div class="w-full h-full p-8 flex items-center justify-center">
-                                <img src="{{ asset('images/babyshop/images/girl.png') }}" alt="Product Image"
-                                    class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                            </div>
-                        </div>
-
-                        <!-- উইশলিস্ট বাটন -->
-                        <div class="absolute -top-1 -right-1">
-                            <div class="bg-white p-1 rounded-full">
-                                <button
-                                    class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                    aria-label="Add to Wishlist">
-                                    <i class="fa-regular fa-heart text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 p-4">
-                        <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                            Luxury Essentials for Growing Families
-                        </h3>
-
-                        <!-- Price Section inspired by the image -->
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                            <!-- Prices -->
-                            <span
-                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
-                            <span
-                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
-
-                            <div class="basis-full h-0 sm:hidden"></div>
-
-                            <!-- Discount Percentage Badge -->
-                            <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                -22%
-                            </span>
-                        </div>
-                        <button
-                            class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-                <div class="max-w-[348px] group cursor-pointer bg-white border-1 border-[#ddd] rounded-2xl">
-                    <div class="relative">
-                        <div
-                            class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative aspect-[1/1.1] border-b-1 border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-                            <div class="w-full h-full p-8 flex items-center justify-center">
-                                <img src="{{ asset('images/babyshop/images/girl.png') }}" alt="Product Image"
-                                    class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-                            </div>
-                        </div>
-
-                        <!-- উইশলিস্ট বাটন -->
-                        <div class="absolute -top-1 -right-1">
-                            <div class="bg-white p-1 rounded-full">
-                                <button
-                                    class="w-11 h-11 bg-[#66267b] text-white rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all hover:bg-[#521d63]"
-                                    aria-label="Add to Wishlist">
-                                    <i class="fa-regular fa-heart text-xl"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 p-4">
-                        <h3 class="text-[#0f172a] text-base md:text-xl font-medium leading-[1.3] tracking-tight">
-                            Luxury Essentials for Growing Families
-                        </h3>
-
-                        <!-- Price Section inspired by the image -->
-                        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 font-manrope">
-                            <!-- Prices -->
-                            <span
-                                class="text-[#005c7a] text-xl md:text-2xl font-semibold">{{ $setup->currency ?? 'BDT' }}1,040</span>
-                            <span
-                                class="text-[#999999] text-sm md:text-base line-through">{{ $setup->currency ?? 'BDT' }}1,340</span>
-
-                            <div class="basis-full h-0 sm:hidden"></div>
-
-                            <!-- Discount Percentage Badge -->
-                            <span class="bg-[#facc15] text-[#0f172a] text-xs font-bold px-2 py-0.5 rounded-full">
-                                -22%
-                            </span>
-                        </div>
-                        <button
-                            class="bg-[#66267b] text-white text-center text-sm md:text-base rounded-4xl border-0 mt-2 py-3 hover:bg-[#851ea7] cursor-pointer px-4 w-full">
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="container mx-auto py-4 md:py-10 px-4">
+    <section class="container mx-auto py-4 md:py-10 px-4 font-manrope">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-semibold text-[#041533] mb-6 md:mb-10 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             New Arrival
         </h2>
 
         <!-- Grid: 2 columns on mobile, 4 columns on desktop -->
         <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
-            <!-- Single Horizontal Product Card -->
-            <div
-                class="flex items-center h-20 md:h-[140px] bg-[#f9f9f9] border border-[#F0E9F2] shadow-md md:shadow-lg transition-all hover:shadow-xl group cursor-pointer rounded-sm overflow-hidden">
-                <!-- Left side: Product Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="New Arrival Product"
-                        class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
-                </div>
+            @foreach ($newArrivals as $product)
+                <a href="{{ route('product.details', $product->slug) }}" class="block group">
+                    <div
+                        class="flex items-center h-24 md:h-[140px] bg-[#f9f9f9] border border-[#F0E9F2] shadow-md md:shadow-lg transition-all hover:shadow-xl rounded-sm overflow-hidden">
 
-                <!-- Right side: Product Details -->
-                <div class="w-[65%] p-2 md:p-5 flex flex-col justify-center">
-                    <!-- Price -->
-                    <div class="flex items-center mb-0.5 md:mb-1">
-                        <span class="text-[#041533] font-bold text-[13px] md:text-lg">BDT 2056</span>
+                        <!-- Left side: Product Image -->
+                        <div
+                            class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-1 md:p-4 bg-white relative overflow-hidden">
+                            <img src="{{ $product->thumbnail_url ?? asset('images/no-image.png') }}"
+                                alt="{{ $product->title }}"
+                                class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
+                        </div>
+
+                        <!-- Right side: Product Details -->
+                        <div class="w-[65%] p-2 md:p-5 flex flex-col justify-center">
+                            <!-- Price -->
+                            <div class="flex items-center mb-0.5 md:mb-1">
+                                <span class="text-[#041533] font-bold text-[13px] md:text-lg">
+                                    {{ $setup->currency ?? '৳' }}{{ number_format($product->sale_price) }}
+                                </span>
+                            </div>
+
+                            <!-- Product Title -->
+                            <h3
+                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#66267b] transition-colors">
+                                {{ $product->title }}
+                            </h3>
+
+                            <!-- Brand or Subtitle (Dynamic) -->
+                            <p class="text-[#7a818c] text-[9px] md:text-xs font-normal truncate hidden sm:block">
+                                {{ $product->brand->name ?? 'Premium Quality' }}
+                            </p>
+                        </div>
                     </div>
-
-                    <!-- Product Title -->
-                    <h3 class="text-[#041533] font-semibold text-[11px] md:text-lg leading-tight line-clamp-2">
-                        Princess Dress
-                    </h3>
-
-                    <!-- Category/Subtitle (Optional, hidden on mobile to keep it clean) -->
-                    <p class="text-[#7a818c] text-xs md:text-sm font-normal hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
-
-            <!-- Single Horizontal Product Card -->
-            <div
-                class="flex items-center h-20 md:h-[140px] bg-[#f9f9f9] border border-[#F0E9F2] shadow-md md:shadow-lg transition-all hover:shadow-xl group cursor-pointer rounded-sm overflow-hidden">
-                <!-- Left side: Product Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="New Arrival Product"
-                        class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
-                </div>
-
-                <!-- Right side: Product Details -->
-                <div class="w-[65%] p-2 md:p-5 flex flex-col justify-center">
-                    <!-- Price -->
-                    <div class="flex items-center mb-0.5 md:mb-1">
-                        <span class="text-[#041533] font-bold text-[13px] md:text-lg">BDT 2056</span>
-                    </div>
-
-                    <!-- Product Title -->
-                    <h3 class="text-[#041533] font-semibold text-[11px] md:text-lg leading-tight line-clamp-2">
-                        Princess Dress
-                    </h3>
-
-                    <!-- Category/Subtitle (Optional, hidden on mobile to keep it clean) -->
-                    <p class="text-[#7a818c] text-xs md:text-sm font-normal hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
-            <!-- Single Horizontal Product Card -->
-            <div
-                class="flex items-center h-20 md:h-[140px] bg-[#f9f9f9] border border-[#F0E9F2] shadow-md md:shadow-lg transition-all hover:shadow-xl group cursor-pointer rounded-sm overflow-hidden">
-                <!-- Left side: Product Image -->
-                <div class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white">
-                    <img src="{{ asset('images/babyshop/images/dress.png') }}" alt="New Arrival Product"
-                        class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
-                </div>
-
-                <!-- Right side: Product Details -->
-                <div class="w-[65%] p-2 md:p-5 flex flex-col justify-center">
-                    <!-- Price -->
-                    <div class="flex items-center mb-0.5 md:mb-1">
-                        <span class="text-[#041533] font-bold text-[13px] md:text-lg">BDT 2056</span>
-                    </div>
-
-                    <!-- Product Title -->
-                    <h3 class="text-[#041533] font-semibold text-[11px] md:text-lg leading-tight line-clamp-2">
-                        Princess Dress
-                    </h3>
-
-                    <!-- Category/Subtitle (Optional, hidden on mobile to keep it clean) -->
-                    <p class="text-[#7a818c] text-xs md:text-sm font-normal hidden sm:block">
-                        Feeding Item
-                    </p>
-                </div>
-            </div>
+                </a>
+            @endforeach
         </div>
     </section>
     <!-- ABOUT / SEO TEXT SECTION -->
