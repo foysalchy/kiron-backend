@@ -1,14 +1,23 @@
 @extends('saas.layouts.layout')
+@php
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::PRICING_FAQ,
+        $setup->company_id ?? null
+    );
+@endphp
+
 @include('components.meta-info.saas-meta', [
     'setup' => $setup,
 
     'type' => 'WebPage',
 
-    'title' => 'Pricing Plans | ' . $setup->shop_name,
+    'title' => $pageData?->meta_title ?? ('Pricing Plans | ' . $setup->shop_name),
 
-    'description' => 'Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.',
+    'description' => $pageData?->meta_description ?? ('Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.'),
 
-    'keywords' => 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
+    'keywords' => $pageData?->meta_keywords 
+        ? implode(',', $pageData->meta_keywords) 
+        : 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
 
     'image' => $setup->meta_image
         ? asset('storage/' . $setup->meta_image)

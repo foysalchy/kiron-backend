@@ -7,6 +7,7 @@ class SystemPageType
     const HOME           = 'home';
     const BLOG_LIST       = 'blog_list';
     const PRICING_FAQ     = 'pricing_faq';
+    const FEATURE        = 'feature';
     const CONTACT_US      = 'contact_us';
     const CART            = 'cart';
     const CHECKOUT        = 'checkout';
@@ -22,6 +23,7 @@ class SystemPageType
             self::CART,
             self::CHECKOUT,
             self::LOGIN_REGISTER,
+            self::FEATURE,
         ];
     }
 
@@ -33,7 +35,7 @@ class SystemPageType
 
     public static function companyScoped(): array
     {
-        return array_values(array_diff(self::all(), [self::PRICING_FAQ]));
+        return array_values(array_diff(self::all(), [self::PRICING_FAQ,self::FEATURE]));
     }
 
     public static function labels(): array
@@ -42,6 +44,7 @@ class SystemPageType
             self::HOME           => 'Home Page',
             self::BLOG_LIST       => 'Blog List Page',
             self::PRICING_FAQ     => 'Pricing & FAQ Page',
+            self::FEATURE        => 'Feature Page',
             self::CONTACT_US      => 'Contact Us Page',
             self::CART            => 'Cart Page',
             self::CHECKOUT        => 'Checkout Page',

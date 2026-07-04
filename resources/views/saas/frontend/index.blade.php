@@ -1,12 +1,18 @@
 @extends('saas.layouts.layout')
 @section('meta')
 
+@php
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::HOME, null
+    );
+@endphp
+
 @include('components.meta-info.saas-meta',[
     'setup' => $setup,
     'type' => 'WebPage',
-    'title' => $setup->title,
-    'description' => $setup->description,
-    'keywords' => $setup->tags,
+    'title' => $pageData->meta_title ?? $setup->title,
+    'description' => $pageData->meta_description ?? $setup->description,
+    'keywords' => $pageData->meta_keywords ? implode(',', $pageData->meta_keywords) : $setup->tags,
 
     'image' => $setup->meta_image
         ? asset('storage/'.$setup->meta_image)
@@ -19,7 +25,6 @@
         ]
     ]
 ])
-
 @endsection
 @push('styles')
     <style>
