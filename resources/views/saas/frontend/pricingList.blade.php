@@ -1,5 +1,32 @@
 @extends('saas.layouts.layout')
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
 
+    'type' => 'WebPage',
+
+    'title' => 'Pricing Plans | ' . $setup->shop_name,
+
+    'description' => 'Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.',
+
+    'keywords' => 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
+
+    'image' => $setup->meta_image
+        ? asset('storage/' . $setup->meta_image)
+        : asset('storage/' . $setup->logo),
+
+    'canonical' => route('saas.package.list'),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Pricing',
+            'url' => route('saas.package.list'),
+        ],
+    ],
+])
 @section('content')
     <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
         <div class="container mx-auto">

@@ -2,19 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+    
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Explore our shop for the best products. Fast delivery and quality guaranteed.">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
-    <title>{{ $setup->shop_name ?? 'Dorja' }}</title>
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? asset('default-favicon.png') }}">
-
+    @yield('meta')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"

@@ -1,0 +1,199 @@
+@section('meta')
+
+@include('components.meta-info.saas-meta',[
+    'setup'=>$setup,
+
+    'type'=>'Product',
+
+    'title'=>$product->meta_title ?: $product->name,
+
+    'description'=>$product->meta_description,
+
+    'keywords'=>$product->meta_keywords,
+
+    'image'=>$product->thumbnail,
+
+    'canonical'=>route('product.details',$product->slug),
+
+    'breadcrumb'=>[
+        [
+            'name'=>'Home',
+            'url'=>url('/')
+        ],
+        [
+            'name'=>'Products',
+            'url'=>route('product.index')
+        ],
+        [
+            'name'=>$product->name,
+            'url'=>route('product.details',$product->slug)
+        ]
+    ],
+
+    'schema'=>[
+        'name'=>$product->name,
+        'sku'=>$product->sku,
+        'price'=>$product->price,
+        'currency'=>'BDT',
+        'availability'=>'https://schema.org/InStock'
+    ]
+])
+
+@endsection
+
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+
+    'type' => 'CollectionPage',
+
+    'title' => 'All Products | ' . $setup->shop_name,
+
+    'description' => 'Browse all products available on ' . $setup->shop_name . '. Find the right solution for your business.',
+
+    'keywords' => 'products, software, business solutions',
+
+    'image' => $setup->meta_image
+        ? asset('storage/' . $setup->meta_image)
+        : asset('storage/' . $setup->logo),
+
+    'canonical' => route('products.index'),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Products',
+            'url' => route('products.index'),
+        ],
+    ],
+])
+
+২. Product Category Page (/category/{slug})
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+
+    'type' => 'CollectionPage',
+
+    'title' => $category->meta_title ?: $category->name,
+
+    'description' => $category->meta_description,
+
+    'keywords' => $category->meta_keywords,
+
+    'image' => asset('storage/' . $category->image),
+
+    'canonical' => route('category.show', $category->slug),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Products',
+            'url' => route('products.index'),
+        ],
+        [
+            'name' => $category->name,
+            'url' => route('category.show', $category->slug),
+        ],
+    ],
+])
+৩. Brand Page (/brand/{slug})
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+
+    'type' => 'CollectionPage',
+
+    'title' => $brand->meta_title ?: $brand->name,
+
+    'description' => $brand->meta_description,
+
+    'keywords' => $brand->meta_keywords,
+
+    'image' => asset('storage/' . $brand->image),
+
+    'canonical' => route('brand.show', $brand->slug),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Brands',
+            'url' => route('brands.index'),
+        ],
+        [
+            'name' => $brand->name,
+            'url' => route('brand.show', $brand->slug),
+        ],
+    ],
+])
+৪. Search Result Page
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+
+    'type' => 'CollectionPage',
+
+    'title' => 'Search: ' . request('q') . ' | ' . $setup->shop_name,
+
+    'description' => 'Search results for "' . request('q') . '".',
+
+    'keywords' => request('q'),
+
+    'image' => asset('storage/' . $setup->logo),
+
+    'canonical' => url()->current(),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Search',
+            'url' => url()->current(),
+        ],
+    ],
+])
+
+{{-- Product --}}
+@if($type=='Product')
+
+<script type="application/ld+json">
+{!! json_encode([
+    '@context'=>'https://schema.org',
+    '@type'=>'Product',
+
+    'name'=>$schema['name'] ?? $title,
+
+    'description'=>$description,
+
+    'image'=>$image,
+
+    'sku'=>$schema['sku'] ?? null,
+
+    'brand'=>[
+        '@type'=>'Brand',
+        'name'=>$setup->shop_name
+    ],
+
+    'offers'=>[
+        '@type'=>'Offer',
+
+        'url'=>$canonical,
+
+        'priceCurrency'=>$schema['currency'] ?? 'BDT',
+
+        'price'=>$schema['price'] ?? 0,
+
+        'availability'=>$schema['availability'] ?? 'https://schema.org/InStock'
+    ]
+
+],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
+</script>
+
+@endif

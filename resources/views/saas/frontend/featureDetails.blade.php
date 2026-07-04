@@ -1,5 +1,34 @@
 @extends('saas.layouts.layout')
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
 
+    'type' => 'WebPage',
+
+    'title' => $feature->meta_title ?: $feature->title,
+
+    'description' => $feature->meta_description,
+
+    'keywords' => $feature->meta_keywords,
+
+    'image' => asset('storage/'.$feature->image),
+
+    'canonical' => route('saas.feature.details', $feature->slug),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/')
+        ],
+        [
+            'name' => 'Features',
+            'url' => route('saas.feature.list')
+        ],
+        [
+            'name' => $feature->title,
+            'url' => route('saas.feature.details', $feature->slug)
+        ]
+    ]
+])
 @push('styles')
     <style>
         table {

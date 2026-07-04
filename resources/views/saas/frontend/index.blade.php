@@ -1,4 +1,26 @@
 @extends('saas.layouts.layout')
+@section('meta')
+
+@include('components.meta-info.saas-meta',[
+    'setup' => $setup,
+    'type' => 'WebPage',
+    'title' => $setup->title,
+    'description' => $setup->description,
+    'keywords' => $setup->tags,
+
+    'image' => $setup->meta_image
+        ? asset('storage/'.$setup->meta_image)
+        : asset('storage/'.$setup->logo),
+    'canonical' => url()->current(),
+    'breadcrumb' => [
+        [
+            'name'=>'Home',
+            'url'=>url('/')
+        ]
+    ]
+])
+
+@endsection
 @push('styles')
     <style>
         .hero-bg {
@@ -295,7 +317,7 @@
                 'desc' =>
                     'Power your online store with automated order processing, inventory sync, and seamless customer experience.',
                 'mockup' => 'ecommerce_dashboard_preview',
-                'img' => 'https://via.placeholder.com/900x600?text=Ecommerce+Dashboard',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-globe', 'text' => 'Website Integration'],
                     ['icon' => 'fa-cart-shopping', 'text' => 'Order Management'],
@@ -309,7 +331,7 @@
                 'title' => 'POS System',
                 'desc' => 'Fast and reliable POS system for retail and wholesale billing with barcode support.',
                 'mockup' => 'pos_system_preview',
-                'img' => 'https://via.placeholder.com/900x600?text=POS+System',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-barcode', 'text' => 'Barcode Scanning'],
                     ['icon' => 'fa-receipt', 'text' => 'Instant Invoice'],
@@ -323,7 +345,7 @@
                 'title' => 'ERP Core',
                 'desc' => 'Manage your entire business operations including sales, purchase, inventory and warehouse.',
                 'mockup' => 'erp_core_system',
-                'img' => 'https://via.placeholder.com/900x600?text=ERP+System',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-layer-group', 'text' => 'Centralized System'],
                     ['icon' => 'fa-sitemap', 'text' => 'Multi Module Control'],
@@ -337,7 +359,7 @@
                 'title' => 'CRM',
                 'desc' => 'Manage leads, customers, and improve sales conversion with smart tracking.',
                 'mockup' => 'crm_dashboard',
-                'img' => 'https://via.placeholder.com/900x600?text=CRM+System',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-user', 'text' => 'Lead Management'],
                     ['icon' => 'fa-users', 'text' => 'Customer Profiles'],
@@ -351,7 +373,7 @@
                 'title' => 'Accounting',
                 'desc' => 'Complete financial management with profit, loss, cash flow and reporting tools.',
                 'mockup' => 'accounting_system',
-                'img' => 'https://via.placeholder.com/900x600?text=Accounting',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-coins', 'text' => 'Income Tracking'],
                     ['icon' => 'fa-money-bill', 'text' => 'Expense Management'],
@@ -365,7 +387,7 @@
                 'title' => 'HRM',
                 'desc' => 'Employee management, attendance, payroll and leave tracking system.',
                 'mockup' => 'hrm_system',
-                'img' => 'https://via.placeholder.com/900x600?text=HRM',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-users', 'text' => 'Employee Records'],
                     ['icon' => 'fa-clock', 'text' => 'Attendance System'],
@@ -379,7 +401,7 @@
                 'title' => 'Inventory',
                 'desc' => 'Real-time stock management with warehouse control and alerts.',
                 'mockup' => 'inventory_system',
-                'img' => 'https://via.placeholder.com/900x600?text=Inventory',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-boxes', 'text' => 'Stock Tracking'],
                     ['icon' => 'fa-truck', 'text' => 'Warehouse Transfer'],
@@ -393,7 +415,7 @@
                 'title' => 'Analytics',
                 'desc' => 'Get real-time business insights with charts, reports and performance tracking.',
                 'mockup' => 'analytics_dashboard',
-                'img' => 'https://via.placeholder.com/900x600?text=Analytics',
+                'img' => '',
                 'features' => [
                     ['icon' => 'fa-chart-line', 'text' => 'Sales Analytics'],
                     ['icon' => 'fa-chart-pie', 'text' => 'Performance Reports'],

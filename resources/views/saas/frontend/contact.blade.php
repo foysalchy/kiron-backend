@@ -1,5 +1,26 @@
 @extends('saas.layouts.layout')
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+    'type' => 'ContactPage',
+    'title' => 'Contact Us | ' . $setup->shop_name,
+    'description' => 'Contact ' . $setup->shop_name . ' for sales, support, product demos, or any business inquiries. We are here to help you grow your business.',
+    'keywords' => 'contact, support, sales, customer service, business software',
+    'image' => $setup->meta_image
+        ? asset('storage/' . $setup->meta_image)
+        : asset('storage/' . $setup->logo),
 
+    'canonical' => route('saas.contact'),
+      'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Contact',
+            'url' => route('saas.contact'),
+        ],
+    ],
+])
 @section('content')
 <!-- CONTACT US SECTION WITH DOT GRID BACKGROUND -->
 <section class="relative py-24 px-6 md:px-10 font-manrope overflow-hidden"

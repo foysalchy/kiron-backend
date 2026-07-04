@@ -1,5 +1,26 @@
 @extends('saas.layouts.layout')
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+    'type' => 'CollectionPage',
+    'title' => 'Blog | ' . $setup->shop_name,
+    'description' => 'Read the latest articles, business tips, inventory management guides, POS software insights, and ERP resources from ' . $setup->shop_name . '.',
+    'keywords' => 'blog, business blog, inventory management, POS, ERP, CRM',
+    'image' => $setup->meta_image
+        ? asset('storage/' . $setup->meta_image)
+        : asset('storage/' . $setup->logo),
 
+    'canonical' => route('saas.blog.list'),
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/'),
+        ],
+        [
+            'name' => 'Blog',
+            'url' => route('saas.blog.list'),
+        ],
+    ],
+])
 @section('content')
     <!-- HEADER SECTION -->
     <section class="bg-[#34a487] pt-32 pb-20 relative overflow-hidden">

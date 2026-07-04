@@ -15,6 +15,7 @@ use App\Http\Controllers\Frontend\SellerController;
 use App\Http\Controllers\Frontend\SupportController;
 use App\Http\Controllers\Frontend\TermController;
 use App\Http\Controllers\Frontend\SitemapController;
+use App\Http\Controllers\Saas\SeoController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Saas\IndexController as SaasIndexController;
 use App\Http\Controllers\Saas\MasterBrandController;
@@ -33,7 +34,8 @@ Route::get('/faqs', [SaasIndexController::class, 'faqList'])->name('saas.faq.lis
 Route::get('/pricing', [SaasIndexController::class, 'packageList'])->name('saas.package.list');
 Route::get('/contact', [SaasIndexController::class, 'contact'])->name('saas.contact');
 Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');
-
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap.saas.index');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.saas.txt');
 
  Route::domain('{store}.dorja.io')->middleware(SubdomainMiddleware::class)->group(function () {
 // Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {

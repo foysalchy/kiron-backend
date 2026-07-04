@@ -1,4 +1,20 @@
 @extends('saas.layouts.layout')
+@section('meta')
+
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
+    'type' => 'FAQPage',
+
+    'title' => 'Frequently Asked Questions',
+    'description' => 'Frequently Asked Questions',
+
+    'faq' => $faqs->map(function ($item) {
+        return [
+            'question' => $item->title,
+            'answer' => strip_tags($item->content),
+        ];
+    })->toArray(),
+])
 @push('styles')
     <style>
         html {

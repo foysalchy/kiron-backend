@@ -1,5 +1,30 @@
 @extends('saas.layouts.layout')
+@include('components.meta-info.saas-meta', [
+    'setup' => $setup,
 
+    'type' => 'CollectionPage',
+
+    'title' => 'Features | ' . $setup->shop_name,
+
+    'description' => 'Explore all features of our ERP, POS, Inventory, CRM, Accounting, HRM and Business Management Software.',
+
+    'keywords' => 'ERP Features, POS Features, Inventory Features, CRM Features',
+
+    'image' => asset('storage/' . $setup->logo),
+
+    'canonical' => route('saas.feature.list'),
+
+    'breadcrumb' => [
+        [
+            'name' => 'Home',
+            'url' => url('/')
+        ],
+        [
+            'name' => 'Features',
+            'url' => route('saas.feature.list')
+        ]
+    ]
+])
 @section('content')
     <!-- HEADER SECTION -->
     <section class="bg-[#34a487] pt-32 pb-20 relative overflow-hidden">
