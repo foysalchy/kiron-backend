@@ -173,7 +173,9 @@
       </div>
 
     </div>
-
+<div class="mt-5">
+            {!! $pageData->content !!}
+        </div>
   </div>
 </section>
 @endsection

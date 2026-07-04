@@ -87,6 +87,9 @@
             <div class="mt-16">
                 {{ $allFeatures->links() }}
             </div>
+            <div class="mt-5">
+            {!! $pageData->content !!}
+        </div>
         </div>
     </section>
 @endsection

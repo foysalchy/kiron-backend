@@ -82,6 +82,9 @@ $pageData = \App\Services\Saas\SystemPageService::get(
         <div class="mt-16">
             {{ $blogPosts->links() }}
         </div>
+        <div class="mt-5">
+            {!! $pageData->content !!}
+        </div>
     </div>
 </section>
 @endsection
