@@ -147,7 +147,7 @@
 
                                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                                            <div class="w-5 h-5 rounded-full bg-[#a855f717] flex items-center justify-center">
                                                 <i class="fa-solid fa-check text-[10px] text-[#a855f7]"></i>
                                             </div>
 
