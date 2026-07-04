@@ -15,6 +15,7 @@ class SystemPageType
     const REGISTER         = 'register';       
     const FEATURE          = 'feature';
     const BRAND_LIST       = 'brand_list';
+    const CATEGORY         = 'category';
     const SHOP             = 'shop';
 
     public static function all(): array
@@ -32,12 +33,13 @@ class SystemPageType
             self::FEATURE,
             self::BRAND_LIST,
             self::SHOP,
+            self::CATEGORY,
         ];
     }
 
     public static function superAdminScoped(): array
     {
-        return array_values(array_diff(self::all(), [self::CART, self::CHECKOUT,self::BRAND_LIST, self::SHOP]));
+        return array_values(array_diff(self::all(), [self::CART, self::CHECKOUT,self::BRAND_LIST, self::SHOP, self::CATEGORY]));
     }
 
     public static function companyScoped(): array
@@ -59,6 +61,7 @@ class SystemPageType
             self::REGISTER        => 'Register Page',
             self::FEATURE    => 'Features Page',
             self::BRAND_LIST   => 'Brand List Page',
+            self::CATEGORY     => 'Category Page',
             self::SHOP         => 'Shop/Product Page',
         ];
     }
