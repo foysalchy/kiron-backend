@@ -158,7 +158,7 @@
                                         </div>
 
                                         <span class="text-sm font-semibold text-[#a855f7]">
-                                            {{ $label === 'Extra Order' ? '৳' : '' }}.{{ $value ?: 'Unlimited' }} {{ $label === 'Extra Order' ? '/order' : '' }}
+                                            {{ $label === 'Extra Order' ? '৳.' : '' }}{{ $value ?: 'Unlimited' }} {{ $label === 'Extra Order' ? '/order' : '' }}
                                         </span>
                                     </div>
 
