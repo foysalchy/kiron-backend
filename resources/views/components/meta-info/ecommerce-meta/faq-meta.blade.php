@@ -5,7 +5,7 @@ $setup->company_id ?? null
 );
 @endphp
 
-@include('components.meta-info', [
+@include('components.meta-info.meta', [
 'setup' => $setup,
 'type' => 'FAQPage',
 

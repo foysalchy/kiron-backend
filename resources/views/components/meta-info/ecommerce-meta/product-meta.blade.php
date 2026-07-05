@@ -19,7 +19,7 @@
         $canonicalUrl = url()->current();
     @endphp
 
-    @include('components.meta-info', [
+    @include('components.meta-info.meta', [
         'setup'       => $setup,
         'type'        => 'CollectionPage',
         'title'       => ($activeCategory->meta_title ?: $activeCategory->name) . ' - ' . ($setup->shop_name ?? ''),

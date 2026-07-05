@@ -4,7 +4,7 @@
     );
 @endphp
 
-@include('components.meta-info',[
+@include('components.meta-info.meta',[
     'setup' => $setup,
     'type' => 'WebPage',
     'title' => $pageData->meta_title ?? $setup->title,

@@ -10,7 +10,7 @@
     }
 @endphp
 
-@include('components.meta-info', [
+@include('components.meta-info.meta', [
     'setup' => $setup,
     'type' => 'CollectionPage',
     'title' => ($pageData->meta_title ?? 'Our Blog') . ' - ' . ($setup->shop_name ?? 'Bhaiya Digital'),
