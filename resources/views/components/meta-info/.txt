@@ -1,5 +1,6 @@
 @section('meta')
 
+// product details seo
 @include('components.meta-info.saas-meta',[
     'setup'=>$setup,
 
@@ -160,40 +161,3 @@
     ],
 ])
 
-{{-- Product --}}
-@if($type=='Product')
-
-<script type="application/ld+json">
-{!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'Product',
-
-    'name'=>$schema['name'] ?? $title,
-
-    'description'=>$description,
-
-    'image'=>$image,
-
-    'sku'=>$schema['sku'] ?? null,
-
-    'brand'=>[
-        '@type'=>'Brand',
-        'name'=>$setup->shop_name
-    ],
-
-    'offers'=>[
-        '@type'=>'Offer',
-
-        'url'=>$canonical,
-
-        'priceCurrency'=>$schema['currency'] ?? 'BDT',
-
-        'price'=>$schema['price'] ?? 0,
-
-        'availability'=>$schema['availability'] ?? 'https://schema.org/InStock'
-    ]
-
-],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
-</script>
-
-@endif

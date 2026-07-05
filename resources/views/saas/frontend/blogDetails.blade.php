@@ -1,52 +1,49 @@
 @extends('saas.layouts.layout')
 @section('meta')
-
-@include('components.meta-info.saas-meta',[
-    'setup'=>$setup,
-
-    'type'=>'BlogPosting',
-
-    'title'=>$blogPost->meta_title ?: $blogPost->title,
-
-    'description'=>$blogPost->meta_description
-        ?: Str::limit(strip_tags($blogPost->short),160),
-
-    'keywords'=>is_array($blogPost->meta_keywords)
-        ? implode(',',$blogPost->meta_keywords)
-        : $blogPost->meta_keywords,
-
-    'image'=>count($blogPost->images)
-        ? asset('storage/'.$blogPost->images[0])
-        : asset('storage/'.$setup->logo),
-
-    'canonical'=>route('saas.blog.details',$blogPost->slug),
-
-    'breadcrumb'=>[
-        [
-            'name'=>'Home',
-            'url'=>url('/')
+    @include('components.meta-info.saas-meta', [
+        'setup' => $setup,
+    
+        'type' => 'BlogPosting',
+    
+        'title' => $blogPost->meta_title ?: $blogPost->title,
+    
+        'description' => $blogPost->meta_description ?: Str::limit(strip_tags($blogPost->short), 160),
+    
+        'keywords' => is_array($blogPost->meta_keywords)
+            ? implode(',', $blogPost->meta_keywords)
+            : $blogPost->meta_keywords,
+    
+        'image' => count($blogPost->images)
+            ? asset('storage/' . $blogPost->images[0])
+            : asset('storage/' . $setup->logo),
+    
+        'canonical' => route('saas.blog.details', $blogPost->slug),
+    
+        'breadcrumb' => [
+            [
+                'name' => 'Home',
+                'url' => url('/'),
+            ],
+            [
+                'name' => 'Blog',
+                'url' => route('saas.blog.list'),
+            ],
+            [
+                'name' => $blogPost->title,
+                'url' => route('saas.blog.details', $blogPost->slug),
+            ],
         ],
-        [
-            'name'=>'Blog',
-            'url'=>route('saas.blog.list')
+    
+        'schema' => [
+            'headline' => $blogPost->title,
+    
+            'author' => $setup->founder_name,
+    
+            'published' => $blogPost->created_at,
+    
+            'updated' => $blogPost->updated_at,
         ],
-        [
-            'name'=>$blogPost->title,
-            'url'=>route('saas.blog.details',$blogPost->slug)
-        ]
-    ],
-
-    'schema'=>[
-        'headline'=>$blogPost->title,
-
-        'author'=>$setup->founder_name,
-
-        'published'=>$blogPost->created_at,
-
-        'updated'=>$blogPost->updated_at
-    ]
-])
-
+    ])
 @endsection
 @push('styles')
     <style>
@@ -172,10 +169,10 @@
                         </div>
                     </div>
 
-                   
-                        <img src="{{ $blogPost->thumbnail_url ? asset($blogPost->thumbnail_url) : asset('images/saas/live1.png') }}" class="w-full  im mb-8"
-                            alt="{{ $blogPost->title }}" />
-             
+
+                    <img src="{{ $blogPost->thumbnail_url ? asset($blogPost->thumbnail_url) : asset('images/saas/live1.png') }}"
+                        class="w-full  im mb-8" alt="{{ $blogPost->title }}" />
+
 
                     <h1 class="text-3xl md:text-[36px] font-black text-gray-900 leading-[1.1] mb-6">
                         {{ $blogPost->title }}
@@ -192,10 +189,10 @@
                         <div class="prose prose-slate max-w-none">
                             {!! $blogPost->body !!}
                         </div>
-                         <div class="prose prose-slate max-w-none">
+                        <div class="prose prose-slate max-w-none">
                             {!! $blogPost->body_2 !!}
                         </div>
-                         <div class="prose prose-slate max-w-none">
+                        <div class="prose prose-slate max-w-none">
                             {!! $blogPost->body_3 !!}
                         </div>
                     </div>
