@@ -107,6 +107,3 @@ Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.saas.t
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
-
-
-

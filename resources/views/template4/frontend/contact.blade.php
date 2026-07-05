@@ -69,7 +69,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full primary-bg hover:bg-orange-600 text-primary font-black py-3 rounded-lg shadow-lg transition-all">
+                        class="w-full primary-bg hover:bg-[#66267b] text-primary font-black py-3 rounded-lg shadow-lg transition-all">
                         <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
@@ -97,13 +97,13 @@
                                 <p class="text-gray-900 font-semibold mb-1">Phone</p>
 
                                 <a href="tel:{{ str_replace(' ', '', $setup->phone) }}"
-                                    class="text-gray-600 hover:text-orange-500 transition-colors d-block mb-1">
+                                    class="text-gray-600 hover:[#66267b] transition-colors d-block mb-1">
                                     {{ $setup->phone }}
                                 </a>
 
                                 @if ($setup->alt_phone)
                                     <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}"
-                                        class="text-gray-600 hover:text-orange-500 transition-colors block">
+                                        class="text-gray-600 hover:[#66267b] transition-colors block">
                                         {{ $setup->alt_phone }}
                                     </a>
                                 @endif
@@ -126,7 +126,7 @@
 
                             <div>
                                 <p class="text-gray-900 font-semibold">WhatsApp</p>
-                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-orange-500 transition-colors">
+                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-[#66267b] transition-colors">
                                     {{ $whatsappNumber }}
                                 </a>
                             </div>
@@ -146,7 +146,7 @@
                             </div>
                             <div>
                                 <p class="text-gray-900 font-semibold">Email</p>
-                                <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                <a href="mailto:{{ $setup->email }}" class="hover:text-[#66267b] transition-colors">
                                     {{ $setup->email }}
                                 </a>
                             </div>
