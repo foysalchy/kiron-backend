@@ -437,10 +437,10 @@
         <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
             <div class="swiper-wrapper">
                 @foreach ($sliders as $slider)
-                    <div class="swiper-slide min-h-screen flex items-center pt-28 pb-32 md:pt-20 relative overflow-hidden">
-                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
+                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
-                            <div class="text-center lg:text-left order-2 lg:order-1 pt-14 md:pt-0">
+                            <div class="text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
 
                                 <h1
                                     class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
@@ -480,7 +480,7 @@
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class=" w-[90%] max-w-[90%] block m-auto" alt="Core Platform" />
+                                        class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto" alt="Core Platform" />
                                 </div>
 
                             </div>
@@ -1306,12 +1306,12 @@
                 </h2>
 
                 <!-- Tabs -->
-                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full "
+                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full overflow-auto max-w-[700px]"
                     id="solution-tabs">
 
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
-                            class="sol-tab-btn flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                            class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
                         {{ $loop->first ? 'bg-[#34a487] text-white' : 'bg-[#34a48730] text-gray-900 hover:bg-white' }}">
                             {{ $sol['title'] }}
                         </button>
@@ -1548,12 +1548,12 @@
                 <div class="flex flex-col gap-10">
                     @foreach ($whyChooseUs as $index => $benefit)
                         <div
-                            class="bg-white  animated-border border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
+                            class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="text-[#34a487] text-3xl md:text-4xl font-extrabold mb-6">
+                                <h3 class="text-[#34a487] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
                                     {{ $benefit->title }}
                                 </h3>
-                                <div class="text-gray-800 text-lg leading-relaxed font-semibold max-w-xl">
+                                <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
                                     {!! $benefit->description !!}
                         </div>
                             </div>
