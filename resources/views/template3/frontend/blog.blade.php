@@ -1,6 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-     <x-meta-info.meta />
+    @include('components.meta-info.ecommerce-meta.blog-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <!-- 1. Hero & Search -->

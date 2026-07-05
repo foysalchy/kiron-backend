@@ -1,5 +1,12 @@
 @extends('template1.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.product-meta', [
+        'setup'         => $setup,
+        'megaCategory'  => $megaCategory ?? null,
+        'subCategory'   => $subCategory ?? null,
+        'miniCategory'  => $miniCategory ?? null,
+    ])
+@endsection
 @section('content')
     <section class="bg-white border-t-1 border-t border-gray-300 pb-4">
         <div class="py-2 md:py-2 container mx-auto px-4 lg:px-0">
@@ -242,7 +249,7 @@
                 </div>
                 @endif
             </main>
-            
+
 
         </div>
 

@@ -1,8 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-    <x-meta-info.meta :title="$page_title ?? 'Checkout'"
-        description="Securely complete your order by providing shipping and payment details." />
-    <meta name="robots" content="noindex, nofollow">
+    @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">

@@ -1,4 +1,7 @@
 @extends('template4.layouts.front')
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
+@endsection
 @push('styles')
     <style>
         @keyframes marqueeFast {

@@ -1,5 +1,7 @@
 @extends('template1.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>

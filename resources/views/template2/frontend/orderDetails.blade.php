@@ -1,5 +1,7 @@
 @extends('template2.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Header Actions -->

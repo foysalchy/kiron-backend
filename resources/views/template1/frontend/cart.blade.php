@@ -1,5 +1,7 @@
 @extends('template1.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)

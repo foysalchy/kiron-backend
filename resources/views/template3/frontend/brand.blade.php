@@ -1,6 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-     <x-meta-info.meta />
+    @include('components.meta-info.ecommerce-meta.brand-meta', ['setup' => $setup])
 @endsection
 @section('content')
 <!-- ALL BRANDS GRID SECTION -->

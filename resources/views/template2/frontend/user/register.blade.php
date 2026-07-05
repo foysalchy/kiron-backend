@@ -1,5 +1,7 @@
 @extends('template2.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.register-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="container py-6 mx-auto">
         <div class="max-w-xl mx-auto">

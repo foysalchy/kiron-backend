@@ -24,7 +24,7 @@
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    @yield('meta')
     <style>
         :root {
             --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }};

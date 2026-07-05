@@ -1,6 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-     <x-meta-info.meta />
+    @include('components.meta-info.ecommerce-meta.contact-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <!-- CONTACT HEADER SECTION -->
