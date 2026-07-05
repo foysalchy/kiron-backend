@@ -480,7 +480,7 @@
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
                                     <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class=" w-[90%] max-w-[90%]" alt="Core Platform" />
+                                        class=" w-[90%] max-w-[90%] block m-auto" alt="Core Platform" />
                                 </div>
 
                             </div>
