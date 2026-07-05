@@ -32,7 +32,7 @@
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
                     <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                        <img src="{{ $blog->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                             alt="{{ $blog->title }}" class="w-full h-full object-cover">
 
                         @php
@@ -100,7 +100,7 @@
                 </div>
             @empty
                 <div class="col-span-full text-center py-20 bg-white rounded-lg border border-dashed">
-                    <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png"
+                    <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" loading="lazy" height="" width=" " alt="blog image"
                         class="w-24 h-24 mx-auto opacity-10 mb-4">
                     <h2 class="text-xl font-bold text-gray-400">No blogs found in this category.</h2>
                 </div>

@@ -82,7 +82,7 @@
                                         </div>
 
                                         @if ($method->icon)
-                                            <img src="{{ $method->icon_url }}"
+                                            <img src="{{ $method->icon_url }}" alt="icon" loading="lazy" height="" width=""
                                                 class="w-6 h-6 md:w-8 md:h-8 object-contain rounded shrink-0" />
                                         @endif
                                     </label>

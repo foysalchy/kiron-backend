@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template4.layouts.front')
 
 @section('content')
     <!-- CONTACT HEADER SECTION -->
@@ -94,15 +94,11 @@
                             <div>
                                 <p class="text-gray-900 font-semibold mb-1">Phone</p>
 
-                                {{-- মেইন ফোন নম্বর --}}
                                 <a href="tel:{{ str_replace(' ', '', $setup->phone) }}"
                                     class="text-gray-600 hover:text-orange-500 transition-colors d-block mb-1">
                                     {{ $setup->phone }}
                                 </a>
 
-
-
-                                {{-- অল্টারনেটিভ ফোন নম্বর --}}
                                 @if ($setup->alt_phone)
                                     <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}"
                                         class="text-gray-600 hover:text-orange-500 transition-colors block">
@@ -188,7 +184,7 @@
 
                                 @if ($social->icon_image)
                                     <img src="{{ asset('storage/' . $social->icon_image) }}"
-                                        alt="{{ $social->icon_name }}"
+                                        alt="{{ $social->icon_name }}" height="" width="" loading="lazy"
                                         class="h-5 w-5 object-contain group-hover:primary-bg transition-transform">
                                 @else
                                     <i
@@ -202,11 +198,6 @@
                         @endforeach
                     </div>
                 </div>
-
-                <!-- WhatsApp Card -->
-
-
-                <!-- Social Media -->
 
 
             </div>
@@ -230,11 +221,11 @@
                     <div class="border border-gray-200 rounded-lg overflow-hidden transition-all bg-white">
                         <button onclick="toggleFAQ(this)"
                             class="w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors">
-                            <span class="text-md font-medium text-gray-800">{{ $faq->title ?? ''}}</span>
+                            <span class="text-lg font-medium text-gray-800">{{ $faq->title ?? ''}}</span>
                             <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
                         </button>
                         <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white">
-                            <div class="px-6 pb-5 text-gray-600 text-md border-t border-gray-50 pt-3">
+                            <div class="px-6 pb-5 text-gray-600 text-lg border-t border-gray-50 pt-3">
                                 {!! $faq->content !!}
                             </div>
                         </div>

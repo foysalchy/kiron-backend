@@ -13,7 +13,7 @@
                         <div class="flex items-start gap-4">
                             <!-- Logo Section -->
                             <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-orange-50 shrink-0 transition-colors overflow-hidden">
-                                <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp')}}" alt="{{ $brand->name }}" class="w-full h-full object-contain p-2">
+                                <img src="{{ $brand->logo_url ?? '' }}" alt="{{ $brand->name }}" loading="lazy" class="w-full h-full object-contain p-2">
 
                             </div>
 

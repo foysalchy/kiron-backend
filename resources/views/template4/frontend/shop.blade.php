@@ -45,9 +45,9 @@
                 <!-- ② Filter By Brand (Select Dropdown) -->
                 @if ($brands->isNotEmpty())
                     <div>
-                        <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Select
+                        <label for="mobile-brand-select" class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Select
                             Brand</label>
-                        <select name="brand[]"
+                        <select id="mobile-brand-select" name="brand[]"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
                             <option value="">All Brands</option>
                             @foreach ($brands as $brand)
@@ -63,9 +63,9 @@
                 <!-- ③ Dynamic Attributes (Size, Color, etc. from $attributeGroups) -->
                 @foreach ($attributeGroups as $group)
                     <div>
-                        <label class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Filter By
+                        <label for="" class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Filter By
                             {{ $group->name }}</label>
-                        <select name="attributes[{{ $group->id }}][]"
+                        <select name="attributes[{{ $group->id }}][]" aria-label="Filter By {{ $group->name }}"
                             class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
                             <option value="">All {{ $group->name }}s</option>
                             @foreach ($group->values as $value)

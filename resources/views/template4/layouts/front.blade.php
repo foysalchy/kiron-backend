@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/fon'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {
@@ -126,8 +126,7 @@
                 icon.classList.toggle("fa-minus");
             });
         });
-    </script>
-    <script>
+
         document.addEventListener('DOMContentLoaded', function() {
             toastr.options = {
                 "closeButton": true,

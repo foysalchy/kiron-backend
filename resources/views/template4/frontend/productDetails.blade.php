@@ -39,16 +39,16 @@
                     <!-- Thumbnails -->
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
-                        <button
+                        <button  aria-label="View product image {{ $loop->iteration ?? '' }}"
                             class="thumb-btn border-2 border-[#632085] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('{{ $product->thumbnail_url }}', this)">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover" />
+                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover" alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
                         </button>
                         @foreach ($product->galleries as $gallery)
                             <button
                                 class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                 onclick="changeImage('{{ $gallery->image_url }}', this)">
-                                <img src="{{ $gallery->image_url }}" class="w-full h-full object-cover" />
+                                <img src="{{ $gallery->image_url }}" loading="lazy" height="" width="" alt="gallery image" class="w-full h-full object-cover" />
                             </button>
                         @endforeach
                     </div>
@@ -56,7 +56,7 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 bg-gray-50 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[4/5]">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" loading="lazy" height="" width="" alt="main image"
                             class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
@@ -168,15 +168,15 @@
                 <!-- Sticky Navigation Bar (৩টি ট্যাব) -->
                 <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
                     <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
-                        <button onclick="scrollToSection('section-description', this)"
+                        <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true" aria-controls="section-description" {}
                             class="tab-nav-btn flex-1 bg-white text-[#632085] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[#632085]">
                             Description
                         </button>
-                        <button onclick="scrollToSection('section-features', this)"
+                        <button onclick="scrollToSection('section-features', this)" role="tab"  aria-selected="false" aria-controls="section-features"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Features
                         </button>
-                        <button onclick="scrollToSection('section-specifications', this)"
+                        <button onclick="scrollToSection('section-specifications', this)" role="tab"  aria-selected="false"  aria-controls="section-specifications"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Specifications
                         </button>
@@ -266,7 +266,7 @@
                         @foreach ($relatedProducts->take(5) as $rel)
                             <a href="{{ route('product.details', $rel->slug) }}"
                                 class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                                <img src="{{ $rel->thumbnail_url }}"
+                                <img src="{{ $rel->thumbnail_url }}" loading="lazy" height="" width="" alt="related product image"
                                     class="w-16 h-16 object-cover rounded-lg shrink-0" />
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
