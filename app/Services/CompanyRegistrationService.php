@@ -93,8 +93,8 @@ class CompanyRegistrationService
                     'role'              => 'User', // primary role, roles relation eventually assign hobe
                     'is_super_admin'    => false,
                     'status'            => $user->status,
-                    'setup_complete'    => false,   // 👈 notun account, setup baki
-                    'billing_required'  => false,   // 👈 registration flow-e, billing check ekhono na
+                    'setup_complete'    => false,  
+                    'billing_required'  => false,  
                     'profile'           => $user->profile,
                     'profile_url'       => $user->profile_url,
                     'company'           => $company,

@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\{DB, Log, Storage};
 
 class CompanyDeletionService
 {
-    // softDelete এবং ডিলিট সামারির জন্য রিলেশনগুলোর তালিকা
     protected array $relations = [
         'users',
         'orderReturns',
@@ -24,7 +23,6 @@ class CompanyDeletionService
         'warehouses',
     ];
 
-    // R2 থেকে ফাইল ডিলিট করার সোর্সগুলো
     protected array $imageSources = [
         [
             'model'   => \App\Models\Company::class,
@@ -188,9 +186,24 @@ class CompanyDeletionService
         return in_array(SoftDeletes::class, class_uses_recursive($modelClass));
     }
 
-    /**
-     * ইমেজের ফুল URL থেকে রিলেটিভ পাথ আলাদা করার হেল্পার
-     */
+    protected function getBaseQuery(string $modelClass)
+    {
+        $query = $this->usesSoftDeletes($modelClass)
+            ? $modelClass::withTrashed()
+            : $modelClass::query();
+
+        return $query->withoutGlobalScopes();
+    }
+
+
+    protected function deleteQuery($query, string $modelClass): int
+    {
+        return $this->usesSoftDeletes($modelClass)
+            ? $query->forceDelete()
+            : $query->delete();
+    }
+
+ 
     protected function getCleanPath($path): ?string
     {
         if (!$path) {
@@ -205,24 +218,27 @@ class CompanyDeletionService
         return ltrim($path, '/');
     }
 
-    /**
-     * R2 ফাইল মুছে ফেলার ডিটেইলড লগিং সহ সংশোধিত মেথড
-     */
+
     protected function deleteCompanyImages(Company $company): int
     {
         $deletedCount = 0;
+        $companyId = $company->id;
 
-        $productIds = \App\Models\Product::withTrashed()
-            ->withoutGlobalScopes() // গ্লোবাল স্কোপ এড়ানো হচ্ছে
-            ->where('company_id', $company->id)
-            ->pluck('id');
+        $productIds = $this->getBaseQuery(\App\Models\Product::class)
+            ->where('company_id', $companyId)
+            ->pluck('id')
+            ->all();
+
+        $variationIds = $this->getBaseQuery(\App\Models\ProductVariation::class)
+            ->whereIn('product_id', $productIds)
+            ->pluck('id')
+            ->all();
 
         foreach ($this->imageSources as $source) {
             $modelClass = $source['model'];
             $columns    = $source['columns'];
             $scope      = $source['scope'];
 
-            // যদি মডেল ক্লাসটির কোনো অস্তিত্ব না থাকে, তবে লগে ওয়ার্নিং দিয়ে স্কিপ করা হচ্ছে
             if (!class_exists($modelClass)) {
                 Log::warning("Model class does not exist under this namespace. Skipping.", [
                     'model' => $modelClass
@@ -234,23 +250,18 @@ class CompanyDeletionService
                 continue;
             }
 
-            $query = $this->usesSoftDeletes($modelClass)
-                ? $modelClass::withTrashed()
-                : $modelClass::query();
-
-            // গ্লোবাল স্কোপ (TenantScope/CompanyScope) যাতে কোয়েরিকে বাধা না দেয়
-            $query->withoutGlobalScopes();
+            $query = $this->getBaseQuery($modelClass);
 
             match ($scope) {
-                'self'        => $query->where('id', $company->id),
-                'company_id'  => $query->where('company_id', $company->id),
-                'via_product' => $query->whereIn('product_id', $productIds),
-                default       => null,
+                'self'          => $query->where('id', $companyId),
+                'company_id'    => $query->where('company_id', $companyId),
+                'via_product'   => $query->whereIn('product_id', $productIds),
+                'via_variation' => $query->whereIn('variation_id', $variationIds),
+                default         => null,
             };
 
             $rows = $query->get($columns);
 
-            // ট্র্যাকিংয়ের জন্য লগে কোয়েরি রেজাল্ট কাউন্ট প্রিন্ট করা হচ্ছে
             Log::info("Image source query executed", [
                 'model' => $modelClass,
                 'records_found' => $rows->count()
@@ -315,9 +326,6 @@ class CompanyDeletionService
         return $deletedCount;
     }
 
-    /**
-     * Soft Delete (কোম্পানি এবং সম্পর্কিত মূল রিলেশনগুলো)
-     */
     public function softDelete(int $id): bool
     {
         DB::beginTransaction();
@@ -388,15 +396,12 @@ class CompanyDeletionService
         }
     }
 
-    /**
-     * Force Delete (সম্পূর্ণ মডেল এবং রিলেশন ভিত্তিক - গ্লোবাল স্কোপ এড়ানো সহ)
-     */
+
     public function forceDelete($id): bool
     {
         DB::beginTransaction();
 
         try {
-            // ১. সাময়িকভাবে ফরেন কি চেক বন্ধ করা হচ্ছে
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
             $company = Company::withTrashed()->findOrFail($id);
@@ -406,7 +411,6 @@ class CompanyDeletionService
                 'company_name' => $company->name,
             ]);
 
-            // ২. R2 ফাইলগুলো ডিলিট করা হচ্ছে
             $filesDeleted = $this->deleteCompanyImages($company);
 
             $companyId   = $company->id;
@@ -414,42 +418,32 @@ class CompanyDeletionService
 
             $totalDeletedRows = 0;
 
-            // ৩. চাইল্ড/নেস্টেড মডেলগুলোর ডাটা আগে মুছে ফেলা হচ্ছে
-            $productIds = \App\Models\Product::withTrashed()
-                ->withoutGlobalScopes()
+            $productIds = $this->getBaseQuery(\App\Models\Product::class)
                 ->where('company_id', $companyId)
                 ->pluck('id')
                 ->all();
 
             if (!empty($productIds)) {
                 // Variation Galleries
-                $variationIds = \App\Models\ProductVariation::withTrashed()
-                    ->withoutGlobalScopes()
+                $variationIds = $this->getBaseQuery(\App\Models\ProductVariation::class)
                     ->whereIn('product_id', $productIds)
                     ->pluck('id')
                     ->all();
 
                 if (!empty($variationIds)) {
-                    $totalDeletedRows += \App\Models\VariationGallery::withTrashed()
-                        ->withoutGlobalScopes()
-                        ->whereIn('variation_id', $variationIds)
-                        ->forceDelete();
+                    $vgQuery = $this->getBaseQuery(\App\Models\VariationGallery::class)->whereIn('variation_id', $variationIds);
+                    $totalDeletedRows += $this->deleteQuery($vgQuery, \App\Models\VariationGallery::class);
                 }
                 // Product Variations
-                $totalDeletedRows += \App\Models\ProductVariation::withTrashed()
-                    ->withoutGlobalScopes()
-                    ->whereIn('product_id', $productIds)
-                    ->forceDelete();
+                $pvQuery = $this->getBaseQuery(\App\Models\ProductVariation::class)->whereIn('product_id', $productIds);
+                $totalDeletedRows += $this->deleteQuery($pvQuery, \App\Models\ProductVariation::class);
+                
                 // Product Galleries
-                $totalDeletedRows += \App\Models\Gallery::withTrashed()
-                    ->withoutGlobalScopes()
-                    ->whereIn('product_id', $productIds)
-                    ->forceDelete();
+                $gQuery = $this->getBaseQuery(\App\Models\Gallery::class)->whereIn('product_id', $productIds);
+                $totalDeletedRows += $this->deleteQuery($gQuery, \App\Models\Gallery::class);
             }
 
-            // অর্ডারের চাইল্ড আইটেম ডিলিট
-            $orderIds = \App\Models\Order::withTrashed()
-                ->withoutGlobalScopes()
+            $orderIds = $this->getBaseQuery(\App\Models\Order::class)
                 ->where('company_id', $companyId)
                 ->pluck('id')
                 ->all();
@@ -459,9 +453,7 @@ class CompanyDeletionService
                 $totalDeletedRows += DB::table('order_details')->whereIn('order_id', $orderIds)->delete();
             }
 
-            // পারচেজের চাইল্ড আইটেম ডিলিট
-            $purchaseIds = \App\Models\Purchase::withTrashed()
-                ->withoutGlobalScopes()
+            $purchaseIds = $this->getBaseQuery(\App\Models\Purchase::class)
                 ->where('company_id', $companyId)
                 ->pluck('id')
                 ->all();
@@ -471,7 +463,6 @@ class CompanyDeletionService
                 $totalDeletedRows += DB::table('purchase_details')->whereIn('purchase_id', $purchaseIds)->delete();
             }
 
-            // ৪. সমস্ত প্রাইমারি মডেল যা সরাসরি কোম্পানির আইডি ধারণ করে (গ্লোবাল স্কোপ এড়ানো সহ)
             $companyModels = [
                 \App\Models\User::class,
                 \App\Models\Party::class,
@@ -512,14 +503,9 @@ class CompanyDeletionService
                     continue;
                 }
                 try {
-                    $query = $this->usesSoftDeletes($modelClass)
-                        ? $modelClass::withTrashed()
-                        : $modelClass::query();
-                        
-                    // গ্লোবাল স্কোপ এড়ানো হচ্ছে
-                    $query->withoutGlobalScopes();
-
-                    $count = $query->where('company_id', $companyId)->forceDelete();
+                    $query = $this->getBaseQuery($modelClass)->where('company_id', $companyId);
+                    
+                    $count = $this->deleteQuery($query, $modelClass);
                     $totalDeletedRows += $count;
                 } catch (\Throwable $e) {
                     Log::warning("Could not force delete model {$modelClass}", [
@@ -528,13 +514,10 @@ class CompanyDeletionService
                 }
             }
 
-            // ৫. কোম্পানির পুরনো অ্যাকশন লগগুলো ডিলিট করা
             $totalDeletedRows += DB::table('action_logs')->where('company_id', $companyId)->delete();
 
-            // ৬. কোম্পানির মূল রেকর্ড ডিলিট করা
             DB::table('companies')->where('id', $companyId)->delete();
 
-            // ৭. ফরেন কি চেক পুনরায় চালু করা হচ্ছে
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
             DB::commit();
@@ -545,7 +528,6 @@ class CompanyDeletionService
                 'related_rows_deleted' => $totalDeletedRows,
             ]);
 
-            // সিস্টেম ট্র্যাকিংয়ের জন্য অ্যাকশন লগ তৈরি
             LogHelper::custom(
                 'force_deleted',
                 'company',
@@ -572,7 +554,7 @@ class CompanyDeletionService
     }
 
     /**
-     * Restore soft deleted company and all related data
+     * Restore soft deleted company and all related data (ডাইনামিক হ্যান্ডেলিং সহ)
      */
     public function restore($id): bool
     {
@@ -592,16 +574,23 @@ class CompanyDeletionService
             foreach (array_reverse($this->relations) as $relation) {
                 try {
                     if (method_exists($company, $relation)) {
-                        $count = $company->$relation()->onlyTrashed()->count();
+                        $relationQuery = $company->$relation();
+                        $relatedModel  = $relationQuery->getRelated();
+                        $relatedClass  = get_class($relatedModel);
 
-                        if ($count > 0) {
-                            $company->$relation()->onlyTrashed()->restore();
-                            $restoredCounts[$relation] = $count;
+                        // শুধুমাত্র SoftDeletes সমর্থন করলেই কেবল রিস্টোর কোড রান করবে
+                        if ($this->usesSoftDeletes($relatedClass)) {
+                            $count = $relationQuery->onlyTrashed()->count();
 
-                            Log::info("Restored {$relation}", [
-                                'company_id' => $company->id,
-                                'count' => $count
-                            ]);
+                            if ($count > 0) {
+                                $relationQuery->onlyTrashed()->restore();
+                                $restoredCounts[$relation] = $count;
+
+                                Log::info("Restored {$relation}", [
+                                    'company_id' => $company->id,
+                                    'count' => $count
+                                ]);
+                            }
                         }
                     } else {
                         Log::warning("Relation method not found", [
