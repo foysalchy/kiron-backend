@@ -1,6 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-     <x-meta-info.meta /> 
+    @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <!-- HERO SECTION (Full Width Slider) -->

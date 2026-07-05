@@ -1,5 +1,7 @@
 @extends('template2.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <!-- HERO SECTION (Updated to 2-Column Layout) -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">

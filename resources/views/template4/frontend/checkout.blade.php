@@ -1,5 +1,7 @@
 @extends('template4.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.checkout-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="bg-[#F9F9F9] py-2">
         <nav aria-label="Breadcrumb"

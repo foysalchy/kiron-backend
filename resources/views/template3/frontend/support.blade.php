@@ -1,5 +1,7 @@
 @extends('template3.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.faq-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <section class="container py-6 mx-auto">
         <div class="max-w-3xl mx-auto text-center">

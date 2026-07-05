@@ -1,5 +1,7 @@
 @extends('template2.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.contact-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <!-- CONTACT HEADER SECTION -->
     <section class="container py-6 mx-auto font-['Outfit'] px-4">

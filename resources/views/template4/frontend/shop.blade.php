@@ -1,5 +1,12 @@
 @extends('template4.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.product-meta', [
+        'setup'         => $setup,
+        'megaCategory'  => $megaCategory ?? null,
+        'subCategory'   => $subCategory ?? null,
+        'miniCategory'  => $miniCategory ?? null,
+    ])
+@endsection
 @section('content')
     <!-- Mobile Filter Overlay (Right Drawer) -->
     <div id="right-filter-overlay" class="fixed inset-0 bg-black/60 z-[60] hidden lg:hidden transition-opacity"
@@ -80,7 +87,7 @@
 
                 <!-- Clear All Option -->
                 <div class="pt-2">
-                    <a href="{{ url()->current() }}"
+                    <a href="{{ url()->current() }}" aria-label="clear all"
                         class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest">
                         Clear All Filters
                     </a>
@@ -109,12 +116,11 @@
                 </h2>
 
                 <div class="space-y-2">
-                    {{-- ১. মেগা ক্যাটাগরি লুপ --}}
                     @foreach ($headerCategories as $mega)
                         <div class="category-item border-b border-gray-50 last:border-0 pb-1">
                             <div class="flex justify-between items-center py-2 group">
-                                <a href="{{ route('category.products', $mega->slug) }}"
-                                    class="text-[15px] font-bold text-gray-700 hover:text-[#632085] transition-colors uppercase">
+                                <a href="{{ route('category.products', $mega->slug) }}" aria-label="{{ $mega->name }}"
+                                    class="text-base font-bold text-gray-700 hover:text-[#632085] transition-colors uppercase">
                                     {{ $mega->name }}
                                 </a>
 
@@ -134,8 +140,8 @@
                                     @foreach ($mega->subCategories as $sub)
                                         <div class="sub-category-item">
                                             <div class="flex justify-between items-center py-1.5 group/sub">
-                                                <a href="{{ route('category.products', $sub->slug) }}"
-                                                    class="text-[14px] font-semibold text-gray-600 hover:text-[#632085] transition-colors">
+                                                <a href="{{ route('category.products', $sub->slug) }}" aria-label="sub category"
+                                                    class="text-sm font-semibold text-gray-600 hover:text-[#632085] transition-colors">
                                                     {{ $sub->name }}
                                                 </a>
 
@@ -153,8 +159,8 @@
                                                 <div id="sub-{{ $sub->id }}"
                                                     class="hidden pl-4 space-y-1.5 mt-1 pb-2 border-l border-gray-100 ml-1">
                                                     @foreach ($sub->miniCategories as $mini)
-                                                        <a href="{{ route('category.products', $mini->slug) }}"
-                                                            class="block text-[13px] text-gray-500 hover:text-[#632085] py-1 transition-all hover:pl-1">
+                                                        <a href="{{ route('category.products', $mini->slug) }}" aria-label="mini category"
+                                                            class="block text-sm text-gray-500 hover:text-[#632085] py-1 transition-all hover:pl-1">
                                                             {{ $mini->name }}
                                                         </a>
                                                     @endforeach
@@ -285,8 +291,8 @@
                                     @endif
 
                                     @if (request()->has('attributes') || request()->has('brand'))
-                                        <a href="{{ url()->current() }}"
-                                            class="text-[11px] font-black text-red-500 hover:underline uppercase tracking-widest ml-2">
+                                        <a href="{{ url()->current() }}" aria-label="attributes name"
+                                            class="text-xs font-black text-red-500 hover:underline uppercase tracking-widest ml-2">
                                             Clear All
                                         </a>
                                     @endif

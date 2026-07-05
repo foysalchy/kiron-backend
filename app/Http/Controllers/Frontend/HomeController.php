@@ -18,17 +18,17 @@ class HomeController extends FrontendController
 {
     public function index()
     {
-         $faqs = KnowledgeBase::active()
+        $faqs = KnowledgeBase::active()
             ->get();
 
         $categories = MegaCategory::with('subCategories.miniCategories')->get();
 
         $latestOffers = Product::with(['brand', 'variations'])
-        ->where('discount', '>', 0)
-        ->where('status', Status::Active->value)
-        ->latest()
-        ->take(12)
-        ->get();
+            ->where('discount', '>', 0)
+            ->where('status', Status::Active->value)
+            ->latest()
+            ->take(12)
+            ->get();
 
         $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
             ->where('status', Status::Active->value)
@@ -100,19 +100,20 @@ class HomeController extends FrontendController
     public function filterSubCategory(Request $request)
     {
         $subId = (int)$request->sub_id;
-
         $products = Product::where('status', Status::Active->value)
             ->whereJsonContains('sub_category_ids', $subId)
             ->with(['variations'])
             ->latest()->take(6)->get();
 
         $html = '';
+        $template = $this->template;
+
         foreach ($products as $product) {
-            $html .= view('components.template1.product-card', compact('product'))->render();
+            $html .= view("components.{$template}.product-card", compact('product'))->render();
         }
 
         if ($html == '') {
-            return '<div class="col-span-full py-10 text-center text-gray-400">এই ক্যাটাগরিতে কোনো পণ্য পাওয়া যায়নি।</div>';
+            return '<div class="col-span-full py-10 text-center text-gray-400">কোনো পণ্য পাওয়া যায়নি।</div>';
         }
 
         return $html;

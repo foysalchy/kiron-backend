@@ -1,5 +1,7 @@
 @extends('template1.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.product-details-meta', ['setup' => $setup])
+@endsection
 @section('content')
     @php
         $isWishlisted = false;

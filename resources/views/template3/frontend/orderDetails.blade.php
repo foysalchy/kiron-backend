@@ -1,10 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-    <x-meta-info.meta
-        :title="'Order Details #' . $order->order_no"
-        :description="'View summary and tracking information for order number ' . $order->order_no"
-    />
-    <meta name="robots" content="noindex, nofollow">
+    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">

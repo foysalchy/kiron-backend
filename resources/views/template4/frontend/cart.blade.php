@@ -1,5 +1,7 @@
 @extends('template4.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <nav aria-label="Breadcrumb"
         class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">

@@ -1,10 +1,6 @@
 @extends('template3.layouts.front')
 @section('meta')
-    <x-meta-info.meta
-        title="Shopping Cart"
-        description="Review your selected items and proceed to checkout for a secure shopping experience."
-    />
-    <meta name="robots" content="noindex, nofollow">
+    @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
 @endsection
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">

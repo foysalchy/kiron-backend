@@ -1,5 +1,7 @@
 @extends('template1.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.blog-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <!-- 1. Hero & Search -->
     <section class="py-10 md:py-24"

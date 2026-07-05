@@ -1,10 +1,11 @@
 @extends('template3.layouts.front')
 @section('meta')
-    <x-meta-info.meta
-        :title="$category->meta_title ?? $category->name ?? 'Shop'"
-        :description="$category->meta_description ?? Str::limit(strip_tags($category->description ?? ''), 160)"
-        :image="isset($category->image) ? asset('storage/' . $category->image) : null"
-    />
+    @include('components.meta-info.ecommerce-meta.product-meta', [
+        'setup'         => $setup,
+        'megaCategory'  => $megaCategory ?? null,
+        'subCategory'   => $subCategory ?? null,
+        'miniCategory'  => $miniCategory ?? null,
+    ])
 @endsection
 @section('content')
     <section class="bg-white border-t-1 border-t border-gray-300 pb-4">

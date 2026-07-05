@@ -1,5 +1,7 @@
 @extends('template4.layouts.front')
-
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.product-details-meta', ['setup' => $setup])
+@endsection
 @section('content')
     @php
         // উইশলিস্ট চেক

@@ -1,5 +1,7 @@
-@extends('template1.layouts.front')
-
+@extends('template4.layouts.front')
+@section('meta')
+    @include('components.meta-info.ecommerce-meta.blog-meta', ['setup' => $setup])
+@endsection
 @section('content')
     <!-- 1. Hero & Search -->
     <section class="py-10 md:py-24"
@@ -32,7 +34,7 @@
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
                     <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        <img src="{{ $blog->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
+                        <img src="{{ $blog->thumbnail_url ?? '' }} "width="400" height="250" loading="lazy"
                             alt="{{ $blog->title }}" class="w-full h-full object-cover">
 
                         @php
