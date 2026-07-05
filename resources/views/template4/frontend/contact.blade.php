@@ -184,7 +184,7 @@
 
                                 @if ($social->icon_image)
                                     <img src="{{ asset('storage/' . $social->icon_image) }}"
-                                        alt="{{ $social->icon_name }}"
+                                        alt="{{ $social->icon_name }}" height="" width="" loading="lazy"
                                         class="h-5 w-5 object-contain group-hover:primary-bg transition-transform">
                                 @else
                                     <i

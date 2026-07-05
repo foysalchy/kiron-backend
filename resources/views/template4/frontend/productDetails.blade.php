@@ -48,7 +48,7 @@
                             <button
                                 class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                 onclick="changeImage('{{ $gallery->image_url }}', this)">
-                                <img src="{{ $gallery->image_url }}" class="w-full h-full object-cover" />
+                                <img src="{{ $gallery->image_url }}" loading="lazy" height="" width="" alt="gallery image" class="w-full h-full object-cover" />
                             </button>
                         @endforeach
                     </div>
@@ -56,7 +56,7 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 bg-gray-50 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[4/5]">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" loading="lazy" height="" width="" alt="main image"
                             class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
@@ -266,7 +266,7 @@
                         @foreach ($relatedProducts->take(5) as $rel)
                             <a href="{{ route('product.details', $rel->slug) }}"
                                 class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                                <img src="{{ $rel->thumbnail_url }}"
+                                <img src="{{ $rel->thumbnail_url }}" loading="lazy" height="" width="" alt="related product image"
                                     class="w-16 h-16 object-cover rounded-lg shrink-0" />
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>

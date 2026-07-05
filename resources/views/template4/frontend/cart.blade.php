@@ -26,8 +26,8 @@
                             @foreach ($cartContent as $item)
                                 <div class="cart-item grid grid-cols-12 gap-3 md:gap-4 items-center py-4 md:py-6">
                                     <div class="col-span-12 sm:col-span-6 flex gap-3 md:gap-4 items-center">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
-                                            onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                        <img src="{{ $item->options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy" height="" width=""
+                                            onerror="this.src='{{ $item->options->thumbnail ?? '' }}'"
                                             class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl border border-gray-100 shrink-0" />
                                         <div class="min-w-0">
                                             <h4 class="text-base md:text-lg lg:text-xl font-bold text-gray-900 truncate">{{ $item->name }}</h4>
