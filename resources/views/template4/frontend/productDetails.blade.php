@@ -41,16 +41,18 @@
                     <!-- Thumbnails -->
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
-                        <button  aria-label="View product image {{ $loop->iteration ?? '' }}"
+                        <button aria-label="View product image {{ $loop->iteration ?? '' }}"
                             class="thumb-btn border-2 border-[#632085] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('{{ $product->thumbnail_url }}', this)">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover" alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
+                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover"
+                                alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
                         </button>
                         @foreach ($product->galleries as $gallery)
                             <button
                                 class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                 onclick="changeImage('{{ $gallery->image_url }}', this)">
-                                <img src="{{ $gallery->image_url }}" loading="lazy" height="" width="" alt="gallery image" class="w-full h-full object-cover" />
+                                <img src="{{ $gallery->image_url }}" loading="lazy" height="" width=""
+                                    alt="gallery image" class="w-full h-full object-cover" />
                             </button>
                         @endforeach
                     </div>
@@ -58,14 +60,16 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 bg-gray-50 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[4/5]">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}" loading="lazy" height="" width="" alt="main image"
-                            class="w-full h-full object-contain transition-all duration-500" />
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" loading="lazy" height="" width=""
+                            alt="main image" class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
-                        <button onclick="toggleWishlist({{ $product->id }})"
-                            class="absolute top-3 left-3 md:top-4 md:left-4 bg-white p-2 md:p-2.5 rounded-full shadow-md hover:bg-gray-100 transition text-[#632085] z-10">
-                            <i id="wish-icon-main"
-                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                        <button onclick="toggleWishlist({{ $product->id }})" type="button"
+                            class="absolute top-3 left-3 md:top-4 md:left-4 p-2 md:p-2.5 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
+    {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[#632085]' }}">
+
+                            <i
+                                class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"></i>
                         </button>
                     </div>
                 </div>
@@ -170,15 +174,18 @@
                 <!-- Sticky Navigation Bar (৩টি ট্যাব) -->
                 <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
                     <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
-                        <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true" aria-controls="section-description" {}
+                        <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true"
+                            aria-controls="section-description" {}
                             class="tab-nav-btn flex-1 bg-white text-[#632085] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[#632085]">
                             Description
                         </button>
-                        <button onclick="scrollToSection('section-features', this)" role="tab"  aria-selected="false" aria-controls="section-features"
+                        <button onclick="scrollToSection('section-features', this)" role="tab" aria-selected="false"
+                            aria-controls="section-features"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Features
                         </button>
-                        <button onclick="scrollToSection('section-specifications', this)" role="tab"  aria-selected="false"  aria-controls="section-specifications"
+                        <button onclick="scrollToSection('section-specifications', this)" role="tab"
+                            aria-selected="false" aria-controls="section-specifications"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Specifications
                         </button>
@@ -217,11 +224,11 @@
                             Product Specifications
                         </h2>
                         <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
-                            <div class="flex justify-between py-2 border-b">
+                            <div class="flex justify-between py-2 border-b border-gray-100">
                                 <span class="text-gray-500 font-medium">Brand:</span>
                                 <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
                             </div>
-                            <div class="flex justify-between py-2 border-b">
+                            <div class="flex justify-between py-2 border-b border-gray-100">
                                 <span class="text-gray-500 font-medium">SKU:</span>
                                 <span
                                     class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
@@ -268,8 +275,8 @@
                         @foreach ($relatedProducts->take(5) as $rel)
                             <a href="{{ route('product.details', $rel->slug) }}"
                                 class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                                <img src="{{ $rel->thumbnail_url }}" loading="lazy" height="" width="" alt="related product image"
-                                    class="w-16 h-16 object-cover rounded-lg shrink-0" />
+                                <img src="{{ $rel->thumbnail_url }}" loading="lazy" height="" width=""
+                                    alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
                                     <p class="text-xs font-bold text-[#632085] mt-1">{{ $setup->currency }}
@@ -332,7 +339,7 @@
                 });
 
                 let groupHtml =
-                    `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+                    `<div class="mb-4"><h3 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     // ডিজাইন ঠিক রাখতে বাটন চেক
@@ -344,12 +351,12 @@
                         'border-gray-200 bg-white text-gray-700';
 
                     groupHtml +=
-                        `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
+                        `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${valName}</button>`;
                 }
                 groupHtml += `</div></div>`;
                 container.innerHTML += groupHtml;
 
-                if (!activeFilters[groupName]) break; // সাইজ সিলেক্ট না করলে কালার আসবে না
+                if (!activeFilters[groupName]) break;
 
                 currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[
                     groupName]);
@@ -429,12 +436,10 @@
         document.addEventListener("DOMContentLoaded", () => {
             if (attributeGroups.length > 0) renderAttributes();
         });
-
+    </script>
+    <script>
         function toggleWishlist(productId) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
-            const btnWish = document.getElementById('btn-wish');
-            const wishIcon = document.getElementById('wish-icon-main');
-            const wishText = document.getElementById('wish-text-main');
 
             fetch("{{ route('wishlist.toggle') }}", {
                     method: 'POST',
@@ -450,39 +455,45 @@
                 .then(data => {
                     if (data.status === 'unauthorized') {
                         toastr.warning(data.message);
-                    } else {
-                        // temporary disable button to prevent multiple clicks
-                        if (data.status === 'added') {
-                            // added to change to active style and 'Wishlisted' text
-                            btnWish.classList.add('bg-orange-50', 'text-[var(--primary-color)]',
-                                'border-[var(--primary-color)]');
-                            btnWish.classList.remove('bg-white', 'border-gray-100', 'text-gray-600');
-                            wishIcon.className = 'fas fa-heart text-red-500';
-                            wishText.innerText = 'Wishlisted';
-                            toastr.success(data.message);
-                        } else {
-                            // removed to change to default style and 'Wishlist' text
-                            btnWish.classList.remove('bg-orange-50', 'text-[var(--primary-color)]',
-                                'border-[var(--primary-color)]');
-                            btnWish.classList.add('bg-white', 'border-gray-100', 'text-gray-600');
-                            wishIcon.className = 'far fa-heart';
-                            wishText.innerText = 'Wishlist';
-                            toastr.info(data.message);
-                        }
-
-                        // update all icons with the same product id (in case there are multiple wishlist buttons for the same product)
-                        const icons = document.querySelectorAll(`[id="wish-icon-${productId}"]`);
-                        icons.forEach(icon => {
-                            if (data.status === 'added') {
-                                icon.setAttribute('fill', '#ef4444');
-                                icon.setAttribute('stroke', '#ef4444');
-                            } else {
-                                icon.setAttribute('fill', 'none');
-                                icon.setAttribute('stroke', 'currentColor');
-                            }
-                        });
+                        return;
                     }
-                });
+
+                    const allIcons = document.querySelectorAll(
+                        `[id="wish-icon-${productId}"], .wish-icon-${productId}, button[onclick="toggleWishlist(${productId})"] i`
+                    );
+
+                    allIcons.forEach(icon => {
+                        if (data.status === 'added') {
+                            // SVG সাপোর্ট (Template 1)
+                            icon.setAttribute('fill', '#ef4444');
+                            icon.setAttribute('stroke', '#ef4444');
+                            icon.classList.replace('fa-regular', 'fa-solid');
+                            icon.classList.add('text-white');
+
+                            const btn = icon.closest('button');
+                            if (btn) btn.classList.replace('bg-[#66267b]', 'bg-red-500');
+                        } else {
+                            icon.setAttribute('fill', 'none');
+                            icon.setAttribute('stroke', 'currentColor');
+                            icon.classList.replace('fa-solid', 'fa-regular');
+
+                            const btn = icon.closest('button');
+                            if (btn) btn.classList.replace('bg-red-500', 'bg-[#66267b]');
+                        }
+                    });
+
+                    const wishCountElements = document.querySelectorAll('.wishlist-count-val');
+                    wishCountElements.forEach(el => {
+                        el.innerText = data.wish_count;
+                    });
+
+                    if (data.status === 'added') {
+                        toastr.success(data.message);
+                    } else {
+                        toastr.info(data.message);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
         }
     </script>
     <script>

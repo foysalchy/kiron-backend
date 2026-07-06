@@ -43,8 +43,8 @@
 
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
-                    <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}" height="80" width="200"
-                        alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
+                    <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}" height="80"
+                        width="200" alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
                         class="h-16 md:h-20 w-auto object-contain" />
                 </a>
             </div>
@@ -84,8 +84,8 @@
                             @foreach ($relatedProducts as $p)
                                 <a href="{{ route('product.details', $p->slug) }}"
                                     class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <img src="{{ $p->thumbnail_url }}" height="" width="" alt="product iamge"
-                                        class="w-8 h-8 rounded object-cover border border-gray-100">
+                                    <img src="{{ $p->thumbnail_url }}" height="" width=""
+                                        alt="product iamge" class="w-8 h-8 rounded object-cover border border-gray-100">
                                     <span class="truncate">{{ $p->title }}</span>
                                 </a>
                             @endforeach
@@ -118,19 +118,19 @@
                 </a>
 
                 <!-- Shopping Cart Link -->
-                <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group"
-                    aria-label="View shopping cart, currently 0 items">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-bag-shopping text-xl text-[#66267b]" aria-hidden="true"></i>
-                    </div>
-                    <div class="hidden xl:block">
-                        <p class="text-sm font-medium leading-tight">Shopping Card</p>
-                        <p class="text-xs opacity-80">
-                            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span>
-                            items )
-                        </p>
-                    </div>
-                </a>
+                <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group">
+    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
+        <i class="fa-solid fa-bag-shopping text-xl text-[#66267b]"></i>
+    </div>
+    
+    {{-- এই ডিভটি মোবাইলে হাইড হয়ে থাকে, তাই কাউন্ট দেখা যায় না --}}
+    <div class="hidden lg:block"> 
+        <p class="text-sm font-medium leading-tight">Shopping Card</p>
+        <p class="text-xs opacity-80">
+            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span> items )
+        </p>
+    </div>
+</a>
             </div>
         </div>
 
@@ -162,7 +162,7 @@
         </form>
     </div>
 
-    <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100 font-manrope">
+    <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100">
         <div class="container mx-auto px-4 md:px-10">
             <ul class="flex items-center justify-center text-sm font-semibold text-gray-700">
 
@@ -170,144 +170,48 @@
                     <li class="group relative">
                         <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
                             class="flex items-center gap-2 px-5 py-4 hover:text-[#66267b] transition-all cursor-pointer uppercase">
-                            {{ $mega->name }} <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
+                            {{ $mega->name }}
+                            @if ($mega->subCategories->count() > 0)
+                                <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
+                            @endif
                         </a>
 
-                        <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
-                            <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
-
-                                @if ($mega->subCategories->count() > 0)
+                        @if ($mega->subCategories->count() > 0)
+                            <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
                                     @foreach ($mega->subCategories as $sub)
                                         <li
                                             class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                            <a href="{{ route('subcategory.products', [$mega->slug ?? $mega->id, $sub->slug ?? $sub->id]) }}"
+                                            <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
                                                 class="group-hover/sub:text-[#66267b] uppercase">
                                                 {{ $sub->name }}
                                             </a>
-                                            <i class="fa-solid fa-chevron-right text-xs text-gray-600"></i>
+                                            @if ($sub->miniCategories->count() > 0)
+                                                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                                            @endif
 
-                                            <ul
-                                                class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
-                                                @if ($sub->miniCategories->count() > 0)
+                                            @if ($sub->miniCategories->count() > 0)
+                                                <ul
+                                                    class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
                                                     @foreach ($sub->miniCategories as $mini)
-                                                        <li
-                                                            class="group/mini px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                                            <a href="{{ route('minicategory.products', [$mega->slug ?? $mega->id, $sub->slug ?? $sub->id, $mini->slug ?? $mini->id]) }}"
-                                                                class="group-hover/mini:text-[#66267b]">
+                                                        <li class="px-4 py-2.5 hover:bg-gray-100">
+                                                            <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                                class="block group-hover/mini:text-[#66267b] uppercase">
                                                                 {{ $mini->name }}
                                                             </a>
-                                                            <i
-                                                                class="fa-solid fa-chevron-right text-xs text-gray-600"></i>
-
-                                                            <ul
-                                                                class="absolute left-full top-0 w-72 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/mini:block">
-                                                                @php
-                                                                    $miniProds = $allHeaderProducts
-                                                                        ->filter(function ($p) use ($mini) {
-                                                                            return is_array($p->mini_category_ids) &&
-                                                                                in_array(
-                                                                                    (int) $mini->id,
-                                                                                    array_map(
-                                                                                        'intval',
-                                                                                        $p->mini_category_ids,
-                                                                                    ),
-                                                                                );
-                                                                        })
-                                                                        ->take(6);
-                                                                @endphp
-                                                                @forelse($miniProds as $product)
-                                                                    <li
-                                                                        class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                                                                        <a href="{{ route('product.details', $product->slug) }}"
-                                                                            class="flex items-center gap-3">
-                                                                            <img src="{{ $product->thumbnail_url }}" height="" width=""
-                                                                                class="w-10 h-10 object-cover rounded border"
-                                                                                alt="">
-                                                                            <div class="flex flex-col min-w-0">
-                                                                                <span
-                                                                                    class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
-                                                                            </div>
-                                                                        </a>
-                                                                    </li>
-                                                                @empty
-                                                                    <li
-                                                                        class="px-5 py-4 text-center text-xs text-gray-600 italic">
-                                                                        No products</li>
-                                                                @endforelse
-                                                            </ul>
                                                         </li>
                                                     @endforeach
-                                                @else
-                                                    @php
-                                                        $subProds = $allHeaderProducts
-                                                            ->filter(function ($p) use ($sub) {
-                                                                return is_array($p->sub_category_ids) &&
-                                                                    in_array(
-                                                                        (int) $sub->id,
-                                                                        array_map('intval', $p->sub_category_ids),
-                                                                    );
-                                                            })
-                                                            ->take(6);
-                                                    @endphp
-                                                    @forelse($subProds as $product)
-                                                        <li
-                                                            class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                                                            <a href="{{ route('product.details', $product->slug) }}"
-                                                                class="flex items-center gap-3">
-                                                                <img src="{{ $product->thumbnail_url }}" height="" width=""
-                                                                    class="w-10 h-10 object-cover rounded border"
-                                                                    alt="">
-                                                                <div class="flex flex-col min-w-0">
-                                                                    <span
-                                                                        class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
-
-                                                                </div>
-                                                            </a>
-                                                        </li>
-                                                    @empty
-                                                        <li class="px-5 py-4 text-center text-xs text-gray-600 italic">
-                                                            No products</li>
-                                                    @endforelse
-                                                @endif
-                                            </ul>
+                                                </ul>
+                                            @endif
                                         </li>
                                     @endforeach
-                                @else
-                                    @php
-                                        $megaProds = $allHeaderProducts
-                                            ->filter(function ($p) use ($mega) {
-                                                return is_array($p->mega_category_ids) &&
-                                                    in_array(
-                                                        (int) $mega->id,
-                                                        array_map('intval', $p->mega_category_ids),
-                                                    );
-                                            })
-                                            ->take(6);
-                                    @endphp
-                                    @forelse($megaProds as $product)
-                                        <li class="px-4 py-2 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                                            <a href="{{ route('product.details', $product->slug) }}"
-                                                class="flex items-center gap-3">
-                                                <img src="{{ $product->thumbnail_url }}" height="" width=""
-                                                    class="w-10 h-10 object-cover rounded border" alt="">
-                                                <div class="flex flex-col min-w-0">
-                                                    <span
-                                                        class="text-xs font-bold text-gray-700 truncate">{{ $product->title }}</span>
-
-                                                </div>
-                                            </a>
-                                        </li>
-                                    @empty
-                                        <li class="px-5 py-4 text-center text-xs text-gray-600 italic">No products
-                                        </li>
-                                    @endforelse
-                                @endif
-                            </ul>
-                        </div>
+                                </ul>
+                            </div>
+                        @endif
                     </li>
                 @endforeach
 
-                <li><a href="{{ route('contact.index') }}"
+                <li><a href="{{ route('contact.index') }}" aria-label="contact"
                         class="px-5 py-4 block hover:text-[#66267b] transition-colors">Contact</a></li>
             </ul>
         </div>
@@ -315,62 +219,99 @@
 
     <div id="mobile-sidebar"
         class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col">
-        <div class="p-4 flex justify-between items-center border-b bg-[#66267b] text-white">
-            <h2 class="font-bold text-lg">All Categories</h2>
-            <button id="close-sidebar" aria-label="Close Menu" class="text-2xl">&times;</button>
-        </div>
-        <nav class="flex-1 overflow-y-auto font-manrope">
-            <!-- Diapering -->
-            <div class="border-b border-[#f3f3f3]">
-                <button
-                    class="accordion-btn w-full flex justify-between items-center px-5 py-4 text-[#0f172a] font-bold"
-                    data-target="m-diaper">
-                    <span>Diapering</span> <i class="fa-solid fa-plus text-sm"></i>
-                </button>
-                <div id="m-diaper" class="hidden bg-gray-50">
-                    <a href="#" class="block px-10 py-3 text-sm border-b border-[#f3f3f3]">Diapers</a>
-                    <a href="#" class="block px-10 py-3 text-sm border-b border-[#f3f3f3]">Wipes</a>
-                </div>
-            </div>
-            <!-- Baby Foods -->
-            <div class="border-b border-[#f3f3f3]">
-                <button
-                    class="accordion-btn w-full flex justify-between items-center px-5 py-4 text-[#0f172a] font-bold"
-                    data-target="m-food">
-                    <span>Baby Foods</span> <i class="fa-solid fa-plus text-sm"></i>
-                </button>
-                <div id="m-food" class="hidden bg-gray-50">
-                    <a href="#" class="block px-10 py-3 text-sm border-b border-[#f3f3f3]">Formula Milk</a>
-                </div>
-                <div class="border-t border-gray-100 mt-2">
-                    @auth('customer')
-                        <a href="{{ route('user.dashboard') }}"
-                            class="flex items-center gap-3 px-5 py-4 text-[#0f172a] font-bold hover:bg-gray-50 transition-all">
-                            <i class="fa-regular fa-circle-user text-lg text-[#66267b]"></i>
-                            <span>Dashboard ({{ auth('customer')->user()->name }})</span>
-                        </a>
-                        <form action="{{ route('user.logout') }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="w-full flex items-center gap-3 px-5 py-4 text-red-600 font-bold hover:bg-red-50 transition-all border-t border-gray-50 cursor-pointer">
-                                <i class="fa-solid fa-right-from-bracket text-lg"></i>
-                                <span>Logout</span>
-                            </button>
-                        </form>
-                    @else
-                        <a href="{{ route('user.login') }}"
-                            class="flex items-center gap-3 px-5 py-4 text-[#0f172a] font-bold hover:bg-gray-50 transition-all">
-                            <i class="fa-regular fa-user text-lg text-[#66267b]"></i>
-                            <span>Log In / Register</span>
-                        </a>
-                    @endauth
 
-                    <a href="tel:{{ $setup->phone ?? '' }}"
-                        class="flex items-center gap-3 px-5 py-4 text-[#0f172a] font-bold hover:bg-gray-50 transition-all border-t border-gray-50">
-                        <i class="fa-brands fa-whatsapp text-lg text-green-500"></i>
-                        <span>Call: {{ $setup->phone ?? '' }}</span>
-                    </a>
+        <div class="p-4 flex justify-between items-center border-b bg-[#66267b] text-white">
+            <h2 class="font-bold text-lg uppercase tracking-wider">All Categories</h2>
+            <button id="close-sidebar" aria-label="Close Menu"
+                class="text-2xl hover:text-red-400 transition-colors">&times;</button>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto ">
+            {{-- ১. মেগা ক্যাটাগরি লুপ --}}
+            @foreach ($headerCategories as $mega)
+                <div class="border-b border-[#f3f3f3]">
+                    <div class="flex justify-between items-center px-5 py-4 group">
+                        <a href="{{ route('category.products', $mega->slug) }}"
+                            class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-[#66267b] transition-colors flex-1">
+                            {{ $mega->name }}
+                        </a>
+
+                        @if ($mega->subCategories->count() > 0)
+                            <button class="accordion-btn text-gray-400 p-2 -mr-2" aria-label="Toggle {{ $mega->name }} categories"
+                                data-target="m-cat-{{ $mega->id }}">
+                                <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
+                            </button>
+                        @endif
+                    </div>
+
+                    @if ($mega->subCategories->count() > 0)
+                        <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
+                            @foreach ($mega->subCategories as $sub)
+                                <div class="border-b border-gray-100 last:border-0">
+                                    <div class="flex justify-between items-center pl-8 pr-5 py-3">
+                                        <a href="{{ route('category.products', $sub->slug) }}"
+                                            class="text-sm font-semibold text-gray-700 hover:text-[#66267b] flex-1">
+                                            {{ $sub->name }}
+                                        </a>
+
+                                        @if ($sub->miniCategories->count() > 0)
+                                            <button class="accordion-btn text-gray-400 p-1"
+                                                data-target="m-sub-{{ $sub->id }}">
+                                                <i class="fa-solid fa-plus text-[10px]"></i>
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    {{-- ৩. মিনি ক্যাটাগরি লিস্ট --}}
+                                    @if ($sub->miniCategories->count() > 0)
+                                        <div id="m-sub-{{ $sub->id }}" class="hidden bg-gray-100/50">
+                                            @foreach ($sub->miniCategories as $mini)
+                                                <a href="{{ route('category.products', $mini->slug) }}"
+                                                    class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-[#66267b]">
+                                                    {{ $mini->name }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
+            @endforeach
+
+            {{-- ইউজার অ্যাকাউন্ট এবং কন্টাক্ট সেকশন --}}
+            <div class="p-4 space-y-2 bg-white mt-4">
+                @auth('customer')
+                    <div class="p-4 bg-purple-50 rounded-xl mb-2">
+                        <p class="text-[10px] text-purple-600 uppercase font-black tracking-widest mb-1">Welcome back,</p>
+                        <p class="font-bold text-gray-900">{{ auth('customer')->user()->name }}</p>
+                    </div>
+                    <a href="{{ route('user.dashboard') }}"
+                        class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 font-bold hover:bg-gray-50 rounded-lg transition-all">
+                        <i class="fa-regular fa-circle-user text-lg text-[#66267b]"></i>
+                        <span>My Dashboard</span>
+                    </a>
+                    <form action="{{ route('user.logout') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 font-bold hover:bg-red-50 rounded-lg transition-all text-left">
+                            <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                            <span>Sign Out</span>
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('user.login') }}"
+                        class="flex items-center justify-center p-4 bg-[#66267b] text-white rounded-xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">
+                        <i class="fa-regular fa-user mr-2"></i> Log In / Register
+                    </a>
+                @endauth
+
+                <a href="tel:{{ $setup->phone ?? '' }}"
+                    class="flex items-center justify-center gap-2 p-4 border-2 border-green-500 text-green-600 rounded-xl font-bold mt-4">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Order on WhatsApp</span>
+                </a>
             </div>
         </nav>
     </div>

@@ -16,7 +16,7 @@
                          RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
                         ════════════════════════════════════════ -->
     <aside id="right-filter-drawer"
-        class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden flex flex-col font-manrope">
+        class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden flex flex-col ">
 
         <!-- Drawer Header -->
         <div class="flex items-center justify-between border-b border-gray-100 px-4 py-5 mb-2">
@@ -110,7 +110,7 @@
                              LEFT SIDEBAR: CATEGORIES (Desktop Only)
                             ════════════════════════════════════════ -->
             <aside
-                class="hidden lg:block lg:col-span-3 bg-white px-5 py-6 border border-gray-100 rounded-2xl shadow-sm h-fit sticky top-24 font-manrope">
+                class="hidden lg:block lg:col-span-3 bg-white px-5 py-6 border border-gray-100 rounded-2xl shadow-sm h-fit sticky top-24 ">
                 <h2 class="text-xl font-bold text-[#0f172a] border-b border-gray-50 pb-4 mb-6 uppercase tracking-wider">
                     All Categories
                 </h2>
@@ -190,7 +190,7 @@
                             <input type="hidden" name="min_price" value="{{ request('min_price') }}">
                             <input type="hidden" name="max_price" value="{{ request('max_price') }}">
 
-                            <div class="flex items-center gap-3 font-manrope">
+                            <div class="flex items-center gap-3 ">
 
                                 <div class="hidden lg:flex flex-wrap items-center gap-3">
 
