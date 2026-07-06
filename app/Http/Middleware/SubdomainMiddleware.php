@@ -40,7 +40,8 @@ class SubdomainMiddleware
 
         if ($store) {
 
-            URL::defaults(['store' => $store->slug]);
+            echo $store->subdomain;
+            URL::defaults(['store' => $store->subdomain]);
 
             return $next($request);
         }
