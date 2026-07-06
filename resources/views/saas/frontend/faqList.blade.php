@@ -58,7 +58,7 @@ return [
     }
 
     .active-link {
-        color: #34a487 !important;
+        color: #22705d !important;
         font-weight: 700 !important;
         text-decoration: underline !important;
     }
@@ -95,7 +95,7 @@ return [
                     class="scroll-mt-32 faq-section-block transition-all duration-500">
 
                     <div
-                        class="question-header bg-[#34a487] px-4 py-3 text-white font-bold text-base border border-gray-200 rounded-lg transition-all duration-300">
+                        class="question-header bg-[#22705d] px-4 py-3 text-white font-bold text-base border border-gray-200 rounded-lg transition-all duration-300">
                         {{ $index + 1 }}. {{ $faq->title }}
                     </div>
 

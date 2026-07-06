@@ -87,10 +87,10 @@
 
                 <!-- Clear All Option -->
                 <div class="pt-2">
-                    <a href="{{ url()->current() }}" aria-label="clear all"
-                        class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest">
-                        Clear All Filters
-                    </a>
+                    <a href="{{ url()->current() }}"
+   class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest min-h-[48px] flex items-center">
+    Clear All Filters
+</a>
                 </div>
             </div>
 

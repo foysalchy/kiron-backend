@@ -1,3 +1,9 @@
+@php
+    $pageData = \App\Services\Saas\SystemPageService::get(
+        \App\Enums\SystemPageType::BRAND_LIST,
+        $setup->company_id ?? null
+    );
+@endphp
 @include('components.meta-info.meta', [
     'setup' => $setup,
 

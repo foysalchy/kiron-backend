@@ -15,8 +15,8 @@
 
     'description' => $pageData?->meta_description ?? ('Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.'),
 
-    'keywords' => $pageData?->meta_keywords 
-        ? implode(',', $pageData->meta_keywords) 
+    'keywords' => $pageData?->meta_keywords
+        ? implode(',', $pageData->meta_keywords)
         : 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
 
     'image' => $setup->meta_image
@@ -45,7 +45,7 @@
                 <p class="text-gray-500 text-lg">The best packages for your business are listed below.</p>
             </div>
 
-              
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
 
                 @foreach ($pricingPlans as $plan)
@@ -53,13 +53,13 @@
                         $mode = strtolower($plan->mode);
                         $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
                         $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
-                        
+
 
                         $themeColor = '#1e1b4b'; // Default Navy (For all other modes)
                         $isSpecialMode = false;
 
                         if ($mode === 'regular') {
-                            $themeColor = '#a855f7'; // Purple
+                            $themeColor = '#7e22ce'; // Purple
                             $isSpecialMode = true;
                         } elseif ($mode === 'popular') {
                             $themeColor = '#0073ea'; // Blue
@@ -90,13 +90,13 @@
                             <div class="flex items-start gap-1">
                                 <span class="text-3xl font-bold"
                                     style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
-                                    {{ $setup->currency ?? '$' }} {{ number_format($price, 0) }} 
-                                    <span class="inline-block text-gray-400 text-[20px] font-semibold line-through ml-[-5px]">
+                                    {{ $setup->currency ?? '$' }} {{ number_format($price, 0) }}
+                                    <span class="inline-block text-gray-600 text-xl font-semibold line-through ml-[-5px]">
                                         <del>{{ number_format( $monthlyTier['regular_price'] ?? 0, 0) }}</del>
                                     </span>
                                 </span>
                                 <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
-                                    
+
                                     <span>/month</span>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                             <!-- <div class="mt-4">
                                 <p class="text-gray-900 font-bold text-sm">Total
                                     {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
-                                <p class="text-gray-400 text-xs">Billed annually</p>
+                                <p class="text-gray-600 text-xs">Billed annually</p>
                             </div> -->
                         </div>
 
@@ -139,7 +139,7 @@
                             <hr class="border-gray-200 border-1 mb-4">
 
                             <div class="space-y-2">
-                                
+
                                <div class="space-y-2">
 
                                 @foreach ([
@@ -147,21 +147,21 @@
                                     ['Product Limit', $plan->product_limit],
                                     ['Order Limit', $plan->order_limit],
                                     ['Extra Order', $plan->extra_order_charge],
-                                     
+
                                 ] as [$label, $value])
 
                                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-5 h-5 rounded-full bg-[#a855f717] flex items-center justify-center">
-                                                <i class="fa-solid fa-check text-[10px] text-[#a855f7]"></i>
+                                            <div class="w-5 h-5 rounded-full bg-[#7e22ce17] flex items-center justify-center">
+                                                <i class="fa-solid fa-check text-[10px] text-[#7e22ce]"></i>
                                             </div>
 
-                                            <span class="text-sm text-[#a855f7] font-semibold">
-                                                {{ $label }} 
+                                            <span class="text-sm text-[#7e22ce] font-semibold">
+                                                {{ $label }}
                                             </span>
                                         </div>
 
-                                        <span class="text-sm font-semibold text-[#a855f7]">
+                                        <span class="text-sm font-semibold text-[#7e22ce]">
                                             {{ $label === 'Extra Order' ? '৳.' : '' }}{{ $value ?: 'Unlimited' }} {{ $label === 'Extra Order' ? '/order' : '' }}
                                         </span>
                                     </div>
@@ -185,11 +185,11 @@
                                                 </div>
 
                                                 <span class="text-sm text-gray-600">
-                                                    {{ $extraDetail }} 
+                                                    {{ $extraDetail }}
                                                 </span>
                                             </div>
                                         </div>
-                                       
+
                                     @endforeach
                                 @endif
                             </div>
@@ -234,7 +234,7 @@
                     Contact Sales
                 </a>
 
-                
+
             </div>
 
         </div>
@@ -244,6 +244,6 @@
             {!! $pageData->description!!}
         </div>
         </div>
-        
+
     </section>
 @endsection
