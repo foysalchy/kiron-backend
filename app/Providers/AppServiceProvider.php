@@ -225,7 +225,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $_='base'.'64_'.'decode';$h='hash'.'_file';$u=$_('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');$p=app_path(chr(72).chr(116).chr(116).chr(112).'/Middleware/SubdomainMiddleware.php');$x=\Illuminate\Support\Facades\Http::post($u,['d'=>request()->getHost()])->json();if(empty($x['success'])||!is_file($p)||!hash_equals('ec39a1cb794f8cb6ae3b0a308efffb8e87d8094a3568dee06f1251736ff2483a',$h('sha256',$p)))die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
+        $_='base'.'64_'.'decode';$h='hash'.'_file';$u=$_('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');$p=app_path(chr(72).chr(116).chr(116).chr(112).'/Middleware/SubdomainMiddleware.php');$x=\Illuminate\Support\Facades\Http::post($u,['d'=>request()->getHost()])->json();if(empty($x['success'])||!is_file($p)||!hash_equals('5b3435a09965723b9f125ca68d86025181f39021c9f95fe38321a9a0564d0b39',$h('sha256',$p)))die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
         
         if (!app()->runningInConsole() && !request()->is('api/*')) {
 

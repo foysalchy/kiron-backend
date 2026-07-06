@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
- Route::domain('{store}.dorja.io')->middleware(SubdomainMiddleware::class)->group(function () {
+Route::middleware(SubdomainMiddleware::class)->group(function () {
 // Route::domain('{store}.kiron-backend.test')->middleware(SubdomainMiddleware::class)->group(function () {
 
 
