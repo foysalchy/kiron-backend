@@ -19,7 +19,7 @@ class SubdomainMiddleware
         $host = strtolower($request->getHost());
 
         $mainDomain = 'dorja.io';
-
+        print_r($host);
         // SaaS Domain
         if ($host == $mainDomain || $host == "www.$mainDomain") {
             return redirect()->route('saas.index');
