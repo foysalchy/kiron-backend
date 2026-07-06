@@ -71,7 +71,7 @@ class Order extends Model
         'return_info' => 'array',
         'warehouse_info' => 'array',
         'assigned_to' => 'array',
-        'status' => Status::class,
+      
 
     ];
 
