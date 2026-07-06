@@ -560,7 +560,7 @@
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
                             class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-white' }}">
+                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900  ' }}">
                             {{ $sol['title'] }}
                         </button>
                     @endforeach
@@ -1886,67 +1886,10 @@
 </section>
 @endsection
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-
+     
     <!-- Accordion + Search Script -->
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        window.addEventListener("load", () => {
-
-            const wrap = document.querySelector(".pin-wrap");
-            const section = document.querySelector(".integration-section");
-
-            if (!wrap || !section) return;
-
-            function createAnimation() {
-
-                ScrollTrigger.getAll().forEach(st => st.kill());
-
-                gsap.set(wrap, {
-                    x: 0
-                });
-
-                const totalWidth = wrap.scrollWidth;
-                const visibleWidth = section.clientWidth;
-
-                const maxTranslate = totalWidth - visibleWidth;
-
-                gsap.to(wrap, {
-                    x: -maxTranslate,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top top",
-                        end: "+=" + maxTranslate,
-                        pin: true,
-                        scrub: 1,
-                        invalidateOnRefresh: true,
-                        anticipatePin: 1,
-                        snap: {
-                            snapTo: (value) => {
-
-                                const cards = gsap.utils.toArray(".integration-card");
-                                const gap = 24;
-
-                                const step = cards[0].offsetWidth + gap;
-
-                                return Math.round((value * maxTranslate) / step) * step / maxTranslate;
-                            },
-                            duration: 0.25
-                        }
-                    }
-                });
-
-                ScrollTrigger.refresh();
-            }
-
-            createAnimation();
-
-            window.addEventListener("resize", createAnimation);
-
-        });
+        
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -1987,7 +1930,7 @@
                         delay: 2000,
                         disableOnInteraction: false,
                     },
-                    speed: 100,
+                    speed: 900,
                     pagination: {
                         el: '.hero-pagination',
                         clickable: true,
