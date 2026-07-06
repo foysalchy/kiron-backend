@@ -36,7 +36,7 @@ class SubdomainMiddleware
         }
 
         // Custom Domain
-        $store = \App\Models\Store::where('domain', $host)->first();
+    $store = \App\Models\DomainSetup::where('domain', $host)->first();
 
         if ($store) {
 
