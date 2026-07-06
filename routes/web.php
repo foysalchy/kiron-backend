@@ -97,14 +97,17 @@ use Illuminate\Support\Facades\Route;
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
 });
-// Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
-// Route::get('/features', [SaasIndexController::class, 'features'])->name('saas.feature.list');
-// Route::get('/features/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');
-// Route::get('/blog', [SaasIndexController::class, 'blogPosts'])->name('saas.blog.list');
-// Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');
-// Route::get('/faqs', [SaasIndexController::class, 'faqList'])->name('saas.faq.list');
-// Route::get('/pricing', [SaasIndexController::class, 'packageList'])->name('saas.package.list');
-// Route::get('/contact', [SaasIndexController::class, 'contact'])->name('saas.contact');
-// Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');
-// Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap.saas.index');
-// Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.saas.txt');
+
+Route::domain('dorja.io')->group(function () {
+Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
+Route::get('/features', [SaasIndexController::class, 'features'])->name('saas.feature.list');
+Route::get('/features/{slug}', [SaasIndexController::class, 'featureDetails'])->name('saas.feature.details');
+Route::get('/blog', [SaasIndexController::class, 'blogPosts'])->name('saas.blog.list');
+Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');
+Route::get('/faqs', [SaasIndexController::class, 'faqList'])->name('saas.faq.list');
+Route::get('/pricing', [SaasIndexController::class, 'packageList'])->name('saas.package.list');
+Route::get('/contact', [SaasIndexController::class, 'contact'])->name('saas.contact');
+Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap.saas.index');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots.saas.txt');
+});
