@@ -20,8 +20,8 @@ $pageData = \App\Services\Saas\SystemPageService::get(
 ])
 @section('content')
 <!-- HEADER SECTION -->
-<section class="bg-[#22705d] pt-32 pb-20 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#22705d]/10 blur-[120px] rounded-full"></div>
+<section class="bg-[#00555c] pt-32 pb-20 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full"></div>
     <div class="container mx-auto px-6 text-center relative z-10">
         <h1 class="text-white text-4xl md:text-6xl font-black mb-6">Our Blogs and Articles</h1>
         <p class="text-gray-800 text-lg md:text-xl max-w-2xl mx-auto">
@@ -50,7 +50,7 @@ $pageData = \App\Services\Saas\SystemPageService::get(
                 <div class="p-6 md:p-8 flex flex-col flex-grow">
                     <div class="flex justify-between items-center mb-5">
                         <span
-                            class="bg-indigo-50 text-[#22705d] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                            class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                             {{ $blog->company->shop_name ?? 'Admin' }}
                         </span>
                         <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
@@ -70,7 +70,7 @@ $pageData = \App\Services\Saas\SystemPageService::get(
 
                     <div class="mt-auto pt-5 border-t border-gray-50">
                         <div
-                            class="inline-flex items-center gap-2 text-[#22705d] font-bold text-lg group-hover:gap-3 transition-all">
+                            class="inline-flex items-center gap-2 text-[#00555c] font-bold text-lg group-hover:gap-3 transition-all">
                             Read More <i class="fa-solid fa-arrow-right text-sm"></i>
                         </div>
                     </div>

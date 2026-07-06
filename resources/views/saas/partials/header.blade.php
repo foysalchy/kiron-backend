@@ -20,23 +20,23 @@
 
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
-            <a href="{{ route('saas.index') }}" class="text-[#22705d] font-semibold text-lg">Home</a>
-            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#22705d] font-semibold text-lg transition">Features</a>
+            <a href="{{ route('saas.index') }}" class="text-[#00555c] font-semibold text-lg">Home</a>
+            <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Features</a>
             <a href="{{ route('saas.index') }}#intergation"
-                class="text-gray-700 hover:text-[#22705d] font-semibold text-lg transition">Integration</a>
-            <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#22705d] font-semibold text-lg transition">Pricing</a>
-            <a href="{{ route('saas.faq.list') }}" class="text-gray-700 hover:text-[#22705d] font-semibold text-lg transition">FAQ</a>
-            <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#22705d] font-semibold text-lg transition">Contact</a>
+                class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Integration</a>
+            <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Pricing</a>
+            <a href="{{ route('saas.faq.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">FAQ</a>
+            <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Contact</a>
         </nav>
 
         <!-- Right Side Buttons -->
         <div class="flex items-center space-x-3 md:space-x-6">
-            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#22705d]">
+            <a href="https://app.dorja.io" class="hidden md:block text-gray-900 font-bold text-lg hover:text-[#00555c]">
                 Login
             </a>
             <!-- CTA Button (Responsive Padding & Font) -->
             <a href="https://app.dorja.io/register"
-                class="bg-[#22705d] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#4a38b8] transition shadow-sm whitespace-nowrap">
+                class="bg-[#00555c] text-white px-4 py-2.5 md:px-6 md:py-3 rounded-xl font-bold text-xs md:text-lg hover:bg-[#078e9a] transition shadow-sm whitespace-nowrap">
                 Start Free Trial
             </a>
 
@@ -62,7 +62,7 @@
             </div>
 
             <nav class="flex flex-col space-y-5">
-                <a href="{{ route('saas.index') }}" class="text-[#22705d] font-bold text-lg">Home</a>
+                <a href="{{ route('saas.index') }}" class="text-[#00555c] font-bold text-lg">Home</a>
                 <a href="{{ route('saas.feature.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Features</a>
                 <a href="{{ route('saas.index') }}#intergation"
                     class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Integration</a>
