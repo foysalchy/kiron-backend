@@ -13,54 +13,37 @@ class SubdomainMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    
     public function handle(Request $request, Closure $next)
     {
-
-        $host = request()->getHost(); // Example: storeone.localhost
-        $u = base64_decode('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');
-        $response = Http::post($u, [
-            'd' => request()->getHost(),
-        ]);
-        $data = $response->json();
-        if (!($data['success'] ?? false)) {
-            die(base64_decode('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
-        }
-        // =======================
-
         $host = strtolower($request->getHost());
 
-        // Main SaaS domain
-        if ($host == 'dorja.io' || $host == 'www.dorja.io') {
+        $mainDomain = 'dorja.io';
+
+        // SaaS Domain
+        if ($host == $mainDomain || $host == "www.$mainDomain") {
+            return redirect()->route('saas.index');
+        }
+
+        // Subdomain
+        if (str_ends_with($host, '.' . $mainDomain)) {
+
+            $subdomain = explode('.', $host)[0];
+
+            URL::defaults(['store' => $subdomain]);
+
             return $next($request);
         }
 
-        // Try custom domain first
-        $store = Store::where('custom_domain', $host)->first();
+        // Custom Domain
+        $store = \App\Models\Store::where('domain', $host)->first();
 
-        if (!$store) {
+        if ($store) {
 
-            // Try subdomain
-            $parts = explode('.', $host);
+            URL::defaults(['store' => $store->slug]);
 
-            if (count($parts) >= 3) {
-
-                $subdomain = $parts[0];
-
-                $store = Store::where('slug', $subdomain)->first();
-            }
+            return $next($request);
         }
 
-        if (!$store) {
-            abort(404);
-        }
-
-        app()->instance('currentStore', $store);
-
-        URL::defaults([
-            'store' => $store->slug
-        ]);
-
-        return $next($request);
+        abort(404);
     }
 }
