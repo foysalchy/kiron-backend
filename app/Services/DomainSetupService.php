@@ -11,7 +11,7 @@ class DomainSetupService
 {
     private string $apiToken   = 'iF9aNbBfaKiT3WtsdZSkUiAEoMEnt2Q6aCFlYWUv';
     private string $zoneId     = 'ac7c72e0460207f900a635fb32ae43cf';
-    private string $ipAddress  = '134.209.65.214';
+    private string $ipAddress  = '62.72.12.195';
     private string $baseDomain = 'doob.com.bd';
 
     public function getDomain()
@@ -49,14 +49,7 @@ class DomainSetupService
 
             Log::info('Domain saved', ['domain' => $domain]);
 
-            if (!empty($data['sub_domain'])) {
-                $cfResult = $this->createCloudflareDnsRecord($data['sub_domain']);
-                if (!$cfResult['success']) {
-                    DB::rollBack();
-                    Log::error('Cloudflare DNS failed', ['errors' => $cfResult['errors'] ?? []]);
-                    return 'Failed to create Cloudflare DNS record.';
-                }
-            }
+            
 
             $action = $domain->wasRecentlyCreated ? 'created' : 'updated';
             LogHelper::$action('domain_setup', $domain->id, $domain->company_id, 'Domain updated to: ' . $domain->custom_domain);
@@ -113,33 +106,33 @@ class DomainSetupService
         }
     }
 
-    private function createCloudflareDnsRecord(string $subDomain): array
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiToken,
-            'Content-Type'  => 'application/json',
-        ])->post("https://api.cloudflare.com/client/v4/zones/{$this->zoneId}/dns_records", [
-            'type'    => 'A',
-            'name'    => "{$subDomain}.{$this->baseDomain}",
-            'content' => $this->ipAddress,
-            'ttl'     => 3600,
-            'proxied' => false,
-        ]);
+    // private function createCloudflareDnsRecord(string $subDomain): array
+    // {
+    //     $response = Http::withHeaders([
+    //         'Authorization' => 'Bearer ' . $this->apiToken,
+    //         'Content-Type'  => 'application/json',
+    //     ])->post("https://api.cloudflare.com/client/v4/zones/{$this->zoneId}/dns_records", [
+    //         'type'    => 'A',
+    //         'name'    => "{$subDomain}.{$this->baseDomain}",
+    //         'content' => $this->ipAddress,
+    //         'ttl'     => 3600,
+    //         'proxied' => false,
+    //     ]);
 
-        $result = $response->json();
-        Log::info('Cloudflare response', ['response' => $result]);
+    //     $result = $response->json();
+    //     Log::info('Cloudflare response', ['response' => $result]);
 
-        if (!empty($result['errors'])) {
-            foreach ($result['errors'] as $error) {
-                if ($error['code'] === 81058) {
-                    Log::info('Cloudflare DNS record already exists, skipping.');
-                    return ['success' => true];
-                }
-            }
-        }
+    //     if (!empty($result['errors'])) {
+    //         foreach ($result['errors'] as $error) {
+    //             if ($error['code'] === 81058) {
+    //                 Log::info('Cloudflare DNS record already exists, skipping.');
+    //                 return ['success' => true];
+    //             }
+    //         }
+    //     }
 
-        return $result ?? ['success' => false, 'errors' => ['No response from Cloudflare']];
-    }
+    //     return $result ?? ['success' => false, 'errors' => ['No response from Cloudflare']];
+    // }
 
     private function zoneCheck(string $domain): bool
     {
