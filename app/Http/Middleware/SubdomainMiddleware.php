@@ -22,7 +22,7 @@ class SubdomainMiddleware
         if (str_starts_with($host, 'www.')) {
             $host = substr($host, 4);
         }
-        print_r($host); // Debugging line to check the host value
+    
 
         $mainDomain = 'dorja.io';
         
