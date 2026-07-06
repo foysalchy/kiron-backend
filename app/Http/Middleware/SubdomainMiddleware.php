@@ -15,37 +15,44 @@ class SubdomainMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next)
-    {
-        $host = strtolower($request->getHost());
+{
+    $host = strtolower($request->getHost());
 
-        $mainDomain = 'dorja.io';
-        print_r($host);
-        // SaaS Domain
-        if ($host == $mainDomain || $host == "www.$mainDomain") {
-            return redirect()->route('saas.index');
-        }
+    // Remove www.
+    if (str_starts_with($host, 'www.')) {
+        $host = substr($host, 4);
+    }
 
-        // Subdomain
-        if (str_ends_with($host, '.' . $mainDomain)) {
+    $mainDomain = 'dorja.io';
 
-            $subdomain = explode('.', $host)[0];
+    // SaaS Domain
+    if ($host === $mainDomain) {
+        return redirect()->route('saas.index');
+    }
 
-            URL::defaults(['store' => $subdomain]);
+    // Subdomain (*.dorja.io)
+    if (str_ends_with($host, '.' . $mainDomain)) {
 
-            return $next($request);
-        }
+        $subdomain = explode('.', $host)[0];
 
-        // Custom Domain
+        URL::defaults([
+            'store' => $subdomain
+        ]);
+
+        return $next($request);
+    }
+
+    // Custom Domain
     $store = \App\Models\DomainSetup::where('custom_domain', $host)->first();
 
-        if ($store) {
+    if ($store) {
+        URL::defaults([
+            'store' => $store->subdomain
+        ]);
 
-            echo $store->subdomain;
-            URL::defaults(['store' => $store->subdomain]);
-
-            return $next($request);
-        }
-
-        abort(404);
+        return $next($request);
     }
+
+    abort(404);
+}
 }
