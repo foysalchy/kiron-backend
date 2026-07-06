@@ -171,7 +171,7 @@
 
 
                     <img src="{{ $blogPost->thumbnail_url ? asset($blogPost->thumbnail_url) : asset('images/saas/live1.png') }}"
-                        class="w-full  im mb-8" alt="{{ $blogPost->title }}" />
+                        class="w-full  im mb-8" alt="{{ $blogPost->title }}" loading="lazy" />
 
 
                     <h1 class="text-3xl md:text-[36px] font-black text-gray-900 leading-[1.1] mb-6">

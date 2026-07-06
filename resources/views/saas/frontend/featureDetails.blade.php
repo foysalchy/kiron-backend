@@ -153,7 +153,7 @@
                     </div>
 
                     @if ($feature->image)
-                        <img src="{{ $feature->image_url }}" class="w-full rounded-xl shadow-lg mb-8"
+                        <img src="{{ $feature->image_url }}" class="w-full rounded-xl shadow-lg mb-8" loading="lazy"
                             alt="{{ $feature->title }}" />
                     @endif
 

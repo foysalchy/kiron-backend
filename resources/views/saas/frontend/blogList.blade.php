@@ -42,7 +42,7 @@ $pageData = \App\Services\Saas\SystemPageService::get(
                 <div class="group block overflow-hidden rounded-xl">
                     <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
                         <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}"
-                            alt="{{ $blog->title }}"
+                            alt="{{ $blog->title }}" loading="lazy"
                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                     </div>
                 </div>

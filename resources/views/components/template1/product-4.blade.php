@@ -17,18 +17,22 @@
     if ($regularPrice > $salePrice && $regularPrice > 0) {
         $diff = $regularPrice - $salePrice;
         $percentage = round(($diff / $regularPrice) * 100);
-        if ($percentage > 0) { $discountLabel = $percentage . '%'; }
+        if ($percentage > 0) {
+            $discountLabel = $percentage . '%';
+        }
     }
     $isOutOfStock = $product->available_stock <= 0;
 @endphp
 
-<div class="group bg-white border border-gray-100 rounded-xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl">
+<div
+    class="group bg-white border border-gray-100 rounded-xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-xl">
 
     <!-- image section -->
     <div class="relative overflow-hidden aspect-square bg-[#f9f9f9]">
         <!-- Discount Badge -->
         @if ($discountLabel)
-            <span class="absolute top-3 left-3 bg-[#be123c] text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-md z-20 shadow-sm">
+            <span
+                class="absolute top-3 left-3 bg-[#be123c] text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md z-20 shadow-sm">
                 -{{ $discountLabel }}
             </span>
         @endif
@@ -37,10 +41,11 @@
         <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="wish button"
             class="absolute top-3 right-3 z-30 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md transition-transform active:scale-90 cursor-pointer">
             <i id="wish-icon-{{ $product->id }}"
-               class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400' }} text-sm"></i>
+                class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400' }} text-sm"></i>
         </button>
 
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full p-4" aria-label="product details">
+        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full p-4"
+            aria-label="product details">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
                 alt="{{ $product->title }}" width="300" height="300" loading="lazy"
                 class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110">
@@ -54,14 +59,16 @@
             {{ $product->mega_categories?->pluck('name')->implode(', ') ?: 'General' }}
         </div> --}}
 
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow" aria-label="product details">
-            <h3 class="text-gray-900 text-sm md:text-base font-bold leading-tight line-clamp-2 min-h-[40px] group-hover:text-[#be123c] transition-colors">
+        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow"
+            aria-label="product details">
+            <h3
+                class="text-gray-900 text-sm md:text-base font-bold leading-tight line-clamp-2 group-hover:text-[#be123c] transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
 
         <!-- Price section -->
-        <div class="mt-3 flex items-center gap-2">
+        <div class="flex items-center gap-2">
             @if ($regularPrice > $salePrice)
                 <span class="text-gray-600 text-xs md:text-sm line-through font-medium">
                     {{ $setup->currency }}{{ number_format($regularPrice) }}
@@ -73,13 +80,17 @@
         </div>
 
         <!-- size variations snippet (If it's a variation product) -->
-        <div class="mt-3 flex flex-wrap gap-1.5 h-8 overflow-hidden">
-            @if($product->type === 'variation')
+        <div class="mt-4 mb-3 flex flex-wrap gap-2">
+            @if ($product->type === 'variation')
                 @php
-                    $previewValues = $product->variations->flatMap->attributes->pluck('attributeValue.name')->unique()->take(5);
+                    $previewValues = $product->variations->flatMap->attributes
+                        ->pluck('attributeValue.name')
+                        ->unique()
+                        ->take(5);
                 @endphp
-                @foreach($previewValues as $val)
-                    <span class="w-7 h-7 flex items-center justify-center border border-gray-200 rounded text-[10px] font-bold text-gray-600 hover:border-[#66267b] transition-colors">
+                @foreach ($previewValues as $val)
+                    <span
+                        class="min-w-[30px] h-7 px-2 flex items-center justify-center border border-gray-200 rounded text-xs font-bold text-gray-600 hover:border-[#66267b] transition-colors">
                         {{ $val }}
                     </span>
                 @endforeach
@@ -87,9 +98,9 @@
         </div>
 
         <!-- action button -->
-        <button
-            {{ $isOutOfStock ? 'disabled' : '' }}
-            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}" aria-label="cart button"
+        <button {{ $isOutOfStock ? 'disabled' : '' }}
+            onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
+            aria-label="cart button"
             class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-4 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
             {{ $isOutOfStock ? 'bg-gray-300' : 'bg-[#be123c] hover:bg-red-700 active:scale-95' }}">
 
@@ -105,7 +116,7 @@
 
 @once
     @push('scripts')
-          <script>
+        <script>
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
             // product variation modal related scripts
