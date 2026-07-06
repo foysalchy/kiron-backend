@@ -1,5 +1,5 @@
 @php
-    $activeCategory = $miniCategory ?? $subCategory ?? $megaCategory ?? null;
+    $activeCategory = $category ?? $miniCategory ?? $subCategory ?? $megaCategory ?? null;
 @endphp
 
 @if($activeCategory)
@@ -24,7 +24,7 @@
         'type'        => 'CollectionPage',
         'title'       => ($activeCategory->meta_title ?: $activeCategory->name) . ' - ' . ($setup->shop_name ?? ''),
         'description' => $activeCategory->meta_description ?: 'Browse our latest collection of ' . $activeCategory->name,
-        'keywords'    => is_array($activeCategory->meta_keywords) ? implode(',', $activeCategory->meta_keywords) : $activeCategory->meta_keywords,
+        'keywords'    => is_array($activeCategory->meta_keywords) ? implode(',', $activeCategory->meta_keywords) : ($activeCategory->meta_keywords ?? ''),
         'image'       => $activeCategory->image ? asset('storage/' . $activeCategory->image) : asset('images/default-share.jpg'),
         'canonical'   => $canonicalUrl,
         'breadcrumb'  => $breadcrumbItems,
@@ -39,13 +39,19 @@
         );
     @endphp
 
-    @include('components.meta-info', [
+    @include('components.meta-info.meta', [
         'setup'       => $setup,
         'type'        => 'CollectionPage',
-        'title'       => $pageData->meta_title ?? ('All Products | ' . $setup->shop_name),
-        'description' => $pageData->meta_description ?? ('Browse all products available on ' . $setup->shop_name),
-        'keywords'    => $pageData->meta_keywords ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords) : 'products, online shop',
-        'image'       => $setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('storage/' . $setup->logo),
+
+        'title'       => $pageData?->meta_title ?? ('All Products | ' . ($setup->shop_name ?? 'Shop')),
+
+        'description' => $pageData?->meta_description ?? ('Browse all products available on ' . ($setup->shop_name ?? 'our shop')),
+
+        'keywords'    => ($pageData && $pageData->meta_keywords)
+                         ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
+                         : ($setup->tags ?? 'products, online shop'),
+
+        'image'       => ($setup->meta_image ?? null) ? asset('storage/' . $setup->meta_image) : asset('storage/' . ($setup->logo ?? '')),
         'canonical'   => route('shop.index'),
         'breadcrumb'  => [
             ['name' => 'Home', 'url' => url('/')],

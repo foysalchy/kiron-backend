@@ -1873,10 +1873,10 @@
                         crossFade: true
                     },
                     autoplay: {
-                        delay: 3000,
+                        delay: 2000,
                         disableOnInteraction: false,
                     },
-                    speed: 1000,
+                    speed: 100,
                     pagination: {
                         el: '.hero-pagination',
                         clickable: true,

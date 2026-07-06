@@ -17,11 +17,13 @@ $setup->company_id ?? null
     'image' => $setup->meta_image
         ? asset('storage/'.$setup->meta_image)
         : asset('storage/'.$setup->logo),
+
     'canonical' => url()->current(),
+
     'breadcrumb' => [
         [
-            'name'=>'Home',
-            'url'=>url('/')
+            'name' => 'Home',
+            'url'  => url('/')
         ]
     ]
 ])

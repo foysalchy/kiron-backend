@@ -114,7 +114,7 @@
 @endpush
 @section('content')
     <!-- hero section -->
-    <section class="container mx-auto mt-6 px-4 font-manrope">
+    <section class="container mx-auto mt-6 px-4 ">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
 
             <!-- LEFT: Dynamic Swiper Slider -->
@@ -146,7 +146,7 @@
                 @php $sideBanner = $sidebarSliders->first(); @endphp
                 @if ($sideBanner)
                     <a href="{{ $sideBanner->url ?? '#' }}" aria-label="{{ $sideBanner->title ?? 'banner Image' }}">
-                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}" height="" width=""
+                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}" height="450" width="300"
                             loading="lazy"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
@@ -196,7 +196,7 @@
         </div>
     </section>
     <!-- PRODUCT CATEGORIES SECTION -->
-    <section class="w-full mx-auto bg-[#fcfcfc] px-4 font-manrope">
+    <section class="w-full mx-auto bg-[#fcfcfc] px-4 ">
         <div class="container mx-auto py-4 md:py-10">
             <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
                 Product Categories
@@ -226,7 +226,7 @@
                             class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
 
                             <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
-                                <img src="{{ $category->image_url ?? '' }}" height="" width=""
+                                <img src="{{ $category->image_url ?? '' }}" height="64" width="64"
                                     aria-label="category image" loading="lazy" alt="{{ $category->name }}"
                                     class="w-full h-full object-contain">
                             </div>
@@ -247,7 +247,7 @@
     </section>
 
     <!-- LATEST OFFERS SECTION  -->
-    <section class="container mx-auto py-4 md:py-10 px-4 font-manrope">
+    <section class="container mx-auto py-4 md:py-10 px-4 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             Latest Offers
@@ -290,7 +290,7 @@
                             </h3>
 
                             <!-- Subtitle/Short Description (Dynamic) -->
-                            <p class="text-[#777777] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
+                            <p class="text-[#4b5563] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
                                 {{ $product->short_description ?? 'Quality Product' }}
                             </p>
                         </div>
@@ -318,7 +318,7 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="container mx-auto py-4 md:py-10 px-4 font-manrope">
+    <section class="container mx-auto py-4 md:py-10 px-4 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             New Arrival
@@ -355,7 +355,7 @@
                             </h3>
 
                             <!-- Brand or Subtitle (Dynamic) -->
-                            <p class="text-[#7a818c] text-[9px] md:text-xs font-normal truncate hidden sm:block">
+                            <p class="text-[#374151] text-[9px] md:text-xs font-normal truncate hidden sm:block">
                                 {{ $product->brand->name ?? 'Premium Quality' }}
                             </p>
                         </div>

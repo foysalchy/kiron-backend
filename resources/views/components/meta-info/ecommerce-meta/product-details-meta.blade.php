@@ -20,7 +20,7 @@
         ],
         [
             'name'=>'Products',
-            'url'=>route('product.index')
+            'url'=>route('shop.index')
         ],
         [
             'name'=>$product->name,

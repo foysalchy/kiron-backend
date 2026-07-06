@@ -219,7 +219,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
+                            'Accept': 'application/json', 
                             'X-CSRF-TOKEN': token
                         },
                         body: JSON.stringify(postData)
