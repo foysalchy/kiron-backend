@@ -24,7 +24,7 @@ if (!function_exists('getCurrentCompany')) {
             return $store;
         }else{
 
-            $host = strtolower($request->getHost());
+            $host = strtolower(request()->getHost());
 
             // Remove www.
             if (str_starts_with($host, 'www.')) {
