@@ -269,11 +269,17 @@ class FrontendOrderService
     /**
      * Get status label
      */
-    private function getStatusLabel($status): string
-    {
-        return Status::tryFrom($status)?->label() ?? 'Unknown';
-    }
+public function getStatusLabel($status): string
+{
+    $statusEnum = $status instanceof Status ? $status : Status::tryFrom($status);
 
+    return match($statusEnum) {
+        Status::Draft => 'Draft',
+        Status::Pending => 'Pending',
+        // ...
+        default => 'Unknown',
+    };
+}
     /**
      * Get payment status label
      */
