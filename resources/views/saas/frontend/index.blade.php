@@ -499,8 +499,8 @@
                                 </div>
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
-                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" 
-                                        class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
+                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" width="600" height="500"
+                                    class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
                                         alt="Core Platform" />
                                 </div>
 
@@ -528,8 +528,8 @@
                     @forelse($brands as $brand)
                         <div class="w-full flex justify-center text-white">
                             <a href="{{ $brand->link }}" target="_blank" class="block">
-                                <img src="{{ $brand->logo_url ?? '' }}" alt="{{ $brand->name }}"
-                                    class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
+                                <img src="{{ $brand->logo_url ?? '' }}" alt="{{ $brand->name }}" width="150"
+                                height="60" loading="lazy" class="h-8 md:h-10 lg:h-14 object-contain hover:grayscale-0 transition cursor-pointer" />
                             </a>
                         </div>
                     @empty
@@ -1278,7 +1278,7 @@
                         <div class="demo-card group border border-indigo-100 rounded-xl overflow-hidden bg-white"
                             data-type="{{ $demo->type }}">
                             <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                                <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}" alt="demo image"
+                                <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}" alt="demo image" loading="lazy"
                                     class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
                                     alt="{{ $demo->title }}" />
                             </div>
@@ -1458,9 +1458,11 @@
                         Setup in Minutes
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
-                        Secure Cloud Platform
+                            <div class="aspect-video bg-gray-100">
+                                <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard" loading="lazy"
+                                    class="w-full h-full object-cover object-top" alt="right image" />
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -1665,8 +1667,8 @@
                                 </div>
                             </div>
                             <div class="w-full lg:w-1/2">
-                                <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
-                                    class="w-full h-auto rounded-3xl  " alt="{{ $benefit->title }}" />
+                                <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}" loading="lazy" width="800" height="600"
+                                class="w-full h-auto rounded-3xl" alt="{{ $benefit->title }}" />
                             </div>
                         </div>
                     @endforeach
@@ -1702,7 +1704,7 @@
                             <div class="group block overflow-hidden rounded-xl">
                                 <div class="aspect-[16/10] bg-[#eef2ff] relative overflow-hidden">
                                     <img src="{{ $blog->thumbnail_url ? asset($blog->thumbnail_url) : asset('images/saas/live1.png') }}"
-                                        alt="{{ $blog->title }}"
+                                        alt="{{ $blog->title }}" loading="lazy"
                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 </div>
                             </div>

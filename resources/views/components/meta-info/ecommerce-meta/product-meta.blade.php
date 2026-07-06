@@ -2,19 +2,28 @@
     $activeCategory = $category ?? $miniCategory ?? $subCategory ?? $megaCategory ?? null;
 @endphp
 
-@if($activeCategory)
+@if ($activeCategory)
     {{-- ─── CATEGORY SPECIFIC META ─── --}}
     @php
         $breadcrumbItems = [['name' => 'Home', 'url' => url('/')]];
 
         if (isset($megaCategory)) {
-            $breadcrumbItems[] = ['name' => $megaCategory->name, 'url' => route('category.products', $megaCategory->slug)];
+            $breadcrumbItems[] = [
+                'name' => $megaCategory->name,
+                'url' => route('category.products', $megaCategory->slug),
+            ];
         }
         if (isset($subCategory)) {
-            $breadcrumbItems[] = ['name' => $subCategory->name, 'url' => route('category.products', $subCategory->slug)];
+            $breadcrumbItems[] = [
+                'name' => $subCategory->name,
+                'url' => route('category.products', $subCategory->slug),
+            ];
         }
         if (isset($miniCategory)) {
-            $breadcrumbItems[] = ['name' => $miniCategory->name, 'url' => route('category.products', $miniCategory->slug)];
+            $breadcrumbItems[] = [
+                'name' => $miniCategory->name,
+                'url' => route('category.products', $miniCategory->slug),
+            ];
         }
         $canonicalUrl = url()->current();
     @endphp
@@ -29,13 +38,12 @@
         'canonical'   => $canonicalUrl,
         'breadcrumb'  => $breadcrumbItems,
     ])
-
 @else
     {{-- ─── GENERAL SHOP PAGE META ─── --}}
     @php
         $pageData = \App\Services\Saas\SystemPageService::get(
             \App\Enums\SystemPageType::SHOP,
-            $setup->company_id ?? null
+            $setup->company_id ?? null,
         );
     @endphp
 
