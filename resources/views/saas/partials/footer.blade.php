@@ -15,9 +15,9 @@
 
                  <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-3">
                      <input type="email" placeholder="Email"
-                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#22705d] transition text-lg" />
+                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#00555c] transition text-lg" />
                      <button
-                         class="w-full sm:w-auto bg-[#22705d] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
+                         class="w-full sm:w-auto bg-[#00555c] hover:bg-[#078e9a] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
                          Subscribe
                      </button>
                  </div>
@@ -43,7 +43,7 @@
                  <div class="flex items-center gap-3">
                      @foreach ($socialLinks as $social)
                          <a href="{{ $social->link ?? '#' }}" target="_blank" aria-label="Follow us on {{ $social->name ?? 'Social Media' }}"
-                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#22705d] hover:border-[#22705d] transition group">
+                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#00555c] hover:border-[#00555c] transition group">
 
                              <i class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
                          </a>
@@ -55,7 +55,7 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Important Links
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#00555c] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-base">
                      <li>
@@ -82,7 +82,7 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Company
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#00555c] rounded-full"></span>
                  </h3>
                  <ul class="space-y-4 text-gray-400 text-base">
                     @foreach ($footerPages as $page)
@@ -105,15 +105,15 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Help & Support
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#00555c] rounded-full"></span>
                  </h3>
                  <ul class="space-y-5 text-gray-400 text-base">
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-phone mt-1 text-[#22705d]"></i>
+                         <i class="fa-solid fa-phone mt-1 text-[#00555c]"></i>
                          <span>{{ $setup->phone ?? '0188-8888888' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-envelope mt-1 text-[#22705d]"></i>
+                         <i class="fa-solid fa-envelope mt-1 text-[#00555c]"></i>
                          <span>{{ $setup->email ?? 'hello@sopify.com' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
@@ -150,7 +150,7 @@
 <!-- Scroll to Top Button -->
 <button
     id="backToTop"
-    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#22705d] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-black hover:-translate-y-1 focus:outline-none"
+    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#00555c] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-black hover:-translate-y-1 focus:outline-none"
     aria-label="Scroll to Top"
 >
     <i class="fa-solid fa-chevron-up text-xl"></i>

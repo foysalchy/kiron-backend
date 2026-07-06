@@ -23,7 +23,7 @@ class IndexController extends Controller
             ->where('status', Status::Active->value)
             ->where('placement', 'hero')
             ->whereNull('company_id')
-            ->latest()
+            ->orderBy('id', 'desc')
             ->get();
         $brands = MasterBrand::where('status', Status::Active->value)
             ->latest()

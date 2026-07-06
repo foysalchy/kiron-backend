@@ -34,7 +34,7 @@
 @push('styles')
     <style>
         .hero-bg {
-            background: radial-gradient(circle at 70% 30%, #124738 0%, #030f0c 60%);
+            background: radial-gradient(circle at 70% 30%, #00555c 0%, #030f0c 60%);
         }
 
         .pin-wrap {
@@ -52,7 +52,7 @@
             background:
                 linear-gradient(#ffff, rgb(255, 255, 255)) padding-box,
                 linear-gradient(90deg,
-                    #22705d,
+                    #00555c,
                     #fff,
                     #fff,
                     #fff,
@@ -71,18 +71,18 @@
             }
         }
 
-        .animated-text {
+        /* .animated-text {
             background: linear-gradient(90deg,
-                    #22705d,
+                    #00555c,
                     #4fd1c5,
                     #7c3aed,
-                    #22705d);
+                    #00555c);
             background-size: 300% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             animation: textGradient 4s linear infinite;
-        }
+        } */
 
         @keyframes textGradient {
             0% {
@@ -228,7 +228,7 @@
         }
 
         .flow-pulse {
-            stroke: #22705d;
+            stroke: #00555c;
             stroke-width: 2.2;
             fill: none;
             stroke-dasharray: 8 200;
@@ -273,7 +273,7 @@
         }
 
         .node-circle:hover {
-            border-color: #22705d;
+            border-color: #00555c;
             box-shadow: 0 0 0 6px rgba(52, 164, 135, 0.1);
             transform: translate(-50%, -50%) scale(1.15);
         }
@@ -297,7 +297,7 @@
             width: 120px;
             height: 60px;
             border-radius: 5px;
-            background: linear-gradient(145deg, #22705d, #2c8a71);
+            background: linear-gradient(145deg, #00555c, #2c8a71);
             border: 2px solid #ffffff;
             box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
             display: flex;
@@ -468,7 +468,7 @@
                                 </h1>
 
                                 <p
-                                    class="text-gray-600 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
+                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
                                     {{ $slider->description }}
                                 </p>
 
@@ -476,7 +476,7 @@
                                 <div
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
                                     <a href="https://app.dorja.io/register"
-                                        class="w-full sm:w-auto bg-[#22705d] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                                        class="w-full sm:w-auto bg-[#00555c] hover:bg-[#078e9a] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
                                         Start Free Trial
                                     </a>
                                     <a href="#"
@@ -539,65 +539,75 @@
             </div>
         </section>
     @endif
-    <!-- FEATURES SECTION -->
-    @if ($topFeatures->isNotEmpty())
-        <section class="bg-white py-10">
-            <div class="container mx-auto px-6 md:px-10">
-                <!-- Section Header -->
-                <div class="text-center mb-16">
-                    <span
-                        class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-indigo-600 font-semibold text-sm md:text-lg mb-6">
-                        Features
-                    </span>
-                    <h2 class="text-2xl animated-text  md:text-5xl font-bold text-gray-900 leading-tight">
-                        Everything you need for your business <br class="hidden md:block" />
-                        now in one place
-                    </h2>
-                </div>
+    <section class="bg-white py-10 px-4 md:px-10">
+        <div class="container mx-auto">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach ($topFeatures as $feature)
-                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-                            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#22705d] transition-all duration-300">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <span
+                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                    All-in-One Solution
+                </span>
 
-                            <!-- Left Icon -->
-                            <div class="flex-shrink-0">
-                                <div
-                                    class="w-12 h-12  bg-[#22705d21] rounded
-                   border border-white/20
-                   flex items-center justify-center">
-                                    <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#22705d]"></i>
-                                </div>
-                            </div>
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
+                    From Start to Growth — Everything in One System
+                </h2>
 
-                            <!-- Right Content -->
-                            <div class="flex-1 min-w-0">
-                                <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#22705d]">
-                                    {{ $feature->title }}
-                                </div>
+                <!-- Tabs -->
+                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full overflow-auto max-w-[700px]"
+                    id="solution-tabs">
 
-
-
-                                <span class="inline-flex items-center gap-2 font-semibold text-[#22705d]">
-                                    Read More
-                                    <i
-                                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                                </span>
-                            </div>
-
-                        </a>
+                    @foreach ($solutions as $key => $sol)
+                        <button onclick="switchSolution('{{ $key }}', this)"
+                            class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900  ' }}">
+                            {{ $sol['title'] }}
+                        </button>
                     @endforeach
-                </div>
 
-                <div class="mt-16 text-center">
-                    <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#22705d] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
-                        Start Free Trial
-                    </a>
                 </div>
             </div>
-        </section>
-    @endif
+
+            <!-- Content Card -->
+            <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                    <!-- Left Content -->
+                    <div>
+                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
+
+                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
+
+                        <!-- Features -->
+                        <div id="sol-features" class="space-y-5 mb-12"></div>
+
+                        <a href="#"
+                            class="inline-flex items-center gap-3 bg-[#00555c] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
+                            Explore More
+                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                        </a>
+                    </div>
+
+                    <!-- Right Image -->
+                    <div>
+                        <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-600 font-mono">
+                                <span id="sol-mockup"></span>
+                            </div>
+
+                            <div class="aspect-video bg-gray-100">
+                                <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
+                                    class="w-full h-full object-cover object-top" alt="right image" />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+    
     <!-- INTEGRATION SECTION -->
     <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden " id="intergation">
         <div class="max-w-[1400px] mx-auto">
@@ -605,10 +615,10 @@
             <!-- Section Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-bold text-[14px] mb-6 uppercase tracking-wider">
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
-                <h2 class="text-3xl animated-text  md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
                     Track and automate your entire business
                 </h2>
 
@@ -642,7 +652,7 @@
 
                                 <!-- সেন্ট্রাল পালস রিং -->
                                 <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#22705d" stroke-width="1.5" />
+                                    stroke="#00555c" stroke-width="1.5" />
 
                                 <!-- Output Path -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -662,8 +672,8 @@
                                     src="{{ asset('./images/saas/ssl.png') }}" alt="Rocket"></div>
 
                             <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
-                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
+                                <i class="fa-brands fa-shopify text-2xl text-[#00555c]"></i>
                             </div>
 
                             <!-- Main Center Node -->
@@ -702,7 +712,7 @@
 
                                 <!-- সেন্ট্রাল পালস রিং -->
                                 <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#22705d" stroke-width="1.5" />
+                                    stroke="#00555c" stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -720,8 +730,8 @@
                                     src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
 
                             <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
-                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
+                                <i class="fa-brands fa-shopify text-2xl text-[#00555c]"></i>
                             </div>
 
                             <!-- Main Center Node -->
@@ -759,7 +769,7 @@
 
                                 <!-- সেন্ট্রাল পালস রিং -->
                                 <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#22705d" stroke-width="1.5" />
+                                    stroke="#00555c" stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -779,8 +789,8 @@
 
 
                             <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
-                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
+                                <i class="fa-brands fa-shopify text-2xl text-[#00555c]"></i>
                             </div>
 
                             <!-- Main Center Node -->
@@ -819,7 +829,7 @@
 
                                 <!-- সেন্ট্রাল পালস রিং -->
                                 <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#22705d" stroke-width="1.5" />
+                                    stroke="#00555c" stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -838,8 +848,8 @@
                                     src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
 
                             <!-- Output Logo -->
-                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
-                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#00555c">
+                                <i class="fa-brands fa-shopify text-2xl text-[#00555c]"></i>
                             </div>
 
                             <!-- Main Center Node -->
@@ -867,7 +877,7 @@
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-base mb-6">
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-base mb-6">
                     Integration
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight max-w-4xl mx-auto">
@@ -884,39 +894,39 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#00555c] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
                         <!-- Line down to Middle Box -->
-                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                        <div class="w-[2px] h-10 bg-[#00555c]"></div>
 
                         <!-- Middle Node Box -->
                         <div
-                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#00555c] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Payment Methods
                         </div>
 
                         <!-- The Fork Connection Line -->
                         <div class="w-full relative flex flex-col items-center">
                             <!-- Vertical line from middle box to horizontal bar -->
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
 
                             <!-- Horizontal Bar: Exactly connects the centers of 1st and 3rd box -->
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#00555c]"></div>
                         </div>
 
                         <!-- 3 Vertical Lines down to logos -->
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
                         </div>
 
                         <!-- Logo Row -->
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Nagad"
                                     onerror="
@@ -925,12 +935,12 @@
                       " />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/bkash.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="bKash" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/sslcommerz.png') }}" class="h-5 md:h-7 object-contain"
                                     alt="SSL" />
                             </div>
@@ -943,41 +953,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#00555c] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                        <div class="w-[2px] h-10 bg-[#00555c]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#00555c] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Courier Management
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#00555c]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -988,41 +998,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#00555c] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                        <div class="w-[2px] h-10 bg-[#00555c]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#00555c] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Omni Channel Chat
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#00555c]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -1033,41 +1043,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#00555c] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                        <div class="w-[2px] h-10 bg-[#00555c]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#00555c] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                            Order Source
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#00555c]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
-                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
+                            <div class="w-[2px] h-10 bg-[#00555c]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -1077,6 +1087,164 @@
             </div>
         </div>
     </section> --}}
+   
+    <!-- FEATURES SECTION -->
+    @if ($topFeatures->isNotEmpty())
+        <section class="bg-white py-10">
+            <div class="container mx-auto px-6 md:px-10">
+                <!-- Section Header -->
+                <div class="text-center mb-16">
+                    <span
+                        class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                        Features
+                    </span>
+                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 ">
+                        Everything you need for your business <br class="hidden md:block" />
+                        now in one place
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($topFeatures as $feature)
+                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#00555c] transition-all duration-300">
+
+                            <!-- Left Icon -->
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="w-12 h-12  bg-[#00555c21] rounded
+                   border border-white/20
+                   flex items-center justify-center">
+                                    <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                                </div>
+                            </div>
+
+                            <!-- Right Content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#00555c]">
+                                    {{ $feature->title }}
+                                </div>
+
+
+
+                                <span class="inline-flex items-center gap-2 font-semibold text-[#00555c]">
+                                    Read More
+                                    <i
+                                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
+
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="mt-16 text-center">
+                    <a href="https://app.dorja.io/register"
+                        class="inline-block bg-[#00555c] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
+                        Start Free Trial
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
+     <!-- SUCCESS SECTION (Dark Theme) -->
+    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
+        <div
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="container mx-auto">
+            <!-- TOP PART: Header and Button -->
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
+                <div class="max-w-2xl">
+                    <!-- Badge Tag -->
+                    <span
+                        class="inline-block px-5 py-2 rounded-full border border-white/40 text-gray-300 text-sm md:text-lg font-medium mb-6">
+                        Your Business Growth Partner
+                    </span>
+                    <!-- Heading -->
+                    <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-6">
+                        Start Your Online Business Now and Grow with dorja.io
+                    </h2>
+                    <!-- Description -->
+                    <p class="text-gray-300 text-lg leading-relaxed max-w-2xl">
+                        Our advanced integrations make your business operations easier, smarter, and significantly more
+                        powerful.
+                    </p>
+                </div>
+
+                <!-- CTA Button -->
+                <div class="flex-shrink-0">
+                    <a href="https://app.dorja.io/register"
+                        class="inline-block bg-[#00555c] hover:bg-[#078e9a] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
+                        Start Now
+                    </a>
+                </div>
+            </div>
+
+            <!-- BOTTOM PART: 3 Columns Features -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12 lg:gap-20">
+                <!-- Feature 1 -->
+                <div class="group">
+                    <div class="mb-6">
+                        <i class="fa-solid fa-table-cells-large text-[#26ffc7] text-4xl"></i>
+                    </div>
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                        Affordable Pricing
+                    </h3>
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                        Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
+                        to enterprises that grow with you.
+                    </p>
+                    <a href="{{ route('saas.package.list') }}"
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        Explore Our Pricing
+                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group">
+                    <div class="mb-6">
+                        <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
+                    </div>
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                        Explore Features
+                    </h3>
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                        Discover a complete suite of business tools designed to automate operations, improve efficiency, and
+                        help you make faster data-driven decisions.
+                    </p>
+                    <a href="{{ route('saas.feature.list') }}"
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        Explore Features
+                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group">
+                    <div class="mb-6">
+                        <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
+                    </div>
+                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                        Start Your Journey Today
+                    </h3>
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way
+                        you manage and grow your business.
+                    </p>
+                    <a href="https://app.dorja.io/register"
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        Get Started
+                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- SOLUTION SECTION -->
     <!-- DEMO & TEMPLATE SECTION -->
     @if ($demos->isNotEmpty())
         <section class="bg-white py-10 px-4 md:px-10" id="demo-section">
@@ -1084,21 +1252,21 @@
                 <!-- Section Header -->
                 <div class="text-center mb-12">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Demo & Template
                     </span>
-                    <h2 class="text-2xl animated-text  md:text-4xl font-black text-gray-900 leading-tight mb-10">
+                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10">
                         Get a complete system live experience on one platform
                     </h2>
 
                     <!-- Tabs Container (Clickable and Hover Effect Fixed) -->
                     <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
                         <button onclick="filterDemos(1, this)"
-                            class="tab-btn bg-[#22705d] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
+                            class="tab-btn bg-[#00555c] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
                             Landing Page Template
                         </button>
                         <button onclick="filterDemos(2, this)"
-                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#22705d] transition-all">
+                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#00555c] transition-all">
                             E-Commerce Template
                         </button>
                     </div>
@@ -1116,7 +1284,7 @@
                             </div>
                             <div class="py-6 text-center border-t border-gray-100">
                                 <a href="{{ $demo->link ?? '#' }}" target="_blank"
-                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#22705d] hover:decoration-[#22705d]">
+                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#00555c] hover:decoration-[#00555c]">
                                     Live Preview
                                 </a>
                             </div>
@@ -1221,7 +1389,7 @@
                             <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                                 @foreach ($row['data'] as $item)
                                     <span
-                                        class="bg-[#22705d] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
+                                        class="bg-[#00555c] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
                                         {{ $item }}
                                     </span>
                                 @endforeach
@@ -1234,158 +1402,61 @@
 
         </div>
     </section>
-    <!-- SUCCESS SECTION (Dark Theme) -->
-    <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
-        <div
-            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#22705d]/10 blur-[120px] rounded-full pointer-events-none">
-        </div>
+    <section class="py-24 hero-bg relative overflow-hidden">
+        <!-- Background Blur -->
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
 
-        <div class="container mx-auto">
-            <!-- TOP PART: Header and Button -->
-            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
-                <div class="max-w-2xl">
-                    <!-- Badge Tag -->
-                    <span
-                        class="inline-block px-5 py-2 rounded-full border border-white/40 text-gray-300 text-sm md:text-lg font-medium mb-6">
-                        Your Business Growth Partner
-                    </span>
-                    <!-- Heading -->
-                    <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-6">
-                        The key driver of your online business success
-                    </h2>
-                    <!-- Description -->
-                    <p class="text-gray-300 text-lg leading-relaxed max-w-2xl">
-                        Our advanced integrations make your business operations easier, smarter, and significantly more
-                        powerful.
-                    </p>
-                </div>
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-4xl mx-auto text-center">
 
-                <!-- CTA Button -->
-                <div class="flex-shrink-0">
-                    <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#22705d] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
-                        Start Free Trial
-                    </a>
-                </div>
-            </div>
-
-            <!-- BOTTOM PART: 3 Columns Features -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-12 lg:gap-20">
-                <!-- Feature 1 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-table-cells-large text-[#26ffc7] text-4xl"></i>
-                    </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
-                        Affordable Pricing
-                    </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
-                        Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
-                        to enterprises that grow with you.
-                    </p>
-                    <a href="{{ route('saas.package.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
-                        Explore Our Pricing
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
-                    </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
-                        Explore Features
-                    </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
-                        Discover a complete suite of business tools designed to automate operations, improve efficiency, and
-                        help you make faster data-driven decisions.
-                    </p>
-                    <a href="{{ route('saas.feature.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
-                        Explore Features
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="group">
-                    <div class="mb-6">
-                        <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
-                    </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
-                        Start Your Journey Today
-                    </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
-                        Join thousands of businesses already using dorja.io. Start your journey today and transform the way
-                        you manage and grow your business.
-                    </p>
-                    <a href="https://app.dorja.io/register"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
-                        Get Started
-                        <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- SOLUTION SECTION -->
-    <section class="bg-white py-10 px-4 md:px-10">
-        <div class="container mx-auto">
-
-            <!-- Header -->
-            <div class="text-center mb-8">
                 <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
-                    All-in-One Solution
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-semibold">
+                    🚀 Business Made Simple
                 </span>
 
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
-                    From Operations to Growth — Everything in One System
+                <h2 class="mt-6 text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                    Ready to Grow Your Business?
                 </h2>
 
-                <!-- Tabs -->
-                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full overflow-auto max-w-[700px]"
-                    id="solution-tabs">
+                <p class="mt-6 text-lg text-gray-300 leading-8 max-w-3xl mx-auto">
+                    Join thousands of businesses using <strong>Dorja.io</strong> to manage sales,
+                    inventory, accounting, CRM, HRM, POS, warehouses, and marketing from one
+                    powerful cloud platform.
+                </p>
 
-                    @foreach ($solutions as $key => $sol)
-                        <button onclick="switchSolution('{{ $key }}', this)"
-                            class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#22705d] text-white' : 'bg-[#22705d30] text-gray-900 hover:bg-white' }}">
-                            {{ $sol['title'] }}
-                        </button>
-                    @endforeach
+                <!-- Buttons -->
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+
+                    <a href="https://app.dorja.io/register"
+                        class="px-8 py-4 rounded-xl bg-[#00555c] hover:bg-[#078e9a] text-white font-semibold transition duration-300 shadow-lg">
+                        Start Free Trial
+                    </a>
+
+                    <a href="{{ route('saas.package.list') }}"
+                        class="px-8 py-4 rounded-xl border border-white/20 hover:border-white text-white font-semibold transition duration-300">
+                        View Pricing
+                    </a>
 
                 </div>
-            </div>
 
-            <!-- Content Card -->
-            <div class="bg-white border border-indigo-100 rounded-2xl p-8 md:p-16">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Trust Badges -->
+                <div class="mt-12 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm text-gray-400">
 
-                    <!-- Left Content -->
-                    <div>
-                        <h3 id="sol-title" class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-6"></h3>
-
-                        <p id="sol-desc" class="text-gray-600 text-lg leading-relaxed mb-10 max-w-md"></p>
-
-                        <!-- Features -->
-                        <div id="sol-features" class="space-y-5 mb-12"></div>
-
-                        <a href="#"
-                            class="inline-flex items-center gap-3 bg-[#22705d] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
-                            Explore More
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
-                        </a>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        Free Trial
                     </div>
 
-                    <!-- Right Image -->
-                    <div>
-                        <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-600 font-mono">
-                                <span id="sol-mockup"></span>
-                            </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        No Credit Card Required
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        Setup in Minutes
+                    </div>
 
                             <div class="aspect-video bg-gray-100">
                                 <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard" loading="lazy"
@@ -1395,18 +1466,24 @@
                     </div>
 
                 </div>
-            </div>
 
+            </div>
         </div>
     </section>
+    
     @if ($pricingPlans->isNotEmpty())
         <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
             <div class="container mx-auto">
 
                 <div class="text-center mb-20">
-                    <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan
-                    </h1>
-                    <p class="text-gray-500 text-lg">Here are the best packages for your business below.</p>
+                   <span
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                        Choose Best Plan for Your Business
+                    </span>
+                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10">
+                      Here are the best packages for your business below.
+                    </h2>
+ 
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
@@ -1555,7 +1632,7 @@
                 </div>
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-block bg-[#22705d] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="inline-block bg-[#00555c] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
                         More Packages <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
@@ -1568,8 +1645,8 @@
             <div class="container mx-auto">
                 <div class="text-center mb-20">
                     <span
-                        class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
-                        Why Chose Us
+                        class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
+                       Why Businesses Choose Dorja.io 
                     </span>
 
                     <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
@@ -1582,7 +1659,7 @@
                         <div
                             class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="text-[#22705d] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
+                                <h3 class="text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
                                     {{ $benefit->title }}
                                 </h3>
                                 <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
@@ -1597,15 +1674,16 @@
                     @endforeach
                 </div>
 
-                <div class="mt-28 text-center">
+                <div class="mt-4 text-center">
                     <a href="#"
-                        class="inline-block bg-[#22705d] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
+                        class="inline-block bg-[#00555c] hover:bg-[#078e9a] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
                         Start Free Trial
                     </a>
                 </div>
             </div>
         </section>
     @endif
+   
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
         <section class="bg-white py-10 px-6 md:px-10">
@@ -1613,7 +1691,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
-                        class="bg-[#22705d] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="bg-[#00555c] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
                         View All <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
@@ -1634,7 +1712,7 @@
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
                                     <span
-                                        class="bg-indigo-50 text-[#22705d] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                                         {{ $blog->company->shop_name ?? 'Admin' }}
                                     </span>
                                     <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
@@ -1654,7 +1732,7 @@
 
                                 <div class="mt-auto pt-5 border-t border-gray-50">
                                     <div
-                                        class="inline-flex items-center gap-2 text-[#22705d] font-bold text-lg group-hover:gap-3 transition-all">
+                                        class="inline-flex items-center gap-2 text-[#00555c] font-bold text-lg group-hover:gap-3 transition-all">
                                         Read More <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </div>
                                 </div>
@@ -1671,7 +1749,7 @@
             <div class="container mx-auto">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Customer Reviews
                     </span>
                     <h2 class="text-3xl md:text-5xl font-black text-gray-900">
@@ -1686,7 +1764,7 @@
                             class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
                                 <div>
-                                    <h3 class="text-[#22705d] font-bold text-lg">
+                                    <h3 class="text-[#00555c] font-bold text-lg">
                                         @ {{ $review->name }}
                                     </h3>
                                     <p class="text-gray-500 text-xs">{{ $review->designation }}</p>
@@ -1709,7 +1787,7 @@
                 @if ($allReviews->count() > 6)
                     <div class="mt-16 text-center">
                         <button id="load-more-reviews"
-                            class="inline-block bg-[#22705d] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                            class="inline-block bg-[#00555c] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#078e9a] transition shadow-lg shadow-indigo-100">
                             See More
                         </button>
                     </div>
@@ -1723,12 +1801,12 @@
             <!-- Header -->
             <div class="text-center mb-10">
                 <span
-                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
+                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                     Frequently Asked Questions
                 </span>
 
-                <h2 class="text-3xl md:text-5xl font-black text-gray-900 animated-text ">
-                    dorja.io FAQ
+              <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
+                   Better Understanding of Dorja.io and its Features
                 </h2>
 
                 <!-- Search Box -->
@@ -1772,70 +1850,48 @@
             </div>
         </div>
     </section>
+ <section class="py-10 bg-white">
+    <div class="container mx-auto px-6">
 
+        
+
+       
+
+        <div class=" bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-10 text-center text-white">
+
+            <h3 class="text-3xl font-bold">
+                Start Managing Your Business Smarter Today
+            </h3>
+
+            <p class="mt-4 text-emerald-100 max-w-2xl mx-auto leading-8">
+                Join businesses using Dorja.io to simplify operations, increase productivity,
+                and grow faster with one complete cloud-based business management platform.
+            </p>
+
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+
+                <a href="https://app.dorja.io/register"
+                    class="bg-white text-emerald-700 font-bold px-7 py-3 rounded-xl hover:bg-gray-100 transition">
+                    Start Free Trial
+                </a>
+
+                <a href="{{ route('saas.package.list') }}"
+                    class="border border-white px-7 py-3 rounded-xl hover:bg-white hover:text-emerald-700 transition">
+                    View Pricing
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
 @endsection
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-
+     
     <!-- Accordion + Search Script -->
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        window.addEventListener("load", () => {
-
-            const wrap = document.querySelector(".pin-wrap");
-            const section = document.querySelector(".integration-section");
-
-            if (!wrap || !section) return;
-
-            function createAnimation() {
-
-                ScrollTrigger.getAll().forEach(st => st.kill());
-
-                gsap.set(wrap, {
-                    x: 0
-                });
-
-                const totalWidth = wrap.scrollWidth;
-                const visibleWidth = section.clientWidth;
-
-                const maxTranslate = totalWidth - visibleWidth;
-
-                gsap.to(wrap, {
-                    x: -maxTranslate,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: section,
-                        start: "top top",
-                        end: "+=" + maxTranslate,
-                        pin: true,
-                        scrub: 1,
-                        invalidateOnRefresh: true,
-                        anticipatePin: 1,
-                        snap: {
-                            snapTo: (value) => {
-
-                                const cards = gsap.utils.toArray(".integration-card");
-                                const gap = 24;
-
-                                const step = cards[0].offsetWidth + gap;
-
-                                return Math.round((value * maxTranslate) / step) * step / maxTranslate;
-                            },
-                            duration: 0.25
-                        }
-                    }
-                });
-
-                ScrollTrigger.refresh();
-            }
-
-            createAnimation();
-
-            window.addEventListener("resize", createAnimation);
-
-        });
+        
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -1876,7 +1932,7 @@
                         delay: 2000,
                         disableOnInteraction: false,
                     },
-                    speed: 100,
+                    speed: 900,
                     pagination: {
                         el: '.hero-pagination',
                         clickable: true,
@@ -1899,7 +1955,7 @@
             data.features.forEach(f => {
                 featureHtml += `
             <div class="flex items-center gap-4">
-                <div class="w-8 h-8 bg-[#22705d] rounded-lg flex items-center justify-center text-white">
+                <div class="w-8 h-8 bg-[#00555c] rounded-lg flex items-center justify-center text-white">
                     <i class="fa-solid ${f.icon} text-sm"></i>
                 </div>
                 <span class="font-bold text-gray-900 text-lg">${f.text}</span>
@@ -1910,12 +1966,12 @@
             document.getElementById('sol-features').innerHTML = featureHtml;
 
             document.querySelectorAll('.sol-tab-btn').forEach(b => {
-                b.classList.remove('bg-[#22705d]', 'text-white');
-                b.classList.add('bg-[#22705d30]', 'text-gray-900');
+                b.classList.remove('bg-[#00555c]', 'text-white');
+                b.classList.add('bg-[#00555c30]', 'text-gray-900');
             });
 
-            btn.classList.add('bg-[#22705d]', 'text-white');
-            btn.classList.remove('bg-[#22705d30]', 'text-gray-900');
+            btn.classList.add('bg-[#00555c]', 'text-white');
+            btn.classList.remove('bg-[#00555c30]', 'text-gray-900');
         }
 
         // default load
@@ -1947,12 +2003,12 @@
         function filterDemos(type, btn) {
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(b => {
-                b.classList.remove('bg-[#22705d]', 'text-white');
-                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#22705d]');
+                b.classList.remove('bg-[#00555c]', 'text-white');
+                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#00555c]');
             });
 
-            btn.classList.add('bg-[#22705d]', 'text-white');
-            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#22705d]');
+            btn.classList.add('bg-[#00555c]', 'text-white');
+            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#00555c]');
 
             const cards = document.querySelectorAll('.demo-card');
             cards.forEach(card => {
