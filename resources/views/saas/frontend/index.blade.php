@@ -1,96 +1,102 @@
 @extends('saas.layouts.layout')
 @section('meta')
+    @php
+        $pageData = \App\Services\Saas\SystemPageService::get(\App\Enums\SystemPageType::HOME, null);
+    @endphp
 
-@php
-    $pageData = \App\Services\Saas\SystemPageService::get(
-        \App\Enums\SystemPageType::HOME, null
-    );
-@endphp
+    @include('components.meta-info.saas-meta', [
+        'setup' => $setup,
+        'type' => 'WebPage',
+        'title' => $pageData->meta_title ?? ($setup->title ?? 'Home'),
+        'description' =>
+            $pageData->meta_description ??
+            ($setup->description ??
+                'Dorja is a powerful all-in-one business management platform that helps you streamline your operations, automate tasks, and grow your business with ease.'),
+        'keywords' => $pageData?->meta_keywords
+            ? (is_array($pageData->meta_keywords)
+                ? implode(',', $pageData->meta_keywords)
+                : $pageData->meta_keywords)
+            : $setup?->tags ?? 'business management, automation, growth, all-in-one platform',
 
-@include('components.meta-info.saas-meta',[
-    'setup' => $setup,
-    'type' => 'WebPage',
-    'title' => $pageData->meta_title ?? $setup->title,
-    'description' => $pageData->meta_description ?? $setup->description,
-    'keywords' => $pageData->meta_keywords ? implode(',', $pageData->meta_keywords) : $setup->tags,
-
-    'image' => $setup->meta_image
-        ? asset('storage/'.$setup->meta_image)
-        : asset('storage/'.$setup->logo),
-    'canonical' => url()->current(),
-    'breadcrumb' => [
-        [
-            'name'=>'Home',
-            'url'=>url('/')
-        ]
-    ]
-])
+        'image' =>
+            $setup?->meta_image ?? null
+                ? asset('storage/' . $setup->meta_image)
+                : asset('storage/' . ($setup?->logo ?? '')),
+        'canonical' => url()->current(),
+        'breadcrumb' => [
+            [
+                'name' => 'Home',
+                'url' => url('/'),
+            ],
+        ],
+    ])
 @endsection
 @push('styles')
     <style>
         .hero-bg {
             background: radial-gradient(circle at 70% 30%, #124738 0%, #030f0c 60%);
         }
-        
-.pin-wrap{
-    display:flex;
-    gap:24px;
-    /* width:max-content; */
-}
-.animated-border {
-    position: relative;
-   
-    color: #fff;
-    border: 5px solid transparent;
-    border-radius: 12px;
-    background:
-        linear-gradient(#ffff,rgb(255, 255, 255)) padding-box,
-        linear-gradient(
-            90deg,
-            #34a487,
-            #fff,
-            #fff,
-            #fff,
-            #fff
-        ) border-box;
-    background-size: 100% 100%, 300% 100%;
-    animation: borderAnimation 5s linear infinite;
-}
 
-@keyframes borderAnimation {
-    0% {
-        background-position: 0 0, 0% 50%;
-    }
-    100% {
-        background-position: 0 0, 300% 50%;
-    }
-}
-.animated-text {
-    background: linear-gradient(
-        90deg,
-        #34a487,
-        #4fd1c5,
-        #7c3aed,
-        #34a487
-    );
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: textGradient 4s linear infinite;
-}
+        .pin-wrap {
+            display: flex;
+            gap: 24px;
+            /* width:max-content; */
+        }
 
-@keyframes textGradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    100% {
-        background-position: 300% 50%;
-    }
-}
-.integration-card{
-    flex:0 0 calc(50% - 12px);
-}
+        .animated-border {
+            position: relative;
+
+            color: #fff;
+            border: 5px solid transparent;
+            border-radius: 12px;
+            background:
+                linear-gradient(#ffff, rgb(255, 255, 255)) padding-box,
+                linear-gradient(90deg,
+                    #22705d,
+                    #fff,
+                    #fff,
+                    #fff,
+                    #fff) border-box;
+            background-size: 100% 100%, 300% 100%;
+            animation: borderAnimation 5s linear infinite;
+        }
+
+        @keyframes borderAnimation {
+            0% {
+                background-position: 0 0, 0% 50%;
+            }
+
+            100% {
+                background-position: 0 0, 300% 50%;
+            }
+        }
+
+        .animated-text {
+            background: linear-gradient(90deg,
+                    #22705d,
+                    #4fd1c5,
+                    #7c3aed,
+                    #22705d);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: textGradient 4s linear infinite;
+        }
+
+        @keyframes textGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 300% 50%;
+            }
+        }
+
+        .integration-card {
+            flex: 0 0 calc(50% - 12px);
+        }
 
         .hero-bg::before {
             content: "";
@@ -103,22 +109,35 @@
             pointer-events: none;
         }
 
-        .hero-pagination .swiper-pagination-bullet {
-            width: 10px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.3) !important;
-            opacity: 1 !important;
-            border-radius: 50%;
-            transition: all 0.4s ease;
-            cursor: pointer;
-            margin: 0 !important;
-        }
+       .hero-pagination .swiper-pagination-bullet {
+        width: 10px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.3) !important;
+        opacity: 1 !important;
+        border-radius: 50%;
+        transition: all 0.4s ease;
+        cursor: pointer;
+        margin: 0 8px !important;
+        position: relative;
+    }
 
-        .hero-pagination .swiper-pagination-bullet-active {
-            width: 45px !important;
-            background: #ffffff !important;
-            border-radius: 20px;
-        }
+    .hero-pagination .swiper-pagination-bullet-active {
+        width: 45px !important;
+        background: #ffffff !important;
+        border-radius: 20px;
+    }
+
+    .hero-pagination .swiper-pagination-bullet::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 48px; /* লাইটহাউসের রিকোয়ারমেন্ট */
+        height: 48px;
+        background: transparent;
+        z-index: 1;
+    }
 
         .line-clamp-3 {
             display: -webkit-box;
@@ -209,7 +228,7 @@
         }
 
         .flow-pulse {
-            stroke: #34a487;
+            stroke: #22705d;
             stroke-width: 2.2;
             fill: none;
             stroke-dasharray: 8 200;
@@ -254,7 +273,7 @@
         }
 
         .node-circle:hover {
-            border-color: #34a487;
+            border-color: #22705d;
             box-shadow: 0 0 0 6px rgba(52, 164, 135, 0.1);
             transform: translate(-50%, -50%) scale(1.15);
         }
@@ -278,7 +297,7 @@
             width: 120px;
             height: 60px;
             border-radius: 5px;
-            background: linear-gradient(145deg, #34a487, #2c8a71);
+            background: linear-gradient(145deg, #22705d, #2c8a71);
             border: 2px solid #ffffff;
             box-shadow: 0 10px 25px rgba(52, 164, 135, 0.35);
             display: flex;
@@ -438,7 +457,8 @@
             <div class="swiper-wrapper">
                 @foreach ($sliders as $slider)
                     <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
-                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
+                        <div
+                            class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
                             <div class="text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
 
@@ -448,7 +468,7 @@
                                 </h1>
 
                                 <p
-                                    class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
+                                    class="text-gray-600 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">
                                     {{ $slider->description }}
                                 </p>
 
@@ -456,7 +476,7 @@
                                 <div
                                     class="flex flex-col sm:flex-row flex-wrap gap-4 items-center justify-center lg:justify-start mb-12">
                                     <a href="https://app.dorja.io/register"
-                                        class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
+                                        class="w-full sm:w-auto bg-[#22705d] hover:bg-[#4a38b8] text-white px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20 text-center">
                                         Start Free Trial
                                     </a>
                                     <a href="#"
@@ -479,8 +499,9 @@
                                 </div>
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
-                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto" alt="Core Platform" />
+                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" 
+                                        class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
+                                        alt="Core Platform" />
                                 </div>
 
                             </div>
@@ -534,44 +555,43 @@
                     </h2>
                 </div>
 
-               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    @foreach ($topFeatures as $feature)
-        <a href="{{ route('saas.feature.details', $feature->slug) }}"
-            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#34a487] transition-all duration-300">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach ($topFeatures as $feature)
+                        <a href="{{ route('saas.feature.details', $feature->slug) }}"
+                            class="flex items-center gap-5 p-4 group rounded border border-gray-200 hover:border-[#22705d] transition-all duration-300">
 
-            <!-- Left Icon -->
-            <div class="flex-shrink-0">
-                  <div
-            class="w-12 h-12  bg-[#34a48721] rounded
+                            <!-- Left Icon -->
+                            <div class="flex-shrink-0">
+                                <div
+                                    class="w-12 h-12  bg-[#22705d21] rounded
                    border border-white/20
                    flex items-center justify-center">
-            <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#34a487]"></i>
-        </div>
-            </div>
+                                    <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#22705d]"></i>
+                                </div>
+                            </div>
 
-            <!-- Right Content -->
-            <div class="flex-1 min-w-0">
-    <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#34a487]">
-        {{ $feature->title }}
-    </div>
- 
-               
+                            <!-- Right Content -->
+                            <div class="flex-1 min-w-0">
+                                <div class="block w-full truncate text-lg text-gray-900 group-hover:text-[#22705d]">
+                                    {{ $feature->title }}
+                                </div>
 
-                <span
-                    class="inline-flex items-center gap-2 font-semibold text-[#34a487]">
-                    Read More
-                    <i
-                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-                </span>
-            </div>
 
-        </a>
-    @endforeach
-</div>
+
+                                <span class="inline-flex items-center gap-2 font-semibold text-[#22705d]">
+                                    Read More
+                                    <i
+                                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                </span>
+                            </div>
+
+                        </a>
+                    @endforeach
+                </div>
 
                 <div class="mt-16 text-center">
                     <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="inline-block bg-[#22705d] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         Start Free Trial
                     </a>
                 </div>
@@ -585,236 +605,258 @@
             <!-- Section Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-bold text-[14px] mb-6 uppercase tracking-wider">
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
                 <h2 class="text-3xl animated-text  md:text-5xl font-black text-white leading-tight max-w-4xl mx-auto">
                     Track and automate your entire business
                 </h2>
-               
+
             </div>
 
-             <!-- <div class="integration-section pt-10">
-            <div class="pin-wrap"> -->
-        <div class="  pt-10">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+            <!-- <div class="integration-section pt-10">
+                <div class="pin-wrap"> -->
+            <div class="  pt-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
-                <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
-                <div class="  border integration-card    shadow-sm relative group">
-                     
+                    <!-- গ্রাফ ১: পেমেন্ট মেথড (4 Paths) -->
+                    <div class="  border integration-card    shadow-sm relative group">
 
-                    <div class="relative border-[#262626] border-[20px]">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <!-- 4 Input Paths -->
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- Pulse Animation (4 Paths) -->
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+                        <div class="relative border-[#262626] border-[20px]">
+                            <svg viewBox="0 0 460 300" class="w-full h-auto">
+                                <!-- 4 Input Paths -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
-                                stroke-width="1.5" />
+                                <!-- Pulse Animation (4 Paths) -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                    style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                    style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                    style="animation-delay:1.2s" />
 
-                            <!-- Output Path -->
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
-                        </svg>
+                                <!-- সেন্ট্রাল পালস রিং -->
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
+                                    stroke="#22705d" stroke-width="1.5" />
 
-                        <!-- 4 Payment Source Logos -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
-                                
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/ssl.png') }}"
-                                alt="Rocket"></div>
+                                <!-- Output Path -->
+                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                    style="animation-delay:.6s" />
+                            </svg>
 
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                            <!-- 4 Payment Source Logos -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                    src="{{ asset('./images/saas/nagad.png') }}" alt="Nagad"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                    src="{{ asset('./images/saas/bkash.png') }}" alt="bKash"></div>
+
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                    src="{{ asset('./images/saas/rocket.png') }}" alt="SSL"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                    src="{{ asset('./images/saas/ssl.png') }}" alt="Rocket"></div>
+
+                            <!-- Output Logo -->
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
+                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            </div>
+
+                            <!-- Main Center Node -->
+                            <div class="center-node">
+                                <span
+                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                            </div>
                         </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Payment</span>
+                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
+                            Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept
+                            secure online payments, automate payment confirmation, and manage every transaction from a
+                            single platform.
                         </div>
                     </div>
-                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">     Multiple Payment Gateways </h3>
-                        Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept secure online payments, automate payment confirmation, and manage every transaction from a single platform. 
-                    </div>
-                </div>
-                
-                <div class="  border  integration-card   shadow-sm relative group">
-                     
 
-                    <div class="relative border-[#262626] border-[20px]">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <!-- ৪টি ইনপুট পাথ -->
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+                    <div class="  border  integration-card   shadow-sm relative group">
 
-                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
 
-                            <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
-                                stroke-width="1.5" />
+                        <div class="relative border-[#262626] border-[20px]">
+                            <svg viewBox="0 0 460 300" class="w-full h-auto">
+                                <!-- ৪টি ইনপুট পাথ -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- আউটপুট পাথ -->
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
-                        </svg>
+                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                    style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                    style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                    style="animation-delay:1.2s" />
+
+                                <!-- সেন্ট্রাল পালস রিং -->
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
+                                    stroke="#22705d" stroke-width="1.5" />
+
+                                <!-- আউটপুট পাথ -->
+                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                    style="animation-delay:.6s" />
+                            </svg>
 
                             <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
-                                  <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/carrybee.png') }}"
-                                alt="carrybee"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
-                      
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                                    src="{{ asset('./images/saas/steadfast.svg') }}" alt="Steadfast"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                    src="{{ asset('./images/saas/pathao.svg') }}" alt="Pathao"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                    src="{{ asset('./images/saas/carrybee.png') }}" alt="carrybee"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                    src="{{ asset('./images/saas/redx.svg') }}" alt="redx"></div>
+
+                            <!-- Output Logo -->
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
+                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            </div>
+
+                            <!-- Main Center Node -->
+                            <div class="center-node">
+                                <span
+                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
+                            </div>
                         </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Courier</span>
-                        </div>
-                    </div>
-                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">   Ship Orders with Multiple Courier Partners </h3>
-                       Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
-                    </div>
-                </div>
-                <div class="  border  integration-card   shadow-sm relative group">
-                     
-
-                    <div class="relative border-[#262626] border-[20px]">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <!-- ৪টি ইনপুট পাথ -->
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
-
-                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
-
-                            <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
-                                stroke-width="1.5" />
-
-                            <!-- আউটপুট পাথ -->
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
-                        </svg>
-
-                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
-                                  <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/live.png') }}"
-                                alt="Live Support"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
-                      
-
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
-                        </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
+                            </h3>
+                            Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create
+                            shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
                         </div>
                     </div>
-                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2">  Manage Customer Conversations from Every Channel </h3>
-                  Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified inbox. Respond faster, manage conversations efficiently, and deliver a better customer experience.
-                    </div>
-                </div>
-                <div class="  border  integration-card   shadow-sm relative group">
-                     
+                    <div class="  border  integration-card   shadow-sm relative group">
 
-                    <div class="relative border-[#262626] border-[20px]">
-                        <svg viewBox="0 0 460 300" class="w-full h-auto">
-                            <!-- ৪টি ইনপুট পাথ -->
-                            <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
-                            <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
-                            <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
-                            <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150" style="animation-delay:.4s" />
-                            <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150" style="animation-delay:.8s" />
-                            <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150" style="animation-delay:1.2s" />
+                        <div class="relative border-[#262626] border-[20px]">
+                            <svg viewBox="0 0 460 300" class="w-full h-auto">
+                                <!-- ৪টি ইনপুট পাথ -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
 
-                            <!-- সেন্ট্রাল পালস রিং -->
-                            <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#34a487"
-                                stroke-width="1.5" />
+                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                    style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                    style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                    style="animation-delay:1.2s" />
 
-                            <!-- আউটপুট পাথ -->
-                            <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
-                            <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150" style="animation-delay:.6s" />
-                        </svg>
+                                <!-- সেন্ট্রাল পালস রিং -->
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
+                                    stroke="#22705d" stroke-width="1.5" />
 
-                        <!-- ৪টি পেমেন্ট সোর্স লোগো -->
-                        <div class="node-circle small" style="left:13%; top:13.3%;"><img
-                                src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
-                        <div class="node-circle small" style="left:13%; top:37.6%;"><img
-                                src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
-                        <div class="node-circle small" style="left:13%; top:62.1%;"><img
-                                src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
-                        <div class="node-circle small" style="left:13%; top:86.7%;"><img
-                                src="{{ asset('./images/saas/daraz.png') }}"
-                                alt="Daraz"></div>
+                                <!-- আউটপুট পাথ -->
+                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                    style="animation-delay:.6s" />
+                            </svg>
 
-                        <!-- Output Logo -->
-                        <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#34a487">
-                            <i class="fa-brands fa-shopify text-2xl text-[#34a487]"></i>
+                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                    src="{{ asset('./images/saas/whatsapp.svg') }}" alt="WhatsApp"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                    src="{{ asset('./images/saas/fb.png') }}" alt="Facebook"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                    src="{{ asset('./images/saas/live.png') }}" alt="Live Support"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                    src="{{ asset('./images/saas/inst.png') }}" alt="Instagram"></div>
+
+
+                            <!-- Output Logo -->
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
+                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            </div>
+
+                            <!-- Main Center Node -->
+                            <div class="center-node">
+                                <span
+                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            </div>
                         </div>
-
-                        <!-- Main Center Node -->
-                        <div class="center-node">
-                            <span
-                                class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
+                                Channel </h3>
+                            Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified
+                            inbox. Respond faster, manage conversations efficiently, and deliver a better customer
+                            experience.
                         </div>
                     </div>
-                    <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                       <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel </h3>
-                 Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other connected sales channels through a single dashboard. Process, fulfill, and track every order from one centralized platform.
+                    <div class="  border  integration-card   shadow-sm relative group">
+
+
+                        <div class="relative border-[#262626] border-[20px]">
+                            <svg viewBox="0 0 460 300" class="w-full h-auto">
+                                <!-- ৪টি ইনপুট পাথ -->
+                                <path class="flow-line" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 113 C 150 113, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 186 C 150 186, 170 150, 225 150" />
+                                <path class="flow-line" d="M60 260 C 150 260, 170 150, 225 150" />
+
+                                <!-- পালস অ্যানিমেশন (৪টি পাথ) -->
+                                <path class="flow-pulse" d="M60 40 C 150 40, 170 150, 225 150" />
+                                <path class="flow-pulse" d="M60 113 C 150 113, 170 150, 225 150"
+                                    style="animation-delay:.4s" />
+                                <path class="flow-pulse" d="M60 186 C 150 186, 170 150, 225 150"
+                                    style="animation-delay:.8s" />
+                                <path class="flow-pulse" d="M60 260 C 150 260, 170 150, 225 150"
+                                    style="animation-delay:1.2s" />
+
+                                <!-- সেন্ট্রাল পালস রিং -->
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
+                                    stroke="#22705d" stroke-width="1.5" />
+
+                                <!-- আউটপুট পাথ -->
+                                <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
+                                <path class="flow-pulse" d="M255 150 C 320 150, 340 150, 400 150"
+                                    style="animation-delay:.6s" />
+                            </svg>
+
+                            <!-- ৪টি পেমেন্ট সোর্স লোগো -->
+                            <div class="node-circle small" style="left:13%; top:13.3%;"><img
+                                    src="{{ asset('./images/saas/ecim.png') }}" alt="e-commerce"></div>
+                            <div class="node-circle small" style="left:13%; top:37.6%;"><img
+                                    src="{{ asset('./images/saas/landing.png') }}" alt="Landing Page"></div>
+                            <div class="node-circle small" style="left:13%; top:62.1%;"><img
+                                    src="{{ asset('./images/saas/woo.png') }}" alt="Woocommerce"></div>
+                            <div class="node-circle small" style="left:13%; top:86.7%;"><img
+                                    src="{{ asset('./images/saas/daraz.png') }}" alt="Daraz"></div>
+
+                            <!-- Output Logo -->
+                            <div class="node-circle small shadow-lg" style="left:87%; top:50%; border-color:#22705d">
+                                <i class="fa-brands fa-shopify text-2xl text-[#22705d]"></i>
+                            </div>
+
+                            <!-- Main Center Node -->
+                            <div class="center-node">
+                                <span
+                                    class="text-white text-[11px] md:text-[13px] font-black leading-tight uppercase">Omnichannel</span>
+                            </div>
+                        </div>
+                        <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
+                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
+                            </h3>
+                            Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other
+                            connected sales channels through a single dashboard. Process, fulfill, and track every order
+                            from one centralized platform.
+                        </div>
                     </div>
-                </div>
-                
+
 
                 </div>
             </div>
@@ -825,7 +867,7 @@
         <div class="max-w-[1400px] mx-auto">
             <div class="text-center mb-16">
                 <span
-                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-[15px] mb-6">
+                    class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-base mb-6">
                     Integration
                 </span>
                 <h2 class="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight max-w-4xl mx-auto">
@@ -842,39 +884,39 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
                         <!-- Line down to Middle Box -->
-                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
 
                         <!-- Middle Node Box -->
                         <div
-                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Payment Methods
                         </div>
 
                         <!-- The Fork Connection Line -->
                         <div class="w-full relative flex flex-col items-center">
                             <!-- Vertical line from middle box to horizontal bar -->
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
 
                             <!-- Horizontal Bar: Exactly connects the centers of 1st and 3rd box -->
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
                         </div>
 
                         <!-- 3 Vertical Lines down to logos -->
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
                         </div>
 
                         <!-- Logo Row -->
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Nagad"
                                     onerror="
@@ -883,12 +925,12 @@
                       " />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/bkash.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="bKash" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/sslcommerz.png') }}" class="h-5 md:h-7 object-contain"
                                     alt="SSL" />
                             </div>
@@ -901,41 +943,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Courier Management
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -946,41 +988,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                             Omni Channel Chat
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -991,41 +1033,41 @@
                     <div class="flex flex-col items-center w-full">
                         <!-- Top Shopify Icon -->
                         <div
-                            class="w-20 h-20 bg-[#34a487] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
+                            class="w-20 h-20 bg-[#22705d] rounded-full flex items-center justify-center shadow-lg shadow-indigo-200 z-10">
                             <i class="fa-brands fa-shopify text-white text-4xl"></i>
                         </div>
 
-                        <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                        <div class="w-[2px] h-10 bg-[#22705d]"></div>
 
                         <div
-                            class="px-8 py-3 border-2 border-[#34a487] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
+                            class="px-8 py-3 border-2 border-[#22705d] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
                            Order Source
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="absolute bottom-0 w-[66.6%] h-[2px] bg-[#22705d]"></div>
                         </div>
 
                         <div class="flex justify-between w-full px-[16.6%]">
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
-                            <div class="w-[2px] h-10 bg-[#34a487]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
+                            <div class="w-[2px] h-10 bg-[#22705d]"></div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-4 w-full">
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/steadfast.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Steadfast" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/pathao.png') }}" class="h-8 md:h-10 object-contain"
                                     alt="Pathao" />
                             </div>
                             <div
-                                class="border-2 border-[#34a487] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
+                                class="border-2 border-[#22705d] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <span class="font-black italic text-[#FF9900] text-sm md:text-lg">Carry<span
                                         class="text-[#000]">Bee</span></span>
                             </div>
@@ -1042,7 +1084,7 @@
                 <!-- Section Header -->
                 <div class="text-center mb-12">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
                         Demo & Template
                     </span>
                     <h2 class="text-2xl animated-text  md:text-4xl font-black text-gray-900 leading-tight mb-10">
@@ -1052,11 +1094,11 @@
                     <!-- Tabs Container (Clickable and Hover Effect Fixed) -->
                     <div class="inline-flex p-1.5 bg-white border-2 border-indigo-100 rounded-2xl" id="tab-container">
                         <button onclick="filterDemos(1, this)"
-                            class="tab-btn bg-[#34a487] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
+                            class="tab-btn bg-[#22705d] text-white px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base transition-all">
                             Landing Page Template
                         </button>
                         <button onclick="filterDemos(2, this)"
-                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#34a487] transition-all">
+                            class="tab-btn text-gray-900 px-6 md:px-10 py-3 rounded-xl font-bold text-sm md:text-base hover:bg-indigo-50 hover:text-[#22705d] transition-all">
                             E-Commerce Template
                         </button>
                     </div>
@@ -1068,13 +1110,13 @@
                         <div class="demo-card group border border-indigo-100 rounded-xl overflow-hidden bg-white"
                             data-type="{{ $demo->type }}">
                             <div class="aspect-[4/3] overflow-hidden bg-gray-100">
-                                <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}"
+                                <img src="{{ $demo->image_url ?? asset('images/saas/live1.png') }}" alt="demo image"
                                     class="w-full h-full object-cover object-top rounded-xl border border-gray-200 transition-transform duration-700 group-hover:scale-105"
                                     alt="{{ $demo->title }}" />
                             </div>
                             <div class="py-6 text-center border-t border-gray-100">
                                 <a href="{{ $demo->link ?? '#' }}" target="_blank"
-                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#34a487] hover:decoration-[#34a487]">
+                                    class="text-xl md:text-2xl font-bold text-gray-900 underline hover:text-[#22705d] hover:decoration-[#22705d]">
                                     Live Preview
                                 </a>
                             </div>
@@ -1090,72 +1132,70 @@
     @endif
     @php
         $badges = [
-              'ERP',
-                'Business Management',
-                'Cloud ERP',
-                'Business Software',
-                'SaaS',
-                'Business Automation',
-                'Enterprise Software',
-                'Digital Business',
-                'Business Solution',
-                'Workflow Automation',
-                'Business Dashboard',
-                'Business Analytics',
-                'Reports',
-                'Financial Management',
-                'Business Intelligence',
-                'Organization Management',
-                'Operations Management',
-                'Productivity',
-                'SME Software',
-                'Enterprise Resource Planning',
+            'ERP',
+            'Business Management',
+            'Cloud ERP',
+            'Business Software',
+            'SaaS',
+            'Business Automation',
+            'Enterprise Software',
+            'Digital Business',
+            'Business Solution',
+            'Workflow Automation',
+            'Business Dashboard',
+            'Business Analytics',
+            'Reports',
+            'Financial Management',
+            'Business Intelligence',
+            'Organization Management',
+            'Operations Management',
+            'Productivity',
+            'SME Software',
+            'Enterprise Resource Planning',
         ];
-                $badges2 = [
-               
-                'POS System',
-        'Point of Sale',
-        'Sales Management',
-        'Order Management',
-        'Inventory Management',
-        'Stock Management',
-        'Warehouse Management',
-        'Product Management',
-        'SKU Management',
-        'Barcode Management',
-        'Purchase Management',
-        'Supplier Management',
-        'Invoice Management',
-        'Quotation',
-        'Billing Software',
-        'eCommerce',
-        'WooCommerce',
-        'Courier Integration',
-        'Payment Gateway',
-        'Multi Warehouse',
+        $badges2 = [
+            'POS System',
+            'Point of Sale',
+            'Sales Management',
+            'Order Management',
+            'Inventory Management',
+            'Stock Management',
+            'Warehouse Management',
+            'Product Management',
+            'SKU Management',
+            'Barcode Management',
+            'Purchase Management',
+            'Supplier Management',
+            'Invoice Management',
+            'Quotation',
+            'Billing Software',
+            'eCommerce',
+            'WooCommerce',
+            'Courier Integration',
+            'Payment Gateway',
+            'Multi Warehouse',
         ];
-         $badges3 = [
-               
+        $badges3 = [
             'CRM',
-        'Customer Management',
-        'Customer Analytics',
-        'Lead Management',
-        'HRM',
-        'Payroll',
-        'Employee Management',
-        'Attendance Management',
-        'Marketing Automation',
-        'Email Marketing',
-        'SMS Marketing',
-        'Landing Page Builder',
-        'CMS',
-        'Website Management',
-        'Multi Branch',
-        'Profit & Loss',
-        'Accounting',
-        'Expense Management',
-        'Income Management',
-        'Cloud Software',
+            'Customer Management',
+            'Customer Analytics',
+            'Lead Management',
+            'HRM',
+            'Payroll',
+            'Employee Management',
+            'Attendance Management',
+            'Marketing Automation',
+            'Email Marketing',
+            'SMS Marketing',
+            'Landing Page Builder',
+            'CMS',
+            'Website Management',
+            'Multi Branch',
+            'Profit & Loss',
+            'Accounting',
+            'Expense Management',
+            'Income Management',
+            'Cloud Software',
         ];
 
         $rows = [
@@ -1181,7 +1221,7 @@
                             <div class="flex gap-6 pr-6"> {{-- pr-6 গ্যাপ বজায় রাখার জন্য --}}
                                 @foreach ($row['data'] as $item)
                                     <span
-                                        class="bg-[#34a487] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
+                                        class="bg-[#22705d] text-white px-10 py-4 rounded-2xl font-bold whitespace-nowrap text-lg shadow-sm border border-[#2d8a71]">
                                         {{ $item }}
                                     </span>
                                 @endforeach
@@ -1197,7 +1237,7 @@
     <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
         <div
-            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#34a487]/10 blur-[120px] rounded-full pointer-events-none">
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#22705d]/10 blur-[120px] rounded-full pointer-events-none">
         </div>
 
         <div class="container mx-auto">
@@ -1223,7 +1263,7 @@
                 <!-- CTA Button -->
                 <div class="flex-shrink-0">
                     <a href="https://app.dorja.io/register"
-                        class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
+                        class="inline-block bg-[#22705d] hover:bg-[#4a38b8] text-white px-6 py-4 rounded-2xl font-bold text-md transition shadow-lg shadow-indigo-500/20">
                         Start Free Trial
                     </a>
                 </div>
@@ -1239,11 +1279,11 @@
                     <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                         Affordable Pricing
                     </h3>
-                    <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
                         Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
                         to enterprises that grow with you.
                     </p>
-                    <a href="{{route('saas.package.list')}}"
+                    <a href="{{ route('saas.package.list') }}"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Our Pricing
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
@@ -1258,11 +1298,11 @@
                     <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                         Explore Features
                     </h3>
-                    <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
                         Discover a complete suite of business tools designed to automate operations, improve efficiency, and
                         help you make faster data-driven decisions.
                     </p>
-                    <a href="{{route('saas.feature.list')}}"
+                    <a href="{{ route('saas.feature.list') }}"
                         class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
                         Explore Features
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
@@ -1277,7 +1317,7 @@
                     <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
                         Start Your Journey Today
                     </h3>
-                    <p class="text-gray-400 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
                         Join thousands of businesses already using dorja.io. Start your journey today and transform the way
                         you manage and grow your business.
                     </p>
@@ -1297,7 +1337,7 @@
             <!-- Header -->
             <div class="text-center mb-8">
                 <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
                     All-in-One Solution
                 </span>
 
@@ -1312,7 +1352,7 @@
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
                             class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#34a487] text-white' : 'bg-[#34a48730] text-gray-900 hover:bg-white' }}">
+                        {{ $loop->first ? 'bg-[#22705d] text-white' : 'bg-[#22705d30] text-gray-900 hover:bg-white' }}">
                             {{ $sol['title'] }}
                         </button>
                     @endforeach
@@ -1334,7 +1374,7 @@
                         <div id="sol-features" class="space-y-5 mb-12"></div>
 
                         <a href="#"
-                            class="inline-flex items-center gap-3 bg-[#34a487] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
+                            class="inline-flex items-center gap-3 bg-[#22705d] hover:bg-[#2c8a70] text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-lg">
                             Explore More
                             <i class="fa-solid fa-arrow-right text-sm"></i>
                         </a>
@@ -1343,13 +1383,13 @@
                     <!-- Right Image -->
                     <div>
                         <div class="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-400 font-mono">
+                            <div class="bg-gray-50 border-b px-4 py-3 text-xs text-gray-600 font-mono">
                                 <span id="sol-mockup"></span>
                             </div>
 
                             <div class="aspect-video bg-gray-100">
                                 <img id="sol-img" src="https://via.placeholder.com/900x600?text=ERP+Dashboard"
-                                    class="w-full h-full object-cover object-top" />
+                                    class="w-full h-full object-cover object-top" alt="right image" />
                             </div>
                         </div>
                     </div>
@@ -1369,161 +1409,153 @@
                     <p class="text-gray-500 text-lg">Here are the best packages for your business below.</p>
                 </div>
 
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
 
-                @foreach ($pricingPlans as $plan)
-                    @php
-                        $mode = strtolower($plan->mode);
-                        $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
-                        $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
+                    @foreach ($pricingPlans as $plan)
+                        @php
+                            $mode = strtolower($plan->mode);
+                            $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
+                            $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
 
-                        $themeColor = '#1e1b4b'; // Default Navy (For all other modes)
-                        $isSpecialMode = false;
+                            $themeColor = '#1e1b4b'; // Default Navy (For all other modes)
+                            $isSpecialMode = false;
 
-                        if ($mode === 'regular') {
-                            $themeColor = '#a855f7'; // Purple
-                            $isSpecialMode = true;
-                        } elseif ($mode === 'popular') {
-                            $themeColor = '#0073ea'; // Blue
-                            $isSpecialMode = true;
-                        }
-                    @endphp
+                            if ($mode === 'regular') {
+                                $themeColor = '#7e22ce'; // Purple
+                                $isSpecialMode = true;
+                            } elseif ($mode === 'popular') {
+                                $themeColor = '#0073ea'; // Blue
+                                $isSpecialMode = true;
+                            }
+                        @endphp
 
-                    <!-- Card Container -->
-                    <div class="bg-white border border-gray-200 flex flex-col h-full p-7 transition-all duration-300 relative border-t-[6px] shadow-sm hover:shadow-xl"
-                        style="border-top-color: {{ $themeColor }};">
+                        <!-- Card Container -->
+                        <div class="bg-white border border-gray-200 flex flex-col h-full p-7 transition-all duration-300 relative border-t-[6px] shadow-sm hover:shadow-xl"
+                            style="border-top-color: {{ $themeColor }};">
 
-                        <!-- Header: Title and Most Popular Badge -->
-                        <div class="flex items-center justify-between mb-6">
-                            <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
-                              
+                            <!-- Header: Title and Most Popular Badge -->
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-xl font-bold text-gray-900">{{ $plan->name }}</h2>
 
-                            @if ($mode === 'popular')
-                                <div
-                                    class="relative bg-[#0073ea] text-white text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
-                                    <span>Most Popular</span>
-                                    <div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
+
+                                @if ($mode === 'popular')
+                                    <div
+                                        class="relative bg-[#0073ea] text-white text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
+                                        <span>Most Popular</span>
+                                        <div
+                                            class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
+                                        </div>
                                     </div>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Price Section -->
-                        <div class="mb-4">
-                            <div class="flex items-start gap-1">
-                                <span class="text-3xl font-bold"
-                                    style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
-                                    {{ $setup->currency ?? '$' }} {{ number_format($price, 0) }} 
-                                    <span class="inline-block text-gray-400 text-[20px] font-semibold line-through ml-[-5px]">
-                                        <del>{{ number_format( $monthlyTier['regular_price'] ?? 0, 0) }}</del>
-                                    </span>
-                                </span>
-                                <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
-                                    
-                                    <span>/month</span>
-                                </div>
+                                @endif
                             </div>
 
-                            <!-- <div class="mt-4">
-                                <p class="text-gray-900 font-bold text-sm">Total
-                                    {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
-                                <p class="text-gray-400 text-xs">Billed annually</p>
-                            </div> -->
-                        </div>
+                            <!-- Price Section -->
+                            <div class="mb-4">
+                                <div class="flex items-start gap-1">
+                                    <span class="text-3xl font-bold"
+                                        style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
+                                        {{ $setup->currency ?? '$' }} {{ number_format($price, 0) }}
+                                        <span
+                                            class="inline-block text-gray-600 text-xl font-semibold line-through ml-[-5px]">
+                                            <del>{{ number_format($monthlyTier['regular_price'] ?? 0, 0) }}</del>
+                                        </span>
+                                    </span>
+                                    <div class="text-xs text-gray-500 font-bold pt-2 leading-tight">
 
-                        <!-- CTA Button -->
-                        <div class="mb-4">
-                            <a href="https://app.dorja.io/register?plan={{ $plan->id }}"
-                                class="block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all hover:bg-gray-50"
-                                style="border-color: {{ $themeColor }}; color: {{ $themeColor }};">
-                                Start Free Trial
-                            </a>
-                        </div>
+                                        <span>/month</span>
+                                    </div>
+                                </div>
 
-                        <!-- Description -->
-                       <div class="mb-4">
-                            <p class="text-gray-600 text-sm leading-relaxed">
-                                {{
-                                    strtolower($plan->name) == 'starter'
+                                <!-- <div class="mt-4">
+                                    <p class="text-gray-900 font-bold text-sm">Total
+                                        {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
+                                    <p class="text-gray-600 text-xs">Billed annually</p>
+                                </div> -->
+                            </div>
+
+                            <!-- CTA Button -->
+                            <div class="mb-4">
+                                <a href="https://app.dorja.io/register?plan={{ $plan->id }}"
+                                    class="block text-center border-[1.5px] py-2.5 rounded-full font-bold text-sm transition-all hover:bg-gray-50"
+                                    style="border-color: {{ $themeColor }}; color: {{ $themeColor }};">
+                                    Start Free Trial
+                                </a>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <p class="text-gray-600 text-sm leading-relaxed">
+                                    {{ strtolower($plan->name) == 'starter'
                                         ? 'Start your business with confidence.'
                                         : (strtolower($plan->name) == 'growth'
                                             ? 'Scale faster with smarter tools.'
                                             : (strtolower($plan->name) == 'business'
                                                 ? 'Powerful tools for growing teams.'
-                                                : 'Enterprise-grade performance & support.'
-                                            )
-                                        )
-                                }}
-                            </p>
-                        </div>
-
-                        <!-- Features/Limits Section (Fixed at bottom) -->
-                        <div class="mt-auto">
-                            <hr class="border-gray-200 border-1 mb-4">
-
-                            <div class="space-y-2">
-                                
-                               <div class="space-y-2">
-
-                                @foreach ([
-                                    ['User Limit', $plan->user_limit],
-                                    ['Product Limit', $plan->product_limit],
-                                    ['Order Limit', $plan->order_limit],
-                                    ['Extra Order', $plan->extra_order_charge],
-                                     
-                                ] as [$label, $value])
-
-                                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-5 h-5 rounded-full bg-[#a855f717] flex items-center justify-center">
-                                                <i class="fa-solid fa-check text-[10px] text-[#a855f7]"></i>
-                                            </div>
-
-                                            <span class="text-sm text-[#a855f7] font-semibold">
-                                                {{ $label }} 
-                                            </span>
-                                        </div>
-
-                                        <span class="text-sm font-semibold text-[#a855f7]">
-                                            {{ $label === 'Extra Order' ? '৳.' : '' }}{{ $value ?: 'Unlimited' }} {{ $label === 'Extra Order' ? '/order' : '' }}
-                                        </span>
-                                    </div>
-
-                                @endforeach
-
+                                                : 'Enterprise-grade performance & support.')) }}
+                                </p>
                             </div>
 
-                                <!-- <div class="flex justify-between items-center text-gray-700 text-sm">
-                                    <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
-                                    <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                </div> -->
+                            <!-- Features/Limits Section (Fixed at bottom) -->
+                            <div class="mt-auto">
+                                <hr class="border-gray-200 border-1 mb-4">
 
-                                {{-- Custom multiple input loop --}}
-                                @if (!empty($plan->multiple_input))
-                                    @foreach ($plan->multiple_input as $extraDetail)
-                                        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                                                    <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+                                <div class="space-y-2">
+
+                                    <div class="space-y-2">
+
+                                        @foreach ([['User Limit', $plan->user_limit], ['Product Limit', $plan->product_limit], ['Order Limit', $plan->order_limit], ['Extra Order', $plan->extra_order_charge]] as [$label, $value])
+                                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-5 h-5 rounded-full bg-[#7e22ce17] flex items-center justify-center">
+                                                        <i class="fa-solid fa-check text-[10px] text-[#7e22ce]"></i>
+                                                    </div>
+
+                                                    <span class="text-sm text-[#7e22ce] font-semibold">
+                                                        {{ $label }}
+                                                    </span>
                                                 </div>
 
-                                                <span class="text-sm text-gray-600">
-                                                    {{ $extraDetail }} 
+                                                <span class="text-sm font-semibold text-[#7e22ce]">
+                                                    {{ $label === 'Extra Order' ? '৳.' : '' }}{{ $value ?: 'Unlimited' }}
+                                                    {{ $label === 'Extra Order' ? '/order' : '' }}
                                                 </span>
                                             </div>
-                                        </div>
-                                       
-                                    @endforeach
-                                @endif
+                                        @endforeach
+
+                                    </div>
+
+                                    <!-- <div class="flex justify-between items-center text-gray-700 text-sm">
+                                        <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
+                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                    </div> -->
+
+                                    {{-- Custom multiple input loop --}}
+                                    @if (!empty($plan->multiple_input))
+                                        @foreach ($plan->multiple_input as $extraDetail)
+                                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                        <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
+                                                    </div>
+
+                                                    <span class="text-sm text-gray-600">
+                                                        {{ $extraDetail }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
 
-            </div>
+                </div>
                 <div class="mt-16 text-center">
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-block bg-[#34a487] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="inline-block bg-[#22705d] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         More Packages <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
@@ -1535,14 +1567,14 @@
         <section class="bg-[#f9fafb] py-24 px-6 md:px-10 relative overflow-hidden">
             <div class="container mx-auto">
                 <div class="text-center mb-20">
-                   <span
-                    class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
-                   Why Chose Us
-                </span>
+                    <span
+                        class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
+                        Why Chose Us
+                    </span>
 
-                <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
-                    From Operations to Growth — Everything in One System
-                </h2>
+                    <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
+                        From Operations to Growth — Everything in One System
+                    </h2>
                 </div>
 
                 <div class="flex flex-col gap-10">
@@ -1550,12 +1582,12 @@
                         <div
                             class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="text-[#34a487] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
+                                <h3 class="text-[#22705d] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
                                     {{ $benefit->title }}
                                 </h3>
                                 <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
                                     {!! $benefit->description !!}
-                        </div>
+                                </div>
                             </div>
                             <div class="w-full lg:w-1/2">
                                 <img src="{{ $benefit->image_url ?? asset('images/saas/choose.jpg') }}"
@@ -1567,7 +1599,7 @@
 
                 <div class="mt-28 text-center">
                     <a href="#"
-                        class="inline-block bg-[#34a487] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
+                        class="inline-block bg-[#22705d] hover:bg-[#4a38b8] text-white px-10 py-4 rounded-xl font-bold text-lg transition shadow-lg shadow-indigo-500/20">
                         Start Free Trial
                     </a>
                 </div>
@@ -1581,7 +1613,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-12 gap-6">
                     <h2 class="text-2xl md:text-4xl font-black text-gray-900">Our Blogs</h2>
                     <a href="{{ route('saas.blog.list') }}"
-                        class="bg-[#34a487] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                        class="bg-[#22705d] text-white px-8 py-3 rounded-xl font-bold text-lg hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                         View All <i class="fa-solid fa-arrow-right text-sm"></i>
                     </a>
                 </div>
@@ -1602,10 +1634,10 @@
                             <div class="p-6 md:p-8 flex flex-col flex-grow">
                                 <div class="flex justify-between items-center mb-5">
                                     <span
-                                        class="bg-indigo-50 text-[#34a487] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
+                                        class="bg-indigo-50 text-[#22705d] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                                         {{ $blog->company->shop_name ?? 'Admin' }}
                                     </span>
-                                    <div class="flex items-center gap-2 text-gray-400 text-sm font-bold">
+                                    <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
                                         <i class="fa-regular fa-clock"></i>
                                         <span>{{ $blog->reading_time ?? '' }} minutes</span>
                                     </div>
@@ -1622,7 +1654,7 @@
 
                                 <div class="mt-auto pt-5 border-t border-gray-50">
                                     <div
-                                        class="inline-flex items-center gap-2 text-[#34a487] font-bold text-lg group-hover:gap-3 transition-all">
+                                        class="inline-flex items-center gap-2 text-[#22705d] font-bold text-lg group-hover:gap-3 transition-all">
                                         Read More <i class="fa-solid fa-arrow-right text-sm"></i>
                                     </div>
                                 </div>
@@ -1639,7 +1671,7 @@
             <div class="container mx-auto">
                 <div class="text-center mb-16">
                     <span
-                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                        class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
                         Customer Reviews
                     </span>
                     <h2 class="text-3xl md:text-5xl font-black text-gray-900">
@@ -1654,9 +1686,9 @@
                             class="review-card break-inside-avoid bg-white border border-indigo-100 p-8 rounded-2xl hover:shadow-md transition {{ $index >= 6 ? 'hidden' : '' }}">
                             <div class="flex justify-between items-start {{ $review->review ? 'mb-6' : '' }}">
                                 <div>
-                                    <h4 class="text-[#34a487] font-bold text-lg">
+                                    <h3 class="text-[#22705d] font-bold text-lg">
                                         @ {{ $review->name }}
-                                    </h4>
+                                    </h3>
                                     <p class="text-gray-500 text-xs">{{ $review->designation }}</p>
                                 </div>
                                 <div class="flex items-center gap-1 text-gray-900 font-bold">
@@ -1666,7 +1698,7 @@
                             </div>
 
                             @if ($review->review)
-                                <p class="text-gray-700 leading-relaxed text-[15px]">
+                                <p class="text-gray-700 leading-relaxed text-base">
                                     “{{ $review->review }}”
                                 </p>
                             @endif
@@ -1677,7 +1709,7 @@
                 @if ($allReviews->count() > 6)
                     <div class="mt-16 text-center">
                         <button id="load-more-reviews"
-                            class="inline-block bg-[#34a487] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
+                            class="inline-block bg-[#22705d] text-white px-10 py-3 rounded-xl font-bold hover:bg-[#4a38b8] transition shadow-lg shadow-indigo-100">
                             See More
                         </button>
                     </div>
@@ -1691,7 +1723,7 @@
             <!-- Header -->
             <div class="text-center mb-10">
                 <span
-                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#34a487] font-semibold text-sm md:text-lg mb-6">
+                    class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#22705d] font-semibold text-sm md:text-lg mb-6">
                     Frequently Asked Questions
                 </span>
 
@@ -1714,93 +1746,96 @@
             @endphp
 
             <div class="div space-y-4 h-[700px] overflow-y-auto">
-            <!-- FAQ List -->
-           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
+                <!-- FAQ List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 " id="faq-container">
 
-    @foreach ($faqs as $faq)
-        <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl">
+                    @foreach ($faqs as $faq)
+                        <div class="faq-item bg-[#f9faff] border border-indigo-100 rounded-2xl">
 
-            <!-- Question -->
-            <button
-                class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
-                <span class="faq-question">{{ $faq->title }}</span>
+                            <!-- Question -->
+                            <button
+                                class="p-6 w-full flex justify-between items-center text-left font-bold text-gray-900 text-lg faq-toggle">
+                                <span class="faq-question">{{ $faq->title }}</span>
 
-                <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
-            </button>
+                                <i class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                            </button>
 
-            <!-- Answer -->
-            <div class="px-6 pb-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
-                {!! $faq->content !!}
+                            <!-- Answer -->
+                            <div class="px-6 pb-6 faq-content mt-[-2px] text-gray-600 leading-relaxed hidden">
+                                {!! $faq->content !!}
+                            </div>
+
+                        </div>
+                    @endforeach
+
+                </div>
             </div>
-
-        </div>
-    @endforeach
-
-</div></div>
         </div>
     </section>
 
 @endsection
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
 
     <!-- Accordion + Search Script -->
     <script>
-       gsap.registerPlugin(ScrollTrigger);
+        gsap.registerPlugin(ScrollTrigger);
 
-window.addEventListener("load", () => {
+        window.addEventListener("load", () => {
 
-    const wrap = document.querySelector(".pin-wrap");
-    const section = document.querySelector(".integration-section");
+            const wrap = document.querySelector(".pin-wrap");
+            const section = document.querySelector(".integration-section");
 
-    if (!wrap || !section) return;
+            if (!wrap || !section) return;
 
-    function createAnimation() {
+            function createAnimation() {
 
-        ScrollTrigger.getAll().forEach(st => st.kill());
+                ScrollTrigger.getAll().forEach(st => st.kill());
 
-        gsap.set(wrap, { x: 0 });
+                gsap.set(wrap, {
+                    x: 0
+                });
 
-        const totalWidth = wrap.scrollWidth;
-        const visibleWidth = section.clientWidth;
+                const totalWidth = wrap.scrollWidth;
+                const visibleWidth = section.clientWidth;
 
-        const maxTranslate = totalWidth - visibleWidth;
+                const maxTranslate = totalWidth - visibleWidth;
 
-        gsap.to(wrap, {
-            x: -maxTranslate,
-            ease: "none",
-            scrollTrigger: {
-                trigger: section,
-                start: "top top",
-                end: "+=" + maxTranslate,
-                pin: true,
-                scrub: 1,
-                invalidateOnRefresh: true,
-                anticipatePin: 1,
-                snap: {
-                    snapTo: (value) => {
+                gsap.to(wrap, {
+                    x: -maxTranslate,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top top",
+                        end: "+=" + maxTranslate,
+                        pin: true,
+                        scrub: 1,
+                        invalidateOnRefresh: true,
+                        anticipatePin: 1,
+                        snap: {
+                            snapTo: (value) => {
 
-                        const cards = gsap.utils.toArray(".integration-card");
-                        const gap = 24;
+                                const cards = gsap.utils.toArray(".integration-card");
+                                const gap = 24;
 
-                        const step = cards[0].offsetWidth + gap;
+                                const step = cards[0].offsetWidth + gap;
 
-                        return Math.round((value * maxTranslate) / step) * step / maxTranslate;
-                    },
-                    duration: 0.25
-                }
+                                return Math.round((value * maxTranslate) / step) * step / maxTranslate;
+                            },
+                            duration: 0.25
+                        }
+                    }
+                });
+
+                ScrollTrigger.refresh();
             }
+
+            createAnimation();
+
+            window.addEventListener("resize", createAnimation);
+
         });
-
-        ScrollTrigger.refresh();
-    }
-
-    createAnimation();
-
-    window.addEventListener("resize", createAnimation);
-
-});
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -1864,7 +1899,7 @@ window.addEventListener("load", () => {
             data.features.forEach(f => {
                 featureHtml += `
             <div class="flex items-center gap-4">
-                <div class="w-8 h-8 bg-[#34a487] rounded-lg flex items-center justify-center text-white">
+                <div class="w-8 h-8 bg-[#22705d] rounded-lg flex items-center justify-center text-white">
                     <i class="fa-solid ${f.icon} text-sm"></i>
                 </div>
                 <span class="font-bold text-gray-900 text-lg">${f.text}</span>
@@ -1875,12 +1910,12 @@ window.addEventListener("load", () => {
             document.getElementById('sol-features').innerHTML = featureHtml;
 
             document.querySelectorAll('.sol-tab-btn').forEach(b => {
-                b.classList.remove('bg-[#34a487]', 'text-white');
-                b.classList.add('bg-[#34a48730]', 'text-gray-900');
+                b.classList.remove('bg-[#22705d]', 'text-white');
+                b.classList.add('bg-[#22705d30]', 'text-gray-900');
             });
 
-            btn.classList.add('bg-[#34a487]', 'text-white');
-            btn.classList.remove('bg-[#34a48730]', 'text-gray-900');
+            btn.classList.add('bg-[#22705d]', 'text-white');
+            btn.classList.remove('bg-[#22705d30]', 'text-gray-900');
         }
 
         // default load
@@ -1912,12 +1947,12 @@ window.addEventListener("load", () => {
         function filterDemos(type, btn) {
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(b => {
-                b.classList.remove('bg-[#34a487]', 'text-white');
-                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#34a487]');
+                b.classList.remove('bg-[#22705d]', 'text-white');
+                b.classList.add('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#22705d]');
             });
 
-            btn.classList.add('bg-[#34a487]', 'text-white');
-            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#34a487]');
+            btn.classList.add('bg-[#22705d]', 'text-white');
+            btn.classList.remove('text-gray-900', 'hover:bg-indigo-50', 'hover:text-[#22705d]');
 
             const cards = document.querySelectorAll('.demo-card');
             cards.forEach(card => {

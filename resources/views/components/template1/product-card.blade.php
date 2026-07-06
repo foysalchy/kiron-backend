@@ -9,6 +9,8 @@
     @include('components.template1.product-2', ['product' => $product, 'company' => $company])
 @elseif($template == 3)
     @include('components.template1.product-3', ['product' => $product, 'company' => $company])
+@elseif($template == 4)
+    @include('components.template1.product-4', ['product' => $product, 'company' => $company])
 @endif
 
 @once

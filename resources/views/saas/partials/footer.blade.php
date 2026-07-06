@@ -8,16 +8,16 @@
                      <h2 class="text-2xl md:text-3xl font-bold mb-3">
                          Is your business ready to go online?
                      </h2>
-                     <p class="text-gray-400 text-lg md:text-base">
+                     <p class="text-gray-300 text-lg md:text-base">
                          Subscribe to our newsletter and get e-commerce tips directly to your inbox.
                      </p>
                  </div>
 
                  <div class="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-3">
                      <input type="email" placeholder="Email"
-                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#34a487] transition text-lg" />
+                         class="w-full sm:w-80 bg-transparent border border-gray-600 rounded-xl px-5 py-3.5 focus:outline-none focus:border-[#22705d] transition text-lg" />
                      <button
-                         class="w-full sm:w-auto bg-[#34a487] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
+                         class="w-full sm:w-auto bg-[#22705d] hover:bg-[#4a38b8] text-white px-8 py-3.5 rounded-xl font-bold transition whitespace-nowrap">
                          Subscribe
                      </button>
                  </div>
@@ -32,18 +32,18 @@
                      title="{{ $setup->shop_name ?? 'Home' }}">
 
                      <img src="{{ $setup->logo_url ?? asset('images/saas/Shopify_Logo.png') }}"
-                         alt="{{ $setup->shop_name }} Logo" class="h-8 w-auto object-contain" fetchpriority="high"
-                         loading="eager"
+                         alt="{{ $setup->shop_name ?? 'Dorja' }} Logo" class="h-8 w-auto object-contain" fetchpriority="high"
+                         loading="lazy" width="180" height="45"
                          onerror="this.onerror=null; this.src='{{ asset('images/saas/Shopify_Logo.png') }}';">
 
                  </a>
-                 <p class="text-gray-400 leading-relaxed text-[15px]">
+                 <p class="text-gray-400 leading-relaxed text-base">
                      Sales, inventory, accounting, CRM, and e-commerce for your business—all now on one powerful platform.
                  </p>
                  <div class="flex items-center gap-3">
                      @foreach ($socialLinks as $social)
-                         <a href="{{ $social->link ?? '#' }}" target="_blank"
-                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#34a487] hover:border-[#34a487] transition group">
+                         <a href="{{ $social->link ?? '#' }}" target="_blank" aria-label="Follow us on {{ $social->name ?? 'Social Media' }}"
+                             class="w-10 h-10 rounded-full border border-gray-700 flex items-center justify-center hover:bg-[#22705d] hover:border-[#22705d] transition group">
 
                              <i class="{{ $social->icon_name }} text-lg text-gray-400 group-hover:text-white"></i>
                          </a>
@@ -55,17 +55,17 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Important Links
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
                  </h3>
-                 <ul class="space-y-4 text-gray-400 text-[15px]">
+                 <ul class="space-y-4 text-gray-400 text-base">
                      <li>
                          <a href="{{route('saas.package.list')}}" class="hover:text-white transition">Pricing</a>
                      </li>
                      <li>
                          <a href="{{route('saas.feature.list')}}" class="hover:text-white transition">Features</a>
                      </li>
-                     
-                     
+
+
                      <li>
                          <a href="{{route('saas.blog.list')}}" class="hover:text-white transition">Blog</a>
                      </li>
@@ -82,9 +82,9 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Company
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
                  </h3>
-                 <ul class="space-y-4 text-gray-400 text-[15px]">
+                 <ul class="space-y-4 text-gray-400 text-base">
                     @foreach ($footerPages as $page)
                          <li>
                              <a href="{{ url('/page/' . $page->slug) }}" class="hover:text-white transition">
@@ -105,15 +105,15 @@
              <div>
                  <h3 class="text-lg font-bold mb-6 relative inline-block">
                      Help & Support
-                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#34a487] rounded-full"></span>
+                     <span class="absolute bottom-[-8px] left-0 w-16 h-[4px] bg-[#22705d] rounded-full"></span>
                  </h3>
-                 <ul class="space-y-5 text-gray-400 text-[15px]">
+                 <ul class="space-y-5 text-gray-400 text-base">
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-phone mt-1 text-[#34a487]"></i>
+                         <i class="fa-solid fa-phone mt-1 text-[#22705d]"></i>
                          <span>{{ $setup->phone ?? '0188-8888888' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
-                         <i class="fa-solid fa-envelope mt-1 text-[#34a487]"></i>
+                         <i class="fa-solid fa-envelope mt-1 text-[#22705d]"></i>
                          <span>{{ $setup->email ?? 'hello@sopify.com' }}</span>
                      </li>
                      <li class="flex items-start gap-3">
@@ -121,7 +121,7 @@
                              <i class="fa-solid fa-location-dot mt-1.5 text-primary text-lg" aria-hidden="true"></i>
                          </div>
 
-                         <address class="not-italic text-gray-400 leading-relaxed text-sm md:text-base">
+                         <address class="not-italic text-gray-300 leading-relaxed text-sm md:text-base">
                              @if ($setup && $setup->corporate_address)
                                  {!! $setup->corporate_address !!}
                              @else
@@ -135,7 +135,7 @@
 
          <!-- BOTTOM BAR -->
          <div
-             class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-500">
+             class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-lg text-gray-400">
              <p>
                  © 2026 <span class="text-white font-semibold"></span> All rights reserved.
              </p>
@@ -150,7 +150,7 @@
 <!-- Scroll to Top Button -->
 <button
     id="backToTop"
-    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#34a487] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-black hover:-translate-y-1 focus:outline-none"
+    class="fixed bottom-8 right-8 z-[100] w-12 h-12 bg-[#22705d] text-white rounded-full flex items-center justify-center shadow-2xl opacity-0 invisible transition-all duration-300 hover:bg-black hover:-translate-y-1 focus:outline-none"
     aria-label="Scroll to Top"
 >
     <i class="fa-solid fa-chevron-up text-xl"></i>

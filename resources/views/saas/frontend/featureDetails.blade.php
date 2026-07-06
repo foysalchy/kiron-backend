@@ -61,7 +61,7 @@
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 14px;
-            border-left: 5px solid #34a487;
+            border-left: 5px solid #22705d;
             padding-left: 15px;
         }
 
@@ -87,7 +87,7 @@
         }
 
         .feature-content a {
-            color: #34a487;
+            color: #22705d;
             text-decoration: underline;
             font-weight: 500;
         }
@@ -126,7 +126,7 @@
                         @if (isset($socialLinks))
                             @foreach ($socialLinks as $social)
                                 <a href="{{ $social->link ?? $social->url }}" target="_blank"
-                                    class="w-10 h-10 rounded-full bg-[#34a487] flex items-center justify-center hover:bg-black hover:text-[#34a487] transition-all shadow-sm text-white">
+                                    class="w-10 h-10 rounded-full bg-[#22705d] flex items-center justify-center hover:bg-black hover:text-[#22705d] transition-all shadow-sm text-white">
 
                                     @if ($social->short)
                                         {!! $social->short !!}
@@ -181,22 +181,22 @@
                 <div class="col-span-12 lg:col-span-4">
                     <div class="sticky top-52 lg:pl-4 h-fit">
                         <h3
-                            class="text-sm font-bold text-gray-900 mb-8 uppercase tracking-[0.2em] border-l-4 border-[#34a487] pl-4">
+                            class="text-sm font-bold text-gray-900 mb-8 uppercase tracking-[0.2em] border-l-4 border-[#22705d] pl-4">
                             More Features
                         </h3>
                         <div class="flex flex-col gap-10">
                             @foreach ($otherFeatures as $other)
                                 <a href="{{ route('saas.feature.details', $other->slug ?? $other->id) }}"
                                     class="flex items-start gap-4 group" style="text-decoration: none;">
-                                     
+
                                     <div class="flex flex-col pt-1">
                                         <h4
-                                            class="text-gray-900 font-bold leading-snug text-sm transition-colors group-hover:text-[#34a487]">
+                                            class="text-gray-900 font-bold leading-snug text-sm transition-colors group-hover:text-[#22705d]">
                                             {{ $other->title }}
                                         </h4>
                                         <p> {{ Str::limit($other->subtitle, 50) }}</p>
                                         <span
-                                            class="text-[10px] text-gray-400 font-bold uppercase mt-2 tracking-widest">Read
+                                            class="text-[10px] text-gray-600 font-bold uppercase mt-2 tracking-widest">Read
                                             More ›</span>
                                     </div>
                                 </a>

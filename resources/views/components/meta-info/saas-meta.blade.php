@@ -13,7 +13,7 @@
 ])
 
 <?php
-    $titlex = $title ?: ($setup->title ?? $setup->shop_name);
+    $titlex = $title ?: ($setup->title ?? $setup->shop_name ?? 'Dorja');
     $title = $titlex.' | dorja.io';
     $description = $description ?: ($setup->description ?? '');
     $keywords = is_array($keywords)
@@ -47,7 +47,7 @@
 <meta name="keywords" content="{{ $keywords }}">
 @endif
 
-<meta name="author" content="{{ $setup->shop_name }}">
+<meta name="author" content="{{ $setup->shop_name ?? 'Dorja' }}">
 <link rel="canonical" href="{{ $canonical }}">
 
 {{-- Open Graph --}}
@@ -56,7 +56,7 @@
 <meta property="og:description" content="{{ $description }}">
 <meta property="og:url" content="{{ $canonical }}">
 <meta property="og:image" content="{{ $image }}">
-<meta property="og:site_name" content="{{ $setup->shop_name }}">
+<meta property="og:site_name" content="{{ $setup->shop_name ?? 'Dorja' }}">
 <meta property="og:locale" content="en_US">
 
 {{-- Twitter --}}
@@ -70,21 +70,21 @@
 {!! json_encode([
     '@context'=>'https://schema.org',
     '@type'=>'Organization',
-    'name'=>$setup->shop_name,
+    'name'=>$setup->shop_name ?? 'Dorja',
     'url'=>url('/'),
     'logo'=>$organizationLogo,
-    'email'=>$setup->email,
-    'telephone'=>$setup->phone,
-    'foundingDate'=>$setup->established,
+    'email'=>$setup->email ?? '',
+    'telephone'=>$setup->phone ?? '',
+    'foundingDate'=>$setup->established ?? '',
     'sameAs'=>$socialLinks,
     'founder'=>[
         '@type'=>'Person',
-        'name'=>$setup->founder_name,
-        'jobTitle'=>$setup->founder_designation
+        'name'=>$setup->founder_name ?? '',
+        'jobTitle'=>$setup->founder_designation ?? ''
     ],
     'address'=>[
         '@type'=>'PostalAddress',
-        'streetAddress'=>$setup->store_address ?: $setup->corporate_address,
+        'streetAddress'=>($setup?->store_address ?: $setup?->corporate_address) ?? '',
         'addressCountry'=>'BD'
     ]
 ],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
@@ -95,7 +95,7 @@
 {!! json_encode([
     '@context'=>'https://schema.org',
     '@type'=>'WebSite',
-    'name'=>$setup->shop_name,
+    'name'=>$setup->shop_name ?? 'Dorja',
     'url'=>url('/')
 ],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
 </script>

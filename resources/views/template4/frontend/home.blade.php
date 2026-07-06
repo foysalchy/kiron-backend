@@ -82,6 +82,35 @@
             }
         }
     </style>
+    <style>
+        .mainHeroSwiper .swiper-pagination-bullet {
+            width: 12px !important;
+            height: 12px !important;
+            background: #ffffff !important;
+            opacity: 1 !important;
+            margin: 0 12px !important;
+            position: relative !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .mainHeroSwiper .swiper-pagination-bullet-active {
+            background: #66267b !important;
+            transform: scale(1.2);
+        }
+
+        .mainHeroSwiper .swiper-pagination-bullet::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            cursor: pointer;
+        }
+    </style>
 @endpush
 @section('content')
     <!-- hero section -->
@@ -89,8 +118,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
 
             <!-- LEFT: Dynamic Swiper Slider -->
-            <div
-                class="lg:col-span-3 relative group overflow-hidden shadow-lg [&_.swiper-pagination-bullet]:!w-4 [&_.swiper-pagination-bullet]:!h-4 [&_.swiper-pagination-bullet]:!rounded-full [&_.swiper-pagination-bullet]:!bg-white [&_.swiper-pagination-bullet]:!opacity-100 [&_.swiper-pagination-bullet]:mx-2 [&_.swiper-pagination-bullet]:shadow-md [&_.swiper-pagination-bullet]:transition-all [&_.swiper-pagination-bullet-active]:!bg-[#66267b] [&_.swiper-pagination-bullet-active]:scale-110">
+            <div class="lg:col-span-3 relative group overflow-hidden shadow-lg">
                 <div class="swiper mainHeroSwiper w-full h-[300px] md:h-[450px] lg:h-[450px]">
                     <div class="swiper-wrapper">
                         @forelse($mainSliders as $slider)
@@ -192,7 +220,8 @@
                     @endphp
 
                     <!-- Dynamic Category Card -->
-                    <a href="{{ route('category.products', $category->slug) }}" class="notch-border hover:-translate-y-1 transition-transform block group">
+                    <a href="{{ route('category.products', $category->slug) }}"
+                        class="notch-border hover:-translate-y-1 transition-transform block group">
                         <div
                             class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
 
@@ -234,7 +263,7 @@
                         <!-- Left Part: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" height="" width=""
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150"
                                 alt="{{ $product->title }}" loading="lazy"
                                 class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                         </div>
@@ -305,7 +334,7 @@
                         <!-- Left side: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-1 md:p-4 bg-white relative overflow-hidden">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" height="" width=""
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="140" width="100"
                                 alt="{{ $product->title }}" loading="lazy"
                                 class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
                         </div>
@@ -397,7 +426,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (document.querySelector('.mainHeroSwiper')) {
                 new Swiper('.mainHeroSwiper', {
-                    modules: [SwiperModules.Pagination, SwiperModules.Autoplay, SwiperModules.EffectFade],
                     loop: true,
                     effect: 'fade',
                     speed: 1000,
