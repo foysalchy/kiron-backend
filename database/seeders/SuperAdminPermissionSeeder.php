@@ -95,6 +95,7 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('settings_ip',              'IP Restriction Settings');
         $addCrud('settings_reminder',        'Reminder Settings');
         $addCrud('settings_meta',        'Meta Settings');
+        $addCrud('settings_menu',        'Menu Settings');
 
 
         // ── Roles & Permissions ────────────────────────────
