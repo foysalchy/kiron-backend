@@ -24,7 +24,12 @@ if (!function_exists('getCurrentCompany')) {
             return $store;
         }else{
 
-            $host = request()->getHost();
+            $host = strtolower($request->getHost());
+
+            // Remove www.
+            if (str_starts_with($host, 'www.')) {
+                $host = substr($host, 4);
+            }
 
             if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP)) {
                 return null;

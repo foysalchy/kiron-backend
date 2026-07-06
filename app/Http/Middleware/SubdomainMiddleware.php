@@ -17,7 +17,7 @@ class SubdomainMiddleware
     public function handle(Request $request, Closure $next)
     {
         $host = strtolower($request->getHost());
-  print_r($host); // Debugging line to check the host value
+
         // Remove www.
         if (str_starts_with($host, 'www.')) {
             $host = substr($host, 4);
