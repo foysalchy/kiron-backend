@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class WishlistController extends Controller
 {
-    public function toggle($store, Request $request)
+    public function toggle( Request $request)
     {
         if (!auth('customer')->check()) {
             return response()->json([

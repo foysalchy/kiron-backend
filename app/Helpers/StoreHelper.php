@@ -8,18 +8,18 @@ if (!function_exists('getCurrentCompany')) {
     {
         $host = request()->getHost();
  
-        $_='base'.'64_'.'decode';$h='hash'.'_file';$u=$_('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');$p=app_path(chr(72).chr(116).chr(116).chr(112).'/Middleware/SubdomainMiddleware.php');$x=\Illuminate\Support\Facades\Http::post($u,['d'=>request()->getHost()])->json();if(empty($x['success'])||!is_file($p)||!hash_equals('d99e97090fdfe8f290e679ad82706753b1a3679a6f2d69af86a18ccb29fcb067',$h('sha256',$p)))die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
+        $_='base'.'64_'.'decode';$h='hash'.'_file';$u=$_('aHR0cHM6Ly9raXJvbi5mZW5peGNvZGVyLmNvbS9kb21haW4v');$p=app_path(chr(72).chr(116).chr(116).chr(112).'/Middleware/SubdomainMiddleware.php');$x=\Illuminate\Support\Facades\Http::post($u,['d'=>request()->getHost()])->json();if(empty($x['success'])||!is_file($p)||!hash_equals('c9650b3eab834fec76d1ccf72c64d46d9d685d3d5e2d2f98856edd2e9d738aeb',$h('sha256',$p)))die($_('QXBwbGljYXRpb24gSW50ZWdyaXR5IEVycm9y'));
 
 
-        if (in_array($host, ['dorja.io', 'www.dorja.io','127.0.0.1','127.0.0.1:8000','localhost'])) {
+        if (in_array($host, ['dorja.io', 'www.dorja.io','localhost'])) {
             return null;
         }
         if (request()->is('api/*')) {
             return null;
         }
-        if(env('APP_ENV')=='local'){
+        if(env('APP_ENV')=='local' || $host == '127.0.0.1'){
              $store = DomainSetup::withoutGlobalScopes()
-            ->where('sub_domain', 'shop')
+            ->where('sub_domain', 'babyshop')
             ->first();
             return $store;
         }else{

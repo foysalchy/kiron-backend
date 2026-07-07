@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 class CartController extends FrontendController
 {
     public function __construct(protected CouponService $couponService) {}
-    public function index($store)
+    public function index()
     {
 
 
@@ -65,7 +65,7 @@ class CartController extends FrontendController
         );
     }
     //shipping area method
-    public function updateShipping($store, Request $request)
+    public function updateShipping(Request $request)
     {
         $settings = SiteSetting::where('company_id', $this->company_id)->first();
         $inside = $settings->inside_charge ?? 60;
@@ -108,7 +108,7 @@ class CartController extends FrontendController
         return back()->with('success', 'Shipping area has been updated.');
     }
 
-    public function applyCoupon($store, Request $request)
+    public function applyCoupon(Request $request)
     {
         try {
             $subtotal = (float) str_replace(',', '', Cart::subtotal());
@@ -142,13 +142,13 @@ class CartController extends FrontendController
         }
     }
 
-    public function removeCoupon($store)
+    public function removeCoupon()
     {
         session()->forget('coupon');
         return back()->with('success', 'The coupon has been removed.');
     }
     // product add to cart
-    public function add($store, Request $request)
+    public function add(Request $request)
     {
         try {
             //
@@ -258,7 +258,7 @@ class CartController extends FrontendController
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
-    // public function add($store, Request $request)
+    // public function add( Request $request)
     // {
     //     try {
     //         $qty         = (int) ($request->qty ?? 1);
@@ -442,7 +442,7 @@ class CartController extends FrontendController
         return $total;
     }
     //update cart
-    public function update($store, Request $request)
+    public function update(Request $request)
     {
         $item = Cart::get($request->rowId);
         if ($item) {
@@ -455,7 +455,7 @@ class CartController extends FrontendController
         return back()->with('success', 'Cart has been updated.');
     }
 
-    public function remove($store, $rowId)
+    public function remove($rowId)
     {
         $item = Cart::get($rowId);
         if ($item) {

@@ -24,7 +24,7 @@
                 Filter Products
             </h2>
             <button id="close-right-filter-btn"
-                class="text-3xl leading-none text-gray-400 hover:text-[#632085] focus:outline-none transition">
+                class="text-3xl leading-none text-gray-400 hover:text-[var(--primary-color)] focus:outline-none transition">
                 &times;
             </button>
         </div>
@@ -41,11 +41,11 @@
                         ({{ $setup->currency }})</label>
                     <div class="flex items-center gap-2">
                         <input type="number" name="min_price" placeholder="Min" value="{{ request('min_price', 0) }}"
-                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#632085]">
+                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[var(--primary-color)]">
                         <span class="text-gray-300">-</span>
                         <input type="number" name="max_price" placeholder="Max"
                             value="{{ request('max_price', (int) $maxPriceLimit) }}"
-                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[#632085]">
+                            class="w-1/2 border border-gray-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-[var(--primary-color)]">
                     </div>
                 </div>
 
@@ -55,7 +55,7 @@
                         <label for="mobile-brand-select" class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Select
                             Brand</label>
                         <select id="mobile-brand-select" name="brand[]"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)]">
                             <option value="">All Brands</option>
                             @foreach ($brands as $brand)
                                 <option value="{{ $brand->id }}"
@@ -73,7 +73,7 @@
                         <label for="" class="block text-sm font-bold text-gray-800 uppercase tracking-wider mb-2">Filter By
                             {{ $group->name }}</label>
                         <select name="attributes[{{ $group->id }}][]" aria-label="Filter By {{ $group->name }}"
-                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[#632085]">
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-700 bg-white focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)]">
                             <option value="">All {{ $group->name }}s</option>
                             @foreach ($group->values as $value)
                                 <option value="{{ $value->id }}"
@@ -97,7 +97,7 @@
             <!-- Apply Button (Fixed at Bottom) -->
             <div class="mt-auto p-4 border-t border-gray-100 bg-gray-50">
                 <button type="submit" id="apply-filters-btn"
-                    class="w-full bg-[#632085] hover:bg-[#52166d] text-white font-bold py-3.5 rounded-xl text-base shadow-lg transition active:scale-95">
+                    class="w-full primary-bg hover:bg-[#52166d] text-white font-bold py-3.5 rounded-xl text-base shadow-lg transition active:scale-95">
                     Apply Filters
                 </button>
             </div>
@@ -120,7 +120,7 @@
                         <div class="category-item border-b border-gray-50 last:border-0 pb-1">
                             <div class="flex justify-between items-center py-2 group">
                                 <a href="{{ route('category.products', $mega->slug) }}" aria-label="{{ $mega->name }}"
-                                    class="text-base font-bold text-gray-700 hover:text-[#632085] transition-colors uppercase">
+                                    class="text-base font-bold text-gray-700 hover:text-[var(--primary-color)] transition-colors uppercase">
                                     {{ $mega->name }}
                                 </a>
 
@@ -141,13 +141,13 @@
                                         <div class="sub-category-item">
                                             <div class="flex justify-between items-center py-1.5 group/sub">
                                                 <a href="{{ route('category.products', $sub->slug) }}" aria-label="sub category"
-                                                    class="text-sm font-semibold text-gray-600 hover:text-[#632085] transition-colors">
+                                                    class="text-sm font-semibold text-gray-600 hover:text-[var(--primary-color)] transition-colors">
                                                     {{ $sub->name }}
                                                 </a>
 
                                                 @if ($sub->miniCategories->count() > 0)
                                                     <button
-                                                        class="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-[#632085] cursor-pointer"
+                                                        class="w-6 h-6 flex items-center justify-center text-gray-300 hover:text-[var(--primary-color)] cursor-pointer"
                                                         onclick="toggleAccordion('sub-{{ $sub->id }}', this)">
                                                         <span class="sub-icon text-base font-light">+</span>
                                                     </button>
@@ -160,7 +160,7 @@
                                                     class="hidden pl-4 space-y-1.5 mt-1 pb-2 border-l border-gray-100 ml-1">
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <a href="{{ route('category.products', $mini->slug) }}" aria-label="mini category"
-                                                            class="block text-sm text-gray-500 hover:text-[#632085] py-1 transition-all hover:pl-1">
+                                                            class="block text-sm text-gray-500 hover:text-[var(--primary-color)] py-1 transition-all hover:pl-1">
                                                             {{ $mini->name }}
                                                         </a>
                                                     @endforeach
@@ -213,12 +213,12 @@
 
                                         <div class="relative group">
                                             <button type="button"
-                                                class="border {{ $isActive ? 'border-[#632085] bg-purple-50 text-[#632085]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
+                                                class="border {{ $isActive ? 'border-[var(--primary-color)] bg-purple-50 text-[var(--primary-color)]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
 
                                                 {{-- নাম এখানে দেখানো হচ্ছে এবং বেশি বড় হলে ডট ডট হবে --}}
                                                 <span class="truncate">{{ $displayText }}</span>
 
-                                                <svg class="w-3.5 h-3.5 {{ $isActive ? 'text-[#632085]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
+                                                <svg class="w-3.5 h-3.5 {{ $isActive ? 'text-[var(--primary-color)]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
                                                     fill="none" stroke="currentColor" stroke-width="2"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -232,13 +232,13 @@
                                                     @foreach ($group->values as $value)
                                                         @php $isSelected = in_array($value->id, $selectedIds); @endphp
                                                         <label
-                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isSelected ? 'text-[#632085] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
+                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isSelected ? 'text-[var(--primary-color)] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
                                                             <span>{{ $value->name }}</span>
                                                             <input type="checkbox"
                                                                 name="attributes[{{ $group->id }}][]"
                                                                 value="{{ $value->id }}" onchange="this.form.submit()"
                                                                 {{ $isSelected ? 'checked' : '' }}
-                                                                class="w-4 h-4 accent-[#632085] cursor-pointer">
+                                                                class="w-4 h-4 accent-[var(--primary-color)] cursor-pointer">
                                                         </label>
                                                     @endforeach
                                                 </div>
@@ -262,9 +262,9 @@
                                         @endphp
                                         <div class="relative group">
                                             <button type="button"
-                                                class="border {{ $isBrandActive ? 'border-[#632085] bg-purple-50 text-[#632085]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
+                                                class="border {{ $isBrandActive ? 'border-[var(--primary-color)] bg-purple-50 text-[var(--primary-color)]' : 'border-gray-300 bg-white text-gray-700' }} rounded px-4 py-2 text-sm font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-gray-50 transition cursor-pointer max-w-[180px]">
                                                 <span class="truncate">{{ $brandText }}</span>
-                                                <svg class="w-3.5 h-3.5 {{ $isBrandActive ? 'text-[#632085]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
+                                                <svg class="w-3.5 h-3.5 {{ $isBrandActive ? 'text-[var(--primary-color)]' : 'text-gray-500' }} group-hover:rotate-180 transition-transform shrink-0"
                                                     fill="none" stroke="currentColor" stroke-width="2"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -277,12 +277,12 @@
                                                     @foreach ($brands as $brand)
                                                         @php $isBrandSelected = in_array($brand->id, $selectedBrandIds); @endphp
                                                         <label
-                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isBrandSelected ? 'text-[#632085] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
+                                                            class="flex items-center justify-between px-5 py-3 text-sm font-semibold {{ $isBrandSelected ? 'text-[var(--primary-color)] bg-purple-50' : 'text-gray-600' }} hover:bg-gray-50 cursor-pointer transition">
                                                             <span>{{ $brand->name }}</span>
                                                             <input type="checkbox" name="brand[]"
                                                                 value="{{ $brand->id }}" onchange="this.form.submit()"
                                                                 {{ $isBrandSelected ? 'checked' : '' }}
-                                                                class="w-4 h-4 accent-[#632085] cursor-pointer">
+                                                                class="w-4 h-4 accent-[var(--primary-color)] cursor-pointer">
                                                         </label>
                                                     @endforeach
                                                 </div>
@@ -311,7 +311,7 @@
                                 <form action="" method="GET" id="sortForm">
                                     <select name="sort" onchange="document.getElementById('sortForm').submit()"
                                         aria-label="Sort products"
-                                        class="w-full appearance-none bg-white border border-gray-200 text-gray-600 text-sm md:text-base rounded-md pr-10 pl-3 py-2 outline-none focus:ring-1 focus:ring-[#632085] cursor-pointer shadow-sm">
+                                        class="w-full appearance-none bg-white border border-gray-200 text-gray-600 text-sm md:text-base rounded-md pr-10 pl-3 py-2 outline-none focus:ring-1 focus:ring-[var(--primary-color)] cursor-pointer shadow-sm">
                                         <option value="default" class=""
                                             {{ request('sort') == 'default' ? 'selected' : '' }}>
                                             Default Sorting</option>
@@ -371,11 +371,11 @@
             if (content.classList.contains('hidden')) {
                 content.classList.remove('hidden');
                 icon.textContent = '-';
-                btn.closest('.flex').querySelector('a').classList.add('text-[#632085]');
+                btn.closest('.flex').querySelector('a').classList.add('text-[var(--primary-color)]');
             } else {
                 content.classList.add('hidden');
                 icon.textContent = '+';
-                btn.closest('.flex').querySelector('a').classList.remove('text-[#632085]');
+                btn.closest('.flex').querySelector('a').classList.remove('text-[var(--primary-color)]');
             }
         }
     </script>
@@ -417,11 +417,11 @@
                     if (content.classList.contains("hidden")) {
                         content.classList.remove("hidden");
                         icon.textContent = "-";
-                        this.classList.add("text-[#632085]", "font-bold");
+                        this.classList.add("text-[var(--primary-color)]", "font-bold");
                     } else {
                         content.classList.add("hidden");
                         icon.textContent = "+";
-                        this.classList.remove("text-[#632085]", "font-bold");
+                        this.classList.remove("text-[var(--primary-color)]", "font-bold");
                         this.classList.add("text-gray-700");
                     }
                 });
@@ -441,11 +441,11 @@
                     if (content.classList.contains("hidden")) {
                         content.classList.remove("hidden");
                         icon.textContent = "-";
-                        this.classList.add("text-[#632085]", "font-bold");
+                        this.classList.add("text-[var(--primary-color)]", "font-bold");
                     } else {
                         content.classList.add("hidden");
                         icon.textContent = "+";
-                        this.classList.remove("text-[#632085]", "font-bold");
+                        this.classList.remove("text-[var(--primary-color)]", "font-bold");
                         this.classList.add("text-gray-700");
                     }
                 });

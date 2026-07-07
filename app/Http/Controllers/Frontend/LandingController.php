@@ -18,7 +18,7 @@ class LandingController extends FrontendController
     {
         parent::__construct();
     }
-    public function index($store, $slug)
+    public function index($slug)
     {
         $landing = LandingPage::with('product')->where('slug', $slug)->firstOrFail();
 

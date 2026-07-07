@@ -39,6 +39,7 @@ class SubdomainMiddleware
             URL::defaults([
                 'store' => $subdomain
             ]);
+            app()->instance('currentStore', $subdomain);
 
             return $next($request);
         }
@@ -47,8 +48,17 @@ class SubdomainMiddleware
         $store = \App\Models\DomainSetup::where('custom_domain', $host)->first();
 
         if ($store) {
+            app()->instance('currentStore', $store->subdomain);
             URL::defaults([
                 'store' => $store->subdomain
+            ]);
+
+            return $next($request);
+        }
+        if($host == '127.0.0.1'){
+            app()->instance('currentStore', 'babyshop');
+            URL::defaults([
+                'store' => 'babyshop'
             ]);
 
             return $next($request);

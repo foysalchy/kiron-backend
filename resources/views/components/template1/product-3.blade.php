@@ -27,7 +27,7 @@
 
     <div class="relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
-           class="hover:border-2 hover:border-[#d6bbdf] product-card-notch relative block aspect-[1/1.1] border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
+           class="hover:border-2 hover:border-[var(--primary-color)] product-card-notch relative block aspect-[1/1.1] border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
             <div class="w-full h-full p-6 flex items-center justify-center">
                 <img
                     src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
@@ -42,7 +42,7 @@
                 <button
                     type="button"
                     onclick="toggleWishlist({{ $product->id }})"
-                    class="w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-[#66267b] text-white' }}"
+                    class="w-10 h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-md active:scale-90 transition-all cursor-pointer {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-[var(--primary-color)] text-white' }}"
                     aria-label="Add to Wishlist">
                     <i class="{{ $isWishlisted ? 'fa-solid' : 'fa-regular' }} fa-heart text-lg"></i>
                 </button>
@@ -52,7 +52,7 @@
 
     <div class="p-4 flex flex-col flex-grow">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
-            <h3 class="text-[#0f172a] text-base md:text-lg font-bold leading-tight tracking-tight line-clamp-2 min-h-[44px] group-hover:text-[#66267b] transition-colors">
+            <h3 class="text-[#0f172a] text-base md:text-lg font-bold leading-tight tracking-tight line-clamp-2 min-h-[44px] group-hover:text-[var(--primary-color)] transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
@@ -82,7 +82,7 @@
             {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="w-full text-white text-center text-sm md:text-base rounded-full border-0 mt-4 py-3 transition-all cursor-pointer px-4 font-bold shadow-sm flex items-center justify-center gap-2
-            {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#66267b] hover:bg-[#521d63] active:scale-95' }}">
+            {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:bg-[#521d63] active:scale-95' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out
@@ -219,7 +219,7 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json', 
+                            'Accept': 'application/json',
                             'X-CSRF-TOKEN': token
                         },
                         body: JSON.stringify(postData)

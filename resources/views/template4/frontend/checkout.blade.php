@@ -6,9 +6,9 @@
     <section class="bg-[#F9F9F9] py-2">
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-            <a href="/" class="text-[#632085] hover:text-[#52166d] transition font-medium">Home</a>
+            <a href="/" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
             <span class="text-gray-400">/</span>
-            <span class="text-[#632085] hover:text-[#52166d] transition font-medium">Checkout</span>
+            <span class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Checkout</span>
         </nav>
     </section>
 
@@ -30,14 +30,14 @@
                                         *</label>
                                     <input type="text" name="name" placeholder="Enter your full name" required
                                         value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#632085] transition" />
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                                 <div>
                                     <label class="block text-sm md:text-base font-semibold text-gray-700 mb-1">Phone
                                         *</label>
                                     <input type="tel" name="phone" id="customer-phone" placeholder="Enter your Number"
                                         required value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#632085] transition" />
+                                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
 
@@ -53,7 +53,7 @@
                                     </span>
                                     <input type="text" name="address" placeholder="Search and enter address detail"
                                         required value="{{ old('address', auth('customer')->user()->address ?? '') }}"
-                                        class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#632085] transition" />
+                                        class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                                 @php $slug = strtolower(trim($method->name)); @endphp
                                 <div class="payment-option-wrapper">
                                     <label id="label-{{ $slug }}"
-                                        class="payment-option-label flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-xl cursor-pointer transition hover:border-[#632085]"
+                                        class="payment-option-label flex items-center justify-between p-3 md:p-4 border border-gray-200 rounded-xl cursor-pointer transition hover:border-[var(--primary-color)]"
                                         onclick="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')">
 
                                         <div class="flex items-center gap-3">
@@ -84,7 +84,7 @@
                                         </div>
 
                                         @if ($method->icon)
-                                            <img src="{{ $method->icon_url }}" alt="icon" loading="lazy" height="" width=""
+                                            <img src="{{ $method->icon_url ?? '' }}" alt="icon" loading="lazy" height="" width=""
                                                 class="w-6 h-6 md:w-8 md:h-8 object-contain rounded shrink-0" />
                                         @endif
                                     </label>
@@ -121,14 +121,14 @@
                                     ({{ $setup->currency }}{{ number_format($setup->inside_charge) }})</span>
                                 <input type="radio" name="delivery_area" value="inside"
                                     onchange="updateCheckoutShipping(this.value)"
-                                    {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#632085] w-4 h-4">
+                                    {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
                             <label class="flex items-center justify-between cursor-pointer text-sm">
                                 <span>Outside Dhaka
                                     ({{ $setup->currency }}{{ number_format($setup->outside_charge) }})</span>
                                 <input type="radio" name="delivery_area" value="outside"
                                     onchange="updateCheckoutShipping(this.value)"
-                                    {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#632085] w-4 h-4">
+                                    {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
                         </div>
                     </div>
@@ -155,7 +155,7 @@
 
                     <div class="mt-2 md:mt-4">
                         <button type="submit"
-                            class="w-full bg-[#632085] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base shadow-md">
+                            class="w-full bg-[var(--primary-color)] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base shadow-md">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2.2"
                                 viewBox="0 0 24 24">
                                 <path
@@ -187,23 +187,23 @@
         function handlePaymentSelection(slug, name) {
             // UI Reset
             document.querySelectorAll(".payment-option-label").forEach(opt => {
-                opt.classList.remove("border-[#632085]", "bg-purple-50/20");
+                opt.classList.remove("border-[var(--primary-color)]", "bg-purple-50/20");
                 opt.classList.add("border-gray-200");
                 const ring = opt.querySelector(".radio-ring");
                 const dot = opt.querySelector(".radio-dot");
-                if (ring) ring.classList.replace("border-[#632085]", "border-gray-300");
-                if (dot) dot.classList.replace("bg-[#632085]", "bg-transparent");
+                if (ring) ring.classList.replace("border-[var(--primary-color)]", "border-gray-300");
+                if (dot) dot.classList.replace("bg-[var(--primary-color)]", "bg-transparent");
             });
 
             // Highlight Active
             const activeLabel = document.getElementById('label-' + slug);
             if (activeLabel) {
-                activeLabel.classList.replace("border-gray-200", "border-[#632085]");
+                activeLabel.classList.replace("border-gray-200", "border-[var(--primary-color)]");
                 activeLabel.classList.add("bg-purple-50/20");
                 const ring = activeLabel.querySelector(".radio-ring");
                 const dot = activeLabel.querySelector(".radio-dot");
-                if (ring) ring.classList.replace("border-gray-300", "border-[#632085]");
-                if (dot) dot.classList.replace("bg-transparent", "bg-[#632085]");
+                if (ring) ring.classList.replace("border-gray-300", "border-[var(--primary-color)]");
+                if (dot) dot.classList.replace("bg-transparent", "bg-[var(--primary-color)]");
                 activeLabel.querySelector('input[type="radio"]').checked = true;
             }
 

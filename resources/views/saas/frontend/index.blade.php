@@ -246,7 +246,7 @@
         }
 
         .flow-pulse {
-            stroke: #00555c;
+            stroke: white;
             stroke-width: 2.2;
             fill: none;
             stroke-dasharray: 8 200;
@@ -636,7 +636,7 @@
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-white mb-10">
                     Track and automate your entire business
                 </h2>
 
@@ -701,7 +701,7 @@
                             </div>
                         </div>
                         <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
+                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Multiple Payment Gateways </h3>
                             Integrate leading payment gateways including bKash, Nagad, Rocket, SSLCommerz, and more. Accept
                             secure online payments, automate payment confirmation, and manage every transaction from a
                             single platform.
@@ -759,7 +759,7 @@
                             </div>
                         </div>
                         <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
+                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Ship Orders with Multiple Courier Partners
                             </h3>
                             Connect with trusted courier services like Pathao, SteadFast, CarryBee, RedX, and more. Create
                             shipments, track deliveries, manage returns, and update order statuses without leaving dorja.io.
@@ -818,7 +818,7 @@
                             </div>
                         </div>
                         <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
+                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Manage Customer Conversations from Every
                                 Channel </h3>
                             Handle customer inquiries from Facebook Messenger, WhatsApp, Live Chat, and more in one unified
                             inbox. Respond faster, manage conversations efficiently, and deliver a better customer
@@ -877,7 +877,7 @@
                             </div>
                         </div>
                         <div class="bg-[#262626] text-white px-5 py-5 pt-2  text-left text-sm md:text-base">
-                            <h3 class="text-[#26ffc7] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
+                            <h3 class="text-[#02adbb] text-2xl font-bold mb-2"> Manage Orders from Every Sales Channel
                             </h3>
                             Receive and manage orders from your Website, Landing Pages, WooCommerce, Daraz, and other
                             connected sales channels through a single dashboard. Process, fulfill, and track every order
@@ -1207,10 +1207,10 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-table-cells-large text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Affordable Pricing
                     </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
                         Select a plan that fits your business size and goals. dorja.io offers flexible packages for startups
                         to enterprises that grow with you.
                     </p>
@@ -1226,10 +1226,10 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Explore Features
                     </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
                         Discover a complete suite of business tools designed to automate operations, improve efficiency, and
                         help you make faster data-driven decisions.
                     </p>
@@ -1245,10 +1245,10 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#26ffc7] text-2xl font-bold mb-5">
+                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Start Your Journey Today
                     </h3>
-                    <p class="text-gray-600 text-[17px] leading-relaxed mb-8">
+                    <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
                         Join thousands of businesses already using dorja.io. Start your journey today and transform the way
                         you manage and grow your business.
                     </p>

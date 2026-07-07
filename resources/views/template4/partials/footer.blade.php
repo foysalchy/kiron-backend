@@ -1,14 +1,14 @@
     <!-- FOOTER SECTION -->
-    <footer class="bg-[#3b143c] text-white pt-20 pb-10" role="contentinfo">
+    <footer class="primary-bg text-white pt-20 pb-10" role="contentinfo">
         <div class="container mx-auto p-4">
             <!-- Top Part: Logo & Menus -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
                 <!-- Column 1: Logo & Newsletter (Takes 2 parts space) -->
                 <div class="lg:col-span-2 space-y-8">
                     <div>
                         <a href="{{ route('home') }}" aria-label="Little Joy Home">
-                            <img src="{{ $setup->logo_url ?? '' }}"
-                            loading="lazy"    alt="Little Joy Baby Shop Logo" height="80" width="200" class="h-20">
+                            <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}"
+                            loading="lazy" alt="Little Joy Baby Shop Logo" height="80" width="150" class="h-20">
                         </a>
                     </div>
                     <p class="text-base font-light leading-relaxed max-w-[280px]">
@@ -32,43 +32,27 @@
                 <!-- Column 2: SOLUTIONS -->
                 <div class="lg:col-start-3">
                     <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
-                        Solutions
+                        Pages
                     </h3>
                     <ul class="space-y-4 text-white/90 text-base">
-                        <li><a href="#" class="hover:underline">Careers</a></li>
-                        <li><a href="#" class="hover:underline">Resources</a></li>
-                        <li><a href="#" class="hover:underline">Finance</a></li>
-                        <li><a href="#" class="hover:underline">Management</a></li>
-                        <li><a href="#" class="hover:underline">Workflow</a></li>
+                        @foreach ($footerPages as $page)
+                        <li><a href="{{ url('page', ['slug' => $page->slug]) }}" class="hover:underline">{{ $page->title }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 
                 <!-- Column 3: ABOUT US -->
                 <div>
                     <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
-                        About Us
+                        Quick Link
                     </h3>
                     <ul class="space-y-4 text-white/90 text-base">
-                        <li><a href="#" class="hover:underline">What We Offer</a></li>
-                        <li><a href="#" class="hover:underline">Solutions</a></li>
-                        <li><a href="#" class="hover:underline">Careers</a></li>
-                        <li><a href="#" class="hover:underline">Pricing</a></li>
-                        <li><a href="#" class="hover:underline">Features</a></li>
+                        <li><a href="{{ route('blog.index') }}" class="hover:underline">Blog</a></li>
+                        <li><a href="{{ route('shop.index') }}" class="hover:underline">Shop</a></li>
+                        <li><a href="{{ route('contact.index') }}" class="hover:underline">Contact Us</a></li>
                     </ul>
                 </div>
 
-                <!-- Column 4: PERSONAL -->
-                <div>
-                    <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
-                        Personal
-                    </h3>
-                    <ul class="space-y-4 text-white/90 text-base">
-                        <li><a href="#" class="hover:underline">Features</a></li>
-                        <li><a href="#" class="hover:underline">Profile</a></li>
-                        <li><a href="#" class="hover:underline">Payments</a></li>
-                        <li><a href="#" class="hover:underline">Accounts</a></li>
-                    </ul>
-                </div>
 
                 <!-- Column 5: SOCIAL -->
                 <div>

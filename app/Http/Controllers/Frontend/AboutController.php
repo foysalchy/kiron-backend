@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 
 class AboutController extends FrontendController
 {
-    public function showPage($store,$slug)
+    public function showPage($slug)
     {
         $page = Page::where('slug', $slug)
-                    ->where('status', 1)
-                    ->firstOrFail();
+            ->where('status', 1)
+            ->firstOrFail();
         return $this->view('frontend.page', compact('page'));
     }
 }

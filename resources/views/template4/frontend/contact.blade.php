@@ -38,7 +38,7 @@
                             <label class="block text-sm font-bold text-gray-700 mb-2">Name *</label>
                             <input type="text" name="name" value="{{ old('name') }}" placeholder="Enter Your Name.."
                                 required
-                                class="w-full h-10 px-3 rounded-lg focus:border-[#016738] outline-none border border-gray-300">
+                                class="w-full h-10 px-3 rounded-lg focus:border-[var(--primary-color)] outline-none border border-gray-300">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2">Email *</label>
@@ -65,11 +65,11 @@
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Message *</label>
                         <textarea name="message" placeholder="Enter Your Message..." rows="5" required
-                            class="w-full px-3 py-2 rounded-lg focus:border-[#016738] outline-none border border-gray-300">{{ old('message') }}</textarea>
+                            class="w-full px-3 py-2 rounded-lg focus:border-[var(--primary-color)] outline-none border border-gray-300">{{ old('message') }}</textarea>
                     </div>
 
                     <button type="submit"
-                        class="w-full primary-bg hover:bg-[#66267b] text-primary font-black py-3 rounded-lg shadow-lg transition-all">
+                        class="w-full primary-bg hover:primary-bg text-primary font-black py-3 rounded-lg shadow-lg transition-all">
                         <i class="fas fa-paper-plane mr-2"></i> Send Message
                     </button>
                 </form>
@@ -97,13 +97,13 @@
                                 <p class="text-gray-900 font-semibold mb-1">Phone</p>
 
                                 <a href="tel:{{ str_replace(' ', '', $setup->phone) }}"
-                                    class="text-gray-600 hover:[#66267b] transition-colors d-block mb-1">
+                                    class="text-gray-600 hover:[var(--primary-color)] transition-colors d-block mb-1">
                                     {{ $setup->phone }}
                                 </a>
 
                                 @if ($setup->alt_phone)
                                     <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}"
-                                        class="text-gray-600 hover:[#66267b] transition-colors block">
+                                        class="text-gray-600 hover:[var(--primary-color)] transition-colors block">
                                         {{ $setup->alt_phone }}
                                     </a>
                                 @endif
@@ -126,7 +126,7 @@
 
                             <div>
                                 <p class="text-gray-900 font-semibold">WhatsApp</p>
-                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-[#66267b] transition-colors">
+                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-[var(--primary-color)] transition-colors">
                                     {{ $whatsappNumber }}
                                 </a>
                             </div>
@@ -146,7 +146,7 @@
                             </div>
                             <div>
                                 <p class="text-gray-900 font-semibold">Email</p>
-                                <a href="mailto:{{ $setup->email }}" class="hover:text-[#66267b] transition-colors">
+                                <a href="mailto:{{ $setup->email }}" class="hover:text-[var(--primary-color)] transition-colors">
                                     {{ $setup->email }}
                                 </a>
                             </div>
@@ -185,7 +185,7 @@
                                 onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='inherit'">
 
                                 @if ($social->icon_image)
-                                    <img src="{{ asset('storage/' . $social->icon_image) }}"
+                                    <img src="{{ asset('storage/' . $social->icon_image)  ?? '' }}"
                                         alt="{{ $social->icon_name }}" height="" width="" loading="lazy"
                                         class="h-5 w-5 object-contain group-hover:primary-bg transition-transform">
                                 @else
