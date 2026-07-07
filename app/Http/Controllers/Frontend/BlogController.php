@@ -8,15 +8,15 @@ use Illuminate\Http\Request;
 
 class BlogController extends FrontendController
 {
-    public function index(Request $request, $store)
+    public function index(Request $request)
     {
         $query = Blog::with('user')->active();
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                ->orWhere('body', 'like', "%{$search}%");
+                    ->orWhere('body', 'like', "%{$search}%");
             });
         }
 
@@ -29,13 +29,13 @@ class BlogController extends FrontendController
 
         return  $this->view('frontend.blog', compact('blogs'));
     }
-    public function blogDetails($store, $slug)
+    public function blogDetails($slug)
     {
         $slugWithDash = str_replace(['%20', ' '], '-', $slug);
         $slugWithSpace = str_replace(['%20', '-'], ' ', $slug);
 
         $blog = Blog::with('user')
-            ->where(function($query) use ($slugWithDash, $slugWithSpace, $slug) {
+            ->where(function ($query) use ($slugWithDash, $slugWithSpace, $slug) {
                 $query->where('slug', $slug)
                     ->orWhere('slug', $slugWithDash)
                     ->orWhere('slug', $slugWithSpace);

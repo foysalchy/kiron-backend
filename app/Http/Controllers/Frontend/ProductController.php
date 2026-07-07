@@ -20,14 +20,15 @@ use Illuminate\Http\Request;
 
 class ProductController extends FrontendController
 {
-    public function getVariationModal($store, $id)
+
+    public function getVariationModal($id)
     {
         $product = Product::with(['variations.attributes.attributeValue', 'variations.attributes.attributeGroup'])
             ->findOrFail($id);
 
         return $this->view('partials/variation_modal_content', compact('product'));
     }
-    public function index(Request $request, $store)
+    public function index(Request $request)
     {
         $query = Product::with('variations')
             ->withCount('reviews')
@@ -70,7 +71,7 @@ class ProductController extends FrontendController
         ]);
     }
 
-    public function categoryProducts(Request $request, $store, $slug)
+    public function categoryProducts(Request $request, $slug)
     {
         $category = MegaCategory::where('slug', $slug)->first();
         $column = 'mega_category_ids';
@@ -182,7 +183,7 @@ class ProductController extends FrontendController
         }
     }
 
-    public function productDetails($store, $slug)
+    public function productDetails($slug)
     {
         $product = Product::with([
             'variations.attributes.attributeGroup',
@@ -251,7 +252,7 @@ class ProductController extends FrontendController
 
         return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations', 'trustBadges'));
     }
-    public function flashSale(Request $request, $store)
+    public function flashSale(Request $request)
     { // Filter products that have a discount > 0
         $query = Product::where('discount', '>', 0)
             ->where('status', Status::Active->value)
@@ -279,7 +280,7 @@ class ProductController extends FrontendController
     }
 
 
-    public function brandProducts(Request $request, $store, $slug)
+    public function brandProducts(Request $request, $slug)
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
 
@@ -341,19 +342,19 @@ class ProductController extends FrontendController
 
         return response()->json($results);
     }
-    public function subcategoryProducts(Request $request, $store, $mega_slug, $sub_slug)
+    public function subcategoryProducts(Request $request, $mega_slug, $sub_slug)
     {
         $category = SubCategory::where('slug', $sub_slug)->firstOrFail();
 
         $query = Product::where('status', Status::Active->value)
-            ->whereJsonContains('sub_category_ids', (int)$category->id) 
+            ->whereJsonContains('sub_category_ids', (int)$category->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
 
         return $this->renderShopView($request, $query, $category);
     }
 
-    public function minicategoryProducts(Request $request, $store, $mega_slug, $sub_slug, $mini_slug)
+    public function minicategoryProducts(Request $request,  $mega_slug, $sub_slug, $mini_slug)
     {
         $category = MiniCategory::where('slug', $mini_slug)->firstOrFail();
 

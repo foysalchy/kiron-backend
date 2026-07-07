@@ -158,8 +158,8 @@ class Product extends Model
     // Accessors
     public function getThumbnailUrlAttribute(): ?string
     {
-       
-         return $this->thumbnail
+
+        return $this->thumbnail
             ? Storage::disk('r2')->url($this->thumbnail)
             : null;
     }

@@ -431,7 +431,7 @@ class OrderController extends FrontendController
         //     return ['success' => false, 'error' => $e->getMessage()];
         // }
     }
-    public function orderDetails($store, $id)
+    public function orderDetails($id)
     {
         $order = Order::with([
             'customer',
@@ -456,7 +456,7 @@ class OrderController extends FrontendController
     }
 
 
-    public function invoice($store, $id)
+    public function invoice($id)
     {
         $order = Order::with([
             'customer',
