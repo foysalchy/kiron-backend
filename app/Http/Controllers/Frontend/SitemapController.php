@@ -24,12 +24,17 @@ class SitemapController extends Controller
         }
 
         $companyId = $currentStore->company_id;
+
         $robotsContent = Cache::remember(
             "robots_{$companyId}",
             now()->addHours(6),
-            function () use ($companyId) {
-                // Customize the robots.txt content based on your requirements
-                return "User-agent: *\nDisallow: /admin/\nSitemap: " . route('sitemap.index');
+            function () {
+                return <<<ROBOTS
+    User-agent: *
+    Disallow: /
+    Noindex: /
+    Nofollow: /
+    ROBOTS;
             }
         );
 

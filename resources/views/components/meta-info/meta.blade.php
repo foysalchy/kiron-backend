@@ -38,6 +38,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="title" content="{{ $title }}">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="description" content="{{ $description }}">
 @if ($keywords)
     <meta name="keywords" content="{{ $keywords }}">
