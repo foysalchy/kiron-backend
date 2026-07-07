@@ -124,7 +124,7 @@
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
-                                    <img src="{{ $slider->image_url }}" alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
+                                    <img src="{{ $slider->image_url ?? ''}}" alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
                                         height="400" width="1200" class="w-full h-full object-cover"
                                         @if ($loop->first) fetchpriority="high"
                         loading="eager"
@@ -146,7 +146,7 @@
                 @php $sideBanner = $sidebarSliders->first(); @endphp
                 @if ($sideBanner)
                     <a href="{{ $sideBanner->url ?? '#' }}" aria-label="{{ $sideBanner->title ?? 'banner Image' }}">
-                        <img src="{{ $sideBanner->image_url }}" alt="{{ $sideBanner->title }}" height="450" width="300"
+                        <img src="{{ $sideBanner->image_url ?? '' }}" alt="{{ $sideBanner->title }}" height="450" width="300"
                             loading="lazy"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
@@ -169,7 +169,7 @@
 
                     <span class="text-gray-900 font-black text-2xl">•</span>
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-truck-fast text-[#66267b]"></i>
+                        <i class="fa-solid fa-truck-fast text-[var(--primary-color)]"></i>
                         <span>Inside Charge: {{ $setup->currency ?? 'BDT' }}{{ $setup->inside_charge ?? '0' }} | Outside:
                             {{ $setup->currency ?? 'BDT' }}{{ $setup->outside_charge ?? '0' }}</span>
                     </div>
@@ -187,7 +187,7 @@
                     <div>Call to Order: {{ $setup->phone ?? '' }}</div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
                     <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-truck-fast text-[#66267b]"></i>
+                        <i class="fa-solid fa-truck-fast text-[var(--primary-color)]"></i>
                         <span>Delivery Charges Apply</span>
                     </div>
                     <span class="text-gray-900 font-black text-2xl">•</span>
@@ -350,7 +350,7 @@
 
                             <!-- Product Title -->
                             <h3
-                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#66267b] transition-colors">
+                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors">
                                 {{ $product->title }}
                             </h3>
 
@@ -365,61 +365,21 @@
         </div>
     </section>
     <!-- ABOUT / SEO TEXT SECTION -->
-    <section class="w-full bg-[#fcfcfc] px-4">
-        <div class="container mx-auto py-4 md:py-10">
-            <!-- Item 1 -->
-            <div class="mb-12">
-                <h2 class="text-[24px] md:text-[28px] font-bold text-[#041533] mb-4 tracking-tight">
-                    Welcome to BabyShoppers: Your Trusted Partner in Parenthood
-                </h2>
-                <p class="text-[#4b5563] text-base md:text-[16px] leading-[1.7] text-justify md:text-left">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting
-                    industry. Lorem Ipsum has been the industry's standard dummy text
-                    ever since 1966, when designers at Letraset and James Mosley, the
-                    librarian at St Bride Printing Library in London, took a 1914
-                    Cicero translation and scrambled it to make dummy text for
-                    Letraset's Body Type sheets. It has survived not only many
-                    decades, but also the leap into electronic typesetting, remaining
-                    essentially unchanged. It was popularised thanks to these sheets
-                    and more recently with desktop publishing software including
-                    versions of Lorem Ipsum.
-                </p>
-            </div>
+@if($homePageData->description)
+<section class="w-full bg-[#fcfcfc] px-4 font-manrope">
+    <div class="container mx-auto py-4 md:py-10">
+        <div class="prose prose-slate max-w-none
+            prose-headings:text-[#041533] prose-headings:font-bold
+            prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+            prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+            prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
 
-            <!-- Item 2 (Repeated Structure) -->
-            <div class="mb-12">
-                <h3 class="text-[22px] md:text-[24px] font-bold text-[#041533] mb-4 tracking-tight">
-                    Why Bangladeshi Parents Choose BabyShoppers
-                </h3>
-                <p class="text-[#4b5563] text-base md:text-[16px] leading-[1.7] text-justify md:text-left">
-                    It is a long established fact that a reader will be distracted by
-                    the readable content of a page when looking at its layout. The
-                    point of using Lorem Ipsum is that it has a more-or-less normal
-                    distribution of letters, as opposed to using 'Content here,
-                    content here', making it look like readable English. Many desktop
-                    publishing packages and web page editors now use Lorem Ipsum as
-                    their default model text, and a search for 'lorem ipsum' will
-                    uncover many web sites still in their infancy. Various versions
-                    have evolved over the years, sometimes by accident, sometimes on
-                    purpose (injected humour and the like).
-                </p>
-            </div>
+            {!! $homePageData->description !!}
 
-            <!-- Repeat Item 2 for more sections as shown in your image -->
-            <div class="mb-12">
-                <h3 class="text-[22px] md:text-[24px] font-bold text-[#041533] mb-4 tracking-tight">
-                    Why Bangladeshi Parents Choose BabyShoppers
-                </h3>
-                <p class="text-[#4b5563] text-base md:text-[16px] leading-[1.7] text-justify md:text-left">
-                    It is a long established fact that a reader will be distracted by
-                    the readable content of a page when looking at its layout. The
-                    point of using Lorem Ipsum is that it has a more-or-less normal
-                    distribution of letters, as opposed to using 'Content here,
-                    content here', making it look like readable English.
-                </p>
-            </div>
         </div>
-    </section>
+    </div>
+</section>
+@endif
 @endsection
 @push('scripts')
     <script>

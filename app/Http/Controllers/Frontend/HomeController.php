@@ -12,12 +12,17 @@ use App\Models\ProductGroup;
 use App\Models\ProductReview;
 use App\Models\Slider;
 use App\Models\Subscription;
+use App\Models\SystemPage;
 use Illuminate\Http\Request;
 
 class HomeController extends FrontendController
 {
     public function index()
     {
+        $homePageData = SystemPage::where('company_id', $this->company_id)
+        ->where('page_type', 'home')
+        ->first();
+
         $faqs = KnowledgeBase::active()
             ->get();
 
@@ -93,7 +98,8 @@ class HomeController extends FrontendController
                 'allProducts',
                 'allReviews',
                 'faqs',
-                'latestOffers'
+                'latestOffers',
+                'homePageData'
             )
         );
     }

@@ -1,9 +1,16 @@
+@php
+    $customMenu = \App\Models\MenuSetting::where('company_id', $setup->company_id ?? null)
+        ->where('status', \App\Enums\Status::Active->value)
+        ->first();
+
+    $menuItems = $customMenu ? $customMenu->items : null;
+@endphp
 <header class="w-full sticky top-0 z-50">
     <div class="hidden md:block bg-[#3533cd] text-white py-2 px-4 md:px-10">
         <div class="container mx-auto flex justify-between items-center text-xs md:text-sm">
             <div class="flex items-center gap-2">
                 <!-- WhatsApp Icon with label -->
-                <i class="fa-brands fa-whatsapp text-[#4ade80] text-lg" aria-hidden="true"></i>
+                <i class="fa-brands fa-whatsapp text-[var(--primary-color)] text-lg" aria-hidden="true"></i>
                 <span>Call Or Text Us to Order :
                     <a href="tel:{{ $setup->phone ?? '+88000000000' }}" class="hover:underline" aria-label="Call us">
                         {{ $setup->phone ?? '+880 00000000' }}
@@ -34,7 +41,7 @@
         </div>
     </div>
 
-    <div class="bg-[#66267b] text-white py-4 px-4 md:px-10 border-b border-purple-800">
+    <div class="primary-bg text-white py-4 px-4 md:px-10 border-b border-[var(--primary-color)]">
         <div class="container mx-auto flex items-center justify-between gap-4">
             <button id="menu-toggle" aria-label="Open Menu" class="lg:hidden text-2xl focus:outline-none"
                 aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-sidebar">
@@ -43,8 +50,8 @@
 
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
-                    <img src="{{ $setup->logo_url ?? asset('images/babyshop/images/babylogo.png') }}" height="80"
-                        width="200" alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" height="80" width="200"
+                        alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
                         class="h-16 md:h-20 w-auto object-contain" />
                 </a>
             </div>
@@ -56,7 +63,7 @@
                         placeholder="Search by product name" aria-label="Search for baby products"
                         class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
                     <button type="submit" aria-label="Search Products"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-purple-800">
+                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-[var(--primary-color)]">
                         <i class="fa-solid fa-magnifying-glass text-lg"></i>
                     </button>
                 </div>
@@ -101,7 +108,7 @@
                 <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 cursor-pointer group"
                     aria-label="View your wishlist, currently 0 items">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-regular fa-heart text-xl text-[#66267b]" aria-hidden="true"></i>
+                        <i class="fa-regular fa-heart text-xl text-[var(--primary-color)]" aria-hidden="true"></i>
                     </div>
                     <div class="hidden xl:block">
                         <p class="text-sm font-medium leading-tight">My Wishlist</p>
@@ -119,18 +126,18 @@
 
                 <!-- Shopping Cart Link -->
                 <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group">
-    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-        <i class="fa-solid fa-bag-shopping text-xl text-[#66267b]"></i>
-    </div>
-    
-    {{-- এই ডিভটি মোবাইলে হাইড হয়ে থাকে, তাই কাউন্ট দেখা যায় না --}}
-    <div class="hidden lg:block"> 
-        <p class="text-sm font-medium leading-tight">Shopping Card</p>
-        <p class="text-xs opacity-80">
-            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span> items )
-        </p>
-    </div>
-</a>
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-bag-shopping text-xl text-[var(--primary-color)]"></i>
+                    </div>
+
+                    <div class="hidden lg:block">
+                        <p class="text-sm font-medium leading-tight">Shopping Card</p>
+                        <p class="text-xs opacity-80">
+                            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span>
+                            items )
+                        </p>
+                    </div>
+                </a>
             </div>
         </div>
 
@@ -141,7 +148,7 @@
                     placeholder="Search..." aria-label="Search products"
                     class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
                 <button type="submit" aria-label="Search"
-                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-purple-800 transition-colors">
+                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] transition-colors">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
             </div>
@@ -165,54 +172,92 @@
     <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100">
         <div class="container mx-auto px-4 md:px-10">
             <ul class="flex items-center justify-center text-sm font-semibold text-gray-700">
+                @if ($menuItems && count($menuItems) > 0)
+                    @foreach (collect($menuItems)->sortBy('order') as $item)
+                        @if (data_get($item, 'visible') === true)
+                            @php
+                                $link = $item['link'] ?? '#';
+                                $finalUrl = str_starts_with($link, 'http') ? $link : url($link);
+                            @endphp
+                            <li class="group relative">
+                                <a href="{{ $finalUrl }}"
+                                    class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
+                                    {{ $item['label'] }}
+                                    @if (!empty($item['children']))
+                                        <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
+                                    @endif
+                                </a>
 
-                @foreach ($headerCategories->take(5) as $mega)
-                    <li class="group relative">
-                        <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
-                            class="flex items-center gap-2 px-5 py-4 hover:text-[#66267b] transition-all cursor-pointer uppercase">
-                            {{ $mega->name }}
-                            @if ($mega->subCategories->count() > 0)
-                                <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
-                            @endif
-                        </a>
-
-                        @if ($mega->subCategories->count() > 0)
-                            <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
-                                <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
-                                    @foreach ($mega->subCategories as $sub)
-                                        <li
-                                            class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                            <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
-                                                class="group-hover/sub:text-[#66267b] uppercase">
-                                                {{ $sub->name }}
-                                            </a>
-                                            @if ($sub->miniCategories->count() > 0)
-                                                <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
-                                            @endif
-
-                                            @if ($sub->miniCategories->count() > 0)
-                                                <ul
-                                                    class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
-                                                    @foreach ($sub->miniCategories as $mini)
-                                                        <li class="px-4 py-2.5 hover:bg-gray-100">
-                                                            <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
-                                                                class="block group-hover/mini:text-[#66267b] uppercase">
-                                                                {{ $mini->name }}
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @endif
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                                @if (!empty($item['children']))
+                                    <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                        <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
+                                            @foreach ($item['children'] as $child)
+                                                @if (data_get($child, 'visible') === true)
+                                                    @php
+                                                        $cLink = $child['link'] ?? '#';
+                                                        $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
+                                                    @endphp
+                                                    <li class="px-4 py-2.5 hover:bg-gray-100">
+                                                        <a href="{{ $cUrl }}"
+                                                            class="group-hover:text-[var(--primary-color)] uppercase block">
+                                                            {{ $child['label'] }}
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+                            </li>
                         @endif
-                    </li>
-                @endforeach
+                    @endforeach
+                @else
+                    @foreach ($headerCategories->take(5) as $mega)
+                        <li class="group relative">
+                            <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                                class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
+                                {{ $mega->name }}
+                                @if ($mega->subCategories->count() > 0)
+                                    <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
+                                @endif
+                            </a>
 
-                <li><a href="{{ route('contact.index') }}" aria-label="contact"
-                        class="px-5 py-4 block hover:text-[#66267b] transition-colors">Contact</a></li>
+                            @if ($mega->subCategories->count() > 0)
+                                <div class="absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                    <ul class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2">
+                                        @foreach ($mega->subCategories as $sub)
+                                            <li
+                                                class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
+                                                <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                                    class="group-hover/sub:text-[var(--primary-color)] uppercase">
+                                                    {{ $sub->name }}
+                                                </a>
+                                                @if ($sub->miniCategories->count() > 0)
+                                                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                                                @endif
+
+                                                @if ($sub->miniCategories->count() > 0)
+                                                    <ul
+                                                        class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
+                                                        @foreach ($sub->miniCategories as $mini)
+                                                            <li class="px-4 py-2.5 hover:bg-gray-100">
+                                                                <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                                    class="block group-hover/mini:text-[var(--primary-color)] uppercase">
+                                                                    {{ $mini->name }}
+                                                                </a>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                        </li>
+                    @endforeach
+                @endif
+
             </ul>
         </div>
     </nav>
@@ -220,67 +265,110 @@
     <div id="mobile-sidebar"
         class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col">
 
-        <div class="p-4 flex justify-between items-center border-b bg-[#66267b] text-white">
+        <div class="p-4 flex justify-between items-center border-b primary-bg text-white">
             <h2 class="font-bold text-lg uppercase tracking-wider">All Categories</h2>
             <button id="close-sidebar" aria-label="Close Menu"
                 class="text-2xl hover:text-red-400 transition-colors">&times;</button>
         </div>
 
         <nav class="flex-1 overflow-y-auto ">
-            {{-- ১. মেগা ক্যাটাগরি লুপ --}}
-            @foreach ($headerCategories as $mega)
-                <div class="border-b border-[#f3f3f3]">
-                    <div class="flex justify-between items-center px-5 py-4 group">
-                        <a href="{{ route('category.products', $mega->slug) }}"
-                            class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-[#66267b] transition-colors flex-1">
-                            {{ $mega->name }}
-                        </a>
+            @if ($menuItems && count($menuItems) > 0)
+                @foreach (collect($menuItems)->sortBy('order') as $index => $item)
+                    @if (data_get($item, 'visible') === true)
+                        @php
+                            $link = $item['link'] ?? '#';
+                            $finalUrl = str_starts_with($link, 'http') ? $link : url($link);
+                        @endphp
+                        <div class="border-b border-[#f3f3f3]">
+                            <div class="flex justify-between items-center px-5 py-4 group">
+                                <a href="{{ $finalUrl }}"
+                                    class="text-[#0f172a] font-bold uppercase text-sm flex-1">
+                                    {{ $item['label'] }}
+                                </a>
 
-                        @if ($mega->subCategories->count() > 0)
-                            <button class="accordion-btn text-gray-400 p-2 -mr-2" aria-label="Toggle {{ $mega->name }} categories"
-                                data-target="m-cat-{{ $mega->id }}">
-                                <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
-                            </button>
-                        @endif
-                    </div>
+                                @if (!empty($item['children']))
+                                    <button class="accordion-btn text-gray-400 p-2 -mr-2"
+                                        data-target="m-custom-{{ $index }}">
+                                        <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
+                                    </button>
+                                @endif
+                            </div>
 
-                    @if ($mega->subCategories->count() > 0)
-                        <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
-                            @foreach ($mega->subCategories as $sub)
-                                <div class="border-b border-gray-100 last:border-0">
-                                    <div class="flex justify-between items-center pl-8 pr-5 py-3">
-                                        <a href="{{ route('category.products', $sub->slug) }}"
-                                            class="text-sm font-semibold text-gray-700 hover:text-[#66267b] flex-1">
-                                            {{ $sub->name }}
-                                        </a>
-
-                                        @if ($sub->miniCategories->count() > 0)
-                                            <button class="accordion-btn text-gray-400 p-1"
-                                                data-target="m-sub-{{ $sub->id }}">
-                                                <i class="fa-solid fa-plus text-[10px]"></i>
-                                            </button>
+                            {{-- কাস্টম মেনুর সাব-মেনু (Children) --}}
+                            @if (!empty($item['children']))
+                                <div id="m-custom-{{ $index }}"
+                                    class="hidden bg-gray-50 border-t border-gray-100">
+                                    @foreach ($item['children'] as $child)
+                                        @if (data_get($child, 'visible') === true)
+                                            @php
+                                                $cLink = $child['link'] ?? '#';
+                                                $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
+                                            @endphp
+                                            <a href="{{ $cUrl }}"
+                                                class="block px-10 py-3 text-sm border-b border-[#f3f3f3] text-gray-700">
+                                                {{ $child['label'] }}
+                                            </a>
                                         @endif
-                                    </div>
-
-                                    {{-- ৩. মিনি ক্যাটাগরি লিস্ট --}}
-                                    @if ($sub->miniCategories->count() > 0)
-                                        <div id="m-sub-{{ $sub->id }}" class="hidden bg-gray-100/50">
-                                            @foreach ($sub->miniCategories as $mini)
-                                                <a href="{{ route('category.products', $mini->slug) }}"
-                                                    class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-[#66267b]">
-                                                    {{ $mini->name }}
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                    @endforeach
                                 </div>
-                            @endforeach
+                            @endif
                         </div>
                     @endif
-                </div>
-            @endforeach
+                @endforeach
+            @else
+                @foreach ($headerCategories as $mega)
+                    <div class="border-b border-[#f3f3f3]">
+                        <div class="flex justify-between items-center px-5 py-4 group">
+                            <a href="{{ route('category.products', $mega->slug) }}"
+                                class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-[var(--primary-color)] transition-colors flex-1">
+                                {{ $mega->name }}
+                            </a>
 
-            {{-- ইউজার অ্যাকাউন্ট এবং কন্টাক্ট সেকশন --}}
+                            @if ($mega->subCategories->count() > 0)
+                                <button class="accordion-btn text-gray-400 p-2 -mr-2"
+                                    aria-label="Toggle {{ $mega->name }} categories"
+                                    data-target="m-cat-{{ $mega->id }}">
+                                    <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
+                                </button>
+                            @endif
+                        </div>
+
+                        @if ($mega->subCategories->count() > 0)
+                            <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
+                                @foreach ($mega->subCategories as $sub)
+                                    <div class="border-b border-gray-100 last:border-0">
+                                        <div class="flex justify-between items-center pl-8 pr-5 py-3">
+                                            <a href="{{ route('category.products', $sub->slug) }}"
+                                                class="text-sm font-semibold text-gray-700 hover:text-[var(--primary-color)] flex-1">
+                                                {{ $sub->name }}
+                                            </a>
+
+                                            @if ($sub->miniCategories->count() > 0)
+                                                <button class="accordion-btn text-gray-400 p-1"
+                                                    data-target="m-sub-{{ $sub->id }}">
+                                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        {{-- ৩. মিনি ক্যাটাগরি লিস্ট --}}
+                                        @if ($sub->miniCategories->count() > 0)
+                                            <div id="m-sub-{{ $sub->id }}" class="hidden bg-gray-100/50">
+                                                @foreach ($sub->miniCategories as $mini)
+                                                    <a href="{{ route('category.products', $mini->slug) }}"
+                                                        class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-[var(--primary-color)]">
+                                                        {{ $mini->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            @endif
             <div class="p-4 space-y-2 bg-white mt-4">
                 @auth('customer')
                     <div class="p-4 bg-purple-50 rounded-xl mb-2">
@@ -289,7 +377,7 @@
                     </div>
                     <a href="{{ route('user.dashboard') }}"
                         class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 font-bold hover:bg-gray-50 rounded-lg transition-all">
-                        <i class="fa-regular fa-circle-user text-lg text-[#66267b]"></i>
+                        <i class="fa-regular fa-circle-user text-lg text-[var(--primary-color)]"></i>
                         <span>My Dashboard</span>
                     </a>
                     <form action="{{ route('user.logout') }}" method="POST">
@@ -302,7 +390,7 @@
                     </form>
                 @else
                     <a href="{{ route('user.login') }}"
-                        class="flex items-center justify-center p-4 bg-[#66267b] text-white rounded-xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">
+                        class="flex items-center justify-center p-4 primary-bg text-white rounded-xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">
                         <i class="fa-regular fa-user mr-2"></i> Log In / Register
                     </a>
                 @endauth

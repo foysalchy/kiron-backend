@@ -28,7 +28,7 @@
                                 </span>
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     placeholder="Enter Your Full Name" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('name') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('name')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -44,7 +44,7 @@
                                 </span>
                                 <input type="email" name="email" value="{{ old('email') }}"
                                     placeholder="user@example.com" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('email')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -60,7 +60,7 @@
                                 </span>
                                 <input type="tel" name="phone" value="{{ old('phone') }}"
                                     placeholder="Enter Your Phone Number.." required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('phone') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                             </div>
                             @error('phone')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -75,7 +75,7 @@
                                     <i class="fas fa-map-marker-alt text-sm"></i>
                                 </span>
                                 <textarea name="address" placeholder="Enter Your Full Address" rows="3" required
-                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('address') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">{{ old('address') }}</textarea>
+                                    class="w-full pl-11 pr-4 py-3 rounded-lg border @error('address') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">{{ old('address') }}</textarea>
                             </div>
                             @error('address')
                                 <span class="text-red-500 text-xs ml-1">{{ $message }}</span>
@@ -90,9 +90,9 @@
                                     <i class="fas fa-lock text-sm"></i>
                                 </span>
                                 <input type="password" name="password" id="password" placeholder="••••••••" required
-                                    class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-12 py-3 rounded-lg border @error('password') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password', this)"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#66267b]">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--primary-color)]">
                                     <i class="far fa-eye text-[14px]"></i>
                                 </button>
                             </div>
@@ -108,12 +108,11 @@
                                 <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <i class="fas fa-lock text-sm"></i>
                                 </span>
-                                {{-- পাসওয়ার্ড কনফার্মেশনের জন্য নাম অবশ্যই password_confirmation হতে হবে --}}
                                 <input type="password" name="password_confirmation" id="password_confirmation"
                                     placeholder="Re-enter password" required
-                                    class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                                    class="w-full pl-11 pr-12 py-3 rounded-lg border border-gray-200 outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                                 <button type="button" onclick="togglePassword('password_confirmation', this)"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#66267b]">
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[var(--primary-color)]">
                                     <i class="far fa-eye text-sm"></i>
                                 </button>
                             </div>
@@ -122,19 +121,19 @@
                         <!-- Terms & Conditions -->
                         <div class="flex items-start gap-3 py-2">
                             <input type="checkbox" name="terms" id="terms" required
-                                class="mt-1 w-4 h-4 accent-[#66267b] cursor-pointer">
+                                class="mt-1 w-4 h-4 accent-[var(--primary-color)] cursor-pointer">
                             <label for="terms" class="text-sm font-medium text-gray-600 cursor-pointer">
                                 I accept the <a href=" "
-                                    class="text-[#66267b] hover:underline">Terms and
+                                    class="text-[var(--primary-color)] hover:underline">Terms and
                                     Conditions</a> and <a href=" "
-                                    class="text-[#66267b] hover:underline">Privacy
+                                    class="text-[var(--primary-color)] hover:underline">Privacy
                                     Policy</a>
                             </label>
                         </div>
 
                         <!-- Submit Button -->
                         <button type="submit"
-                            class="w-full bg-[#66267b] text-primary font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
+                            class="w-full primary-bg text-primary font-black py-3 text-md rounded-lg shadow-xs shadow-orange-100 transition-all active:scale-[0.98]">
                             Register
                         </button>
 
@@ -142,7 +141,7 @@
                         <div class="text-center pt-4 text-sm">
                             <p class="text-gray-500 font-medium">
                                 Already have an account? <a href="{{ route('user.login') }}"
-                                    class="text-[#66267b] font-medium hover:underline ml-1">Login</a>
+                                    class="text-[var(--primary-color)] font-medium hover:underline ml-1">Login</a>
                             </p>
                         </div>
 
