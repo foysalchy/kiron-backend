@@ -39,7 +39,7 @@ Route::domain('dorja.io')->group(function () {
 });
 
 
- Route::middleware(SubdomainMiddleware::class)->group(function () {
+Route::middleware(SubdomainMiddleware::class)->group(function () {
 
 
 

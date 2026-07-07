@@ -55,6 +55,14 @@ class SubdomainMiddleware
 
             return $next($request);
         }
+        if($host == '127.0.0.1'){
+            app()->instance('currentStore', 'babyshop');
+            URL::defaults([
+                'store' => 'babyshop'
+            ]);
+
+            return $next($request);
+        }
 
         abort(404);
     }
