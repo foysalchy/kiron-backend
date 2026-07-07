@@ -39,6 +39,7 @@ class SubdomainMiddleware
             URL::defaults([
                 'store' => $subdomain
             ]);
+            app()->instance('currentStore', $subdomain);
 
             return $next($request);
         }
@@ -47,6 +48,7 @@ class SubdomainMiddleware
         $store = \App\Models\DomainSetup::where('custom_domain', $host)->first();
 
         if ($store) {
+            app()->instance('currentStore', $store->subdomain);
             URL::defaults([
                 'store' => $store->subdomain
             ]);
