@@ -286,7 +286,7 @@ class CompanyService
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'companies/logos',
-                    2048
+
                 );
             }
             $company->updateRequests()->create($data);
