@@ -17,14 +17,14 @@
         <!-- Breadcrumbs -->
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-            <a href="/" class="text-[#632085] hover:text-[#52166d] transition font-medium">Home</a>
+            <a href="/" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
             <span class="text-gray-400">/</span>
-            <a href="#" class="text-[#632085] hover:text-[#52166d] transition font-medium">Products</a>
+            <a href="#" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Products</a>
             @php $mega = $product->mega_categories?->first(); @endphp
             @if ($mega)
                 <span class="text-gray-400">/</span>
                 <a href="{{ route('category.products', $mega->slug) }}"
-                    class="text-[#632085] hover:text-[#52166d] transition font-medium">{{ $mega->name }}</a>
+                    class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">{{ $mega->name }}</a>
             @endif
             <span class="text-gray-400">/</span>
             <span class="text-gray-500 font-normal truncate">{{ $product->title }}</span>
@@ -42,16 +42,16 @@
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
                         <button aria-label="View product image {{ $loop->iteration ?? '' }}"
-                            class="thumb-btn border-2 border-[#632085] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                            class="thumb-btn border-2 border-[var(--primary-color)] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('{{ $product->thumbnail_url }}', this)">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-cover"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" class="w-full h-full object-cover"
                                 alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
                         </button>
                         @foreach ($product->galleries as $gallery)
                             <button
                                 class="thumb-btn border border-gray-200 p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                 onclick="changeImage('{{ $gallery->image_url }}', this)">
-                                <img src="{{ $gallery->image_url }}" loading="lazy" height="" width=""
+                                <img src="{{ $gallery->image_url ?? '' }}" loading="lazy" height="" width=""
                                     alt="gallery image" class="w-full h-full object-cover" />
                             </button>
                         @endforeach
@@ -60,13 +60,13 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 bg-gray-50 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[4/5]">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}" loading="lazy" height="" width=""
+                        <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                             alt="main image" class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
                         <button onclick="toggleWishlist({{ $product->id }})" type="button"
                             class="absolute top-3 left-3 md:top-4 md:left-4 p-2 md:p-2.5 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
-    {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[#632085]' }}">
+    {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
 
                             <i
                                 class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"></i>
@@ -83,12 +83,12 @@
 
                         <p class="text-gray-500 mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-medium pt-2 md:pt-4">
                             Brand Name: <span
-                                class="text-[#632085] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
+                                class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
                         </p>
 
                         <div class="flex items-baseline gap-2 md:gap-3 pt-3 md:pt-4">
                             <span id="sale-price"
-                                class="text-2xl md:text-3xl font-bold text-[#632085]">{{ $setup->currency }}
+                                class="text-2xl md:text-3xl font-bold text-[var(--primary-color)]">{{ $setup->currency }}
                                 {{ number_format($product->display_price_data->sale_price) }}</span>
                             @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
                                 <span id="regular-price"
@@ -123,7 +123,7 @@
                                     <span id="qty-value"
                                         class="w-4 md:w-6 text-center text-base md:text-lg font-bold text-[#0f172a]">1</span>
                                     <button onclick="changeQty(1)"
-                                        class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border border-[#632085] rounded-lg hover:bg-purple-50 transition text-[#632085] text-xl font-bold">+</button>
+                                        class="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center border border-[var(--primary-color)] rounded-lg hover:bg-purple-50 transition text-[var(--primary-color)] text-xl font-bold">+</button>
                                 </div>
                             </div>
 
@@ -133,7 +133,7 @@
                                     Add to Cart
                                 </button>
                                 <button onclick="handleAddToCart(true)"
-                                    class="flex-1 flex items-center justify-center gap-2 bg-[#632085] hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm">
+                                    class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm">
                                     Buy Now
                                 </button>
                             </div>
@@ -149,7 +149,7 @@
                             <p class="font-bold text-gray-800 text-sm md:text-base">Have a question?</p>
                             <div class="flex flex-wrap gap-4 md:gap-6 mt-4">
                                 <a href="tel:{{ $setup->phone }}"
-                                    class="flex items-center gap-2 font-bold text-gray-800 hover:text-[#632085]">
+                                    class="flex items-center gap-2 font-bold text-gray-800 hover:text-[var(--primary-color)]">
                                     Call: {{ $setup->phone }}
                                 </a>
                                 <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}" target="_blank"
@@ -176,7 +176,7 @@
                     <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
                         <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true"
                             aria-controls="section-description" {}
-                            class="tab-nav-btn flex-1 bg-white text-[#632085] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[#632085]">
+                            class="tab-nav-btn flex-1 bg-white text-[var(--primary-color)] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[var(--primary-color)]">
                             Description
                         </button>
                         <button onclick="scrollToSection('section-features', this)" role="tab" aria-selected="false"
@@ -198,7 +198,7 @@
                     <!-- 1. Description Content (scroll-mt-32 দিয়ে উপরে জায়গা রাখা হয়েছে) -->
                     <div id="section-description"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[#632085] pl-3 mb-4">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Description
                         </h2>
                         <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
@@ -209,7 +209,7 @@
                     <!-- 2. Features Content (short_description থেকে ডাটা নেওয়া হয়েছে) -->
                     <div id="section-features"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[#632085] pl-3 mb-4">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Features
                         </h2>
                         <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
@@ -220,7 +220,7 @@
                     <!-- 3. Specifications Content -->
                     <div id="section-specifications"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[#632085] pl-3 mb-4">
+                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Specifications
                         </h2>
                         <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
@@ -275,11 +275,11 @@
                         @foreach ($relatedProducts->take(5) as $rel)
                             <a href="{{ route('product.details', $rel->slug) }}"
                                 class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                                <img src="{{ $rel->thumbnail_url }}" loading="lazy" height="" width=""
+                                <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                                     alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
-                                    <p class="text-xs font-bold text-[#632085] mt-1">{{ $setup->currency }}
+                                    <p class="text-xs font-bold text-[var(--primary-color)] mt-1">{{ $setup->currency }}
                                         {{ number_format($rel->sale_price) }}</p>
                                 </div>
                             </a>
@@ -299,8 +299,8 @@
     <script>
         function changeImage(src, btn) {
             document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('border-[#632085]'));
-            btn.classList.add('border-[#632085]');
+            document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('border-[var(--primary-color)]'));
+            btn.classList.add('border-[var(--primary-color)]');
         }
 
         function changeQty(val) {
@@ -471,14 +471,14 @@
                             icon.classList.add('text-white');
 
                             const btn = icon.closest('button');
-                            if (btn) btn.classList.replace('bg-[#66267b]', 'bg-red-500');
+                            if (btn) btn.classList.replace('primary-bg', 'bg-red-500');
                         } else {
                             icon.setAttribute('fill', 'none');
                             icon.setAttribute('stroke', 'currentColor');
                             icon.classList.replace('fa-solid', 'fa-regular');
 
                             const btn = icon.closest('button');
-                            if (btn) btn.classList.replace('bg-red-500', 'bg-[#66267b]');
+                            if (btn) btn.classList.replace('bg-red-500', 'primary-bg');
                         }
                     });
 
@@ -506,11 +506,11 @@
                 });
 
                 document.querySelectorAll('.tab-nav-btn').forEach(b => {
-                    b.classList.remove('text-[#632085]', 'border-[#632085]');
+                    b.classList.remove('text-[var(--primary-color)]', 'border-[var(--primary-color)]');
                     b.classList.add('text-gray-500', 'border-transparent');
                 });
                 btn.classList.remove('text-gray-500', 'border-transparent');
-                btn.classList.add('text-[#632085]', 'border-[#632085]');
+                btn.classList.add('text-[var(--primary-color)]', 'border-[var(--primary-color)]');
             }
         }
     </script>

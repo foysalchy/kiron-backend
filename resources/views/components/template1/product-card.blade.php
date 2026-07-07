@@ -49,14 +49,14 @@
                                 icon.classList.add('text-white');
 
                                 const btn = icon.closest('button');
-                                if (btn) btn.classList.replace('bg-[#66267b]', 'bg-red-500');
+                                if (btn) btn.classList.replace('bg-[var(--primary-color)]', 'bg-red-500');
                             } else {
                                 icon.setAttribute('fill', 'none');
                                 icon.setAttribute('stroke', 'currentColor');
                                 icon.classList.replace('fa-solid', 'fa-regular');
 
                                 const btn = icon.closest('button');
-                                if (btn) btn.classList.replace('bg-red-500', 'bg-[#66267b]');
+                                if (btn) btn.classList.replace('bg-red-500', 'bg-[var(--primary-color)]');
                             }
                         });
 

@@ -73,7 +73,7 @@
                         </div>
 
                         <!-- Tags Section -->
-                        <div class="flex flex-wrap gap-3 mb-6 relative z-20"> <!-- এখানে z-20 দেওয়া হয়েছে -->
+                        <div class="flex flex-wrap gap-3 mb-6 relative z-20"> 
                             @php
                                 $keywords = is_array($blog->meta_keywords)
                                     ? $blog->meta_keywords

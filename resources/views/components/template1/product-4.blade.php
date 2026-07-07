@@ -90,7 +90,7 @@
                 @endphp
                 @foreach ($previewValues as $val)
                     <span
-                        class="min-w-[30px] h-7 px-2 flex items-center justify-center border border-gray-200 rounded text-xs font-bold text-gray-600 hover:border-[#66267b] transition-colors">
+                        class="min-w-[30px] h-7 px-2 flex items-center justify-center border border-gray-200 rounded text-xs font-bold text-gray-600 hover:border-[var(--primary-color)] transition-colors">
                         {{ $val }}
                     </span>
                 @endforeach

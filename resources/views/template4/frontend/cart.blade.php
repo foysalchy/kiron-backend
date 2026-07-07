@@ -5,9 +5,9 @@
 @section('content')
     <nav aria-label="Breadcrumb"
         class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-        <a href="/" class="text-[#632085] hover:text-[#52166d] transition font-medium">Home</a>
+        <a href="/" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
         <span class="text-gray-400">/</span>
-        <span class="text-[#632085] hover:text-[#52166d] transition font-medium">Shopping Cart</span>
+        <span class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Shopping Cart</span>
     </nav>
 
     <div class="w-full bg-white">
@@ -44,10 +44,10 @@
                                     <div class="col-span-6 sm:col-span-3 flex justify-start sm:justify-center mt-2 sm:mt-0">
                                         <div class="flex items-center gap-2 md:gap-3">
                                             <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center border border-[#632085] rounded hover:bg-purple-50 transition text-base md:text-lg font-bold focus:outline-none">-</button>
+                                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center border border-[var(--primary-color)] rounded hover:bg-purple-50 transition text-base md:text-lg font-bold focus:outline-none">-</button>
                                             <span class="qty-val w-6 text-center font-bold text-gray-800 text-base md:text-xl">{{ $item->qty }}</span>
                                             <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center border border-[#632085] rounded hover:bg-purple-50 transition text-base md:text-lg font-bold focus:outline-none">+</button>
+                                                class="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center border border-[var(--primary-color)] rounded hover:bg-purple-50 transition text-base md:text-lg font-bold focus:outline-none">+</button>
                                         </div>
                                     </div>
                                     <div class="col-span-6 sm:col-span-3 text-right mt-2 sm:mt-0">
@@ -82,11 +82,11 @@
                                     <div class="flex flex-col gap-3 w-full ml-auto">
                                         <label class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
                                             <span class="text-left sm:text-right leading-tight">Inside Dhaka: {{ $setup->currency }} {{ number_format($setup->inside_charge) }}</span>
-                                            <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="shrink-0 w-4 h-4 text-[#632085] focus:ring-[#632085] border-gray-300" />
+                                            <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
                                         </label>
                                         <label class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
                                             <span class="text-left sm:text-right leading-tight">Outside Dhaka: {{ $setup->currency }} {{ number_format($setup->outside_charge) }}</span>
-                                            <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="shrink-0 w-4 h-4 text-[#632085] focus:ring-[#632085] border-gray-300" />
+                                            <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
                                         </label>
                                     </div>
                                 </div>
@@ -114,7 +114,7 @@
 
                         <div class="mt-2 md:mt-4">
                             <a href="{{ route('checkout.index') }}"
-                                class="block w-full bg-[#632085] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl text-center text-base md:text-lg lg:text-xl shadow-md focus:outline-none">
+                                class="block w-full bg-[var(--primary-color)] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl text-center text-base md:text-lg lg:text-xl shadow-md focus:outline-none">
                                 Checkout Now
                             </a>
                         </div>
@@ -124,7 +124,7 @@
                 <!-- Empty Cart State (Design-consistent) -->
                 <div class="bg-white p-20 text-center rounded-lg border border-dashed border-gray-300">
                     <h2 class="text-2xl font-bold text-gray-800">Your cart is currently empty!</h2>
-                    <a href="{{ route('shop.index') }}" class="inline-block mt-6 bg-[#632085] text-white px-10 py-3 rounded-xl font-bold">Start Shopping</a>
+                    <a href="{{ route('shop.index') }}" class="inline-block mt-6 bg-[var(--primary-color)] text-white px-10 py-3 rounded-xl font-bold">Start Shopping</a>
                 </div>
             @endif
         </div>
