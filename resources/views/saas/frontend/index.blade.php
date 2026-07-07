@@ -636,7 +636,7 @@
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-white mb-10">
                     Track and automate your entire business
                 </h2>
 
