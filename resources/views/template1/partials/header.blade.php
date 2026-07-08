@@ -26,7 +26,7 @@
             </div>
             <div class="flex items-center gap-6">
 
-                <a href="{{ route('support.index') }}" class="hover:underline">Help</a>
+                <a href="{{ route('faq.index') }}" class="hover:underline">Help</a>
             </div>
         </div>
     </div>

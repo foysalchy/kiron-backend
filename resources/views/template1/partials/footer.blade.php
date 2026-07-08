@@ -99,7 +99,7 @@
                                 class="text-[16px] text-gray-400 hover-text transition-colors">Contact Us</a></li>
                         <li><a href="{{ route('order.track') }}"
                                 class="text-[16px] text-gray-400 hover-text transition-colors">Track Order</a></li>
-                        <li><a href="{{ route('support.index') }}"
+                        <li><a href="{{ route('faq.index') }}"
                                 class="text-[16px] text-gray-400 hover-text transition-colors">Help & Support</a></li>
                         <li><a href="{{ route('blog.index') }}"
                                 class="text-[16px] text-gray-400 hover-text transition-colors">Blog</a></li>

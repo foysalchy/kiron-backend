@@ -308,7 +308,7 @@
                             </svg>
                             Invoice Download
                         </a>
-                        <a href="{{ route('support.index') }}"
+                        <a href="{{ route('faq.index') }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[#FF6A00] hover:text-[#FF6A00] transition-all flex items-center justify-center gap-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
