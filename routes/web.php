@@ -39,7 +39,7 @@ Route::domain('dorja.io')->group(function () {
 });
 
 
-// Route::middleware(SubdomainMiddleware::class)->group(function () {
+Route::middleware(SubdomainMiddleware::class)->group(function () {
 
 
 
@@ -108,4 +108,4 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.i
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 
     // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
-// });
+});
