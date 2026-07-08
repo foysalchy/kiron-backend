@@ -53,6 +53,7 @@ class IndexController extends Controller
             ->get();
 
         $blogs = Blog::withoutCompanyScope()
+          ->whereNull('company_id')
             ->where('status', Status::Active->value)
             ->latest()
             ->take(3)
@@ -99,17 +100,18 @@ class IndexController extends Controller
     public function blogPosts()
     {
         $blogPosts = Blog::withoutCompanyScope()
-            ->with('company')
+             ->whereNull('company_id')
             ->where('status', Status::Active->value)
             ->latest()
-            ->paginate(3);
+            ->select('id', 'title', 'slug', 'images', 'created_at', 'short')
+            ->paginate(9);
 
         return view('saas.frontend.blogList', compact('blogPosts'));
     }
     public function blogPostDetails($slug)
     {
         $blogPost = Blog::withoutCompanyScope()
-            ->with('company')
+             ->whereNull('company_id')
             ->where('slug', $slug)
             ->where('status', Status::Active->value)
             ->firstOrFail();
