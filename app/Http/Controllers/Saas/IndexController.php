@@ -41,12 +41,16 @@ class IndexController extends Controller
             ->select('title', 'description', 'image')
             ->get();
 
-        $reviewsQuery = CustomerReview::where('status', Status::Active->value);
+       $reviewStats = CustomerReview::where('status', Status::Active->value)
+            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_reviews')
+            ->first();
 
-        $avgRating = $reviewsQuery->avg('rating') ?: 0;
-        $totalReviews = $reviewsQuery->count();
+        $avgRating = round($reviewStats->avg_rating ?? 0, 1);
+        $totalReviews = $reviewStats->total_reviews ?? 0;
 
-        $allReviews = CustomerReview::where('status', Status::Active->value)->latest()->get();
+        $allReviews = CustomerReview::where('status', Status::Active->value)
+            ->latest()
+            ->get();
 
         $demos = MasterDemo::where('status', Status::Active->value)
             ->latest()
@@ -77,9 +81,9 @@ class IndexController extends Controller
     public function features()
     {
         $allFeatures = MasterFeature::where('status', Status::Active->value)
-            ->where('placement', 1)
-             
-            ->paginate(40);
+        ->where('placement', 1)
+        ->select('id', 'slug', 'title', 'icon')
+        ->paginate(40);
 
         return view('saas.frontend.featureList', compact('allFeatures'));
     }
