@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger, ProductVariationStockLedger, PurchasePayment};
+use App\Models\{Purchase, PurchaseDetail, Product, ProductStockLedger, ProductVariationStockLedger, PurchasePayment, Requisition};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -141,6 +141,13 @@ class PurchaseService
             // If purchase is completed, add stock to warehouse
             if (isset($data['status']) && $data['status'] == Status::Completed->value) {
                 $this->addPurchaseStockToWarehouse($purchase);
+            }
+            if ($data['requisition_id']) {
+                $req = Requisition::find($data['requisition_id']);
+                if ($req) {
+                    $req->status = Status::Completed->value;
+                    $req->update();
+                }
             }
 
             DB::commit();

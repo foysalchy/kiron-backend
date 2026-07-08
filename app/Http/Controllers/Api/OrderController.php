@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPaymentRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Models\Order;
 use App\Services\FrontendOrderService;
 use App\Services\OrderService;
 use Illuminate\Http\{JsonResponse, Request};
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -167,7 +171,7 @@ class OrderController extends Controller
     }
     public function getSelectListOrder(Request $request)
     {
-        $q = $request->query('q'); 
+        $q = $request->query('q');
 
         $data = $this->orderService->getSelectListOrder($q);
 
@@ -180,5 +184,40 @@ class OrderController extends Controller
         $data = $this->orderService->orderProducts($orderId);
 
         return ResponseHelper::success($data, 'Order product list retrive');
+    }
+    public function bulkStatusUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'    => 'required|array|min:1',
+            'ids.*'  => 'integer|exists:orders,id',
+            'status' => 'required'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            Order::whereIn('id', $validated['ids'])
+                ->update(['status' => $validated['status']]);
+
+            foreach ($validated['ids'] as $orderId) {
+                LogHelper::statusChanged('orders', $orderId, auth()->user()->company_id);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order status updated successfully',
+                'updated_count' => count($validated['ids']),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk status update failed: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while updating status',
+            ], 500);
+        }
     }
 }
