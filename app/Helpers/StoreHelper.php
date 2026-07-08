@@ -59,7 +59,7 @@ if (!function_exists('getCurrentCompany')) {
 function getCurrentCompany()
 {
     
-    return app('currentStore');
+    return app('store') ?? getCurrentCompanyCycle();
 }
 }
 
