@@ -57,7 +57,7 @@
             </h3>
         </a>
 
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-3 font-manrope">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-3">
             <div class="flex items-center gap-2">
                 <span class="text-[#005c7a] text-lg md:text-xl font-black">
                     {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
@@ -72,7 +72,7 @@
             <div class="basis-full h-0 sm:hidden"></div>
 
             @if ($discountLabel)
-                <span class="bg-[#facc15] text-[#0f172a] text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full uppercase">
+                <span class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full uppercase">
                     -{{ $discountLabel }} OFF
                 </span>
             @endif
@@ -82,7 +82,7 @@
             {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="w-full text-white text-center text-sm md:text-base rounded-full border-0 mt-4 py-3 transition-all cursor-pointer px-4 font-bold shadow-sm flex items-center justify-center gap-2
-            {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:bg-[#521d63] active:scale-95' }}">
+            {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:primary-bg active:scale-95' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out
