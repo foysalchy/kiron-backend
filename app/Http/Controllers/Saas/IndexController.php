@@ -14,69 +14,79 @@ use App\Models\MasterFeature;
 use App\Models\PricingPackage;
 use App\Models\Slider;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Cache;
 class IndexController extends Controller
 {
+    
+
     public function home()
     {
-        $sliders = Slider::withoutCompanyScope()
-            ->where('status', Status::Active->value)
-            ->where('placement', 'hero')
-            ->whereNull('company_id')
-            ->orderBy('id', 'desc')
-            ->get();
-        $brands = MasterBrand::where('status', Status::Active->value)
-            ->latest()
-            ->get();
+        $data = Cache::remember('system_page_home', now()->addHours(6), function () {
 
-        $topFeatures = MasterFeature::where('status', Status::Active->value)
-            ->where('placement', 1)
-       
-            ->select('title', 'subtitle', 'icon', 'slug')
-            ->get();
+            $sliders = Slider::withoutCompanyScope()
+                ->where('status', Status::Active->value)
+                ->where('placement', 'hero')
+                ->whereNull('company_id')
+                ->orderByDesc('id')
+                ->get();
 
-        $whyChooseUs = MasterFeature::where('status', Status::Active->value)
-            ->where('placement', 2)
-            ->latest()
-            ->select('title', 'description', 'image')
-            ->get();
+            $brands = MasterBrand::where('status', Status::Active->value)
+                ->latest()
+                ->get();
 
-       $reviewStats = CustomerReview::where('status', Status::Active->value)
-            ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_reviews')
-            ->first();
+            $topFeatures = MasterFeature::where('status', Status::Active->value)
+                ->where('placement', 1)
+                ->select('title', 'subtitle', 'icon', 'slug')
+                ->get();
 
-        $avgRating = round($reviewStats->avg_rating ?? 0, 1);
-        $totalReviews = $reviewStats->total_reviews ?? 0;
+            $whyChooseUs = MasterFeature::where('status', Status::Active->value)
+                ->where('placement', 2)
+                ->latest()
+                ->select('title', 'description', 'image')
+                ->get();
 
-        $allReviews = CustomerReview::where('status', Status::Active->value)
-            ->latest()
-            ->get();
+            $reviewStats = CustomerReview::where('status', Status::Active->value)
+                ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_reviews')
+                ->first();
 
-        $demos = MasterDemo::where('status', Status::Active->value)
-            ->latest()
-            ->get();
+            $avgRating = round($reviewStats->avg_rating ?? 0, 1);
+            $totalReviews = $reviewStats->total_reviews ?? 0;
 
-        $blogs = Blog::withoutCompanyScope()
-          ->whereNull('company_id')
-            ->where('status', Status::Active->value)
-            ->latest()
-            ->take(3)
-            ->get(['id', 'title', 'slug', 'images', 'created_at','short']);
-        $pricingPlans = PricingPackage::with('tiers')->where('status', Status::Active->value)
-            ->take(4)
-            ->get();
-        return view('saas.frontend.index', compact(
-            'sliders',
-            'brands',
-            'topFeatures',
-            'whyChooseUs',
-            'avgRating',
-            'totalReviews',
-            'demos',
-            'allReviews',
-            'blogs',
-            'pricingPlans'
-        ));
+            $allReviews = CustomerReview::where('status', Status::Active->value)
+                ->latest()
+                ->get();
+
+            $demos = MasterDemo::where('status', Status::Active->value)
+                ->latest()
+                ->get();
+
+            $blogs = Blog::withoutCompanyScope()
+                ->whereNull('company_id')
+                ->where('status', Status::Active->value)
+                ->latest()
+                ->take(3)
+                ->get(['id', 'title', 'slug', 'images', 'created_at', 'short']);
+
+            $pricingPlans = PricingPackage::with('tiers')
+                ->where('status', Status::Active->value)
+                ->take(4)
+                ->get();
+
+            return compact(
+                'sliders',
+                'brands',
+                'topFeatures',
+                'whyChooseUs',
+                'avgRating',
+                'totalReviews',
+                'demos',
+                'allReviews',
+                'blogs',
+                'pricingPlans'
+            );
+        });
+
+        return view('saas.frontend.index', $data);
     }
     public function features()
     {
@@ -97,6 +107,7 @@ class IndexController extends Controller
             ->where('id', '!=', $feature->id)
             ->where('placement', 1)
             ->take(4)
+            ->select('id', 'slug', 'title', 'icon')
             ->get();
 
         return view('saas.frontend.featureDetails', compact('feature', 'otherFeatures'));
@@ -126,7 +137,7 @@ class IndexController extends Controller
             ->where('id', '!=', $blogPost->id)
             ->latest()
             ->take(4)
-            ->get();
+             ->get(['id', 'title', 'slug', 'images', 'created_at','short']);
  
         return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
     }
