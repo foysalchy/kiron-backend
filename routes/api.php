@@ -654,6 +654,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
                     Route::get('/products/{id}', [OrderController::class, 'orderProducts']);
                 });
+                Route::post('/orders/bulk-status-update', [OrderController::class, 'bulkStatusUpdate']);
 
                 Route::prefix('orders-return')->group(function () {
                     Route::get('/', [OrderReturnController::class, 'index']);
