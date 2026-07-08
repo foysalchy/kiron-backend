@@ -58,7 +58,7 @@ class IndexController extends Controller
             ->latest()
             ->take(3)
             ->get(['id', 'title', 'slug', 'images', 'created_at','short']);
-        $pricingPlans = PricingPackage::where('status', Status::Active->value)
+        $pricingPlans = PricingPackage::with('tiers')->where('status', Status::Active->value)
             ->take(4)
             ->get();
         return view('saas.frontend.index', compact(

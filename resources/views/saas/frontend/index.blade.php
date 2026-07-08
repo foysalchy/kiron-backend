@@ -1507,17 +1507,21 @@
                     @foreach ($pricingPlans as $plan)
                         @php
                             $mode = strtolower($plan->mode);
-                            $monthlyTier = collect($plan->tiers)->firstWhere('billing_cycle', 'monthly');
-                            $price = $monthlyTier['discount_price'] ?? ($monthlyTier['regular_price'] ?? 0);
 
-                            $themeColor = '#1e1b4b'; // Default Navy (For all other modes)
+                            $monthlyTier = $plan->tiers->firstWhere('billing_cycle', 'monthly');
+
+                            $price = $monthlyTier?->discount_price
+                                ?? $monthlyTier?->regular_price
+                                ?? 0;
+
+                            $themeColor = '#1e1b4b';
                             $isSpecialMode = false;
 
                             if ($mode === 'regular') {
-                                $themeColor = '#7e22ce'; // Purple
+                                $themeColor = '#7e22ce';
                                 $isSpecialMode = true;
                             } elseif ($mode === 'popular') {
-                                $themeColor = '#0073ea'; // Blue
+                                $themeColor = '#0073ea';
                                 $isSpecialMode = true;
                             }
                         @endphp
