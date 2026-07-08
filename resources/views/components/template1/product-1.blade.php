@@ -87,7 +87,7 @@
     <!-- Price & Button -->
     <div class="mt-auto pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
-            <span class="text-md font-medium text-brand text-primary">
+            <span class="text-lg font-bold text-brand text-primary">
                 {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
             @if ($regularPrice > $salePrice)
@@ -103,7 +103,7 @@
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="flex-1 py-2 rounded-lg text-sm font-medium transition-all shrink-0 whitespace-nowrap
-    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'primary-bg text-primary hover:bg-[#BD4F00] cursor-pointer' }}">
+    {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'w-[50px] max-w-[50px] primary-bg text-primary hover:bg-[#BD4F00] cursor-pointer' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle mr-1"></i> Stock Out
