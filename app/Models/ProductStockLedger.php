@@ -193,7 +193,7 @@ class ProductStockLedger extends Model
             $query->where('batch_number', $batchNumber);
         }
 
-        $lastLedger = $query->latest()->first();
+        $lastLedger = $query->orderBy('id','desc')->first();
         \Log::info($lastLedger);
         return $lastLedger ? $lastLedger->quantity_after : 0;
     }
