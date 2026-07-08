@@ -578,7 +578,7 @@
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
                             class="sol-tab-btn whitespace-nowrap flex-1  mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c]' }}">
+                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c] hover:text-white' }}">
                             {{ $sol['title'] }}
                         </button>
                     @endforeach
@@ -1205,7 +1205,7 @@
                 <!-- Feature 1 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-table-cells-large text-[#26ffc7] text-4xl"></i>
+                        <i class="fa-solid fa-table-cells-large text-[#02adbb] text-4xl"></i>
                     </div>
                     <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Affordable Pricing
@@ -1215,7 +1215,7 @@
                         to enterprises that grow with you.
                     </p>
                     <a href="{{ route('saas.package.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
                         Explore Our Pricing
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -1234,7 +1234,7 @@
                         help you make faster data-driven decisions.
                     </p>
                     <a href="{{ route('saas.feature.list') }}"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
                         Explore Features
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
@@ -1243,7 +1243,7 @@
                 <!-- Feature 3 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-bolt text-[#26ffc7] text-4xl"></i>
+                        <i class="fa-solid fa-bolt text-[#02adbb] text-4xl"></i>
                     </div>
                     <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Start Your Journey Today
@@ -1253,7 +1253,7 @@
                         you manage and grow your business.
                     </p>
                     <a href="https://app.dorja.io/register"
-                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#26ffc7] transition group">
+                        class="inline-flex items-center gap-3 text-white font-bold text-lg hover:text-[#02adbb] transition group">
                         Get Started
                         <i class="fa-solid fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
                     </a>
