@@ -56,7 +56,7 @@ class IndexController extends Controller
             ->where('status', Status::Active->value)
             ->latest()
             ->take(3)
-            ->get(['id', 'title', 'slug', 'images', 'reading_time', 'created_at','short']);
+            ->get(['id', 'title', 'slug', 'images', 'created_at','short']);
         $pricingPlans = PricingPackage::where('status', Status::Active->value)
             ->take(4)
             ->get();

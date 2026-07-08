@@ -1731,10 +1731,10 @@
                                         class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
                                         {{  'Admin' }}
                                     </span>
-                                    <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
+                                    <!-- <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
                                         <i class="fa-regular fa-clock"></i>
                                         <span>{{ $blog->reading_time ?? '' }} minutes</span>
-                                    </div>
+                                    </div> -->
                                 </div>
 
                                 <h3
