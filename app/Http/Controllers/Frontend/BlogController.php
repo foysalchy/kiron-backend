@@ -10,6 +10,8 @@ class BlogController extends FrontendController
 {
     public function index(Request $request)
     {
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
         $query = Blog::with('user')->active();
 
         if ($request->filled('search')) {
