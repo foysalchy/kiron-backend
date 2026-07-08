@@ -567,17 +567,17 @@
                     All-in-One Solution
                 </span>
 
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-10">
+                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-4">
                     From Start to Growth — Everything in One System
                 </h2>
 
                 <!-- Tabs -->
-                <div class="inline-flex p-1.5 bg-indigo-50/30 border-2 border-indigo-100 gap-2 rounded-2xl w-full overflow-auto max-w-[700px]"
+                <div class=" p-1.5  gap-2 rounded-2xl w-full  "
                     id="solution-tabs">
 
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
-                            class="sol-tab-btn whitespace-nowrap flex-1 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                            class="sol-tab-btn whitespace-nowrap flex-1 mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
                         {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900  ' }}">
                             {{ $sol['title'] }}
                         </button>
@@ -1224,7 +1224,7 @@
                 <!-- Feature 2 -->
                 <div class="group">
                     <div class="mb-6">
-                        <i class="fa-solid fa-layer-group text-[#26ffc7] text-4xl"></i>
+                        <i class="fa-solid fa-layer-group text-[#02adbb] text-4xl"></i>
                     </div>
                     <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
                         Explore Features
@@ -1945,10 +1945,10 @@
                         crossFade: true
                     },
                     autoplay: {
-                        delay: 2000,
+                        delay: 5000,
                         disableOnInteraction: false,
                     },
-                    speed: 900,
+                    speed: 1500,
                     pagination: {
                         el: '.hero-pagination',
                         clickable: true,
