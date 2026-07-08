@@ -2,9 +2,9 @@
 
 use App\Models\DomainSetup;
 
-if (!function_exists('getCurrentCompany')) {
+if (!function_exists('getCurrentCompanyCycle')) {
 
-    function getCurrentCompany()
+    function getCurrentCompanyCycle()
     {
         $host = request()->getHost();
  
@@ -54,3 +54,13 @@ if (!function_exists('getCurrentCompany')) {
         }
     }
 }
+if (!function_exists('getCurrentCompany')) {
+
+function getCurrentCompany()
+{
+    
+    return app('currentStore');
+}
+}
+
+// middlewear
