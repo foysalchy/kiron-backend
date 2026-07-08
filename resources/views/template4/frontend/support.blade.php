@@ -7,7 +7,8 @@
         <div class="max-w-3xl mx-auto text-center">
 
             <!-- Icon Circle -->
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-orange-100 text-[var(--primary-color)] rounded-full mb-8">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-orange-100 text-[var(--primary-color)] rounded-full mb-8">
                 <!-- Question Mark Icon (Lucide/FontAwesome style) -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -45,8 +46,16 @@
                         <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
-                        <div class="px-6 pb-5 text-gray-500 text-md border-t border-gray-50 pt-3">
-                            {!! nl2br(e($faq->content)) !!}
+                        <div class="px-6 pb-5 border-t border-gray-50 pt-3">
+                            <div
+                                class="prose prose-slate max-w-none
+                                prose-p:text-gray-500 prose-p:text-md prose-p:leading-relaxed
+                                prose-p:m-0
+                                prose-strong:text-gray-700 prose-a:text-[var(--primary-color)]">
+
+                                {!! $faq->content !!}
+
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -57,7 +66,6 @@
             @endforelse
         </div>
     </section>
-
 @endsection
 @push('scripts')
     <script>

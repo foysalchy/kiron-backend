@@ -9,13 +9,13 @@
         <nav
             class="flex items-center space-x-2 text-sm text-gray-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
             {{-- Home Link --}}
-            <a href="/" class="hover:text-primary transition-colors flex items-center gap-1">
+            <a href="{{ route('home') }}" class="hover:text-primary transition-colors flex items-center gap-1">
                 <i class="fas fa-home text-xs"></i> Home
             </a>
 
             {{-- Blogs Index Link --}}
             <i class="fas fa-chevron-right text-[8px] opacity-40"></i>
-            <a href="{{ url('/blogs') }}" class="hover:text-primary transition-colors">
+            <a href="{{ route('blog.index') }}" class="hover:text-primary transition-colors">
                 Blogs
             </a>
 
@@ -26,8 +26,7 @@
             </span>
         </nav>
 
-        <!-- আপনার বিদ্যমান Back Button -->
-        <a class="inline-flex items-center text-secondary hover:text-primary mb-6 font-medium" href="{{ url('/blogs') }}">
+        <a class="inline-flex items-center text-secondary hover:text-primary mb-6 font-medium" href="{{ route('blog.index') }}">
             <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
         </a>
 

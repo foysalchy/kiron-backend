@@ -3,19 +3,19 @@
 
         'type' => 'BlogPosting',
 
-        'title' => $blogPost->meta_title ?: $blogPost->title,
+        'title' => $blog->meta_title ?: $blog->title,
 
-        'description' => $blogPost->meta_description ?: Str::limit(strip_tags($blogPost->short), 160),
+        'description' => $blog->meta_description ?: Str::limit(strip_tags($blog->short), 160),
 
-        'keywords' => is_array($blogPost->meta_keywords)
-            ? implode(',', $blogPost->meta_keywords)
-            : $blogPost->meta_keywords,
+        'keywords' => is_array($blog->meta_keywords)
+            ? implode(',', $blog->meta_keywords)
+            : $blog->meta_keywords,
 
-        'image' => count($blogPost->images)
-            ? asset('storage/' . $blogPost->images[0])
+        'image' => count($blog->images)
+            ? asset('storage/' . $blog->images[0])
             : asset('storage/' . $setup->logo),
 
-        'canonical' => route('blog.details', $blogPost->slug),
+        'canonical' => route('blog.details', $blog->slug),
 
         'breadcrumb' => [
             [
@@ -27,18 +27,18 @@
                 'url' => route('blog.index'),
             ],
             [
-                'name' => $blogPost->title,
-                'url' => route('blog.details', $blogPost->slug),
+                'name' => $blog->title,
+                'url' => route('blog.details', $blog->slug),
             ],
         ],
 
         'schema' => [
-            'headline' => $blogPost->title,
+            'headline' => $blog->title,
 
             'author' => $setup->founder_name,
 
-            'published' => $blogPost->created_at,
+            'published' => $blog->created_at,
 
-            'updated' => $blogPost->updated_at,
+            'updated' => $blog->updated_at,
         ],
     ])
