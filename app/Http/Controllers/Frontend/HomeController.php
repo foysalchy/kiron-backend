@@ -15,114 +15,158 @@ use App\Models\Subscription;
 use App\Models\SystemPage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
 class HomeController extends FrontendController
 {
     public function index()
     {
         $companyId = $this->company_id;
+        // ক্যাশ লাইফটাইম (৬ ঘণ্টা)
+        $ttl = now()->addHours(6);
 
-        $data = Cache::remember(
-            "home_page_{$companyId}",
-            now()->addHours(6),
-            function () use ($companyId) {
+        // ১. হোমপেজ মেটা/সেটিংস ডেটা
+        $homePageData = Cache::remember("home_page_data_{$companyId}", $ttl, function () use ($companyId) {
+            return SystemPage::where('company_id', $companyId)
+                ->where('page_type', 'home')
+                ->select('id', 'company_id', 'title', 'description', 'meta_title', 'meta_description', 'meta_keywords')
+                ->first();
+        });
 
-                $homePageData = SystemPage::where('company_id', $companyId)
-                    ->where('page_type', 'home')
-                    ->first();
+        // ২. এফএকিউ (FAQs)
+        $faqs = Cache::remember("home_faqs_{$companyId}", $ttl, function () {
+            return KnowledgeBase::active()->select('id', 'title', 'content')->get();
+        });
 
-                $faqs = KnowledgeBase::active()->get();
+        // ৩. ক্যাটাগরি এবং সাব-ক্যাটাগরি
+        $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () {
+            return MegaCategory::select('id', 'name','company_id', 'slug', 'image')
+            ->with('subCategories:id,mega_category_id,name,slug','subCategories.miniCategories:id,sub_category_id,name,slug')->get();
+        });
 
-                $categories = MegaCategory::with('subCategories.miniCategories')->get();
+        // ৪. লেটেস্ট অফার
+        $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () {
+            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+                ->where('discount', '>', 0)
+                ->where('status', Status::Active->value)
+                ->latest()
+                ->take(12)
+                ->get();
+        });
 
-                $latestOffers = Product::with(['brand', 'variations'])
-                    ->where('discount', '>', 0)
-                    ->where('status', Status::Active->value)
-                    ->latest()
-                    ->take(12)
-                    ->get();
+        // ৫. নিউ অ্যারাইভালস
+        $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () {
+            return Product::with(['brand:id,company_id,name,slug,logo', 'variations.attributes.attributeValue'])
+                ->where('status', Status::Active->value)
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
+                ->latest()
+                ->take(8)
+                ->get();
+        });
 
-                $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
-                    ->where('status', Status::Active->value)
-                    ->withCount('reviews')
-                    ->withAvg('reviews', 'rating')
-                    ->latest()
-                    ->take(8)
-                    ->get();
+        // ৬. প্রোডাক্ট গ্রুপ (N+1 কুয়েরি ফিক্সড)
+        $productGroups = Cache::remember("home_product_groups_{$companyId}", $ttl, function () {
+            return ProductGroup::where('status', Status::Active->value)
+                ->where('is_frontend', 1)
+                ->select('id', 'name', 'slug', 'product_ids')
+                ->get()
+                ->map(function ($group) {
+                    $group->products = Product::whereIn('id', $group->product_ids ?? [])
+                        ->with(['variations'])
+                        ->where('status', Status::Active->value)
+                        ->withCount('reviews')
+                        ->withAvg('reviews', 'rating')
+                        ->take(6)
+                        ->get();
 
-                $productGroups = ProductGroup::where('status', Status::Active->value)
-                    ->where('is_frontend', 1)
-                    ->get()
-                    ->map(function ($group) {
-                        $group->products = Product::whereIn('id', $group->product_ids ?? [])
-                            ->with(['variations'])
-                            ->where('status', Status::Active->value)
-                            ->withCount('reviews')
-                            ->withAvg('reviews', 'rating')
-                            ->take(6)
-                            ->get();
+                    return $group;
+                })
+                ->filter(fn($group) => $group->products->count() > 0);
+        });
 
-                        return $group;
-                    })
-                    ->filter(fn($group) => $group->products->count() > 0);
+        // ৭. ব্র্যান্ডস
+        $brands = Cache::remember("home_brands_{$companyId}", $ttl, function () {
+            return Brand::where('status', Status::Active->value)
+                ->select('id', 'company_id', 'name', 'slug', 'logo')
+                ->latest()
+                ->take(10)
+                ->get();
+        });
 
-                $brands = Brand::where('status', Status::Active->value)
-                    ->latest()
-                    ->take(10)
-                    ->get();
+        // ৮. পপুলার প্রোডাক্টস
+        $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () {
+            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+                ->select('id', 'company_id', 'brand_id', 'name', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->where('status', Status::Active->value)
+                ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
+                ->withSum('orderDetails as total_sales', 'quantity')
+                ->orderByDesc('total_sales')
+                ->take(12)
+                ->get();
+        });
 
-                $popularProducts = Product::with(['brand', 'variations'])
-                    ->where('status', Status::Active->value)
-                    ->withCount('reviews')
-                    ->withAvg('reviews', 'rating')
-                    ->withSum('orderDetails as total_sales', 'quantity')
-                    ->orderByDesc('total_sales')
-                    ->take(12)
-                    ->get();
+        // ৯. অল প্রোডাক্টস (লেটেস্ট ১২টি)
+        $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () {
+            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+                ->select('id', 'company_id', 'brand_id', 'name', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->where('status', Status::Active->value)
+                ->latest()
+                ->take(12)
+                ->get();
+        });
 
-                $allProducts = Product::with(['brand', 'variations'])
-                    ->where('status', Status::Active->value)
-                    ->latest()
-                    ->take(12)
-                    ->get();
+        // ১০. স্লাইডার্স (একটি কোয়েরি দিয়ে এনে নিচে ফিল্টার করা হয়েছে)
+        $allSliders = Cache::remember("home_sliders_{$companyId}", $ttl, function () use ($companyId) {
+            return Slider::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->select('id', 'company_id', 'title', 'image', 'url', 'placement')
+                ->get();
+        });
 
-                $allSliders = Slider::where('status', Status::Active->value)->get();
+        $mainSliders = $allSliders->where('placement', 'hero');
+        $sidebarSliders = $allSliders->where('placement', 'right');
+        $middleSliders = $allSliders->where('placement', 'middle')->take(3);
 
-                $mainSliders = $allSliders->where('placement', 'hero');
-                $sidebarSliders = $allSliders->where('placement', 'right');
-                $middleSliders = $allSliders->where('placement', 'middle')->take(2);
+        // ১১. অল রিভিউস
+        $allReviews = Cache::remember("home_reviews_{$companyId}", $ttl, function () use ($companyId) {
+            return ProductReview::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->with('customer')
+                ->latest()
+                ->get();
+        });
 
-                $allReviews = ProductReview::where('company_id', $companyId)
-                    ->where('status', Status::Active->value)
-                    ->with('customer')
-                    ->latest()
-                    ->get();
-
-                return compact(
-                    'categories',
-                    'newArrivals',
-                    'brands',
-                    'popularProducts',
-                    'productGroups',
-                    'allSliders',
-                    'mainSliders',
-                    'sidebarSliders',
-                    'middleSliders',
-                    'allProducts',
-                    'allReviews',
-                    'faqs',
-                    'latestOffers',
-                    'homePageData'
-                );
-            }
-        );
-
-        return $this->view('frontend.home', $data);
+        // ভিউতে ডেটা পাঠানো
+        return $this->view('frontend.home', compact(
+            'categories',
+            'newArrivals',
+            'brands',
+            'popularProducts',
+            'productGroups',
+            'allSliders',
+            'mainSliders',
+            'sidebarSliders',
+            'middleSliders',
+            'allProducts',
+            'allReviews',
+            'faqs',
+            'latestOffers',
+            'homePageData'
+        ));
     }
     public function filterSubCategory(Request $request)
     {
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+
         $subId = (int)$request->sub_id;
+        return Cache::remember("filter_sub_cat_{$companyId}_{$subId}", $ttl, function () use ($subId, $companyId) {
+
         $products = Product::where('status', Status::Active->value)
+            ->where('company_id', $companyId)
             ->whereJsonContains('sub_category_ids', $subId)
+            ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock'])
             ->with(['variations'])
             ->latest()->take(6)->get();
 
@@ -138,6 +182,7 @@ class HomeController extends FrontendController
         }
 
         return $html;
+        });
     }
     public function subscribe(Request $request)
     {
