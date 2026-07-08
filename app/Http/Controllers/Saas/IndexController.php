@@ -53,11 +53,10 @@ class IndexController extends Controller
             ->get();
 
         $blogs = Blog::withoutCompanyScope()
-            ->with('company')
             ->where('status', Status::Active->value)
             ->latest()
             ->take(3)
-            ->get();
+            ->get(['id', 'title', 'slug', 'image', 'reading_time', 'created_at','short']);
         $pricingPlans = PricingPackage::where('status', Status::Active->value)
             ->take(4)
             ->get();
