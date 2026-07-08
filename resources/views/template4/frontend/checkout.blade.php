@@ -155,7 +155,7 @@
 
                     <div class="mt-2 md:mt-4">
                         <button type="submit"
-                            class="w-full bg-[var(--primary-color)] hover:bg-[#52166d] transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base shadow-md">
+                            class="w-full primary-bg hover:primary-bg transition text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-xl flex items-center justify-center gap-2 text-sm md:text-base shadow-md">
                             <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2.2"
                                 viewBox="0 0 24 24">
                                 <path
