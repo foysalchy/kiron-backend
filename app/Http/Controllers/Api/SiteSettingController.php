@@ -154,10 +154,13 @@ class SiteSettingController extends Controller
             'secondary_color'      => 'nullable|string|max:20',
             'primary_text_color'   => 'nullable|string|max:20',
             'secondary_text_color' => 'nullable|string|max:20',
+            'header_color' => 'nullable|string|max:20',
+            'header_text_color' => 'nullable|string|max:20',
+            'footer_color' => 'nullable|string|max:20',
+            'footer_text_color' => 'nullable|string|max:20',
             'card_id'              => 'nullable|string|max:100',
             'is_review'            => 'nullable|boolean',
         ]);
-
         try {
             $user = auth()->user();
             $company = $user->company;
@@ -176,9 +179,12 @@ class SiteSettingController extends Controller
                     'secondary_color'      => $validated['secondary_color'] ?? null,
                     'primary_text_color'   => $validated['primary_text_color'] ?? null,
                     'secondary_text_color' => $validated['secondary_text_color'] ?? null,
+                    'header_color' => $validated['header_color'] ?? null,
+                    'header_text_color' => $validated['header_text_color'] ?? null,
+                    'footer_color' => $validated['footer_color'] ?? null,
+                    'footer_text_color' => $validated['footer_text_color'] ?? null,
                 ]
             ]);
-
             $domain = DomainSetup::where('company_id', $company->id)->first();
 
             if ($domain) {
@@ -194,7 +200,7 @@ class SiteSettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Theme settings updated successfully!',
-                'data'    => $company->fresh()->load('domainSetup') // 👈 relation load kora holo
+                'data'    => $company->fresh()->load('domainSetup') 
             ], 200);
         } catch (\Exception $e) {
             Log::error('Theme Template Update Error: ' . $e->getMessage());

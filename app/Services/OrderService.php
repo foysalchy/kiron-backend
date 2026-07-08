@@ -302,8 +302,8 @@ class OrderService
 
                 // Deduct stock using ProductService (for completed/pending orders, not hold)
                 if ($order->status !== Status::Hold && $order->status !== Status::Draft) {
-    $this->deductOrderStock($order, $item);
-}
+                    $this->deductOrderStock($order, $item);
+                }
             }
             if ($order->type === Order::TYPE_SALES || $order->type === Order::TYPE_LANDING) {
                 $productIds = collect($items)->pluck('product_id')->filter();
