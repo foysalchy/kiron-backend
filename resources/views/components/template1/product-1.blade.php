@@ -61,7 +61,7 @@
     <div class="flex flex-col flex-grow">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
             <h3
-                class="text-lg font-medium leading-[1.4] text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
+                class="text-lg font-light leading-[1.4] text-gray-800 line-clamp-2  min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
             </h3>
         </a>
