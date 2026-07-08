@@ -280,6 +280,7 @@ class AppServiceProvider extends ServiceProvider
                         ->orderBy('sort_order')->get(),
 
                     'socialLinks'       => $applyLogic(SocialSetting::class)
+                        ->select('id', 'company_id', 'icon_name', 'icon_image', 'link', 'hover_bg', 'icon_class')
                         ->where('status', Status::Active->value)->get(),
 
                     'footerPages'       => $applyLogic(Page::class)
@@ -291,7 +292,8 @@ class AppServiceProvider extends ServiceProvider
 
                     // its for company
                     'popularSearches'   => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
-                    'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+                    'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                     ->select('id', 'company_id', 'title', 'slug', 'thumbnail')->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
 
                     'allHeaderProducts' => Product::where('status', Status::Active->value)->get(),
                 ];
