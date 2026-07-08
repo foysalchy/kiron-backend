@@ -577,8 +577,8 @@
 
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
-                            class="sol-tab-btn whitespace-nowrap flex-1 mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900  ' }}">
+                            class="sol-tab-btn whitespace-nowrap flex-1  mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
+                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c]' }}">
                             {{ $sol['title'] }}
                         </button>
                     @endforeach
