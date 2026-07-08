@@ -47,13 +47,13 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
 Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/blogs', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
 
 Route::get('/contact', [ContctController::class, 'index'])->name('contact.index');
 Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
 
-Route::get('/support', [SupportController::class, 'index'])->name('support.index');
+Route::get('/faq', [SupportController::class, 'index'])->name('faq.index');
 
 
 Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');

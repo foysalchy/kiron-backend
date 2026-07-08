@@ -71,7 +71,7 @@ class Order extends Model
         'return_info' => 'array',
         'warehouse_info' => 'array',
         'assigned_to' => 'array',
-      
+
 
     ];
 
@@ -326,7 +326,10 @@ class Order extends Model
     {
         // Uses the label() method you defined in your Status Enum
         // return Status::from($this->status)->label();
-        return $this->status?->label() ?? 'Unknown';
+        // return $this->status?->label() ?? 'Unknown';
+        $statusEnum = Status::tryFrom($this->status);
+
+        return $statusEnum ? $statusEnum->label() : 'Unknown';
     }
 
     /**
