@@ -14,94 +14,109 @@ use App\Models\Slider;
 use App\Models\Subscription;
 use App\Models\SystemPage;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Cache;
 class HomeController extends FrontendController
 {
     public function index()
     {
-        $homePageData = SystemPage::where('company_id', $this->company_id)
-        ->where('page_type', 'home')
-        ->first();
+        $companyId = $this->company_id;
 
-        $faqs = KnowledgeBase::active()
-            ->get();
+        $data = Cache::remember(
+            "home_page_{$companyId}",
+            now()->addHours(6),
+            function () use ($companyId) {
 
-        $categories = MegaCategory::with('subCategories.miniCategories')->get();
+                $homePageData = SystemPage::where('company_id', $companyId)
+                    ->where('page_type', 'home')
+                    ->first();
 
-        $latestOffers = Product::with(['brand', 'variations'])
-            ->where('discount', '>', 0)
-            ->where('status', Status::Active->value)
-            ->latest()
-            ->take(12)
-            ->get();
+                $faqs = KnowledgeBase::active()->get();
 
-        $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
-            ->where('status', Status::Active->value)
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')->latest()->take(8)->get();
-        // \Log::info($newArrivals);
-        //for product groups
-        $productGroups = ProductGroup::where('status', Status::Active->value)
-            ->where('is_frontend', 1)
-            ->get()
-            ->map(function ($group) {
-                $group->products = Product::whereIn('id', $group->product_ids ?? [])
+                $categories = MegaCategory::with('subCategories.miniCategories')->get();
 
-                    ->with(['variations'])
+                $latestOffers = Product::with(['brand', 'variations'])
+                    ->where('discount', '>', 0)
+                    ->where('status', Status::Active->value)
+                    ->latest()
+                    ->take(12)
+                    ->get();
+
+                $newArrivals = Product::with(['brand', 'variations.attributes.attributeValue'])
                     ->where('status', Status::Active->value)
                     ->withCount('reviews')
                     ->withAvg('reviews', 'rating')
-                    ->take(6)
+                    ->latest()
+                    ->take(8)
                     ->get();
-                return $group;
-            })
-            ->filter(fn($group) => $group->products->count() > 0);
 
-        $brands = Brand::where('status', Status::Active->value)->latest()->take(10)->get();
+                $productGroups = ProductGroup::where('status', Status::Active->value)
+                    ->where('is_frontend', 1)
+                    ->get()
+                    ->map(function ($group) {
+                        $group->products = Product::whereIn('id', $group->product_ids ?? [])
+                            ->with(['variations'])
+                            ->where('status', Status::Active->value)
+                            ->withCount('reviews')
+                            ->withAvg('reviews', 'rating')
+                            ->take(6)
+                            ->get();
 
-        $popularProducts = Product::with(['brand', 'variations'])
-            ->where('status', Status::Active->value)
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
-            ->withSum('orderDetails as total_sales', 'quantity')
-            ->orderByDesc('total_sales')
-            ->take(12)
-            ->get();
-        $allProducts = Product::with(['brand', 'variations'])
-            ->where('status', Status::Active->value)
-            ->latest()
-            ->take(12)
-            ->get();
+                        return $group;
+                    })
+                    ->filter(fn($group) => $group->products->count() > 0);
 
-        $allSliders = Slider::where('status', Status::Active->value)->get();
-        $mainSliders = $allSliders->where('placement', 'hero');
-        $sidebarSliders = $allSliders->where('placement', 'right');
-        $middleSliders = $allSliders->where('placement', 'middle')->take(2);
+                $brands = Brand::where('status', Status::Active->value)
+                    ->latest()
+                    ->take(10)
+                    ->get();
 
-        $allReviews = ProductReview::where('company_id', $this->company_id)
-            ->where('status', Status::Active->value)
-            ->with('customer')
-            ->latest()
-            ->get();
-        return  $this->view(
-            'frontend.home',
-            compact(
-                'categories',
-                'newArrivals',
-                'brands',
-                'popularProducts',
-                'productGroups',
-                'allSliders',
-                'mainSliders',
-                'sidebarSliders',
-                'middleSliders',
-                'allProducts',
-                'allReviews',
-                'faqs',
-                'latestOffers',
-                'homePageData'
-            )
+                $popularProducts = Product::with(['brand', 'variations'])
+                    ->where('status', Status::Active->value)
+                    ->withCount('reviews')
+                    ->withAvg('reviews', 'rating')
+                    ->withSum('orderDetails as total_sales', 'quantity')
+                    ->orderByDesc('total_sales')
+                    ->take(12)
+                    ->get();
+
+                $allProducts = Product::with(['brand', 'variations'])
+                    ->where('status', Status::Active->value)
+                    ->latest()
+                    ->take(12)
+                    ->get();
+
+                $allSliders = Slider::where('status', Status::Active->value)->get();
+
+                $mainSliders = $allSliders->where('placement', 'hero');
+                $sidebarSliders = $allSliders->where('placement', 'right');
+                $middleSliders = $allSliders->where('placement', 'middle')->take(2);
+
+                $allReviews = ProductReview::where('company_id', $companyId)
+                    ->where('status', Status::Active->value)
+                    ->with('customer')
+                    ->latest()
+                    ->get();
+
+                return compact(
+                    'categories',
+                    'newArrivals',
+                    'brands',
+                    'popularProducts',
+                    'productGroups',
+                    'allSliders',
+                    'mainSliders',
+                    'sidebarSliders',
+                    'middleSliders',
+                    'allProducts',
+                    'allReviews',
+                    'faqs',
+                    'latestOffers',
+                    'homePageData'
+                );
+            }
         );
+
+        return $this->view('frontend.home', $data);
     }
     public function filterSubCategory(Request $request)
     {
