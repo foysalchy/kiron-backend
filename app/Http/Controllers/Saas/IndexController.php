@@ -71,9 +71,14 @@ class IndexController extends Controller
                 ->where('status', Status::Active->value)
                 ->take(4)
                 ->get();
+                $faqs = KnowledgeBase::where('status', 1)
+                    ->where('company_id', null)
+                    ->orderBy('id', 'asc')
+                    ->get();
 
             return compact(
                 'sliders',
+                'faqs',
                 'brands',
                 'topFeatures',
                 'whyChooseUs',

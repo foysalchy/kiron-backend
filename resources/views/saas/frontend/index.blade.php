@@ -1836,12 +1836,7 @@
                 </div>
             </div>
 
-            @php
-                $faqs = App\Models\KnowledgeBase::where('status', 1)
-                    ->where('company_id', null)
-                    ->orderBy('id', 'asc')
-                    ->get();
-            @endphp
+             
 
             <div class="div space-y-4 h-[700px] overflow-y-auto">
                 <!-- FAQ List -->
