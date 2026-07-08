@@ -15,158 +15,227 @@ use App\Models\PricingPackage;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
 class IndexController extends Controller
 {
-    
+    // গ্লোবাল ক্যাশ লাইফটাইম (৬ ঘণ্টা)
+    protected $ttl;
+
+    public function __construct()
+    {
+        $this->ttl = now()->addHours(6);
+    }
 
     public function home()
     {
-        $data = Cache::remember('system_page_home', now()->addHours(6), function () {
-
-            $sliders = Slider::withoutCompanyScope()
+        // ১. স্লাইডার্স ক্যাশ
+        $sliders = Cache::remember('saas_home_sliders', $this->ttl, function () {
+            return Slider::withoutCompanyScope()
                 ->where('status', Status::Active->value)
                 ->where('placement', 'hero')
                 ->whereNull('company_id')
                 ->orderByDesc('id')
                 ->get();
+        });
 
-            $brands = MasterBrand::where('status', Status::Active->value)
+        // ২. ব্র্যান্ডস ক্যাশ
+        $brands = Cache::remember('saas_home_brands', $this->ttl, function () {
+            return MasterBrand::where('status', Status::Active->value)
                 ->latest()
                 ->get();
+        });
 
-            $topFeatures = MasterFeature::where('status', Status::Active->value)
+        // ৩. টপ ফিচার্স ক্যাশ
+        $topFeatures = Cache::remember('saas_home_top_features', $this->ttl, function () {
+            return MasterFeature::where('status', Status::Active->value)
                 ->where('placement', 1)
                 ->select('title', 'subtitle', 'icon', 'slug')
                 ->get();
+        });
 
-            $whyChooseUs = MasterFeature::where('status', Status::Active->value)
+        // ৪. হোয়াই চুজ আস ক্যাশ
+        $whyChooseUs = Cache::remember('saas_home_why_choose_us', $this->ttl, function () {
+            return MasterFeature::where('status', Status::Active->value)
                 ->where('placement', 2)
                 ->latest()
                 ->select('title', 'description', 'image')
                 ->get();
+        });
 
-            $reviewStats = CustomerReview::where('status', Status::Active->value)
+        // ৫. রিভিউ স্ট্যাটস ক্যাশ
+        $reviewStats = Cache::remember('saas_home_review_stats', $this->ttl, function () {
+            $stats = CustomerReview::where('status', Status::Active->value)
                 ->selectRaw('AVG(rating) as avg_rating, COUNT(*) as total_reviews')
                 ->first();
 
-            $avgRating = round($reviewStats->avg_rating ?? 0, 1);
-            $totalReviews = $reviewStats->total_reviews ?? 0;
+            return [
+                'avgRating' => round($stats->avg_rating ?? 0, 1),
+                'totalReviews' => $stats->total_reviews ?? 0
+            ];
+        });
 
-            $allReviews = CustomerReview::where('status', Status::Active->value)
+        $avgRating = $reviewStats['avgRating'];
+        $totalReviews = $reviewStats['totalReviews'];
+
+        // ৬. অল রিভিউস ক্যাশ
+        $allReviews = Cache::remember('saas_home_all_reviews', $this->ttl, function () {
+            return CustomerReview::where('status', Status::Active->value)
                 ->latest()
                 ->get();
+        });
 
-            $demos = MasterDemo::where('status', Status::Active->value)
+        // ৭. ডেমোস ক্যাশ
+        $demos = Cache::remember('saas_home_demos', $this->ttl, function () {
+            return MasterDemo::where('status', Status::Active->value)
                 ->latest()
                 ->get();
+        });
 
-            $blogs = Blog::withoutCompanyScope()
+        // ৮. লেটেস্ট ব্লগস ক্যাশ (হোমপেজের জন্য ৩টি)
+        $blogs = Cache::remember('saas_home_latest_blogs', $this->ttl, function () {
+            return Blog::withoutCompanyScope()
                 ->whereNull('company_id')
                 ->where('status', Status::Active->value)
                 ->latest()
                 ->take(3)
                 ->get(['id', 'title', 'slug', 'images', 'created_at', 'short']);
+        });
 
-            $pricingPlans = PricingPackage::with('tiers')
+        // ৯. প্রাইসিং প্ল্যানস ক্যাশ
+        $pricingPlans = Cache::remember('saas_home_pricing_plans', $this->ttl, function () {
+            return PricingPackage::with('tiers')
                 ->where('status', Status::Active->value)
                 ->take(4)
                 ->get();
-                $faqs = KnowledgeBase::where('status', 1)
-                    ->where('company_id', null)
-                    ->orderBy('id', 'asc')
-                    ->get();
-
-            return compact(
-                'sliders',
-                'faqs',
-                'brands',
-                'topFeatures',
-                'whyChooseUs',
-                'avgRating',
-                'totalReviews',
-                'demos',
-                'allReviews',
-                'blogs',
-                'pricingPlans'
-            );
         });
 
-        return view('saas.frontend.index', $data);
+        // ১০. এফএকিউ ক্যাশ
+        $faqs = Cache::remember('saas_home_faqs', $this->ttl, function () {
+            return KnowledgeBase::where('status', 1)
+                ->whereNull('company_id')
+                ->orderBy('id', 'asc')
+                ->get();
+        });
+
+        return view('saas.frontend.index', compact(
+            'sliders',
+            'faqs',
+            'brands',
+            'topFeatures',
+            'whyChooseUs',
+            'avgRating',
+            'totalReviews',
+            'demos',
+            'allReviews',
+            'blogs',
+            'pricingPlans'
+        ));
     }
+
     public function features()
     {
-        $allFeatures = MasterFeature::where('status', Status::Active->value)
-        ->where('placement', 1)
-        ->select('id', 'slug', 'title', 'icon')
-        ->paginate(40);
+        // প্যাজিনেশনের জন্য পেজ নম্বর অনুযায়ী আলাদা ক্যাশ কী জেনারেট হবে
+        $page = request()->get('page', 1);
+
+        $allFeatures = Cache::remember("saas_features_page_{$page}", $this->ttl, function () {
+            return MasterFeature::where('status', Status::Active->value)
+                ->where('placement', 1)
+                ->select('id', 'slug', 'title', 'icon')
+                ->paginate(40);
+        });
 
         return view('saas.frontend.featureList', compact('allFeatures'));
     }
+
     public function featureDetails($slug)
     {
-        $feature = MasterFeature::where('slug', $slug)
-            ->where('status', Status::Active->value)
-            ->firstOrFail();
+        // স্লাগ ভিত্তিক নির্দিষ্ট ফিচারের ক্যাশ
+        $feature = Cache::remember("saas_feature_details_{$slug}", $this->ttl, function () use ($slug) {
+            return MasterFeature::where('slug', $slug)
+                ->where('status', Status::Active->value)
+                ->firstOrFail();
+        });
 
-        $otherFeatures = MasterFeature::where('status', Status::Active->value)
-            ->where('id', '!=', $feature->id)
-            ->where('placement', 1)
-            ->take(4)
-            ->select('id', 'slug', 'title', 'icon')
-            ->get();
+        // অন্যান্য সাজেস্টেড ফিচার ক্যাশ
+        $otherFeatures = Cache::remember("saas_other_features_for_{$slug}", $this->ttl, function () use ($feature) {
+            return MasterFeature::where('status', Status::Active->value)
+                ->where('id', '!=', $feature->id)
+                ->where('placement', 1)
+                ->take(4)
+                ->select('id', 'slug', 'title', 'icon')
+                ->get();
+        });
 
         return view('saas.frontend.featureDetails', compact('feature', 'otherFeatures'));
     }
+
     public function blogPosts()
     {
-        $blogPosts = Blog::withoutCompanyScope()
-             ->whereNull('company_id')
-            ->where('status', Status::Active->value)
-            ->latest()
-            ->select('id', 'title', 'slug', 'images', 'created_at', 'short')
-            ->paginate(9);
+        $page = request()->get('page', 1);
+
+        $blogPosts = Cache::remember("saas_blogs_page_{$page}", $this->ttl, function () {
+            return Blog::withoutCompanyScope()
+                ->whereNull('company_id')
+                ->where('status', Status::Active->value)
+                ->latest()
+                ->select('id', 'title', 'slug', 'images', 'created_at', 'short')
+                ->paginate(9);
+        });
 
         return view('saas.frontend.blogList', compact('blogPosts'));
     }
+
     public function blogPostDetails($slug)
     {
-        $blogPost = Blog::withoutCompanyScope()
-             ->whereNull('company_id')
-            ->where('slug', $slug)
-            ->where('status', Status::Active->value)
-            ->firstOrFail();
+        $blogPost = Cache::remember("saas_blog_details_{$slug}", $this->ttl, function () use ($slug) {
+            return Blog::withoutCompanyScope()
+                ->whereNull('company_id')
+                ->where('slug', $slug)
+                ->where('status', Status::Active->value)
+                ->firstOrFail();
+        });
 
-        $otherBlogPosts = Blog::withoutCompanyScope()
-            ->with('company')
-            ->where('status', Status::Active->value)
-            ->where('id', '!=', $blogPost->id)
-            ->latest()
-            ->take(4)
-             ->get(['id', 'title', 'slug', 'images', 'created_at','short']);
- 
+        $otherBlogPosts = Cache::remember("saas_other_blogs_for_{$slug}", $this->ttl, function () use ($blogPost) {
+            return Blog::withoutCompanyScope()
+                ->with('company')
+                ->where('status', Status::Active->value)
+                ->where('id', '!=', $blogPost->id)
+                ->latest()
+                ->take(4)
+                ->get(['id', 'title', 'slug', 'images', 'created_at', 'short']);
+        });
+
         return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
     }
+
     public function faqList()
     {
-        $faqs = KnowledgeBase::where('status', Status::Active->value)
-            ->latest()
-            ->get();
+        $faqs = Cache::remember('saas_faqs_list', $this->ttl, function () {
+            return KnowledgeBase::where('status', Status::Active->value)
+                ->whereNull('company_id')
+                ->latest()
+                ->get();
+        });
+
         return view('saas.frontend.faqList', compact('faqs'));
     }
+
     public function packageList()
     {
-        $pricingPlans = PricingPackage::where('status', Status::Active->value)
-          
-            ->get();
+        $pricingPlans = Cache::remember('saas_packages_list', $this->ttl, function () {
+            return PricingPackage::where('status', Status::Active->value)->get();
+        });
+
         return view('saas.frontend.pricingList', compact('pricingPlans'));
     }
+
     public function contact()
     {
         return view('saas.frontend.contact');
     }
+
     public function send(Request $request)
     {
-        // ১. ভ্যালিডেশন
         $validated = $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|max:255',
