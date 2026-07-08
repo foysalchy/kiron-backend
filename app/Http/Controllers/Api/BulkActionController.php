@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\LogHelper;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class BulkActionController extends Controller
 {
@@ -85,6 +87,14 @@ class BulkActionController extends Controller
     }
 
     /**
+     * Get the current authenticated user's company_id (if any).
+     */
+    private function currentCompanyId(): ?int
+    {
+        return Auth::user()->company_id ?? null;
+    }
+
+    /**
      * Bulk update status for the given resource.
      */
     public function updateStatus(Request $request, string $resource)
@@ -96,9 +106,15 @@ class BulkActionController extends Controller
         ]);
 
         $model = $this->resolveModel($resource);
+        $actionType = class_basename($model);
+        $companyId = $this->currentCompanyId();
 
         $updated = $model::whereIn('id', $request->ids)
             ->update(['status' => $request->status]);
+
+        foreach ($request->ids as $id) {
+            LogHelper::statusChanged($resource, $id, $companyId, $actionType);
+        }
 
         return response()->json([
             'message' => 'Status updated successfully.',
@@ -117,8 +133,14 @@ class BulkActionController extends Controller
         ]);
 
         $model = $this->resolveModel($resource);
+        $actionType = class_basename($model);
+        $companyId = $this->currentCompanyId();
 
         $deleted = $model::whereIn('id', $request->ids)->delete();
+
+        foreach ($request->ids as $id) {
+            LogHelper::deleted($resource, $id, $companyId, $actionType);
+        }
 
         return response()->json([
             'message' => 'Deleted successfully.',
@@ -138,14 +160,19 @@ class BulkActionController extends Controller
         ]);
 
         $model = $this->resolveModel($resource);
-
         $this->assertSoftDeletable($model, $resource);
+        $actionType = class_basename($model);
+        $companyId = $this->currentCompanyId();
 
         // withTrashed() so we can target already soft-deleted rows;
         // forceDelete() bypasses the soft-delete and removes permanently.
         $deleted = $model::withTrashed()
             ->whereIn('id', $request->ids)
             ->forceDelete();
+
+        foreach ($request->ids as $id) {
+            LogHelper::forceDeleted($resource, $id, $companyId, $actionType);
+        }
 
         return response()->json([
             'message' => 'Permanently deleted successfully.',
@@ -165,13 +192,18 @@ class BulkActionController extends Controller
         ]);
 
         $model = $this->resolveModel($resource);
-
         $this->assertSoftDeletable($model, $resource);
+        $actionType = class_basename($model);
+        $companyId = $this->currentCompanyId();
 
         // onlyTrashed() ensures we only touch soft-deleted rows.
         $restored = $model::onlyTrashed()
             ->whereIn('id', $request->ids)
             ->restore();
+
+        foreach ($request->ids as $id) {
+            LogHelper::restored($resource, $id, $companyId, $actionType);
+        }
 
         return response()->json([
             'message'  => 'Restored successfully.',

@@ -69,8 +69,9 @@ class AuthController extends Controller
             'login_at'   => now(),
         ]);
 
-       
+
         $token = $user->createToken('auth_token', ['*'], now()->addDays(30))->plainTextToken;
+        
         $effectivePermissions = [];
 
         if ($user->is_super_admin) {

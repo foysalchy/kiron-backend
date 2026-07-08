@@ -9,6 +9,7 @@ use App\Models\Area;
 use App\Models\Asset;
 use App\Models\AssetCategory;
 use App\Models\AttributeGroup;
+use App\Models\AttributeValue;
 use App\Models\Bin;
 use App\Models\Brand;
 use App\Models\Cell;
@@ -18,12 +19,15 @@ use App\Models\CustomerGroup;
 use App\Models\DisposalType;
 use App\Models\Domain;
 use App\Models\DomainSetup;
+use App\Models\ExtraCategory;
 use App\Models\MegaCategory;
+use App\Models\MiniCategory;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Rack;
 use App\Models\Role;
+use App\Models\SubCategory;
 use App\Models\SupportDepartment;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -37,6 +41,10 @@ class SelectOptionController extends Controller
     public function warehouseOptions()
     {
         return Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
+    }
+    public function productwarehouseOptions()
+    {
+        return Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
     }
     public function areaOptions($warehouseId)
     {
@@ -67,6 +75,14 @@ class SelectOptionController extends Controller
             ->orderBy('name', 'asc')
             ->get();
     }
+    public function productbinOptions($warehouseId)
+    {
+        return Bin::where('warehouse_id', $warehouseId)
+            ->select('id', 'name', 'bin_code')
+            ->where('status', Status::Active->value)
+            ->orderBy('name', 'asc')
+            ->get();
+    }
     public function supplierOptions()
     {
         return Party::where('type', 1)->orderBy('name', 'asc')->get();
@@ -87,8 +103,10 @@ class SelectOptionController extends Controller
             'variations.stocks.warehouse',
         ])->orderBy('title', 'asc')->get();
     }
-    public function getProductByWarehouse($warehouseId)
+    public function getProductByWarehouse(Request $request, $warehouseId)
     {
+        $type = $request->query('type'); 
+
         $products = Product::with([
             'brand',
             'galleries',
@@ -107,6 +125,9 @@ class SelectOptionController extends Controller
                         $stockQuery->where('warehouse_id', $warehouseId)
                             ->where('quantity', '>', 0);
                     });
+            })
+            ->when($type === 'pos', function ($q) {
+                $q->whereIn('purpose', ['pos', 'both']);
             })
             ->orderBy('title', 'asc')
             ->get();
@@ -223,7 +244,7 @@ class SelectOptionController extends Controller
     }
     public function userOptions()
     {
-        return auth()->user()->company->users()->select('id', 'name')->orderBy('name', 'asc')->get();
+        return auth()->user()->company->users()->select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
     }
     public function superAdminUserOptions()
     {
@@ -238,13 +259,41 @@ class SelectOptionController extends Controller
     {
         return AttributeGroup::select('id', 'name')->orderBy('name', 'asc')->get();
     }
+    public function productattributeGroupOptions()
+    {
+        return AttributeGroup::where('status', Status::Active->value)->select('id', 'name')->orderBy('name', 'asc')->get();
+    }
+    public function productattributeValueOptions()
+    {
+        return AttributeValue::where('status', Status::Active->value)->select('id', 'name', 'attribute_group_id')->orderBy('name', 'asc')->get();
+    }
     public function megaCategoryOptions()
     {
-        return MegaCategory::select('id', 'name','slug')->orderBy('name', 'asc')->get();
+        return MegaCategory::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    }
+    public function productmegaCategoryOptions()
+    {
+        return MegaCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    }
+    public function productsubCategoryOptions()
+    {
+        return SubCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    }
+    public function productminiCategoryOptions()
+    {
+        return MiniCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    }
+    public function productextraCategoryOptions()
+    {
+        return ExtraCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
     }
     public function brandOptions()
     {
-        return Brand::select('id', 'name','slug')->orderBy('name', 'asc')->get();
+        return Brand::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+    }
+    public function productbrandOptions()
+    {
+        return Brand::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
     }
     public function nestedCategoryOptions()
     {

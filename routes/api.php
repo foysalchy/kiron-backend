@@ -155,28 +155,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
-Route::get('/test-delete', function () {
-    $path = 'categories/mega/2RUQXbEh0PmdyBSrDbpA8r7wkxpIHNgY9Vze6X43.jpg';
 
-    // ১. ফাইলটি আসলেই R2 ডিস্কের এই পাথে খুঁজে পাওয়া যাচ্ছে কি না
-    $exists = Storage::disk('r2')->exists($path);
-    
-    if ($exists) {
-        // ২. ফাইল ডিলিট করার চেষ্টা
-        $deleted = Storage::disk('r2')->delete($path);
-        return response()->json([
-            'status' => 'success',
-            'message' => 'ফাইলটি খুঁজে পাওয়া গেছে এবং ডিলিট করা হয়েছে।',
-            'path' => $path
-        ]);
-    }
-
-    return response()->json([
-        'status' => 'failed',
-        'message' => 'R2 বাকেটের এই পাথে ফাইলটি খুঁজে পাওয়া যায়নি! সম্ভবত পাথ প্রিফিক্স বা স্পেলিং ভুল আছে।',
-        'path' => $path
-    ]);
-});
 
 Route::prefix('v1')->group(function () {
 
@@ -297,10 +276,12 @@ Route::prefix('v1')->group(function () {
 
                 Route::prefix('options')->group(function () {
                     Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
+                    Route::get('/product/warehouses', [SelectOptionController::class, 'productwarehouseOptions']);
                     Route::get('/areas/{warehouseId}', [SelectOptionController::class, 'areaOptions']);
                     Route::get('/racks/{areaId}', [SelectOptionController::class, 'rackOptions']);
                     Route::get('/cells/{rackId}', [SelectOptionController::class, 'cellOptions']);
                     Route::get('/bins/{warehouseId}', [SelectOptionController::class, 'binOptions']);
+                    Route::get('/product/bins/{warehouseId}', [SelectOptionController::class, 'productbinOptions']);
                     Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
                     Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
                     Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
@@ -308,8 +289,15 @@ Route::prefix('v1')->group(function () {
                     Route::get('/products', [SelectOptionController::class, 'productOptions']);
                     Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
                     Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
+                    Route::get('/product/attribute-group', [SelectOptionController::class, 'productattributeGroupOptions']);
+                    Route::get('/product/attribute-value', [SelectOptionController::class, 'productattributeValueOptions']);
                     Route::get('/mega-categories', [SelectOptionController::class, 'megaCategoryOptions']);
-                    Route::get('/brands', [SelectOptionController::class, 'brandOptions']);
+                    Route::get('/product/mega-categories', [SelectOptionController::class, 'productmegaCategoryOptions']);
+                    Route::get('/product/sub-categories', [SelectOptionController::class, 'productsubCategoryOptions']);
+                    Route::get('/product/mini-categories', [SelectOptionController::class, 'productminiCategoryOptions']);
+                    Route::get('/product/extra-categories', [SelectOptionController::class, 'productextraCategoryOptions']);
+                    Route::get('/product/brands', [SelectOptionController::class, 'brandOptions']);
+                    Route::get('/brands', [SelectOptionController::class, 'productbrandOptions']);
                     Route::get('/nested-categories', [SelectOptionController::class, 'nestedCategoryOptions']);
                     Route::get('/users', [SelectOptionController::class, 'userOptions']);
                     Route::get('/super-admin-users', [SelectOptionController::class, 'superAdminUserOptions']);
