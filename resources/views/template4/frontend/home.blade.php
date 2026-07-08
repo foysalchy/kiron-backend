@@ -24,7 +24,6 @@
             filter: drop-shadow(1px 0 0 #e5e7eb) drop-shadow(-1px 0 0 #e5e7eb) drop-shadow(0 1px 0 #e5e7eb) drop-shadow(0 -1px 0 #e5e7eb);
         }
 
-        /* ১ম সারি (Notch Bottom) */
         .notch-bottom-right {
             clip-path: polygon(0% 0%,
                     100% 0%,
@@ -42,8 +41,6 @@
                     25% 75%,
                     0% 75%);
         }
-
-        /* ২য় সারি (Notch Top) */
         .notch-top-right {
             clip-path: polygon(0% 0%,
                     75% 0%,
