@@ -85,11 +85,11 @@ class SelectOptionController extends Controller
     }
     public function supplierOptions()
     {
-        return Party::where('type', 1)->orderBy('name', 'asc')->get();
+        return Party::where('type', 1)->select('id','name')->orderBy('name', 'asc')->get();
     }
     public function customersOptions()
     {
-        return Party::where('type', 2)->orderBy('name', 'asc')->get();
+        return Party::where('type', 2)->select('id','name')->orderBy('name', 'asc')->get();
     }
 
     public function productOptions()
