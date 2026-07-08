@@ -473,17 +473,21 @@
     @if ($sliders->isNotEmpty())
         <section class="swiper heroSwiper hero-bg  relative overflow-hidden h-[90vh] min-h-[500px]">
             <div class="swiper-wrapper">
-                @foreach ($sliders as $slider)
+                @foreach ($sliders as $key => $slider)
                     <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
                         <div
                             class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
                             <div class="text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
-
-                                <h1
-                                    class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
-                                    {{ $slider->title }}
-                                </h1>
+                                @if($key == 0)
+                                    <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                        {{ $slider->title }}
+                                    </h1>
+                                @else
+                                    <h2 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                        {{ $slider->title }}
+                                    </h2>
+                                @endif
 
                                 <p
                                     class="text-gray-400 text-sm md:text-lg lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0    ">

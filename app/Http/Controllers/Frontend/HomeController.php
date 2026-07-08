@@ -45,7 +45,7 @@ class HomeController extends FrontendController
 
         // ৪. লেটেস্ট অফার
         $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+            return Product::with(['brand:id,company_id,title,slug,logo', 'variations'])
                 ->where('discount', '>', 0)
                 ->where('status', Status::Active->value)
                 ->latest()
@@ -55,7 +55,7 @@ class HomeController extends FrontendController
 
         // ৫. নিউ অ্যারাইভালস
         $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations.attributes.attributeValue'])
+            return Product::with(['brand:id,company_id,title,slug,logo', 'variations.attributes.attributeValue'])
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
