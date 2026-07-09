@@ -96,7 +96,7 @@ class HomeController extends FrontendController
         // ৮. পপুলার প্রোডাক্টস
         $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () {
             return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'name', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
@@ -109,7 +109,7 @@ class HomeController extends FrontendController
         // ৯. অল প্রোডাক্টস (লেটেস্ট ১২টি)
         $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () {
             return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'name', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
                 ->where('status', Status::Active->value)
                 ->latest()
                 ->take(12)
