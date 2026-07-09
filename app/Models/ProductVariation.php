@@ -64,7 +64,7 @@ class ProductVariation extends Model
     }
     public function barcode()
     {
-        return $this->morphOne(Barcode::class, 'barcodeable');
+        return $this->morphOne(BarCode::class, 'barcodeable');
     }
     /**
      * Calculate final price after discount

@@ -42,7 +42,6 @@ class DomainSetupService
                 [],
                 [
                     'custom_domain' => $data['custom_domain'] ?? null,
-                    'sub_domain'    => $data['sub_domain'] ?? null,
                     'status'        => $data['status'] ?? 1,
                 ]
             );

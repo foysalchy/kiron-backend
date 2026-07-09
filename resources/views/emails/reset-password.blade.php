@@ -8,12 +8,12 @@
   <style>
     body { margin: 0; padding: 0; background: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
     .wrapper { max-width: 560px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e4e4e7; }
-    .header { background: #34a487; padding: 32px 40px; text-align: center; }
+    .header { background: #13565e; padding: 32px 40px; text-align: center; }
     .header img { height: 48px; }
     .body { padding: 40px; }
     h1 { margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #111827; }
     p { margin: 0 0 16px; font-size: 15px; line-height: 1.6; color: #374151; }
-    .btn { display: inline-block; padding: 14px 32px; background: #34a487; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 600; margin: 8px 0 24px; }
+    .btn { display: inline-block; padding: 14px 32px; background: #13565e; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 600; margin: 8px 0 24px; }
     .link-block { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; word-break: break-all; font-size: 13px; color: #6b7280; margin-bottom: 24px; }
     .footer { padding: 24px 40px; border-top: 1px solid #f3f4f6; font-size: 13px; color: #9ca3af; text-align: center; }
     .warning { background: #fff7ed; border-left: 4px solid #f97316; padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 13px; color: #92400e; margin-bottom: 24px; }

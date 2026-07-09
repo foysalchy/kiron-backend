@@ -23,7 +23,7 @@
         }
 
         .header {
-            background: #34a487;
+            background: #13565e;
             padding: 28px 40px;
             text-align: center;
         }
@@ -48,14 +48,14 @@
 
         .label {
             display: inline-block;
-            color: #34a487;
+            color: #13565e;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 3px 10px;
             border-radius: 20px;
-            border: 1px solid #34a487;
+            border: 1px solid #13565e;
             margin-bottom: 20px;
         }
 
@@ -69,9 +69,9 @@
             letter-spacing: 10px;
             font-size: 40px;
             font-weight: 800;
-            color: #34a487;
+            color: #13565e;
             background: #f0faf7;
-            border: 2px dashed #34a487;
+            border: 2px dashed #13565e;
             border-radius: 12px;
             padding: 16px 32px;
             font-family: monospace;
