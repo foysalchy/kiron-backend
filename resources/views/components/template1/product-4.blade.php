@@ -44,7 +44,7 @@
                 class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400' }} text-sm"></i>
         </button>
 
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full p-4"
+        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full "
             aria-label="product details">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
                 alt="{{ $product->title }}" width="300" height="300" loading="lazy"
@@ -61,26 +61,26 @@
 
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow"
             aria-label="product details">
-            <h3
-                class="text-gray-900 text-sm md:text-base font-bold leading-tight line-clamp-2 group-hover:text-[#be123c] transition-colors">
+            <p
+                class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2  min-h-[30px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
-            </h3>
+</p>
         </a>
 
         <!-- Price section -->
         <div class="flex items-center gap-2">
             @if ($regularPrice > $salePrice)
-                <span class="text-gray-600 text-xs md:text-sm line-through font-medium">
+                <span class="text-gray-600 text-xs md:text-sm line-through font-semibold">
                     {{ $setup->currency }}{{ number_format($regularPrice) }}
                 </span>
             @endif
-            <span class="text-[#be123c] text-base md:text-lg font-black">
+            <span class="text-[#be123c] text-base md:text-lg font-black font-semibold">
                 {{ $setup->currency }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
             </span>
         </div>
 
         <!-- size variations snippet (If it's a variation product) -->
-        <div class="mt-4 mb-3 flex flex-wrap gap-2">
+        <div class="mt-2 mb-2 flex flex-wrap gap-2">
             @if ($product->type === 'variation')
                 @php
                     $previewValues = $product->variations->flatMap->attributes
@@ -101,7 +101,7 @@
         <button {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             aria-label="cart button"
-            class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-4 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
+            class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-2 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
             {{ $isOutOfStock ? 'bg-gray-300' : 'bg-[#be123c] hover:bg-red-700 active:scale-95' }}">
 
             @if ($isOutOfStock)

@@ -27,8 +27,8 @@
 
     <div class="relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
-           class="hover:border-2 hover:border-[var(--primary-color)] product-card-notch relative block aspect-[1/1.1] border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
-            <div class="w-full h-full p-6 flex items-center justify-center">
+           class="hover:border-2 hover:border-[var(--primary-color)] product-card-notch relative block  border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
+            <div class="w-full h-full  flex items-center justify-center">
                 <img
                     src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
                     alt="{{ $product->title }}" height="300" width="300" loading="lazy"
@@ -52,18 +52,19 @@
 
     <div class="p-4 flex flex-col flex-grow">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
-            <h3 class="text-[#0f172a] text-base md:text-lg font-bold leading-tight tracking-tight line-clamp-2 min-h-[44px] group-hover:text-[var(--primary-color)] transition-colors">
+          <p
+                class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
-            </h3>
+</p>
         </a>
 
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-3">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 ">
             <div class="flex items-center gap-2">
-                <span class="text-[#005c7a] text-lg md:text-xl font-black">
+                <span class="text-[#005c7a] text-lg md:text-xl font-black font-semibold ">
                     {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
                 </span>
                 @if ($regularPrice > $salePrice)
-                    <span class="text-[#52525b] text-xs md:text-sm line-through font-medium">
+                    <span class="text-[#52525b] text-xs md:text-sm font-semibold line-through ">
                         {{ $setup->currency ?? '৳' }}{{ number_format($regularPrice) }}
                     </span>
                 @endif
@@ -72,7 +73,7 @@
             <div class="basis-full h-0 sm:hidden"></div>
 
             @if ($discountLabel)
-                <span class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-black px-2 py-0.5 rounded-full uppercase">
+                <span class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold  font-black px-2 py-0.5 rounded-full uppercase">
                     -{{ $discountLabel }} OFF
                 </span>
             @endif
