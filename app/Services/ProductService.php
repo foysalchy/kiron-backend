@@ -885,12 +885,27 @@ class ProductService
     /**
      * Generate unique hash for attribute combination
      */
+    // private function generateCombinationHash(int $productId, array $attributes): string
+    // {
+    //     // Sort attributes by group_id for consistent hashing
+    //     $sorted = collect($attributes)->sortBy('attribute_group_id')->values()->all();
+    //     $hashData = $productId . '-' . json_encode($sorted);
+    //     return hash('sha256', $hashData);
+    // }
     private function generateCombinationHash(int $productId, array $attributes): string
     {
-        // Sort attributes by group_id for consistent hashing
-        $sorted = collect($attributes)->sortBy('attribute_group_id')->values()->all();
-        $hashData = $productId . '-' . json_encode($sorted);
-        return hash('sha256', $hashData);
+        $sorted = collect($attributes)
+            ->map(function ($attr) {
+                return [
+                    'attribute_group_id' => (int) $attr['attribute_group_id'],
+                    'attribute_value_id' => (int) $attr['attribute_value_id'],
+                ];
+            })
+            ->sortBy('attribute_group_id')
+            ->values()
+            ->all();
+
+        return hash('sha256', $productId . '-' . json_encode($sorted));
     }
 
     /**
