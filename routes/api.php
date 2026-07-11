@@ -26,11 +26,13 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\BulkActionController;
 use App\Http\Controllers\Api\BusinessPaymentMethodController;
 use App\Http\Controllers\Api\CellController;
+use App\Http\Controllers\Api\ChannelController;
 use App\Http\Controllers\Api\ChartOfAccountController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\SystemPageController;
 use App\Http\Controllers\Api\CompanyRegistrationController;
 use App\Http\Controllers\Api\ContentSettingController;
+use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\EmployeeTypeController;
@@ -72,6 +74,7 @@ use App\Http\Controllers\Api\LogActionController;
 use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MenuSettingController;
+use App\Http\Controllers\Api\MetaConnectController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
@@ -1480,7 +1483,29 @@ Route::prefix('v1')->group(function () {
                     Route::post('/', [EmailSendController::class, 'store']);
                     Route::get('/{id}', [EmailSendController::class, 'show']);
                 });
+                Route::get('/inbox/channels', [ChannelController::class, 'index']);
+                Route::post('/inbox/channels', [ChannelController::class, 'store']);
+                Route::put('/inbox/channels/{channel}', [ChannelController::class, 'update']);
+                Route::delete('/inbox/channels/{channel}', [ChannelController::class, 'destroy']);
 
+                Route::get('/inbox/conversations', [ConversationController::class, 'index']);
+                Route::post('/inbox/conversations/{conversation}/assign', [ConversationController::class, 'assign']);
+                Route::get('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'messages']);
+                Route::post('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage']);
+
+                // routes/api.php
+                Route::prefix('/inbox/meta')->group(function () {
+                    Route::get('/login/{type}', [MetaConnectController::class, 'startLogin']);        
+                    Route::get('/session/{sessionId}/businesses', [MetaConnectController::class, 'businesses']);
+                    Route::get('/session/{sessionId}/pages', [MetaConnectController::class, 'pages']);
+                    Route::post('/session/{sessionId}/connect-page', [MetaConnectController::class, 'connectPage']);
+                    Route::get('/session/{sessionId}/whatsapp-accounts', [MetaConnectController::class, 'whatsappAccounts']);
+                    Route::post('/session/{sessionId}/connect-whatsapp', [MetaConnectController::class, 'connectWhatsapp']);
+                    Route::delete('/connections/{connection}', [MetaConnectController::class, 'disconnect']);
+                });
+
+                // callback must be OUTSIDE auth middleware (Meta redirects here directly)
+                Route::get('/v1/inbox/meta/callback', [MetaConnectController::class, 'callback']);
                 //billing
                 Route::prefix('billing')->group(function () {
                     Route::get('/{id}', [BillingController::class, 'billingReports']);

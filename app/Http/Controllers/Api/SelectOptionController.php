@@ -85,11 +85,11 @@ class SelectOptionController extends Controller
     }
     public function supplierOptions()
     {
-        return Party::where('type', 1)->select('id','name')->orderBy('name', 'asc')->get();
+        return Party::where('type', 1)->select('id', 'name')->orderBy('name', 'asc')->get();
     }
     public function customersOptions()
     {
-        return Party::where('type', 2)->select('id','name')->orderBy('name', 'asc')->get();
+        return Party::where('type', 2)->select('id', 'name')->orderBy('name', 'asc')->get();
     }
 
     public function productOptions()
@@ -105,7 +105,7 @@ class SelectOptionController extends Controller
     }
     public function getProductByWarehouse(Request $request, $warehouseId)
     {
-        $type = $request->query('type'); 
+        $type = $request->query('type');
 
         $products = Product::with([
             'brand',
@@ -257,43 +257,72 @@ class SelectOptionController extends Controller
 
     public function attributeGroupOptions()
     {
-        return AttributeGroup::select('id', 'name')->orderBy('name', 'asc')->get();
+        return response()->json(
+            AttributeGroup::getCachedOptions(auth()->user()->company_id, ['id', 'name'])
+        );
     }
+
     public function productattributeGroupOptions()
     {
-        return AttributeGroup::where('status', Status::Active->value)->select('id', 'name')->orderBy('name', 'asc')->get();
+        return response()->json(
+            AttributeGroup::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name'])
+        );
     }
+
     public function productattributeValueOptions()
     {
-        return AttributeValue::where('status', Status::Active->value)->select('id', 'name', 'attribute_group_id')->orderBy('name', 'asc')->get();
+        return response()->json(
+            AttributeValue::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'attribute_group_id'])
+        );
     }
+
     public function megaCategoryOptions()
     {
-        return MegaCategory::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            MegaCategory::getCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function productmegaCategoryOptions()
     {
-        return MegaCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            MegaCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function productsubCategoryOptions()
     {
-        return SubCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            SubCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function productminiCategoryOptions()
     {
-        return MiniCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            MiniCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function productextraCategoryOptions()
     {
-        return ExtraCategory::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            ExtraCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function brandOptions()
     {
-        return Brand::select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            Brand::getCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
+
     public function productbrandOptions()
     {
-        return Brand::where('status', Status::Active->value)->select('id', 'name', 'slug')->orderBy('name', 'asc')->get();
+        return response()->json(
+            Brand::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+        );
     }
     public function nestedCategoryOptions()
     {

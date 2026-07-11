@@ -73,6 +73,9 @@ class PermissionSeeder extends Seeder
         $addViewOnly('incomplete_orders', 'Incomplete Orders',        'incomplete_orders');
         $addCrud('pos',                   'POS',                      'pos_module');
 
+        //omni
+        $addCrud('omni',                   'Omni Channel',                      'omni');
+
         // ==========================================
         // 4. Products
         // ==========================================
@@ -219,6 +222,7 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_theme',         'Theme Settings',        'settings_theme');
         $addCrud('settings_meta',         'Meta Settings',        'settings_meta');
         $addCrud('settings_menu',         'Menu Settings',        'settings_menu');
+        $addCrud('settings_marketing',         'Marketing Settings',        'settings_marketing');
 
         //21. Subscriptions
         $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');

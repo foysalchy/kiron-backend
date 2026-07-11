@@ -5,12 +5,13 @@ namespace App\Providers;
 use App\Enums\Status;
 use App\Models\Company;
 use App\Models\ContentSetting;
-use App\Models\MegaCategory;
+use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue};
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\SearchProduct;
 use App\Models\SiteSetting;
 use App\Models\SocialSetting;
+use App\Observers\CachedOptionsObserver;
 use App\Services\AccountGroupService;
 use App\Services\AreaService;
 use App\Services\AssetCategoryService;
@@ -113,6 +114,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Http;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -260,8 +262,8 @@ class AppServiceProvider extends ServiceProvider
                     'headerCategories'  => $applyLogic(MegaCategory::class)
                         ->select('id', 'company_id', 'name', 'slug', 'image')
                         ->with([
-                            'subCategories' => fn($q) => $q->select('id','company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value),
-                            'subCategories.miniCategories' => fn($q) => $q->select('id','company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value)
+                            'subCategories' => fn($q) => $q->select('id', 'company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value),
+                            'subCategories.miniCategories' => fn($q) => $q->select('id', 'company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value)
                         ])
                         ->where('status', Status::Active->value)
                         ->whereNotNull('slug')
@@ -293,13 +295,26 @@ class AppServiceProvider extends ServiceProvider
                     // its for company
                     'popularSearches'   => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
                     'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))
-                     ->select('id', 'company_id', 'title', 'slug', 'thumbnail')->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
+                        ->select('id', 'company_id', 'title', 'slug', 'thumbnail')->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
 
                     'allHeaderProducts' => Product::where('status', Status::Active->value)->get(),
                 ];
             });
 
             View::share($data);
+        }
+
+        $models = [
+            MegaCategory::class,
+            SubCategory::class,
+            MiniCategory::class,
+            ExtraCategory::class,
+            Brand::class,
+            AttributeGroup::class,
+            AttributeValue::class,
+        ];
+        foreach ($models as $model) {
+            $model::observe(CachedOptionsObserver::class);
         }
     }
 }

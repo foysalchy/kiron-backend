@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasCachedOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class MegaCategory extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped,HasCachedOptions;
 
     protected $fillable = [
         'company_id',
@@ -38,7 +41,7 @@ class MegaCategory extends Model
     {
         return $this->belongsTo(Company::class);
     }
-
+  
     public function subCategories(): HasMany
     {
         return $this->hasMany(SubCategory::class);
@@ -56,7 +59,7 @@ class MegaCategory extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-         return $this->image
+        return $this->image
             ? Storage::disk('r2')->url($this->image)
             : null;
     }
