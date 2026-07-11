@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasCachedOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class ExtraCategory extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped,HasCachedOptions;
 
     protected $fillable = [
         'company_id',

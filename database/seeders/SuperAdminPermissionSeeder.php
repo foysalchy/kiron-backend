@@ -82,6 +82,8 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('master_demos',         'Master Demos');
         $addCrud('master_features',         'Master Features');
 
+        $addCrud('omni',                   'Omni Channel');
+
         // ── Marketing ──────────────────────────────────────
         $addCrud('marketing_coupons',        'Marketing Coupons');
         $addCrud('super_admin_email',          'Marketing Email');
@@ -96,6 +98,8 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('settings_reminder',        'Reminder Settings');
         $addCrud('settings_meta',        'Meta Settings');
         $addCrud('settings_menu',        'Menu Settings');
+        $addCrud('settings_marketing',         'Marketing Settings');
+
 
 
         // ── Roles & Permissions ────────────────────────────

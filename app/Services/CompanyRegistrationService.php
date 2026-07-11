@@ -93,8 +93,8 @@ class CompanyRegistrationService
                     'role'              => 'User', // primary role, roles relation eventually assign hobe
                     'is_super_admin'    => false,
                     'status'            => $user->status,
-                    'setup_complete'    => false,  
-                    'billing_required'  => false,  
+                    'setup_complete'    => false,
+                    'billing_required'  => false,
                     'profile'           => $user->profile,
                     'profile_url'       => $user->profile_url,
                     'company'           => $company,
@@ -560,8 +560,8 @@ class CompanyRegistrationService
 
     private function createOtpRecord(int $companyId, string $type, string $email): string
     {
-        //  $otp = $this->generateOtp();
-        $otp = 123456;
+        $otp = $this->generateOtp();
+
         EmailVerification::where('company_id', $companyId)->where('type', $type)->whereNull('verified_at')->delete();
         EmailVerification::create([
             'company_id' => $companyId,
