@@ -57,6 +57,7 @@ class DisposalTypeService
     {
         DB::beginTransaction();
         try {
+            $data['status']=1;
             $type = DisposalType::create($data);
             LogHelper::created('disposal_type', $type->id, $type->company_id, $type->name);
             DB::commit();

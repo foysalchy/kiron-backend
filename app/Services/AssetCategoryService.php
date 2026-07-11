@@ -66,6 +66,7 @@ class AssetCategoryService
     {
         DB::beginTransaction();
         try {
+            $data['status']=1;
             $category = AssetCategory::create($data);
 
             LogHelper::created('asset_category', $category->id, $category->company_id, $category->name);

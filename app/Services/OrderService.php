@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Order, OrderDetail, OrderPayment, Party, Product};
+use App\Models\{Order, OrderDetail, OrderPayment, Party, Product,Bin};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -892,6 +892,12 @@ class OrderService
             Log::warning("Skipping stock deduction: Warehouse ID is missing for Order #{$order->id}");
             return;
         }
+        
+
+        if($item['bin_id']){
+            $warehouseId=Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
+        }
+       
         $stockData = [
             'warehouse_id' => $warehouseId,
             'bin_id' => $item['bin_id'] ?? null,

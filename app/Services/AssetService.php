@@ -85,8 +85,9 @@ public function createAsset(array $data): Asset
                    
                 );
             }
-
+            
             $asset = Asset::create($data);
+            
             LogHelper::created('asset', $asset->id, $asset->company_id, $asset->name);
 
             DB::commit();
