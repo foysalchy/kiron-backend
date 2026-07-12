@@ -120,7 +120,7 @@ class SeoController extends Controller
 
             return implode("\n", [
                 'User-agent: *',
-                'Allow: /',
+                'Disallow: /',
                 '',
                 'Disallow: /admin',
                 'Disallow: /login',
