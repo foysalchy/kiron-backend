@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
@@ -41,7 +42,12 @@ class ConversationController extends Controller
     public function messages(Request $request, Conversation $conversation)
     {
         abort_unless($conversation->company_id === $request->user()->company_id, 403);
-
+        if ($request->user()) {
+            $conversation->messages()
+                ->where('from', 'customer')
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        }
         return response()->json(
             $conversation->messages()->with('agent')->orderBy('created_at')->get()
         );
@@ -59,11 +65,17 @@ class ConversationController extends Controller
 
         $filePath = null;
         $fileName = null;
-        if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('inbox-attachments', 'public');
-            $fileName = $request->file('file')->getClientOriginalName();
-        }
 
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+
+            $filePath = FileUploadHelper::upload(
+                $file,
+                'inbox-attachments'
+            );
+
+            $fileName = $file->getClientOriginalName();
+        }
         $message = $conversation->messages()->create([
             'from' => 'agent',
             'type' => $data['type'],

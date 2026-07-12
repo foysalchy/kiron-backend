@@ -1487,6 +1487,8 @@ Route::prefix('v1')->group(function () {
                 Route::post('/inbox/channels', [ChannelController::class, 'store']);
                 Route::put('/inbox/channels/{channel}', [ChannelController::class, 'update']);
                 Route::delete('/inbox/channels/{channel}', [ChannelController::class, 'destroy']);
+                Route::get('/inbox/labels', [ChannelController::class, 'label']);
+                Route::post('/inbox/labels', [ChannelController::class, 'labelStore']);
 
                 Route::get('/inbox/conversations', [ConversationController::class, 'index']);
                 Route::post('/inbox/conversations/{conversation}/assign', [ConversationController::class, 'assign']);
@@ -1495,7 +1497,7 @@ Route::prefix('v1')->group(function () {
 
                 // routes/api.php
                 Route::prefix('/inbox/meta')->group(function () {
-                    Route::get('/login/{type}', [MetaConnectController::class, 'startLogin']);        
+                    Route::get('/login/{type}', [MetaConnectController::class, 'startLogin']);
                     Route::get('/session/{sessionId}/businesses', [MetaConnectController::class, 'businesses']);
                     Route::get('/session/{sessionId}/pages', [MetaConnectController::class, 'pages']);
                     Route::post('/session/{sessionId}/connect-page', [MetaConnectController::class, 'connectPage']);
