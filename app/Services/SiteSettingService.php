@@ -84,7 +84,14 @@ class SiteSettingService
                 $data['favicon'] = FileUploadHelper::uploadImage(
                     $data['favicon'],
                     'settings/favicons',
-                  
+
+                );
+            }
+            if (isset($data['meta_image'])) {
+                $data['meta_image'] = FileUploadHelper::uploadImage(
+                    $data['meta_image'],
+                    'settings/meta_image',
+
                 );
             }
 
@@ -129,6 +136,13 @@ class SiteSettingService
                     $data['favicon'],
                     $setting->favicon,
                     'settings/favicons'
+                );
+            }
+            if (isset($data['meta_image'])) {
+                $data['meta_image'] = FileUploadHelper::replace(
+                    $data['meta_image'],
+                    $setting->meta_image,
+                    'settings/meta_image'
                 );
             }
 
