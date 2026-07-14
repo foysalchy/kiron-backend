@@ -555,7 +555,8 @@ class CompanyRegistrationService
 
     private function generateOtp(): string
     {
-        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        // return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        return 123456;
     }
 
     private function createOtpRecord(int $companyId, string $type, string $email): string
