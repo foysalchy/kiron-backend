@@ -171,17 +171,17 @@ Route::prefix('v1')->group(function () {
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
     Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/auth/reset-password',  [AuthController::class, 'resetPassword']);
-    // Route::prefix('registration')->group(function () {
-    //     Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
-    //     Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);
-    //     Route::post('subscription', [CompanyRegistrationController::class, 'storeSubscription']);
-    //     Route::post('basic-settings', [CompanyRegistrationController::class, 'storeBasicSettings']);
+    Route::prefix('registration')->group(function () {
+        Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
+        Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);
+        Route::post('subscription', [CompanyRegistrationController::class, 'storeSubscription']);
+        Route::post('basic-settings', [CompanyRegistrationController::class, 'storeBasicSettings']);
 
 
-    //     // OTP actions
-    //     Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
-    //     Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
-    // });
+        // OTP actions
+        Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
+        Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
+    });
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
         Route::post('/clear-cache', function () {
             Artisan::call('cache:clear');
