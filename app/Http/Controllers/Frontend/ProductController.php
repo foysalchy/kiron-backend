@@ -32,7 +32,7 @@ class ProductController extends FrontendController
     {
         $query = Product::with('variations')
             ->withCount('reviews')
-            ->withAvg('reviews', 'rating');;
+            ->withAvg('reviews', 'rating');
 
         if ($request->filled('search')) {
             SearchProduct::create([
@@ -189,8 +189,8 @@ class ProductController extends FrontendController
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
             'variations.galleries',
-            'galleries',
-            'brand',
+            'galleries:id,product_id,image',
+            'brand:id,company_id,name,slug,logo',
             'reviews.customer',
             'reviews.variation.attributes.attributeGroup',
         ])->where('slug', $slug)->firstOrFail();
@@ -374,9 +374,9 @@ class ProductController extends FrontendController
         $products = $query->paginate(12)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::get();
+        $brands = Brand::select('id,name,logo')->get();
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values')->active()->get()->unique('name');
+            ->with('values:id,attribute_group_id,name')->where('status', Status::Active->value)->get()->unique('name');
 
         return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products

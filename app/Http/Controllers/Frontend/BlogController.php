@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends FrontendController
 {
@@ -33,27 +35,35 @@ class BlogController extends FrontendController
     }
     public function blogDetails($slug)
     {
-        $slugWithDash = str_replace(['%20', ' '], '-', $slug);
-        $slugWithSpace = str_replace(['%20', '-'], ' ', $slug);
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+        $blog = Cache::remember("blog_single_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
+            $slugWithDash = str_replace(['%20', ' '], '-', $slug);
+            $slugWithSpace = str_replace(['%20', '-'], ' ', $slug);
 
-        $blog = Blog::with('user')
-            ->where(function ($query) use ($slugWithDash, $slugWithSpace, $slug) {
-                $query->where('slug', $slug)
-                    ->orWhere('slug', $slugWithDash)
-                    ->orWhere('slug', $slugWithSpace);
-            })
-            ->active()
-            ->firstOrFail();
+            return Blog::with('user:id,name')
+                ->where('company_id', $companyId)
+                ->where(function ($query) use ($slugWithDash, $slugWithSpace, $slug) {
+                    $query->where('slug', $slug)
+                        ->orWhere('slug', $slugWithDash)
+                        ->orWhere('slug', $slugWithSpace);
+                })
+                ->active()
+                ->firstOrFail();
+        });
+        $relatedPosts = Cache::remember("blog_related_{$companyId}_{$blog->id}", $ttl, function () use ($blog, $companyId) {
+            return Blog::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->where('id', '!=', $blog->id)
+                ->latest()->take(3)->get();
+        });
 
-        $relatedPosts = Blog::active()
-            ->where('id', '!=', $blog->id)
-            ->latest()->take(3)->get();
-
-
-        $popularTags = Blog::active()
-            ->whereNotNull('meta_keywords')
-            ->get()->pluck('meta_keywords')->flatten()->unique()->filter()->values();
-
+        $popularTags = Cache::remember("blog_tags_{$companyId}", $ttl, function () use ($companyId) {
+            return  Blog::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->whereNotNull('meta_keywords')
+                ->get()->pluck('meta_keywords')->flatten()->unique()->filter()->values();
+        });
         return  $this->view('frontend.blogDetails', compact('blog', 'relatedPosts', 'popularTags'));
     }
 }

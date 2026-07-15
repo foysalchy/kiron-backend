@@ -7,8 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\LandingPage;
 use App\Models\Order;
 use App\Models\Party;
+use App\Models\Product;
+use App\Models\ProductVariation;
+use App\Models\ProductVariationStock;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Facades\{Cache, DB, Log};
 use Illuminate\Support\Facades\Hash;
 use App\Services\OrderService;
 
@@ -20,8 +23,13 @@ class LandingController extends FrontendController
     }
     public function index($slug)
     {
-        $landing = LandingPage::with('product')->where('slug', $slug)->firstOrFail();
-
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+        $landing = Cache::remember("landing_page_view_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
+            return LandingPage::where('company_id', $companyId)
+                ->where('status', Status::Active->value)->with('product:id, company_id, title, slug, thumbnail, sale_price, regular_price, discount, type, warehouse_info')
+                ->where('slug', $slug)->firstOrFail();
+        });
         $product = $landing->product;
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
@@ -61,15 +69,15 @@ class LandingController extends FrontendController
             $variationId = $request->variation_id;
 
             if ($variationId) {
-                $variation = \App\Models\ProductVariation::findOrFail($variationId);
+                $variation = ProductVariation::findOrFail($variationId);
                 $unitPrice = $variation->regular_price - $variation->discount;
 
-                $vStock = \App\Models\ProductVariationStock::where('product_variation_id', $variationId)
+                $vStock = ProductVariationStock::where('product_variation_id', $variationId)
                     ->where('quantity', '>=', $request->qty)
                     ->first();
                 $warehouseId = $vStock ? $vStock->warehouse_id : null;
             } else {
-                $product = \App\Models\Product::findOrFail($productId);
+                $product = Product::findOrFail($productId);
                 $unitPrice = $product->sale_price;
 
                 $pWarehouseInfo = $product->warehouse_info ?? [];
@@ -82,7 +90,7 @@ class LandingController extends FrontendController
             }
 
             if (!$warehouseId) {
-                return back()->with('error', 'দুঃখিত, এই প্রোডাক্টটি বর্তমানে পর্যাপ্ত স্টকে নেই।');
+                return back()->with('error', 'Sorry, This product is not available now!');
             }
 
             $settings = DB::table('site_settings')->where('company_id', $this->company_id)->first();

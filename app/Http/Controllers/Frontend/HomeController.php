@@ -33,19 +33,23 @@ class HomeController extends FrontendController
         });
 
         // ২. এফএকিউ (FAQs)
-        $faqs = Cache::remember("home_faqs_{$companyId}", $ttl, function () {
-            return KnowledgeBase::active()->select('id', 'title', 'content')->get();
+        $faqs = Cache::remember("home_faqs_{$companyId}", $ttl, function () use ($companyId) {
+            return KnowledgeBase::where('company_id', $companyId)
+            ->where('status', Status::Active->value)
+            ->select('id', 'title', 'content')->get();
         });
 
         // ৩. ক্যাটাগরি এবং সাব-ক্যাটাগরি
-        $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () {
-            return MegaCategory::select('id', 'name','company_id', 'slug', 'image')
+        $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
+            return MegaCategory::where('company_id', $companyId)
+            ->select('id', 'name','company_id', 'slug', 'image')
             ->with('subCategories:id,mega_category_id,name,slug','subCategories.miniCategories:id,sub_category_id,name,slug')->get();
         });
 
         // ৪. লেটেস্ট অফার
-        $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+        $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () use ($companyId){
+            return Product::where('company_id', $companyId)
+                ->with(['brand:id,company_id,name,slug,logo', 'variations'])
                 ->where('discount', '>', 0)
                 ->where('status', Status::Active->value)
                 ->latest()
@@ -53,9 +57,9 @@ class HomeController extends FrontendController
                 ->get();
         });
 
-        // ৫. নিউ অ্যারাইভালস
-        $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations.attributes.attributeValue'])
+        $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () use ($companyId) {
+            return Product::where('company_id', $companyId)
+                ->with(['brand:id,company_id,name,slug,logo', 'variations.attributes.attributeValue'])
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
@@ -64,9 +68,10 @@ class HomeController extends FrontendController
                 ->get();
         });
 
-        // ৬. প্রোডাক্ট গ্রুপ (N+1 কুয়েরি ফিক্সড)
-        $productGroups = Cache::remember("home_product_groups_{$companyId}", $ttl, function () {
-            return ProductGroup::where('status', Status::Active->value)
+        //  (N+1 )
+        $productGroups = Cache::remember("home_product_groups_{$companyId}", $ttl, function () use ($companyId) {
+            return ProductGroup::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
                 ->where('is_frontend', 1)
                 ->select('id', 'name', 'slug', 'product_ids')
                 ->get()
@@ -85,8 +90,9 @@ class HomeController extends FrontendController
         });
 
         // ৭. ব্র্যান্ডস
-        $brands = Cache::remember("home_brands_{$companyId}", $ttl, function () {
-            return Brand::where('status', Status::Active->value)
+        $brands = Cache::remember("home_brands_{$companyId}", $ttl, function () use ($companyId) {
+            return Brand::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
                 ->select('id', 'company_id', 'name', 'slug', 'logo')
                 ->latest()
                 ->take(10)
@@ -94,8 +100,8 @@ class HomeController extends FrontendController
         });
 
         // ৮. পপুলার প্রোডাক্টস
-        $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+        $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () use ($companyId){
+            return Product::where('company_id', $companyId)->with(['brand:id,company_id,name,slug,logo', 'variations'])
                 ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
@@ -107,8 +113,9 @@ class HomeController extends FrontendController
         });
 
         // ৯. অল প্রোডাক্টস (লেটেস্ট ১২টি)
-        $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () {
-            return Product::with(['brand:id,company_id,name,slug,logo', 'variations'])
+        $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () use ($companyId){
+            return Product::where('company_id', $companyId)
+                ->with(['brand:id,company_id,name,slug,logo', 'variations'])
                 ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
                 ->where('status', Status::Active->value)
                 ->latest()
