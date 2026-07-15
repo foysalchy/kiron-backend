@@ -6,11 +6,11 @@
     $menuItems = $customMenu ? $customMenu->items : null;
 @endphp
 <header class="w-full sticky top-0 z-50">
-    <div class="hidden md:block bg-[#3533cd] text-white py-2 px-4 md:px-10">
+    <div class="hidden md:block bg-[#3533cd] text-header py-2 px-4 md:px-10">
         <div class="container mx-auto flex justify-between items-center text-xs md:text-sm">
             <div class="flex items-center gap-2">
                 <!-- WhatsApp Icon with label -->
-                <i class="fa-brands fa-whatsapp text-[var(--primary-color)] text-lg" aria-hidden="true"></i>
+                <i class="fa-brands fa-whatsapp text-header text-lg" aria-hidden="true"></i>
                 <span>Call Or Text Us to Order :
                     <a href="tel:{{ $setup->phone ?? '+88000000000' }}" class="hover:underline" aria-label="Call us">
                         {{ $setup->phone ?? '+880 00000000' }}
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="primary-bg text-white py-4 px-4 md:px-10 border-b border-[var(--primary-color)]">
+    <div class="header-custom-bg text-header py-4 px-4 md:px-10 border-b border-[var(--primary-color)]">
         <div class="container mx-auto flex items-center justify-between gap-4">
             <button id="menu-toggle" aria-label="Open Menu" class="lg:hidden text-2xl focus:outline-none"
                 aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-sidebar">
@@ -63,7 +63,7 @@
                         placeholder="Search by product name" aria-label="Search for baby products"
                         class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white placeholder-gray-400 text-sm border border-gray-100 shadow-sm" />
                     <button type="submit" aria-label="Search Products"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-[var(--primary-color)]">
+                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-header">
                         <i class="fa-solid fa-magnifying-glass text-lg"></i>
                     </button>
                 </div>
@@ -108,7 +108,7 @@
                 <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 cursor-pointer group"
                     aria-label="View your wishlist, currently 0 items">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-regular fa-heart text-xl text-[var(--primary-color)]" aria-hidden="true"></i>
+                        <i class="fa-regular fa-heart text-xl text-header" aria-hidden="true"></i>
                     </div>
                     <div class="hidden xl:block">
                         <p class="text-sm font-medium leading-tight">My Wishlist</p>
@@ -127,7 +127,7 @@
                 <!-- Shopping Cart Link -->
                 <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-bag-shopping text-xl text-[var(--primary-color)]"></i>
+                        <i class="fa-solid fa-bag-shopping text-xl text-header"></i>
                     </div>
 
                     <div class="hidden lg:block">
@@ -148,7 +148,7 @@
                     placeholder="Search..." aria-label="Search products"
                     class="w-full py-2 px-5 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100" />
                 <button type="submit" aria-label="Search"
-                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] transition-colors">
+                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-header transition-colors">
                     <i class="fa-solid fa-magnifying-glass text-lg"></i>
                 </button>
             </div>
@@ -181,7 +181,7 @@
                             @endphp
                             <li class="group relative">
                                 <a href="{{ $finalUrl }}"
-                                    class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
+                                    class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
                                     {{ $item['label'] }}
                                     @if (!empty($item['children']))
                                         <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
@@ -199,7 +199,7 @@
                                                     @endphp
                                                     <li class="px-4 py-2.5 hover:bg-gray-100">
                                                         <a href="{{ $cUrl }}"
-                                                            class="group-hover:text-[var(--primary-color)] uppercase block">
+                                                            class="group-hover:text-header uppercase block">
                                                             {{ $child['label'] }}
                                                         </a>
                                                     </li>
@@ -215,7 +215,7 @@
                     @foreach ($headerCategories->take(5) as $mega)
                         <li class="group relative">
                             <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
-                                class="flex items-center gap-2 px-5 py-4 hover:text-[var(--primary-color)] transition-all cursor-pointer uppercase">
+                                class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
                                 {{ $mega->name }}
                                 @if ($mega->subCategories->count() > 0)
                                     <i class="fa-solid fa-chevron-down text-[10px] mt-1 opacity-50"></i>
@@ -229,7 +229,7 @@
                                             <li
                                                 class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
                                                 <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
-                                                    class="group-hover/sub:text-[var(--primary-color)] uppercase">
+                                                    class="group-hover/sub:text-header uppercase">
                                                     {{ $sub->name }}
                                                 </a>
                                                 @if ($sub->miniCategories->count() > 0)
@@ -242,7 +242,7 @@
                                                         @foreach ($sub->miniCategories as $mini)
                                                             <li class="px-4 py-2.5 hover:bg-gray-100">
                                                                 <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
-                                                                    class="block group-hover/mini:text-[var(--primary-color)] uppercase">
+                                                                    class="block group-hover/mini:text-header uppercase">
                                                                     {{ $mini->name }}
                                                                 </a>
                                                             </li>
@@ -265,7 +265,7 @@
     <div id="mobile-sidebar"
         class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col">
 
-        <div class="p-4 flex justify-between items-center border-b primary-bg text-white">
+        <div class="p-4 flex justify-between items-center border-b header-custom-bg text-header">
             <h2 class="font-bold text-lg uppercase tracking-wider">All Categories</h2>
             <button id="close-sidebar" aria-label="Close Menu"
                 class="text-2xl hover:text-red-400 transition-colors">&times;</button>
@@ -320,7 +320,7 @@
                     <div class="border-b border-[#f3f3f3]">
                         <div class="flex justify-between items-center px-5 py-4 group">
                             <a href="{{ route('category.products', $mega->slug) }}"
-                                class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-[var(--primary-color)] transition-colors flex-1">
+                                class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-header transition-colors flex-1">
                                 {{ $mega->name }}
                             </a>
 
@@ -339,7 +339,7 @@
                                     <div class="border-b border-gray-100 last:border-0">
                                         <div class="flex justify-between items-center pl-8 pr-5 py-3">
                                             <a href="{{ route('category.products', $sub->slug) }}"
-                                                class="text-sm font-semibold text-gray-700 hover:text-[var(--primary-color)] flex-1">
+                                                class="text-sm font-semibold text-gray-700 hover:text-header flex-1">
                                                 {{ $sub->name }}
                                             </a>
 
@@ -356,7 +356,7 @@
                                             <div id="m-sub-{{ $sub->id }}" class="hidden bg-gray-100/50">
                                                 @foreach ($sub->miniCategories as $mini)
                                                     <a href="{{ route('category.products', $mini->slug) }}"
-                                                        class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-[var(--primary-color)]">
+                                                        class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-header">
                                                         {{ $mini->name }}
                                                     </a>
                                                 @endforeach
@@ -377,7 +377,7 @@
                     </div>
                     <a href="{{ route('user.dashboard') }}"
                         class="flex items-center gap-3 px-4 py-3 text-sm text-gray-700 font-bold hover:bg-gray-50 rounded-lg transition-all">
-                        <i class="fa-regular fa-circle-user text-lg text-[var(--primary-color)]"></i>
+                        <i class="fa-regular fa-circle-user text-lg text-header"></i>
                         <span>My Dashboard</span>
                     </a>
                     <form action="{{ route('user.logout') }}" method="POST">
@@ -390,7 +390,7 @@
                     </form>
                 @else
                     <a href="{{ route('user.login') }}"
-                        class="flex items-center justify-center p-4 primary-bg text-white rounded-xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">
+                        class="flex items-center justify-center p-4 header-custom-bg text-header rounded-xl font-bold shadow-lg shadow-purple-100 active:scale-95 transition-all">
                         <i class="fa-regular fa-user mr-2"></i> Log In / Register
                     </a>
                 @endauth

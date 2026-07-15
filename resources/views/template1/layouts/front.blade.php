@@ -36,8 +36,23 @@
 
             --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
             --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
+
+            --header-bg: {{ $themeColor->theme_template['header_color'] ?? ($themeColor->theme_template['primary_color'] ?? '#66267b') }};
+            --header-text: {{ $themeColor->theme_template['header_text_color'] ?? '#ffffff' }};
+
+            --footer-bg: {{ $themeColor->theme_template['footer_color'] ?? '#0a061e' }};
+            --footer-text: {{ $themeColor->theme_template['footer_text_color'] ?? '#ffffff' }};
         }
 
+        .header-custom-bg {
+            background-color: var(--header-bg) !important;
+            color: var(--header-text) !important;
+        }
+
+        .footer-custom-bg {
+            background-color: var(--footer-bg) !important;
+            color: var(--footer-text) !important;
+        }
         .primary-bg {
             background-color: var(--primary-color) !important;
             color: var(--primary-text) !important;

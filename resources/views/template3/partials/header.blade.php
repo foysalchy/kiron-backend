@@ -1,4 +1,4 @@
-<header class="w-full bg-white sticky top-0 z-50 shadow-sm">
+<header class="w-full header-custom-bg sticky top-0 z-50 shadow-sm">
     <!-- 1. Main Header (Logo, Search, User Actions) -->
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-10">
 
@@ -118,7 +118,7 @@
                     <i
                         class="fa-solid fa-basket-shopping text-2xl text-gray-800 group-hover:text-blue-600 transition-colors"></i>
                     <span
-                        class="cart-count-nav absolute -top-2 -right-2 primary-bg text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
+                        class="cart-count-nav absolute -top-2 -right-2 primary-bg header_text_color text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
                         {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                     </span>
                 </div>
@@ -136,15 +136,15 @@
         <div class="container mx-auto px-4 flex items-center justify-between">
             <nav class="flex items-center gap-6 md:gap-8 py-3">
                 <a href="{{ route('home') }}"
-                    class="text-base font-normal text-[var(--primary-color)] hover:text-[var(--primary-color)] whitespace-nowrap">Home</a>
+                    class="text-base font-normal text-header hover:text-header whitespace-nowrap">Home</a>
                 <a href="{{ route('shop.index') }}"
-                    class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">Shop</a>
+                    class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">Shop</a>
                 @foreach ($headerCategories->take(7) as $cat)
                     <a href="{{ route('category.products', $cat->slug) }}"
-                        class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">{{ $cat->name }}</a>
+                        class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">{{ $cat->name }}</a>
                 @endforeach
                 <a href="{{ route('flash.sale') }}"
-                    class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">Offers</a>
+                    class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">Offers</a>
             </nav>
 
             <!-- Track Order Button -->
@@ -331,7 +331,6 @@
         @endforelse
     </div>
 
-    <!-- Footer -->
     @if (count($cartItems) > 0)
         <div class="p-4 border-t bg-gray-50">
             <div class="flex justify-between items-center mb-4">

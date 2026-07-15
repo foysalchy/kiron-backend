@@ -1,5 +1,5 @@
     <!-- FOOTER SECTION -->
-    <footer class="primary-bg text-white pt-20 pb-10" role="contentinfo">
+    <footer class="footer-custom-bg text-footer pt-20 pb-10" role="contentinfo">
         <div class="container mx-auto p-4">
             <!-- Top Part: Logo & Menus -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
@@ -34,7 +34,7 @@
                     <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
                         Pages
                     </h3>
-                    <ul class="space-y-4 text-white/90 text-base">
+                    <ul class="space-y-4 text-footer/90 text-base">
                         @foreach ($footerPages as $page)
                         <li><a href="{{ url('page', ['slug' => $page->slug]) }}" class="hover:underline">{{ $page->title }}</a></li>
                         @endforeach
@@ -46,7 +46,7 @@
                     <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
                         Quick Link
                     </h3>
-                    <ul class="space-y-4 text-white/90 text-base">
+                    <ul class="space-y-4 text-footer/90 text-base">
                         <li><a href="{{ route('blog.index') }}" class="hover:underline">Blog</a></li>
                         <li><a href="{{ route('shop.index') }}" class="hover:underline">Shop</a></li>
                         <li><a href="{{ route('contact.index') }}" class="hover:underline">Contact Us</a></li>
@@ -59,7 +59,7 @@
                     <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
                         Social
                     </h3>
-                    <ul class="space-y-4 text-white/90 text-base">
+                    <ul class="space-y-4 text-footer/90 text-base">
                         @foreach ($socialLinks as $social)
                             <li>
                                 <a href="{{ $social->link }}" target="_blank" rel="noopener noreferrer"
@@ -75,7 +75,7 @@
 
             <!-- Bottom Part: Divider & Copyright -->
             <div class="border-t border-white/40 pt-8 mt-10">
-                <p class="text-center text-white/90 text-base tracking-wide">
+                <p class="text-center text-footer/90 text-base tracking-wide">
                     @ {{ $setup->shop_name }} 2025. All Rights Reserved
                 </p>
             </div>
