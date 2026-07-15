@@ -76,4 +76,23 @@ class ChannelController extends Controller
 
         return response()->json($label, 201);
     }
+    public function labelUpdate(Request $request, Label $label)
+    {
+        abort_unless($label->company_id === $request->user()->company_id, 403);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:100',
+            'color' => 'required',
+        ]);
+
+        $label->update($data);
+        return response()->json($label);
+    }
+
+    public function labelDestroy(Request $request, Label $label)
+    {
+        abort_unless($label->company_id === $request->user()->company_id, 403);
+        $label->delete();
+        return response()->json(['message' => 'Label deleted']);
+    }
 }
