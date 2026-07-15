@@ -147,7 +147,7 @@
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
                                 @if ($social->icon_image)
-                                    <img src="{{ asset('storage/' . $social->icon_image) }}" alt="social icon"
+                                    <img src="{{ $social->icon_image ?? '' }}" alt="social icon"
                                         class="h-5 w-5 object-contain">
                                 @else
                                     <i class="{{ $social->icon_class ?? 'fab fa-share' }}" aria-hidden="true"></i>
