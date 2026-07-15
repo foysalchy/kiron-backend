@@ -1489,6 +1489,8 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/inbox/channels/{channel}', [ChannelController::class, 'destroy']);
                 Route::get('/inbox/labels', [ChannelController::class, 'label']);
                 Route::post('/inbox/labels', [ChannelController::class, 'labelStore']);
+                Route::put('/inbox/labels/{label}', [ChannelController::class, 'labelUpdate']);
+                Route::delete('/inbox/labels/{label}', [ChannelController::class, 'labelDestroy']);
 
                 Route::get('/inbox/conversations', [ConversationController::class, 'index']);
                 Route::post('/inbox/conversations/{conversation}/assign', [ConversationController::class, 'assign']);
