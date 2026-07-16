@@ -62,7 +62,7 @@ class MetaConnectController extends Controller
         ], now()->addMinutes(20));
 
         // redirect back to frontend with the session id, frontend then continues the picker steps
-        $frontendUrl = config('app.frontend_url') . "/settings/connections?meta_session={$sessionId}&type={$ctx['type']}";
+        $frontendUrl = config('app.frontend_url') . "/settings/connections?meta_session={$token['access_token']}&type={$ctx['type']}";
         return redirect($frontendUrl);
     }
 
