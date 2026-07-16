@@ -76,6 +76,7 @@ use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MenuSettingController;
 use App\Http\Controllers\Api\MetaConnectController;
+use App\Http\Controllers\Api\MetaDirectProxyController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
@@ -1521,9 +1522,12 @@ Route::prefix('v1')->group(function () {
                     Route::post('/session/{sessionId}/connect-whatsapp', [MetaConnectController::class, 'connectWhatsapp']);
                     Route::delete('/connections/{connection}', [MetaConnectController::class, 'disconnect']);
                 });
+                Route::get('/inbox/facebook/{channelId}/conversations', [MetaDirectProxyController::class, 'getConversations']);
+                Route::get('/inbox/facebook/{channelId}/threads/{threadId}/messages', [MetaDirectProxyController::class, 'getMessages']);
+                Route::post('/inbox/facebook/{channelId}/threads/{threadId}/send', [MetaDirectProxyController::class, 'sendMessage']);
 
                 // callback must be OUTSIDE auth middleware (Meta redirects here directly)
-          
+
                 //billing
                 Route::prefix('billing')->group(function () {
                     Route::get('/{id}', [BillingController::class, 'billingReports']);

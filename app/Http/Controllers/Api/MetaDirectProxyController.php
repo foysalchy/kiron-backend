@@ -1,0 +1,132 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Channel; // আমাদের নতুন চাইল্ড মডেল ইম্পোর্ট করা হলো
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class MetaDirectProxyController extends Controller
+{
+  
+     public function getConversations($channelId)
+    {
+        Log::info("Meta Proxy: Initializing conversations fetch for Channel ID: {$channelId}");
+
+        try {
+            $channel = Channel::findOrFail($channelId);
+            Log::info("Meta Proxy: Retrieved Channel from DB. Page ID: {$channel->page_id}");
+            
+            $pageToken = $channel->page_token;
+            $pageId = $channel->page_id;
+
+            // মেটা গ্রাফ এপিআই কল
+            $response = Http::get("https://graph.facebook.com/v20.0/{$pageId}/conversations", [
+                'access_token' => $pageToken,
+                'fields' => 'id,updated_time,unread_count,participants,messages.limit(1){message}'
+            ]);
+
+            if ($response->failed()) {
+                // মেটার আসল এরর কোড ও পে-লোড লারাভেল লগে প্রিন্ট হবে
+                Log::error("Meta Proxy Error [Conversations]: Graph API call failed for Page ID: {$pageId}. Raw Response: " . $response->body());
+                return response()->json(['error' => 'Failed to fetch conversations from Meta.'], 500);
+            }
+
+            $data = $response->json('data', []);
+            Log::info("Meta Proxy: Successfully retrieved " . count($data) . " conversations for Page ID: {$pageId}");
+
+            $formatted = array_map(function ($convo) {
+                $customer = $convo['participants']['data'][0] ?? null;
+                return [
+                    'id' => $convo['id'],
+                    'customer_name' => $customer['name'] ?? 'Facebook User',
+                    'customer_id' => $customer['id'] ?? null,
+                    'last_message' => $convo['messages']['data'][0]['message'] ?? 'No text',
+                    'unread_count' => $convo['unread_count'] ?? 0,
+                    'last_activity' => $convo['updated_time']
+                ];
+            }, $data);
+
+            return response()->json($formatted);
+
+        } catch (\Exception $e) {
+            Log::critical("Meta Proxy Critical [Conversations]: Exception occurred for Channel ID: {$channelId}. Message: " . $e->getMessage());
+            return response()->json(['error' => 'An unexpected error occurred.'], 500);
+        }
+    }
+
+    /**
+     * নির্দিষ্ট চ্যাট থ্রেডের সম্পূর্ণ মেসেজ হিস্ট্রি সরাসরি মেটা থেকে লোড করা (ডিবাগ লগসহ)
+     */
+    public function getMessages($channelId, $threadId)
+    {
+        Log::info("Meta Proxy: Initializing messages fetch for Thread ID: {$threadId} on Channel ID: {$channelId}");
+
+        try {
+            $channel = Channel::findOrFail($channelId);
+            $pageToken = $channel->page_token;
+
+            // মেটা মেসেজেস গ্রাফ এপিআই কল
+            $response = Http::get("https://graph.facebook.com/v20.0/{$threadId}/messages", [
+                'access_token' => $pageToken,
+                'fields' => 'id,message,created_time,from,to,attachments{media_type,picture}'
+            ]);
+
+            if ($response->failed()) {
+                Log::error("Meta Proxy Error [Messages]: Failed to load messages for Thread ID: {$threadId}. Raw Response: " . $response->body());
+                return response()->json(['error' => 'Failed to load live messages.'], 500);
+            }
+
+            $data = $response->json('data', []);
+            Log::info("Meta Proxy: Successfully processed " . count($data) . " messages from Meta for Thread ID: {$threadId}");
+
+            $messages = array_map(function ($msg) use ($channel) {
+                $senderId = $msg['from']['id'] ?? null;
+                $isAgent = $senderId === $channel->page_id;
+
+                return [
+                    'id' => $msg['id'],
+                    'from' => $isAgent ? 'agent' : 'customer',
+                    'type' => isset($msg['attachments']) ? 'image' : 'text',
+                    'text' => $msg['message'] ?? '',
+                    'file_path' => $msg['attachments']['data'][0]['picture'] ?? null,
+                    'created_at' => $msg['created_time']
+                ];
+            }, $data);
+
+            return response()->json(array_reverse($messages));
+
+        } catch (\Exception $e) {
+            Log::critical("Meta Proxy Critical [Messages]: Exception occurred for Thread ID: {$threadId}. Message: " . $e->getMessage());
+            return response()->json(['error' => 'An unexpected error occurred.'], 500);
+        }
+    }
+    /**
+     * এজেন্ট যখন মেসেজ লিখে সেন্ড করবে, সেটি সরাসরি মেটা সার্ভারে পোস্ট হয়ে যাবে
+     */
+    public function sendMessage(Request $request, $channelId, $threadId)
+    {
+        $channel = Channel::findOrFail($channelId);
+        $pageToken = $channel->page_token;
+
+        $data = $request->validate([
+            'text' => 'required|string',
+            'recipient_psid' => 'required|string' // কাস্টমারের পেজ স্কোপড আইডি (PSID)
+        ]);
+
+        // মেটা সেন্ড মেসেজ এপিআই কল (রিয়েল-টাইমে কাস্টমারের মেসেঞ্জারে পুশ হবে)
+        $response = Http::post("https://graph.facebook.com/v20.0/me/messages", [
+            'access_token' => $pageToken,
+            'recipient' => ['id' => $data['recipient_psid']],
+            'message' => ['text' => $data['text']]
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(['error' => 'Message delivery failed via Meta API.'], 500);
+        }
+
+        return response()->json($response->json(), 201);
+    }
+}
