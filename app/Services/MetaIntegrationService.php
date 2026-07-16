@@ -6,18 +6,19 @@ use Illuminate\Support\Facades\Http;
 
 class MetaIntegrationService
 {
-    protected string $version;
-    protected string $appId;
-    protected string $appSecret;
-    protected string $redirectUri;
+    protected ?string $version = null;
+    protected ?string $appId = null;
+    protected ?string $appSecret = null;
+    protected ?string $redirectUri = null;
 
     public function __construct()
     {
-        $this->version = config('services.meta.version');
-        $this->appId = config('services.meta.app_id');
-        $this->appSecret = config('services.meta.app_secret');
-        $this->redirectUri = config('services.meta.redirect_uri');
+        $this->version = (string) config('services.meta.version', 'v20.0');
+        $this->appId = (string) config('services.meta.app_id');
+        $this->appSecret = (string) config('services.meta.app_secret');
+        $this->redirectUri = (string) config('services.meta.redirect_uri');
     }
+
 
     public function loginUrl(string $state, array $scopes): string
     {

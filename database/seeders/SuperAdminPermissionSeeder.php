@@ -83,6 +83,8 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('master_features',         'Master Features');
 
         $addCrud('omni',                   'Omni Channel');
+        $addCrud('omni_setting',                   'Omni Setting');
+        $addCrud('omni_channel',                   'Omni Channel');
 
         // ── Marketing ──────────────────────────────────────
         $addCrud('marketing_coupons',        'Marketing Coupons');

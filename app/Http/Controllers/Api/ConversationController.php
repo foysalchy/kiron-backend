@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\FileUploadHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\Message;
+use App\Models\PartyActivity;
 use Illuminate\Http\Request;
 
 class ConversationController extends Controller
@@ -14,18 +16,62 @@ class ConversationController extends Controller
         $companyId = $request->user()->company_id;
         $filter = $request->query('filter', 'all');
 
+        // ১. মূল ফিল্টার কুয়েরি
         $query = Conversation::with(['channel', 'customer', 'assignedUser'])
+            ->where('company_id', $companyId)
             ->orderByDesc('last_activity_at');
 
         match ($filter) {
-            'unassigned' => $query->whereNull('assigned_user_id'),
-            'mine' => $query->where('assigned_user_id', $request->user()->id),
+            'unassigned' => $query->whereNull('assigned_user_id')->where('status', '!=', 'closed'),
+            'mine' => $query->where('assigned_user_id', $request->user()->id)->where('status', '!=', 'closed'),
             'archived' => $query->where('status', 'closed'),
-            'all' => $query,
+            'unread' => $query->whereHas('messages', fn($q) => $q->where('from', 'customer')->where('is_read', false)),
+            'all' => $query->where('status', '!=', 'closed'),
             default => $query->whereHas('channel', fn($q) => $q->where('slug', $filter)),
         };
 
-        return response()->json($query->get());
+        $conversations = $query->get();
+
+        $allCount = Conversation::where('company_id', $companyId)->where('status', '!=', 'closed')->count();
+        $unassignedCount = Conversation::where('company_id', $companyId)->whereNull('assigned_user_id')->where('status', '!=', 'closed')->count();
+        $mineCount = Conversation::where('company_id', $companyId)->where('assigned_user_id', $request->user()->id)->where('status', '!=', 'closed')->count();
+        $archivedCount = Conversation::where('company_id', $companyId)->where('status', 'closed')->count();
+
+        $unreadCount = Message::whereHas('conversation', function ($q) use ($companyId) {
+            $q->where('company_id', $companyId)->where('status', '!=', 'closed');
+        })
+            ->where('from', 'customer')
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'conversations' => $conversations,
+            'counts' => [
+                'all' => $allCount,
+                'unassigned' => $unassignedCount,
+                'mine' => $mineCount,
+                'archived' => $archivedCount,
+                'unread' => $unreadCount, // ডাইনামিক আনরিড মেসেজ কাউন্ট
+            ]
+        ]);
+    }
+    public function archive(Request $request, Conversation $conversation)
+    {
+        $newStatus = $conversation->status === 'closed' ? 'open' : 'closed';
+        $conversation->update(['status' => $newStatus]);
+
+        $agentName = $request->user()->name;
+        $action = $newStatus === 'closed' ? 'archived' : 'reopened';
+
+        PartyActivity::create([
+            'party_id' => $conversation->party_id,
+            'agent_id' => $request->user()->id,
+            'type' => 'conversation',
+            'label' => "Chat {$action} by {$agentName}",
+            'meta' => $conversation->channel->name ?? 'Omni Inbox'
+        ]);
+
+        return response()->json($conversation);
     }
 
     public function assign(Request $request, Conversation $conversation)

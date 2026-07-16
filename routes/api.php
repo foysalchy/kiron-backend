@@ -41,6 +41,7 @@ use App\Http\Controllers\Api\CourierController;
 use App\Http\Controllers\Api\CourierMethodController;
 use App\Http\Controllers\Api\CurrencyController;
 use App\Http\Controllers\Api\CustomerGroupController;
+use App\Http\Controllers\Api\CustomerPanelController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\CustomerReportController;
 use App\Http\Controllers\Api\DashboardController;
@@ -78,6 +79,7 @@ use App\Http\Controllers\Api\MetaConnectController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\OfficeLocationController;
+use App\Http\Controllers\Api\OmniSettingsController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\Api\OrderReturnController;
@@ -1496,7 +1498,19 @@ Route::prefix('v1')->group(function () {
                 Route::post('/inbox/conversations/{conversation}/assign', [ConversationController::class, 'assign']);
                 Route::get('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'messages']);
                 Route::post('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage']);
+                Route::put('/inbox/conversations/{conversation}/archive', [ConversationController::class, 'archive']);
 
+                Route::get('/inbox/settings', [OmniSettingsController::class, 'getSettings']);
+                Route::post('/inbox/settings', [OmniSettingsController::class, 'saveSettings']);
+                Route::post('/inbox/quick-replies', [OmniSettingsController::class, 'storeQuickReply']);
+                Route::delete('/inbox/quick-replies/{id}', [OmniSettingsController::class, 'destroyQuickReply']);
+                Route::get('/inbox/parties/{id}', [CustomerPanelController::class, 'show']);
+                Route::post('/inbox/parties/{party}/labels', [CustomerPanelController::class, 'addLabel']);
+                Route::post('/inbox/parties/{party}/notes', [CustomerPanelController::class, 'addNote']);
+                Route::put('/inbox/crm-notes/{id}', [CustomerPanelController::class, 'noteUpdate']);
+                Route::delete('/inbox/crm-notes/{id}', [CustomerPanelController::class, 'noteDestroy']);
+
+                Route::post('/inbox/channels/direct-connect', [MetaConnectController::class, 'directConnect']);
                 // routes/api.php
                 Route::prefix('/inbox/meta')->group(function () {
                     Route::get('/login/{type}', [MetaConnectController::class, 'startLogin']);

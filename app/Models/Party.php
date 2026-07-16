@@ -36,6 +36,9 @@ class Party extends Authenticatable
         'profile',
         'password',
         'status',
+        'fb_psid',
+        'ig_id',
+        'ig_username'
     ];
 
 
@@ -48,7 +51,14 @@ class Party extends Authenticatable
 
 
 
-
+    public function labels()
+    {
+        return $this->belongsToMany(Label::class, 'label_parties');
+    }
+    public function crmNotes()
+    {
+        return $this->hasMany(CrmNote::class)->with('agent')->latest();
+    }
     // Relationships
     public function company(): BelongsTo
     {
