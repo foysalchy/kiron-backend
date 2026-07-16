@@ -59,9 +59,9 @@ class LandingController extends FrontendController
                 ]
             );
 
-            if (!auth('customer')->check()) {
-                auth('customer')->login($customer);
-            }
+            // if (!auth('customer')->check()) {
+            //     auth('customer')->login($customer);
+            // }
 
             $unitPrice = 0;
             $warehouseId = null;
