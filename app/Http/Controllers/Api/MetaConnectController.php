@@ -19,7 +19,7 @@ class MetaConnectController extends Controller
     {
         $state = Str::uuid()->toString();
 
-        // remember which company + which flow (facebook/instagram/whatsapp) triggered this
+     
         Cache::put("meta_oauth_state:{$state}", [
             'company_id' => $request->user()->company_id,
             'type' => $type, // facebook | instagram | whatsapp
