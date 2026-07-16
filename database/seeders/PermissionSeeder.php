@@ -75,6 +75,8 @@ class PermissionSeeder extends Seeder
 
         //omni
         $addCrud('omni',                   'Omni Channel',                      'omni');
+        $addCrud('omni_setting',                   'Omni Setting',                      'omni_setting');
+        $addCrud('omni_channel',                   'Omni Channel',                      'omni_channel');
 
         // ==========================================
         // 4. Products

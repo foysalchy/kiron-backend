@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Api;
+
 use App\Http\Controllers\Controller;
+use App\Models\Channel;
 use App\Models\ChannelConnection;
 use App\Services\MetaIntegrationService;
 use Illuminate\Http\Request;
@@ -85,49 +87,69 @@ class MetaConnectController extends Controller
     }
 
     // STEP 3c: finalize Facebook + Instagram connection with chosen page
-    public function connectPage(Request $request, string $sessionId)
+    public function connectPages(Request $request, string $sessionId)
     {
         $session = Cache::get("meta_session:{$sessionId}");
         abort_unless($session, 400, 'Session expired');
 
         $data = $request->validate([
-            'page_id' => 'required|string',
-            'page_name' => 'required|string',
-            'page_access_token' => 'required|string',
-            'ig_id' => 'nullable|string',
-            'ig_username' => 'nullable|string',
+            'pages' => 'required|array',
+            'pages.*.page_id' => 'required|string',
+            'pages.*.page_name' => 'required|string',
+            'pages.*.page_access_token' => 'required|string',
+            'pages.*.ig_id' => 'nullable|string',
+            'pages.*.ig_username' => 'nullable|string',
         ]);
 
-        $this->meta->subscribePageToWebhooks($data['page_id'], $data['page_access_token']);
+        foreach ($data['pages'] as $pageData) {
+            // ১. মেটা সিস্টেমে পেজের ওয়েব হুক সাবস্ক্রাইব করা হচ্ছে
+            // $this->meta->subscribePageToWebhooks($pageData['page_id'], $pageData['page_access_token']);
 
-        $fb = ChannelConnection::updateOrCreate(
-            ['company_id' => $session['company_id'], 'type' => 'facebook'],
-            [
-                'page_id' => $data['page_id'],
-                'page_name' => $data['page_name'],
-                'access_token' => $data['page_access_token'],
-                'connected_at' => now(),
-                'is_active' => true,
-            ]
-        );
-
-        if (!empty($data['ig_id'])) {
             ChannelConnection::updateOrCreate(
-                ['company_id' => $session['company_id'], 'type' => 'instagram'],
+                ['type' => 'facebook', 'page_id' => $pageData['page_id']],
                 [
-                    'page_id' => $data['page_id'],
-                    'ig_id' => $data['ig_id'],
-                    'ig_username' => $data['ig_username'] ?? null,
-                    'access_token' => $data['page_access_token'],
+                    'page_name' => $pageData['page_name'],
+                    'access_token' => $pageData['page_access_token'],
                     'connected_at' => now(),
                     'is_active' => true,
                 ]
             );
+
+            Channel::updateOrCreate(
+                ['slug' => 'fb-' . $pageData['page_id']],
+                [
+                    'name' => $pageData['page_name'] . ' (Facebook)',
+                    'type' => 'facebook',
+                    'color' => '#1877F2',
+                ]
+            );
+
+            // ৪. ফেসবুক পেজের সাথে ইনস্টাগ্রাম লিংকড থাকলে সেটিও অটো কানেক্ট হয়ে যাবে
+            if (!empty($pageData['ig_id'])) {
+                ChannelConnection::updateOrCreate(
+                    ['type' => 'instagram', 'ig_id' => $pageData['ig_id']],
+                    [
+                        'page_id' => $pageData['page_id'],
+                        'ig_username' => $pageData['ig_username'],
+                        'access_token' => $pageData['page_access_token'],
+                        'connected_at' => now(),
+                        'is_active' => true,
+                    ]
+                );
+
+                Channel::updateOrCreate(
+                    ['slug' => 'ig-' . $pageData['ig_id']],
+                    [
+                        'name' => '@' . $pageData['ig_username'] . ' (Instagram)',
+                        'type' => 'instagram',
+                        'color' => '#C13584',
+                    ]
+                );
+            }
         }
 
         Cache::forget("meta_session:{$sessionId}");
-
-        return response()->json(['message' => 'Connected', 'facebook' => $fb]);
+        return response()->json(['message' => 'Selected Facebook and Instagram accounts successfully connected.']);
     }
 
     // STEP 3d (whatsapp): list WABAs + phone numbers
@@ -140,34 +162,45 @@ class MetaConnectController extends Controller
     }
 
     // STEP 3e: finalize WhatsApp connection with chosen number
-    public function connectWhatsapp(Request $request, string $sessionId)
+    public function connectWhatsappNumbers(Request $request, string $sessionId)
     {
         $session = Cache::get("meta_session:{$sessionId}");
         abort_unless($session, 400, 'Session expired');
 
         $data = $request->validate([
             'waba_id' => 'required|string',
-            'phone_number_id' => 'required|string',
-            'phone_number' => 'required|string',
-            'business_name' => 'nullable|string',
+            'numbers' => 'required|array',
+            'numbers.*.phone_number_id' => 'required|string',
+            'numbers.*.phone_number' => 'required|string',
+            'numbers.*.verified_name' => 'nullable|string',
         ]);
 
-        $wa = ChannelConnection::updateOrCreate(
-            ['company_id' => $session['company_id'], 'type' => 'whatsapp'],
-            [
-                'waba_id' => $data['waba_id'],
-                'phone_number_id' => $data['phone_number_id'],
-                'phone_number' => $data['phone_number'],
-                'business_name' => $data['business_name'] ?? null,
-                'access_token' => $session['user_token'],
-                'connected_at' => now(),
-                'is_active' => true,
-            ]
-        );
+        foreach ($data['numbers'] as $num) {
+            ChannelConnection::updateOrCreate(
+                ['type' => 'whatsapp', 'phone_number_id' => $num['phone_number_id']],
+                [
+                    'waba_id' => $data['waba_id'],
+                    'phone_number' => $num['phone_number'],
+                    'business_name' => $num['verified_name'] ?? 'WhatsApp Number',
+                    'access_token' => $session['user_token'],
+                    'connected_at' => now(),
+                    'is_active' => true,
+                ]
+            );
+
+
+            Channel::updateOrCreate(
+                ['slug' => 'wa-' . $num['phone_number_id']],
+                [
+                    'name' => ($num['verified_name'] ?? $num['phone_number']) . ' (WhatsApp)',
+                    'type' => 'whatsapp',
+                    'color' => '#22C35E',
+                ]
+            );
+        }
 
         Cache::forget("meta_session:{$sessionId}");
-
-        return response()->json(['message' => 'Connected', 'whatsapp' => $wa]);
+        return response()->json(['message' => 'Selected WhatsApp phone numbers successfully connected.']);
     }
 
     public function disconnect(Request $request, ChannelConnection $connection)
@@ -175,5 +208,93 @@ class MetaConnectController extends Controller
         abort_unless($connection->company_id === $request->user()->company_id, 403);
         $connection->update(['is_active' => false, 'access_token' => '']);
         return response()->json(['message' => 'Disconnected']);
+    }
+    // app/Http/Controllers/Api/V1/MetaConnectController.php
+
+    public function directConnect(Request $request)
+    {
+        $data = $request->validate([
+            'type' => 'required|in:facebook,instagram,whatsapp',
+
+  
+            'page_id' => 'nullable|required_if:type,facebook,instagram|string',
+            'page_name' => 'nullable|required_if:type,facebook,instagram|string',
+            'page_access_token' => 'nullable|required_if:type,facebook,instagram|string',
+            'ig_id' => 'nullable|string',
+            'ig_username' => 'nullable|string',
+
+            'waba_id' => 'nullable|required_if:type,whatsapp|string',
+            'phone_number_id' => 'nullable|required_if:type,whatsapp|string',
+            'phone_number' => 'nullable|required_if:type,whatsapp|string',
+            'business_name' => 'nullable|required_if:type,whatsapp|string',
+            'whatsapp_access_token' => 'nullable|required_if:type,whatsapp|string',
+        ]);
+
+        if ($data['type'] === 'facebook' || $data['type'] === 'instagram') {
+            // ১. পেজ কানেকশন তৈরি
+            ChannelConnection::updateOrCreate(
+                ['type' => 'facebook', 'page_id' => $data['page_id']],
+                [
+                    'page_name' => $data['page_name'],
+                    'access_token' => $data['page_access_token'],
+                    'connected_at' => now(),
+                    'is_active' => true,
+                ]
+            );
+
+            Channel::updateOrCreate(
+                ['slug' => 'fb-' . $data['page_id']],
+                [
+                    'name' => $data['page_name'] . ' (FB)',
+                    'type' => 'facebook',
+                    'color' => '#1877F2',
+                ]
+            );
+
+            if (!empty($data['ig_id'])) {
+                ChannelConnection::updateOrCreate(
+                    ['type' => 'instagram', 'ig_id' => $data['ig_id']],
+                    [
+                        'page_id' => $data['page_id'],
+                        'ig_username' => $data['ig_username'],
+                        'access_token' => $data['page_access_token'],
+                        'connected_at' => now(),
+                        'is_active' => true,
+                    ]
+                );
+
+                Channel::updateOrCreate(
+                    ['slug' => 'ig-' . $data['ig_id']],
+                    [
+                        'name' => '@' . $data['ig_username'] . ' (IG)',
+                        'type' => 'instagram',
+                        'color' => '#C13584',
+                    ]
+                );
+            }
+        } elseif ($data['type'] === 'whatsapp') {
+            ChannelConnection::updateOrCreate(
+                ['type' => 'whatsapp', 'phone_number_id' => $data['phone_number_id']],
+                [
+                    'waba_id' => $data['waba_id'],
+                    'phone_number' => $data['phone_number'],
+                    'business_name' => $data['business_name'],
+                    'access_token' => $data['whatsapp_access_token'],
+                    'connected_at' => now(),
+                    'is_active' => true,
+                ]
+            );
+
+            Channel::updateOrCreate(
+                ['slug' => 'wa-' . $data['phone_number_id']],
+                [
+                    'name' => $data['business_name'] . ' (WA)',
+                    'type' => 'whatsapp',
+                    'color' => '#22C35E',
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Channel successfully registered via direct credentials.']);
     }
 }

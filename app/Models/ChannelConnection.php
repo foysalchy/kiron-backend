@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\CompanyScoped;
 use Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class ChannelConnection extends Model
 {
+    use CompanyScoped;
     protected $fillable = [
         'company_id',
         'type',
