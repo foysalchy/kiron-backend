@@ -25,6 +25,7 @@ class CompanyService
                 'primaryUser',
                 'pricingPackage',
                 'currentSubscription.pricingPackage',
+                'domainSetup'
             ])
                 ->withCount([
                     'products as product_used',

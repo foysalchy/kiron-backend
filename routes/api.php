@@ -167,7 +167,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/ping', function () {
         return 'pong';
     });
-
+    Route::get('/inbox/meta/callback', [MetaConnectController::class, 'callback']);
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
@@ -1523,7 +1523,7 @@ Route::prefix('v1')->group(function () {
                 });
 
                 // callback must be OUTSIDE auth middleware (Meta redirects here directly)
-                Route::get('/v1/inbox/meta/callback', [MetaConnectController::class, 'callback']);
+          
                 //billing
                 Route::prefix('billing')->group(function () {
                     Route::get('/{id}', [BillingController::class, 'billingReports']);
