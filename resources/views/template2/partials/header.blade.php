@@ -24,10 +24,10 @@
                 <div
                     class="flex w-full border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white z-30 relative">
                     <!-- Category Dropdown -->
-                    <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px]">
+                    <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px] max-w-[200px]">
                         <select name="category" id="header-category-select"
                             class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header font-bold bg-transparent outline-none appearance-none cursor-pointer">
-                            <option value="">সব দেখুন</option>
+                            <option value="">All</option>
                             @foreach ($headerCategories as $cat)
                                 <option value="{{ $cat->slug }}"
                                     {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -41,7 +41,7 @@
                     </div>
                     <!-- Input -->
                     <input type="text" name="search" id="header-search-input" autocomplete="off"
-                        value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন..."
+                        value="{{ request('search') }}" placeholder="Find all product..."
                         class="flex-1 px-4 py-2 text-base text-black outline-none placeholder:text-gray-500">
                     <!-- Search Button -->
                     <button type="submit"
@@ -66,12 +66,11 @@
                                     <i class="fa-solid fa-arrow-trend-up text-[10px] text-gray-200"></i>
                                 </a>
                             @empty
-                                <p class="px-5 py-2 text-xs text-gray-400 italic">কোনো সার্চ হিস্ট্রি নেই</p>
+                                <p class="px-5 py-2 text-xs text-gray-400 italic">Search history not found!!!</p>
                             @endforelse
                         </div>
                         <div class="border-t border-gray-50 pt-2 pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">ট্রেন্ডিং
-                                প্রোডাক্ট</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending products</p>
                             @foreach ($relatedProducts ?? [] as $p)
                                 <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                     class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
@@ -183,10 +182,10 @@
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white">
             <!-- Category Segment for Mobile -->
-            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[80px]">
+            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[90px] max-w-[110px]">
                 <select name="category" id="mobile-category-select"
-                    class="h-full pl-2 pr-6 py-2 text-xs text-header font-bold bg-transparent outline-none appearance-none cursor-pointer">
-                    <option value="">সব</option>
+                    class="h-full pl-2 pr-6 py-2 text-xs text-header font-bold bg-transparent outline-none truncate appearance-none cursor-pointer">
+                    <option value="">All</option>
                     @foreach ($headerCategories as $cat)
                         <option value="{{ $cat->slug }}"
                             {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -200,7 +199,7 @@
             </div>
 
             <input type="text" name="search" id="mobile-search-input" autocomplete="off"
-                value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন.."
+                value="{{ request('search') }}" placeholder="Find some product ..."
                 class="flex-1 px-3 py-2 text-sm outline-none">
 
             <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">

@@ -54,6 +54,12 @@
             background-color: var(--footer-bg) !important;
             color: var(--footer-text) !important;
         }
+        .text-header {
+            color: var(--header-text) !important;
+        }
+        .text-footer {
+            color: var(--footer-text) !important;
+        }
         .primary-bg {
             background-color: var(--primary-color) !important;
             color: var(--primary-text) !important;

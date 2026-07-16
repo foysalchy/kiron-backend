@@ -72,12 +72,12 @@
 
                 <!-- Navigation Buttons (Green as per Image) -->
                 <button onclick="scrollCats(-240)" aria-label="Scroll left"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full flex items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer">
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
                     <i class="fas fa-chevron-left text-xs"></i>
                 </button>
 
                 <button onclick="scrollCats(240)" aria-label="Scroll right"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full flex items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer">
+                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
                     <i class="fas fa-chevron-right text-xs"></i>
                 </button>
 
