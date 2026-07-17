@@ -1,11 +1,11 @@
-<header class="w-full bg-white sticky top-0 z-50 shadow-sm">
+<header class="w-full header-custom-bg sticky top-0 z-50 shadow-sm">
     <!-- 1. Main Header -->
     <div class="container mx-auto px-4 py-3 md:py-4">
         <div class="flex items-center justify-between gap-4 lg:gap-8">
 
             <!-- Mobile Menu Toggle (Visible only on Mobile) -->
             <button onclick="toggleMobileMenu()"
-                class="md:hidden text-[var(--primary-color)] text-2xl focus:outline-none">
+                class="md:hidden text-header text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
 
@@ -14,7 +14,7 @@
                 @if ($setup && $setup->logo)
                     <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
-                    <span class="text-xl md:text-2xl font-bold text-[var(--primary-color)]">খাঁটি ভাই</span>
+                    <span class="text-xl md:text-2xl font-bold text-header">খাঁটি ভাই</span>
                 @endif
             </a>
 
@@ -24,10 +24,10 @@
                 <div
                     class="flex w-full border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white z-30 relative">
                     <!-- Category Dropdown -->
-                    <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px]">
+                    <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px] max-w-[200px]">
                         <select name="category" id="header-category-select"
-                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-[var(--primary-color)] font-bold bg-transparent outline-none appearance-none cursor-pointer">
-                            <option value="">সব দেখুন</option>
+                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header font-bold bg-transparent outline-none appearance-none cursor-pointer">
+                            <option value="">All</option>
                             @foreach ($headerCategories as $cat)
                                 <option value="{{ $cat->slug }}"
                                     {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -36,12 +36,12 @@
                             @endforeach
                         </select>
                         <div class="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                            <i class="fas fa-chevron-down text-[10px] text-[var(--primary-color)]"></i>
+                            <i class="fas fa-chevron-down text-[10px] text-header"></i>
                         </div>
                     </div>
                     <!-- Input -->
                     <input type="text" name="search" id="header-search-input" autocomplete="off"
-                        value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন..."
+                        value="{{ request('search') }}" placeholder="Find all product..."
                         class="flex-1 px-4 py-2 text-base text-black outline-none placeholder:text-gray-500">
                     <!-- Search Button -->
                     <button type="submit"
@@ -66,12 +66,11 @@
                                     <i class="fa-solid fa-arrow-trend-up text-[10px] text-gray-200"></i>
                                 </a>
                             @empty
-                                <p class="px-5 py-2 text-xs text-gray-400 italic">কোনো সার্চ হিস্ট্রি নেই</p>
+                                <p class="px-5 py-2 text-xs text-gray-400 italic">Search history not found!!!</p>
                             @endforelse
                         </div>
                         <div class="border-t border-gray-50 pt-2 pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">ট্রেন্ডিং
-                                প্রোডাক্ট</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending products</p>
                             @foreach ($relatedProducts ?? [] as $p)
                                 <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                     class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
@@ -92,7 +91,7 @@
             <div class="flex items-center gap-3 sm:gap-4 lg:gap-6">
                 <!-- Cart Icon -->
                 <button onclick="toggleCartDrawer()" class="relative group outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-[var(--primary-color)]"
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -108,7 +107,7 @@
                     @auth('customer')
                         <!-- Logged In User Trigger -->
                         <button onclick="toggleDesktopAccount()"
-                            class="flex items-center gap-2 text-[var(--primary-color)] outline-none cursor-pointer select-none">
+                            class="flex items-center gap-2 text-header outline-none cursor-pointer select-none">
                             <div
                                 class="w-8 h-8 md:w-9 md:h-9 rounded-full primary-bg text-primary flex items-center justify-center font-bold border-2 border-white shadow-sm">
                                 {{ substr(auth('customer')->user()->name, 0, 1) }}
@@ -131,15 +130,15 @@
                             </div>
 
                             <a href="{{ route('user.dashboard') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
                                 <i class="fas fa-th-large w-4 text-gray-400"></i> ড্যাশবোর্ড
                             </a>
                             <a href="{{ route('user.dashboard') }}?section=orders"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
                                 <i class="fas fa-box w-4 text-gray-400"></i> আমার অর্ডারসমূহ
                             </a>
                             <a href="{{ route('user.profile') }}"
-                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-[var(--primary-color)] transition-colors">
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
                                 <i class="fas fa-user-edit w-4 text-gray-400"></i> প্রোফাইল আপডেট
                             </a>
 
@@ -156,7 +155,7 @@
                     @else
                         <!-- Guest User Icon -->
                         <a href="{{ route('user.login') }}"
-                            class="flex items-center gap-2 text-[var(--primary-color)] group/login">
+                            class="flex items-center gap-2 text-header group/login">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -183,10 +182,10 @@
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white">
             <!-- Category Segment for Mobile -->
-            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[80px]">
+            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[90px] max-w-[110px]">
                 <select name="category" id="mobile-category-select"
-                    class="h-full pl-2 pr-6 py-2 text-xs text-[var(--primary-color)] font-bold bg-transparent outline-none appearance-none cursor-pointer">
-                    <option value="">সব</option>
+                    class="h-full pl-2 pr-6 py-2 text-xs text-header font-bold bg-transparent outline-none truncate appearance-none cursor-pointer">
+                    <option value="">All</option>
                     @foreach ($headerCategories as $cat)
                         <option value="{{ $cat->slug }}"
                             {{ request('category') == $cat->slug ? 'selected' : '' }}>
@@ -195,12 +194,12 @@
                     @endforeach
                 </select>
                 <div class="absolute inset-y-0 right-1 flex items-center pointer-events-none">
-                    <i class="fas fa-chevron-down text-[10px] text-[var(--primary-color)]"></i>
+                    <i class="fas fa-chevron-down text-[10px] text-header"></i>
                 </div>
             </div>
 
             <input type="text" name="search" id="mobile-search-input" autocomplete="off"
-                value="{{ request('search') }}" placeholder="প্রোডাক্ট খুঁজুন.."
+                value="{{ request('search') }}" placeholder="Find some product ..."
                 class="flex-1 px-3 py-2 text-sm outline-none">
 
             <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
@@ -256,9 +255,9 @@
             @if ($setup && $setup->logo)
                 <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold text-[var(--primary-color)]">খাঁটি ভাই</span>
+                <span class="text-xl font-bold text-header">খাঁটি ভাই</span>
             @endif
-            <button onclick="toggleMobileMenu()" class="text-[var(--primary-color)] text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="text-header text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -279,13 +278,13 @@
         <!-- Navigation Links -->
         <nav class="flex flex-col p-6 gap-5">
             <a href="{{ route('home') }}"
-                class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">হোমপেজ</a>
+                class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">হোমপেজ</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">অফার</a>
+                class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">অফার</a>
 
             @foreach ($headerCategories as $cat)
                 <a href="{{ route('category.products', $cat->slug) }}"
-                    class="text-[17px] font-bold text-[var(--primary-color)] hover:opacity-80 transition-opacity">
+                    class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">
                     {{ $cat->name }}
                 </a>
             @endforeach

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Cart as CartTrack;
 use App\Models\Coupon;
@@ -12,6 +13,7 @@ use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use App\Models\Cart as CartModel;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CartController extends FrontendController
@@ -19,13 +21,17 @@ class CartController extends FrontendController
     public function __construct(protected CouponService $couponService) {}
     public function index()
     {
-
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
 
         $cartContent = Cart::content();
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
         //delivvery charge default=60
-        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
+            return SiteSetting::where('company_id', $companyId)
+                ->where('status', Status::Active->value)->first();
+        });
         $defaultInside = $settings->inside_charge ?? 60;
 
         $shipping = session()->get('shipping_cost', $defaultInside);
@@ -67,7 +73,12 @@ class CartController extends FrontendController
     //shipping area method
     public function updateShipping(Request $request)
     {
-        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+         $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
+            return SiteSetting::where('company_id', $companyId)
+            ->where('status', Status::Active->value)->first();
+         });
         $inside = $settings->inside_charge ?? 60;
         $outside = $settings->outside_charge ?? 100;
 
@@ -167,7 +178,7 @@ class CartController extends FrontendController
 
                 if (isset($item['variation_id'])) {
                     // ── VARIATION PRODUCT  ──
-                    $variation = ProductVariation::with(['product', 'stocks.warehouse'])->findOrFail($item['variation_id']);
+                    $variation = ProductVariation::with(['product:id,title,slug,thumbnail', 'stocks.warehouse'])->findOrFail($item['variation_id']);
                     $stockRecord = $variation->stocks->where('quantity', '>=', $qty)->sortByDesc('quantity')->first();
 
                     if (!$stockRecord) continue; //

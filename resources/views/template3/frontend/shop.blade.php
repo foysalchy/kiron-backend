@@ -1,62 +1,62 @@
 @extends('template3.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.product-meta', [
-        'setup'         => $setup,
-        'megaCategory'  => $megaCategory ?? null,
-        'subCategory'   => $subCategory ?? null,
-        'miniCategory'  => $miniCategory ?? null,
+        'setup' => $setup,
+        'megaCategory' => $megaCategory ?? null,
+        'subCategory' => $subCategory ?? null,
+        'miniCategory' => $miniCategory ?? null,
     ])
 @endsection
 @section('content')
     <section class="bg-white border-t-1 border-t border-gray-300 pb-4">
-        <div class="py-2 md:py-2 container mx-auto px-4 lg:px-0">
-        <div class="lg:hidden mb-3 flex items-center justify-between">
-            <button onclick="toggleMobileSidebar()"
-                class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
-                <i class="fas fa-filter text-[#f15a24]"></i> Filters
-            </button>
-            <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
-        </div>
+        <div class="py-2 md:py-2 container mx-auto px-5 lg:px-0">
+            <div class="lg:hidden mb-3 flex items-center justify-between">
+                <button onclick="toggleMobileSidebar()"
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
+                    <i class="fas fa-filter text-[var(--primary-color)]"></i> Filters
+                </button>
+                <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
+            </div>
 
 
-        <!-- Main Card Container -->
-        <div class="archiveTopInfo">
+            <!-- Main Card Container -->
+            <div class="archiveTopInfo">
 
-            <!-- Breadcrumb -->
-            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
+                <!-- Breadcrumb -->
+                <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
+                    <a href="{{ route('home') }}" class="hover:text-gray-500 transition-colors">Home</a>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
 
-                <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[#f15a24] transition-colors">
-                    {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
-                </a>
+                    <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
+                        {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+                    </a>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-500" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
 
-                <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
-            </nav>
-            <div class="meta_info">
-                @if (isset($category->meta_title) && $category->meta_title)
-                    <h1 class="text-[24px] py-1">{{$category->meta_title}}</h1>
-                @endif
-                <!-- Description Section -->
-                @if (isset($category->meta_description) && $category->meta_description)
+                    <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                </nav>
+                <div class="meta_info">
+                    @if (isset($category->meta_title) && $category->meta_title)
+                        <h1 class="text-[24px] py-1">{{ $category->meta_title }}</h1>
+                    @endif
+                    <!-- Description Section -->
+                    @if (isset($category->meta_description) && $category->meta_description)
                         <p class="text-[15px] text-gray-600 l">
                             {!! $category->meta_description !!}
                         </p>
-                @endif
+                    @endif
+                </div>
             </div>
         </div>
-</div>
     </section>
     <!-- SHOP PAGE SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pt-0">
@@ -92,11 +92,12 @@
 
                             <!-- Inputs -->
                             <div class="flex items-center gap-2 mb-4">
-                                <input type="number" id="min_price" name="min_price" aria-label="Minimum Price"  value="{{ request('min_price', 0) }}"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
+                                <input type="number" id="min_price" name="min_price" aria-label="Minimum Price"
+                                    value="{{ request('min_price', 0) }}"
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[var(--primary-color)]">
                                 <input type="number" id="max_price" name="max_price" aria-label="Maximum Price"
                                     value="{{ request('max_price', (int) $maxPriceLimit) }}"
-                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[#f15a24]">
+                                    class="w-full border border-gray-200 rounded px-2 py-1.5 text-xs outline-none focus:border-[var(--primary-color)]">
                             </div>
 
                             <div class="flex items-center justify-between">
@@ -134,7 +135,7 @@
                                         @php $isSelectedBrand = in_array($brand->id, (array)request('brand')); @endphp
                                         <label class="flex items-center justify-between py-1.5 cursor-pointer group">
                                             <span
-                                                class="text-sm group-hover:text-[#f15a24] {{ $isSelectedBrand ? 'text-[#f15a24]' : '' }}">
+                                                class="text-sm group-hover:text-[var(--primary-color)] {{ $isSelectedBrand ? 'text-[var(--primary-color)]' : '' }}">
                                                 {{ $brand->name }}
                                             </span>
                                             <div class="relative flex items-center">
@@ -142,9 +143,9 @@
                                                     onchange="this.form.submit()" {{ $isSelectedBrand ? 'checked' : '' }}
                                                     class="absolute opacity-0 w-4 h-4 cursor-pointer z-10">
                                                 <div
-                                                    class="w-4 h-4 border {{ $isSelectedBrand ? 'border-[#f15a24] bg-[#f15a24]/10' : 'border-gray-300' }} rounded-full group-hover:border-[#f15a24] shrink-0 flex items-center justify-center">
+                                                    class="w-4 h-4 border {{ $isSelectedBrand ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/10' : 'border-gray-300' }} rounded-full group-hover:border-[var(--primary-color)] shrink-0 flex items-center justify-center">
                                                     @if ($isSelectedBrand)
-                                                        <div class="w-1.5 h-1.5 bg-[#f15a24] rounded-full"></div>
+                                                        <div class="w-1.5 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
                                                     @endif
                                                 </div>
                                             </div>
@@ -163,9 +164,9 @@
                                                 <input type="checkbox" name="attributes[{{ $group->id }}][]"
                                                     value="{{ $value->id }}" onchange="this.form.submit()"
                                                     {{ isset(request('attributes')[$group->id]) && in_array($value->id, request('attributes')[$group->id]) ? 'checked' : '' }}
-                                                    class="w-3.5 h-3.5 accent-[#f15a24]">
+                                                    class="w-3.5 h-3.5 accent-[var(--primary-color)]">
                                                 <span
-                                                    class="text-sm group-hover:text-[#f15a24]">{{ $value->name }}</span>
+                                                    class="text-sm group-hover:text-[var(--primary-color)]">{{ $value->name }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -185,10 +186,10 @@
             </aside>
 
             <!-- ══════════════════════════════════════
-                                                                MAIN CONTENT
-                                                            ══════════════════════════════════════ -->
+                                                                    MAIN CONTENT
+                                                                ══════════════════════════════════════ -->
             <main class="flex-1 ">
-                <div class="bg-white rounded-lg shadow-xs overflow-hidden">
+                <div class="bg-white rounded-lg overflow-hidden">
                     <!-- Shop Header -->
                     <div class="px-5 py-3.5 flex items-center justify-between">
                         <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
@@ -198,14 +199,17 @@
                             <form action="" method="GET" id="sortForm">
                                 <select name="sort" onchange="document.getElementById('sortForm').submit()"
                                     aria-label="Sort products"
-                                    class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[#f15a24] cursor-pointer">
+                                    class="appearance-none bg-white border border-gray-200 text-gray-600 text-md rounded-md pr-8 pl-3 py-1.5 outline-none focus:ring-1 focus:ring-[var(--primary-color)] cursor-pointer">
                                     <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Default
                                         Sorting</option>
-                                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price:
+                                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>
+                                        Price:
                                         Low to High</option>
-                                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price:
+                                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>
+                                        Price:
                                         High to Low</option>
-                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest First
+                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest
+                                        First
                                     </option>
                                 </select>
                             </form>
@@ -243,10 +247,10 @@
                 </div>
 
 
-                 @if (isset($category->description) && $category->description)
-                <div class="bg-white rounded-lg shadow-xs  mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
-                    {!! $category->description !!}
-                </div>
+                @if (isset($category->description) && $category->description)
+                    <div class="bg-white rounded-lg shadow-xs  mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
+                        {!! $category->description !!}
+                    </div>
                 @endif
             </main>
 

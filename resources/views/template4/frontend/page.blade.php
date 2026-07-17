@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template4.layouts.front')
 
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -30,8 +30,11 @@
                         <img src="{{ asset('storage/' . $page->image) ?? '' }}" loading="lazy" height="" width="" alt="image" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif
 
-                    <div class="page-description text-gray-600 leading-relaxed text-base">
-                        {!! $page->description !!}
+                    <div class="prose prose-slate max-w-none
+                                prose-p:text-gray-500 prose-p:text-md prose-p:leading-relaxed
+                                prose-p:m-0
+                                prose-strong:text-gray-700 prose-a:text-[var(--primary-color)]">
+                        {!! $page->content !!}
                     </div>
                 </div>
             </div>

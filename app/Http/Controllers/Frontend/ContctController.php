@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ContctController extends FrontendController
 {
     //
     public function index(Request $request)
     {
-        $faqs = KnowledgeBase::active()
-            ->get();
-
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+        $faqs = Cache::remember("home_faqs_{$companyId}", $ttl, function () use ($companyId) {
+            return KnowledgeBase::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->get();
+        });
         return  $this->view('frontend.contact', compact('faqs'));
     }
     public function send(Request $request)

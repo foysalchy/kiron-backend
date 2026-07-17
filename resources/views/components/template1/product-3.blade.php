@@ -82,13 +82,13 @@
         <button
             {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="w-full text-white text-center text-sm md:text-base rounded-full border-0 mt-4 py-3 transition-all cursor-pointer px-4 font-bold shadow-sm flex items-center justify-center gap-2
+            class="w-full text-white text-center text-sm md:text-base rounded-full border-0 mt-4 py-2 transition-all cursor-pointer px-4 font-bold shadow-sm flex items-center justify-center gap-2
             {{ $isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : 'bg-[var(--primary-color)] hover:primary-bg active:scale-95' }}">
 
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out
             @else
-                <i class="fas fa-shopping-cart text-xs"></i> Add To Cart
+                <i class="fas fa-shopping-cart text-xs"></i> Cart
             @endif
         </button>
     </div>

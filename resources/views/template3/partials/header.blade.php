@@ -1,4 +1,4 @@
-<header class="w-full bg-white sticky top-0 z-50 shadow-sm">
+<header class="w-full header-custom-bg sticky top-0 z-50 shadow-sm">
     <!-- 1. Main Header (Logo, Search, User Actions) -->
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-10">
 
@@ -10,7 +10,8 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex-shrink-0">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" alt="{{ $setup->shop_name }}" width="200" height="48" class="h-8 md:h-12 w-auto">
+                <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" alt="{{ $setup->shop_name }}" width="200"
+                    height="48" class="h-8 md:h-12 w-auto">
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
                         class="text-blue-600">ZONE</span></span>
@@ -106,27 +107,24 @@
                         </form>
                     </div>
                 @else
-                    <a href="{{ route('user.login') }}" aria-label="Login to your account" class="text-gray-800 hover:text-blue-600 transition-colors">
+                    <a href="{{ route('user.login') }}" aria-label="Login to your account"
+                        class="text-gray-800 hover:text-blue-600 transition-colors">
                         <i class="fa-regular fa-user text-2xl"></i>
                     </a>
                 @endauth
             </div>
 
             <!-- Cart Section -->
-            <button onclick="toggleCartDrawer()" class="flex items-center gap-3 group outline-none">
-                <div class="relative">
-                    <i
-                        class="fa-solid fa-basket-shopping text-2xl text-gray-800 group-hover:text-blue-600 transition-colors"></i>
-                    <span
-                        class="cart-count-nav absolute -top-2 -right-2 primary-bg text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full border-2 border-white">
-                        {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
-                    </span>
-                </div>
-                <div class="hidden sm:flex flex-col items-start leading-none">
-                    <span
-                        class="text-lg font-bold text-gray-900">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}
-                        {{ $setup->currency ?? '৳' }}</span>
-                </div>
+            <button onclick="toggleCartDrawer()" class="relative group outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span
+                    class="cart-count-nav absolute -top-1 -right-1 bg-black text-primary text-[10px] font-bold h-4 w-4 md:h-5 md:w-5 flex items-center justify-center rounded-full border-2 border-white">
+                    {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
+                </span>
             </button>
         </div>
     </div>
@@ -136,15 +134,15 @@
         <div class="container mx-auto px-4 flex items-center justify-between">
             <nav class="flex items-center gap-6 md:gap-8 py-3">
                 <a href="{{ route('home') }}"
-                    class="text-base font-normal text-[var(--primary-color)] hover:text-[var(--primary-color)] whitespace-nowrap">Home</a>
+                    class="text-base font-normal text-header hover:text-header whitespace-nowrap">Home</a>
                 <a href="{{ route('shop.index') }}"
-                    class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">Shop</a>
+                    class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">Shop</a>
                 @foreach ($headerCategories->take(7) as $cat)
                     <a href="{{ route('category.products', $cat->slug) }}"
-                        class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">{{ $cat->name }}</a>
+                        class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">{{ $cat->name }}</a>
                 @endforeach
                 <a href="{{ route('flash.sale') }}"
-                    class="text-base font-normal text-black hover:text-[var(--primary-color)] whitespace-nowrap transition-colors">Offers</a>
+                    class="text-base font-normal text-black hover:text-header whitespace-nowrap transition-colors">Offers</a>
             </nav>
 
             <!-- Track Order Button -->
@@ -216,7 +214,8 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url }}" height="" width="" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
+                <img src="{{ $setup->logo_url }}" height="" width="" alt="{{ $setup->shop_name }}"
+                    class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-[#016738]">খাঁটি ভাই</span>
             @endif
@@ -296,48 +295,25 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
         <h2 class="text-lg font-bold text-gray-800">Shopping Cart</h2>
-        <button onclick="toggleCartDrawer()" aria-label="Close Cart" class="text-gray-500 hover:text-red-500 text-2xl">
+        <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
     </div>
 
     <!-- Products List -->
-    <div class="flex-1 overflow-y-auto p-4">
-        @php $cartItems = \Gloudemans\Shoppingcart\Facades\Cart::content(); @endphp
-
-        @forelse($cartItems as $item)
-            <div class="flex gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0">
-                <div class="w-20 h-20 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
-                    <img src="{{ $item->options->image ?? asset('images/no-image.png') }}" alt="{{ $item->name }}"
-                    height="" width="" class="w-full h-full object-contain">
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-sm font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
-                    <p class="text-xs text-gray-500 mt-1">পরিমাণ: {{ $item->options->variant ?? 'N/A' }}</p>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-sm font-bold text-[#016738]">{{ $item->qty }} ×
-                            {{ number_format($item->price, 0) }}৳</span>
-                        <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item from cart" class="text-gray-400 hover:text-red-500">
-                            <i class="fa-regular fa-circle-xmark"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="h-full flex flex-col items-center justify-center text-gray-400">
-                <i class="fas fa-shopping-basket text-5xl mb-3"></i>
-                <p>আপনার কার্ট খালি</p>
-            </div>
-        @endforelse
+    <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
+        <!-- কম্পোনেন্ট কল করা হলো -->
+        <x-template1.cart-drawer-items />
     </div>
 
     <!-- Footer -->
-    @if (count($cartItems) > 0)
-        <div class="p-4 border-t bg-gray-50">
+    @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
+        <div class="p-4 border-t bg-gray-50" id="mini-cart-footer">
             <div class="flex justify-between items-center mb-4">
                 <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-                <span
-                    class="text-lg font-bold text-gray-900">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳</span>
+                <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
+                    {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
+                </span>
             </div>
 
             <div class="space-y-3">
@@ -355,16 +331,9 @@
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        /**
-         * সার্চ সাজেশন ফাংশন
-         * @param {string} inputId - ইনপুট ফিল্ডের আইডি
-         * @param {string} suggestionBoxId - সাজেশন বক্সের আইডি
-         * @param {string} contentId - ডিফল্ট কন্টেন্টের আইডি
-         * @param {string} resultsId - লাইভ রেজাল্ট কন্টেইনার আইডি
-         * @param {string} containerId - পুরো সার্চ এরিয়ার আইডি (বাইরে ক্লিক ডিটেক্ট করার জন্য)
-         */
-        function initUnifiedSearch(inputId, suggestionBoxId, contentId, resultsId, containerId) {
+        function setupSearch(inputId, categorySelectId, suggestionBoxId, contentId, resultsId, containerId) {
             const input = document.getElementById(inputId);
+            const categorySelect = document.getElementById(categorySelectId); // ক্যাটাগরি সিলেক্ট আইডি
             const suggestionBox = document.getElementById(suggestionBoxId);
             const defaultContent = document.getElementById(contentId);
             const liveResults = document.getElementById(resultsId);
@@ -375,14 +344,14 @@
             let debounceTimer;
             let abortController = null;
 
-            // ইনপুট ফোকাস করলে বক্স দেখাবে
             input.addEventListener('focus', () => {
                 suggestionBox.classList.remove('hidden');
             });
 
-            // টাইপ করলে সার্চ শুরু হবে
             input.addEventListener('input', function() {
                 const query = this.value.trim();
+                const selectedCategory = categorySelect.value; // বর্তমান সিলেক্ট করা ক্যাটাগরি নিন
+
                 clearTimeout(debounceTimer);
                 if (abortController) abortController.abort();
 
@@ -392,9 +361,10 @@
                         defaultContent.classList.add('hidden');
                         liveResults.classList.remove('hidden');
                         liveResults.innerHTML =
-                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>খোঁজা হচ্ছে...</div>';
 
-                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`, {
+                        // ক্যাটাগরি স্লাগটি প্যারামিটার হিসেবে পাঠানো হচ্ছে
+                        fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}&category=${selectedCategory}`, {
                                 signal: abortController.signal
                             })
                             .then(res => res.json())
@@ -408,19 +378,18 @@
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                         link.innerHTML = `
-                                        <img src="${item.thumbnail_url}" height="" width="" class="w-6 h-6 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/no-image.png') }}'">
-                                        <span class="truncate">${item.title}</span>
-                                    `;
+                                            <img src="${item.thumbnail_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'">
+                                            <span class="truncate">${item.title}</span>
+                                        `;
                                         liveResults.appendChild(link);
                                     });
                                 } else {
                                     liveResults.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
+                                        '<div class="px-5 py-3 text-xs text-gray-400">পণ্য পাওয়া যায়নি।</div>';
                                 }
                             })
                             .catch(err => {
-                                if (err.name !== 'AbortError') console.error(
-                                    'Search error:', err);
+                                if (err.name !== 'AbortError') console.error(err);
                             });
                     }, 500);
                 } else {
@@ -429,7 +398,7 @@
                 }
             });
 
-            // বাইরে ক্লিক করলে বন্ধ হবে
+            // বাইরে ক্লিক করলে বন্ধ করা
             document.addEventListener('click', (e) => {
                 if (container && !container.contains(e.target)) {
                     suggestionBox.classList.add('hidden');
@@ -437,13 +406,13 @@
             });
         }
 
-        // ডেক্সটপ সার্চ চালু করুন
-        initUnifiedSearch('header-search-input', 'search-suggestions', 'suggestion-content',
+        // ডেক্সটপ সার্চ অ্যাক্টিভেট
+        setupSearch('header-search-input', 'header-category-select', 'search-suggestions', 'suggestion-content',
             'live-search-results', 'header-search-container');
 
-        // মোবাইল সার্চ চালু করুন
-        initUnifiedSearch('mobile-search-input', 'mobile-search-suggestions', 'mobile-suggestion-content',
-            'mobile-live-search-results', 'mobile-search-container');
+        // মোবাইল সার্চ অ্যাক্টিভেট
+        setupSearch('mobile-search-input', 'mobile-category-select', 'mobile-search-suggestions',
+            'mobile-suggestion-content', 'mobile-live-results', 'mobile-search-container');
     });
 </script>
 <script>
@@ -453,22 +422,6 @@
         document.body.classList.toggle('overflow-hidden');
     }
 
-    function toggleCartDrawer() {
-        const drawer = document.getElementById('cart-drawer');
-        const overlay = document.getElementById('cart-overlay');
-
-        if (drawer.classList.contains('translate-x-full')) {
-            // Open
-            drawer.classList.remove('translate-x-full');
-            overlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // স্ক্রল বন্ধ করবে
-        } else {
-            // Close
-            drawer.classList.add('translate-x-full');
-            overlay.classList.add('hidden');
-            document.body.style.overflow = ''; // স্ক্রল চালু করবে
-        }
-    }
     // Toggle Desktop Account Dropdown
     function toggleDesktopAccount() {
         const menu = document.getElementById('desktop-account-menu');
@@ -489,3 +442,4 @@
         }
     });
 </script>
+

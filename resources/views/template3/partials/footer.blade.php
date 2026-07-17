@@ -1,9 +1,9 @@
 <!-- FOOTER -->
-<footer class="text-primary">
+<footer class="text-footer">
 
     <!-- 1. Top Features Row -->
      @if($footerFeatures->count() > 0)
-    <div class="bg-[#1A2937] p-6">
+    <div class="footer-custom-bg p-6">
         <div class="container mx-auto">
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 @foreach ($footerFeatures as $feature)
@@ -14,11 +14,11 @@
                                 <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}" height="" width=""
                                     class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                             @else
-                                <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-primary text-lg"></i>
+                                <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-footer text-lg"></i>
                             @endif
                         </div>
                         <div>
-                            <h4 class="font-medium text-sm md:text-[16px] text-primary leading-tight">
+                            <h4 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
                                 {{ $feature->title }}</h4>
                             <p class="text-gray-400 text-xs md:text-sm mt-0.5">
                                 {{ $feature->subtitle ?? $feature->text_content }}</p>
@@ -44,7 +44,7 @@
                         @else
                             <div class="w-10 h-10 flex items-center justify-center rounded-lg">
                                 <span
-                                    class="text-primary text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
+                                    class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
                             </div>
                         @endif
                         <span
@@ -123,12 +123,12 @@
 
                 <!-- Column 4: Newsletter -->
                 <div>
-                    <h4 class="text-base text-primary md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
+                    <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
                     <p class="text-gray-300 text-[16px] mb-4">Subscribe to get updates on new products and exclusive offers.
                     </p>
                     <div class="flex mb-5">
                         <input type="email" placeholder="Enter your email"
-                            class="bg-[#1A222F] border border-gray-700 text-primary px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
+                            class="bg-[#1A222F] border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
                         <button
                             class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
                             Subscribe
@@ -142,7 +142,7 @@
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
                                 @if ($social->icon_image)
-                                    <img src="{{ asset('storage/' . $social->icon_image) }}" alt="social icon" height="" width="" 
+                                    <img src="{{ $social->icon_image ?? '' }}" alt="social icon" height="" width=""
                                         class="h-5 w-5 object-contain">
                                 @else
                                     <i class="{{ $social->icon_class ?? 'fab fa-share' }}" aria-hidden="true"></i>

@@ -7,6 +7,26 @@
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
     <form action="{{ route('landing.order.store') }}" method="POST" id="landing-order-form">
+        {{-- Success & Error Messages --}}
+@if(session('success'))
+    <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-r-lg shadow-sm flex items-center gap-3">
+        <i class="fas fa-check-circle text-xl"></i>
+        <div>
+            <p class="font-bold">সফল হয়েছে!</p>
+            <p class="text-sm">{{ session('success') }}</p>
+        </div>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-lg shadow-sm flex items-center gap-3">
+        <i class="fas fa-exclamation-triangle text-xl"></i>
+        <div>
+            <p class="font-bold">দুঃখিত!</p>
+            <p class="text-sm">{{ session('error') }}</p>
+        </div>
+    </div>
+@endif
         @csrf
         <input type="hidden" name="product_id" value="{{ $landing->product_id }}">
         <input type="hidden" name="landing_page_id" value="{{ $landing->id }}">
@@ -231,4 +251,23 @@
         this.querySelector('button[type="submit"]').innerText = "প্রসেসিং...";
         return true;
     };
+     @if(session('success'))
+        Swal.fire({
+            title: 'অর্ডার সফল হয়েছে!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'ঠিক আছে',
+            confirmButtonColor: '#1f8a54'
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            title: 'দুঃখিত!',
+            text: "{{ session('error') }}",
+            icon: 'error',
+            confirmButtonText: 'আবার চেষ্টা করুন',
+            confirmButtonColor: '#d33'
+        });
+    @endif
 </script>

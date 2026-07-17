@@ -66,7 +66,7 @@ class Company extends Model
     }
 
     public function getThemeSettingsAttribute()
-    {   
+    {
         $domain = $this->domainSetup;
 
         if (! $domain) {
@@ -80,6 +80,10 @@ class Company extends Model
             'primary_text_color'   => $domain->primary_text_color,
             'secondary_color'      => $domain->secondary_color,
             'secondary_text_color' => $domain->secondary_text_color,
+            'header_color'         => $domain->header_color,
+            'header_text_color'    => $domain->header_text_color,
+            'footer_color'         => $domain->footer_color,
+            'footer_text_color'    => $domain->footer_text_color,
             'is_review'            => $domain->is_review,
         ];
     }

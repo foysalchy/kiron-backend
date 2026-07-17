@@ -9,7 +9,7 @@ use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, P
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\{DB, Hash, Log, Session};
+use Illuminate\Support\Facades\{Cache, DB, Hash, Log, Session};
 
 class OrderController extends FrontendController
 {
@@ -26,7 +26,7 @@ class OrderController extends FrontendController
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
         $paymentMethods = CustomerPaymentMethod::where('company_id', $this->company_id)->where('status', Status::Active->value)
-            ->get();
+            ->select(['id', 'company_id', 'name', 'account_number', 'phone', 'method_details', 'status'])->get();
 
         $existingDraftId = Session::get('current_draft_order_id');
         $existingDraft   = $existingDraftId
@@ -43,7 +43,7 @@ class OrderController extends FrontendController
             ]);
         }
 
-        $settings = SiteSetting::where('company_id', $this->company_id)->first();
+        $settings = SiteSetting::where('company_id', $this->company_id)->select(['id', 'company_id', 'inside_charge', 'outside_charge'])->first();
         $defaultInside = $settings->inside_charge ?? 60;
         $cartContent = Cart::content();
 
@@ -433,16 +433,22 @@ class OrderController extends FrontendController
     }
     public function orderDetails($id)
     {
-        $order = Order::with([
-            'customer',
-            'orderDetails.product' => function ($query) {
-                $query->withTrashed(); // This loads deleted products
-            },
-            'orderDetails.variation.attributes.attributeValue',
-            'orderDetails.variation.attributes.attributeGroup'
-        ])
-            ->find($id);
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
 
+        $order = Cache::remember("order_details_view_{$id}", $ttl, function () use ($id, $companyId) {
+            return Order::where('company_id', $companyId)
+                ->with([
+                    'customer',
+                    'orderDetails.product' => function ($query) {
+                        $query->withTrashed()->select(['id', 'title', 'slug', 'thumbnail']); // This loads deleted products
+                    },
+                    'orderDetails.variation:id,product_id,display_name,regular_price,sale_price',
+                    'orderDetails.variation.attributes.attributeValue:id,name',
+                    'orderDetails.variation.attributes.attributeGroup:id,name'
+                ])
+                ->find($id);
+        });
         if (!$order) {
             abort(404);
         }
@@ -458,16 +464,20 @@ class OrderController extends FrontendController
 
     public function invoice($id)
     {
-        $order = Order::with([
-            'customer',
-            'orderPayments',
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+        $order = Cache::remember("order_invoice_view_{$id}", $ttl, function () use ($id, $companyId) {
+        return Order::where('company_id', $companyId)
+            ->with([
+            'customer:id,name,phone,email,address',
+            'orderPayments:id,order_id,amount,payment_method,transaction_id,created_at',
             'orderDetails.product' => function ($q) {
                 $q->withTrashed();
             }, // Add this
             'company'
         ])
             ->findOrFail($id);
-
+        });
         return $this->view('frontend.invoice', compact('order'));
     }
     public function trackOrder(Request $request)

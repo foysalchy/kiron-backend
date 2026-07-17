@@ -45,9 +45,15 @@
                         <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
-                        <div class="px-6 pb-5 text-gray-500 text-md border-t border-gray-50 pt-3">
-                            {!! nl2br(e($faq->content)) !!}
-                        </div>
+                        <div
+                                class="prose prose-slate max-w-none
+                                prose-p:text-gray-500 prose-p:text-md prose-p:leading-relaxed
+                                prose-p:m-0
+                                prose-strong:text-gray-700 prose-a:text-[var(--primary-color)]">
+
+                                {!! $faq->content !!}
+
+                            </div>
                     </div>
                 </div>
             @empty

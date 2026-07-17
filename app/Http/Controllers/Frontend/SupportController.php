@@ -7,12 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactMessage;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SupportController extends FrontendController
 {
     public function index(Request $request)
     {
-
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
 
         $query = KnowledgeBase::where('status', Status::Active);
 
@@ -29,12 +31,14 @@ class SupportController extends FrontendController
 
         $faqs = $query->get();
 
-        $categories = KnowledgeBase::where('status', Status::Active)
-            ->whereNotNull('category')
-            ->distinct()
-            ->pluck('category');
-
+        $categories = Cache::remember("support_categories_{$companyId}", $ttl, function () use ($companyId) {
+            return KnowledgeBase::where('company_id', $companyId)
+                ->where('status', Status::Active)
+                ->whereNotNull('category')
+                ->distinct()
+                ->pluck('category');
+        });
         return $this->view('frontend.support', compact('faqs', 'categories'));
     }
- 
+
 }

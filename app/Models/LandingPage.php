@@ -7,6 +7,7 @@ use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class LandingPage extends Model
@@ -74,12 +75,18 @@ class LandingPage extends Model
     // Accessors
     public function getThumbnailUrlAttribute(): ?string
     {
-        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
+        return $this->thumbnail
+            ? Storage::disk('r2')->url($this->thumbnail)
+            : null;
+        // return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
     }
 
     public function getVideoUrlAttribute(): ?string
     {
-        return $this->video ? asset('storage/' . $this->video) : null;
+        return $this->video
+            ? Storage::disk('r2')->url($this->video)
+            : null;
+        // return $this->video ? asset('storage/' . $this->video) : null;
     }
 
     // Mutators
@@ -119,5 +126,5 @@ class LandingPage extends Model
 
         return 0;
     }
-    
+
 }
