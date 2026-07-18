@@ -2,34 +2,34 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\Status;
 use App\Http\Controllers\Controller;
 use App\Models\Channel; // আমাদের নতুন চাইল্ড মডেল ইম্পোর্ট করা হলো
+use App\Models\Party;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class MetaDirectProxyController extends Controller
 {
-  
-     public function getConversations($channelId)
+
+    public function getConversations($channelId)
     {
         Log::info("Meta Proxy: Initializing conversations fetch for Channel ID: {$channelId}");
 
         try {
             $channel = Channel::findOrFail($channelId);
             Log::info("Meta Proxy: Retrieved Channel from DB. Page ID: {$channel->page_id}");
-            
+
             $pageToken = $channel->page_token;
             $pageId = $channel->page_id;
 
-            // মেটা গ্রাফ এপিআই কল
             $response = Http::get("https://graph.facebook.com/v20.0/{$pageId}/conversations", [
                 'access_token' => $pageToken,
                 'fields' => 'id,updated_time,unread_count,participants,messages.limit(1){message}'
             ]);
 
             if ($response->failed()) {
-                // মেটার আসল এরর কোড ও পে-লোড লারাভেল লগে প্রিন্ট হবে
                 Log::error("Meta Proxy Error [Conversations]: Graph API call failed for Page ID: {$pageId}. Raw Response: " . $response->body());
                 return response()->json(['error' => 'Failed to fetch conversations from Meta.'], 500);
             }
@@ -37,12 +37,36 @@ class MetaDirectProxyController extends Controller
             $data = $response->json('data', []);
             Log::info("Meta Proxy: Successfully retrieved " . count($data) . " conversations for Page ID: {$pageId}");
 
-            $formatted = array_map(function ($convo) {
+            $formatted = array_map(function ($convo) use ($channel) {
                 $customer = $convo['participants']['data'][0] ?? null;
+
+                $customerName = $customer['name'] ?? 'Facebook User';
+                $customerPsid = $customer['id'] ?? null;
+
+                if ($customerPsid) {
+                    $exists = Party::where('company_id', $channel->company_id)
+                        ->where('fb_psid', $customerPsid)
+                        ->exists();
+
+                    if (!$exists) {
+                    Party::create([
+                            'company_id'   => $channel->company_id,
+                            'type'         => 2, // Customer
+                            'name'         => $customerName,
+                            'phone'        => 'N/A', // FB doesn't provide phone; placeholder unless column made nullable
+                            'fb_psid'      => $customerPsid,
+                            'status'       => Status::Active->value,
+                        ]);
+
+                        Log::info("Meta Proxy: New party created for PSID: {$customerPsid}");
+                    }
+                }
+                // -------------------------------------------------------------
+
                 return [
                     'id' => $convo['id'],
-                    'customer_name' => $customer['name'] ?? 'Facebook User',
-                    'customer_id' => $customer['id'] ?? null,
+                    'customer_name' => $customerName,
+                    'customer_id' => $customerPsid,
                     'last_message' => $convo['messages']['data'][0]['message'] ?? 'No text',
                     'unread_count' => $convo['unread_count'] ?? 0,
                     'last_activity' => $convo['updated_time']
@@ -50,19 +74,16 @@ class MetaDirectProxyController extends Controller
             }, $data);
 
             return response()->json($formatted);
-
         } catch (\Exception $e) {
             Log::critical("Meta Proxy Critical [Conversations]: Exception occurred for Channel ID: {$channelId}. Message: " . $e->getMessage());
             return response()->json(['error' => 'An unexpected error occurred.'], 500);
         }
     }
-
     /**
      * নির্দিষ্ট চ্যাট থ্রেডের সম্পূর্ণ মেসেজ হিস্ট্রি সরাসরি মেটা থেকে লোড করা (ডিবাগ লগসহ)
      */
     public function getMessages($channelId, $threadId)
     {
-        Log::info("Meta Proxy: Initializing messages fetch for Thread ID: {$threadId} on Channel ID: {$channelId}");
 
         try {
             $channel = Channel::findOrFail($channelId);
@@ -97,7 +118,6 @@ class MetaDirectProxyController extends Controller
             }, $data);
 
             return response()->json(array_reverse($messages));
-
         } catch (\Exception $e) {
             Log::critical("Meta Proxy Critical [Messages]: Exception occurred for Thread ID: {$threadId}. Message: " . $e->getMessage());
             return response()->json(['error' => 'An unexpected error occurred.'], 500);
@@ -113,10 +133,9 @@ class MetaDirectProxyController extends Controller
 
         $data = $request->validate([
             'text' => 'required|string',
-            'recipient_psid' => 'required|string' // কাস্টমারের পেজ স্কোপড আইডি (PSID)
+            'recipient_psid' => 'required|string' 
         ]);
 
-        // মেটা সেন্ড মেসেজ এপিআই কল (রিয়েল-টাইমে কাস্টমারের মেসেঞ্জারে পুশ হবে)
         $response = Http::post("https://graph.facebook.com/v20.0/me/messages", [
             'access_token' => $pageToken,
             'recipient' => ['id' => $data['recipient_psid']],

@@ -15,8 +15,33 @@ use Illuminate\Support\Str;
 class MetaConnectController extends Controller
 {
     public function __construct(protected MetaIntegrationService $meta) {}
+    public function startLogin(Request $request, string $type)
+    {
+        $state = Str::uuid()->toString();
 
- 
+        Cache::put("meta_oauth_state:{$state}", [
+            'type' => $type, // 'facebook', 'instagram', 'whatsapp'
+        ], now()->addMinutes(15));
+
+        $scopes = match ($type) {
+            'whatsapp' => ['business_management', 'whatsapp_business_management', 'whatsapp_business_messaging'],
+            default => [
+                'pages_show_list',
+                'pages_messaging',
+                'pages_read_engagement',
+                'pages_manage_metadata',
+                'instagram_basic',
+                'instagram_manage_messages',
+                'business_management'
+            ],
+        };
+
+        // মেটা ইন্টিগ্রেশন সার্ভিস থেকে রিডাইরেক্ট ইউআরএল জেনারেট করে রিটার্ন করা হচ্ছে
+        return response()->json([
+            'url' => $this->meta->loginUrl($state, $scopes),
+        ]);
+    }
+
     public function callback(Request $request)
     {
         $state = $request->query('state');
