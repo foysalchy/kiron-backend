@@ -1525,8 +1525,9 @@ Route::prefix('v1')->group(function () {
                 Route::get('/inbox/facebook/{channelId}/conversations', [MetaDirectProxyController::class, 'getConversations']);
                 Route::get('/inbox/facebook/{channelId}/threads/{threadId}/messages', [MetaDirectProxyController::class, 'getMessages']);
                 Route::post('/inbox/facebook/{channelId}/threads/{threadId}/send', [MetaDirectProxyController::class, 'sendMessage']);
-
-                // callback must be OUTSIDE auth middleware (Meta redirects here directly)
+                Route::post('channels/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
+                Route::post('channels/{channelId}/threads/{threadId}/assign', [MetaDirectProxyController::class, 'assignUser']);
+                Route::post('channels/{channelId}/threads/{threadId}/unassign', [MetaDirectProxyController::class, 'unassignUser']);
 
                 //billing
                 Route::prefix('billing')->group(function () {
