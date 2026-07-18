@@ -85,7 +85,7 @@ class MetaConnectController extends Controller
         ], now()->addMinutes(20));
 
         // ৫. ওথ থেকে রিঅ্যাক্টের ক্রিয়েশন পেজে রিডাইরেক্ট
-        $frontendUrl = env('APP_FRONTEND_URL', 'http://localhost:5173') . "/settings/connections?meta_session={$sessionId}&type=facebook";
+        $frontendUrl = env('FRONTEND_URL', 'https://dorja.io/') . "/settings/connections?meta_session={$sessionId}&type=facebook";
         return redirect($frontendUrl);
     }
 
