@@ -1487,6 +1487,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}', [EmailSendController::class, 'show']);
                 });
                 Route::get('/inbox/channels', [ChannelController::class, 'index']);
+                Route::get('/inbox/integrated/channels', [ChannelController::class, 'getChannel']);
                 Route::post('/inbox/channels', [ChannelController::class, 'store']);
                 Route::put('/inbox/channels/{channel}', [ChannelController::class, 'update']);
                 Route::delete('/inbox/channels/{channel}', [ChannelController::class, 'destroy']);
@@ -1528,9 +1529,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('channels/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
                 Route::post('channels/{channelId}/threads/{threadId}/assign', [MetaDirectProxyController::class, 'assignUser']);
                 Route::post('channels/{channelId}/threads/{threadId}/unassign', [MetaDirectProxyController::class, 'unassignUser']);
- Route::get('/inbox/meta/sessions/{sessionId}/pages', [MetaConnectController::class, 'getPages']);
-    
-    Route::post('/inbox/meta/sessions/{sessionId}/connect-channels', [MetaConnectController::class, 'connectChannels']);
+                Route::get('/inbox/meta/sessions/{sessionId}/pages', [MetaConnectController::class, 'getPages']);
+
+                Route::post('/inbox/meta/sessions/{sessionId}/connect-channels', [MetaConnectController::class, 'connectChannels']);
                 //billing
                 Route::prefix('billing')->group(function () {
                     Route::get('/{id}', [BillingController::class, 'billingReports']);

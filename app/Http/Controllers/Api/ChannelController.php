@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Channel;
+use App\Models\ChannelGroup;
 use App\Models\Label;
 use Illuminate\Http\Request;
 
@@ -11,24 +12,13 @@ class ChannelController extends Controller
 {
     public function index(Request $request)
     {
-        // কোম্পানি স্কোপসহ সমস্ত অ্যাক্টিভ চ্যানেল লোড করা হলো
-        $channels = Channel::all();
+        $channels = ChannelGroup::with('channels')->get();
 
-        // লুপ চালিয়ে শুধুমাত্র কাস্টম (লোকাল) চ্যানেলের জন্য আনরিড মেসেজ কাউন্ট করা হচ্ছে
-        // ফেসবুক বা মেটা চ্যানেলের ক্ষেত্রে কোনো ডাটাবেজ কুয়েরি স্পর্শ করা হবে না (যেহেতু এগুলো রিয়েল-টাইমে মেটা থেকে লোড হয়)
-        foreach ($channels as $channel) {
-            if (is_null($channel->channel_group_id)) {
-                // কাস্টম চ্যানেলের ক্ষেত্রে ডাটাবেজ থেকে আনরিড কাউন্ট
-                $channel->unread_count = $channel->conversations()
-                    ->whereHas('messages', function ($q) {
-                        $q->where('from', 'customer')->where('is_read', false);
-                    })
-                    ->count();
-            } else {
-                // মেটা বা ফেসবুক চ্যানেলের জন্য ডিফল্ট কাউন্ট ০ (কারণ চ্যাট লিস্ট রিয়েল-টাইমে মেটা থেকে আসবে)
-                $channel->unread_count = 0;
-            }
-        }
+        return response()->json($channels);
+    }
+    public function getChannel(Request $request)
+    {
+        $channels = Channel::all();
 
         return response()->json($channels);
     }

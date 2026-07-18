@@ -17,21 +17,30 @@ use Illuminate\Support\Facades\Storage;
 class MetaDirectProxyController extends Controller
 {
 
-    public function getConversations($channelId)
+    public function getConversations($channelId, Request $request)
     {
         Log::info("Meta Proxy: Initializing conversations fetch for Channel ID: {$channelId}");
 
         try {
             $channel = Channel::findOrFail($channelId);
-            Log::info("Meta Proxy: Retrieved Channel from DB. Page ID: {$channel->page_id}");
 
             $pageToken = $channel->page_token;
             $pageId = $channel->page_id;
 
-            $response = Http::get("https://graph.facebook.com/v20.0/{$pageId}/conversations", [
+            $limit = $request->get('limit', 15);
+            $after = $request->get('after');
+
+            $params = [
                 'access_token' => $pageToken,
-                'fields' => 'id,updated_time,unread_count,participants,messages.limit(1){message}'
-            ]);
+                'fields' => 'id,updated_time,unread_count,participants,messages.limit(1){message}',
+                'limit' => $limit,
+            ];
+
+            if ($after) {
+                $params['after'] = $after;
+            }
+
+            $response = Http::get("https://graph.facebook.com/v20.0/{$pageId}/conversations", $params);
 
             if ($response->failed()) {
                 Log::error("Meta Proxy Error [Conversations]: Graph API call failed for Page ID: {$pageId}. Raw Response: " . $response->body());
@@ -39,14 +48,14 @@ class MetaDirectProxyController extends Controller
             }
 
             $data = $response->json('data', []);
+            $paging = $response->json('paging', []);
+
             Log::info("Meta Proxy: Successfully retrieved " . count($data) . " conversations for Page ID: {$pageId}");
 
-            // ---- NEW: sob conversation-er state (read status + assigned users) ekbar-e fetch kora ----
-            $states =MetaConversationState::where('channel_id', $channel->id)
+            $states = \App\Models\MetaConversationState::where('channel_id', $channel->id)
                 ->with('assignedUsers:id,name')
                 ->get()
                 ->keyBy('thread_id');
-            // ------------------------------------------------------------------------------------
 
             $formatted = array_map(function ($convo) use ($channel, $states) {
                 $customer = $convo['participants']['data'][0] ?? null;
@@ -62,30 +71,24 @@ class MetaDirectProxyController extends Controller
                     if (!$exists) {
                         Party::create([
                             'company_id'   => $channel->company_id,
-                            'type'         => 2, // Customer
+                            'type'         => 2,
                             'name'         => $customerName,
                             'phone'        => 'N/A',
                             'fb_psid'      => $customerPsid,
                             'status'       => Status::Active->value,
                         ]);
-
-                        Log::info("Meta Proxy: New party created for PSID: {$customerPsid}");
                     }
                 }
 
-                // ---- NEW: is jaygay ei conversation-er state ber kora ----
                 $state = $states->get($convo['id']);
-                // -----------------------------------------------------------
 
                 return [
                     'id' => $convo['id'],
                     'customer_name' => $customerName,
                     'customer_id' => $customerPsid,
                     'last_message' => $convo['messages']['data'][0]['message'] ?? 'No text',
-                    // ---- NEW: unread_count nijer DB state diye override ----
                     'unread_count' => ($state->is_read ?? false) ? 0 : ($convo['unread_count'] ?? 0),
                     'last_activity' => $convo['updated_time'],
-                    // ---- NEW: assigned_users field ----
                     'assigned_users' => $state?->assignedUsers->map(fn($u) => [
                         'id' => $u->id,
                         'name' => $u->name,
@@ -93,13 +96,17 @@ class MetaDirectProxyController extends Controller
                 ];
             }, $data);
 
-            return response()->json($formatted);
+            // ---- NEW: pagination cursor frontend-ke ferot dewa ----
+            return response()->json([
+                'data' => $formatted,
+                'next_cursor' => $paging['cursors']['after'] ?? null,
+                'has_more' => isset($paging['next']),
+            ]);
         } catch (\Exception $e) {
             Log::critical("Meta Proxy Critical [Conversations]: Exception occurred for Channel ID: {$channelId}. Message: " . $e->getMessage());
             return response()->json(['error' => 'An unexpected error occurred.'], 500);
         }
     }
-
     public function markSeen(Request $request, $channelId, $threadId)
     {
         try {
