@@ -83,7 +83,7 @@ class MetaConnectController extends Controller
         ], now()->addMinutes(20));
 
         // ৫. ওথ থেকে রিঅ্যাক্টের ক্রিয়েশন পেজে রিডাইরেক্ট
-        $frontendUrl = env('APP_FRONTEND_URL', 'https://dorja.io') . "/?meta_session={$sessionId}&type=facebook";
+        $frontendUrl = env('FRONTEND_URL', 'https://app.dorja.io/') . "/omni/channel?meta_session={$sessionId}&type=facebook";
         return redirect($frontendUrl);
     }
 
@@ -135,5 +135,25 @@ class MetaConnectController extends Controller
         Cache::forget("meta_session:{$sessionId}");
 
         return response()->json(['message' => 'Selected pages successfully connected.']);
+    }
+    public function getPages(string $sessionId)
+    {
+        // লারাভেল ক্যাশ থেকে ওথ ডাটা রিড করা
+        $session = Cache::get("meta_session:{$sessionId}");
+
+        if (!$session) {
+            return response()->json(['error' => 'Your OAuth session has expired. Please try again.'], 400);
+        }
+
+        // প্যারেন্ট চ্যানেল গ্রুপ (ফেসবুক প্রোফাইল) এর নাম ও ছবি খুঁজে বের করা
+        $channelGroup = ChannelGroup::find($session['group_id']);
+
+        return response()->json([
+            'pages' => $session['pages'] ?? [],
+            'group_profile' => $channelGroup ? [
+                'profile_name' => $channelGroup->profile_name,
+                'profile_image' => $channelGroup->profile_image
+            ] : null
+        ]);
     }
 }

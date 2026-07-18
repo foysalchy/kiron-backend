@@ -1528,7 +1528,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('channels/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
                 Route::post('channels/{channelId}/threads/{threadId}/assign', [MetaDirectProxyController::class, 'assignUser']);
                 Route::post('channels/{channelId}/threads/{threadId}/unassign', [MetaDirectProxyController::class, 'unassignUser']);
-
+ Route::get('/inbox/meta/sessions/{sessionId}/pages', [MetaConnectController::class, 'getPages']);
+    
+    Route::post('/inbox/meta/sessions/{sessionId}/connect-channels', [MetaConnectController::class, 'connectChannels']);
                 //billing
                 Route::prefix('billing')->group(function () {
                     Route::get('/{id}', [BillingController::class, 'billingReports']);
