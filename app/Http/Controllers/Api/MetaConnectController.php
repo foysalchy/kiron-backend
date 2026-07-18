@@ -71,13 +71,11 @@ class MetaConnectController extends Controller
             'personal_token' => $userToken,
         ]);
 
-        // ৪. ইউজারের আন্ডারে থাকা ফেসবুক পেজগুলোর তালিকা (নাম, পেজ টোকেন ও ছবি) নিয়ে আসা
         $pagesData = Http::get("https://graph.facebook.com/v20.0/me/accounts", [
             'access_token' => $userToken,
             'fields' => 'id,name,access_token,picture.type(large)'
         ])->json('data', []);
 
-        // পেজের তালিকা সাময়িকভাবে ক্যাশে সেভ রাখা যাতে ফ্রন্টএন্ড চেকবক্স লিস্টে রেন্ডার করতে পারে
         $sessionId = Str::uuid()->toString();
         Cache::put("meta_session:{$sessionId}", [
             'group_id' => $channelGroup->id,
@@ -85,7 +83,7 @@ class MetaConnectController extends Controller
         ], now()->addMinutes(20));
 
         // ৫. ওথ থেকে রিঅ্যাক্টের ক্রিয়েশন পেজে রিডাইরেক্ট
-        $frontendUrl = env('FRONTEND_URL', 'https://dorja.io/') . "/settings/connections?meta_session={$sessionId}&type=facebook";
+        $frontendUrl = env('APP_FRONTEND_URL', 'https://dorja.io') . "/?meta_session={$sessionId}&type=facebook";
         return redirect($frontendUrl);
     }
 
