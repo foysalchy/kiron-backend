@@ -9,6 +9,7 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\CompanyUpdateRequest;
+use App\Models\DomainSetup;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -25,7 +26,7 @@ class CompanyService
                 'primaryUser',
                 'pricingPackage',
                 'currentSubscription.pricingPackage',
-                'domainSetup'
+                // 'domainSetup' <- eager load remove kora holo
             ])
                 ->withCount([
                     'products as product_used',
@@ -60,7 +61,6 @@ class CompanyService
 
             // ── New filters ──
 
-            // Package wise
             if (isset($filters['pricing_package_id'])) {
                 $query->whereHas(
                     'currentSubscription',
@@ -69,7 +69,6 @@ class CompanyService
                 );
             }
 
-            // Registered date range
             if (isset($filters['registered_from'])) {
                 $query->whereDate('created_at', '>=', $filters['registered_from']);
             }
@@ -77,7 +76,6 @@ class CompanyService
                 $query->whereDate('created_at', '<=', $filters['registered_to']);
             }
 
-            // Subscription expire date range
             if (isset($filters['expire_from'])) {
                 $query->whereHas(
                     'currentSubscription',
@@ -93,10 +91,8 @@ class CompanyService
                 );
             }
 
-            // Free trial — trial_ends_at is not null and in future
             if (isset($filters['free_trial'])) {
                 if ($filters['free_trial'] == 1) {
-                    // On free trial
                     $query->whereHas(
                         'currentSubscription',
                         fn($q) =>
@@ -104,7 +100,6 @@ class CompanyService
                             ->where('trial_ends_at', '>', now())
                     );
                 } else {
-                    // Trial ended or no trial
                     $query->whereDoesntHave(
                         'currentSubscription',
                         fn($q) =>
@@ -115,7 +110,7 @@ class CompanyService
             }
 
             if (isset($filters['expiring_in_days'])) {
-                $days = (int) $filters['expiring_in_days']; // string → int cast
+                $days = (int) $filters['expiring_in_days'];
                 $query->whereHas(
                     'currentSubscription',
                     fn($q) =>
@@ -128,9 +123,24 @@ class CompanyService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
-            return $paginate
+            $result = $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
+
+            // ── domain_setup alada query diye load + attach ──
+            $companyIds = $result->pluck('id');
+
+            $domainSetups = DomainSetup::withoutGlobalScopes()->get()->keyBy('company_id');
+            $result->each(function ($company) use ($domainSetups) {
+                $company->setRelation(
+                    'domainSetup',
+                    $domainSetups->get($company->id)
+                );
+            });
+
+            return $result;
+
+            return $result;
         } catch (\Exception $e) {
             Log::error('Error fetching companies: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch companies');

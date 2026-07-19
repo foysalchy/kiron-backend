@@ -24,13 +24,14 @@ class CustomerPanelController extends Controller
     }
 
 
-    public function addLabel(Request $request, Party $party)
+    public function addLabel(Request $request, $id)
     {
         $data = $request->validate([
             'label_id' => 'required|exists:labels,id'
         ]);
 
         $label = \App\Models\Label::findOrFail($data['label_id']);
+        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
 
         $party->labels()->syncWithoutDetaching([$label->id]);
 
@@ -45,11 +46,13 @@ class CustomerPanelController extends Controller
         return response()->json($party->load('labels'));
     }
 
-    public function addNote(Request $request, Party $party)
+    public function addNote(Request $request, $id)
     {
         $data = $request->validate([
             'text' => 'required|string'
         ]);
+        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
+
 
         $note = $party->crmNotes()->create([
             'text' => $data['text'],
@@ -69,7 +72,7 @@ class CustomerPanelController extends Controller
     }
     public function show($id)
     {
-        $party = Party::with(['labels', 'crmNotes'])->find($id);
+        $party = Party::with(['labels', 'crmNotes'])->where('fb_psid', $id)->first();
 
         if (!$party) {
             return response()->json([
