@@ -76,6 +76,7 @@ use App\Http\Controllers\Api\MarketController;
 use App\Http\Controllers\Api\MegaCategoryController;
 use App\Http\Controllers\Api\MenuSettingController;
 use App\Http\Controllers\Api\MetaConnectController;
+use App\Http\Controllers\Api\MetaWebhookController;
 use App\Http\Controllers\Api\MetaDirectProxyController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
@@ -168,7 +169,22 @@ Route::prefix('v1')->group(function () {
     Route::get('/ping', function () {
         return 'pong';
     });
+    Route::get('/test-subscribe/{channelId}', function ($channelId) {
+        $channel = \App\Models\Channel::findOrFail($channelId);
+
+        $response = \Illuminate\Support\Facades\Http::post(
+            "https://graph.facebook.com/v20.0/{$channel->page_id}/subscribed_apps",
+            [
+                'access_token' => $channel->page_token,
+                'subscribed_fields' => 'messages,messaging_postbacks',
+            ]
+        );
+
+        return $response->json();
+    });
     Route::get('/inbox/meta/callback', [MetaConnectController::class, 'callback']);
+    Route::get('/webhook/meta', [MetaWebhookController::class, 'verify']);
+    Route::post('/webhook/meta', [MetaWebhookController::class, 'handle']);
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
@@ -1500,7 +1516,6 @@ Route::prefix('v1')->group(function () {
                 Route::post('/inbox/conversations/{conversation}/assign', [ConversationController::class, 'assign']);
                 Route::get('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'messages']);
                 Route::post('/inbox/conversations/{conversation}/messages', [ConversationController::class, 'sendMessage']);
-                Route::put('/inbox/conversations/{conversation}/archive', [ConversationController::class, 'archive']);
 
                 Route::get('/inbox/settings', [OmniSettingsController::class, 'getSettings']);
                 Route::post('/inbox/settings', [OmniSettingsController::class, 'saveSettings']);
@@ -1526,11 +1541,12 @@ Route::prefix('v1')->group(function () {
                 Route::get('/inbox/facebook/{channelId}/conversations', [MetaDirectProxyController::class, 'getConversations']);
                 Route::get('/inbox/facebook/{channelId}/threads/{threadId}/messages', [MetaDirectProxyController::class, 'getMessages']);
                 Route::post('/inbox/facebook/{channelId}/threads/{threadId}/send', [MetaDirectProxyController::class, 'sendMessage']);
-                Route::post('channels/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
+                Route::post('/inbox/facebook/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
+                Route::put('/inbox/facebook/conversations/{threadId}/archive', [MetaDirectProxyController::class, 'archive']);
                 Route::post('channels/{channelId}/threads/{threadId}/assign', [MetaDirectProxyController::class, 'assignUser']);
                 Route::post('channels/{channelId}/threads/{threadId}/unassign', [MetaDirectProxyController::class, 'unassignUser']);
                 Route::get('/inbox/meta/sessions/{sessionId}/pages', [MetaConnectController::class, 'getPages']);
-
+                Route::get('/link-preview', [MetaDirectProxyController::class, 'fetchLinkPreview']);
                 Route::post('/inbox/meta/sessions/{sessionId}/connect-channels', [MetaConnectController::class, 'connectChannels']);
                 //billing
                 Route::prefix('billing')->group(function () {

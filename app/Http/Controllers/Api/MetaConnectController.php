@@ -130,6 +130,11 @@ class MetaConnectController extends Controller
                     'color' => '#1877F2'
                 ]
             );
+
+            Http::post("https://graph.facebook.com/v20.0/{$pageId}/subscribed_apps", [
+                'access_token' => $pageToken, 
+                'subscribed_fields' => 'messages,messaging_postbacks',
+            ]);
         }
 
         Cache::forget("meta_session:{$sessionId}");

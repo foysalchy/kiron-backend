@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MetaConversationState extends Model
 {
-    protected $fillable = ['thread_id', 'channel_id', 'is_read', 'last_read_at'];
+    protected $fillable = ['thread_id','customer_psid', 'channel_id', 'is_read', 'last_read_at'];
 
     public function assignedUsers()
     {
