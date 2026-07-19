@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\FileUploadHelper;
+use App\Helpers\MessagePlaceholderHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Channel; // আমাদের নতুন চাইল্ড মডেল ইম্পোর্ট করা হলো
+use App\Models\ConversationAssignment;
 use App\Models\MetaConversationState;
+use App\Models\OmniSetting;
 use App\Models\Party;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -52,12 +56,20 @@ class MetaDirectProxyController extends Controller
 
             Log::info("Meta Proxy: Successfully retrieved " . count($data) . " conversations for Page ID: {$pageId}");
 
-            $states = \App\Models\MetaConversationState::where('channel_id', $channel->id)
+            // ---- Sob conversation state (assign/read/archive) ekbar-e fetch kora ----
+            $states = MetaConversationState::where('channel_id', $channel->id)
                 ->with('assignedUsers:id,name')
                 ->get()
                 ->keyBy('thread_id');
 
-            $formatted = array_map(function ($convo) use ($channel, $states) {
+            // ---- NEW: customer_psid diye-o lookup korার জন্য alada map (webhook-created state-er জন্য, jegular thread_id null) ----
+            $statesByPsid = MetaConversationState::where('channel_id', $channel->id)
+                ->whereNotNull('customer_psid')
+                ->with('assignedUsers:id,name')
+                ->get()
+                ->keyBy('customer_psid');
+
+            $formatted = array_map(function ($convo) use ($channel, $states, $statesByPsid) {
                 $customer = $convo['participants']['data'][0] ?? null;
 
                 $customerName = $customer['name'] ?? 'Facebook User';
@@ -80,7 +92,18 @@ class MetaDirectProxyController extends Controller
                     }
                 }
 
+                // ---- thread_id diye state khoja ----
                 $state = $states->get($convo['id']);
+
+                // ---- NEW: thread_id diye na paওয়া গেলে, customer_psid diye khoja (webhook-created state) ----
+                if (!$state && $customerPsid) {
+                    $state = $statesByPsid->get($customerPsid);
+
+                    // Pawa gele, ei state-er thread_id ekhon jana geche — DB-te sync kore rakha
+                    if ($state && !$state->thread_id) {
+                        $state->update(['thread_id' => $convo['id']]);
+                    }
+                }
 
                 return [
                     'id' => $convo['id'],
@@ -93,10 +116,10 @@ class MetaDirectProxyController extends Controller
                         'id' => $u->id,
                         'name' => $u->name,
                     ])->values() ?? [],
+                    'is_archived' => $state?->is_archived ?? false,
                 ];
             }, $data);
 
-            // ---- NEW: pagination cursor frontend-ke ferot dewa ----
             return response()->json([
                 'data' => $formatted,
                 'next_cursor' => $paging['cursors']['after'] ?? null,
@@ -113,21 +136,23 @@ class MetaDirectProxyController extends Controller
             $channel = Channel::findOrFail($channelId);
             $pageToken = $channel->page_token;
 
-            $data = $request->validate([
-                'recipient_psid' => 'required|string',
-            ]);
+            $data = $request->validate(['recipient_psid' => 'required|string']);
 
+            // Meta-ke customer-seen notify kora
             $response = Http::post("https://graph.facebook.com/v20.0/me/messages", [
                 'access_token' => $pageToken,
                 'recipient' => ['id' => $data['recipient_psid']],
                 'sender_action' => 'mark_seen',
             ]);
 
-            Log::info("Meta Proxy: mark_seen response. Status: {$response->status()}, Body: " . $response->body());
+            MetaConversationState::updateOrCreate(
+                ['thread_id' => $threadId],
+                ['channel_id' => $channelId, 'is_read' => true, 'last_read_at' => now()]
+            );
+            // ------------------------------------------------
 
             if ($response->failed()) {
                 Log::error("Meta Proxy Error [MarkSeen]: " . $response->body());
-                return response()->json(['error' => 'Failed to mark as seen.'], 500);
             }
 
             return response()->json(['success' => true]);
@@ -137,6 +162,12 @@ class MetaDirectProxyController extends Controller
         }
     }
 
+    public function archive($threadId)
+    {
+        $state =  MetaConversationState::where('thread_id', $threadId)->first();
+        $state->is_archived = $state->is_archived == 0 ? true : false;
+        $state->update();
+    }
     public function assignUser(Request $request, $channelId, $threadId)
     {
         $data = $request->validate(['user_id' => 'required|exists:users,id']);
@@ -352,5 +383,135 @@ class MetaDirectProxyController extends Controller
             'error' => 'Message delivery failed via Meta API.',
             'meta_error' => $errorBody['message'] ?? null,
         ], 500);
+    }
+
+    public function fetchLinkPreview(Request $request)
+    {
+        $data = $request->validate(['url' => 'required|url']);
+        $url = $data['url'];
+
+        $cacheKey = 'link_preview:' . md5($url);
+
+        $preview = Cache::remember($cacheKey, now()->addDays(7), function () use ($url) {
+            try {
+                $response = Http::timeout(5)
+                    ->withHeaders(['User-Agent' => 'Mozilla/5.0 (compatible; LinkPreviewBot/1.0)'])
+                    ->get($url);
+
+                if ($response->failed()) {
+                    return null;
+                }
+
+                $html = $response->body();
+
+                // Simple OG tag extraction (regex-based, dependency chara)
+                $title = $this->extractMeta($html, 'og:title') ?? $this->extractTitleTag($html);
+                $description = $this->extractMeta($html, 'og:description');
+                $image = $this->extractMeta($html, 'og:image');
+                $siteName = $this->extractMeta($html, 'og:site_name');
+
+                return [
+                    'url' => $url,
+                    'title' => $title,
+                    'description' => $description,
+                    'image' => $image,
+                    'site_name' => $siteName,
+                ];
+            } catch (\Exception $e) {
+                \Log::warning("Link preview fetch failed for {$url}: " . $e->getMessage());
+                return null;
+            }
+        });
+
+        if (!$preview) {
+            return response()->json(['error' => 'Could not fetch preview.'], 404);
+        }
+
+        return response()->json($preview);
+    }
+
+    private function extractMeta(string $html, string $property): ?string
+    {
+        if (preg_match('/<meta[^>]+property=["\']' . preg_quote($property, '/') . '["\'][^>]+content=["\']([^"\']*)["\']/i', $html, $matches)) {
+            return html_entity_decode($matches[1]);
+        }
+        if (preg_match('/<meta[^>]+content=["\']([^"\']*)["\'][^>]+property=["\']' . preg_quote($property, '/') . '["\']/i', $html, $matches)) {
+            return html_entity_decode($matches[1]);
+        }
+        return null;
+    }
+
+    private function extractTitleTag(string $html): ?string
+    {
+        if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $matches)) {
+            return html_entity_decode(trim($matches[1]));
+        }
+        return null;
+    }
+
+
+    private function sendWelcomeOrAwayMessage($channel, $customerPsid, $customerName)
+    {
+        $settings = OmniSetting::where('company_id', $channel->company_id)->first();
+        if (!$settings) return;
+
+        $companyName = $channel->company->name ?? 'our team';
+
+        $now = now();
+        $isBusinessHours = $now->hour >= 10 && $now->hour < 22;
+
+        $messageText = null;
+
+        if (!$isBusinessHours && $settings->away_mode_active) {
+            $messageText = MessagePlaceholderHelper::replace(
+                $settings->away_message,
+                $customerName,
+                $companyName
+            );
+        } elseif ($settings->welcome_mode_active) {
+            $messageText = MessagePlaceholderHelper::replace(
+                $settings->welcome_message,
+                $customerName,
+                $companyName
+            );
+        }
+
+        if ($messageText) {
+            Http::post("https://graph.facebook.com/v20.0/me/messages", [
+                'access_token' => $channel->page_token,
+                'recipient' => ['id' => $customerPsid],
+                'message' => ['text' => $messageText],
+                'messaging_type' => 'RESPONSE',
+            ]);
+        }
+    }
+    private function autoAssignConversation($channel, $threadId)
+    {
+        $settings = OmniSetting::where('company_id', $channel->company_id)->first();
+
+        if (!$settings || !$settings->auto_assign) return;
+
+        $agentIds = $settings->auto_assign_agents ?? [];
+        if (empty($agentIds)) return;
+
+        // Round-robin: last assigned agent-er porerta বেছে নেওয়া
+        $lastAssignment = ConversationAssignment::whereIn('user_id', $agentIds)
+            ->latest('assigned_at')
+            ->first();
+
+        $nextAgentId = $agentIds[0]; // default first
+
+        if ($lastAssignment) {
+            $lastIndex = array_search($lastAssignment->user_id, $agentIds);
+            $nextIndex = ($lastIndex === false) ? 0 : ($lastIndex + 1) % count($agentIds);
+            $nextAgentId = $agentIds[$nextIndex];
+        }
+
+        $state = MetaConversationState::firstOrCreate(
+            ['thread_id' => $threadId],
+            ['channel_id' => $channel->id]
+        );
+
+        $state->assignedUsers()->syncWithoutDetaching([$nextAgentId]);
     }
 }

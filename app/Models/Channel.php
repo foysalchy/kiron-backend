@@ -20,7 +20,7 @@ class Channel extends Model
         'color'
     ];
 
-  
+
 
     public function group()
     {
@@ -29,5 +29,9 @@ class Channel extends Model
     public function conversations()
     {
         return $this->hasMany(Conversation::class, 'channel_id');
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }
