@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
+use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Page extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasSlugCache, HasGlobalLayoutCache;
 
 
     protected $fillable = [
@@ -28,7 +30,10 @@ class Page extends Model
         'id'         => 'integer',
         'meta_keywords' => 'array',
     ];
-
+    public static function globalLayoutSections(): array
+    {
+        return ['footer_pages'];
+    }
     protected $hidden = ['deleted_at'];
 
     // Relationships

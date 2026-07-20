@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
+use App\Traits\HasGlobalLayoutCache;
 use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MegaCategory extends Model
 {
-    use SoftDeletes, CompanyScoped, HasCachedOptions, HasHomepageCache;
+    use SoftDeletes, CompanyScoped, HasCachedOptions, HasHomepageCache, HasGlobalLayoutCache;
 
     protected $fillable = [
         'company_id',
@@ -39,6 +40,10 @@ class MegaCategory extends Model
     public static function homepageCacheKeys(): array
     {
         return ['home_categories'];
+    }
+    public static function globalLayoutSections(): array
+    {
+        return ['header_categories'];
     }
 
     public function company(): BelongsTo

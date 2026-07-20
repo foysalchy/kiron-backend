@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 
 class SubCategory extends Model
 {
-    use SoftDeletes, CompanyScoped,HasCachedOptions;
+    use SoftDeletes, CompanyScoped, HasCachedOptions, HasGlobalLayoutCache;
     protected $fillable = [
         'company_id',
         'mega_category_id',
@@ -30,7 +31,10 @@ class SubCategory extends Model
         'meta_keywords' => 'array',
     ];
 
-
+    public static function globalLayoutSections(): array
+    {
+        return ['header_categories'];
+    }
     protected $hidden = ['deleted_at'];
 
 

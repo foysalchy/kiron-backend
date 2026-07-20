@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductGroup extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -26,4 +27,8 @@ class ProductGroup extends Model
         'product_ids'       => 'array',
         'is_frontend'       => 'boolean',
     ];
+    public static function homepageCacheKeys(): array
+    {
+        return ['home_product_groups'];
+    }
 }

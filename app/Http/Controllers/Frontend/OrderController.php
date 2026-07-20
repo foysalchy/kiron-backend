@@ -434,21 +434,18 @@ class OrderController extends FrontendController
     public function orderDetails($id)
     {
         $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
+        $order = Order::where('company_id', $companyId)
+            ->with([
+                'customer',
+                'orderDetails.product' => function ($query) {
+                    $query->withTrashed()->select(['id', 'title', 'slug', 'thumbnail']); // This loads deleted products
+                },
+                'orderDetails.variation:id,product_id,display_name,regular_price,sale_price',
+                'orderDetails.variation.attributes.attributeValue:id,name',
+                'orderDetails.variation.attributes.attributeGroup:id,name'
+            ])
+            ->find($id);
 
-        $order = Cache::remember("order_details_view_{$id}", $ttl, function () use ($id, $companyId) {
-            return Order::where('company_id', $companyId)
-                ->with([
-                    'customer',
-                    'orderDetails.product' => function ($query) {
-                        $query->withTrashed()->select(['id', 'title', 'slug', 'thumbnail']); // This loads deleted products
-                    },
-                    'orderDetails.variation:id,product_id,display_name,regular_price,sale_price',
-                    'orderDetails.variation.attributes.attributeValue:id,name',
-                    'orderDetails.variation.attributes.attributeGroup:id,name'
-                ])
-                ->find($id);
-        });
         if (!$order) {
             abort(404);
         }
@@ -465,19 +462,18 @@ class OrderController extends FrontendController
     public function invoice($id)
     {
         $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-        $order = Cache::remember("order_invoice_view_{$id}", $ttl, function () use ($id, $companyId) {
-        return Order::where('company_id', $companyId)
+
+        $order =  Order::where('company_id', $companyId)
             ->with([
-            'customer:id,name,phone,email,address',
-            'orderPayments:id,order_id,amount,payment_method,transaction_id,created_at',
-            'orderDetails.product' => function ($q) {
-                $q->withTrashed();
-            }, // Add this
-            'company'
-        ])
+                'customer:id,name,phone,email,address',
+                'orderPayments:id,order_id,amount,payment_method,transaction_id,created_at',
+                'orderDetails.product' => function ($q) {
+                    $q->withTrashed();
+                }, // Add this
+                'company'
+            ])
             ->findOrFail($id);
-        });
+
         return $this->view('frontend.invoice', compact('order'));
     }
     public function trackOrder(Request $request)

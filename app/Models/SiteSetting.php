@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class SiteSetting extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasHomepageCache, HasGlobalLayoutCache;
     protected $fillable = [
         'company_id',
         'shop_name',
@@ -40,6 +42,14 @@ class SiteSetting extends Model
 
 
     protected $appends = ['logo_url', 'favicon_url'];
+    public static function homepageCacheKeys(): array
+    {
+        return ['site_settings_cart'];
+    }
+    public static function globalLayoutSections(): array
+    {
+        return ['setup'];
+    }
 
     // Scopes
     public function scopeByCompany($query, int $companyId)

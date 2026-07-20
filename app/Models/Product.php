@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\IntegerArray;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
-    use SoftDeletes, CompanyScoped, HasHomepageCache;
+    use SoftDeletes, CompanyScoped, HasHomepageCache, HasGlobalLayoutCache;
 
     protected $fillable = [
         'company_id',
@@ -76,7 +77,10 @@ class Product extends Model
             'home_all_products',
         ];
     }
-
+    public static function globalLayoutSections(): array
+    {
+        return ['related_products', 'all_header_products'];
+    }
     // Relationships
     public function company(): BelongsTo
     {

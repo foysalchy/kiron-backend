@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ContentSetting extends Model
 {
-    use CompanyScoped;
+    use CompanyScoped, HasGlobalLayoutCache;
     protected $fillable = [
         'company_id',
         'page_type',
@@ -47,6 +48,11 @@ class ContentSetting extends Model
         self::PRIVACY_POLICY,
         self::TERMS_AND_CONDITIONS,
     ];
+
+    public static function globalLayoutSections(): array
+    {
+        return ['footer_features', 'footer_bottom_right'];
+    }
 
     /* ── Relations ── */
     public function company(): BelongsTo
