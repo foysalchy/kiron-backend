@@ -6,16 +6,22 @@ class CachedOptionsObserver
 {
     public function saved($model)
     {
-        $model::clearOptionsCache($model->company_id);
+        if (method_exists($model, 'clearOptionsCache')) {
+            $model::clearOptionsCache($model->company_id);
+        }
+
+        if (method_exists($model, 'clearHomepageCache')) {
+            $model::clearHomepageCache($model->company_id);
+        }
     }
 
     public function deleted($model)
     {
-        $model::clearOptionsCache($model->company_id);
+        $this->saved($model); 
     }
 
     public function restored($model)
     {
-        $model::clearOptionsCache($model->company_id);
+        $this->saved($model);
     }
 }
