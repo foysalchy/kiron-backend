@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class KnowledgeBase extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped,HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -22,7 +23,10 @@ class KnowledgeBase extends Model
     ];
 
     protected $hidden = ['deleted_at'];
-
+   public static function homepageCacheKeys(): array
+    {
+        return ['home_faqs'];
+    }
     // Relationships
     public function company(): BelongsTo
     {

@@ -102,6 +102,9 @@ class MetaConnectController extends Controller
 
         $groupId = $session['group_id'];
         $cachedPages = $session['pages'];
+        $companyId=auth()->user()->company_id;
+        ChannelGroup::find($groupId)->update(['company_id'=>$companyId]);
+    
 
         // শুধুমাত্র ফ্রন্টএন্ড থেকে সিলেক্ট করা পেজগুলো ফিল্টার করা
         $pagesToConnect = collect($cachedPages)->filter(function ($p) use ($data) {

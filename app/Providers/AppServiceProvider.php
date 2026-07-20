@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Enums\Status;
 use App\Models\Company;
 use App\Models\ContentSetting;
-use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue};
+use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue, KnowledgeBase, ProductGroup, Slider};
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\SearchProduct;
@@ -312,6 +312,10 @@ class AppServiceProvider extends ServiceProvider
             Brand::class,
             AttributeGroup::class,
             AttributeValue::class,
+            Product::class,
+            KnowledgeBase::class,
+            ProductGroup::class,
+            Slider::class,
         ];
         foreach ($models as $model) {
             $model::observe(CachedOptionsObserver::class);

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\IntegerArray;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -65,7 +66,16 @@ class Product extends Model
 
     protected $hidden = ['deleted_at'];
 
-
+    public static function homepageCacheKeys(): array
+    {
+        return [
+            'home_latest_offers',
+            'home_new_arrivals',
+            'home_product_groups',
+            'home_popular_products',
+            'home_all_products',
+        ];
+    }
 
     // Relationships
     public function company(): BelongsTo

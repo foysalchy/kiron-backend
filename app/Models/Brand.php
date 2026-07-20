@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Brand extends Model
 {
-    use SoftDeletes, CompanyScoped,HasCachedOptions;
+    use SoftDeletes, CompanyScoped, HasCachedOptions, HasHomepageCache;
 
 
     protected $fillable = [
@@ -33,7 +34,10 @@ class Brand extends Model
     ];
 
     protected $hidden = ['deleted_at'];
-
+    public static function homepageCacheKeys(): array
+    {
+        return ['home_brands'];
+    }
     // Relationships
     public function company(): BelongsTo
     {

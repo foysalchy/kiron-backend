@@ -200,7 +200,7 @@ class HomeController extends FrontendController
         $exists = Subscription::where('email', $request->email)
             ->where('company_id', $this->company_id)
             ->first();
-
+    
         if ($exists) {
             return response()->json(['success' => false, 'message' => 'You are already subscribed!'], 422);
         }

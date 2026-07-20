@@ -16,6 +16,7 @@ class MegaCategoryService
     public function getAllMegaCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
+            
             $query = MegaCategory::query();
 
             if (isset($filters['status'])) {
@@ -63,7 +64,7 @@ class MegaCategoryService
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mega',
-                   
+
                 );
             }
 
