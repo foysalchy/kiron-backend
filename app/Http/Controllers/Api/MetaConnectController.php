@@ -141,9 +141,9 @@ class MetaConnectController extends Controller
             ]);
         }
         $group=ChannelGroup::get();
-        if($group){
-            $group->update(['company_id'=>$companyId]);
-        }
+        // if($group){
+        //     $group->update(['company_id'=>$companyId]);
+        // }
        
 
         Cache::forget("meta_session:{$sessionId}");
