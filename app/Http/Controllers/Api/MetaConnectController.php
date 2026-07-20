@@ -103,17 +103,7 @@ class MetaConnectController extends Controller
         $groupId = $session['group_id'];
         $cachedPages = $session['pages'];
         $companyId=auth()->user()->company_id;
-       $group = ChannelGroup::find($groupId);
-
-        dd([
-            'groupId' => $groupId,
-            'group' => $group,
-            'exists' => ChannelGroup::where('id', $groupId)->exists(),
-            'withoutScope' => ChannelGroup::withoutGlobalScopes()->find($groupId),
-            'withTrashed' => method_exists(ChannelGroup::class, 'withTrashed')
-                ? ChannelGroup::withTrashed()->find($groupId)
-                : null,
-        ]);
+      
     
 
         // শুধুমাত্র ফ্রন্টএন্ড থেকে সিলেক্ট করা পেজগুলো ফিল্টার করা
@@ -152,7 +142,7 @@ class MetaConnectController extends Controller
 
         Cache::forget("meta_session:{$sessionId}");
 
-        return response()->json(['message' => 'Selected pages successfully connected.']);
+        return response()->json(['message' => 'Selected pages successfully connected.'.$groupId]);
     }
     public function getPages(string $sessionId)
     {
