@@ -103,7 +103,17 @@ class MetaConnectController extends Controller
         $groupId = $session['group_id'];
         $cachedPages = $session['pages'];
         $companyId=auth()->user()->company_id;
-        ChannelGroup::find($groupId)->update(['company_id'=>$companyId]);
+       $group = ChannelGroup::find($groupId);
+
+        dd([
+            'groupId' => $groupId,
+            'group' => $group,
+            'exists' => ChannelGroup::where('id', $groupId)->exists(),
+            'withoutScope' => ChannelGroup::withoutGlobalScopes()->find($groupId),
+            'withTrashed' => method_exists(ChannelGroup::class, 'withTrashed')
+                ? ChannelGroup::withTrashed()->find($groupId)
+                : null,
+        ]);
     
 
         // শুধুমাত্র ফ্রন্টএন্ড থেকে সিলেক্ট করা পেজগুলো ফিল্টার করা
