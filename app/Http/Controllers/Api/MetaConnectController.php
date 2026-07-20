@@ -102,9 +102,12 @@ class MetaConnectController extends Controller
 
         $groupId = $session['group_id'];
         $cachedPages = $session['pages'];
-        $companyId=auth()->user()->company_id;
-     
-        
+         
+       ChannelGroup::withoutGlobalScopes()
+        ->where('id', $groupId)
+        ->update([
+            'company_id' => auth()->user()->company_id,
+        ]);
     
 
         // শুধুমাত্র ফ্রন্টএন্ড থেকে সিলেক্ট করা পেজগুলো ফিল্টার করা
@@ -140,15 +143,10 @@ class MetaConnectController extends Controller
                 'subscribed_fields' => 'messages,messaging_postbacks',
             ]);
         }
-        $group=ChannelGroup::get();
-        // if($group){
-        //     $group->update(['company_id'=>$companyId]);
-        // }
-       
 
         Cache::forget("meta_session:{$sessionId}");
 
-        return response()->json(['message' => 'Selected pages successfully connected '.$groupId.$group]);
+        return response()->json(['message' => 'Selected pages successfully connected.']);
     }
     public function getPages(string $sessionId)
     {
