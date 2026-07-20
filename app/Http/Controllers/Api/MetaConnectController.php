@@ -140,11 +140,15 @@ class MetaConnectController extends Controller
                 'subscribed_fields' => 'messages,messaging_postbacks',
             ]);
         }
-        ChannelGroup::find($groupId)->update(['company_id'=>$companyId]);
+        $group=ChannelGroup::find($groupId);
+        if($group){
+            $group->update(['company_id'=>$companyId]);
+        }
+       
 
         Cache::forget("meta_session:{$sessionId}");
 
-        return response()->json(['message' => 'Selected pages successfully connected.']);
+        return response()->json(['message' => 'Selected pages successfully connected '.$groupId.$group]);
     }
     public function getPages(string $sessionId)
     {
