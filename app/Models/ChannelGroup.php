@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ChannelGroup extends Model
 {
     use CompanyScoped;
-    protected $fillable = ['platform', 'profile_name', 'profile_image', 'personal_token'];
+    protected $fillable = ['company_id','platform', 'profile_name', 'profile_image', 'personal_token'];
 
     public function channels()
     {
