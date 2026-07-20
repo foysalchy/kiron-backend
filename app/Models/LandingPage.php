@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +13,7 @@ use Illuminate\Support\Str;
 
 class LandingPage extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped,HasSlugCache;
 
     protected $fillable = [
         'company_id',

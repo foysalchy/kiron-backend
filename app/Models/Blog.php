@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
+use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Blog extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasSlugCache, HasHomepageCache;
 
 
     protected $fillable = [
@@ -36,7 +38,10 @@ class Blog extends Model
 
 
     protected $hidden = ['deleted_at'];
-
+    public static function homepageCacheKeys(): array
+    {
+        return ['blog_tags', 'blog_related'];
+    }
     // Relationships
     public function company(): BelongsTo
     {
@@ -58,21 +63,21 @@ class Blog extends Model
         return $query->where('company_id', $companyId);
     }
 
-public function getThumbnailUrlAttribute(): ?string
-{
-    $images = $this->images;
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        $images = $this->images;
 
-    if (is_array($images) && count($images) > 0) {
-        $localPath = storage_path('app/public/' . $images[0]);
-        if (file_exists($localPath)) {
-            return asset('storage/' . $images[0]);
+        if (is_array($images) && count($images) > 0) {
+            $localPath = storage_path('app/public/' . $images[0]);
+            if (file_exists($localPath)) {
+                return asset('storage/' . $images[0]);
+            }
+
+            return Storage::disk('r2')->url($images[0]);
         }
 
-        return Storage::disk('r2')->url($images[0]);
+        return null;
     }
-
-    return null;
-}
     //read time
     public function getReadingTimeAttribute()
     {

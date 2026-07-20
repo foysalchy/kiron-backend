@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 
 class SearchProduct extends Model
 {
-    use CompanyScoped;
+    use CompanyScoped, HasGlobalLayoutCache;
 
     protected $fillable = [
         'company_id',
@@ -18,7 +19,10 @@ class SearchProduct extends Model
 
 
     protected $hidden = ['deleted_at'];
-
+    public static function globalLayoutSections(): array
+    {
+        return ['popular_searches'];
+    }
     public function customer()
     {
         return $this->belongsTo(Party::class, 'customer_id');

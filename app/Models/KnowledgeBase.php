@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class KnowledgeBase extends Model
 {
-    use SoftDeletes, CompanyScoped,HasHomepageCache;
+    use SoftDeletes, CompanyScoped, HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -23,9 +23,9 @@ class KnowledgeBase extends Model
     ];
 
     protected $hidden = ['deleted_at'];
-   public static function homepageCacheKeys(): array
+    public static function homepageCacheKeys(): array
     {
-        return ['home_faqs'];
+        return ['home_faqs', 'support_categories', 'support_categories'];
     }
     // Relationships
     public function company(): BelongsTo

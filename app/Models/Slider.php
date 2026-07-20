@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Slider extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasHomepageCache;
 
 
     protected $fillable = [
@@ -26,7 +27,10 @@ class Slider extends Model
 
 
     protected $hidden = ['deleted_at'];
-
+    public static function homepageCacheKeys(): array
+    {
+        return ['home_sliders'];
+    }
     // Relationships
     public function company(): BelongsTo
     {

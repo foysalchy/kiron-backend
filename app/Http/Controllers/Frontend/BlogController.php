@@ -51,12 +51,17 @@ class BlogController extends FrontendController
                 ->active()
                 ->firstOrFail();
         });
-        $relatedPosts = Cache::remember("blog_related_{$companyId}_{$blog->id}", $ttl, function () use ($blog, $companyId) {
+        $relatedPostsPool = Cache::remember("blog_related_{$companyId}", $ttl, function () use ($companyId) {
             return Blog::where('company_id', $companyId)
                 ->where('status', Status::Active->value)
-                ->where('id', '!=', $blog->id)
-                ->latest()->take(3)->get();
+                ->latest()
+                ->take(5) 
+                ->get();
         });
+
+        $relatedPosts = $relatedPostsPool
+            ->where('id', '!=', $blog->id)
+            ->take(3);
 
         $popularTags = Cache::remember("blog_tags_{$companyId}", $ttl, function () use ($companyId) {
             return  Blog::where('company_id', $companyId)

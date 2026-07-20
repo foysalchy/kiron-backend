@@ -51,6 +51,7 @@ class SelectOptionController extends Controller
         return Area::where('warehouse_id', $warehouseId)
             ->select('id', 'name')
             ->orderBy('name', 'asc')
+            ->where('status', Status::Active->value)
             ->get();
     }
 
@@ -59,6 +60,7 @@ class SelectOptionController extends Controller
         return Rack::where('area_id', $areaId)
             ->select('id', 'name')
             ->orderBy('name', 'asc')
+            ->where('status', Status::Active->value)
             ->get();
     }
     public function cellOptions($rackId)
@@ -66,6 +68,7 @@ class SelectOptionController extends Controller
         return Cell::where('rack_id', $rackId)
             ->select('id', 'name')
             ->orderBy('name', 'asc')
+            ->where('status', Status::Active->value)
             ->get();
     }
     public function binOptions($warehouseId)
@@ -73,6 +76,7 @@ class SelectOptionController extends Controller
         return Bin::where('warehouse_id', $warehouseId)
             ->select('id', 'name', 'bin_code')
             ->orderBy('name', 'asc')
+            ->where('status', Status::Active->value)
             ->get();
     }
     public function productbinOptions($warehouseId)

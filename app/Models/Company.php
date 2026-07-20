@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Exceptions\ApiException;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Company extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasGlobalLayoutCache;
 
     protected $fillable = [
         'name',
@@ -59,7 +60,10 @@ class Company extends Model
             }
         });
     }
-
+    public static function globalLayoutSections(): array
+    {
+        return ['theme_color'];
+    }
     public function domainSetup()
     {
         return $this->hasOne(DomainSetup::class);

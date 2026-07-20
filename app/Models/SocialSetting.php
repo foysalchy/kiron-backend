@@ -1,14 +1,16 @@
 <?php
+
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class SocialSetting extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped, HasGlobalLayoutCache;
 
     protected $fillable = [
         'company_id',
@@ -19,7 +21,10 @@ class SocialSetting extends Model
         'icon_class',
         'status',
     ];
-
+    public static function globalLayoutSections(): array
+    {
+        return ['social_links'];
+    }
     public function company()
     {
         return $this->belongsTo(Company::class);

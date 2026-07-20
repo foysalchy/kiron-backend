@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Enums\Status;
 use App\Models\Company;
 use App\Models\ContentSetting;
-use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue, KnowledgeBase, ProductGroup, Slider};
+use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue, Blog, KnowledgeBase, LandingPage, ProductGroup, ProductReview, Slider, SystemPage};
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\SearchProduct;
@@ -110,6 +110,7 @@ use App\Services\TransactionInternalService;
 use App\Services\TransactionJournalService;
 use App\Services\WarehouseService;
 use App\Services\WocommerceSettingService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -232,74 +233,10 @@ class AppServiceProvider extends ServiceProvider
         if (!app()->runningInConsole() && !request()->is('api/*')) {
 
             $isSaasRoute = request()->routeIs('saas.*') || request()->is('saas*');
-
             $currentStore = getCurrentCompany();
+            $companyId = $isSaasRoute ? null : ($currentStore ? $currentStore->company_id : null);
 
-            $companyId = $isSaasRoute ? Null : ($currentStore ? $currentStore->company_id : Null);
-
-            $cacheKey = $companyId ? "final_store_{$companyId}" : "final_saas_global";
-
-            $data = cache()->remember($cacheKey, 600, function () use ($companyId) {
-
-                /**
-                 * this function handle for all table
-                 */
-                $applyLogic = function ($model) use ($companyId) {
-                    if ($companyId) {
-                        //
-                        return $model::where(function ($q) use ($companyId) {
-                            $q->where('company_id', $companyId)->orWhereNull('company_id');
-                        })->orderByRaw('company_id IS NULL ASC');
-                    } else {
-                        // main page
-                        return $model::whereNull('company_id');
-                    }
-                };
-
-                return [
-                    'setup'             => $applyLogic(SiteSetting::class)->first(),
-
-                    'headerCategories'  => $applyLogic(MegaCategory::class)
-                        ->select('id', 'company_id', 'name', 'slug', 'image')
-                        ->with([
-                            'subCategories' => fn($q) => $q->select('id', 'company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value),
-                            'subCategories.miniCategories' => fn($q) => $q->select('id', 'company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value)
-                        ])
-                        ->where('status', Status::Active->value)
-                        ->whereNotNull('slug')
-                        ->where('slug', '!=', '')
-                        ->latest()
-                        ->get(),
-
-                    'footerFeatures'    => $applyLogic(ContentSetting::class)
-                        ->where('page_type', ContentSetting::PAGE_ALL)
-                        ->where('status', Status::Active->value)
-                        ->orderBy('sort_order')->get(),
-
-                    'footerBottomRight' => $applyLogic(ContentSetting::class)
-                        ->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)
-                        ->where('status', Status::Active->value)
-                        ->orderBy('sort_order')->get(),
-
-                    'socialLinks'       => $applyLogic(SocialSetting::class)
-                        ->select('id', 'company_id', 'icon_name', 'icon_image', 'link', 'hover_bg', 'icon_class')
-                        ->where('status', Status::Active->value)->get(),
-
-                    'footerPages'       => $applyLogic(Page::class)
-                        ->where('status', Status::Active->value)
-                        ->orderBy('sort_order')->get(),
-
-                    // where is null company id
-                    'themeColor'        => $companyId ? Company::where('id', $companyId)->first() : null,
-
-                    // its for company
-                    'popularSearches'   => SearchProduct::select('keyword', DB::raw('count(*) as total'))->groupBy('keyword')->orderBy('total', 'desc')->take(5)->get(),
-                    'relatedProducts'   => Product::where('status', Status::Active->value)->when($companyId, fn($q) => $q->where('company_id', $companyId))
-                        ->select('id', 'company_id', 'title', 'slug', 'thumbnail')->withCount('views')->orderBy('views_count', 'desc')->take(5)->get(),
-
-                    'allHeaderProducts' => Product::where('status', Status::Active->value)->get(),
-                ];
-            });
+            $data = $this->getGlobalLayoutData($companyId);
 
             View::share($data);
         }
@@ -316,9 +253,146 @@ class AppServiceProvider extends ServiceProvider
             KnowledgeBase::class,
             ProductGroup::class,
             Slider::class,
+            ProductReview::class,
+            Page::class,
+            LandingPage::class,
+            Blog::class,
+            SiteSetting::class,
+            SystemPage::class,
+            ContentSetting::class,
+            SocialSetting::class,
+            Company::class,
+            SearchProduct::class,
         ];
+
         foreach ($models as $model) {
             $model::observe(CachedOptionsObserver::class);
         }
+    }
+
+    private function getGlobalLayoutData($companyId): array
+    {
+        $suffix = $companyId ?: 'global';
+        $ttl = 600;
+
+        $applyLogic = function ($model) use ($companyId) {
+            if ($companyId) {
+                return $model::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)->orWhereNull('company_id');
+                })->orderByRaw('company_id IS NULL ASC');
+            }
+            return $model::whereNull('company_id');
+        };
+
+        return [
+            'setup' => Cache::remember(
+                "layout_setup_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(SiteSetting::class)->first()
+            ),
+
+            'headerCategories' => Cache::remember(
+                "layout_header_categories_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(MegaCategory::class)
+                    ->select('id', 'company_id', 'name', 'slug', 'image')
+                    ->with([
+                        'subCategories' => fn($q) => $q->select('id', 'company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value),
+                        'subCategories.miniCategories' => fn($q) => $q->select('id', 'company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value),
+                    ])
+                    ->where('status', Status::Active->value)
+                    ->whereNotNull('slug')
+                    ->where('slug', '!=', '')
+                    ->latest()
+                    ->get()
+            ),
+
+            'footerFeatures' => Cache::remember(
+                "layout_footer_features_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(ContentSetting::class)
+                    ->where('page_type', ContentSetting::PAGE_ALL)
+                    ->where('status', Status::Active->value)
+                    ->orderBy('sort_order')->get()
+            ),
+
+            'footerBottomRight' => Cache::remember(
+                "layout_footer_bottom_right_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(ContentSetting::class)
+                    ->where('page_type', ContentSetting::FOOTER_BOTTOM_RIGHT)
+                    ->where('status', Status::Active->value)
+                    ->orderBy('sort_order')->get()
+            ),
+
+            'socialLinks' => Cache::remember(
+                "layout_social_links_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(SocialSetting::class)
+                    ->select('id', 'company_id', 'icon_name', 'icon_image', 'link', 'hover_bg', 'icon_class')
+                    ->where('status', Status::Active->value)->get()
+            ),
+
+            'footerPages' => Cache::remember(
+                "layout_footer_pages_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(Page::class)
+                    ->where('status', Status::Active->value)
+                    ->orderBy('sort_order')->get()
+            ),
+
+            'themeColor' => Cache::remember(
+                "layout_theme_color_{$suffix}",
+                $ttl,
+                fn() =>
+                $companyId ? Company::where('id', $companyId)->first() : null
+            ),
+
+            'popularSearches' => Cache::remember(
+                "layout_popular_searches_{$suffix}",
+                $ttl,
+                fn() =>
+                SearchProduct::select('keyword', DB::raw('count(*) as total'))
+                    ->when(
+                        $companyId,
+                        fn($q) => $q->where(function ($q) use ($companyId) {
+                            $q->where('company_id', $companyId)->orWhereNull('company_id');
+                        }),
+                        fn($q) => $q->whereNull('company_id')
+                    )
+                    ->groupBy('keyword')
+                    ->orderBy('total', 'desc')
+                    ->take(5)
+                    ->get()
+            ),
+
+            'relatedProducts' => Cache::remember(
+                "layout_related_products_{$suffix}",
+                $ttl,
+                fn() =>
+                Product::where('status', Status::Active->value)
+                    ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                    ->select('id', 'company_id', 'title', 'slug', 'thumbnail')
+                    ->withCount('views')
+                    ->orderBy('views_count', 'desc')
+                    ->take(5)->get()
+            ),
+
+            'allHeaderProducts' => Cache::remember(
+                "layout_all_header_products_{$suffix}",
+                $ttl,
+                fn() =>
+                Product::where('status', Status::Active->value)
+                    ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                    ->take(50)
+                    ->get()
+            ),
+        ];
     }
 }
