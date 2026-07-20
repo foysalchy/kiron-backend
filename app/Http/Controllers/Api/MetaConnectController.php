@@ -140,7 +140,7 @@ class MetaConnectController extends Controller
                 'subscribed_fields' => 'messages,messaging_postbacks',
             ]);
         }
-        $group=ChannelGroup::where('id',$groupId)->first();
+        $group=ChannelGroup::get();
         if($group){
             $group->update(['company_id'=>$companyId]);
         }
