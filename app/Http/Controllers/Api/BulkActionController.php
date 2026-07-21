@@ -61,6 +61,9 @@ class BulkActionController extends Controller
         'master-brands'        => \App\Models\MasterBrand::class,
         'master-demos'        => \App\Models\MasterDemo::class,
         'master-features'        => \App\Models\MasterFeature::class,
+        'account-groups'        => \App\Models\AccountGroup::class,
+        'account-expenses'        => \App\Models\TransactionExpense::class,
+        'account-incomes'        => \App\Models\TransactionIncome::class,
     ];
 
     /**

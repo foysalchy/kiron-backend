@@ -25,6 +25,7 @@ class StoreBasicSettingsRequest extends FormRequest
             ],
             'lang'   => ['required'],
             'currency'  => ['required'],
+            'currency_position'  => ['required'],
             'manage_warehouse'  => ['required'],
         ];
     }
