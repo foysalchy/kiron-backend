@@ -246,6 +246,8 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/{id}/toggle-status', [SiteSettingController::class, 'toggleStatus']);
             });
         });
+        Route::get('/site-basic-data', [SiteSettingController::class, 'basicData']);
+
         Route::get('/company/package-usage', [PackageUsageController::class, 'index']);
         Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addpayment']);
         Route::post('/subscriptions/upgrade-payment', [SubscriptionController::class, 'upgradePayment']);

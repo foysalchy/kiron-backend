@@ -12,6 +12,7 @@ use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\DomainSetup;
 use App\Models\EmailVerification;
+use App\Models\LeadStatus;
 use App\Models\Permission;
 use App\Models\Pricing;
 use App\Models\PricingPackage;
@@ -222,6 +223,7 @@ class CompanyRegistrationService
                 ->update([
                     'lang'     => $data['lang'],
                     'currency' => $data['currency'],
+                    'currency_position' => $data['currency_position'],
                 ]);
 
             if (isset($data['manage_warehouse'])) {
@@ -253,12 +255,18 @@ class CompanyRegistrationService
                 'status' => Status::Active->value,
             ]);
 
-            // Activate the Company's primary User + mark setup complete
             User::where('company_id', $company->id)
                 ->update([
                     'status'         => Status::Active->value,
                     'setup_complete' => true, // ⚠️ ei column na thakle migration lagbe, note niche
                 ]);
+
+            LeadStatus::create([
+                'company_id' => $company->id,
+                'name' => "Succeffully Converted",
+                'is_default' => 1,
+                'status' => Status::Active->value
+            ]);
 
             DB::commit();
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSiteSettingRequest;
 use App\Http\Requests\UpdateSiteSettingRequest;
 use App\Models\DomainSetup;
+use App\Models\SiteSetting;
 use App\Services\SiteSettingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -200,7 +201,7 @@ class SiteSettingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Theme settings updated successfully!',
-                'data'    => $company->fresh()->load('domainSetup') 
+                'data'    => $company->fresh()->load('domainSetup')
             ], 200);
         } catch (\Exception $e) {
             Log::error('Theme Template Update Error: ' . $e->getMessage());
@@ -209,5 +210,9 @@ class SiteSettingController extends Controller
                 'message' => 'Failed to update theme settings.'
             ], 500);
         }
+    }
+    public function basicData()
+    {
+        return SiteSetting::select('id', 'company_id', 'logo', 'currency', 'currency_position')->first();
     }
 }

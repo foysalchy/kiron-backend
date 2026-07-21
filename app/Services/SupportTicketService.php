@@ -22,7 +22,9 @@ class SupportTicketService
         try {
             $user  = auth()->user();
             $query = SupportTicket::with(['supportDepartment', 'company', 'user', 'assignedUser']);
-
+            if ($user->is_super_admin) {
+                $query->withoutGlobalScope('company');
+            }
             // ── Visibility Filter ───────────────────────────────────────
             $hasRole = $user->roles()->exists();
 
@@ -106,7 +108,15 @@ class SupportTicketService
      */
     public function getTicketById(int $id): SupportTicket
     {
-        $ticket = SupportTicket::with(['supportDepartment', 'user', 'replies.user'])->find($id);
+        $user = auth()->user();
+
+        $query = SupportTicket::with(['supportDepartment', 'user', 'replies.user']);
+
+        if ($user->is_super_admin) {
+            $query->withoutGlobalScope('company');
+        }
+
+        $ticket = $query->find($id);
 
         if (!$ticket) {
             throw ApiException::notFound('Support Ticket');
@@ -260,7 +270,7 @@ class SupportTicketService
     /**
      * Toggle status
      */
-public function toggleStatus(int $id, string $newStatus): SupportTicket
+ public function toggleStatus(int $id, string $newStatus): SupportTicket
 {
     DB::beginTransaction();
     try {
@@ -278,8 +288,15 @@ public function toggleStatus(int $id, string $newStatus): SupportTicket
 
         DB::commit();
         return $ticket;
+    } catch (ApiException $e) {
+        DB::rollBack();
+        throw $e; // original message/status code preserve
     } catch (\Exception $e) {
         DB::rollBack();
+        Log::error('Failed to toggle status: ' . $e->getMessage(), [
+            'ticket_id' => $id,
+            'new_status' => $newStatus,
+        ]);
         throw ApiException::serverError('Failed to toggle status');
     }
 }
@@ -291,38 +308,51 @@ public function toggleStatus(int $id, string $newStatus): SupportTicket
         DB::beginTransaction();
 
         try {
+            $authUser = auth()->user();
 
+            $ticketQuery = SupportTicket::query();
+            if ($authUser->is_super_admin) {
+                $ticketQuery->withoutGlobalScope('company');
+            }
+            $ticket = $ticketQuery->findOrFail($data['support_ticket_id']);
 
-            $ticket = SupportTicket::findOrFail($data['support_ticket_id']);
             if ($ticket->status === Status::Closed->value) {
                 throw ApiException::badRequest('Cannot reply to a closed ticket.');
             }
+
             if (isset($data['image'])) {
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/replies',
-
                 );
             }
-            $authUser = auth()->user();
-            $data['user_id'] = auth()->id();
+
+            $data['user_id'] = $authUser->id;
             $reply = SupportTicketReply::create($data);
+
             $isStaff = $authUser->is_super_admin || $authUser->roles()->exists();
 
             $ticket->update([
                 'response_status' => $isStaff
-                    ? Status::WaitingForClientResponse->value  
-                    : Status::WaitForResponse->value,          
+                    ? Status::WaitingForClientResponse->value
+                    : Status::WaitForResponse->value,
             ]);
+
             LogHelper::updated('support_ticket_reply', $reply->id, $ticket->company_id, 'New reply added');
 
             DB::commit();
             Log::info('Ticket reply stored successfully', ['reply_id' => $reply->id, 'ticket_id' => $ticket->id]);
 
             return $reply->load('user');
+        } catch (ApiException $e) {
+            DB::rollBack();
+            if (isset($data['image']) && is_string($data['image'])) {
+                FileUploadHelper::delete($data['image']);
+            }
+            throw $e; // original message/status code rakho
         } catch (\Exception $e) {
             DB::rollBack();
-            if (isset($data['image'])) {
+            if (isset($data['image']) && is_string($data['image'])) {
                 FileUploadHelper::delete($data['image']);
             }
             Log::error('Ticket reply creation failed: ' . $e->getMessage());

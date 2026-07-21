@@ -102,7 +102,7 @@ class CustomerPanelController extends Controller
             array_unshift($timeline, [
                 'type' => 'order',
                 'label' => "Latest Order #{$lastOrder->id} placed",
-                'meta' => "৳ " . number_format($lastOrder->amount, 2),
+                'meta' =>  number_format($lastOrder->amount, 2),
                 'created_at_human' => $lastOrder->created_at->diffForHumans()
             ]);
         }
@@ -135,7 +135,7 @@ class CustomerPanelController extends Controller
             'crm_notes' => $party->crmNotes,
             'order_summary' => [
                 'count' => $orderCount,
-                'spent' => "৳ " . number_format($totalSpent, 2),
+                'spent' =>  number_format($totalSpent, 2),
                 'last' => $lastOrder ? $lastOrder->created_at->diffForHumans() : 'No orders yet'
             ],
             'timeline' => $timeline

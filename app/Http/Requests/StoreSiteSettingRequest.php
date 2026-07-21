@@ -37,6 +37,7 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'email'             => ['required', 'email'],
                 'lang'             => ['nullable'],
                 'currency'             => ['nullable'],
+                'currency_position'             => ['nullable'],
                 'inside_charge'             => ['nullable'],
                 'outside_charge'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],
