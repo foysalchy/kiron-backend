@@ -8,6 +8,11 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use App\Models\SupportTicket;
 use App\Models\SupportTicketReply;
+use App\Models\User;
+use App\Notifications\TicketAssignedNotification;
+use App\Notifications\TicketCreatedNotification;
+use App\Services\Notification\NotificationRecipientResolver;
+use App\Services\Notification\NotificationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -142,8 +147,18 @@ class SupportTicketService
             }
             $data['user_id'] = auth()->id();
             $ticket = SupportTicket::create($data);
+            $creator = auth()->user();
+            $companyName = $ticket->company?->name ?? 'Saas Supder Admin';
             LogHelper::created('support_ticket', $ticket->id, $ticket->company_id, $ticket->subject);
-
+            NotificationService::notify(
+                NotificationRecipientResolver::saasSuperAdmins(),
+                new TicketCreatedNotification(
+                    $ticket->id,
+                    $ticket->subject,
+                    $companyName,
+                    $creator->name,
+                )
+            );
             DB::commit();
             Log::info('Ticket created successfully', ['ticket_id' => $ticket->id]);
 
@@ -270,36 +285,36 @@ class SupportTicketService
     /**
      * Toggle status
      */
- public function toggleStatus(int $id, string $newStatus): SupportTicket
-{
-    DB::beginTransaction();
-    try {
-        $ticket = $this->getTicketById($id);
+    public function toggleStatus(int $id, string $newStatus): SupportTicket
+    {
+        DB::beginTransaction();
+        try {
+            $ticket = $this->getTicketById($id);
 
-        $updateData = ['status' => $newStatus];
+            $updateData = ['status' => $newStatus];
 
-        // Close হলে response_status null করো
-        if ($newStatus == Status::Closed->value) {
-            $updateData['response_status'] = null;
+            // Close হলে response_status null করো
+            if ($newStatus == Status::Closed->value) {
+                $updateData['response_status'] = null;
+            }
+
+            $ticket->update($updateData);
+            LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
+
+            DB::commit();
+            return $ticket;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e; // original message/status code preserve
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to toggle status: ' . $e->getMessage(), [
+                'ticket_id' => $id,
+                'new_status' => $newStatus,
+            ]);
+            throw ApiException::serverError('Failed to toggle status');
         }
-
-        $ticket->update($updateData);
-        LogHelper::statusChanged('support_ticket', $ticket->id, $ticket->company_id);
-
-        DB::commit();
-        return $ticket;
-    } catch (ApiException $e) {
-        DB::rollBack();
-        throw $e; // original message/status code preserve
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Failed to toggle status: ' . $e->getMessage(), [
-            'ticket_id' => $id,
-            'new_status' => $newStatus,
-        ]);
-        throw ApiException::serverError('Failed to toggle status');
     }
-}
     /**
      * Store a ticket reply and update status automatically
      */
@@ -369,6 +384,35 @@ class SupportTicketService
             $ticket->save();
 
             DB::commit();
+
+            // ── Notifications ──
+            $actor = auth()->user();
+            $assignedUser = User::find($data['user_id']);
+
+            $recipients = collect([$assignedUser])->filter();
+
+            $isActorCompanySuperAdmin = $actor && !is_null($actor->company_id) && is_null($actor->role);
+
+            // company super admin-der shudhu tokhoni add koro jokhon:
+            // 1. ticket ekta company-r sathe linked (company_id null na)
+            // 2. actor nijei company super admin na
+            if (!is_null($ticket->company_id) && !$isActorCompanySuperAdmin) {
+                $companySuperAdmins = NotificationRecipientResolver::companySuperAdmin($ticket->company_id);
+                $recipients = $recipients->concat($companySuperAdmins);
+            }
+
+            NotificationService::notify(
+                $recipients,
+                new TicketAssignedNotification(
+                    $ticket->id,
+                    $ticket->subject,
+                    $ticket->company_id,
+                    $assignedUser->id,
+                    $assignedUser->name,
+                    $actor->name,
+                )
+            );
+
             return $ticket;
         } catch (\Exception $e) {
             DB::rollBack();

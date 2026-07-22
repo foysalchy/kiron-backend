@@ -3,9 +3,13 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Bin, Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger, VariationGallery, Warehouse};
+use App\Models\{Bin, Product, Gallery, ProductStockLedger, ProductVariation, ProductVariationAttribute, ProductVariationStock, ProductVariationStockLedger, User, VariationGallery, Warehouse};
 use App\Exceptions\ApiException;
 use App\Helpers\{FileUploadHelper, LogHelper};
+use App\Notifications\ProductAssignedNotification;
+use App\Notifications\ProductUnassignedNotification;
+use App\Services\Notification\NotificationRecipientResolver;
+use App\Services\Notification\NotificationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{Auth, DB, Log};
@@ -239,6 +243,31 @@ class ProductService
             ]);
 
             LogHelper::created('product', $product->id, $product->company_id);
+            if (!empty($product->assigned_to)) {
+                $assignedUser = User::find($product->assigned_to);
+
+                if ($assignedUser) {
+                    $actor = auth()->user();
+                    $recipients = collect([$assignedUser]);
+
+                    $isActorCompanySuperAdmin = $actor && !is_null($actor->company_id) && is_null($actor->role);
+
+                    if (!is_null($product->company_id) && !$isActorCompanySuperAdmin) {
+                        $companySuperAdmins = NotificationRecipientResolver::companySuperAdmin($product->company_id);
+                        $recipients = $recipients->concat($companySuperAdmins);
+                    }
+
+                    NotificationService::notify(
+                        $recipients,
+                        new ProductAssignedNotification(
+                            $product->id,
+                            $product->title,
+                            $product->company_id,
+                            $assignedUser->id,
+                        )
+                    );
+                }
+            }
 
             return $product->load([
                 'brand',
@@ -596,7 +625,7 @@ class ProductService
 
         try {
             $product = $this->getProductById($id);
-
+            $previousAssignedTo = $product->assigned_to;
             // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
                 $data['thumbnail'] = FileUploadHelper::replace(
@@ -636,7 +665,53 @@ class ProductService
 
             Log::info('Product updated successfully', ['product_id' => $product->id]);
             LogHelper::updated('product', $product->id, $product->company_id);
+            $newAssignedTo = $product->assigned_to;
 
+            if ($previousAssignedTo != $newAssignedTo) {
+                $actor = auth()->user();
+                $isActorCompanySuperAdmin = $actor && !is_null($actor->company_id) && is_null($actor->role);
+
+                $companySuperAdmins = collect();
+                if (!is_null($product->company_id) && !$isActorCompanySuperAdmin) {
+                    $companySuperAdmins = NotificationRecipientResolver::companySuperAdmin($product->company_id);
+                }
+
+                // Purano user remove
+                if (!empty($previousAssignedTo)) {
+                    $removedUser = User::find($previousAssignedTo);
+                    if ($removedUser) {
+                        $recipients = collect([$removedUser])->concat($companySuperAdmins);
+
+                        NotificationService::notify(
+                            $recipients,
+                            new ProductUnassignedNotification(
+                                $product->id,
+                                $product->title,
+                                $product->company_id,
+                                $removedUser->id,
+                            )
+                        );
+                    }
+                }
+
+                // Notun user assign
+                if (!empty($newAssignedTo)) {
+                    $assignedUser = User::find($newAssignedTo);
+                    if ($assignedUser) {
+                        $recipients = collect([$assignedUser])->concat($companySuperAdmins);
+
+                        NotificationService::notify(
+                            $recipients,
+                            new ProductAssignedNotification(
+                                $product->id,
+                                $product->title,
+                                $product->company_id,
+                                $assignedUser->id,
+                            )
+                        );
+                    }
+                }
+            }
             return $product->fresh([
                 'brand',
                 'galleries',

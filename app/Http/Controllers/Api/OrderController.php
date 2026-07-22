@@ -146,6 +146,13 @@ class OrderController extends Controller
 
         return ResponseHelper::success($data, 'Status Changed Successfully');
     }
+    public function deleteOrder($id)
+    {
+
+        $this->orderService->deleteOrder($id);
+
+        return ResponseHelper::success(null, 'Order Deleted.');
+    }
     /**
      * Update order 
      */

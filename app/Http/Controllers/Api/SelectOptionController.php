@@ -252,7 +252,7 @@ class SelectOptionController extends Controller
     }
     public function superAdminUserOptions()
     {
-        return User::where('is_super_admin', true)->select('id', 'name')->orderBy('name', 'asc')->get();
+        return User::whereNull('company_id')->select('id', 'name')->orderBy('name', 'asc')->get();
     }
     public function purchaseOptions()
     {

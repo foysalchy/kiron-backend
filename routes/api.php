@@ -80,6 +80,7 @@ use App\Http\Controllers\Api\MetaWebhookController;
 use App\Http\Controllers\Api\MetaDirectProxyController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OmniSettingsController;
 use App\Http\Controllers\Api\OrderController;
@@ -672,6 +673,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}', [OrderController::class, 'show']);
                     Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
                     Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);
+                    Route::delete('/{id}', [OrderController::class, 'deleteOrder']);
                     Route::put('/{id}/update', [OrderController::class, 'update']);
                     Route::post('/{id}/add-payment', [OrderController::class, 'addPayment']);
                     Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
@@ -1114,19 +1116,9 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}', [CourierController::class, 'destroy']);
                     Route::get('{id}/restore', [CourierController::class, 'restore']);
                     Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
-                    Route::patch('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
+                    Route::put('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
                 });
-                //sms-settings routes
-                Route::prefix('sms-settings')->group(function () {
-                    Route::get('/', [SmsSettingController::class, 'index']);
-                    Route::post('/', [SmsSettingController::class, 'store']);
-                    Route::get('/{id}', [SmsSettingController::class, 'show']);
-                    Route::post('/update/{id}', [SmsSettingController::class, 'update']);
-                    Route::delete('/{id}', [SmsSettingController::class, 'destroy']);
-                    Route::get('{id}/restore', [SmsSettingController::class, 'restore']);
-                    Route::delete('{id}/force', [SmsSettingController::class, 'forceDestroy']);
-                    Route::patch('/{id}/toggle-status', [SmsSettingController::class, 'toggleStatus']);
-                });
+        
                 //ip-directories routes
                 Route::prefix('ip-directories')->group(function () {
                     Route::get('/', [IpDirectoryController::class, 'index']);
@@ -1148,6 +1140,12 @@ Route::prefix('v1')->group(function () {
                     Route::get('{id}/restore', [IpSettingController::class, 'restore']);
                     Route::delete('{id}/force', [IpSettingController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [IpSettingController::class, 'toggleStatus']);
+                });
+                Route::prefix('notifications')->group(function () {
+                    Route::get('/', [NotificationController::class, 'index']);
+                    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+                    Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+                    Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
                 });
                 //support-departments routes
                 Route::prefix('support-departments')->group(function () {

@@ -95,7 +95,6 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('site_settings',            'Site Settings');
         $addCrud('settings_content',      'Content Settings');
         $addCrud('settings_payment',         'Payment Settings');
-        $addCrud('settings_sms',             'SMS Settings');
         $addCrud('settings_ip',              'IP Restriction Settings');
         $addCrud('settings_reminder',        'Reminder Settings');
         $addCrud('settings_meta',        'Meta Settings');
