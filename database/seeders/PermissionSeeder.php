@@ -216,7 +216,6 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_domain',         'Domain Settings',          'custom_domain');
         $addCrud('settings_ip',             'IP Restriction Settings',  'ip_restriction');
         $addCrud('woocommerce_integration', 'WooCommerce Integration',  'woocommerce_sync');
-        $addCrud('settings_sms',            'SMS Settings',             'settings_sms');
         $addCrud('settings_templates',      'Template Settings',        'settings_templates');
         $addCrud('settings_tax',          'Tax Settings',        'settings_tax');
         $addCrud('settings_content',      'Content Settings',        'settings_content');

@@ -213,6 +213,6 @@ class SiteSettingController extends Controller
     }
     public function basicData()
     {
-        return SiteSetting::select('id', 'company_id', 'logo', 'currency', 'currency_position')->first();
+        return SiteSetting::select('id', 'company_id', 'logo', 'favicon', 'currency', 'currency_position')->first();
     }
 }

@@ -3,9 +3,14 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{Order, OrderDetail, OrderPayment, Party, Product,Bin};
+use App\Models\{Order, OrderDetail, OrderPayment, Party, Product, Bin, User};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Notifications\OrderAssignedNotification;
+use App\Notifications\OrderCreatedNotification;
+use App\Notifications\OrderUnassignedNotification;
+use App\Services\Notification\NotificationRecipientResolver;
+use App\Services\Notification\NotificationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Hash, Log};
@@ -343,7 +348,10 @@ class OrderService
                     $data['customer_id'] ?? null
                 );
             }
-
+            NotificationService::notify(
+                NotificationRecipientResolver::companySuperAdmin($order->company_id),
+                new OrderCreatedNotification($order->id, $order->order_no, $order->company_id)
+            );
             LogHelper::created('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
             DB::commit();
 
@@ -707,6 +715,69 @@ class OrderService
             throw ApiException::serverError('Failed to change order status');
         }
     }
+
+    public function deleteOrder(int $id): void
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = Order::with([
+                'orderDetails.product',
+                'orderDetails.variation',
+            ])->find($id);
+
+            if (!$order) {
+                throw ApiException::notFound('Order not found');
+            }
+
+            $notDeletableStatuses = [
+                Status::HandovertoCourier->value,
+                Status::InTransit->value,
+                Status::Delivered->value,
+                Status::ReturntoCourier->value,
+                Status::ReturnReceived->value,
+                Status::Returned->value,
+                Status::Cancelled->value,
+            ];
+
+            if (in_array($order->status, $notDeletableStatuses)) {
+                throw ApiException::badRequest(
+                    'Order cannot be deleted after it has been shipped/handed over to courier.'
+                );
+            }
+
+            // Draft/Hold ছাড়া বাকি সব status এ stock আগে থেকেই deduct করা আছে, তাই restore করতে হবে
+            if (!in_array($order->status, [Status::Draft->value, Status::Hold->value])) {
+                $this->restoreOrderStock($order);
+            }
+
+            // Related records delete
+            $order->orderDetails()->delete();
+            $order->orderPayments()->delete();
+            $order->orderNotes()->delete();
+
+            $order->delete();
+
+            DB::commit();
+
+            Log::info('Order deleted', [
+                'order_id' => $id,
+                'status'   => $order->status,
+            ]);
+
+            LogHelper::statusChanged('orders', $order->id, $order->company_id, "Order deleted (was: {$order->status})");
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Order delete failed', [
+                'order_id' => $id,
+                'error'    => $e->getMessage(),
+            ]);
+            throw ApiException::serverError('Failed to delete order');
+        }
+    }
     public function assignUsers(int $id, array $userIds): array
     {
         $order = Order::findOrFail($id);
@@ -727,6 +798,41 @@ class OrderService
         $message = !empty($parts) ? implode(', ', $parts) : 'no changes';
 
         LogHelper::custom('assigned_users', 'orders', $id, $order->company_id, $message);
+
+        // ── Notifications ──
+        $companySuperAdmins = NotificationRecipientResolver::companySuperAdmin($order->company_id);
+
+        if (!empty($added)) {
+            $addedUsers = User::whereIn('id', $added)->get();
+            $recipients = $companySuperAdmins->concat($addedUsers);
+
+            NotificationService::notify(
+                $recipients,
+                new OrderAssignedNotification(
+                    $order->id,
+                    $order->order_no,
+                    $order->company_id,
+                    $addedUsers->pluck('id')->all(),
+                    $addedUsers->pluck('name')->all(),
+                )
+            );
+        }
+
+        if (!empty($removed)) {
+            $removedUsers = User::whereIn('id', $removed)->get();
+            $recipients = $companySuperAdmins->concat($removedUsers);
+
+            NotificationService::notify(
+                $recipients,
+                new OrderUnassignedNotification(
+                    $order->id,
+                    $order->order_no,
+                    $order->company_id,
+                    $removedUsers->pluck('id')->all(),
+                    $removedUsers->pluck('name')->all(),
+                )
+            );
+        }
 
         return [
             'order_id'    => $order->id,
@@ -892,12 +998,12 @@ class OrderService
             Log::warning("Skipping stock deduction: Warehouse ID is missing for Order #{$order->id}");
             return;
         }
-        
 
-        if($item['bin_id']){
-            $warehouseId=Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
+
+        if ($item['bin_id']) {
+            $warehouseId = Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
         }
-       
+
         $stockData = [
             'warehouse_id' => $warehouseId,
             'bin_id' => $item['bin_id'] ?? null,

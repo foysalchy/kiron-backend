@@ -17,6 +17,7 @@ use App\Models\Permission;
 use App\Models\Pricing;
 use App\Models\PricingPackage;
 use App\Models\SiteSetting;
+use App\Models\SmsTemplate;
 use App\Models\SystemPage;
 use App\Models\User;
 use App\Models\UserLoginHistory;
@@ -267,7 +268,24 @@ class CompanyRegistrationService
                 'is_default' => 1,
                 'status' => Status::Active->value
             ]);
+            $smsTemplates = [
+                ['title' => 'Order Place',     'description' => 'Your order has been placed successfully.'],
+                ['title' => 'Order Confirm',   'description' => 'Your order has been confirmed.'],
+                ['title' => 'Order Shipped',   'description' => 'Your order has been shipped.'],
+                ['title' => 'Order Delivered', 'description' => 'Your order has been delivered successfully.'],
+                ['title' => 'Cancel Order',    'description' => 'Your order has been cancelled.'],
+                ['title' => 'Follow Up',       'description' => 'This is a follow-up message regarding your order.'],
+            ];
 
+            foreach ($smsTemplates as $template) {
+                SmsTemplate::create([
+                    'company_id'  => $company->id,
+                    'title'       => $template['title'],
+                    'description' => $template['description'],
+                    'is_default' => 1,
+                    'status'      => Status::Active->value,
+                ]);
+            }
             DB::commit();
 
             Log::info("Basic settings saved and company_id: {$company->id} marked as Active.");
