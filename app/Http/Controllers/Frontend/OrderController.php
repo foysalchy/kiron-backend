@@ -26,7 +26,7 @@ class OrderController extends FrontendController
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
         $paymentMethods = CustomerPaymentMethod::where('company_id', $this->company_id)->where('status', Status::Active->value)
-            ->select(['id', 'company_id', 'name', 'account_number', 'phone', 'method_details', 'status'])->get();
+            ->select(['id', 'company_id', 'name', 'account_number', 'method_details', 'status'])->get();
 
         $existingDraftId = Session::get('current_draft_order_id');
         $existingDraft   = $existingDraftId

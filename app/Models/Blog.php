@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use App\Traits\HasHomepageCache;
+use App\Traits\HasSaasCache;
 use App\Traits\HasSlugCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Blog extends Model
 {
-    use SoftDeletes, CompanyScoped, HasSlugCache, HasHomepageCache;
+    use SoftDeletes, CompanyScoped, HasSlugCache, HasHomepageCache, HasSaasCache;
 
 
     protected $fillable = [
@@ -41,6 +42,14 @@ class Blog extends Model
     public static function homepageCacheKeys(): array
     {
         return ['blog_tags', 'blog_related'];
+    }
+    public static function saasCacheKeys(): array
+    {
+        return ['saas_home_latest_blogs'];
+    }
+    public static function clearPaginatedCache()
+    {
+        self::clearPaginatedSaasCache('saas_blogs');
     }
     // Relationships
     public function company(): BelongsTo

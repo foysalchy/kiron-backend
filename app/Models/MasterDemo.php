@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Traits\HasSaasCache;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,13 +11,13 @@ use Illuminate\Support\Facades\Storage;
 
 class MasterDemo extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes,HasSaasCache;
 
     protected $fillable = [
         'title',
         'image',
         'link',
-           'slug',
+        'slug',
         'type',
         'status',
         'meta_title',
@@ -32,7 +33,10 @@ class MasterDemo extends Model
     protected $casts = [
         'status' => Status::class,
     ];
-
+    public static function saasCacheKeys(): array
+    {
+        return ['saas_home_demos'];
+    }
     public function getImageUrlAttribute(): ?string
     {
         return $this->image

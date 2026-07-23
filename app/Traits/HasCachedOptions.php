@@ -21,7 +21,7 @@ trait HasCachedOptions
         return Cache::remember(
             self::optionsCacheKey($companyId),
             now()->addHours(24),
-            fn () => self::query()
+            fn() => self::query()
                 ->select($selectColumns)
                 ->orderBy('name')
                 ->get()

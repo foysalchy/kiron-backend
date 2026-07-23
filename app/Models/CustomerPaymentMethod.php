@@ -17,8 +17,6 @@ class CustomerPaymentMethod extends Model
         'method_details',
         'account_holder',
         'account_number',
-        'contact_name',
-        'phone',
         'status',
     ];
     protected $hidden = ['deleted_at'];

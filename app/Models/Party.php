@@ -18,6 +18,7 @@ class Party extends Authenticatable
     // Type constants
     const TYPE_SUPPLIER = 1;
     const TYPE_CUSTOMER = 2;
+    
 
     protected $fillable = [
         'company_id',

@@ -2,13 +2,19 @@
 
 namespace App\Models;
 
+use App\Traits\HasSaasCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 
 class MasterBrand extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasSaasCache;
+
+    public static function saasCacheKeys(): array
+    {
+        return ['saas_home_brands'];
+    }
     protected $fillable = [
         'name',
         'logo',

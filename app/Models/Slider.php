@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\CompanyScoped;
 use App\Traits\HasHomepageCache;
+use App\Traits\HasSaasCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Slider extends Model
 {
-    use SoftDeletes, CompanyScoped, HasHomepageCache;
+    use SoftDeletes, CompanyScoped, HasHomepageCache, HasSaasCache;
 
 
     protected $fillable = [
@@ -30,6 +31,10 @@ class Slider extends Model
     public static function homepageCacheKeys(): array
     {
         return ['home_sliders'];
+    }
+    public static function saasCacheKeys(): array
+    {
+        return ['saas_home_sliders'];
     }
     // Relationships
     public function company(): BelongsTo
