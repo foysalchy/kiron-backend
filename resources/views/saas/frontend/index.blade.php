@@ -1134,11 +1134,11 @@
                             <!-- Left Icon -->
                             <div class="flex-shrink-0">
                                 <div
-                                    class="w-12 h-12    rounded
+                                    class="w-16 h-16    rounded
                    border border-white/20
                    flex items-center justify-center">
                                     @if( $feature->image_url)
-                                      <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-18" alt=" {{ $feature->title }}"    />
+                                      <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-16" alt=" {{ $feature->title }}"    />
                                     @else
                                     <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
                                     @endif
