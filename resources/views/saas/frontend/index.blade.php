@@ -1137,7 +1137,11 @@
                                     class="w-12 h-12  bg-[#00555c21] rounded
                    border border-white/20
                    flex items-center justify-center">
+                                    @if( $feature->image_url)
+                                      <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-12" alt=" {{ $feature->title }}"    />
+                                    @else
                                     <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                                    @endif
                                 </div>
                             </div>
 

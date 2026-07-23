@@ -49,7 +49,7 @@ class IndexController extends Controller
         $topFeatures = Cache::remember('saas_home_top_features', $this->ttl, function () {
             return MasterFeature::where('status', Status::Active->value)
                 ->where('placement', 1)
-                ->select('title', 'subtitle', 'icon', 'slug')
+                ->select('title', 'subtitle', 'icon', 'slug','image')
                 ->get();
         });
 
