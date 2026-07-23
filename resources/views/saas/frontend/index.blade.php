@@ -1134,7 +1134,7 @@
                             <!-- Left Icon -->
                             <div class="flex-shrink-0">
                                 <div
-                                    class="w-12 h-12  bg-[#00555c21] rounded
+                                    class="w-12 h-12    rounded
                    border border-white/20
                    flex items-center justify-center">
                                     @if( $feature->image_url)
