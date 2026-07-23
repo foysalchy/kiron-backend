@@ -48,8 +48,6 @@ class Company extends Model
                 'company_id'     => $company->id,
                 'name'           => 'Cash on Delivery',
                 'type'           => 'Manual',
-                'contact_name'   => 'System',
-                'phone'          => $company->phone,
                 'is_deletable'   => false,
                 'status'         => Status::Active->value,
             ]);

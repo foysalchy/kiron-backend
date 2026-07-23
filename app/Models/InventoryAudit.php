@@ -34,41 +34,6 @@ class InventoryAudit extends Model
         'audit_type_label',
     ];
 
-    /**
-     * Boot method to auto-generate audit number
-     */
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($audit) {
-            if (!$audit->audit_number) {
-                $audit->audit_number = self::generateAuditNumber($audit->company_id);
-            }
-        });
-    }
-
-    /**
-     * Generate unique audit number: AUD-YYYYMM0001
-     */
-    public static function generateAuditNumber(int $companyId): string
-    {
-        $prefix = 'AUD-' . now()->format('Ym');
-
-        $lastAudit = self::where('company_id', $companyId)
-            ->where('audit_number', 'like', $prefix . '%')
-            ->orderBy('audit_number', 'desc')
-            ->first();
-
-        if ($lastAudit) {
-            $lastNumber = (int) substr($lastAudit->audit_number, -4);
-            $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-        } else {
-            $newNumber = '0001';
-        }
-
-        return $prefix . $newNumber;
-    }
 
     /**
      * Relationships

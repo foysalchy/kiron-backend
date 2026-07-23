@@ -149,22 +149,19 @@ class IndexController extends Controller
 
     public function featureDetails($slug)
     {
-        // স্লাগ ভিত্তিক নির্দিষ্ট ফিচারের ক্যাশ
         $feature = Cache::remember("saas_feature_details_{$slug}", $this->ttl, function () use ($slug) {
             return MasterFeature::where('slug', $slug)
                 ->where('status', Status::Active->value)
                 ->firstOrFail();
         });
 
-        // অন্যান্য সাজেস্টেড ফিচার ক্যাশ
-        $otherFeatures = Cache::remember("saas_other_features_for_{$slug}", $this->ttl, function () use ($feature) {
-            return MasterFeature::where('status', Status::Active->value)
-                ->where('id', '!=', $feature->id)
-                ->where('placement', 1)
-                ->take(4)
-                ->select('id', 'slug', 'title', 'icon')
-                ->get();
-        });
+        // cache ছাড়া সরাসরি - lightweight query, cache করার দরকার নাই
+        $otherFeatures = MasterFeature::where('status', Status::Active->value)
+            ->where('id', '!=', $feature->id)
+            ->where('placement', 1)
+            ->take(4)
+            ->select('id', 'slug', 'title', 'icon')
+            ->get();
 
         return view('saas.frontend.featureDetails', compact('feature', 'otherFeatures'));
     }
@@ -195,15 +192,13 @@ class IndexController extends Controller
                 ->firstOrFail();
         });
 
-        $otherBlogPosts = Cache::remember("saas_other_blogs_for_{$slug}", $this->ttl, function () use ($blogPost) {
-            return Blog::withoutCompanyScope()
-                ->with('company')
-                ->where('status', Status::Active->value)
-                ->where('id', '!=', $blogPost->id)
-                ->latest()
-                ->take(4)
-                ->get(['id', 'title', 'slug', 'images', 'created_at', 'short']);
-        });
+        $otherBlogPosts = Blog::withoutCompanyScope()
+            ->with('company')
+            ->where('status', Status::Active->value)
+            ->where('id', '!=', $blogPost->id)
+            ->latest()
+            ->take(4)
+            ->get(['id', 'title', 'slug', 'images', 'created_at', 'short']);
 
         return view('saas.frontend.blogDetails', compact('blogPost', 'otherBlogPosts'));
     }

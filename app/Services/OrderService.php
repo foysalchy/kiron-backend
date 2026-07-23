@@ -214,9 +214,12 @@ class OrderService
         $dueAmount = isset($data['due_amount']) ? (float) $data['due_amount'] : 0;
 
         if ($isDue && $dueAmount > 0 && !empty($data['customer_id'])) {
-            Party::where('id', $data['customer_id'])
-                ->increment('due_amount', $dueAmount);
+            Party::where('id', $data['customer_id'])->update([
+                'due_amount' => DB::raw("due_amount + {$dueAmount}"),
+                'balance'    => DB::raw('balance - ?'),
+            ]);
         }
+
 
         return $order;
     }

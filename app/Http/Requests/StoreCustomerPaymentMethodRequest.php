@@ -21,8 +21,6 @@ class StoreCustomerPaymentMethodRequest extends FormRequest
             'method_details' => ['nullable', 'array'],
             'account_holder' => ['nullable', 'string', 'max:150'],
             'account_number' => ['nullable', 'string', 'max:50'],
-            'contact_name'   => ['required', 'string', 'max:150'],
-            'phone'          => ['required', 'string', 'max:20'],
             'status'         => ['nullable', 'integer'],
         ];
     }

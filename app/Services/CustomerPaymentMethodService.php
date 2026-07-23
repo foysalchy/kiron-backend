@@ -73,9 +73,8 @@ class CustomerPaymentMethodService
                 $search = $filters['search'];
                 $query->where(function ($q) use ($search) {
                     $q->where('account_holder', 'like', "%{$search}%")
-                        ->orWhere('account_number', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('contact_name', 'like', "%{$search}%");
+                        ->orWhere('account_number', 'like', "%{$search}%");
+                   
                 });
             }
 

@@ -7,6 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\PartyActivity;
+use App\Models\User;
+use App\Notifications\OmnichannelAssignedNotification;
+use App\Notifications\OmnichannelUnassignedNotification;
+use App\Services\Notification\NotificationRecipientResolver;
+use App\Services\Notification\NotificationService;
 use Illuminate\Http\Request;
 
 class ConversationController extends Controller
@@ -80,7 +85,53 @@ class ConversationController extends Controller
 
         $data = $request->validate(['user_id' => 'required|exists:users,id']);
 
+        $previousUserId = $conversation->assigned_user_id;
+
         $conversation->update(['assigned_user_id' => $data['user_id']]);
+
+        // ── Notifications ──
+        if ($previousUserId != $data['user_id']) {
+            $actor = $request->user();
+            $isActorCompanySuperAdmin = !is_null($actor->company_id) && is_null($actor->role);
+
+            $companySuperAdmins = collect();
+            if (!is_null($conversation->company_id) && !$isActorCompanySuperAdmin) {
+                $companySuperAdmins = NotificationRecipientResolver::companySuperAdmin($conversation->company_id);
+            }
+
+            // Purano user remove
+            if (!empty($previousUserId)) {
+                $removedUser = User::find($previousUserId);
+                if ($removedUser) {
+                    $recipients = collect([$removedUser])->concat($companySuperAdmins);
+
+                    NotificationService::notify(
+                        $recipients,
+                        new OmnichannelUnassignedNotification(
+                            $conversation->id,
+                            $conversation->company_id,
+                            $removedUser->id,
+                        )
+                    );
+                }
+            }
+
+            // Notun user assign
+            $assignedUser = User::find($data['user_id']);
+            if ($assignedUser) {
+                $recipients = collect([$assignedUser])->concat($companySuperAdmins);
+
+                NotificationService::notify(
+                    $recipients,
+                    new OmnichannelAssignedNotification(
+                        $conversation->id,
+                        $conversation->company_id,
+                        $assignedUser->id,
+                        $actor->name,
+                    )
+                );
+            }
+        }
 
         return response()->json($conversation->fresh(['assignedUser']));
     }

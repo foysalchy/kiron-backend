@@ -43,11 +43,11 @@ class PartyService
             }
             if (isset($filters['balance'])) {
                 if ($filters['balance'] === 'pay') {
-                    // Balance < 0
-                    $query->whereRaw('(balance + 0) < 0');
-                } elseif ($filters['balance'] === 'receive') {
                     // Balance > 0
                     $query->whereRaw('(balance + 0) > 0');
+                } elseif ($filters['balance'] === 'receive') {
+                    // Balance < 0
+                    $query->whereRaw('(balance + 0) < 0');
                 }
             }
 
@@ -110,29 +110,29 @@ class PartyService
 
         return $party;
     }
-public function getSupplierProfile(int $id): Party
-{
-    $party = Party::with([
-        'logs.user:id,name',
-        'purchases' => fn($q) => $q->latest()
-            ->select([
-                'id',
-                'supplier_id',
-                'reference_no',
-                'purchase_date',
-                'status',
-                'total_quantities',
-                'grand_total',
-            ])
-            ->withSum('payments', 'amount'),
-    ])->suppliers()->find($id);
+    public function getSupplierProfile(int $id): Party
+    {
+        $party = Party::with([
+            'logs.user:id,name',
+            'purchases' => fn($q) => $q->latest()
+                ->select([
+                    'id',
+                    'supplier_id',
+                    'reference_no',
+                    'purchase_date',
+                    'status',
+                    'total_quantities',
+                    'grand_total',
+                ])
+                ->withSum('payments', 'amount'),
+        ])->suppliers()->find($id);
 
-    if (!$party) {
-        throw ApiException::notFound('Supplier');
+        if (!$party) {
+            throw ApiException::notFound('Supplier');
+        }
+
+        return $party;
     }
-
-    return $party;
-}
     /**
      * Create a new party
      */
@@ -151,7 +151,7 @@ public function getSupplierProfile(int $id): Party
             }
             $data['password'] = Hash::make($data['password']);
             $party = Party::create($data);
-            
+
             LogHelper::created('party', $party->id, $party->company_id, $party->type_text . " created");
 
             DB::commit();
@@ -435,7 +435,7 @@ public function getSupplierProfile(int $id): Party
 
         return [
             'imported' => $import->getRowCount(),
-            'skipped'  => $import->getSkippedCount(), 
+            'skipped'  => $import->getSkippedCount(),
             'failed'   => $import->getFailedRows(),
         ];
     }

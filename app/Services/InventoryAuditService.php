@@ -121,6 +121,9 @@ class InventoryAuditService
             $data['created_by'] = Auth::id();
             $data['status'] = Status::Pending->value;
 
+            // Lock দিয়ে audit_number generate করা - race condition আটকাতে
+            $data['audit_number'] = $this->generateAuditNumber($data['company_id']);
+
             // Create audit
             $audit = InventoryAudit::create($data);
 
@@ -143,6 +146,25 @@ class InventoryAuditService
             Log::error('Inventory audit creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create inventory audit: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Race-condition safe audit number generator
+     */
+    private function generateAuditNumber(int $companyId): string
+    {
+        $lastAudit = InventoryAudit::where('company_id', $companyId)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->orderBy('id', 'desc')
+            ->lockForUpdate()
+            ->first();
+
+        $nextNumber = $lastAudit
+            ? (intval(substr($lastAudit->audit_number, -4)) + 1)
+            : 1;
+
+        return 'AUD-' . now()->format('Ym') . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -433,7 +455,7 @@ class InventoryAuditService
             ];
         })->toArray();
 
-    
+
 
         $this->stockAdjustmentService->createAdjustment([
             'company_id' => $audit->company_id,

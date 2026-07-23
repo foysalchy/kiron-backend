@@ -20,8 +20,6 @@ class UpdateCustomerPaymentMethodRequest extends FormRequest
             'type'           => ['sometimes', 'required', 'string'],
             'icon'           => ['sometimes', 'nullable', 'image', 'mimes:jpeg,png,jpg,svg,webp', 'max:2048'],
             'method_details' => ['nullable', 'array'],
-            'contact_name'   => ['sometimes', 'required', 'string', 'max:255'],
-            'phone'          => ['sometimes', 'required', 'string', 'max:20'],
             'account_holder' => ['nullable', 'string', 'max:255'],
             'account_number' => ['nullable', 'string', 'max:100'],
             'status'         => ['sometimes', 'integer', 'in:0,1'],
