@@ -10,7 +10,7 @@ use App\Models\WooCommerceIntegration;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
-
+use Illuminate\Support\Facades\Http;
 class WocommerceSettingService
 {
     /**
@@ -70,19 +70,70 @@ class WocommerceSettingService
     public function createSetting(array $data): WocommerceSetting
     {
         DB::beginTransaction();
+
         try {
+
+            $storeInfo = $this->fetchStoreInfo($data);
+
+            $data['name'] = $storeInfo['name'];
+            $data['logo'] = $storeInfo['logo'];
+
             $setting = WocommerceSetting::create($data);
 
-            LogHelper::created('woocommerce_setting', $setting->id, $setting->company_id, $setting->domain_url);
+            LogHelper::created(
+                'woocommerce_setting',
+                $setting->id,
+                $setting->company_id,
+                $setting->domain_url
+            );
 
             DB::commit();
-            Log::info('WooCommerce setting created successfully', ['id' => $setting->id]);
 
             return $setting;
+
         } catch (\Exception $e) {
+
             DB::rollBack();
-            Log::error('WooCommerce setting creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create setting: ' . $e->getMessage());
+
+            Log::error('WooCommerce setting creation failed: '.$e->getMessage());
+
+            throw ApiException::serverError(
+                'Failed to create setting: '.$e->getMessage()
+            );
+        }
+    }
+    private function fetchStoreInfo(array $data): array
+    {
+        $baseUrl = rtrim($data['domain_url'], '/');
+
+        try {
+            $response = Http::withBasicAuth(
+                $data['consumer_key'],
+                $data['consumer_secret']
+            )->get($baseUrl . '/wp-json');
+
+            if (!$response->successful()) {
+                return [
+                    'name' => null,
+                    'logo' => null,
+                ];
+            }
+
+            $json = $response->json();
+
+            return [
+                'name' => $json['name'] ?? null,
+                'logo' => $baseUrl . '/favicon.ico', // fallback logo
+            ];
+        } catch (\Throwable $e) {
+            Log::warning('Unable to fetch WooCommerce store info', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return [
+                'name' => null,
+                'logo' => null,
+            ];
         }
     }
 

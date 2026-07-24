@@ -14,6 +14,8 @@ class WocommerceSetting extends Model
 
     protected $fillable = [
         'company_id',
+        'name',
+        'logo',
         'domain_url',
         'consumer_key',
         'consumer_secret',
