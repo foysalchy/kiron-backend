@@ -95,46 +95,68 @@ class WocommerceSettingService
 
             DB::rollBack();
 
-            Log::error('WooCommerce setting creation failed: '.$e->getMessage());
-
-            throw ApiException::serverError(
-                'Failed to create setting: '.$e->getMessage()
-            );
-        }
-    }
-    private function fetchStoreInfo(array $data): array
-    {
-        $baseUrl = rtrim($data['domain_url'], '/');
-
-        try {
-            $response = Http::withBasicAuth(
-                $data['consumer_key'],
-                $data['consumer_secret']
-            )->get($baseUrl . '/wp-json');
-
-            if (!$response->successful()) {
-                return [
-                    'name' => null,
-                    'logo' => null,
-                ];
-            }
-
-            $json = $response->json();
-
-            return [
-                'name' => $json['name'] ?? null,
-                'logo' => $baseUrl . '/favicon.ico', // fallback logo
-            ];
-        } catch (\Throwable $e) {
-            Log::warning('Unable to fetch WooCommerce store info', [
+            Log::error('WooCommerce setting creation failed', [
                 'message' => $e->getMessage(),
             ]);
 
-            return [
-                'name' => null,
-                'logo' => null,
-            ];
+            throw ApiException::serverError(
+                $e->getMessage()
+            );
         }
+    }
+
+    private function fetchStoreInfo(array $data): array
+    {
+        $domain = trim($data['domain_url']);
+
+        // Add https:// if missing
+        if (!preg_match('/^https?:\/\//i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
+        $domain = rtrim($domain, '/');
+
+        // Validate WooCommerce credentials
+        $wcResponse = Http::timeout(15)
+            ->withBasicAuth(
+                $data['consumer_key'],
+                $data['consumer_secret']
+            )
+            ->get($domain . '/wp-json/wc/v3/products', [
+                'per_page' => 1,
+            ]);
+
+        if (!$wcResponse->successful()) {
+
+            $message = $wcResponse->json()['message'] ?? 'Invalid WooCommerce credentials.';
+
+            throw new \Exception($message);
+        }
+
+        // Fetch WordPress information
+        $wpResponse = Http::timeout(15)
+            ->get($domain . '/wp-json');
+
+        if (!$wpResponse->successful()) {
+            throw new \Exception('Unable to fetch store information.');
+        }
+
+        $wp = $wpResponse->json();
+
+        $name = $wp['name'] ?? 'WooCommerce Store';
+
+        // Default logo
+        $logo = $domain . '/favicon.ico';
+
+        // WordPress Site Icon
+        if (!empty($wp['site_icon_url'])) {
+            $logo = $wp['site_icon_url'];
+        }
+
+        return [
+            'name' => $name,
+            'logo' => $logo,
+        ];
     }
 
     /**
