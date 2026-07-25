@@ -19,6 +19,7 @@ class WocommerceSetting extends Model
         'domain_url',
         'consumer_key',
         'consumer_secret',
+        'sync',
         'status',
     ];
     protected $hidden = ['deleted_at'];

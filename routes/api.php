@@ -1061,6 +1061,8 @@ Route::prefix('v1')->group(function () {
                     Route::get('{id}/restore', [WocommerceSettingController::class, 'restore']);
                     Route::delete('{id}/force', [WocommerceSettingController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
+                    Route::Put('/{id}/toggle-sync', [WocommerceSettingController::class, 'toggleSync']);
+                    Route::get('/import/{id}',[WocommerceSettingController::class, 'import']);
                 });
                 //note template settings routes
                 Route::prefix('note-templates')->group(function () {

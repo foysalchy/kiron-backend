@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request;
 class WocommerceSettingService
 {
     /**
@@ -288,5 +289,112 @@ class WocommerceSettingService
             Log::error('WooCommerce status toggle failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to toggle status');
         }
+    }
+     /**
+     * Toggle Sync (Active/Inactive)
+     */
+    public function toggleSync(int $id): WocommerceSetting
+    {
+        DB::beginTransaction();
+        try {
+            $setting = $this->getSettingById($id);
+
+     
+            $newStatus = $setting->sync === 1
+                ? 0
+                : 1;
+
+            $setting->update(['sync' => $newStatus]);
+
+            LogHelper::statusChanged(
+                'woocommerce_setting',
+                $setting->id,
+                $setting->company_id,
+                $setting->domain_url . ' new sync ' . $newStatus
+            );
+
+            DB::commit();
+            return $setting;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('WooCommerce status sync failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to sync status');
+        }
+    }
+    public function importProducts(int $id, Request $request): array
+    {
+        $setting = WocommerceSetting::find($id);
+
+        if (!$setting) {
+            throw ApiException::notFound('WooCommerce setting not found.');
+        }
+
+        $domain = trim($setting->domain_url);
+
+        if (!preg_match('/^https?:\/\//i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
+        $domain = rtrim($domain, '/');
+
+        $page = (int) $request->get('page', 1);
+        $perPage = (int) $request->get('per_page', 50);
+
+        $response = Http::timeout(30)
+    ->withBasicAuth(
+        $setting->consumer_key,
+        $setting->consumer_secret
+    )
+    ->get($domain . '/wp-json/wc/v3/products', [
+        'page' => $page,
+        'per_page' => $perPage,
+    ]);
+
+    if (!$response->successful()) {
+        throw ApiException::serverError(
+            $response->json()['message'] ?? 'Unable to fetch WooCommerce products.'
+        );
+    }
+
+    $products = $response->json();
+
+    foreach ($products as &$product) {
+
+        // Variable product হলে variations fetch করুন
+        if (($product['type'] ?? '') === 'variable') {
+
+            $variationResponse = Http::timeout(30)
+                ->withBasicAuth(
+                    $setting->consumer_key,
+                    $setting->consumer_secret
+                )
+                ->get($domain . "/wp-json/wc/v3/products/{$product['id']}/variations");
+
+            if ($variationResponse->successful()) {
+                $product['variations'] = $variationResponse->json();
+
+                // সব variation-এর stock যোগ করে parent stock বানানো (optional)
+                $product['total_stock'] = collect($product['variations'])
+                    ->sum(function ($variation) {
+                        return $variation['stock_quantity'] ?? 0;
+                    });
+            } else {
+                $product['variations'] = [];
+                $product['total_stock'] = 0;
+            }
+        } else {
+            // Simple product
+            $product['variations'] = [];
+            $product['total_stock'] = $product['stock_quantity'] ?? 0;
+        }
+    }
+
+    return [
+        'current_page' => $page,
+        'last_page' => (int) $response->header('X-WP-TotalPages'),
+        'per_page' => $perPage,
+        'total' => (int) $response->header('X-WP-Total'),
+        'data' => $products,
+    ];
     }
 }
