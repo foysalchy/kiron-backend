@@ -41,7 +41,7 @@
         <div class="container mx-auto">
 
             <div class="text-center mb-20">
-                <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan</h1>
+                <h1 class="move-up text-4xl md:text-5xl font-black text-gray-900 mb-5 tracking-tight">Choose the Right Plan</h1>
                 <p class="text-gray-500 text-lg">The best packages for your business are listed below.</p>
             </div>
 

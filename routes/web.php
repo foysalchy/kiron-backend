@@ -107,5 +107,5 @@ Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductControlle
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 
-    // Route::get('/kiron', [IndexController::class, 'index'])->name('kiron.index');
+    // Route::get('/kiron', [SaasIndexController::class, 'home'])->name('kiron.index');
 });

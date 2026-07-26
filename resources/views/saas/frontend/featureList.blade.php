@@ -37,7 +37,7 @@
     <section class="bg-[#00555c] pt-32 pb-20 relative overflow-hidden">
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full"></div>
         <div class="container mx-auto px-6 text-center relative z-10">
-            <h1 class="text-white text-4xl md:text-6xl font-black mb-6">Our Features</h1>
+            <h1 class="move-up text-white text-4xl md:text-6xl font-black mb-6">Our Features</h1>
             <p class="text-gray-800 text-lg md:text-xl max-w-2xl mx-auto">
                 Stay updated with the latest trends, tips, and guides on business growth, modern technology, and e-commerce solutions.
             </p>
