@@ -42,6 +42,7 @@
             gap: 24px;
             /* width:max-content; */
         }
+
         .float-anim {
             animation: heroFloat 4s ease-in-out infinite;
             transform-origin: center;
@@ -90,17 +91,17 @@
         }
 
         /* .animated-text {
-            background: linear-gradient(90deg,
-                    #00555c,
-                    #4fd1c5,
-                    #7c3aed,
-                    #00555c);
-            background-size: 300% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: textGradient 4s linear infinite;
-        } */
+                background: linear-gradient(90deg,
+                        #00555c,
+                        #4fd1c5,
+                        #7c3aed,
+                        #00555c);
+                background-size: 300% 100%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                color: transparent;
+                animation: textGradient 4s linear infinite;
+            } */
 
         @keyframes textGradient {
             0% {
@@ -127,35 +128,36 @@
             pointer-events: none;
         }
 
-       .hero-pagination .swiper-pagination-bullet {
-        width: 10px;
-        height: 10px;
-        background: rgba(255, 255, 255, 0.3) !important;
-        opacity: 1 !important;
-        border-radius: 50%;
-        transition: all 0.4s ease;
-        cursor: pointer;
-        margin: 0 8px !important;
-        position: relative;
-    }
+        .hero-pagination .swiper-pagination-bullet {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3) !important;
+            opacity: 1 !important;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            margin: 0 8px !important;
+            position: relative;
+        }
 
-    .hero-pagination .swiper-pagination-bullet-active {
-        width: 45px !important;
-        background: #ffffff !important;
-        border-radius: 20px;
-    }
+        .hero-pagination .swiper-pagination-bullet-active {
+            width: 45px !important;
+            background: #ffffff !important;
+            border-radius: 20px;
+        }
 
-    .hero-pagination .swiper-pagination-bullet::before {
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 48px; /* লাইটহাউসের রিকোয়ারমেন্ট */
-        height: 48px;
-        background: transparent;
-        z-index: 1;
-    }
+        .hero-pagination .swiper-pagination-bullet::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            /* লাইটহাউসের রিকোয়ারমেন্ট */
+            height: 48px;
+            background: transparent;
+            z-index: 1;
+        }
 
         .line-clamp-3 {
             display: -webkit-box;
@@ -478,13 +480,15 @@
                         <div
                             class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
-                            <div class="text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
-                                @if($key == 0)
-                                    <h1 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                            <div class="scroll-wrapper text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
+                                @if ($key == 0)
+                                    <h1
+                                        class="move-up text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
                                         {{ $slider->title }}
                                     </h1>
                                 @else
-                                    <h2 class="text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
+                                    <h2
+                                        class="move-up text-white text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 line-clamp-2">
                                         {{ $slider->title }}
                                     </h2>
                                 @endif
@@ -521,7 +525,7 @@
                                 </div>
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
-                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}" 
+                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
                                         class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
                                         alt="Core Platform" />
                                 </div>
@@ -571,13 +575,12 @@
                     All-in-One Solution
                 </span>
 
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 mb-4">
+                <h2 class="move-up text-2xl md:text-4xl animated-text font-extrabold text-gray-900 mb-4" data-speed="0.05">
                     From Start to Growth — Everything in One System
                 </h2>
 
                 <!-- Tabs -->
-                <div class=" p-1.5  gap-2 rounded-2xl w-full  "
-                    id="solution-tabs">
+                <div class=" p-1.5  gap-2 rounded-2xl w-full  " id="solution-tabs">
 
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
@@ -629,7 +632,7 @@
 
         </div>
     </section>
-    
+
     <!-- INTEGRATION SECTION -->
     <section class="bg-black integrate-bg py-20 px-4 md:px-10 overflow-hidden " id="intergation">
         <div class="max-w-[1400px] mx-auto">
@@ -640,14 +643,14 @@
                     class="inline-block px-6 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-bold text-[14px] mb-6 uppercase tracking-wider">
                     Smart Integration
                 </span>
-                <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-white mb-10">
+                <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-white mb-10" data-speed="0.05">
                     Track and automate your entire business
                 </h2>
 
             </div>
 
             <!-- <div class="integration-section pt-10">
-                <div class="pin-wrap"> -->
+                    <div class="pin-wrap"> -->
             <div class="  pt-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
@@ -1109,7 +1112,7 @@
             </div>
         </div>
     </section> --}}
-   
+
     <!-- FEATURES SECTION -->
     @if ($topFeatures->isNotEmpty())
         <section class="bg-white py-10">
@@ -1120,7 +1123,7 @@
                         class="inline-block px-5 md:px-8 py-1.5 md:py-2.5 rounded-full border border-indigo-100 bg-indigo-50/50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Features
                     </span>
-                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 ">
+                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900 " data-speed="0.05">
                         Everything you need for your business <br class="hidden md:block" />
                         now in one place
                     </h2>
@@ -1137,10 +1140,12 @@
                                     class="w-16 h-16    rounded
                    border border-white/20
                    flex items-center justify-center">
-                                    @if( $feature->image_url)
-                                      <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-16" alt=" {{ $feature->title }}"    />
+                                    @if ($feature->image_url)
+                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}"
+                                            class="w-16" alt=" {{ $feature->title }}" />
                                     @else
-                                    <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                                        <i
+                                            class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
                                     @endif
                                 </div>
                             </div>
@@ -1173,7 +1178,7 @@
             </div>
         </section>
     @endif
-     <!-- SUCCESS SECTION (Dark Theme) -->
+    <!-- SUCCESS SECTION (Dark Theme) -->
     <section class="bg-[#020410] py-24 px-6 md:px-10 relative overflow-hidden hook-2">
         <div
             class="absolute top-0 right-0 w-[500px] h-[500px] bg-[#00555c]/10 blur-[120px] rounded-full pointer-events-none">
@@ -1189,7 +1194,7 @@
                         Your Business Growth Partner
                     </span>
                     <!-- Heading -->
-                    <h2 class="text-white text-4xl md:text-5xl font-bold leading-tight mb-6">
+                    <h2 class="move-up text-white text-4xl md:text-5xl font-bold leading-tight mb-6" data-speed="0.05">
                         Start Your Online Business Now and Grow with dorja.io
                     </h2>
                     <!-- Description -->
@@ -1215,7 +1220,7 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-table-cells-large text-[#02adbb] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
+                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
                         Affordable Pricing
                     </h3>
                     <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
@@ -1234,7 +1239,7 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-layer-group text-[#02adbb] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
+                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
                         Explore Features
                     </h3>
                     <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
@@ -1253,7 +1258,7 @@
                     <div class="mb-6">
                         <i class="fa-solid fa-bolt text-[#02adbb] text-4xl"></i>
                     </div>
-                    <h3 class="text-[#02adbb] text-2xl font-bold mb-5">
+                    <h3 class="move-up text-[#02adbb] text-2xl font-bold mb-5" data-speed="0.05">
                         Start Your Journey Today
                     </h3>
                     <p class="text-gray-300 text-[17px] leading-relaxed mb-8">
@@ -1269,7 +1274,7 @@
             </div>
         </div>
     </section>
-    
+
     <!-- SOLUTION SECTION -->
     <!-- DEMO & TEMPLATE SECTION -->
     @if ($demos->isNotEmpty())
@@ -1281,7 +1286,7 @@
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Demo & Template
                     </span>
-                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10">
+                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10" data-speed="0.05">
                         Get a complete system live experience on one platform
                     </h2>
 
@@ -1441,7 +1446,7 @@
                     🚀 Business Made Simple
                 </span>
 
-                <h2 class="mt-6 text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                <h2 class="move-up mt-6 text-4xl md:text-5xl font-extrabold text-white leading-tight" data-speed="0.05">
                     Ready to Grow Your Business?
                 </h2>
 
@@ -1494,20 +1499,20 @@
             </div>
         </div>
     </section>
-    
+
     @if ($pricingPlans->isNotEmpty())
         <section class="bg-[#fcfcfc] py-24 px-6 md:px-10 ">
             <div class="container mx-auto">
 
                 <div class="text-center mb-20">
-                   <span
+                    <span
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Choose Best Plan for Your Business
                     </span>
-                    <h2 class="text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10">
-                      Here are the best packages for your business below.
+                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10" data-speed="0.05">
+                        Here are the best packages for your business below.
                     </h2>
- 
+
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
@@ -1518,9 +1523,7 @@
 
                             $monthlyTier = $plan->tiers->firstWhere('billing_cycle', 'monthly');
 
-                            $price = $monthlyTier?->discount_price
-                                ?? $monthlyTier?->regular_price
-                                ?? 0;
+                            $price = $monthlyTier?->discount_price ?? ($monthlyTier?->regular_price ?? 0);
 
                             $themeColor = '#1e1b4b';
                             $isSpecialMode = false;
@@ -1572,10 +1575,10 @@
                                 </div>
 
                                 <!-- <div class="mt-4">
-                                    <p class="text-gray-900 font-bold text-sm">Total
-                                        {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
-                                    <p class="text-gray-600 text-xs">Billed annually</p>
-                                </div> -->
+                                        <p class="text-gray-900 font-bold text-sm">Total
+                                            {{ $setup->currency ?? '$' }}{{ number_format($price, 0) }} / Yearly</p>
+                                        <p class="text-gray-600 text-xs">Billed annually</p>
+                                    </div> -->
                             </div>
 
                             <!-- CTA Button -->
@@ -1631,9 +1634,9 @@
                                     </div>
 
                                     <!-- <div class="flex justify-between items-center text-gray-700 text-sm">
-                                        <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
-                                        <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
-                                    </div> -->
+                                            <span>Invoice Limit: {{ $plan->invoice_limit ?: 'Unlimited' }}</span>
+                                            <i class="fa-regular fa-circle-info text-gray-300 text-xs"></i>
+                                        </div> -->
 
                                     {{-- Custom multiple input loop --}}
                                     @if (!empty($plan->multiple_input))
@@ -1674,10 +1677,10 @@
                 <div class="text-center mb-20">
                     <span
                         class="inline-block px-5 py-1.5 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
-                       Why Businesses Choose Dorja.io 
+                        Why Businesses Choose Dorja.io
                     </span>
 
-                    <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
+                    <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" data-speed="0.05">
                         From Operations to Growth — Everything in One System
                     </h2>
                 </div>
@@ -1687,7 +1690,7 @@
                         <div
                             class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2">
+                                <h3 class="move-up text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2" data-speed="0.05">
                                     {{ $benefit->title }}
                                 </h3>
                                 <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
@@ -1711,7 +1714,7 @@
             </div>
         </section>
     @endif
-   
+
     <!-- BLOG & INSIGHTS SECTION -->
     @if ($blogs->isNotEmpty())
         <section class="bg-white py-10 px-6 md:px-10">
@@ -1741,16 +1744,16 @@
                                 <div class="flex justify-between items-center mb-5">
                                     <span
                                         class="bg-indigo-50 text-[#00555c] px-4 py-1 rounded-full text-xs font-bold border border-indigo-100">
-                                        {{  'Admin' }}
+                                        {{ 'Admin' }}
                                     </span>
                                     <!-- <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
-                                        <i class="fa-regular fa-clock"></i>
-                                        <span>{{ $blog->reading_time ?? '' }} minutes</span>
-                                    </div> -->
+                                            <i class="fa-regular fa-clock"></i>
+                                            <span>{{ $blog->reading_time ?? '' }} minutes</span>
+                                        </div> -->
                                 </div>
 
                                 <h3
-                                    class="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight line-clamp-2">
+                                    class="move-up text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight line-clamp-2" data-speed="0.05">
                                     {{ $blog->title ?? '' }}
                                 </h3>
 
@@ -1780,7 +1783,7 @@
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Customer Reviews
                     </span>
-                    <h2 class="text-3xl md:text-5xl font-black text-gray-900">
+                    <h2 class="move-up text-3xl md:text-5xl font-black text-gray-900" data-speed="0.05">
                         What our customers say
                     </h2>
                 </div>
@@ -1833,8 +1836,8 @@
                     Frequently Asked Questions
                 </span>
 
-              <h2 class="text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10">
-                   Better Understanding of Dorja.io and its Features
+                <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" data-speed="0.05">
+                    Better Understanding of Dorja.io and its Features
                 </h2>
 
                 <!-- Search Box -->
@@ -1844,7 +1847,7 @@
                 </div>
             </div>
 
-             
+
 
             <div class="div space-y-4 h-[700px] overflow-y-auto">
                 <!-- FAQ List -->
@@ -1873,48 +1876,46 @@
             </div>
         </div>
     </section>
- <section class="py-10 bg-white">
-    <div class="container mx-auto px-6">
+    <section class="py-10 bg-white">
+        <div class="container mx-auto px-6">
 
-        
 
-       
 
-        <div class=" bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-10 text-center text-white">
 
-            <h3 class="text-3xl font-bold">
-                Start Managing Your Business Smarter Today
-            </h3>
 
-            <p class="mt-4 text-emerald-100 max-w-2xl mx-auto leading-8">
-                Join businesses using Dorja.io to simplify operations, increase productivity,
-                and grow faster with one complete cloud-based business management platform.
-            </p>
+            <div class=" bg-gradient-to-r from-emerald-600 to-teal-600 rounded-3xl p-10 text-center text-white">
 
-            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+                <h3 class="text-3xl font-bold">
+                    Start Managing Your Business Smarter Today
+                </h3>
 
-                <a href="https://app.dorja.io/register"
-                    class="bg-white text-emerald-700 font-bold px-7 py-3 rounded-xl hover:bg-gray-100 transition">
-                    Start Free Trial
-                </a>
+                <p class="mt-4 text-emerald-100 max-w-2xl mx-auto leading-8">
+                    Join businesses using Dorja.io to simplify operations, increase productivity,
+                    and grow faster with one complete cloud-based business management platform.
+                </p>
 
-                <a href="{{ route('saas.package.list') }}"
-                    class="border border-white px-7 py-3 rounded-xl hover:bg-white hover:text-emerald-700 transition">
-                    View Pricing
-                </a>
+                <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+
+                    <a href="https://app.dorja.io/register"
+                        class="bg-white text-emerald-700 font-bold px-7 py-3 rounded-xl hover:bg-gray-100 transition">
+                        Start Free Trial
+                    </a>
+
+                    <a href="{{ route('saas.package.list') }}"
+                        class="border border-white px-7 py-3 rounded-xl hover:bg-white hover:text-emerald-700 transition">
+                        View Pricing
+                    </a>
+
+                </div>
 
             </div>
 
         </div>
-
-    </div>
-</section>
+    </section>
 @endsection
 @push('scripts')
-     
     <!-- Accordion + Search Script -->
     <script>
-        
         // Accordion
         document.querySelectorAll('.faq-toggle').forEach((btn) => {
             btn.addEventListener('click', () => {
