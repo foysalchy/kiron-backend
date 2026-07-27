@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Courier;
@@ -150,6 +151,8 @@ class PathaoService
                 $resData = $response->json('data');
 
                 $order->update([
+                    'status' => Status::Shipped->value,
+
                     'courier_info' => [
                         'courier_name'   => 'Pathao',
                         'consignment_id' => $resData['consignment_id'] ?? '',
