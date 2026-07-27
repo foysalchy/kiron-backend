@@ -17,7 +17,7 @@ class SteadfastService
     //single order and key from database
     public function sendToSteadfast(Order $order, array $validated)
     {
-     
+
         $courier = Courier::where('name', 'steadfast')->first();
 
         if (!$courier) {
@@ -52,6 +52,7 @@ class SteadfastService
             $res = $response->json('consignment');
 
             $order->update([
+                'status' => Status::Shipped->value,
                 'courier_info' => [
                     'courier_name'   => 'Steadfast',
                     'consignment_id' => $res['consignment_id'],
@@ -77,9 +78,8 @@ class SteadfastService
     //multiple order
     public function bulkSendToSteadfast(array $orderIds): array
     {
-        $courier = Courier::whereHas('method', function ($q) {
-            $q->where('slug', 'steadfast');
-        })->first();
+        $courier = Courier::where('name', 'steadfast')->first();
+
 
         if (!$courier) {
             throw ApiException::serverError('Steadfast settings not found.');
@@ -211,6 +211,7 @@ class SteadfastService
             if ($res && ($res['status'] ?? '') === 'success') {
                 // ✅ Success
                 $order->update([
+                    'status' => Status::Shipped->value,
                     'courier_info' => [
                         'courier_name'   => 'Steadfast',
                         'consignment_id' => $res['consignment_id'] ?? '',
@@ -268,7 +269,7 @@ class SteadfastService
      */
     public function syncStatus(Order $order): array
     {
-        $courier = Courier::whereHas('method', fn($q) => $q->where('slug', 'steadfast'))->first();
+        $courier = Courier::where('name', 'steadfast')->first();
 
         if (!$courier) {
             throw new \Exception('Steadfast settings not found.');
