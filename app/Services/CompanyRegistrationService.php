@@ -23,6 +23,7 @@ use App\Models\User;
 use App\Models\UserLoginHistory;
 use App\Models\Warehouse;
 use Carbon\Carbon;
+use App\Services\SmsSendService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +31,9 @@ use Illuminate\Support\Facades\Mail;
 
 class CompanyRegistrationService
 {
+    public function __construct(
+        private SmsSendService $smsSendService
+    ) {}
     public function getActivePricings()
     {
         return PricingPackage::with('tiers')->where('status', Status::Active->value)
@@ -197,7 +201,7 @@ class CompanyRegistrationService
             $otp = $this->createOtpRecord($company->id, 'user', $company->email);
 
             DB::commit();
-
+           
             // Send email after commit
             //   $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
             Log::info("Otp {$otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
@@ -575,8 +579,13 @@ class CompanyRegistrationService
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
+         
         $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
         Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
+    }
+    public function sendopt($phone,$otp){
+        $message = "Your OTP is {$otp}. Do not share it with anyone.";
+        $this->smsSendService->sendToGateway([$phone], $message);
     }
 
     private function generateOtp(): string

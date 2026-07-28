@@ -7,7 +7,7 @@ use App\Helpers\LogHelper;
 use App\Models\Party;
 use App\Models\SmsSend;
 use Illuminate\Support\Facades\{DB, Log};
-
+use Http;
 class SmsSendService
 {
     /**
@@ -193,21 +193,47 @@ class SmsSendService
     /**
      * Logic to communicate with SMS Provider API
      */
-    protected function sendToGateway(array $numbers, string $message)
+    public function sendToGateway(array $numbers, string $message): array
     {
-        $recipientString = implode(',', $numbers);
+        $recipientString = implode(',', array_unique($numbers));
 
-        // This is a placeholder for your actual Gateway API call
-        /*
-        $response = Http::get("https://api.sms-provider.com/send", [
-            "api_key"   => config('services.sms.key'),
-            "sender_id" => config('services.sms.sender_id'),
-            "number"    => $recipientString,
-            "message"   => $message
+        $response = Http::asForm()
+            ->timeout(30)
+            ->post('http://bulksmsbd.net/api/smsapi', [
+                'api_key'  => 'dcqz5WVDMyudEcGcNOvV',
+                'senderid' => '8809648909856',
+                'number'   => $recipientString,
+                'message'  => $message,
+            ]);
+
+        if (!$response->successful()) {
+            Log::error('SMS Gateway HTTP Error', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+
+            throw ApiException::serverError('SMS gateway connection failed.');
+        }
+
+        
+
+       
+
+        // Optional: adjust according to provider response
+       $data = $response->json();
+        Log::info('SMS Gateway Response', [
+            'response' => $data,
         ]);
-        */
+        if (($data['response_code'] ?? 0) != 202) {
+            throw ApiException::serverError(
+                $data['error_message'] ?? 'SMS sending failed.'
+            );
+        }
 
-        Log::info("SMS Request sent to Gateway for: " . $recipientString);
+        return [
+            'success'  => true,
+            'response' => $data,
+        ];
     }
 
     public function getSmsSendById(int $id): SmsSend
