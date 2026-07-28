@@ -52,10 +52,12 @@ class OrderController extends Controller
 
 
             $orders = $this->frontendOrderService->getOrders($filters);
+            $statusCounts = $this->frontendOrderService->getOrderCountsByStatus();
 
             return response()->json([
                 'success' => true,
                 'data' => $orders->items(),
+                'status_counts' => $statusCounts,
                 'pagination' => [
                     'total' => $orders->total(),
                     'per_page' => $orders->perPage(),

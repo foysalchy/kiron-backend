@@ -193,6 +193,15 @@ class FrontendOrderService
 
         return $orders;
     }
+    public function getOrderCountsByStatus()
+    {
+       
+        return Order::query()
+            ->whereNot('status', Status::Draft->value)  
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');  
+    }
 
     /**
      * Get order by ID with all details
