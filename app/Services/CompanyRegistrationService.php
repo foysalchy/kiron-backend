@@ -201,7 +201,7 @@ class CompanyRegistrationService
             $otp = $this->createOtpRecord($company->id, 'user', $company->email);
 
             DB::commit();
-           
+
             // Send email after commit
             //   $this->sendOtpEmail($company->name, $company->email, $otp, 'user');
             Log::info("Otp {$otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
@@ -273,12 +273,12 @@ class CompanyRegistrationService
                 'status' => Status::Active->value
             ]);
             $smsTemplates = [
-                ['title' => 'Order Place',     'description' => 'Your order has been placed successfully.'],
-                ['title' => 'Order Confirm',   'description' => 'Your order has been confirmed.'],
-                ['title' => 'Order Shipped',   'description' => 'Your order has been shipped.'],
-                ['title' => 'Order Delivered', 'description' => 'Your order has been delivered successfully.'],
-                ['title' => 'Cancel Order',    'description' => 'Your order has been cancelled.'],
-                ['title' => 'Follow Up',       'description' => 'This is a follow-up message regarding your order.'],
+                ['title' => 'Order Place', 'slug' => 'order-place', 'description' => 'Your order has been placed successfully.'],
+                ['title' => 'Order Shipped', 'slug' => 'order-shipped',  'description' => 'Your order has been shipped.'],
+                ['title' => 'Order Confirm', 'slug' => 'order-confirm',  'description' => 'Your order has been confirmed.'],
+                ['title' => 'Order Delivered', 'slug' => 'order-delivered','description' => 'Your order has been delivered successfully.'],
+                ['title' => 'Cancel Order',  'slug' => 'cancel-order',  'description' => 'Your order has been cancelled.'],
+                ['title' => 'Follow Up',    'slug' => 'follow-up',   'description' => 'This is a follow-up message regarding your order.'],
             ];
 
             foreach ($smsTemplates as $template) {
@@ -579,7 +579,7 @@ class CompanyRegistrationService
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-         
+
         $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
         Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
     }

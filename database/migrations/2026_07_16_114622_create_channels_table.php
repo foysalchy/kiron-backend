@@ -11,19 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('channels', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignId('channel_group_id')->constrained('channel_groups')->cascadeOnDelete();
-            $table->string('name'); // ফেসবুক পেজের নাম
-            $table->string('type'); // 'facebook'
-            $table->string('slug'); // ইউনিক স্ল্যাগ (e.g. fb-page-id)
-            $table->string('page_id')->unique();
-            $table->string('profile_image')->nullable();
-            $table->text('page_token'); // পেজ টোকেন (Encrypted)
-            $table->string('color')->default('#1877F2');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('channels')) {
+            Schema::create('channels', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+                $table->foreignId('channel_group_id')->constrained('channel_groups')->cascadeOnDelete();
+                $table->string('name'); // ফেসবুক পেজের নাম
+                $table->string('type'); // 'facebook'
+                $table->string('slug'); // ইউনিক স্ল্যাগ (e.g. fb-page-id)
+                $table->string('page_id')->unique();
+                $table->string('profile_image')->nullable();
+                $table->text('page_token'); // পেজ টোকেন (Encrypted)
+                $table->string('color')->default('#1877F2');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

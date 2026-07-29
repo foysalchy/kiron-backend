@@ -8,6 +8,7 @@ use App\Models\Party;
 use App\Models\SmsSend;
 use Illuminate\Support\Facades\{DB, Log};
 use Http;
+
 class SmsSendService
 {
     /**
@@ -215,12 +216,12 @@ class SmsSendService
             throw ApiException::serverError('SMS gateway connection failed.');
         }
 
-        
 
-       
+
+
 
         // Optional: adjust according to provider response
-       $data = $response->json();
+        $data = $response->json();
         Log::info('SMS Gateway Response', [
             'response' => $data,
         ]);
@@ -248,5 +249,47 @@ class SmsSendService
         $log->suppliers = $parties->where('type', Party::TYPE_SUPPLIER)->values();
 
         return $log;
+    }
+    /**
+     *send sms
+     */
+    public function sendStatusBasedSms($order)
+    {
+        // ১. স্ট্যাটাস এবং স্লাগের ম্যাপিং
+        $slugMap = [
+            \App\Enums\Status::Pending->value   => 'order-place',
+            \App\Enums\Status::Confirmed->value => 'order-confirm',
+            \App\Enums\Status::Shipped->value   => 'order-shipped',
+            \App\Enums\Status::Delivered->value => 'order-delivered',
+            \App\Enums\Status::Cancelled->value => 'cancel-order',
+        ];
+
+
+        $slug = $slugMap[$order->status->value] ?? null;
+        if (!$slug) return;
+
+
+        $template = \App\Models\SmsTemplate::where('company_id', $order->company_id)
+            ->where('slug', $slug)
+            ->where('status', \App\Enums\Status::Active->value)
+            ->first();
+
+        if (!$template) return;
+
+        $replaceData = [
+            '{customer_name}' => $order->customer->name ?? 'Customer',
+            '{company_name}'  => $order->company->name ?? 'আমাদের শপ',
+            '{invoice_id}'    => $order->order_no ?? $order->id,
+            '{invoice_link}'  => route('order.invoice', $order->id),
+        ];
+
+        $messageBody = str_replace(array_keys($replaceData), array_values($replaceData), $template->description);
+
+        return $this->createSmsSend([
+            'company_id'   => $order->company_id,
+            'customer_ids' => [$order->customer_id],
+            'body'         => $messageBody,
+            'message'      => $messageBody,
+        ]);
     }
 }
