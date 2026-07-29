@@ -692,6 +692,12 @@ class OrderService
             $order->update([
                 'status' => $getStatus->value
             ]);
+            try {
+            app(\App\Services\SmsSendService::class)->sendStatusBasedSms($order);
+        } catch (\Exception $smsError) {
+            Log::warning("Automated SMS failed: " . $smsError->getMessage());
+            // এসএমএস না গেলেও অর্ডার আপডেট যাতে হয়ে যায়, তাই ট্রাই-ক্যাচ রাখা হয়েছে
+        }
 
             $logStatus = "{$getOldStatus->label()} → {$getStatus->label()}";
 

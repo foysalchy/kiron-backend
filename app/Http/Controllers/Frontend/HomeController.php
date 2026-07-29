@@ -102,7 +102,8 @@ class HomeController extends FrontendController
         // ৮. পপুলার প্রোডাক্টস
         $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () use ($companyId){
             return Product::where('company_id', $companyId)->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'purchase_price', 'discount', 'discount_type',
+            'available_stock', 'type')
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
@@ -116,7 +117,8 @@ class HomeController extends FrontendController
         $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () use ($companyId){
             return Product::where('company_id', $companyId)
                 ->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'discount', 'discount_type')
+                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'purchase_price', 'discount', 'discount_type',
+            'available_stock', 'type')
                 ->where('status', Status::Active->value)
                 ->latest()
                 ->take(12)
@@ -200,7 +202,7 @@ class HomeController extends FrontendController
         $exists = Subscription::where('email', $request->email)
             ->where('company_id', $this->company_id)
             ->first();
-    
+
         if ($exists) {
             return response()->json(['success' => false, 'message' => 'You are already subscribed!'], 422);
         }

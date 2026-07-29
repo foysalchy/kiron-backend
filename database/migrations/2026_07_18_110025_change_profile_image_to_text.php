@@ -12,7 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('channels', function (Blueprint $table) {
-            $table->text('profile_image')->nullable()->change();
+            if (Schema::hasColumn('channels', 'profile_image')) {
+                $table->text('profile_image')->nullable()->change();
+            } else {
+                $table->text('profile_image')->nullable();
+            }
         });
 
         Schema::table('channel_groups', function (Blueprint $table) {
