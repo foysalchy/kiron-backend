@@ -50,7 +50,7 @@ class OrderController extends Controller
                 'per_page' => $request->input('per_page', 20),
             ];
 
-
+           Log::info($filters);
             $orders = $this->frontendOrderService->getOrders($filters);
             $statusCounts = $this->frontendOrderService->getOrderCountsByStatus();
 

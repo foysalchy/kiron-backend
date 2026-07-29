@@ -36,9 +36,7 @@ class FrontendOrderService
             ->select('orders.*');
 
         // Apply filters
-        if (isset($filters['status'])) {
-            $query->where('orders.status', $filters['status']);
-        }
+
 
         if (isset($filters['payment_status'])) {
             $query->where('orders.payment_status', $filters['payment_status']);
@@ -105,7 +103,20 @@ class FrontendOrderService
 
         // Paginate results
         $perPage = $filters['per_page'] ?? 20;
-        $orders = $query->whereNot('status', Status::Draft->value)->paginate($perPage);
+        $query->when(
+            isset($filters['status']),
+            function ($q) use ($filters) {
+                if ($filters['status'] == Status::Draft->value) {
+                    $q->where('orders.status', Status::Draft->value);
+                } else {
+                    $q->where('orders.status', $filters['status']);
+                }
+            },
+            function ($q) {
+                $q->where('orders.status', '!=', Status::Draft->value);
+            }
+        );
+        $orders = $query->paginate($perPage);
 
         // Transform the data to include calculated fields
         $orders->getCollection()->transform(function ($order) {
@@ -195,12 +206,12 @@ class FrontendOrderService
     }
     public function getOrderCountsByStatus()
     {
-       
+
         return Order::query()
-            ->whereNot('status', Status::Draft->value)  
+            ->whereNot('status', Status::Draft->value)
             ->select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
-            ->pluck('count', 'status');  
+            ->pluck('count', 'status');
     }
 
     /**
