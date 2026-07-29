@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pages', function (Blueprint $table) {
-             $table->json('meta_keywords')->nullable()->after('meta_description');
+            if (!Schema::hasColumn('pages', 'meta_keywords')) {
+                $table->json('meta_keywords')->nullable()->after('meta_description');
+            }
         });
     }
 
