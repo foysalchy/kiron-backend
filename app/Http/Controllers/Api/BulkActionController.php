@@ -58,6 +58,7 @@ class BulkActionController extends Controller
         'brands'        => \App\Models\Brand::class,
         'asset-purchases'        => \App\Models\AssetPurchase::class,
         'disposal-types'        => \App\Models\DisposalType::class,
+        'asset-disposals'        => \App\Models\AssetDisposal::class,
         'master-brands'        => \App\Models\MasterBrand::class,
         'master-demos'        => \App\Models\MasterDemo::class,
         'master-features'        => \App\Models\MasterFeature::class,
