@@ -115,5 +115,12 @@ class WocommerceSettingController extends Controller
 
         return ResponseHelper::success($data, 'WooCommerce products fetched successfully.');
     }
+    public function importProduct(Request $request): JsonResponse
+    {
+        $data = $this->wocommerceService->importProductInDB($request);
+
+        return ResponseHelper::success($data, 'WooCommerce products imported successfully.');
+    }
+
     
 }

@@ -1063,6 +1063,7 @@ Route::prefix('v1')->group(function () {
                     Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
                     Route::Put('/{id}/toggle-sync', [WocommerceSettingController::class, 'toggleSync']);
                     Route::get('/import/{id}',[WocommerceSettingController::class, 'import']);
+                    Route::post('/import-product', [WooCommerceImportController::class, 'importProduct']);
                 });
                 //note template settings routes
                 Route::prefix('note-templates')->group(function () {

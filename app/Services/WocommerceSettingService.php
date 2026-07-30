@@ -12,6 +12,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Models\Product;
 class WocommerceSettingService
 {
     /**
@@ -341,60 +344,239 @@ class WocommerceSettingService
         $perPage = (int) $request->get('per_page', 50);
 
         $response = Http::timeout(30)
-    ->withBasicAuth(
-        $setting->consumer_key,
-        $setting->consumer_secret
-    )
-    ->get($domain . '/wp-json/wc/v3/products', [
-        'page' => $page,
-        'per_page' => $perPage,
-    ]);
+            ->withBasicAuth(
+                $setting->consumer_key,
+                $setting->consumer_secret
+            )
+                ->get($domain . '/wp-json/wc/v3/products', [
+                    'page' => $page,
+                    'per_page' => $perPage,
+                ]);
 
-    if (!$response->successful()) {
-        throw ApiException::serverError(
-            $response->json()['message'] ?? 'Unable to fetch WooCommerce products.'
-        );
+        if (!$response->successful()) {
+            throw ApiException::serverError(
+                $response->json()['message'] ?? 'Unable to fetch WooCommerce products.'
+            );
+        }
+        $products = $response->json();
+        foreach ($products as &$product) {
+            // Variable product হলে variations fetch করুন
+            if (($product['type'] ?? '') === 'variable') {
+                $variationResponse = Http::timeout(30)
+                    ->withBasicAuth(
+                        $setting->consumer_key,
+                        $setting->consumer_secret
+                    )
+                    ->get($domain . "/wp-json/wc/v3/products/{$product['id']}/variations");
+                if ($variationResponse->successful()) {
+                    $product['variations'] = $variationResponse->json();
+                    // সব variation-এর stock যোগ করে parent stock বানানো (optional)
+                    $product['total_stock'] = collect($product['variations'])
+                        ->sum(function ($variation) {
+                            return $variation['stock_quantity'] ?? 0;
+                        });
+                } else {
+                    $product['variations'] = [];
+                    $product['total_stock'] = 0;
+                }
+            } else {
+                // Simple product
+                $product['variations'] = [];
+                $product['total_stock'] = $product['stock_quantity'] ?? 0;
+            }
+        }
+        return [
+            'current_page' => $page,
+            'last_page' => (int) $response->header('X-WP-TotalPages'),
+            'per_page' => $perPage,
+            'total' => (int) $response->header('X-WP-Total'),
+            'data' => $products,
+        ];
     }
 
-    $products = $response->json();
+    // import product to woocommerce in our db ~ pending task
+    public function importProduct(Request $request) :array
+    {
+        $request->validate([
+            'woo_product_id'       => 'required|integer',
+            'mega_category_ids'    => 'required|array',
+            'mega_category_ids.*'  => 'integer',
+            'sub_category_ids'     => 'nullable|array',
+            'mini_category_ids'    => 'nullable|array',
+            'extra_category_ids'   => 'nullable|array',
+            'warehouse_info'       => 'required|array',
+            'warehouse_info.*.warehouse_id' => 'required',
+            'warehouse_info.*.quantity'     => 'nullable',
+        ]);
+        $setting = WocommerceSetting::where('company_id',auth()->user()->company_id)->first();
+        if (!$setting) {
+            throw ApiException::notFound('WooCommerce setting not found.');
+        }
+        $domain = trim($setting->domain_url);
+        if (!preg_match('/^https?:\/\//i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+       
 
-    foreach ($products as &$product) {
+        // 1. Get WooCommerce credentials from your settings / config
+        $storeUrl = rtrim($domain, '/');
+        $consumerKey    =  $setting->consumer_secret;
+        $consumerSecret = config('services.woocommerce.secret');
 
-        // Variable product হলে variations fetch করুন
-        if (($product['type'] ?? '') === 'variable') {
+        // 2. Fetch full product from WooCommerce
+        $response = Http::withBasicAuth($consumerKey, $consumerSecret)
+            ->get("{$storeUrl}/wp-json/wc/v3/products/{$request->woo_product_id}");
 
-            $variationResponse = Http::timeout(30)
-                ->withBasicAuth(
-                    $setting->consumer_key,
-                    $setting->consumer_secret
-                )
-                ->get($domain . "/wp-json/wc/v3/products/{$product['id']}/variations");
+        if (!$response->successful()) {
+            return response()->json(['message' => 'Failed to fetch product from WooCommerce'], 400);
+        }
 
-            if ($variationResponse->successful()) {
-                $product['variations'] = $variationResponse->json();
+        $woo = $response->json();
 
-                // সব variation-এর stock যোগ করে parent stock বানানো (optional)
-                $product['total_stock'] = collect($product['variations'])
-                    ->sum(function ($variation) {
-                        return $variation['stock_quantity'] ?? 0;
-                    });
-            } else {
-                $product['variations'] = [];
-                $product['total_stock'] = 0;
+        // 3. Prepare product data
+        $isVariable = $woo['type'] === 'variable';
+
+        $productData = [
+            'title'              => $woo['name'],
+            'slug'               => $this->makeSlug($woo['slug'] ?? $woo['name']),
+            'type'               => $isVariable ? 'variation' : 'single',
+            'sku_code'           => $woo['sku'] ?? null,
+            'short_description'  => $woo['short_description'] ?? null,
+            'full_description'   => $woo['description'] ?? null,
+            'regular_price'      => $isVariable ? 0 : ($woo['regular_price'] ?: $woo['price'] ?: 0),
+            'purchase_price'     => 0,
+            'discount_type'      => 'flat',
+            'discount'           => 0,
+            'mega_category_ids'  => $request->mega_category_ids,
+            'sub_category_ids'   => $request->sub_category_ids ?? [],
+            'mini_category_ids'  => $request->mini_category_ids ?? [],
+            'extra_category_ids' => $request->extra_category_ids ?? [],
+        ];
+
+        // Calculate discount for simple product
+        if (!$isVariable) {
+            $regular = (float) ($woo['regular_price'] ?: $woo['price'] ?: 0);
+            $sale    = (float) ($woo['sale_price'] ?: 0);
+            if ($sale > 0 && $regular > $sale) {
+                $productData['discount'] = $regular - $sale;
             }
-        } else {
-            // Simple product
-            $product['variations'] = [];
-            $product['total_stock'] = $product['stock_quantity'] ?? 0;
+        }
+
+        // 4. Download thumbnail
+        if (!empty($woo['images'][0]['src'])) {
+            $productData['thumbnail'] = $this->downloadImage($woo['images'][0]['src'], 'products');
+        }
+
+        // 5. Create product (adjust to your actual create logic)
+        $product = Product::create($productData); // or your service
+
+        // Attach categories if you use relationships
+        // $product->megaCategories()->sync($request->mega_category_ids);
+        // ...
+
+        // 6. Gallery images
+        if (!empty($woo['images']) && count($woo['images']) > 1) {
+            foreach (array_slice($woo['images'], 1) as $img) {
+                $path = $this->downloadImage($img['src'], 'products/gallery');
+                if ($path) {
+                    // $product->gallery()->create(['image' => $path]);
+                }
+            }
+        }
+
+        // 7. Warehouse / Stock
+        $qty = $this->getQty($woo);
+
+        foreach ($request->warehouse_info as $wh) {
+            // $product->warehouses()->create([
+            //     'warehouse_id' => $wh['warehouse_id'],
+            //     'bin_id'       => $wh['bin_id'] ?? null,
+            //     'quantity'     => $wh['quantity'] ?: $qty,
+            // ]);
+        }
+
+        // 8. Variations
+        if ($isVariable && !empty($woo['variations'])) {
+            // Note: WooCommerce /products/{id} sometimes only returns variation IDs.
+            // If you only get IDs, you need an extra request for each variation.
+            // In your earlier JSON the full variations were already embedded.
+
+            foreach ($woo['variations'] as $index => $variation) {
+                // If $variation is just an ID, fetch it:
+                if (is_numeric($variation)) {
+                    $varRes = Http::withBasicAuth($consumerKey, $consumerSecret)
+                        ->get("{$storeUrl}/wp-json/wc/v3/products/{$woo['id']}/variations/{$variation}");
+                    if (!$varRes->successful()) continue;
+                    $variation = $varRes->json();
+                }
+
+                $regular = (float) ($variation['regular_price'] ?: $variation['price'] ?: 0);
+                $sale    = (float) ($variation['sale_price'] ?: 0);
+                $discount = ($sale > 0 && $regular > $sale) ? $regular - $sale : 0;
+
+                $varData = [
+                    'regular_price'  => $regular,
+                    'purchase_price' => 0,
+                    'discount_type'  => 'flat',
+                    'discount'       => $discount,
+                    'sku'            => $variation['sku'] ?? null,
+                ];
+
+                // Variation image
+                if (!empty($variation['image']['src'])) {
+                    $varData['image'] = $this->downloadImage($variation['image']['src'], 'products/variations');
+                }
+
+                // Create variation
+                // $newVariation = $product->variations()->create($varData);
+
+                // Warehouse for variation
+                $varQty = $this->getQty($variation);
+                foreach ($request->warehouse_info as $wh) {
+                    // $newVariation->warehouses()->create([
+                    //     'warehouse_id' => $wh['warehouse_id'],
+                    //     'bin_id'       => $wh['bin_id'] ?? null,
+                    //     'quantity'     => $wh['quantity'] ?: $varQty,
+                    // ]);
+                }
+
+                // Attributes mapping can be added later
+            }
+        }
+
+        return response()->json([
+            'message' => 'Product imported successfully',
+            'product' => $product,
+        ]);
+    }
+
+    private function getQty(array $item): int
+    {
+        return ($item['stock_status'] ?? '') === 'instock' ? 99999 : (int) ($item['stock_quantity'] ?? 0);
+    }
+
+    private function downloadImage(string $url, string $folder = 'products'): ?string
+    {
+        try {
+            $response = Http::timeout(20)->get($url);
+            if (!$response->successful()) return null;
+
+            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+            $filename  = $folder . '/' . Str::uuid() . '.' . $extension;
+
+            Storage::disk('public')->put($filename, $response->body());
+
+            return $filename;
+        } catch (\Exception $e) {
+            \Log::error('Image download failed: ' . $url . ' - ' . $e->getMessage());
+            return null;
         }
     }
 
-    return [
-        'current_page' => $page,
-        'last_page' => (int) $response->header('X-WP-TotalPages'),
-        'per_page' => $perPage,
-        'total' => (int) $response->header('X-WP-Total'),
-        'data' => $products,
-    ];
+    private function makeSlug(string $text): string
+    {
+        $text = urldecode($text);
+        $text = preg_replace('/[^a-z0-9\x{0980}-\x{09FF}]+/u', '-', strtolower($text));
+        return trim($text, '-') ?: 'product-' . time();
     }
 }
