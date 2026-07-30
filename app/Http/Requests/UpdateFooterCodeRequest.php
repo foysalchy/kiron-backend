@@ -25,8 +25,21 @@ class UpdateFooterCodeRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'code'   => ['sometimes', 'required'],
-            'status' => ['sometimes', 'integer', 'in:0,1'],
+            'code' => [
+                'sometimes',
+                'required',
+                'string',
+                function ($attribute, $value, $fail) {
+                    $forbiddenTags = ['<?php', '<?=', '<?', '?>', '@php', '{{', '}}'];
+
+                    foreach ($forbiddenTags as $tag) {
+                        if (stripos($value, $tag) !== false) {
+                            return $fail("The :attribute field cannot contain PHP or Blade tags ($tag).");
+                        }
+                    }
+                },
+            ],
+            'status' => ['sometimes', 'integer'],
         ]);
     }
     public function messages(): array

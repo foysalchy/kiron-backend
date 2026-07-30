@@ -656,3 +656,6 @@
         }
     </script>
 @endpush
+@push('scripts')
+    @include('components.meta-info.pixel-events', ['event' => 'ViewContent', 'data' => ['product' => $product]])
+@endpush
