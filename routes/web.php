@@ -107,8 +107,8 @@ Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductControlle
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms.txt');
-Route::get('/google.xml', [SitemapController::class, 'googleXml'])->name('google.xml');
-Route::get('/facebook-catalog.csv', [SitemapController::class, 'facebookCatalogCsv'])->name('facebook.catalog.csv');
+Route::get('/feeds/google/products.xml', [SitemapController::class, 'googleXml'])->name('google.xml');
+Route::get('/feeds/facebook/products.csv', [SitemapController::class, 'facebookCatalogCsv'])->name('facebook.catalog.csv');
 
     // Route::get('/kiron', [SaasIndexController::class, 'home'])->name('kiron.index');
 });
