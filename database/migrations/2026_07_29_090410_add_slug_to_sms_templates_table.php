@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pages', function (Blueprint $table) {
-            if (!Schema::hasColumn('pages', 'meta_keywords')) {
-                $table->json('meta_keywords')->nullable()->after('meta_description');
-            }
+        Schema::table('sms_templates', function (Blueprint $table) {
+            $table->string('slug')->nullable()->unique()->after('title');
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pages', function (Blueprint $table) {
-            //
+        Schema::table('sms_templates', function (Blueprint $table) {
+            $table->dropColumn('slug');
         });
     }
 };
