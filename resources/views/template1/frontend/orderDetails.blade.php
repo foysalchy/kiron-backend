@@ -578,3 +578,11 @@
         });
     </script>
 @endpush
+@push('scripts')
+    @include('components.meta-info.pixel-events', [
+        'event' => 'Purchase',
+        'data' => [
+            'order' => $order
+        ]
+    ])
+@endpush

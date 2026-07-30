@@ -235,3 +235,12 @@
         }
     </script>
 @endpush
+@push('scripts')
+    @include('components.meta-info.pixel-events', [
+        'event' => 'AddToCart',
+        'data' => [
+            'total' => $total,
+            'ids'   => \Gloudemans\Shoppingcart\Facades\Cart::content()->pluck('id')->toArray()
+        ]
+    ])
+@endpush

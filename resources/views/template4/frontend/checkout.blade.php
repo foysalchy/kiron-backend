@@ -315,3 +315,6 @@
         });
     </script>
 @endpush
+@push('scripts')
+    @include('components.meta-info.pixel-events', ['event' => 'InitiateCheckout', 'data' => ['total' => $total]])
+@endpush

@@ -22,7 +22,7 @@
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    @include('components.meta-info.pixel', ['setup' => $setup])
     @stack('styles')
     <style>
         html {
@@ -43,13 +43,15 @@
             overflow-x: hidden;
         }
 
-         .move-up {
-        display: block; /* টাইটেল সেন্টারে রাখার জন্য এটি জরুরি */
-        will-change: transform;
-        /* ট্রানজিশন লিনিয়ার রাখলে স্ক্রলের সাথে স্মুথলি ম্যাচ করবে */
-        transition: transform 0.1s linear;
-        transform: translate3d(0, 0, 0); /* শুরুতে একদম অরিজিনাল জায়গায় থাকবে */
-    }
+        .move-up {
+            display: block;
+            /* টাইটেল সেন্টারে রাখার জন্য এটি জরুরি */
+            will-change: transform;
+            /* ট্রানজিশন লিনিয়ার রাখলে স্ক্রলের সাথে স্মুথলি ম্যাচ করবে */
+            transition: transform 0.1s linear;
+            transform: translate3d(0, 0, 0);
+            /* শুরুতে একদম অরিজিনাল জায়গায় থাকবে */
+        }
 
         .scroll-wrapper {
             overflow: hidden;
@@ -88,32 +90,32 @@
         menuOverlay.addEventListener("click", toggleMenu);
 
         function initLenisAnimation() {
-        if (window.lenis) {
-            window.lenis.on('scroll', () => {
-                const vh = window.innerHeight;
+            if (window.lenis) {
+                window.lenis.on('scroll', () => {
+                    const vh = window.innerHeight;
 
-                document.querySelectorAll('.move-up').forEach(el => {
-                    const rect = el.getBoundingClientRect();
+                    document.querySelectorAll('.move-up').forEach(el => {
+                        const rect = el.getBoundingClientRect();
 
-                    // এলিমেন্টটি যখন স্ক্রিনে দেখা যাবে শুধু তখনই মুভ করবে
-                    if (rect.top < vh && rect.bottom > 0) {
-                        const speed = parseFloat(el.dataset.speed) || 0.05; // স্পিড কমিয়ে ০.০৫ রাখা হয়েছে
+                        // এলিমেন্টটি যখন স্ক্রিনে দেখা যাবে শুধু তখনই মুভ করবে
+                        if (rect.top < vh && rect.bottom > 0) {
+                            const speed = parseFloat(el.dataset.speed) || 0.05; // স্পিড কমিয়ে ০.০৫ রাখা হয়েছে
 
-                        // এলিমেন্টটি যখন স্ক্রিনের মাঝামাঝি থাকবে তখন এর পজিশন হবে ০ (ডিজাইন একদম ঠিক থাকবে)
-                        // মাঝামাঝি থেকে উপরে বা নিচে গেলে এটি সামান্য মুভ করবে
-                        const elementCenter = rect.top + (rect.height / 2);
-                        const viewportCenter = vh / 2;
-                        const movement = (elementCenter - viewportCenter) * speed;
+                            // এলিমেন্টটি যখন স্ক্রিনের মাঝামাঝি থাকবে তখন এর পজিশন হবে ০ (ডিজাইন একদম ঠিক থাকবে)
+                            // মাঝামাঝি থেকে উপরে বা নিচে গেলে এটি সামান্য মুভ করবে
+                            const elementCenter = rect.top + (rect.height / 2);
+                            const viewportCenter = vh / 2;
+                            const movement = (elementCenter - viewportCenter) * speed;
 
-                        el.style.transform = `translate3d(0, ${movement}px, 0)`;
-                    }
+                            el.style.transform = `translate3d(0, ${movement}px, 0)`;
+                        }
+                    });
                 });
-            });
-        } else {
-            setTimeout(initLenisAnimation, 100);
+            } else {
+                setTimeout(initLenisAnimation, 100);
+            }
         }
-    }
-    initLenisAnimation();
+        initLenisAnimation();
     </script>
 
 </body>

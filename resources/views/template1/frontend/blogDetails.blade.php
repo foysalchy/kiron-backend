@@ -250,3 +250,11 @@
         </div>
     </section>
 @endsection
+@push('scripts')
+    @include('components.meta-info.pixel-events', [
+        'event' => 'ViewBlog',
+        'data' => [
+            'blog' => $blog
+        ]
+    ])
+@endpush
