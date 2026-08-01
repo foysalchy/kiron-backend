@@ -75,6 +75,11 @@ class WocommerceSettingService
     {
         DB::beginTransaction();
 
+        $existingSetting = WocommerceSetting::where('company_id', auth()->user()->company_id)->where('consumer_key', $data['consumer_key'])->orWhere('consumer_secret', $data['consumer_secret'])->first();
+        if ($existingSetting) {
+            throw ApiException::badRequest('A WooCommerce setting with this consumer key or secret already exists.');
+        }
+
         try {
 
             $storeInfo = $this->fetchStoreInfo($data);
