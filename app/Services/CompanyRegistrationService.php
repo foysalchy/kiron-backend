@@ -562,7 +562,7 @@ class CompanyRegistrationService
             ->firstOrFail();
     }
 
-    public function resendOtp(int $registrationId, string $type): void
+    public function resendOtp(int $registrationId, string $type, string $method = 'email'): void
     {
         $company = Company::findOrFail($registrationId);
         $record = EmailVerification::where('company_id', $registrationId)
@@ -579,19 +579,25 @@ class CompanyRegistrationService
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-
-        $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
-        Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
+        if( $method === 'sms') {
+            $this->sendopt($company->phone, $newOtp);
+            Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
+            return;
+        }else{
+            $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
+            Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
+        }
+      
     }
     public function sendopt($phone,$otp){
-        $message = "Your OTP is {$otp}. Do not share it with anyone.";
+       $message = "Your Dorja.io verification code is {$otp}. Use it to complete your registration. Valid for 5 minutes. Do not share this code.";
         $this->smsSendService->sendToGateway([$phone], $message);
     }
 
     private function generateOtp(): string
     {
-        // return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        return 123456;
+        return str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        // return 123456;
     }
 
     private function createOtpRecord(int $companyId, string $type, string $email): string

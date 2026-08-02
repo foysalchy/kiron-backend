@@ -59,7 +59,8 @@ class CompanyRegistrationController extends Controller
     {
         $this->registrationService->resendOtp(
             $request->integer('registration_id'),
-            $request->string('type')
+            $request->string('type'),
+            $request->string('method'),
         );
 
         return ResponseHelper::success(null, "New OTP sent to your email.");
