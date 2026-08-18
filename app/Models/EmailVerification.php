@@ -12,6 +12,7 @@ class EmailVerification extends Model
         'type',
         'email',
         'otp',
+        'method',
         'verified_at',
         'expires_at',
     ];

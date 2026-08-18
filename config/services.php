@@ -45,5 +45,8 @@ return [
         'webhook_verify_token' => env('META_WEBHOOK_VERIFY_TOKEN'),
 
     ],
+    'bdcourier' => [
+        'key' => env('BD_COURIER_KEY'),
+    ],
 
 ];

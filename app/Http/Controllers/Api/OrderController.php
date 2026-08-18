@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AddPaymentRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Models\CourierCheckHistory;
 use App\Models\Order;
 use App\Services\FrontendOrderService;
 use App\Services\OrderService;
 use Illuminate\Http\{JsonResponse, Request};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
@@ -50,7 +53,7 @@ class OrderController extends Controller
                 'per_page' => $request->input('per_page', 20),
             ];
 
-           Log::info($filters);
+   
             $orders = $this->frontendOrderService->getOrders($filters);
             $statusCounts = $this->frontendOrderService->getOrderCountsByStatus();
 
@@ -229,4 +232,74 @@ class OrderController extends Controller
             ], 500);
         }
     }
+ public function checkCourier(Request $request)
+{
+    $phone = $request->query('phone');
+    $forceRefresh = $request->boolean('refresh');
+
+    if (!$phone) {
+        throw ApiException::badRequest('Phone number is required.');
+    }
+
+    $companyId = auth()->user()->company_id ?? null;
+
+    $existing = CourierCheckHistory::where('company_id', $companyId)
+        ->where('phone', $phone)
+        ->first();
+
+    // Normal load (no refresh) -> serve from cache if exists
+    if (!$forceRefresh) {
+        if ($existing) {
+            return response()->json([
+                'courierData' => $existing->response_data,
+                'source' => 'cache',
+                'checked_at' => $existing->checked_at,
+            ]);
+        }
+        // no cache, fresh fetch needed even without explicit refresh
+    }
+
+    // Refresh requested -> check rate limit
+    if ($forceRefresh && $existing && $existing->checked_at) {
+        $nextAllowedAt = $existing->checked_at->addHours(2);
+
+        if (now()->lessThan($nextAllowedAt)) {
+            return response()->json([
+                'message' => 'Refresh limit reached. Please try again later.',
+                'courierData' => $existing->response_data,
+                'source' => 'cache',
+                'checked_at' => $existing->checked_at,
+                'next_allowed_at' => $nextAllowedAt,
+                'retry_after_seconds' => now()->diffInSeconds($nextAllowedAt),
+            ], 429);
+        }
+    }
+
+    // Call external API
+    try {
+        $response = Http::withToken(config('services.bdcourier.key'))
+            ->post("https://bdcourier.com/api/courier-check?phone={$phone}");
+
+        if (!$response->successful()) {
+            Log::error('Courier API failed: ' . $response->status() . ' - ' . $response->body());
+            throw ApiException::serverError('Courier API request failed.');
+        }
+
+        $data = $response->json('courierData');
+
+        $record = CourierCheckHistory::updateOrCreate(
+            ['company_id' => $companyId, 'phone' => $phone],
+            ['response_data' => $data, 'checked_at' => now()]
+        );
+
+        return response()->json([
+            'courierData' => $data,
+            'source' => 'live',
+            'checked_at' => $record->checked_at,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Courier check failed: ' . $e->getMessage());
+        throw ApiException::serverError('Unable to fetch courier history.');
+    }
+}
 }

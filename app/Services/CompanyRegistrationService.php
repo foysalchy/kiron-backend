@@ -221,6 +221,7 @@ class CompanyRegistrationService
             DomainSetup::create([
                 'company_id' => $company->id,
                 'sub_domain' => $data['sub_domain'],
+                'template_name' => 'template1'
             ]);
 
             // Update language & currency in SiteSettings
@@ -258,6 +259,17 @@ class CompanyRegistrationService
             // Activate Company
             $company->update([
                 'status' => Status::Active->value,
+                'theme_template' => [
+                    'id' => "1",
+                    'footer_color' => "#dd3636",
+                    'header_color' => "#c82828",
+                    'primary_color' => "#ffffff",
+                    'secondary_color' => "#000",
+                    'footer_text_color' => "#c9c0c0",
+                    'header_text_color' => "#ffffff",
+                    'primary_text_color' => "#000000",
+                    'secondary_text_color' => "#1e40af",
+                ],
             ]);
 
             User::where('company_id', $company->id)
@@ -276,7 +288,7 @@ class CompanyRegistrationService
                 ['title' => 'Order Place', 'slug' => 'order-place', 'description' => 'Your order has been placed successfully.'],
                 ['title' => 'Order Shipped', 'slug' => 'order-shipped',  'description' => 'Your order has been shipped.'],
                 ['title' => 'Order Confirm', 'slug' => 'order-confirm',  'description' => 'Your order has been confirmed.'],
-                ['title' => 'Order Delivered', 'slug' => 'order-delivered','description' => 'Your order has been delivered successfully.'],
+                ['title' => 'Order Delivered', 'slug' => 'order-delivered', 'description' => 'Your order has been delivered successfully.'],
                 ['title' => 'Cancel Order',  'slug' => 'cancel-order',  'description' => 'Your order has been cancelled.'],
                 ['title' => 'Follow Up',    'slug' => 'follow-up',   'description' => 'This is a follow-up message regarding your order.'],
             ];
@@ -531,7 +543,7 @@ class CompanyRegistrationService
             ->toArray();
     }
 
-    public function verifyOtp(int $registrationId, string $type, string $otp): User
+    public function verifyOtp(int $registrationId, string $type, string $otp,string $method): User
     {
         $record = EmailVerification::where('company_id', $registrationId)
             ->where('type', $type)
@@ -543,7 +555,7 @@ class CompanyRegistrationService
         if ($record->isExpired()) throw ApiException::badRequest('Code has expired. Please request a new one.');
         if ($record->otp !== $otp) throw ApiException::badRequest('Invalid verification code.');
 
-        $record->update(['verified_at' => Carbon::now()]);
+        $record->update(['verified_at' => Carbon::now(),'method'=>$method]);
 
         User::where('company_id', $registrationId)
             ->where('email', $record->email)
@@ -579,18 +591,18 @@ class CompanyRegistrationService
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
 
-        if( $method === 'sms') {
+        if ($method === 'sms') {
             $this->sendopt($company->phone, $newOtp);
             Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
             return;
-        }else{
+        } else {
             $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
             Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
         }
-      
     }
-    public function sendopt($phone,$otp){
-       $message = "Your Dorja.io verification code is {$otp}. Use it to complete your registration. Valid for 5 minutes. Do not share this code.";
+    public function sendopt($phone, $otp)
+    {
+        $message = "Your Dorja.io verification code is {$otp}. Use it to complete your registration. Valid for 5 minutes. Do not share this code.";
         $this->smsSendService->sendToGateway([$phone], $message);
     }
 

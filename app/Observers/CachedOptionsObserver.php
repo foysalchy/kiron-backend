@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Page;
 use App\Models\LandingPage;
 use App\Models\Blog;
+use App\Models\DomainSetup;
 use App\Models\MasterFeature;
 
 class CachedOptionsObserver
@@ -64,7 +65,18 @@ class CachedOptionsObserver
         if ($model instanceof \App\Models\MasterFeature) {
             \App\Models\MasterFeature::clearSlugCache(null, $model->slug, 'saas_feature_details');
         }
+
+        if ($model instanceof \App\Models\DomainSetup) {
+            \App\Models\DomainSetup::clearSubdomainCache($model->sub_domain);
+        }
     }
+    public function updating($model)
+    {
+        if ($model instanceof DomainSetup && $model->isDirty('sub_domain')) {
+            DomainSetup::clearSubdomainCache($model->getOriginal('sub_domain'));
+        }
+    }
+
 
     public function deleted($model)
     {
