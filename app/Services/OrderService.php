@@ -1010,9 +1010,9 @@ class OrderService
         }
 
 
-        if ($item['bin_id']) {
-            $warehouseId = Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
-        }
+      if (!empty($item['bin_id'])) {
+        $warehouseId = Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
+    }
 
         $stockData = [
             'warehouse_id' => $warehouseId,

@@ -43,7 +43,8 @@ class CompanyRegistrationController extends Controller
        $user= $this->registrationService->verifyOtp(
             $request->integer('registration_id'),
             $request->string('type'),
-            $request->string('otp')
+            $request->string('otp'),
+            $request->string('method')
         );
 
         return response()->json([
