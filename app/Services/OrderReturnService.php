@@ -117,6 +117,9 @@ class OrderReturnService
             if (!$order) {
                 throw ApiException::notFound('Order');
             }
+            if (!$order->warehouse_id) {
+                throw ApiException::badRequest('Order does not have a warehouse assigned');
+            }
 
             $data['warehouse_id'] = $order->warehouse_id;
             $data['customer_id'] = $order->customer_id;

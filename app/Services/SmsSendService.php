@@ -73,38 +73,38 @@ class SmsSendService
     {
         return DB::transaction(function () use ($data) {
             try {
-                // 1. Merge System Party IDs
+                // 1. Fetch system parties with id + name + phone (personalization এর জন্য)
                 $partyIds = array_unique(array_merge(
                     $data['customer_ids'] ?? [],
                     $data['supplier_ids'] ?? []
                 ));
 
-                $customNumbers = $data['custom_numbers'] ?? [];
-                $phoneNumbers = [];
-
-                // 2. Fetch phone numbers for system parties
+                $systemParties = collect();
                 if (!empty($partyIds)) {
-                    $systemPhones = Party::whereIn('id', $partyIds)
+                    $systemParties = Party::whereIn('id', $partyIds)
                         ->whereNotNull('phone')
                         ->where('phone', '!=', '')
-                        ->pluck('phone')
-                        ->toArray();
-
-                    $phoneNumbers = array_merge($phoneNumbers, $systemPhones);
+                        ->get(['id', 'name', 'phone']);
                 }
 
-                // 3. Add Custom Numbers
-                foreach ($customNumbers as $number) {
-                    $cleanNumber = trim($number);
-                    if (!empty($cleanNumber)) {
-                        $phoneNumbers[] = $cleanNumber;
-                    }
-                }
+                // 2. Custom numbers (এদের নাম নেই, তাই placeholder replace হবে না — raw number)
+                $customNumbers = collect($data['custom_numbers'] ?? [])
+                    ->map(fn($n) => trim($n))
+                    ->filter()
+                    ->unique();
 
-                // 4. Keep only unique phone numbers
-                $phoneNumbers = array_unique($phoneNumbers);
+                // 3. Recipients list বানাও: [ ['phone' => ..., 'name' => ...], ... ]
+                $recipients = $systemParties->map(fn($party) => [
+                    'phone' => $party->phone,
+                    'name'  => $party->name,
+                ])->concat(
+                    $customNumbers->map(fn($number) => [
+                        'phone' => $number,
+                        'name'  => null, // custom number-এ customer_name বসবে না
+                    ])
+                )->unique('phone')->values();
 
-                if (empty($phoneNumbers)) {
+                if ($recipients->isEmpty()) {
                     throw ApiException::badRequest('Selected recipients do not have valid phone numbers.');
                 }
 
@@ -114,7 +114,7 @@ class SmsSendService
                     throw ApiException::badRequest('SMS message cannot be empty.');
                 }
 
-                $recipientCount = count($phoneNumbers);
+                $recipientCount = $recipients->count();
                 $smsCount       = $this->calculateSmsCount($messageBody, $recipientCount);
 
                 // Balance check
@@ -125,17 +125,25 @@ class SmsSendService
                     );
                 }
 
-                // 6. Store record
+                // Store record (raw template body-ই save হবে, replaced version না)
                 $smsSend = SmsSend::create(array_merge($data, [
                     'total_recipients' => $smsCount,
                     'sms_count'        => $smsCount,
                     'rate_per_sms'     => $wallet->currentRate(),
                 ]));
 
-                // 7. Send to gateway
-                $this->sendToGateway($phoneNumbers, $messageBody);
+                // 4. Send to gateway — প্রতিটা recipient-এর জন্য personalized message
+                foreach ($recipients as $recipient) {
+                    $personalizedMessage = $this->renderTemplate($messageBody, $recipient['name']);
+                    Log::info('Sending SMS', [
+                        'phone'   => $recipient['phone'],
+                        'name'    => $recipient['name'] ?? 'N/A',
+                        'message' => $personalizedMessage,
+                    ]);
+                    $this->sendToGateway([$recipient['phone']], $personalizedMessage);
+                }
 
-                // ✅ 8. Deduct balance
+                // Deduct balance
                 $this->smsWalletService->deductBalance(
                     $smsCount,
                     $smsSend->id,
@@ -159,6 +167,15 @@ class SmsSendService
                 throw ApiException::serverError('Failed to process SMS request');
             }
         });
+    }
+
+    private function renderTemplate(string $template, ?string $customerName): string
+    {
+        return str_replace(
+            '{{customer_name}}',
+            $customerName ?? 'Customer',
+            $template
+        );
     }
     private function calculateSmsCount(string $message, int $recipientCount): int
     {

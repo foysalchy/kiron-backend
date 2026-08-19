@@ -42,7 +42,10 @@ class ProductVariation extends Model
     {
         return $this->belongsTo(Product::class);
     }
-
+    public function isStockManaged(): bool
+    {
+        return $this->product->isStockManaged();
+    }
     /**
      * Variation attributes
      */

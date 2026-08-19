@@ -81,69 +81,62 @@ class EmailSendService
                 $customEmails = $data['custom_emails'] ?? [];
                 $recipients = [];
 
-                // 1. Fetch System parties (Customers & Suppliers)
+                // 1. Fetch System parties (Customers & Suppliers) — name সহ
                 if (!empty($partyIds)) {
                     $parties = Party::whereIn('id', $partyIds)
                         ->whereNotNull('email')
                         ->where('email', '!=', '')
-                        ->get(['id', 'email']);
+                        ->get(['id', 'name', 'email']);
 
                     foreach ($parties as $party) {
                         $recipients[] = [
-                            'id' => $party->id,
+                            'id'    => $party->id,
+                            'name'  => $party->name,
                             'email' => $party->email,
-                            'type' => 'system_party'
+                            'type'  => 'system_party'
                         ];
                     }
                 }
 
-                // 2. Format Custom Emails 
+                // 2. Format Custom Emails (নাম নেই, তাই null থাকবে)
                 foreach ($customEmails as $email) {
-                    // Validate email format just to be safe
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        // Make sure we don't duplicate an email that is already in system_parties
                         $alreadyExists = collect($recipients)->contains('email', $email);
                         if (!$alreadyExists) {
                             $recipients[] = [
-                                'id' => null,
+                                'id'    => null,
+                                'name'  => null,
                                 'email' => $email,
-                                'type' => 'custom'
+                                'type'  => 'custom'
                             ];
                         }
                     }
                 }
 
-                // If absolutely no emails were found, throw validation error
                 if (empty($recipients)) {
-                    throw ApiException::validationError('No valid email addresses found among the selected recipients.');
+                    throw ApiException::badRequest('No valid email addresses found among the selected recipients.');
                 }
 
-                // Create record in EmailSend table
-                // Ensure 'custom_emails' is in $fillable and $casts -> 'array'
+                // raw template (placeholder সহ) DB-তে save হচ্ছে
                 $emailSend = EmailSend::create($data);
 
                 $successCount = 0;
                 $failedRecipients = [];
 
-                // 3. Queue emails
+                // 3. Queue emails — personalized subject/body per recipient
                 foreach ($recipients as $index => $recipient) {
                     try {
+                        $personalizedSubject = $this->renderTemplate($data['subject'], $recipient['name']);
+                        $personalizedBody    = $this->renderTemplate($data['body'], $recipient['name']);
+
                         Mail::to($recipient['email'])->later(
                             now()->addSeconds($index * 3),
-                            new SendEmail($data['subject'], $data['body'])
+                            new SendEmail($personalizedSubject, $personalizedBody)
                         );
 
                         $successCount++;
 
-                        Log::info('Email queued successfully', [
-                            'email_send_id' => $emailSend->id,
-                            'company_id'    => $emailSend->company_id,
-                            'recipient'     => $recipient['email'],
-                            'customer_id'   => $recipient['id'], // will be null for custom emails
-                            'type'          => $recipient['type'],
-                            'delay_seconds' => $index * 3,
-                            'queued_at'     => now()->toDateTimeString(),
-                        ]);
+                     
                     } catch (\Exception $e) {
                         $failedRecipients[] = [
                             'customer_id' => $recipient['id'],
@@ -161,14 +154,13 @@ class EmailSendService
                     }
                 }
 
-                // Summary log
                 if (!empty($failedRecipients)) {
                     Log::warning('Email batch completed with some failures', [
-                        'email_send_id'    => $emailSend->id,
-                        'company_id'       => $emailSend->company_id,
-                        'total_recipients' => count($recipients),
-                        'success_count'    => $successCount,
-                        'failed_count'     => count($failedRecipients),
+                        'email_send_id'     => $emailSend->id,
+                        'company_id'        => $emailSend->company_id,
+                        'total_recipients'  => count($recipients),
+                        'success_count'     => $successCount,
+                        'failed_count'      => count($failedRecipients),
                         'failed_recipients' => $failedRecipients,
                     ]);
                 } else {
@@ -180,7 +172,6 @@ class EmailSendService
                     ]);
                 }
 
-                // Call your LogHelper
                 LogHelper::created(
                     'email_send',
                     $emailSend->id,
@@ -201,6 +192,15 @@ class EmailSendService
                 throw ApiException::serverError('Failed to process and send emails: ' . $e->getMessage());
             }
         });
+    }
+
+    private function renderTemplate(string $template, ?string $customerName): string
+    {
+        return str_replace(
+            '{{customer_name}}',
+            $customerName ?? 'Customer',
+            $template
+        );
     }
 
     public function getEmailLogById(int $id): EmailSend

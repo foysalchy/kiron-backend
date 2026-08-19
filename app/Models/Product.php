@@ -48,6 +48,7 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'status',
+        'manage_stock'
     ];
 
     protected $casts = [
@@ -62,6 +63,8 @@ class Product extends Model
         'stock_quantity' => 'integer',
         'regular_price' => 'decimal:2',
         'discount' => 'decimal:2',
+        'manage_stock' => 'boolean',
+
 
     ];
 
@@ -210,6 +213,10 @@ class Product extends Model
     public function getIsInStockAttribute(): bool
     {
         return $this->stock_status === 'in_stock' && $this->stock_quantity > 0;
+    }
+    public function isStockManaged(): bool
+    {
+        return (bool) $this->manage_stock;
     }
     public function getGroupsAttribute(): array
     {
