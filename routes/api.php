@@ -675,6 +675,7 @@ Route::prefix('v1')->group(function () {
                     Route::patch('/{id}/change-status', [OrderController::class, 'changeStatus']);
                     Route::delete('/{id}', [OrderController::class, 'deleteOrder']);
                     Route::put('/{id}/update', [OrderController::class, 'update']);
+                    Route::put('/{id}/update-shipping', [OrderController::class, 'updateShiping']);
                     Route::post('/{id}/add-payment', [OrderController::class, 'addPayment']);
                     Route::get('/cutomer/{customerId}', [OrderController::class, 'customerOrders']);
                     Route::get('/edit-order/{id}', [OrderController::class, 'getEditOrder']);
@@ -1063,7 +1064,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('{id}/force', [WocommerceSettingController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
                     Route::Put('/{id}/toggle-sync', [WocommerceSettingController::class, 'toggleSync']);
-                    Route::get('/import/{id}',[WocommerceSettingController::class, 'import']);
+                    Route::get('/import/{id}', [WocommerceSettingController::class, 'import']);
                     Route::post('/import-product', [WooCommerceImportController::class, 'importProduct']);
                 });
                 //note template settings routes
@@ -1122,7 +1123,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('{id}/force', [CourierController::class, 'forceDestroy']);
                     Route::put('/{id}/toggle-status', [CourierController::class, 'toggleStatus']);
                 });
-        
+
                 //ip-directories routes
                 Route::prefix('ip-directories')->group(function () {
                     Route::get('/', [IpDirectoryController::class, 'index']);

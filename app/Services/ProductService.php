@@ -453,26 +453,34 @@ class ProductService
     private function createSingleProduct(array $data): Product
     {
         // Extract warehouse info
+        $manageStock =  $data['manage_stock'] == 1 ? true : false;
         $warehouseInfo = $data['warehouse_info'] ?? [];
         unset($data['warehouse_info']);
 
+
+
         // Calculate total stock from warehouse_info
-        $totalStock = 0;
-        if (!empty($warehouseInfo)) {
-            $totalStock = collect($warehouseInfo)->sum('quantity');
+        if (!$manageStock) {
+            $warehouseInfo = collect($warehouseInfo)->map(function ($wh) {
+                $wh['quantity'] = 0;
+                return $wh;
+            })->toArray();
         }
+
+        $totalStock = $manageStock ? collect($warehouseInfo)->sum('quantity') : 0;
 
         // Set stock-related fields for single product
         $data['stock_quantity'] = $totalStock;
         $data['available_stock'] = $totalStock;
-        $data['stock_status'] = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
-        $data['warehouse_info'] = $warehouseInfo; // Keep as JSON for single products
-
+        $data['stock_status'] = $manageStock
+            ? ($totalStock > 0 ? 'in_stock' : 'out_of_stock')
+            : 'in_stock';
+        $data['warehouse_info'] = $warehouseInfo;
         // Create the product
         $product = Product::create($data);
 
         // Create initial stock ledger entries for each warehouse
-        if (!empty($warehouseInfo)) {
+        if ($manageStock && !empty($warehouseInfo)) {
             foreach ($warehouseInfo as $warehouseStock) {
                 if (isset($warehouseStock['quantity']) && $warehouseStock['quantity'] > 0) {
                     ProductStockLedger::create([
@@ -518,6 +526,7 @@ class ProductService
         $data['stock_quantity'] = 0;
         $data['available_stock'] = 0;
         $data['stock_status'] = 'out_of_stock';
+        $manageStock =  $data['manage_stock'] == 1 ? true : false;
 
         // Create the product
         $product = Product::create($data);
@@ -528,6 +537,12 @@ class ProductService
         foreach ($variations as $variationData) {
             $attributes = $variationData['attributes'] ?? [];
             $warehouseInfo = $variationData['warehouse_info'] ?? [];
+            if (!$manageStock) {
+                $warehouseInfo = collect($warehouseInfo)->map(function ($wh) {
+                    $wh['quantity'] = 0;
+                    return $wh;
+                })->toArray();
+            }
             $galleryImages = $variationData['gallery_images'] ?? [];
             unset($variationData['gallery_images']);
 
@@ -557,7 +572,9 @@ class ProductService
                 'discount' => $variationData['discount'] ?? 0,
                 'stock_quantity' => $variationStock,
                 'available_stock' => $variationStock,
-                'stock_status' => $variationStock > 0 ? 'in_stock' : 'out_of_stock',
+                'stock_status' => $manageStock
+                    ? ($variationStock > 0 ? 'in_stock' : 'out_of_stock')
+                    : 'in_stock',
                 'combination_hash' => $combinationHash,
             ]);
             if (!empty($galleryImages)) {
@@ -580,28 +597,29 @@ class ProductService
                         'product_variation_id' => $variation->id,
                         'warehouse_id' => $whStock['warehouse_id'],
                         'bin_id' => $whStock['bin_id'] ?? null,
-                        'quantity' => $whStock['quantity'],
+                        'quantity' => $whStock['quantity'] ?? 0
                     ]);
 
-                    // ✅ Create VARIATION stock ledger entry (not product stock ledger)
-                    $variationDisplay = $this->getVariationDisplayName($variation->id);
+                    if (($whStock['quantity'] ?? 0) > 0) {
+                        $variationDisplay = $this->getVariationDisplayName($variation->id);
 
-                    ProductVariationStockLedger::create([
-                        'product_id' => $product->id,
-                        'variation_id' => $variation->id,
-                        'warehouse_id' => $whStock['warehouse_id'],
-                        'bin_id' => $whStock['bin_id'] ?? null,
-                        'batch_number' => $variation->sku ?? null,
-                        'serial_numbers' => null,
-                        'transaction_type' => 'initial_stock',
-                        'reference_type' => 'ProductVariation',
-                        'reference_id' => $variation->id,
-                        'quantity_before' => 0,
-                        'quantity_change' => $whStock['quantity'],
-                        'quantity_after' => $whStock['quantity'],
-                        'notes' => "Initial stock for variation: {$variationDisplay}",
-                        'created_by' => Auth::id(),
-                    ]);
+                        ProductVariationStockLedger::create([
+                            'product_id' => $product->id,
+                            'variation_id' => $variation->id,
+                            'warehouse_id' => $whStock['warehouse_id'],
+                            'bin_id' => $whStock['bin_id'] ?? null,
+                            'batch_number' => $variation->sku ?? null,
+                            'serial_numbers' => null,
+                            'transaction_type' => 'initial_stock',
+                            'reference_type' => 'ProductVariation',
+                            'reference_id' => $variation->id,
+                            'quantity_before' => 0,
+                            'quantity_change' => $whStock['quantity'],
+                            'quantity_after' => $whStock['quantity'],
+                            'notes' => "Initial stock for variation: {$variationDisplay}",
+                            'created_by' => Auth::id(),
+                        ]);
+                    }
                 }
             }
         }
@@ -739,17 +757,28 @@ class ProductService
      */
     private function updateSingleProduct(Product $product, array &$data): void
     {
+
+        $manageStock = ($data['manage_stock'] ?? $product->manage_stock) == 1 ? true : false;
+
         $warehouseInfo = $data['warehouse_info'] ?? [];
         unset($data['warehouse_info']);
-
-        $totalStock = collect($warehouseInfo)->sum('quantity');
+        if (!$manageStock) {
+            $warehouseInfo = collect($warehouseInfo)->map(function ($wh) {
+                $wh['quantity'] = 0;
+                return $wh;
+            })->toArray();
+        }
+        $totalStock = $manageStock ? collect($warehouseInfo)->sum('quantity') : 0;   // ← পরিবর্তিত
         $data['stock_quantity'] = $totalStock;
         $data['available_stock'] = $totalStock;
-        $data['stock_status'] = $totalStock > 0 ? 'in_stock' : 'out_of_stock';
+        $data['stock_status'] = $manageStock
+            ? ($totalStock > 0 ? 'in_stock' : 'out_of_stock')
+            : 'in_stock';
         $data['warehouse_info'] = $warehouseInfo;
 
+
         // ── Stock Ledger Update ──────────────────────────────────────
-        if (!empty($warehouseInfo)) {
+        if ($manageStock && !empty($warehouseInfo)) {
             foreach ($warehouseInfo as $warehouseStock) {
                 $newQty = (int) ($warehouseStock['quantity'] ?? 0);
                 $warehouseId = $warehouseStock['warehouse_id'];
@@ -800,7 +829,7 @@ class ProductService
 
         $newVariations = $data['variations'] ?? [];
         $processedVariationIds = [];
-
+        $manageStock = ($data['manage_stock'] ?? $product->manage_stock) == 1 ? true : false;
         foreach ($newVariations as $variationData) {
             $attributes = $variationData['attributes'] ?? [];
 
@@ -818,6 +847,15 @@ class ProductService
 
                 );
             }
+            $warehouseInfo = $variationData['warehouse_info'] ?? [];
+            if (!$manageStock) {
+                $warehouseInfo = collect($warehouseInfo)->map(function ($wh) {
+                    $wh['quantity'] = 0;
+                    return $wh;
+                })->toArray();
+            }
+            $stockQty = $manageStock ? ($variationData['stock_quantity'] ?? 0) : 0;   // ← নতুন লাইন
+
             // Check if this combination already exists (by hash, not by ID)
             $existingVariation = ProductVariation::where('product_id', $product->id)
                 ->where('combination_hash', $combinationHash)
@@ -833,9 +871,11 @@ class ProductService
                     'purchase_price' => $variationData['purchase_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
-                    'stock_quantity' => $variationData['stock_quantity'] ?? 0,
-                    'available_stock' => $variationData['stock_quantity'] ?? 0,
-                    'stock_status' => $this->determineStockStatus($variationData['stock_quantity'] ?? 0),
+                    'stock_quantity' => $stockQty,
+                    'available_stock' => $stockQty,
+                    'stock_status' => $manageStock
+                        ? $this->determineStockStatus($stockQty)
+                        : 'in_stock',
                 ]);
 
                 // Update warehouse stocks if provided
@@ -843,7 +883,7 @@ class ProductService
                     $this->updateVariationWarehouseStocks(
                         $product,
                         $existingVariation,
-                        $variationData['warehouse_info']
+                        $warehouseInfo
                     );
                 }
 
@@ -873,9 +913,11 @@ class ProductService
                     'regular_price' => $variationData['regular_price'],
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
-                    'stock_quantity' => $variationData['stock_quantity'] ?? 0,
-                    'available_stock' => $variationData['stock_quantity'] ?? 0,
-                    'stock_status' => $this->determineStockStatus($variationData['stock_quantity'] ?? 0),
+                    'stock_quantity' => $stockQty,
+                    'available_stock' => $stockQty,
+                    'stock_status' => $manageStock
+                        ? $this->determineStockStatus($stockQty)
+                        : 'in_stock',
                     'combination_hash' => $combinationHash,
                 ]);
 
@@ -893,9 +935,10 @@ class ProductService
                     $this->createVariationWarehouseStocks(
                         $product,
                         $newVariation,
-                        $variationData['warehouse_info']
+                        $warehouseInfo   
                     );
                 }
+
 
                 // ✅ 3. Create galleries for the new variation
                 if (!empty($galleryImages)) {
@@ -1243,7 +1286,9 @@ class ProductService
         try {
 
             $product = $this->getProductById($id);
-
+            if (!$product->manage_stock) {
+                throw ApiException::badRequest('Stock tracking is disabled for this product');
+            }
             $warehouseId = $data['warehouse_id'];
             $binId = $data['bin_id'] ?? null;
             $variationId = $data['variation_id'] ?? null;
@@ -1764,7 +1809,9 @@ class ProductService
 
         try {
             $product = $this->getProductById($id);
-
+            if (!$product->manage_stock) {
+                return $product;
+            }
             $warehouseId = $data['warehouse_id'];
             $binId = $data['bin_id'] ?? null;
             $quantity = $data['quantity'];
@@ -2000,6 +2047,9 @@ class ProductService
 
         try {
             $product = $this->getProductById($id);
+            if (!$product->manage_stock) {
+                return $product;
+            }
 
             $warehouseId = $data['warehouse_id'];
             $binId = $data['bin_id'] ?? null;

@@ -24,6 +24,8 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
             [
                 'brand_id' => ['nullable', 'exists:brands,id'],
                 'assigned_to' => ['nullable', 'exists:users,id'],
+                'manage_stock' => ['required'],
+
 
                 // Basic Info
                 'title' => ['sometimes', 'required', 'string', 'max:255'],

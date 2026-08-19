@@ -219,7 +219,7 @@ class OrderService
                 'balance'    => DB::raw("balance - {$dueAmount}"),
             ]);
         }
-        
+
 
 
         return $order;
@@ -286,9 +286,9 @@ class OrderService
             if (!isset($data['status'])) {
                 $data['status'] = Status::Pending->value;
             }
-            if ($data['payment_status'] == Order::PAYMENT_PAID && $data['status'] != Status::Hold->value) {
-                $data['status'] = Status::Delivered->value;
-            }
+            // if ($data['payment_status'] == Order::PAYMENT_PAID && $data['status'] != Status::Hold->value) {
+            //     $data['status'] = Status::Delivered->value;
+            // }
             // Create order
             $order = Order::create($data);
             // Create order details and deduct stock
@@ -550,7 +550,33 @@ class OrderService
         }
     }
 
+    public function updateShiping(int $id, array $data, ?string $type = null): Order
+    {
+        $order = Order::find($id);
 
+        if (!$order) {
+            throw ApiException::notFound('Order not found');
+        }
+
+        // shipping_address এলে existing data-র সাথে merge করো, null field গুলো overwrite করো না
+        if (isset($data['shipping_address']) && is_array($data['shipping_address'])) {
+            $existingAddress = $order->shipping_address ?? [];
+
+            // শুধু যেসব key request-এ পাঠানো হয়েছে এবং value null না, সেগুলোই override হবে
+            $newAddress = array_filter(
+                $data['shipping_address'],
+                fn($value) => !is_null($value)
+            );
+
+            $data['shipping_address'] = array_merge($existingAddress, $newAddress);
+        }
+
+       
+        $order->fill($data);
+        $order->save();
+
+        return $order->fresh();
+    }
     /**
      * Cancel order
      */
@@ -678,9 +704,14 @@ class OrderService
                     'Order is already delivered. Only return-related status changes are allowed.'
                 );
             }
+            $wasHoldOrDraft = $oldStatus == Status::Hold->value || $oldStatus == Status::Draft->value;
 
-            // Hold থেকে change হলে stock deduct করো
-            if ($oldStatus == Status::Hold->value || $oldStatus == Status::Draft->value) {
+            if ($getStatus == Status::Cancelled) {
+                if (!$wasHoldOrDraft) {
+                    $this->restoreOrderStock($order);
+                }
+            } elseif ($wasHoldOrDraft) {
+                // Hold/Draft থেকে অন্য active status-এ গেলে stock deduct করো
                 foreach ($order->orderDetails as $detail) {
                     $this->deductOrderStock($order, [
                         'product_id'   => $detail->product_id,
@@ -690,15 +721,16 @@ class OrderService
                 }
             }
 
+
             $order->update([
                 'status' => $getStatus->value
             ]);
             try {
-            app(\App\Services\SmsSendService::class)->sendStatusBasedSms($order);
-        } catch (\Exception $smsError) {
-            Log::warning("Automated SMS failed: " . $smsError->getMessage());
-            // এসএমএস না গেলেও অর্ডার আপডেট যাতে হয়ে যায়, তাই ট্রাই-ক্যাচ রাখা হয়েছে
-        }
+                app(\App\Services\SmsSendService::class)->sendStatusBasedSms($order);
+            } catch (\Exception $smsError) {
+                Log::warning("Automated SMS failed: " . $smsError->getMessage());
+                // এসএমএস না গেলেও অর্ডার আপডেট যাতে হয়ে যায়, তাই ট্রাই-ক্যাচ রাখা হয়েছে
+            }
 
             $logStatus = "{$getOldStatus->label()} → {$getStatus->label()}";
 
@@ -1010,9 +1042,9 @@ class OrderService
         }
 
 
-      if (!empty($item['bin_id'])) {
-        $warehouseId = Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
-    }
+        if (!empty($item['bin_id'])) {
+            $warehouseId = Bin::find($item['bin_id'])->warehouse_id ?? $warehouseId;
+        }
 
         $stockData = [
             'warehouse_id' => $warehouseId,

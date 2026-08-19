@@ -50,12 +50,14 @@ class InventoryStockReportService
                 $product->current_stock = $warehouseStocks->sum('quantity');
                 return $product;
             });
+            $companyId = auth()->user()->company_id;
 
             // ── 2. Variation Products ──
             $variationQuery = DB::table('product_variation_stocks as pvs')
                 ->join('product_variations as pv', "pvs.{$variationColumn}", '=', 'pv.id')
                 ->join('products as p', 'pv.product_id', '=', 'p.id')
                 ->leftJoin('brands as b', 'p.brand_id', '=', 'b.id')
+                ->where('p.company_id', $companyId)
                 ->select([
                     'pv.id as variation_id',
                     'pv.product_id',

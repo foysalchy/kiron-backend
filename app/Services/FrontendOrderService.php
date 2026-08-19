@@ -456,11 +456,13 @@ class FrontendOrderService
             'payments' => $order->orderPayments->map(function ($payment) {
                 return [
                     'id' => $payment->id,
-                    'amount' => $payment->amount,
+                    'amount' => (float) $payment->amount,
                     'payment_method' => $payment->payment_method,
-                    'change_amount' => $payment->change_amount,
+                    'change_amount' => (float) $payment->change_amount,
                     'reference_no' => $payment->reference_no,
                     'note' => $payment->note,
+                    'created_at' => $payment->created_at->format('Y-m-d H:i:s'),
+                    'time_ago' => $payment->created_at->diffForHumans(),
                 ];
             }),
             'orderDate' => $order->order_date,

@@ -40,7 +40,7 @@ class SelectOptionController extends Controller
      */
     public function warehouseOptions()
     {
-        return Warehouse::select('id', 'name')->orderBy('name', 'asc')->get();
+        return Warehouse::select('id', 'name')->where('status',Status::Active->value)->orderBy('name', 'asc')->get();
     }
     public function productwarehouseOptions()
     {

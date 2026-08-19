@@ -26,6 +26,7 @@ class StoreProductRequest extends BaseCompanyRequest
 
                 // Basic Info
                 'title'      => ['required', 'string', 'max:255'],
+                'manage_stock' => ['required'],
                 'slug'       => ['required', 'string', 'max:255', 'unique:products,slug'],
                 'thumbnail'  => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'video_link' => ['nullable', 'url'],
