@@ -590,6 +590,7 @@
 
         function handleAddToCart(isOrderNow = false) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
+            console.log(token,'token')
             const qty = document.getElementById('main-qty').value;
             let items = [];
 
