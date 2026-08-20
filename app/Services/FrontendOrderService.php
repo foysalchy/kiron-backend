@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\Status;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\CourierCheckHistory;
 use App\Models\CourierMethod;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -117,14 +118,24 @@ class FrontendOrderService
             }
         );
         $orders = $query->paginate($perPage);
-
+        $phones = $orders->getCollection()
+            ->pluck('customer.phone')
+            ->filter()
+            ->unique()
+            ->values();
+        $courierHistories = CourierCheckHistory::whereIn('phone', $phones)
+            ->get()
+            ->keyBy('phone');
         // Transform the data to include calculated fields
-        $orders->getCollection()->transform(function ($order) {
-            // Get customer total orders count
-            $customerTotalOrders = 1; // Default for walk-in
+        $orders->getCollection()->transform(function ($order) use ($courierHistories) {
+            $customerTotalOrders = 1;
             if ($order->customer_id) {
                 $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
             }
+
+            // ✅ courier history lookup
+            $phone = $order->customer?->phone;
+            $courierHistory = $phone ? ($courierHistories[$phone] ?? null) : null;
 
             return [
                 'id' => $order->id,
@@ -199,6 +210,10 @@ class FrontendOrderService
                 'courierInfo' => $this->getCourierInfo($order),
                 'assigned_to' => $order->assigned_to,
                 'due_amount' => (float) ($order->grand_total - $order->payment_amount),
+                'courierHistory' => $courierHistory ? [
+                    'summary' => $courierHistory->response_data['summary'] ?? null,
+                    'checked_at' => $courierHistory->checked_at,
+                ] : null,
             ];
         });
 
