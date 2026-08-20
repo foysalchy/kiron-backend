@@ -75,10 +75,10 @@ class CartController extends FrontendController
     {
         $companyId = $this->company_id;
         $ttl = now()->addHours(6);
-         $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
+        $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
             return SiteSetting::where('company_id', $companyId)
-            ->where('status', Status::Active->value)->first();
-         });
+                ->where('status', Status::Active->value)->first();
+        });
         $inside = $settings->inside_charge ?? 60;
         $outside = $settings->outside_charge ?? 100;
 
@@ -181,12 +181,21 @@ class CartController extends FrontendController
                     $variation = ProductVariation::with(['product:id,title,slug,thumbnail', 'stocks.warehouse'])->findOrFail($item['variation_id']);
                     $stockRecord = $variation->stocks->where('quantity', '>=', $qty)->sortByDesc('quantity')->first();
 
-                    if (!$stockRecord) continue; //
+                    if ($variation->product->manage_stock) {
+                        $stockRecord = $variation->stocks->where('quantity', '>=', $qty)->sortByDesc('quantity')->first();
+
+                        if (!$stockRecord) continue;
+
+                        $warehouseId = $stockRecord->warehouse_id;
+                        $binId       = $stockRecord->bin_id;
+                    } else {
+                        $stockRecord = $variation->stocks->first();
+                        $warehouseId = $stockRecord->warehouse_id ?? null;
+                        $binId       = $stockRecord->bin_id ?? null;
+                    }
 
                     $productId   = $variation->product_id;
                     $variationId = $variation->id;
-                    $warehouseId = $stockRecord->warehouse_id;
-                    $binId       = $stockRecord->bin_id;
 
                     Cart::add([
                         'id'      => 'var_' . $variation->id,
@@ -209,21 +218,30 @@ class CartController extends FrontendController
                     $product = Product::findOrFail($item['id']);
                     $bestWarehouse = null;
                     $bestBinId = null;
-                    $bestQty = 0;
+                    if ($product->manage_stock) {                      // ← guard
+                        $bestQty = 0;
 
-                    if (!empty($product->warehouse_info)) {
-                        foreach ($product->warehouse_info as $info) {
-                            $q = (int) ($info['quantity'] ?? 0);
-                            $wId = (int) ($info['warehouse_id'] ?? 0);
-                            if ($wId > 0 && $q > $bestQty) {
-                                $bestQty = $q;
-                                $bestWarehouse = $wId;
-                                $bestBinId = $info['bin_id'] ?? null;
+                        if (!empty($product->warehouse_info)) {
+                            foreach ($product->warehouse_info as $info) {
+                                $q = (int) ($info['quantity'] ?? 0);
+                                $wId = (int) ($info['warehouse_id'] ?? 0);
+                                if ($wId > 0 && $q > $bestQty) {
+                                    $bestQty = $q;
+                                    $bestWarehouse = $wId;
+                                    $bestBinId = $info['bin_id'] ?? null;
+                                }
                             }
+                        }
+
+                        if ($bestQty < $qty) continue;
+                    } else {
+                        if (!empty($product->warehouse_info)) {
+                            $firstWarehouse = $product->warehouse_info[0] ?? null;
+                            $bestWarehouse = $firstWarehouse['warehouse_id'] ?? null;
+                            $bestBinId = $firstWarehouse['bin_id'] ?? null;
                         }
                     }
 
-                    if ($bestQty < $qty) continue;
 
                     $productId   = $product->id;
                     $warehouseId = $bestWarehouse;

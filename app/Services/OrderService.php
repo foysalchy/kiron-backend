@@ -571,7 +571,7 @@ class OrderService
             $data['shipping_address'] = array_merge($existingAddress, $newAddress);
         }
 
-       
+
         $order->fill($data);
         $order->save();
 
@@ -1029,6 +1029,16 @@ class OrderService
      */
     private function deductOrderStock(Order $order, array $item): void
     {
+
+        $product = Product::find($item['product_id']);
+
+        if (!$product || !$product->manage_stock) {
+            Log::info('Skipping stock deduction: manage_stock is off', [
+                'order_id' => $order->id,
+                'product_id' => $item['product_id'],
+            ]);
+            return;
+        }
         Log::info('Deducting stock for order item', [
             'order_id' => $order->id,
             'product_id' => $item['product_id'],
