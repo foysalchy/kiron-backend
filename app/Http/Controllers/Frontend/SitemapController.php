@@ -182,10 +182,9 @@ class SitemapController extends Controller
         if (!$currentStore) abort(404);
 
         $companyId = $currentStore->company_id;
-        $setup = \App\Models\SiteSetting::where('company_id', $companyId)->first();
+        $setup = SiteSetting::where('company_id', $companyId)->first();
         $currency = $setup->currency ?? 'BDT';
 
-        // ১. প্রয়োজনীয় ডাটা লোড করা
         $products = Product::where('company_id', $companyId)
             ->where('status', Status::Active->value)
             ->with(['brand', 'variations.attributes.attributeValue', 'galleries', 'variations.galleries'])
@@ -193,7 +192,6 @@ class SitemapController extends Controller
 
         Product::loadCategoriesForCollection($products);
 
-        // ২. CSV ফাইল তৈরির প্রস্তুতি
         $fileName = 'facebook_catalog_' . $companyId . '.csv';
         $headers = [
             "Content-type"        => "text/csv; charset=UTF-8",
@@ -207,7 +205,7 @@ class SitemapController extends Controller
 
         $callback = function () use ($products, $columns, $setup, $currency) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, $columns); // হেডার রাইট করা
+            fputcsv($file, $columns);
 
             foreach ($products as $product) {
                 if ($product->type === 'single') {
@@ -222,7 +220,7 @@ class SitemapController extends Controller
                         $product->discount > 0 ? number_format($product->sale_price, 2, '.', '') . ' ' . $currency : '',
                         route('product.details', $product->slug),
                         $product->thumbnail_url,
-                        $product->galleries->pluck('image_url')->implode(','), // কমা দিয়ে আলাদা ছবি
+                        $product->galleries->pluck('image_url')->implode(','),
                         $product->brand->name ?? $setup->shop_name,
                         'PRD-' . $product->id,
                         '', // gtin
@@ -230,7 +228,7 @@ class SitemapController extends Controller
                         $product->mega_categories->first()->name ?? 'General'
                     ]);
                 } else {
-                    // ─── Variable Product Rows (প্রতিটি ভ্যারিয়েন্ট আলাদা রো) ───
+                    // ─── Variable Product Rows
                     foreach ($product->variations as $variant) {
                         $vGallery = $variant->galleries->count() > 0 ? $variant->galleries : $product->galleries;
 
@@ -246,10 +244,93 @@ class SitemapController extends Controller
                             $variant->image ? asset('storage/' . $variant->image) : $product->thumbnail_url,
                             $vGallery->pluck('image_url')->implode(','),
                             $product->brand->name ?? $setup->shop_name,
-                            'PRD-' . $product->id, // গ্রুপ আইডি হিসেবে মেইন প্রোডাক্ট আইডি
+                            'PRD-' . $product->id,
                             '', // gtin
                             $variant->sku ?? 'VAR-' . $variant->id, // mpn হিসেবে ভ্যারিয়েন্ট SKU
                             $product->mega_categories->first()->name ?? 'General'
+                        ]);
+                    }
+                }
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+    public function tiktokCatalogCsv()
+    {
+        $currentStore = getCurrentCompany();
+        if (!$currentStore) abort(401);
+
+        $companyId = $currentStore->company_id;
+        $setup = SiteSetting::where('company_id', $companyId)->first();
+        $currency = $setup->currency ?? 'BDT';
+
+        $products = Product::where('company_id', $companyId)
+            ->where('status', Status::Active->value)
+            ->with(['brand', 'variations.attributes.attributeValue', 'galleries'])
+            ->get();
+
+        Product::loadCategoriesForCollection($products);
+
+        $fileName = 'tiktok_catalog_' . $companyId . '.csv';
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+
+        $columns = [
+            'sku_id',
+            'product_name',
+            'product_url',
+            'product_image_url',
+            'price',
+            'sale_price',
+            'availability',
+            'condition',
+            'brand',
+            'description'
+        ];
+
+        $callback = function () use ($products, $columns, $setup, $currency) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($products as $product) {
+                $commonDescription = strip_tags($product->short_description ?: $product->title);
+                $productUrl = route('product.details', $product->slug);
+
+                if ($product->type === 'single') {
+                    // ─── Single Product ───
+                    fputcsv($file, [
+                        'PRD-' . $product->id, // sku_id
+                        $product->title,       // product_name
+                        $productUrl,           // product_url
+                        $product->thumbnail_url, // product_image_url
+                        number_format($product->regular_price, 2, '.', '') . ' ' . $currency, // price
+                        $product->discount > 0 ? number_format($product->sale_price, 2, '.', '') . ' ' . $currency : '', // sale_price
+                        $product->available_stock > 0 ? 'in stock' : 'out of stock', // availability
+                        'new', // condition
+                        $product->brand->name ?? $setup->shop_name ?? 'Guitar', // brand
+                        $commonDescription // description
+                    ]);
+                } else {
+                    foreach ($product->variations as $variant) {
+                        fputcsv($file, [
+                            'VAR-' . $variant->id,
+                            $product->title . ' - ' . $variant->display_name, // product_name
+                            $productUrl, // product_url
+                            $variant->image_url ?: $product->thumbnail_url, // product_image_url
+                            number_format($variant->regular_price, 2, '.', '') . ' ' . $currency, // price
+                            $variant->discount > 0 ? number_format($variant->final_price, 2, '.', '') . ' ' . $currency : '', // sale_price
+                            $variant->available_stock > 0 ? 'in stock' : 'out of stock', // availability
+                            'new', // condition
+                            $product->brand->name ?? $setup->shop_name ?? 'Guitar', // brand
+                            $commonDescription // description
                         ]);
                     }
                 }

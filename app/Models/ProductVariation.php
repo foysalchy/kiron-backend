@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class ProductVariation extends Model
 {
@@ -106,8 +107,15 @@ class ProductVariation extends Model
 
     public function getSalePriceAttribute()
     {
-        // regular_price থেকে discount বিয়োগ করা হচ্ছে
-        $price = $this->regular_price - $this->discount;
-        return $price > 0 ? $price : $this->regular_price;
+       return $this->getFinalPriceAttribute();
     }
+    public function getImageUrlAttribute(): ?string
+{
+    return $this->image
+        ? Storage::disk('r2')->url($this->image)
+        : null;
+}
+
+// ৩. $appends অ্যারেতে এটি যোগ করুন যাতে জাভাস্ক্রিপ্ট এটি সরাসরি পায়
+protected $appends = ['final_price', 'display_name', 'image_url', 'sale_price'];
 }

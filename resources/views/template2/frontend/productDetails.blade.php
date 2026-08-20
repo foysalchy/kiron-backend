@@ -70,21 +70,17 @@
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                         <img id="mainImage"
-                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                             src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
+                    <!-- Left: Image Gallery সেকশনে থাম্বনেইল কন্টেইনার আপডেট করুন -->
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
-                        <button onclick="changeImage('{{ $product->thumbnail_url }}')"
-                            class="aspect-square rounded-lg border-2 border-[var(--primary-color)] p-1 bg-white overflow-hidden">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-contain">
-                        </button>
-                        @foreach ($product->galleries as $gallery)
-                            <button onclick="changeImage('{{ $gallery->image_url }}')"
+                        @foreach ($allProductImages as $imgUrl)
+                            <button onclick="changeImage('{{ $imgUrl }}')"
                                 class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden">
-
-                                <img src="{{ $gallery->image_url }}"
+                                <img src="{{ $imgUrl }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                    class="w-full h-full object-contain" alt="Product Gallery Image">
+                                    class="w-full h-full object-contain" alt="Product Image">
                             </button>
                         @endforeach
                     </div>
@@ -513,80 +509,144 @@
 
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
+        const valueImages = @json($valueImages ?? []);
+        const defaultGalleries = @json($defaultGalleries ?? []);
+        const groupCategories = @json($groupCategories ?? []);
 
         let activeFilters = {}; // বর্তমানে স্ক্রিনে কোন গ্রুপে কি সিলেক্ট হয়ে আছে
         attributeGroups.forEach(group => activeFilters[group] = null);
 
         let finalSelectedVariationIds = []; // যেগুলো কার্টে যাবে
 
-        function renderAttributes() {
-            const container = document.getElementById('dynamic-attributes-container');
-            if (!container) return;
-            container.innerHTML = '';
+        function updateGalleryThumbnails(images) {
+        const container = document.getElementById('thumbnail-container');
+        if (!container) return;
 
-            let currentlyValidVariations = allVariations;
+        container.innerHTML = '';
+        images.forEach((imgUrl, index) => {
+            const borderClass = (index === 0) ? 'border-[var(--primary-color)]' : 'border-gray-200';
+            container.innerHTML += `
+                <button onclick="changeImage('${imgUrl}')"
+                    class="aspect-square rounded-lg border-2 ${borderClass} p-1 bg-white overflow-hidden">
+                    <img src="${imgUrl}" class="w-full h-full object-contain">
+                </button>
+            `;
+        });
 
-            for (let i = 0; i < attributeGroups.length; i++) {
-                const groupName = attributeGroups[i];
-                const isLastGroup = (i === attributeGroups.length - 1);
+        // প্রধান ইমেজ হিসেবে প্রথমটি দেখাবে
+        if (images.length > 0) changeImage(images[0]);
+    }
 
-                let availableValues = {};
-                currentlyValidVariations.forEach(v => {
-                    if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[
-                        groupName].name;
-                });
+         function renderAttributes() {
+        const container = document.getElementById('dynamic-attributes-container');
+        if (!container) return;
+        container.innerHTML = '';
 
-                let groupHtml =
-                    `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+        let currentlyValidVariations = allVariations;
 
-                for (const [valId, valName] of Object.entries(availableValues)) {
-                    // ডিজাইন ঠিক রাখতে বাটন চেক
-                    const isFilterActive = (activeFilters[groupName] == valId);
-                    const isVariationSelected = checkIsSelected(groupName, valId);
+        for (let i = 0; i < attributeGroups.length; i++) {
+            const groupName = attributeGroups[i];
+            const isLastGroup = (i === attributeGroups.length - 1);
 
-                    const activeClass = (isFilterActive || isVariationSelected) ?
-                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
-                        'border-gray-200 bg-white text-gray-700';
-
-                    groupHtml +=
-                        `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
+            let availableValues = {};
+            currentlyValidVariations.forEach(v => {
+                if (v.attributes[groupName]) {
+                    availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
                 }
-                groupHtml += `</div></div>`;
-                container.innerHTML += groupHtml;
+            });
 
-                if (!activeFilters[groupName]) break; // সাইজ সিলেক্ট না করলে কালার আসবে না
+            let groupHtml = `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
 
-                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[
-                    groupName]);
+            for (const [valId, valName] of Object.entries(availableValues)) {
+                const isFilterActive = (activeFilters[groupName] == valId);
+                const isVariationSelected = checkIsSelected(groupName, valId);
+
+                const activeClass = (isFilterActive || isVariationSelected) ?
+                    'border-[var(--primary-color)] bg-orange-50 ring-1 ring-[var(--primary-color)]' :
+                    'border-gray-200 bg-white';
+
+                // ২. যদি এই ভ্যালুর জন্য ভ্যারিয়েশন ইমেজ থাকে তবে ইমেজ দেখাবে
+                let btnContent = valueImages[valId]
+                    ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2"> ${valName}`
+                    : valName;
+
+                groupHtml += `
+                    <button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})"
+                        class="flex items-center px-3 py-2 rounded-lg border text-[15px] font-bold transition-all ${activeClass}">
+                        ${btnContent}
+                    </button>`;
             }
-            document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
-        }
+            groupHtml += `</div></div>`;
+            container.innerHTML += groupHtml;
 
-        function handleSelection(group, valId, isLastGroup) {
-            if (!isLastGroup) {
-                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
-                let idx = attributeGroups.indexOf(group);
-                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-            } else {
-                activeFilters[group] = valId;
-                let matched = allVariations.find(v => {
-                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
-                });
-                if (matched) {
-                    const index = finalSelectedVariationIds.indexOf(matched.id);
-                    if (index > -1) finalSelectedVariationIds.splice(index, 1); // Toggle Off
-                    else {
-                        finalSelectedVariationIds.push(matched.id); // Toggle On
-                        if (matched.image) changeImage(matched.image);
+            if (!activeFilters[groupName]) break;
+
+            currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
+        }
+        document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
+    }
+    function handleSelection(group, valId, isLastGroup) {
+        if (!isLastGroup) {
+            activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+            let idx = attributeGroups.indexOf(group);
+            for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+
+            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+        } else {
+            activeFilters[group] = valId;
+            let matched = allVariations.find(v => {
+                return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+            });
+
+            if (matched) {
+                // --- ক্যাটাগরি চেক করার নতুন লজিক ---
+                let isSingleChoice = false;
+                for (let gName in matched.attributes) {
+                    if (groupCategories[gName] === 'single') {
+                        isSingleChoice = true;
+                        break;
                     }
                 }
-            }
-            renderAttributes();
-        }
 
-        function checkIsSelected(groupName, valId) {
-            return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
+                if (isSingleChoice) {
+                    // যদি 'single' হয়, আগের সব সিলেকশন বাদ দিয়ে শুধু নতুনটা সিলেক্ট হবে
+                    finalSelectedVariationIds = [matched.id];
+
+                    // বড় ছবি এবং গ্যালারি আপডেট
+                    let combined = [...(matched.galleries || []), ...defaultGalleries];
+                    updateGalleryThumbnails([...new Set(combined)]);
+                    if (matched.main_image) changeImage(matched.main_image);
+                } else {
+                    // আপনার আগের টগল (Multiple Selection) লজিক
+                    const index = finalSelectedVariationIds.indexOf(matched.id);
+                    if (index > -1) {
+                        finalSelectedVariationIds.splice(index, 1);
+                        if(finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                    } else {
+                        finalSelectedVariationIds.push(matched.id);
+
+                        let combined = [...(matched.galleries || []), ...defaultGalleries];
+                        let uniqueImages = [...new Set(combined)];
+                        updateGalleryThumbnails(uniqueImages);
+
+                        if (matched.main_image) changeImage(matched.main_image);
+                    }
+                }
+                // ---------------------------------
+            }
         }
+        renderAttributes();
+    }
+
+    function checkIsSelected(groupName, valId) {
+        return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
+    }
+
+    function changeImage(src) {
+        const main = document.getElementById('mainImage');
+        if (main) main.src = src;
+    }
+
 
         function handleAddToCart(isOrderNow = false) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
