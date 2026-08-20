@@ -27,7 +27,7 @@ class LandingController extends FrontendController
         $ttl = now()->addHours(6);
         $landing = Cache::remember("landing_page_view_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
             return LandingPage::where('company_id', $companyId)
-                ->where('status', Status::Active->value)->with('product:id, company_id, title, slug, thumbnail, sale_price, regular_price, discount, type, warehouse_info')
+                ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,warehouse_info')
                 ->where('slug', $slug)->firstOrFail();
         });
         $product = $landing->product;
