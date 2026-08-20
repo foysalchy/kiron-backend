@@ -35,19 +35,19 @@ class HomeController extends FrontendController
         // ২. এফএকিউ (FAQs)
         $faqs = Cache::remember("home_faqs_{$companyId}", $ttl, function () use ($companyId) {
             return KnowledgeBase::where('company_id', $companyId)
-            ->where('status', Status::Active->value)
-            ->select('id', 'title', 'content')->get();
+                ->where('status', Status::Active->value)
+                ->select('id', 'title', 'content')->get();
         });
 
         // ৩. ক্যাটাগরি এবং সাব-ক্যাটাগরি
         $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
             return MegaCategory::where('company_id', $companyId)
-            ->select('id', 'name','company_id', 'slug', 'image')
-            ->with('subCategories:id,mega_category_id,name,slug','subCategories.miniCategories:id,sub_category_id,name,slug')->get();
+                ->select('id', 'name', 'company_id', 'slug', 'image')
+                ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
         });
 
         // ৪. লেটেস্ট অফার
-        $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () use ($companyId){
+        $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
                 ->with(['brand:id,company_id,name,slug,logo', 'variations'])
                 ->where('discount', '>', 0)
@@ -100,10 +100,22 @@ class HomeController extends FrontendController
         });
 
         // ৮. পপুলার প্রোডাক্টস
-        $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () use ($companyId){
+        $popularProducts = Cache::remember("home_popular_products_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'purchase_price', 'discount', 'discount_type',
-            'available_stock', 'type')
+                ->select(
+                    'id',
+                    'company_id',
+                    'brand_id',
+                    'title',
+                    'slug',
+                    'thumbnail',
+                    'regular_price',
+                    'purchase_price',
+                    'discount',
+                    'discount_type',
+                    'available_stock',
+                    'type'
+                )
                 ->where('status', Status::Active->value)
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
@@ -114,11 +126,24 @@ class HomeController extends FrontendController
         });
 
         // ৯. অল প্রোডাক্টস (লেটেস্ট ১২টি)
-        $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () use ($companyId){
+        $allProducts = Cache::remember("home_all_products_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
                 ->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->select('id', 'company_id', 'brand_id', 'title', 'slug', 'thumbnail', 'regular_price', 'purchase_price', 'discount', 'discount_type',
-            'available_stock', 'type')
+                ->select(
+                    'id',
+                    'company_id',
+                    'brand_id',
+                    'title',
+                    'slug',
+                    'thumbnail',
+                    'regular_price',
+                    'purchase_price',
+                    'discount',
+                    'discount_type',
+                    'available_stock',
+                    'manage_stock',
+                    'type'
+                )         
                 ->where('status', Status::Active->value)
                 ->latest()
                 ->take(12)
@@ -172,25 +197,25 @@ class HomeController extends FrontendController
         $subId = (int)$request->sub_id;
         return Cache::remember("filter_sub_cat_{$companyId}_{$subId}", $ttl, function () use ($subId, $companyId) {
 
-        $products = Product::where('status', Status::Active->value)
-            ->where('company_id', $companyId)
-            ->whereJsonContains('sub_category_ids', $subId)
-            ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock'])
-            ->with(['variations'])
-            ->latest()->take(6)->get();
+            $products = Product::where('status', Status::Active->value)
+                ->where('company_id', $companyId)
+                ->whereJsonContains('sub_category_ids', $subId)
+                ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock','manage_stock'])
+                ->with(['variations'])
+                ->latest()->take(6)->get();
 
-        $html = '';
-        $template = $this->template;
+            $html = '';
+            $template = $this->template;
 
-        foreach ($products as $product) {
-            $html .= view("components.{$template}.product-card", compact('product'))->render();
-        }
+            foreach ($products as $product) {
+                $html .= view("components.{$template}.product-card", compact('product'))->render();
+            }
 
-        if ($html == '') {
-            return '<div class="col-span-full py-10 text-center text-gray-400">কোনো পণ্য পাওয়া যায়নি।</div>';
-        }
+            if ($html == '') {
+                return '<div class="col-span-full py-10 text-center text-gray-400">কোনো পণ্য পাওয়া যায়নি।</div>';
+            }
 
-        return $html;
+            return $html;
         });
     }
     public function subscribe(Request $request)

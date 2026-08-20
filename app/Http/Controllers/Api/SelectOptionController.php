@@ -40,7 +40,7 @@ class SelectOptionController extends Controller
      */
     public function warehouseOptions()
     {
-        return Warehouse::select('id', 'name')->where('status',Status::Active->value)->orderBy('name', 'asc')->get();
+        return Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
     }
     public function productwarehouseOptions()
     {
@@ -89,11 +89,11 @@ class SelectOptionController extends Controller
     }
     public function supplierOptions()
     {
-        return Party::where('type', 1)->select('id', 'name','phone','email')->orderBy('name', 'asc')->get();
+        return Party::where('type', 1)->select('id', 'name', 'phone', 'email')->orderBy('name', 'asc')->get();
     }
     public function customersOptions()
     {
-        return Party::where('type', 2)->select('id', 'name','phone','email')->orderBy('name', 'asc')->get();
+        return Party::where('type', 2)->select('id', 'name', 'phone', 'email')->orderBy('name', 'asc')->get();
     }
 
     public function productOptions()
@@ -122,9 +122,10 @@ class SelectOptionController extends Controller
             'variations.stocks.warehouse',
         ])
             ->where(function ($q) use ($warehouseId) {
-                $q->whereJsonContains('warehouse_info', [
-                    'warehouse_id' => (string) $warehouseId
-                ])
+                $q->where('manage_stock', false)
+                    ->orWhereJsonContains('warehouse_info', [
+                        'warehouse_id' => (string) $warehouseId
+                    ])
                     ->orWhereHas('variations.stocks', function ($stockQuery) use ($warehouseId) {
                         $stockQuery->where('warehouse_id', $warehouseId)
                             ->where('quantity', '>', 0);
@@ -138,6 +139,11 @@ class SelectOptionController extends Controller
 
         $mappedProducts = $products->map(function ($product) use ($warehouseId) {
             $warehouseTotalStock = 0;
+            if (!$product->manage_stock) {
+                $product->available_stock = null;
+                $product->stock_quantity = null;
+                return $product;
+            }
 
             if ($product->type === 'single' && is_array($product->warehouse_info)) {
                 $filteredWarehouseInfo = collect($product->warehouse_info)
@@ -168,7 +174,7 @@ class SelectOptionController extends Controller
         });
 
         return $mappedProducts->filter(function ($product) {
-            return $product->available_stock > 0;
+            return !$product->manage_stock || $product->available_stock > 0;
         })->values();
     }
     public function getProductByWarehouseAndBin($warehouseId, $binId)
