@@ -35,17 +35,15 @@
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
-                        <button onclick="changeImage('{{ $product->thumbnail_url }}')"
-                            class="aspect-square rounded-lg border-2 border-[#FF6A00] p-1 bg-white overflow-hidden">
-                            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-contain">
-                        </button>
-                        @foreach ($product->galleries as $gallery)
-                            <button onclick="changeImage('{{ asset('storage/' . $gallery->image) }}')"
-                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
-                                <img src="{{ asset('storage/' . $gallery->image) }}" class="w-full h-full object-contain">
-                            </button>
-                        @endforeach
-                    </div>
+    @foreach ($allProductImages as $imgUrl)
+        <button onclick="changeImage('{{ $imgUrl }}')"
+            class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
+            <img src="{{ $imgUrl }}"
+                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                class="w-full h-full object-contain" alt="Product Image">
+        </button>
+    @endforeach
+</div>
                 </div>
 
                 <!-- Right: Product Purchase Details -->
@@ -470,82 +468,73 @@
         let originalGalleryHtml = ''; // save main gallery
 
         function renderAttributes() {
-            const container = document.getElementById('dynamic-attributes-container');
-            const thumbContainer = document.getElementById('thumbnail-container');
-            if (!container) return;
+        const container = document.getElementById('dynamic-attributes-container');
+        if (!container) return;
+        container.innerHTML = '';
+        let currentlyValidVariations = allVariations;
 
-            // main gallery
-            if (!originalGalleryHtml && thumbContainer) {
-                originalGalleryHtml = thumbContainer.innerHTML;
+        for (let i = 0; i < attributeGroups.length; i++) {
+            const groupName = attributeGroups[i];
+            const isLastGroup = (i === attributeGroups.length - 1);
+            let availableValues = {};
+            currentlyValidVariations.forEach(v => {
+                if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
+            });
+
+            let groupHtml = `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+            for (const [valId, valName] of Object.entries(availableValues)) {
+                const isFilterActive = (activeFilters[groupName] == valId);
+                const isVariationSelected = checkIsSelected(groupName, valId);
+                const activeClass = (isFilterActive || isVariationSelected) ? 'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
+
+                let btnContent = valueImages[valId] ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}` : valName;
+
+                groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${btnContent}</button>`;
             }
+            groupHtml += `</div></div>`;
+            container.innerHTML += groupHtml;
+            if (!activeFilters[groupName]) break;
+            currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
+        }
+        document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
+    }
 
-            container.innerHTML = '';
-            let currentlyValidVariations = allVariations;
+    function handleSelection(group, valId, isLastGroup) {
+        if (!isLastGroup) {
+            activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+            let idx = attributeGroups.indexOf(group);
+            for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+        } else {
+            activeFilters[group] = valId;
+            let matched = allVariations.find(v => {
+                return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+            });
+            if (matched) {
+                let isSingleChoice = false;
+                for (let gName in matched.attributes) { if (groupCategories[gName] === 'single') { isSingleChoice = true; break; } }
 
-            // button
-            for (let i = 0; i < attributeGroups.length; i++) {
-                const groupName = attributeGroups[i];
-                let availableValues = {};
-
-                currentlyValidVariations.forEach(variation => {
-                    if (variation.attributes[groupName]) {
-                        availableValues[variation.attributes[groupName].id] = variation.attributes[groupName].name;
+                if (isSingleChoice) {
+                    finalSelectedVariationIds = [matched.id];
+                    let combined = [...(matched.galleries || []), ...defaultGalleries];
+                    updateGalleryThumbnails([...new Set(combined)]);
+                    if (matched.main_image) changeImage(matched.main_image);
+                } else {
+                    const index = finalSelectedVariationIds.indexOf(matched.id);
+                    if (index > -1) {
+                        finalSelectedVariationIds.splice(index, 1);
+                        if(finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                    } else {
+                        finalSelectedVariationIds.push(matched.id);
+                        let combined = [...(matched.galleries || []), ...defaultGalleries];
+                        updateGalleryThumbnails([...new Set(combined)]);
+                        if (matched.main_image) changeImage(matched.main_image);
                     }
-                });
-
-                let groupHtml =
-                    `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
-                for (const [valId, valName] of Object.entries(availableValues)) {
-                    const activeClass = (userSelections[groupName] == valId) ?
-                        'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
-                    groupHtml +=
-                        `<button type="button" onclick="selectOption('${groupName}', ${valId})" class="px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${valName}</button>`;
                 }
-                groupHtml += `</div></div>`;
-                container.innerHTML += groupHtml;
-
-                if (!userSelections[groupName]) break;
-                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName] && v.attributes[
-                    groupName].id == userSelections[groupName]);
-            }
-
-            // update galleries
-            if (currentlyValidVariations.length === 1 && Object.keys(userSelections).length === attributeGroups.length) {
-                let final = currentlyValidVariations[0];
-
-                if (final.image) changeImage(final.image);
-
-                // show variatin image
-                if (thumbContainer) {
-                    let galleryHtml = '';
-                    // variation main image
-                    if (final.image) {
-                        galleryHtml +=
-                            `<button onclick="changeImage('${final.image}')" class="aspect-square rounded-lg border-2 border-[#FF6A00] p-1 bg-white overflow-hidden"><img src="${final.image}" class="w-full h-full object-contain"></button>`;
-                    }
-                    // variation others image
-                    if (final.galleries && final.galleries.length > 0) {
-                        final.galleries.forEach(imgUrl => {
-                            galleryHtml +=
-                                `<button onclick="changeImage('${imgUrl}')" class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden"><img src="${imgUrl}" class="w-full h-full object-contain"></button>`;
-                        });
-                    }
-                    thumbContainer.innerHTML = galleryHtml;
-                }
-
-                document.getElementById('sale-price').innerText = '{{ $setup->currency }} ' + final.price.toLocaleString();
-                document.getElementById('selected-variation-id').value = final.id;
-            } else {
-                // back main galleries
-                if (thumbContainer && originalGalleryHtml) {
-                    thumbContainer.innerHTML = originalGalleryHtml;
-                    changeImage("{{ $product->thumbnail_url }}");
-                }
-                document.getElementById('sale-price').innerText =
-                    '{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price ?? 0) }}';
-                document.getElementById('selected-variation-id').value = '';
             }
         }
+        renderAttributes();
+    }
 
         function selectOption(group, valId) {
             userSelections[group] = valId;
