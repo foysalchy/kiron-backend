@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class VariationGallery extends Model
 {
@@ -19,8 +20,8 @@ class VariationGallery extends Model
         return $this->belongsTo(ProductVariation::class);
     }
 
-    public function getImageUrlAttribute(): ?string
+    public function getImageUrlAttribute(): string
     {
-        return $this->image ? asset('storage/' . $this->image) : null;
+        return Storage::disk('r2')->url($this->image);
     }
 }

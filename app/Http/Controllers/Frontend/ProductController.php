@@ -189,7 +189,7 @@ class ProductController extends FrontendController
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
             'variations.galleries',
-            'galleries:id,product_id,image',
+            'galleries',
             'brand:id,company_id,name,slug,logo',
             'reviews.customer',
             'reviews.variation.attributes.attributeGroup',
@@ -213,30 +213,50 @@ class ProductController extends FrontendController
 
         $attributeGroups = [];
         $formattedVariations = [];
+        $valueImages = [];
+        $groupCategories = [];
 
         if ($product->type === 'variation') {
             foreach ($product->variations as $variation) {
                 $attrs = [];
                 foreach ($variation->attributes as $attr) {
                     $groupName = $attr->attributeGroup?->name ?? 'Unknown';
+
+            // --- এই ৩টি লাইন যোগ করুন ---
+            if ($attr->attributeGroup && !isset($groupCategories[$groupName])) {
+                $groupCategories[$groupName] = $attr->attributeGroup->category;
+            }
+                    $valId = $attr->attributeValue?->id;
+
                     if (!in_array($groupName, $attributeGroups)) $attributeGroups[] = $groupName;
-                    $attrs[$groupName] = ['id' => $attr->attributeValue?->id, 'name' => $attr->attributeValue?->name ?? 'Unknown'];
+
+                    $attrs[$groupName] = [
+                        'id' => $valId,
+                        'name' => $attr->attributeValue?->name ?? 'Unknown'
+                    ];
+
+                    // ভ্যারিয়েশনের ইমেজকে ভ্যালু আইডির সাথে ম্যাপ করা (যেমন: Red ID => Red Image)
+                    if ($variation->image && $valId && !isset($valueImages[$valId])) {
+                        $valueImages[$valId] = $variation->image_url;
+                    }
                 }
 
-                $varGalleries = $variation->galleries->map(function ($g) {
-                    return $g->image_url;
-                })->toArray();
+                // এই ভ্যারিয়েশনের নিজস্ব গ্যালারি + মেইন ইমেজ
+                $varGalleries = $variation->galleries->map(fn($g) => $g->image_url)->toArray();
+                if ($variation->image) array_unshift($varGalleries, $variation->image_url);
 
                 $formattedVariations[] = [
                     'id' => $variation->id,
                     'price' => $variation->final_price,
                     'attributes' => $attrs,
-                    'main_image' => $variation->image ? asset('storage/' . $variation->image) : $product->thumbnail_url,
+                    'main_image' => $variation->image_url ?? $product->thumbnail_url,
                     'galleries' => $varGalleries,
                     'stock' => $variation->available_stock
                 ];
             }
         }
+        $defaultGalleries = $product->galleries->map(fn($g) => $g->image_url)->toArray();
+        array_unshift($defaultGalleries, $product->thumbnail_url);
         //  \Log::info($formattedVariations);
         $relatedProducts = Product::where('status', Status::Active->value)
             ->where('id', '!=', $product->id)->latest()->take(8)->get();
@@ -250,7 +270,32 @@ class ProductController extends FrontendController
             ->ordered()
             ->get();
 
-        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups', 'formattedVariations', 'trustBadges'));
+
+        $allProductImages = [];
+        $allProductImages[] = $product->thumbnail_url;
+
+        // মেইন প্রোডাক্টের গ্যালারি ইমেজ
+        foreach ($product->galleries as $g) {
+            $allProductImages[] = $g->image_url;
+        }
+
+        // সব ভ্যারিয়েশনের ইমেজ এবং তাদের গ্যালারি ইমেজ
+        if ($product->type === 'variation') {
+            foreach ($product->variations as $variation) {
+                if ($variation->image) {
+                    $allProductImages[] = $variation->image_url;
+                }
+                foreach ($variation->galleries as $vGallery) {
+                    $allProductImages[] = $vGallery->image_url;
+                }
+            }
+        }
+
+        // ডুপ্লিকেট ইমেজ বাদ দেওয়া এবং ইনডেক্স ঠিক করা
+        $allProductImages = array_values(array_unique(array_filter($allProductImages)));
+
+        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups',
+        'formattedVariations', 'trustBadges', 'valueImages', 'defaultGalleries', 'allProductImages','groupCategories'));
     }
     public function flashSale(Request $request)
     { // Filter products that have a discount > 0

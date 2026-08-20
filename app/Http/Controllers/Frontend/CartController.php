@@ -197,7 +197,7 @@ class CartController extends FrontendController
                         'options' => [
                             'slug'          => $variation->product->slug,
                             'variation_id'  => $variation->id,
-                            'thumbnail'     => $variation->product->thumbnail_url,
+                            'thumbnail'     => $variation->image_url ?? $variation->product->thumbnail_url,
                             'variant'       => $variation->display_name,
                             'regular_price' => $variation->regular_price,
                             'warehouse_id'  => $warehouseId,

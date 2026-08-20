@@ -310,7 +310,7 @@ class OrderService
                 ]);
 
                 // Deduct stock using ProductService (for completed/pending orders, not hold)
-                if ($order->status !== Status::Hold && $order->status !== Status::Draft) {
+                if ($order->status !== Status::Hold->value && $order->status !== Status::Draft->value) {
                     $this->deductOrderStock($order, $item);
                 }
             }
@@ -571,7 +571,7 @@ class OrderService
             $data['shipping_address'] = array_merge($existingAddress, $newAddress);
         }
 
-       
+
         $order->fill($data);
         $order->save();
 

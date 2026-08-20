@@ -69,6 +69,19 @@ class Product extends Model
     ];
 
     protected $hidden = ['deleted_at'];
+    protected $appends = ['thumbnail_url', 'display_image_url'];
+
+    public function getDisplayImageUrlAttribute(): ?string
+    {
+        if ($this->type === 'variation') {
+            $firstVariation = $this->variations->first();
+            if ($firstVariation && $firstVariation->image) {
+                return $firstVariation->image_url;
+            }
+        }
+
+        return $this->thumbnail_url;
+    }
 
     public static function homepageCacheKeys(): array
     {

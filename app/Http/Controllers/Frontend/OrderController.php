@@ -245,8 +245,19 @@ class OrderController extends FrontendController
         }
 
         try {
-            DB::beginTransaction();
+            return DB::transaction(function () use ($request, $orderId, $isCOD) {
+                $order = Order::where('company_id', $this->company_id)
+                ->where('id', $orderId)
+                ->lockForUpdate()
+                ->first();
 
+            if (!$order) {
+                throw new \Exception('Order not found.');
+            }
+            $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
+            if ($currentStatus !== Status::Draft->value) {
+                return redirect()->route('order.invoice', $order->id);
+            }
             // 4. Address update
             $order->update([
                 'shipping_address' => [
@@ -257,7 +268,6 @@ class OrderController extends FrontendController
                 ],
                 'status' => Status::Pending->value,
             ]);
-
             if ($order->customer) {
                 $order->customer->update(['name' => $request->name, 'address' => $request->address]);
             }
@@ -267,7 +277,6 @@ class OrderController extends FrontendController
             if (!$stockResult['success']) {
                 throw new \Exception($stockResult['error']);
             }
-
             // 6. Payment create
             $transactionId = $request->transaction_id;
             if ($isCOD) {
@@ -319,7 +328,11 @@ class OrderController extends FrontendController
 
             Log::info('Order confirmed', ['order_id' => $order->id, 'status' => $order->status]);
 
+
+
+
             return redirect()->route('order.invoice', $order->id)->with('success', 'Your order has been successfully placed.');
+            });
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Final Confirmation Error: ' . $e->getMessage());
@@ -329,6 +342,11 @@ class OrderController extends FrontendController
 
     private function finalizeOrderAndDeductStock($order)
     {
+         $statusVal = $order->status instanceof Status ? $order->status->value : (int)$order->status;
+
+    if ($statusVal !== Status::Draft->value) {
+        return ['success' => true, 'message' => 'Stock already deducted.'];
+    }
         $warehouseData = $order->warehouse_info;
 
         if (empty($warehouseData)) {

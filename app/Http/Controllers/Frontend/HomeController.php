@@ -143,7 +143,7 @@ class HomeController extends FrontendController
                     'available_stock',
                     'manage_stock',
                     'type'
-                )         
+                )
                 ->where('status', Status::Active->value)
                 ->latest()
                 ->take(12)
