@@ -11,6 +11,7 @@ use App\Mail\VerifyOtpEmail;
 use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\DomainSetup;
+use App\Models\EmailTemplate;
 use App\Models\EmailVerification;
 use App\Models\LeadStatus;
 use App\Models\Permission;
@@ -297,8 +298,28 @@ class CompanyRegistrationService
                 SmsTemplate::create([
                     'company_id'  => $company->id,
                     'title'       => $template['title'],
+                    'slug'       => $template['slug'],
                     'description' => $template['description'],
                     'is_default' => 1,
+                    'status'      => Status::Active->value,
+                ]);
+            }
+            $emailTemplates = [
+                ['title' => 'Order Place', 'slug' => 'order-place', 'description' => 'Your order has been placed successfully.'],
+                ['title' => 'Order Shipped', 'slug' => 'order-shipped', 'description' => 'Your order has been shipped.'],
+                ['title' => 'Order Confirm', 'slug' => 'order-confirm', 'description' => 'Your order has been confirmed.'],
+                ['title' => 'Order Delivered', 'slug' => 'order-delivered', 'description' => 'Your order has been delivered successfully.'],
+                ['title' => 'Cancel Order', 'slug' => 'cancel-order', 'description' => 'Your order has been cancelled.'],
+                ['title' => 'Follow Up', 'slug' => 'follow-up', 'description' => 'This is a follow-up message regarding your order.'],
+            ];
+
+            foreach ($emailTemplates as $template) {
+                EmailTemplate::create([
+                    'company_id'  => $company->id,
+                    'subject'       => $template['title'],
+                    'slug'        => $template['slug'],
+                    'body' => $template['description'],
+                    'is_default'  => 1,
                     'status'      => Status::Active->value,
                 ]);
             }
@@ -543,7 +564,7 @@ class CompanyRegistrationService
             ->toArray();
     }
 
-    public function verifyOtp(int $registrationId, string $type, string $otp,string $method): User
+    public function verifyOtp(int $registrationId, string $type, string $otp, string $method): User
     {
         $record = EmailVerification::where('company_id', $registrationId)
             ->where('type', $type)
@@ -555,7 +576,7 @@ class CompanyRegistrationService
         if ($record->isExpired()) throw ApiException::badRequest('Code has expired. Please request a new one.');
         if ($record->otp !== $otp) throw ApiException::badRequest('Invalid verification code.');
 
-        $record->update(['verified_at' => Carbon::now(),'method'=>$method]);
+        $record->update(['verified_at' => Carbon::now(), 'method' => $method]);
 
         User::where('company_id', $registrationId)
             ->where('email', $record->email)

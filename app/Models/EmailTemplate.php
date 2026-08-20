@@ -10,17 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmailTemplate extends Model
 {
-    use SoftDeletes,CompanyScoped;
+    use SoftDeletes, CompanyScoped;
 
     protected $fillable = [
         'company_id',
         'subject',
         'body',
+        'is_default',
+        'slug',
         'status',
     ];
     protected $hidden = ['deleted_at'];
 
-     //company scope
+    //company scope
     public function scopeInactive($query)
     {
         return $query->where('status', Status::Inactive->value);

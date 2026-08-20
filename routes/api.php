@@ -312,6 +312,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
                     Route::get('/get-product-by-warehouse/{warehouseId}/{binId}', [SelectOptionController::class, 'getProductByWarehouseAndBin']);
                     Route::get('/products', [SelectOptionController::class, 'productOptions']);
+                    Route::get('/products/purchase', [SelectOptionController::class, 'purchaseProductOptions']);
                     Route::get('/purchases', [SelectOptionController::class, 'purchaseOptions']);
                     Route::get('/attribute-group', [SelectOptionController::class, 'attributeGroupOptions']);
                     Route::get('/product/attribute-group', [SelectOptionController::class, 'productattributeGroupOptions']);
@@ -337,6 +338,8 @@ Route::prefix('v1')->group(function () {
                     Route::get('/customer-groups', [SelectOptionController::class, 'customerGroups']);
                     Route::get('/landing-domains', [SelectOptionController::class, 'getAvailableDomains']);
                     Route::get('/roles', [SelectOptionController::class, 'getRoles']);
+                    Route::get('/email-templates', [SelectOptionController::class, 'getEmailTemplate']);
+                    Route::get('/sms-templates', [SelectOptionController::class, 'getSmsTemplate']);
                 });
                 //party routes
                 Route::prefix('parties')->group(function () {

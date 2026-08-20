@@ -356,9 +356,19 @@ class OrderService
                 NotificationRecipientResolver::companySuperAdmin($order->company_id),
                 new OrderCreatedNotification($order->id, $order->order_no, $order->company_id)
             );
+
             LogHelper::created('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
             DB::commit();
-
+            try {
+                app(SmsSendService::class)->sendStatusBasedSms($order);
+            } catch (\Exception $smsError) {
+                Log::warning("Order creation SMS failed: " . $smsError->getMessage());
+            }
+            try {
+                app(\App\Services\EmailSendService::class)->sendStatusBasedEmail($order);
+            } catch (\Exception $e) {
+                Log::warning("Order Email failed: " . $e->getMessage());
+            }
             Log::info('Order created successfully', [
                 'order_id' => $order->id,
                 'type' => $order->type,
@@ -726,12 +736,15 @@ class OrderService
                 'status' => $getStatus->value
             ]);
             try {
-                app(\App\Services\SmsSendService::class)->sendStatusBasedSms($order);
+                app(SmsSendService::class)->sendStatusBasedSms($order);
             } catch (\Exception $smsError) {
                 Log::warning("Automated SMS failed: " . $smsError->getMessage());
-                // এসএমএস না গেলেও অর্ডার আপডেট যাতে হয়ে যায়, তাই ট্রাই-ক্যাচ রাখা হয়েছে
             }
-
+            try {
+                app(\App\Services\EmailSendService::class)->sendStatusBasedEmail($order);
+            } catch (\Exception $e) {
+                Log::warning("Order Email failed: " . $e->getMessage());
+            }
             $logStatus = "{$getOldStatus->label()} → {$getStatus->label()}";
 
             DB::commit();

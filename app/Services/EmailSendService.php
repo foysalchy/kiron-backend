@@ -6,7 +6,9 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Mail\SendEmail;
 use App\Models\EmailSend;
+use App\Models\EmailTemplate;
 use App\Models\Party;
+use App\Enums\Status;
 use Illuminate\Support\Facades\{DB, Log, Mail};
 
 class EmailSendService
@@ -24,7 +26,6 @@ class EmailSendService
                 ->orderBy('created_at', 'desc')
                 ->paginate($filters['per_page'] ?? 15);
 
-            // 🔥 Collect all party IDs from all logs
             $allIds = [];
 
             foreach ($logs as $log) {
@@ -37,13 +38,11 @@ class EmailSendService
 
             $allIds = array_unique($allIds);
 
-            // 🔥 Get all parties in one query
             $parties = Party::whereIn('id', $allIds)
                 ->select('id', 'name', 'type')
                 ->get()
                 ->groupBy('id');
 
-            // 🔥 Map customers & suppliers to each log
             foreach ($logs as $log) {
                 $customerIds = $log->customer_ids ?? [];
                 $supplierIds = $log->supplier_ids ?? [];
@@ -65,14 +64,16 @@ class EmailSendService
             throw ApiException::serverError('Failed to fetch Email logs');
         }
     }
+
     /**
-     * Store record and Send Email
+     * Store record and Send Email (Bulk Email flow — from UI)
+     * Subject পাঠানো হয় as-is (কোনো placeholder replace হয় না)।
+     * Body-তে শুধু {{customer_name}} personalize হয় প্রতি recipient-এর জন্য।
      */
     public function createEmailSend(array $data): EmailSend
     {
         return DB::transaction(function () use ($data) {
             try {
-                // Merge customer_ids and supplier_ids uniquely
                 $partyIds = array_unique(array_merge(
                     $data['customer_ids'] ?? [],
                     $data['supplier_ids'] ?? []
@@ -98,7 +99,7 @@ class EmailSendService
                     }
                 }
 
-                // 2. Format Custom Emails (নাম নেই, তাই null থাকবে)
+                // 2. Format Custom Emails (নাম নেই, তাই personalize হবে না)
                 foreach ($customEmails as $email) {
                     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                         $alreadyExists = collect($recipients)->contains('email', $email);
@@ -117,26 +118,55 @@ class EmailSendService
                     throw ApiException::badRequest('No valid email addresses found among the selected recipients.');
                 }
 
-                // raw template (placeholder সহ) DB-তে save হচ্ছে
-                $emailSend = EmailSend::create($data);
+                $subject = $data['subject'] ?? '';
+                $body    = $data['body'] ?? '';
+
+                if (empty($subject) || empty($body)) {
+                    throw ApiException::badRequest('Email subject and body cannot be empty.');
+                }
+
+                // supplier_ids/customer_ids/custom_emails কলাম NOT NULL হলে default বসিয়ে দিলাম
+                $emailSend = EmailSend::create(array_merge([
+                    'customer_ids'   => [],
+                    'supplier_ids'   => [],
+                    'custom_emails'  => [],
+                ], $data));
 
                 $successCount = 0;
                 $failedRecipients = [];
-
-                // 3. Queue emails — personalized subject/body per recipient
+                $companyName = auth()->user()?->company?->name
+                    ?? \App\Models\Company::find($data['company_id'] ?? null)?->name
+                    ?? 'dorja.io';
+                // 3. Queue emails — subject as-is, body personalized per recipient
                 foreach ($recipients as $index => $recipient) {
                     try {
-                        $personalizedSubject = $this->renderTemplate($data['subject'], $recipient['name']);
-                        $personalizedBody    = $this->renderTemplate($data['body'], $recipient['name']);
+                        $personalizedBody = $this->replacePlaceholder(
+                            $body,
+                            'customer_name',
+                            $recipient['name'] ?? 'Customer'
+                        );
 
+                        $personalizedBody = $this->replacePlaceholder(
+                            $personalizedBody,
+                            'company_name',
+                            $companyName
+                        );
                         Mail::to($recipient['email'])->later(
                             now()->addSeconds($index * 3),
-                            new SendEmail($personalizedSubject, $personalizedBody)
+                            new SendEmail($subject, $personalizedBody)
                         );
 
                         $successCount++;
 
-                     
+                        Log::info('Email queued successfully', [
+                            'email_send_id' => $emailSend->id,
+                            'company_id'    => $emailSend->company_id,
+                            'recipient'     => $recipient['email'],
+                            'customer_id'   => $recipient['id'],
+                            'type'          => $recipient['type'],
+                            'subject'       => $subject,
+                            'body'          => $personalizedBody,
+                        ]);
                     } catch (\Exception $e) {
                         $failedRecipients[] = [
                             'customer_id' => $recipient['id'],
@@ -181,6 +211,8 @@ class EmailSendService
                 );
 
                 return $emailSend;
+            } catch (ApiException $e) {
+                throw $e;
             } catch (\Exception $e) {
                 Log::error('Email processing failed entirely', [
                     'error'      => $e->getMessage(),
@@ -194,13 +226,99 @@ class EmailSendService
         });
     }
 
-    private function renderTemplate(string $template, ?string $customerName): string
+    /**
+     * Order status change হলে automated email পাঠানো হয়।
+     * Subject as-is যায় (placeholder replace হয় না)।
+     * Body-তে order-এর সব data দিয়ে placeholder replace হয়।
+     */
+    public function sendStatusBasedEmail($order)
     {
-        return str_replace(
-            '{{customer_name}}',
-            $customerName ?? 'Customer',
-            $template
-        );
+        $slugMap = [
+            Status::Pending->value   => 'order-place',
+            Status::Confirmed->value => 'order-confirm',
+            Status::Shipped->value   => 'order-shipped',
+            Status::Delivered->value => 'order-delivered',
+            Status::Cancelled->value => 'cancel-order',
+        ];
+
+        $statusValue = $order->status instanceof Status ? $order->status->value : $order->status;
+
+        $slug = $slugMap[$statusValue] ?? null;
+        if (!$slug) return;
+
+        $template = EmailTemplate::where('company_id', $order->company_id)
+            ->where('slug', $slug)
+            ->where('status', Status::Active->value)
+            ->first();
+
+        if (!$template) return;
+
+        if (empty($order->customer?->email)) {
+            Log::warning("Order {$order->order_no}: customer has no email, status email skipped");
+            return;
+        }
+
+        // subject as-is (no placeholder replace)
+        $subject = $template->subject;
+
+        // body-তে order data দিয়ে সব placeholder replace
+        $body = $this->renderOrderTemplate($template->body, $order);
+
+        return $this->createEmailSend([
+            'company_id'   => $order->company_id,
+            'customer_ids' => [$order->customer_id],
+            'subject'      => $subject,
+            'body'         => $body,
+        ]);
+    }
+
+    /**
+     * একটা নির্দিষ্ট {{placeholder}} replace করে template-এ।
+     */
+    private function replacePlaceholder(string $template, string $key, ?string $value): string
+    {
+        return str_replace('{{' . $key . '}}', $value ?? '', $template);
+    }
+
+    /**
+     * Order object থেকে body-এর সব {{placeholder}} replace করে।
+     * ORDER_PARAMETERS (frontend)-এর সাথে key মিলিয়ে রাখা হয়েছে।
+     */
+    private function renderOrderTemplate(string $template, $order): string
+    {
+        $status = $order->status instanceof Status
+            ? $order->status
+            : Status::from($order->status);
+
+        $replacements = [
+            '{{customer_name}}' => $order->customer?->name ?? 'Customer',
+            '{{company_name}}'  => $order->company?->name ?? '',
+            '{{order_no}}'      => $order->order_no,
+            '{{order_date}}'    => $order->order_date
+                ? \Carbon\Carbon::parse($order->order_date)->format('d M Y')
+                : '',
+            '{{total_amount}}'  => number_format((float) $order->grand_total, 2),
+            '{{due_amount}}'    => number_format(
+                (float) ($order->grand_total - $order->payment_amount),
+                2
+            ),
+            '{{paid_amount}}'   => number_format((float) $order->payment_amount, 2),
+            '{{tracking_no}}'   => $this->getTrackingNo($order),
+            '{{status}}'        => $status->label(),
+            '{{invoice_id}}'    => $order->order_no ?? $order->id,
+            '{{invoice_link}}'  => route('order.invoice', $order->id),
+        ];
+
+        return strtr($template, $replacements);
+    }
+
+    private function getTrackingNo($order): string
+    {
+        $courierInfo = $order->courier_info;
+
+
+
+        return $courierInfo['tracking_code'] ?? '-';
     }
 
     public function getEmailLogById(int $id): EmailSend

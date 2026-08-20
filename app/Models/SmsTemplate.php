@@ -17,6 +17,7 @@ class SmsTemplate extends Model
         'title',
         'description',
         'is_default',
+        'slug',
         'status',
     ];
     protected $hidden = ['deleted_at'];
