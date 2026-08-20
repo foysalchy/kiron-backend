@@ -97,7 +97,7 @@
             @endif
         </div>
         @php
-            $isOutOfStock = $product->available_stock <= 0;
+    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
         @endphp
 
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"

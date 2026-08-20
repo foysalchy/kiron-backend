@@ -69,23 +69,34 @@ class LandingController extends FrontendController
             $variationId = $request->variation_id;
 
             if ($variationId) {
-                $variation = ProductVariation::findOrFail($variationId);
+                $variation = ProductVariation::with('product')->findOrFail($variationId);
                 $unitPrice = $variation->regular_price - $variation->discount;
 
-                $vStock = ProductVariationStock::where('product_variation_id', $variationId)
-                    ->where('quantity', '>=', $request->qty)
-                    ->first();
-                $warehouseId = $vStock ? $vStock->warehouse_id : null;
+                if ($variation->product->manage_stock) {                          // ← guard
+                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)
+                        ->where('quantity', '>=', $request->qty)
+                        ->first();
+                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
+                } else {
+                    // unmanaged হলে quantity check ছাড়াই যেকোনো assigned warehouse নাও
+                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)->first();
+                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
+                }
             } else {
                 $product = Product::findOrFail($productId);
                 $unitPrice = $product->sale_price;
 
-                $pWarehouseInfo = $product->warehouse_info ?? [];
-                foreach ($pWarehouseInfo as $info) {
-                    if ($info['quantity'] >= $request->qty) {
-                        $warehouseId = $info['warehouse_id'];
-                        break;
+                if ($product->manage_stock) {                                    
+                    $pWarehouseInfo = $product->warehouse_info ?? [];
+                    foreach ($pWarehouseInfo as $info) {
+                        if ($info['quantity'] >= $request->qty) {
+                            $warehouseId = $info['warehouse_id'];
+                            break;
+                        }
                     }
+                } else {
+                    $pWarehouseInfo = $product->warehouse_info ?? [];
+                    $warehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
                 }
             }
 
