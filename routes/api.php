@@ -310,6 +310,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
                     Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
                     Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
+                    Route::get('/get-product-by-warehouse/adjustment/{warehouseId}', [SelectOptionController::class, 'getProductOptionsByWarehouse']);
                     Route::get('/get-product-by-warehouse/{warehouseId}/{binId}', [SelectOptionController::class, 'getProductByWarehouseAndBin']);
                     Route::get('/products', [SelectOptionController::class, 'productOptions']);
                     Route::get('/products/purchase', [SelectOptionController::class, 'purchaseProductOptions']);

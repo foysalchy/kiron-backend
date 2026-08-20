@@ -193,6 +193,77 @@ class SelectOptionController extends Controller
             return !$product->manage_stock || $product->available_stock > 0;
         })->values();
     }
+    public function getProductOptionsByWarehouse(Request $request, $warehouseId)
+    {
+        $type = $request->query('type');
+
+        $products = Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeGroup',
+            'variations.attributes.attributeValue',
+            'variations.stocks' => function ($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
+            },
+            'variations.stocks.warehouse',
+        ])
+            ->where(function ($q) use ($warehouseId) {
+                $q->where('manage_stock', false)
+                    ->orWhereJsonContains('warehouse_info', [
+                        'warehouse_id' => (string) $warehouseId
+                    ])
+                    ->orWhereHas('variations.stocks', function ($stockQuery) use ($warehouseId) {
+                        $stockQuery->where('warehouse_id', $warehouseId)
+                            ->where('quantity', '>', 0);
+                    });
+            })
+            ->when($type === 'pos', function ($q) {
+                $q->whereIn('purpose', ['pos', 'both']);
+            })
+            ->where('manage_stock',1)
+            ->orderBy('title', 'asc')
+            ->get();
+
+        $mappedProducts = $products->map(function ($product) use ($warehouseId) {
+            $warehouseTotalStock = 0;
+            if (!$product->manage_stock) {
+                $product->available_stock = null;
+                $product->stock_quantity = null;
+                return $product;
+            }
+
+            if ($product->type === 'single' && is_array($product->warehouse_info)) {
+                $filteredWarehouseInfo = collect($product->warehouse_info)
+                    ->where('warehouse_id', (string) $warehouseId)
+                    ->values();
+                $warehouseTotalStock = $filteredWarehouseInfo->sum('quantity');
+
+                $product->warehouse_info = $filteredWarehouseInfo->toArray();
+            }
+
+            if ($product->type === 'variation') {
+                $product->variations->map(function ($variation) {
+                    $variationStock = $variation->stocks->sum('quantity');
+
+                    $variation->available_stock = $variationStock;
+                    $variation->stock_quantity = $variationStock;
+
+                    return $variation;
+                });
+
+                $warehouseTotalStock = $product->variations->sum('available_stock');
+            }
+
+            $product->available_stock = $warehouseTotalStock;
+            $product->stock_quantity = $warehouseTotalStock;
+
+            return $product;
+        });
+
+        return $mappedProducts->filter(function ($product) {
+            return !$product->manage_stock || $product->available_stock > 0;
+        })->values();
+    }
     public function getProductByWarehouseAndBin($warehouseId, $binId)
     {
         $products = Product::with([
