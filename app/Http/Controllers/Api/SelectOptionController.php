@@ -19,6 +19,7 @@ use App\Models\CustomerGroup;
 use App\Models\DisposalType;
 use App\Models\Domain;
 use App\Models\DomainSetup;
+use App\Models\EmailTemplate;
 use App\Models\ExtraCategory;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
@@ -27,6 +28,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Rack;
 use App\Models\Role;
+use App\Models\SmsTemplate;
 use App\Models\SubCategory;
 use App\Models\SupportDepartment;
 use App\Models\User;
@@ -107,6 +109,19 @@ class SelectOptionController extends Controller
             'variations.stocks.warehouse',
         ])->orderBy('title', 'asc')->get();
     }
+    public function purchaseProductOptions()
+    {
+        return Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeGroup',
+            'variations.attributes.attributeValue',
+            'variations.stocks.warehouse',
+        ])
+            ->where('manage_stock', true)
+            ->orderBy('title', 'asc')
+            ->get();
+    }
     public function getProductByWarehouse(Request $request, $warehouseId)
     {
         $type = $request->query('type');
@@ -134,6 +149,7 @@ class SelectOptionController extends Controller
             ->when($type === 'pos', function ($q) {
                 $q->whereIn('purpose', ['pos', 'both']);
             })
+            
             ->orderBy('title', 'asc')
             ->get();
 
@@ -448,6 +464,14 @@ class SelectOptionController extends Controller
         $roles = Role::orderBy('name', 'asc')->get();
 
         return $roles;
+    }
+    public function getEmailTemplate()
+    {
+        return EmailTemplate::where('is_default', 0)->get();
+    }
+    public function getSmsTemplate()
+    {
+        return SmsTemplate::where('is_default', 0)->get();
     }
     public function getAvailableDomains()
     {

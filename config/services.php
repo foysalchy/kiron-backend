@@ -48,5 +48,10 @@ return [
     'bdcourier' => [
         'key' => env('BD_COURIER_KEY'),
     ],
+    'sms_gateway' => [
+        'url'       => env('SMS_GATEWAY_URL'),
+        'api_key'   => env('SMS_GATEWAY_API_KEY'),
+        'sender_id' => env('SMS_GATEWAY_SENDER_ID'),
+    ],
 
 ];

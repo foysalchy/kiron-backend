@@ -67,6 +67,7 @@ class InventoryStockReportService
                     'p.title as product_name',
                     'p.mega_category_ids',
                     'p.brand_id',
+                    'p.manage_stock',
                     'b.name as brand_name',
                     DB::raw('SUM(pvs.quantity) as current_stock'),
                 ])
@@ -79,6 +80,7 @@ class InventoryStockReportService
                     'p.title',
                     'p.mega_category_ids',
                     'p.brand_id',
+                    'p.manage_stock',
                     'b.name'
                 );
 
@@ -160,6 +162,7 @@ class InventoryStockReportService
                     'variation_name' => null,
                     'sku'            => $product->sku_code ?? null,
                     'brand'          => $product->brand->name ?? 'No Brand',
+                    'manage_stock'   => (bool) $product->manage_stock,
                     'current_stock'  => $stock,
                     'sold_qty'       => $soldQty,
                     'return_qty'     => $returnQty,

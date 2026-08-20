@@ -6,9 +6,8 @@ use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use App\Models\Party;
 use App\Models\SmsSend;
-use App\Models\SmsTemplate;
-use App\Enums\Status;
-use Illuminate\Support\Facades\{DB, Log, Http};
+use Illuminate\Support\Facades\{DB, Log};
+use Http;
 
 class SmsSendService
 {
@@ -18,7 +17,6 @@ class SmsSendService
     public function __construct(
         private SmsWalletService $smsWalletService
     ) {}
-
     public function getAllSmsSends(array $filters)
     {
         try {
@@ -69,8 +67,7 @@ class SmsSendService
     }
 
     /**
-     * Create Log and Send SMS to Gateway (Bulk SMS flow — from UI)
-     * Supports {{customer_name}} personalization per recipient.
+     * Create Log and Send SMS to Gateway
      */
     public function createSmsSend(array $data): SmsSend
     {
@@ -103,7 +100,7 @@ class SmsSendService
                 ])->concat(
                     $customNumbers->map(fn($number) => [
                         'phone' => $number,
-                        'name'  => null,
+                        'name'  => null, // custom number-এ customer_name বসবে না
                     ])
                 )->unique('phone')->values();
 
@@ -117,9 +114,6 @@ class SmsSendService
                     throw ApiException::badRequest('SMS message cannot be empty.');
                 }
 
-                $companyName = auth()->user()?->company?->name
-                    ?? \App\Models\Company::find($data['company_id'] ?? null)?->name
-                    ?? 'dorja.io';
                 $recipientCount = $recipients->count();
                 $smsCount       = $this->calculateSmsCount($messageBody, $recipientCount);
 
@@ -140,25 +134,13 @@ class SmsSendService
 
                 // 4. Send to gateway — প্রতিটা recipient-এর জন্য personalized message
                 foreach ($recipients as $recipient) {
-                    $personalizedMessage = $this->replacePlaceholder(
-                        $messageBody,
-                        'customer_name',
-                        $recipient['name'] ?? 'Customer'
-                    );
-
-                    $personalizedMessage = $this->replacePlaceholder(
-                        $personalizedMessage,
-                        'company_name',
-                        $companyName
-                    );
-
+                    $personalizedMessage = $this->renderTemplate($messageBody, $recipient['name']);
                     Log::info('Sending SMS', [
                         'phone'   => $recipient['phone'],
                         'name'    => $recipient['name'] ?? 'N/A',
                         'message' => $personalizedMessage,
                     ]);
-
-                    //   $this->sendToGateway([$recipient['phone']], $personalizedMessage);
+                    $this->sendToGateway([$recipient['phone']], $personalizedMessage);
                 }
 
                 // Deduct balance
@@ -187,24 +169,27 @@ class SmsSendService
         });
     }
 
-    /**
-     * Replace a single {{placeholder}} in a template string.
-     */
-    private function replacePlaceholder(string $template, string $key, ?string $value): string
+    private function renderTemplate(string $template, ?string $customerName): string
     {
-        return str_replace('{{' . $key . '}}', $value ?? '', $template);
+        return str_replace(
+            '{{customer_name}}',
+            $customerName ?? 'Customer',
+            $template
+        );
     }
-
     private function calculateSmsCount(string $message, int $recipientCount): int
     {
         $messageLength = mb_strlen($message);
 
+        // Unicode detect (Bengali, Arabic etc)
         $isUnicode = $this->isUnicode($message);
 
         if ($isUnicode) {
+            // Unicode: 1st SMS = 70 chars, subsequent = 67 chars
             $singleLimit = 70;
             $multiLimit  = 67;
         } else {
+            // ASCII: 1st SMS = 160 chars, subsequent = 153 chars
             $singleLimit = 160;
             $multiLimit  = 153;
         }
@@ -223,7 +208,6 @@ class SmsSendService
         return mb_strlen($message) !== strlen($message)
             || preg_match('/[^\x00-\x7F]/', $message);
     }
-
     /**
      * Logic to communicate with SMS Provider API
      */
@@ -233,9 +217,9 @@ class SmsSendService
 
         $response = Http::asForm()
             ->timeout(30)
-            ->post(config('services.sms_gateway.url'), [
-                'api_key'  => config('services.sms_gateway.api_key'),
-                'senderid' => config('services.sms_gateway.sender_id'),
+            ->post('http://bulksmsbd.net/api/smsapi', [
+                'api_key'  => 'my api key',
+                'senderid' => 'my sener api',
                 'number'   => $recipientString,
                 'message'  => $message,
             ]);
@@ -249,11 +233,15 @@ class SmsSendService
             throw ApiException::serverError('SMS gateway connection failed.');
         }
 
+
+
+
+
+        // Optional: adjust according to provider response
         $data = $response->json();
         Log::info('SMS Gateway Response', [
             'response' => $data,
         ]);
-
         if (($data['response_code'] ?? 0) != 202) {
             throw ApiException::serverError(
                 $data['error_message'] ?? 'SMS sending failed.'
@@ -279,45 +267,40 @@ class SmsSendService
 
         return $log;
     }
-
     /**
-     * Order status change হলে automated SMS পাঠানো হয়।
-     * এখানে Order-এর সব data দিয়ে template render করা হয়, তারপর
-     * সেই fully-rendered message createSmsSend()-এ পাঠানো হয়
-     * (single recipient হিসেবে, order->customer_id দিয়ে)।
+     *send sms
      */
     public function sendStatusBasedSms($order)
     {
+        // ১. স্ট্যাটাস এবং স্লাগের ম্যাপিং
         $slugMap = [
-            Status::Pending->value   => 'order-place',
-            Status::Confirmed->value => 'order-confirm',
-            Status::Shipped->value   => 'order-shipped',
-            Status::Delivered->value => 'order-delivered',
-            Status::Cancelled->value => 'cancel-order',
+            \App\Enums\Status::Pending->value   => 'order-place',
+            \App\Enums\Status::Confirmed->value => 'order-confirm',
+            \App\Enums\Status::Shipped->value   => 'order-shipped',
+            \App\Enums\Status::Delivered->value => 'order-delivered',
+            \App\Enums\Status::Cancelled->value => 'cancel-order',
         ];
 
-        // ⚠️ NOTE: $order->status যদি raw string/int হয় (enum cast না থাকে),
-        // তাহলে ->value ব্যবহার করলে error দিবে। raw value হলে সরাসরি $order->status ব্যবহার করুন:
-        // $statusValue = $order->status instanceof Status ? $order->status->value : $order->status;
-        $statusValue = $order->status instanceof Status ? $order->status->value : $order->status;
 
-        $slug = $slugMap[$statusValue] ?? null;
+        $slug = $slugMap[$order->status->value] ?? null;
         if (!$slug) return;
 
-        $template = SmsTemplate::where('company_id', $order->company_id)
+
+        $template = \App\Models\SmsTemplate::where('company_id', $order->company_id)
             ->where('slug', $slug)
-            ->where('status', Status::Active->value)
+            ->where('status', \App\Enums\Status::Active->value)
             ->first();
 
         if (!$template) return;
 
-        if (empty($order->customer?->phone)) {
-            Log::warning("Order {$order->order_no}: customer has no phone, status SMS skipped");
-            return;
-        }
+        $replaceData = [
+            '{customer_name}' => $order->customer->name ?? 'Customer',
+            '{company_name}'  => $order->company->name ?? '-',
+            '{invoice_id}'    => $order->order_no ?? $order->id,
+            '{invoice_link}'  => route('order.invoice', $order->id),
+        ];
 
-        // পুরো order data দিয়ে সব placeholder replace করে দাও (একবারেই)
-        $messageBody = $this->renderOrderTemplate($template->description, $order);
+        $messageBody = str_replace(array_keys($replaceData), array_values($replaceData), $template->description);
 
         return $this->createSmsSend([
             'company_id'   => $order->company_id,
@@ -325,42 +308,5 @@ class SmsSendService
             'body'         => $messageBody,
             'message'      => $messageBody,
         ]);
-    }
-
-    /**
-     * Order object থেকে template-এর সব {{placeholder}} replace করে।
-     * ORDER_PARAMETERS (frontend)-এর সাথে key মিলিয়ে রাখা হয়েছে।
-     */
-    private function renderOrderTemplate(string $template, $order): string
-    {
-
-
-        $replacements = [
-            '{{customer_name}}' => $order->customer?->name ?? 'Customer',
-            '{{company_name}}'  => $order->company?->name ?? '',
-            '{{order_no}}'      => $order->order_no,
-            '{{order_date}}'    => $order->order_date
-                ? \Carbon\Carbon::parse($order->order_date)->format('d M Y')
-                : '',
-            '{{total_amount}}'  => number_format((float) $order->grand_total, 2),
-            '{{due_amount}}'    => number_format(
-                (float) ($order->grand_total - $order->payment_amount),
-                2
-            ),
-            '{{paid_amount}}'   => number_format((float) $order->payment_amount, 2),
-            '{{tracking_no}}'   => $this->getTrackingNo($order),
-            '{{invoice_id}}'    => $order->order_no ?? $order->id,
-            '{{invoice_link}}'  => route('order.invoice', $order->id),
-        ];
-
-        return strtr($template, $replacements);
-    }
-    private function getTrackingNo($order): string
-    {
-        $courierInfo = $order->courier_info;
-
-
-
-        return $courierInfo['tracking_code'] ?? '-';
     }
 }
