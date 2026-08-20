@@ -21,7 +21,7 @@
             $discountLabel = $percentage . '%';
         }
     }
-    $isOutOfStock = $product->available_stock <= 0;
+    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
 @endphp
 
 <div

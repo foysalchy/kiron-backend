@@ -20,7 +20,7 @@
         if ($percentage > 0) { $discountLabel = $percentage . '%'; }
     }
 
-    $isOutOfStock = $product->available_stock <= 0;
+    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
 @endphp
 
 <div class="max-w-[348px] group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">

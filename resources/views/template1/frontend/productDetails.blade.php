@@ -140,9 +140,9 @@
                             <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                        <span class="text-sm {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock' }}
-                        </span>
+                   <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+    {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
+</span>
                     </div>
 
                     <!-- Hidden Input for Selected Variation -->
@@ -151,25 +151,24 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
-                        <button id="btn-cart" onclick="handleAddToCart()"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                            Add To Cart
-                        </button>
+                  <button id="btn-cart" onclick="handleAddToCart()"
+    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+    class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+    Add To Cart
+</button>
 
                         <!-- ২. Order Now -->
-                        <button id="btn-order" onclick="handleAddToCart(true)"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                            Order Now
-                        </button>
-
+                     <button id="btn-order" onclick="handleAddToCart(true)"
+    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+    class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+    Order Now
+</button>
                         <!--  Wishlist -->
                         <!-- Wishlist Button Updated -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
-                            {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
+    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+    class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
+    {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -301,13 +300,12 @@
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">Availability:</span>
-                            <span
-                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
-                            </span>
-                        </div>
+                   <div class="flex items-center justify-between py-3 border-b border-gray-100">
+    <span class="font-medium text-gray-500">Availability:</span>
+    <span class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+        {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
+    </span>
+</div>
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                             <span class="font-medium text-gray-500">Category:</span>
