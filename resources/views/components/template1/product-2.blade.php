@@ -29,7 +29,7 @@
     $totalReviews = $product->reviews_count ?? 0;
 
     // 4. Stock check
-    $isOutOfStock = $product->available_stock <= 0;
+    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
 @endphp
 
 <div
