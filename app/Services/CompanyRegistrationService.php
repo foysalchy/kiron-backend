@@ -77,10 +77,18 @@ class CompanyRegistrationService
                 'user_agent' => request()->userAgent(),
                 'login_at'   => now(),
             ]);
+            $shop_name = $company->name;
             foreach (SystemPageType::companyScoped() as $type) {
+
+                $seo = $this->getDefaultSeoData($type, $shop_name);
+
                 SystemPage::create([
-                    'company_id' => $company->id,
-                    'page_type'  => $type,
+                    'company_id'    => $company->id,
+                    'page_type'     => $type,
+                    'meta_title'    => $seo['meta_title'],
+                    'meta_description' => $seo['meta_description'],
+                    'meta_keywords' => $seo['meta_keywords'],
+                    'description'   => $seo['description'],
                 ]);
             }
 
@@ -672,5 +680,89 @@ class CompanyRegistrationService
         } catch (\Exception $e) {
             Log::error("Failed to send OTP email to {$toEmail}: " . $e->getMessage());
         }
+    }
+
+    private function getDefaultSeoData($type, $shop_name)
+    {
+        $data = [
+
+            'home_page' => [
+                'meta_title' => "Online Shopping at {$shop_name} | Shop Latest Products",
+                'meta_description' => "Shop quality products at the best prices from {$shop_name}. Explore fashion, electronics, lifestyle, beauty, home essentials and more with secure payment and fast delivery.",
+                'meta_keywords' => "online shopping, ecommerce, online shop, buy products online, best price, shopping website, {$shop_name}",
+                'description' => "Shop your favorite products from the comfort of your home with {$shop_name}. Explore a wide range of quality products across fashion, electronics, beauty, lifestyle, home essentials and more. We offer competitive prices, secure payment options, reliable delivery and a convenient online shopping experience. Discover the latest products and exciting deals every day."
+            ],
+
+            'blog_list' => [
+                'meta_title' => "Shopping Blog | Tips, Guides & Latest Trends | {$shop_name}",
+                'meta_description' => "Explore the latest shopping tips, product guides, buying advice, trends, reviews and useful information from {$shop_name} to help you make better purchase decisions.",
+                'meta_keywords' => "shopping blog, product guides, buying tips, product reviews, latest trends, ecommerce blog, {$shop_name}",
+                'description' => "Welcome to the {$shop_name} shopping blog, where you can discover useful buying guides, product tips, industry trends, product information and helpful recommendations. Whether you are looking for the right product or want to stay updated with the latest trends, our articles are designed to help you shop smarter."
+            ],
+
+            'brand_list' => [
+                'meta_title' => "Top Brands | Shop Trusted Brands at {$shop_name}",
+                'meta_description' => "Discover products from popular and trusted brands at {$shop_name}. Browse our brand collection and find your favorite products at competitive prices with convenient delivery.",
+                'meta_keywords' => "top brands, trusted brands, branded products, popular brands, buy branded products, online brands, {$shop_name}",
+                'description' => "Explore our collection of products from trusted and popular brands at {$shop_name}. Browse products by brand to easily find your preferred items and discover new favorites. We bring together quality products from a variety of brands to make your online shopping experience simple and convenient."
+            ],
+
+            'contact_us' => [
+                'meta_title' => "Contact Us | Customer Support | {$shop_name}",
+                'meta_description' => "Need help with your order or shopping experience? Contact the {$shop_name} customer support team for assistance with orders, products, delivery, payment and other inquiries.",
+                'meta_keywords' => "contact us, customer support, ecommerce support, online shopping help, order support, customer service, {$shop_name}",
+                'description' => "Have a question about a product, order, payment or delivery? The {$shop_name} customer support team is here to help. Contact us through our available support channels and we will do our best to assist you with your shopping experience."
+            ],
+
+            'shop_product' => [
+                'meta_title' => "Shop Online | Buy Quality Products at Best Prices | {$shop_name}",
+                'meta_description' => "Browse and shop a wide range of quality products at competitive prices from {$shop_name}. Find your favorite products with secure payment and reliable delivery.",
+                'meta_keywords' => "shop online, buy products online, ecommerce shop, online products, best price products, online shopping, {$shop_name}",
+                'description' => "Discover our wide selection of products across multiple categories at {$shop_name}. Compare products, explore different options and find the right products for your needs. Enjoy competitive prices, convenient online ordering, secure payment and reliable delivery."
+            ],
+
+            'category_list' => [
+                'meta_title' => "Product Categories | Browse All Categories | {$shop_name}",
+                'meta_description' => "Explore all product categories at {$shop_name} and easily find what you need. Browse fashion, electronics, beauty, lifestyle, home essentials and more.",
+                'meta_keywords' => "product categories, shopping categories, ecommerce categories, online shopping categories, products, {$shop_name}",
+                'description' => "Browse the complete range of product categories at {$shop_name} and find everything you need in one place. From fashion and electronics to beauty, lifestyle, home essentials and more, our organized categories make it easy to discover products and shop conveniently."
+            ],
+
+            'cart' => [
+                'meta_title' => "Shopping Cart | Review Your Products | {$shop_name}",
+                'meta_description' => "Review your selected products, update quantities and check your order summary before proceeding to secure checkout at {$shop_name}.",
+                'meta_keywords' => "shopping cart, online cart, ecommerce cart, buy products, order cart, {$shop_name}",
+                'description' => "Review the products you have selected from {$shop_name} before completing your purchase. You can update product quantities, remove unwanted items and review your order summary."
+            ],
+
+            'checkout' => [
+                'meta_title' => "Secure Checkout | Complete Your Order | {$shop_name}",
+                'meta_description' => "Complete your purchase through the secure checkout at {$shop_name}. Enter your delivery details, choose your preferred payment method and place your order easily.",
+                'meta_keywords' => "checkout, secure checkout, online payment, place order, ecommerce checkout, online order, {$shop_name}",
+                'description' => "Complete your order quickly and securely through the {$shop_name} checkout process. Provide your delivery information, review your order details and select your preferred payment method."
+            ],
+
+            'login' => [
+                'meta_title' => "Login | Sign In to Your Account | {$shop_name}",
+                'meta_description' => "Sign in to your {$shop_name} account to manage orders, track purchases, save products and enjoy a personalized online shopping experience.",
+                'meta_keywords' => "login, customer login, account login, ecommerce login, online shopping account, {$shop_name}",
+                'description' => "Sign in to your {$shop_name} account to access your orders, manage your profile, track purchases and enjoy a more personalized shopping experience."
+            ],
+
+            'register' => [
+                'meta_title' => "Create Account | Register for Online Shopping | {$shop_name}",
+                'meta_description' => "Create your {$shop_name} account and enjoy a faster, easier shopping experience. Manage orders, track purchases and securely save your information for future orders.",
+                'meta_keywords' => "register, create account, signup, ecommerce registration, online shopping account, customer registration, {$shop_name}",
+                'description' => "Create your account with {$shop_name} and make your online shopping experience faster and more convenient. Manage your profile, view order history, track purchases and save your information for future orders."
+            ],
+
+        ];
+
+        return $data[$type] ?? [
+            'meta_title' => $shop_name,
+            'meta_description' => "Shop online at {$shop_name}.",
+            'meta_keywords' => "online shopping, {$shop_name}",
+            'description' => "Welcome to {$shop_name}, your online shopping destination."
+        ];
     }
 }
