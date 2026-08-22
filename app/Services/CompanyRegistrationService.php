@@ -611,7 +611,7 @@ class CompanyRegistrationService
             'company_id' => $registrationId,
             'type'       => $type,
             'method'     => $method,
-            'email'      => $method === 'email' ? $company->email : $company->phone,
+            'email'      => $method === 'email' ? $company->email : $company->phonea,
             'otp'        => $this->generateOtp(),
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
