@@ -100,6 +100,14 @@ class ProductService
                 }
             }
 
+            if (isset($filters['source'])) {
+                if ($filters['source'] === 'website') {
+                    $query->whereNull('source_info');
+                } else {
+                    $query->where('source_info->source_name', $filters['source']);
+                }
+            }
+
             if (isset($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
                     $q->where('title', 'like', "%{$filters['search']}%");

@@ -202,6 +202,7 @@ Route::prefix('v1')->group(function () {
         Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
         Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
     });
+    Route::post('/wocommerces/webhook/orders/{settingId}', [\App\Http\Controllers\Api\WoocommerceWebhookController::class, 'handle']);
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
         Route::post('/clear-cache', function () {
             Artisan::call('cache:clear');
@@ -1073,9 +1074,10 @@ Route::prefix('v1')->group(function () {
                     Route::get('{id}/restore', [WocommerceSettingController::class, 'restore']);
                     Route::delete('{id}/force', [WocommerceSettingController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
-                    Route::Put('/{id}/toggle-sync', [WocommerceSettingController::class, 'toggleSync']);
+                    Route::Put('/{id}/toggle-product-sync', [WocommerceSettingController::class, 'toggleProductSync']);
+                    Route::Put('/{id}/toggle-order-sync', [WocommerceSettingController::class, 'toggleOrderSync']);
                     Route::get('/import/{id}', [WocommerceSettingController::class, 'import']);
-                    Route::post('/import-product', [WooCommerceImportController::class, 'importProduct']);
+                    Route::post('/import-product', [WocommerceSettingController::class, 'importProduct']);
                 });
                 //note template settings routes
                 Route::prefix('note-templates')->group(function () {

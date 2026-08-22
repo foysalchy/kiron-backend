@@ -53,6 +53,7 @@ class Order extends Model
         'note',
         'hold_ref',
         'return_info',
+        'source_info',
     ];
 
     protected $casts = [
@@ -72,6 +73,7 @@ class Order extends Model
         'return_info' => 'array',
         'warehouse_info' => 'array',
         'assigned_to' => 'array',
+        'source_info' => 'array',
 
 
     ];

@@ -48,7 +48,8 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'status',
-        'manage_stock'
+        'manage_stock',
+        'source_info'
     ];
 
     protected $casts = [
@@ -58,6 +59,7 @@ class Product extends Model
         'mini_category_ids' => IntegerArray::class,
         'extra_category_ids' => IntegerArray::class,
         'warehouse_info' => 'array',
+        'source_info' => 'array',
         'sku_code' => 'array',
         'meta_keywords' => 'array',
         'stock_quantity' => 'integer',

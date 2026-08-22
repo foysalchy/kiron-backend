@@ -308,32 +308,94 @@ class WocommerceSettingService
      /**
      * Toggle Sync (Active/Inactive)
      */
-    public function toggleSync(int $id): WocommerceSetting
+    public function toggleProductSync(int $id): WocommerceSetting
     {
         DB::beginTransaction();
         try {
             $setting = $this->getSettingById($id);
 
-     
-            $newStatus = $setting->sync === 1
-                ? 0
-                : 1;
+            $newStatus = $setting->product_sync === 1 ? 0 : 1;
 
-            $setting->update(['sync' => $newStatus]);
+            $setting->update(['product_sync' => $newStatus]);
 
             LogHelper::statusChanged(
                 'woocommerce_setting',
                 $setting->id,
                 $setting->company_id,
-                $setting->domain_url . ' new sync ' . $newStatus
+                $setting->domain_url . ' new product_sync ' . $newStatus
             );
 
             DB::commit();
             return $setting;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('WooCommerce status sync failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to sync status');
+            Log::error('WooCommerce product sync failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to sync product status');
+        }
+    }
+
+    public function toggleOrderSync(int $id): WocommerceSetting
+    {
+        DB::beginTransaction();
+        try {
+            $setting = $this->getSettingById($id);
+
+            $newStatus = $setting->order_sync === 1 ? 0 : 1;
+
+            $setting->update(['order_sync' => $newStatus]);
+
+            if ($newStatus === 1) {
+                $this->registerOrderWebhooks($setting);
+            } else {
+                $this->deleteOrderWebhooks($setting);
+            }
+
+            LogHelper::statusChanged(
+                'woocommerce_setting',
+                $setting->id,
+                $setting->company_id,
+                $setting->domain_url . ' new order_sync ' . $newStatus
+            );
+
+            DB::commit();
+            return $setting;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('WooCommerce order sync failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to sync order status');
+        }
+    }
+
+    private function registerOrderWebhooks(WocommerceSetting $setting)
+    {
+        $deliveryUrl = url("/api/v1/wocommerces/webhook/orders/{$setting->id}");
+        
+        $topics = ['order.created', 'order.updated'];
+        foreach ($topics as $topic) {
+            Http::withBasicAuth($setting->consumer_key, $setting->consumer_secret)
+                ->post(rtrim($setting->domain_url, '/') . '/wp-json/wc/v3/webhooks', [
+                    'name' => "Kiron {$topic}",
+                    'topic' => $topic,
+                    'delivery_url' => $deliveryUrl
+                ]);
+        }
+    }
+
+    private function deleteOrderWebhooks(WocommerceSetting $setting)
+    {
+        $deliveryUrl = url("/api/v1/wocommerces/webhook/orders/{$setting->id}");
+        
+        $response = Http::withBasicAuth($setting->consumer_key, $setting->consumer_secret)
+            ->get(rtrim($setting->domain_url, '/') . '/wp-json/wc/v3/webhooks');
+            
+        if ($response->successful()) {
+            $webhooks = $response->json();
+            foreach ($webhooks as $webhook) {
+                if ($webhook['delivery_url'] === $deliveryUrl) {
+                    Http::withBasicAuth($setting->consumer_key, $setting->consumer_secret)
+                        ->delete(rtrim($setting->domain_url, '/') . '/wp-json/wc/v3/webhooks/' . $webhook['id'], ['force' => true]);
+                }
+            }
         }
     }
     public function importProducts(int $id, Request $request): array
@@ -407,7 +469,7 @@ class WocommerceSettingService
     }
 
     // import product to woocommerce in our db ~ pending task
-    public function importProduct(Request $request) :array
+    public function importProductInDB(Request $request) :array
     {
         $request->validate([
             'woo_product_id'       => 'required|integer',
@@ -428,138 +490,184 @@ class WocommerceSettingService
         if (!preg_match('/^https?:\/\//i', $domain)) {
             $domain = 'https://' . $domain;
         }
-       
 
         // 1. Get WooCommerce credentials from your settings / config
         $storeUrl = rtrim($domain, '/');
-        $consumerKey    =  $setting->consumer_secret;
-        $consumerSecret = config('services.woocommerce.secret');
+        $consumerKey    = $setting->consumer_key;
+        $consumerSecret = $setting->consumer_secret;
 
         // 2. Fetch full product from WooCommerce
         $response = Http::withBasicAuth($consumerKey, $consumerSecret)
             ->get("{$storeUrl}/wp-json/wc/v3/products/{$request->woo_product_id}");
 
         if (!$response->successful()) {
-            return response()->json(['message' => 'Failed to fetch product from WooCommerce'], 400);
+            throw ApiException::badRequest('Failed to fetch product from WooCommerce');
         }
 
         $woo = $response->json();
-
-        // 3. Prepare product data
         $isVariable = $woo['type'] === 'variable';
 
+        // 3. Prepare product data
         $productData = [
+            'company_id'         => auth()->user()->company_id,
             'title'              => $woo['name'],
             'slug'               => $this->makeSlug($woo['slug'] ?? $woo['name']),
             'type'               => $isVariable ? 'variation' : 'single',
-            'sku_code'           => $woo['sku'] ?? null,
+            'sku_code'           => empty($woo['sku']) ? null : $woo['sku'],
             'short_description'  => $woo['short_description'] ?? null,
             'full_description'   => $woo['description'] ?? null,
-            'regular_price'      => $isVariable ? 0 : ($woo['regular_price'] ?: $woo['price'] ?: 0),
-            'purchase_price'     => 0,
-            'discount_type'      => 'flat',
-            'discount'           => 0,
             'mega_category_ids'  => $request->mega_category_ids,
             'sub_category_ids'   => $request->sub_category_ids ?? [],
             'mini_category_ids'  => $request->mini_category_ids ?? [],
             'extra_category_ids' => $request->extra_category_ids ?? [],
+            'purpose'            => 'website',
+            'manage_stock'       => $woo['manage_stock'] ?? false,
+            'source_info'        => [
+                'source_name' => 'woo',
+                'source_id'   => $woo['id']
+            ],
+            'gallery_images'     => []
         ];
-
-        // Calculate discount for simple product
-        if (!$isVariable) {
-            $regular = (float) ($woo['regular_price'] ?: $woo['price'] ?: 0);
-            $sale    = (float) ($woo['sale_price'] ?: 0);
-            if ($sale > 0 && $regular > $sale) {
-                $productData['discount'] = $regular - $sale;
-            }
-        }
 
         // 4. Download thumbnail
         if (!empty($woo['images'][0]['src'])) {
-            $productData['thumbnail'] = $this->downloadImage($woo['images'][0]['src'], 'products');
+            $file = $this->downloadImageAsUploadedFile($woo['images'][0]['src']);
+            if ($file) {
+                $productData['thumbnail'] = $file;
+            }
         }
-
-        // 5. Create product (adjust to your actual create logic)
-        $product = Product::create($productData); // or your service
-
-        // Attach categories if you use relationships
-        // $product->megaCategories()->sync($request->mega_category_ids);
-        // ...
 
         // 6. Gallery images
         if (!empty($woo['images']) && count($woo['images']) > 1) {
             foreach (array_slice($woo['images'], 1) as $img) {
-                $path = $this->downloadImage($img['src'], 'products/gallery');
-                if ($path) {
-                    // $product->gallery()->create(['image' => $path]);
+                $file = $this->downloadImageAsUploadedFile($img['src']);
+                if ($file) {
+                    $productData['gallery_images'][] = $file;
                 }
             }
         }
 
-        // 7. Warehouse / Stock
-        $qty = $this->getQty($woo);
+        // 7. Pricing & Variations
+        if (!$isVariable) {
+            $regular = (float) ($woo['regular_price'] ?: $woo['price'] ?: 0);
+            $sale    = (float) ($woo['sale_price'] ?: 0);
+            $discount = ($sale > 0 && $regular > $sale) ? $regular - $sale : 0;
 
-        foreach ($request->warehouse_info as $wh) {
-            // $product->warehouses()->create([
-            //     'warehouse_id' => $wh['warehouse_id'],
-            //     'bin_id'       => $wh['bin_id'] ?? null,
-            //     'quantity'     => $wh['quantity'] ?: $qty,
-            // ]);
-        }
-
-        // 8. Variations
-        if ($isVariable && !empty($woo['variations'])) {
-            // Note: WooCommerce /products/{id} sometimes only returns variation IDs.
-            // If you only get IDs, you need an extra request for each variation.
-            // In your earlier JSON the full variations were already embedded.
-
-            foreach ($woo['variations'] as $index => $variation) {
-                // If $variation is just an ID, fetch it:
-                if (is_numeric($variation)) {
-                    $varRes = Http::withBasicAuth($consumerKey, $consumerSecret)
-                        ->get("{$storeUrl}/wp-json/wc/v3/products/{$woo['id']}/variations/{$variation}");
-                    if (!$varRes->successful()) continue;
-                    $variation = $varRes->json();
-                }
-
-                $regular = (float) ($variation['regular_price'] ?: $variation['price'] ?: 0);
-                $sale    = (float) ($variation['sale_price'] ?: 0);
-                $discount = ($sale > 0 && $regular > $sale) ? $regular - $sale : 0;
-
-                $varData = [
-                    'regular_price'  => $regular,
-                    'purchase_price' => 0,
-                    'discount_type'  => 'flat',
-                    'discount'       => $discount,
-                    'sku'            => $variation['sku'] ?? null,
-                ];
-
-                // Variation image
-                if (!empty($variation['image']['src'])) {
-                    $varData['image'] = $this->downloadImage($variation['image']['src'], 'products/variations');
-                }
-
-                // Create variation
-                // $newVariation = $product->variations()->create($varData);
-
-                // Warehouse for variation
-                $varQty = $this->getQty($variation);
-                foreach ($request->warehouse_info as $wh) {
-                    // $newVariation->warehouses()->create([
-                    //     'warehouse_id' => $wh['warehouse_id'],
-                    //     'bin_id'       => $wh['bin_id'] ?? null,
-                    //     'quantity'     => $wh['quantity'] ?: $varQty,
-                    // ]);
-                }
-
-                // Attributes mapping can be added later
+            $productData['regular_price']  = $regular;
+            $productData['purchase_price'] = 0;
+            $productData['discount_type']  = 'flat';
+            $productData['discount']       = $discount;
+            
+            // Manage Stock and Quantities
+            $wcManageStock = $woo['manage_stock'] ?? false;
+            $wcQty = (int) ($woo['stock_quantity'] ?? 0);
+            $productData['manage_stock'] = ($wcManageStock || $wcQty > 0) ? 1 : 0;
+            
+            $whInfo = $request->warehouse_info;
+            if (count($whInfo) > 0) {
+                // Assign all WooCommerce stock to the first warehouse
+                $whInfo[0]['quantity'] = $wcQty;
             }
+            $productData['warehouse_info'] = $whInfo;
+            
+        } else {
+            // Track if we need to manage stock for the overall variable product
+            $parentManageStock = $woo['manage_stock'] ?? false;
+            $anyVariationHasStock = false;
+            
+            $productData['variations'] = [];
+            if (!empty($woo['variations'])) {
+                foreach ($woo['variations'] as $variationId) {
+                    // Fetch variation details if only ID is provided
+                    $variation = $variationId;
+                    if (is_numeric($variation)) {
+                        $varRes = Http::withBasicAuth($consumerKey, $consumerSecret)
+                            ->get("{$storeUrl}/wp-json/wc/v3/products/{$woo['id']}/variations/{$variation}");
+                        if (!$varRes->successful()) continue;
+                        $variation = $varRes->json();
+                    }
+
+                    $regular = (float) ($variation['regular_price'] ?: $variation['price'] ?: 0);
+                    $sale    = (float) ($variation['sale_price'] ?: 0);
+                    $discount = ($sale > 0 && $regular > $sale) ? $regular - $sale : 0;
+                    
+                    $varManageStock = $variation['manage_stock'] ?? false;
+                    $varQty = (int) ($variation['stock_quantity'] ?? 0);
+                    if ($varManageStock || $varQty > 0) {
+                        $anyVariationHasStock = true;
+                    }
+                    
+                    $whInfo = $request->warehouse_info;
+                    if (count($whInfo) > 0) {
+                        // Assign variation stock to the first warehouse
+                        $whInfo[0]['quantity'] = $varQty;
+                    }
+
+                    $varData = [
+                        'sku'            => empty($variation['sku']) ? null : $variation['sku'],
+                        'regular_price'  => $regular,
+                        'purchase_price' => 0,
+                        'discount_type'  => 'flat',
+                        'discount'       => $discount,
+                        'warehouse_info' => $whInfo,
+                        'attributes'     => []
+                    ];
+
+                    if (!empty($variation['image']['src'])) {
+                        $file = $this->downloadImageAsUploadedFile($variation['image']['src']);
+                        if ($file) {
+                            $varData['image'] = $file;
+                        }
+                    }
+
+                    // Map WooCommerce attributes to our AttributeGroup and AttributeValue
+                    if (!empty($variation['attributes'])) {
+                        foreach ($variation['attributes'] as $wcAttr) {
+                            $groupName = $wcAttr['name'];
+                            $valueName = $wcAttr['option'];
+                            
+                            $group = \App\Models\AttributeGroup::firstOrCreate(
+                                ['name' => $groupName, 'company_id' => auth()->user()->company_id],
+                                ['category' => 'Single']
+                            );
+                            $val = \App\Models\AttributeValue::firstOrCreate(
+                                ['attribute_group_id' => $group->id, 'name' => $valueName, 'company_id' => auth()->user()->company_id]
+                            );
+                            
+                            $varData['attributes'][] = [
+                                'attribute_group_id' => $group->id,
+                                'attribute_value_id' => $val->id
+                            ];
+                        }
+                    } else {
+                        // Fallback in case WooCommerce sends variation without attributes
+                        $group = \App\Models\AttributeGroup::firstOrCreate(
+                            ['name' => 'Variation', 'company_id' => auth()->user()->company_id],
+                            ['category' => 'Single']
+                        );
+                        $val = \App\Models\AttributeValue::firstOrCreate(
+                            ['attribute_group_id' => $group->id, 'name' => 'Option ' . uniqid(), 'company_id' => auth()->user()->company_id]
+                        );
+                        $varData['attributes'][] = [
+                            'attribute_group_id' => $group->id,
+                            'attribute_value_id' => $val->id
+                        ];
+                    }
+
+                    $productData['variations'][] = $varData;
+                }
+            }
+            
+            $productData['manage_stock'] = ($parentManageStock || $anyVariationHasStock) ? 1 : 0;
         }
 
-        return response()->json([
-            'message' => 'Product imported successfully',
-            'product' => $product,
-        ]);
+        // 8. Call ProductService to handle stock, ledgers, etc.
+        $productService = app(ProductService::class);
+        $product = $productService->createProduct($productData);
+
+        return [
+            'product' => $product
+        ];
     }
 
     private function getQty(array $item): int
@@ -581,6 +689,31 @@ class WocommerceSettingService
             return $filename;
         } catch (\Exception $e) {
             \Log::error('Image download failed: ' . $url . ' - ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function downloadImageAsUploadedFile(string $url): ?\Illuminate\Http\UploadedFile
+    {
+        try {
+            $response = Http::timeout(20)->get($url);
+            if (!$response->successful()) return null;
+
+            $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+            $filename  = 'temp_' . Str::uuid() . '.' . $extension;
+            $tempPath = sys_get_temp_dir() . '/' . $filename;
+            
+            file_put_contents($tempPath, $response->body());
+            
+            return new \Illuminate\Http\UploadedFile(
+                $tempPath,
+                $filename,
+                mime_content_type($tempPath) ?: 'image/jpeg',
+                null,
+                true
+            );
+        } catch (\Exception $e) {
+            \Log::error('Image download to UploadedFile failed: ' . $url . ' - ' . $e->getMessage());
             return null;
         }
     }

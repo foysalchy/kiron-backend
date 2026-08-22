@@ -26,6 +26,7 @@ class ProductController extends Controller
             'type' => $request->query('type'),
             'stock_status' => $request->query('stock_status'),
             'purpose' => $request->query('purpose'),
+            'source' => $request->query('source'),
             'warehouse_id' => $request->input('warehouse_id'),
             'mega_category_id' => array_filter((array) $request->input('mega_category_id')),
             'search' => $request->query('search'),

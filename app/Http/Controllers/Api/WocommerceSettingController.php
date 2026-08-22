@@ -103,11 +103,18 @@ class WocommerceSettingController extends Controller
 
         return ResponseHelper::success($data, 'WooCommerce status updated successfully');
     }
-    public function toggleSync(int $id): JsonResponse
+    public function toggleProductSync(int $id): JsonResponse
     {
-        $data = $this->wocommerceService->toggleSync($id);
+        $data = $this->wocommerceService->toggleProductSync($id);
 
-        return ResponseHelper::success($data, 'WooCommerce sync updated successfully');
+        return ResponseHelper::success($data, 'WooCommerce product sync updated successfully');
+    }
+
+    public function toggleOrderSync(int $id): JsonResponse
+    {
+        $data = $this->wocommerceService->toggleOrderSync($id);
+
+        return ResponseHelper::success($data, 'WooCommerce order sync updated successfully');
     }
     public function import(Request $request, int $id): JsonResponse
     {
