@@ -64,18 +64,18 @@ class CompanyRegistrationController extends Controller
         $registrationId = $request->integer('registration_id');
         $type = $request->string('type');
 
-        // $rateLimitKey = "resend-otp:{$registrationId}:{$type}";
+        $rateLimitKey = "resend-otp:{$registrationId}:{$type}";
 
-        // if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
-        //     $seconds = RateLimiter::availableIn($rateLimitKey);
-        //     $formattedTime = $this->formatWaitTime($seconds);
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
+            $seconds = RateLimiter::availableIn($rateLimitKey);
+            $formattedTime = $this->formatWaitTime($seconds);
 
-        //     throw ApiException::badRequest(
-        //         "Too many OTP resend attempts. Please try again after {$formattedTime}."
-        //     );
-        // }
+            throw ApiException::badRequest(
+                "Too many OTP resend attempts. Please try again after {$formattedTime}."
+            );
+        }
 
-        // RateLimiter::hit($rateLimitKey, 600); // 600 seconds = 10 minutes
+        RateLimiter::hit($rateLimitKey, 600); // 600 seconds = 10 minutes
 
         $this->registrationService->resendOtp(
             $registrationId,
