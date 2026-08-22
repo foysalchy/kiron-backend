@@ -157,6 +157,7 @@ class FrontendOrderService
                 'status' => $this->getStatusLabel($order->status),
                 'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
+                'source_info' => $order->source_info,
                 'items' => $order->orderDetails->map(function ($detail) {
                     $item = [
                         'id' => $detail->id,
