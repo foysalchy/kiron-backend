@@ -595,32 +595,49 @@ class CompanyRegistrationService
             ->firstOrFail();
     }
 
-    public function resendOtp(int $registrationId, string $type, string $method = 'email'): void
-    {
-        $company = Company::findOrFail($registrationId);
-        $record = EmailVerification::where('company_id', $registrationId)
-            ->where('type', $type)
-            ->latest()
-            ->first();
+ public function resendOtp(int $registrationId, string $type, string $method = 'email'): void
+{
+    $company = Company::findOrFail($registrationId);
 
-        if (! $record) throw ApiException::notFound('Verification record not found.');
-        if ($record->isVerified()) throw ApiException::badRequest('This email is already verified.');
+    $record = EmailVerification::where('company_id', $registrationId)
+        ->where('type', $type)
+        ->where('method', $method) 
+        ->latest()
+        ->first();
 
-        $newOtp = $this->generateOtp();
-        $record->update([
-            'otp'        => $newOtp,
+    // record na thakle notun banate hobe (dashboard theke first-time verify korar case)
+    if (! $record) {
+        $record = EmailVerification::create([
+            'company_id' => $registrationId,
+            'type'       => $type,
+            'method'     => $method,
+            'email'      => $method === 'email' ? $company->email : $company->phonea,
+            'otp'        => $this->generateOtp(),
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
-
-        if ($method === 'sms') {
-            $this->sendopt($company->phone, $newOtp);
-            Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
-            return;
-        } else {
-            $this->sendOtpEmail($company->name, $record->email, $newOtp, $type);
-            Log::info("New OTP {$newOtp} generated for company_id: {$company->id} and sent to email: {$record->email}");
+    } else {
+        if ($record->isVerified()) {
+            throw ApiException::badRequest(
+                $method === 'sms'
+                    ? 'This phone number is already verified.'
+                    : 'This email is already verified.'
+            );
         }
+
+        $record->update([
+            'otp'        => $this->generateOtp(),
+            'expires_at' => Carbon::now()->addMinutes(10),
+        ]);
     }
+
+    if ($method === 'sms') {
+        $this->sendopt($company->phone, $record->otp);
+        Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
+    } else {
+        $this->sendOtpEmail($company->name, $company->email, $record->otp, $type);
+        Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
+    }
+}
     public function sendopt($phone, $otp)
     {
         $message = "Your Dorja.io verification code is {$otp}. Use it to complete your registration. Valid for 5 minutes. Do not share this code.";

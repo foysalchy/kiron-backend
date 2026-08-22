@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Models\{Product, Order, Domain, Employee};
+use App\Models\{CompanyMonthlyUsage, Product, Order, Domain, Employee};
 use App\Models\User;
 
 class PackageUsageController extends Controller
@@ -25,6 +25,10 @@ class PackageUsageController extends Controller
 
         $package   = $company->pricingPackage;
         $companyId = $company->id;
+        $usage = CompanyMonthlyUsage::withoutGlobalScope('company')
+            ->where('company_id', $companyId)
+            ->where('year_month', now()->format('Y-m'))
+            ->first();
 
         $data = [
             'product' => $this->countLimit(
@@ -45,13 +49,10 @@ class PackageUsageController extends Controller
                     ->count(),
                 $package->employee_limit
             ),
+
+
             'order' => $this->countLimit(
-                Order::withoutGlobalScope('company')
-                    ->where('company_id', $companyId)
-                    ->where('type', 'sales')
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)
-                    ->count(),
+                $usage->order_count ?? 0,
                 $package->order_limit,
                 true
             ),
