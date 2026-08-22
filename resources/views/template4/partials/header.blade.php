@@ -127,7 +127,7 @@
                 <!-- Shopping Cart Link -->
                 <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-bag-shopping text-xl text-header"></i>
+                        <i class="fa-solid fa-bag-shopping text-xl text-[var(--primary-color)]"></i>
                     </div>
 
                     <div class="hidden lg:block">
