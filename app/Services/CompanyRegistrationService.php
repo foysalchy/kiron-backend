@@ -85,6 +85,7 @@ class CompanyRegistrationService
                 SystemPage::create([
                     'company_id'    => $company->id,
                     'page_type'     => $type,
+                    'title'    => $seo['meta_title'],
                     'meta_title'    => $seo['meta_title'],
                     'meta_description' => $seo['meta_description'],
                     'meta_keywords' => $seo['meta_keywords'],
