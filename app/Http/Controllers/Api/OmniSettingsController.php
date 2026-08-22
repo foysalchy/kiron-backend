@@ -37,18 +37,22 @@ class OmniSettingsController extends Controller
 
     public function saveSettings(Request $request)
     {
-
         $settings = OmniSetting::firstOrFail();
 
         $data = $request->validate([
             'company_name' => 'nullable|string|max:150',
             'auto_assign' => 'boolean',
             'auto_assign_agents' => 'nullable|array',
-            'auto_assign_agents.*' => 'integer|exists:users,id',
+            'auto_assign_agents.*' => 'integer',
             'away_mode_active' => 'boolean',
             'away_message' => 'nullable|string',
             'welcome_mode_active' => 'boolean',
-            'welcome_message' => 'nullable|string'
+            'welcome_message' => 'nullable|string',
+            'business_hours_start' => 'nullable',
+            'business_hours_end'   => 'nullable|after:business_hours_start',
+
+            'off_days'   => 'nullable|array|max:7',
+            'off_days.*' => 'in:sunday,monday,tuesday,wednesday,thursday,friday,saturday',
         ]);
 
         $settings->update($data);
