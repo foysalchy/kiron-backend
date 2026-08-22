@@ -108,7 +108,7 @@
                 <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 cursor-pointer group"
                     aria-label="View your wishlist, currently 0 items">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-regular fa-heart text-xl text-header" aria-hidden="true"></i>
+                        <i class="fa-regular fa-heart text-xl text-[var(--primary-color)]" aria-hidden="true"></i>
                     </div>
                     <div class="hidden xl:block">
                         <p class="text-sm font-medium leading-tight">My Wishlist</p>
