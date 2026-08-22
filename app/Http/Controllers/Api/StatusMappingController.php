@@ -12,7 +12,7 @@ class StatusMappingController extends Controller
 {
     public function index(Request $request)
     {
-        $companyId = $request->header('Company-Id');
+        $companyId = auth()->user()->company_id;
         
         $mappings = StatusMapping::where('company_id', $companyId)->get();
         
@@ -21,7 +21,7 @@ class StatusMappingController extends Controller
 
     public function update(Request $request)
     {
-        $companyId = $request->header('Company-Id');
+        $companyId = auth()->user()->company_id;
         $mappingsData = $request->input('mappings'); // Array of {kiron_status: X, mappings: {woo: Y, pathao: Z}}
 
         DB::beginTransaction();
