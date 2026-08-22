@@ -520,4 +520,45 @@ class QuotationService
             'grand_total' => round($grandTotal, 2),
         ];
     }
+    /**
+     * Bulk update status for multiple quotations
+     */
+    public function bulkUpdateStatus(array $ids, int $status): void
+    {
+        DB::beginTransaction();
+
+        try {
+            foreach ($ids as $id) {
+                $this->changeStatus((int)$id, $status);
+            }
+
+            DB::commit();
+            Log::info('Quotations bulk status updated', ['ids' => $ids, 'status' => $status]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk status update failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Bulk delete multiple quotations
+     */
+    public function bulkDelete(array $ids): void
+    {
+        DB::beginTransaction();
+
+        try {
+            foreach ($ids as $id) {
+                $this->deleteQuotation((int)$id);
+            }
+
+            DB::commit();
+            Log::info('Quotations bulk deleted', ['ids' => $ids]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Bulk delete failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
 }

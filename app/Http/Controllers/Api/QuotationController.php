@@ -134,4 +134,34 @@ class QuotationController extends Controller
 
         return ResponseHelper::success(null, 'Quotation permanently deleted successfully');
     }
+    /**
+     * Bulk update status for quotations
+     */
+    public function bulkStatus(Request $request): JsonResponse
+    {
+        $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['exists:quotations,id'],
+            'status' => ['required'],
+        ]);
+
+        $this->quotationService->bulkUpdateStatus($request->ids, (int)$request->status);
+
+        return ResponseHelper::success(null, 'Quotations status updated successfully');
+    }
+
+    /**
+     * Bulk delete quotations
+     */
+    public function bulkDestroy(Request $request): JsonResponse
+    {
+        $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['exists:quotations,id'],
+        ]);
+
+        $this->quotationService->bulkDelete($request->ids);
+
+        return ResponseHelper::success(null, 'Quotations deleted successfully');
+    }
 }
