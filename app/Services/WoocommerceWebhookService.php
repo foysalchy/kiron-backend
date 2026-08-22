@@ -59,7 +59,7 @@ class WoocommerceWebhookService
             
             // Payments
             'payments' => [],
-            'status' => 'pending',
+            'status' => \App\Enums\Status::Pending->value,
             'is_due' => true,
         ];
         
