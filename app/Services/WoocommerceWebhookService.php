@@ -97,7 +97,7 @@ class WoocommerceWebhookService
                 'phone' => $phone,
                 'email' => $billing['email'] ?? null,
                 'address' => $billing['address_1'] ?? null,
-                'status' => 'active',
+                'status' => 1,
             ]);
         }
 
