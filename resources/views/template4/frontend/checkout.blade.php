@@ -80,7 +80,7 @@
                                             <input type="radio" name="payment_method" value="{{ $method->name }}"
                                                 class="hidden">
                                             <span
-                                                class="text-sm md:text-base font-bold text-[#0f172a]">{{ $method->name }}</span>
+                                                class="text-sm md:text-base font-bold text-[#0f172a] capitalize">{{ $method->name }}</span>
                                         </div>
 
                                         @if ($method->icon)

@@ -2,7 +2,7 @@
     <!-- product info -->
     <div class="flex gap-4 border-b border-gray-100 pb-4">
         <div class="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden border">
-            <img src="{{ $product->thumbnail_url ?? }}" class="w-full h-full object-contain" alt="product image">
+            <img src="{{ $product->thumbnail_url }}" class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
             <h4 class="font-bold text-gray-800 text-md leading-tight">{{ $product->title }}</h4>

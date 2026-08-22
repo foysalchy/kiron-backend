@@ -41,12 +41,7 @@
                     <!-- Thumbnails -->
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
-                        <button aria-label="View product image {{ $loop->iteration ?? '' }}"
-                            class="thumb-btn border-2 border-[var(--primary-color)] p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                            onclick="changeImage('{{ $product->thumbnail_url }}', this)">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" class="w-full h-full object-cover"
-                                alt="Product thumbnail {{ $loop->iteration ?? '' }}" />
-                        </button>
+                        
                         <!-- Thumbnails (Updated to show all images) -->
                         <div id="thumbnail-container"
                             class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
@@ -62,13 +57,13 @@
 
                     <!-- Main Image Box -->
                     <div
-                        class="relative flex-1 bg-gray-50 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[4/5]">
+                        class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[3/4]">
                         <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                             alt="main image" class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
                         <button onclick="toggleWishlist({{ $product->id }})" type="button"
-                            class="absolute top-3 left-3 md:top-4 md:left-4 p-2 md:p-2.5 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
+                            class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
                             {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
 
                             <i
@@ -78,7 +73,7 @@
                 </div>
 
                 <!-- RIGHT COLUMN (Info) -->
-                <div class="lg:col-span-5 flex flex-col justify-between h-full">
+                <div class="lg:col-span-5 flex flex-col gap-y-4 md:gap-y-6">
                     <div>
                         <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                             {{ $product->title }}
@@ -258,7 +253,7 @@
                                 }
                             @endphp
                             @foreach ($grouped as $groupName => $values)
-                                <div class="flex justify-between py-2 border-b">
+                                <div class="flex justify-between py-2 border-b border-gray-100">
                                     <span class="text-gray-500 font-medium">{{ $groupName }}:</span>
                                     <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
                                 </div>
@@ -271,7 +266,7 @@
             <!-- RIGHT COLUMN: Related Products (Sticky Sidebar) -->
             <aside class="lg:col-span-2 flex flex-col gap-6 sticky top-24">
                 <div class="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
-                    <div class="px-4 py-3 bg-gray-50 border-b">
+                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                         <h3 class="font-bold text-gray-900 text-lg">Related Products</h3>
                     </div>
                     <div class="divide-y divide-gray-200">
@@ -300,27 +295,19 @@
 
 @push('scripts')
     <script>
-        function changeImage(src, btn) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('border-[var(--primary-color)]'));
-            btn.classList.add('border-[var(--primary-color)]');
-        }
 
         function changeImage(src, btn) {
             document.getElementById('mainImage').src = src;
-            // সব বাটন থেকে একটিভ বর্ডার সরানো
             document.querySelectorAll('.thumb-btn').forEach(b => {
                 b.classList.remove('border-2', 'border-[var(--primary-color)]');
                 b.classList.add('border-gray-200');
             });
-            // ক্লিক করা বাটনে বর্ডার যোগ করা
             if (btn) {
                 btn.classList.add('border-2', 'border-[var(--primary-color)]');
                 btn.classList.remove('border-gray-200');
             }
         }
 
-        // ১. ডাটা ইনিশিয়ালাইজেশন
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
         const valueImages = @json($valueImages ?? []);
@@ -440,8 +427,10 @@
 
             let varIds = document.getElementById('selected-variation-id').value;
             if ('{{ $product->type }}' === 'variation') {
-                if (!varIds) {
-                    toastr.warning('Please select options');
+                let missingAttribute = attributeGroups.find(group => !activeFilters[group]);
+
+                if (missingAttribute) {
+                    toastr.warning(`Please select ${missingAttribute}`);
                     return;
                 }
                 varIds.split(',').forEach(id => items.push({
