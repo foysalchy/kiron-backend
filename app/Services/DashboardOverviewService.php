@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\Status;
 use App\Models\Attendance;
+use App\Models\Company;
 use App\Models\Employee;
 use App\Models\EmployeeSalary;
 use App\Models\Lead;
@@ -30,6 +31,8 @@ class DashboardOverviewService
 
     public function generate(string $period = 'this_month', ?string $customStart = null, ?string $customEnd = null): array
     {
+        $company = auth()->user()->company; // ba Company::find($id)
+
         if ($period === 'custom' && $customStart && $customEnd) {
             $startDate = Carbon::parse($customStart)->toDateString();
             $endDate   = Carbon::parse($customEnd)->toDateString();
@@ -47,6 +50,7 @@ class DashboardOverviewService
             'loyal_customers'  => $this->getLoyalCustomers(),
             'latest_sales'     => $this->getLatestSales(),
             'low_stock'        => $this->getLowStockProducts(),
+            'verification_status' => $company->getVerificationStatus(),
         ];
     }
 
