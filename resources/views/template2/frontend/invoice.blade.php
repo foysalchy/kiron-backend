@@ -602,7 +602,7 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url }}" >
+                                <img src="{{ $setup->logo_url }}">
                             @else
                                 <div class="logo-placeholder">
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>

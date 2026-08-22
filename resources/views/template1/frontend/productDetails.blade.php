@@ -647,8 +647,10 @@
 
             let varIds = document.getElementById('selected-variation-id').value;
             if ('{{ $product->type }}' === 'variation') {
-                if (!varIds) {
-                    toastr.warning('Please select options');
+                let missingAttribute = attributeGroups.find(group => !activeFilters[group]);
+
+                if (missingAttribute) {
+                    toastr.warning(`Please select ${missingAttribute}`);
                     return;
                 }
                 varIds.split(',').forEach(id => items.push({

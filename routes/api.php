@@ -701,6 +701,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('{id}/restore', [OrderReturnController::class, 'restore']);
                     Route::delete('{id}/force', [OrderReturnController::class, 'forceDestroy']);
                 });
+
                 Route::prefix('quotations')->group(function () {
                     Route::get('/', [QuotationController::class, 'index']);
                     Route::post('/', [QuotationController::class, 'store']);
@@ -715,7 +716,12 @@ Route::prefix('v1')->group(function () {
                     // Soft delete management
                     Route::get('/{id}/restore', [QuotationController::class, 'restore']);
                     Route::delete('/{id}/force', [QuotationController::class, 'forceDestroy']);
+
+                    // status update
+                    Route::post('/bulk-status-update', [QuotationController::class, 'bulkStatus']);
+                    Route::post('/bulk-delete', [QuotationController::class, 'bulkDestroy']);
                 });
+
                 Route::prefix('bin')->group(function () {
                     Route::get('/', [BinController::class, 'index']);
                     Route::post('/', [BinController::class, 'store']);

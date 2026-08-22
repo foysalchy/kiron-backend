@@ -41,6 +41,7 @@
                     25% 75%,
                     0% 75%);
         }
+
         .notch-top-right {
             clip-path: polygon(0% 0%,
                     75% 0%,
@@ -121,12 +122,10 @@
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
-                                    <img src="{{ $slider->image_url ?? ''}}" alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
-                                        height="400" width="1200" class="w-full h-full object-cover"
-                                        @if ($loop->first) fetchpriority="high"
-                        loading="eager"
-                     @else
-                        loading="lazy" @endif />
+                                    <img src="{{ $slider->image_url ?? ''}}"
+                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}" height="400" width="1200"
+                                        class="w-full h-full object-cover" @if ($loop->first) fetchpriority="high"
+                                        loading="eager" @else loading="lazy" @endif />
                                 </a>
                             </div>
                         @empty
@@ -192,7 +191,7 @@
             </div>
         </div>
     </section>
-    <!-- PRODUCT CATEGORIES SECTION -->
+    {{-- <!-- PRODUCT CATEGORIES SECTION -->
     <section class="w-full mx-auto bg-[#fcfcfc] px-4 ">
         <div class="container mx-auto py-4 md:py-10">
             <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
@@ -202,47 +201,86 @@
             <!-- Categories Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-8 gap-x-6">
                 @foreach ($headerCategories as $category)
-                    @php
-                        $index = $loop->index;
+                @php
+                $index = $loop->index;
 
-                        $isReverse = $index % 2 != 0;
+                $isReverse = $index % 2 != 0;
 
-                        $isTopNotch = $index >= 6;
+                $isTopNotch = $index >= 6;
 
-                        if (!$isTopNotch) {
-                            $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
-                        } else {
-                            $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
-                        }
-                    @endphp
+                if (!$isTopNotch) {
+                $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
+                } else {
+                $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
+                }
+                @endphp
 
-                    <!-- Dynamic Category Card -->
+                <!-- Dynamic Category Card -->
+                <a href="{{ route('category.products', $category->slug) }}"
+                    class="notch-border hover:-translate-y-1 transition-transform block group">
+                    <div
+                        class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+
+                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
+                            @if($category->image_url)
+                            <img src="{{ $category->image_url }}" height="64" width="64" aria-label="category image"
+                                loading="lazy" alt="{{ $category->name }}" class="w-full h-full object-contain">
+                            @else
+                            <i class="fas fa-layer-group text-2xl md:text-4xl text-gray-400"></i>
+                            @endif
+                        </div>
+
+                        <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
+                            <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
+                                {{ $category->name }}
+                            </h3>
+                            <p class="text-[11px] text-gray-500 mt-1">
+                                {{ $category->products_count ?? '12,203' }} Items
+                            </p>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </section> --}}
+    <!-- PRODUCT CATEGORIES SECTION -->
+    <section class="w-full mx-auto  px-4">
+        <div class="container mx-auto py-6 md:py-10">
+            <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-8">
+                Product Categories
+            </h2>
+
+            <!-- Categories Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @foreach ($headerCategories as $category)
                     <a href="{{ route('category.products', $category->slug) }}"
-                        class="notch-border hover:-translate-y-1 transition-transform block group">
-                        <div
-                            class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
+                        class="bg-white shadow-sm  p-4 h-24 flex items-center justify-between hover:shadow-sm transition-all group">
 
-                            <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
-                                <img src="{{ $category->image_url ?? '' }}" height="64" width="64"
-                                    aria-label="category image" loading="lazy" alt="{{ $category->name }}"
+                        
+
+                        <!-- 2. Name on the Far RIGHT -->
+                        <div class="flex-1 text-left ml-4">
+                            <h3
+                                class="font-bold text-[#0f172a] text-sm md:text-base leading-tight group-hover:text-[var(--primary-color)] transition-colors">
+                                {{ $category->name }}
+                            </h3>
+                        </div>
+                        <!-- 1. Image on the Far LEFT -->
+                        <div class="w-14 md:w-18 h-14 md:h-18 shrink-0 flex items-center justify-end overflow-hidden">
+                            @if($category->image_url)
+                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}" height="" width=""
+                                    onerror="this.src='{{ $category->image_url }}'"
                                     class="w-full h-full object-contain">
-                            </div>
-
-                            <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
-                                <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
-                                    {{ $category->name }}
-                                </h3>
-                                <p class="text-[11px] text-gray-500 mt-1">
-                                    {{ $category->products_count ?? '12,203' }} Items
-                                </p>
-                            </div>
+                            @else
+                                <i class="fas fa-layer-group text-2xl text-gray-400"></i>
+                            @endif
                         </div>
                     </a>
                 @endforeach
             </div>
         </div>
     </section>
-
     <!-- LATEST OFFERS SECTION  -->
     <section class="container mx-auto py-4 md:py-10 px-4 ">
         <!-- Section Title -->
@@ -260,8 +298,8 @@
                         <!-- Left Part: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150"
-                                alt="{{ $product->title }}" loading="lazy"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150" alt="{{ $product->title }}"
+                                loading="lazy"
                                 class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                         </div>
 
@@ -331,8 +369,8 @@
                         <!-- Left side: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-1 md:p-4 bg-white relative overflow-hidden">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" height="140" width="100"
-                                alt="{{ $product->title }}" loading="lazy"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="140" width="100" alt="{{ $product->title }}"
+                                loading="lazy"
                                 class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
                         </div>
 
@@ -362,21 +400,22 @@
         </div>
     </section>
     <!-- ABOUT / SEO TEXT SECTION -->
-@if($homePageData->description)
-<section class="w-full bg-[#fcfcfc] px-4 font-manrope">
-    <div class="container mx-auto py-4 md:py-10">
-        <div class="prose prose-slate max-w-none
-            prose-headings:text-[#041533] prose-headings:font-bold
-            prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
-            prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
-            prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
+    @if($homePageData->description)
+        <section class="w-full bg-[#fcfcfc] px-4 font-manrope">
+            <div class="container mx-auto py-4 md:py-10">
+                <div
+                    class="prose prose-slate max-w-none
+                    prose-headings:text-[#041533] prose-headings:font-bold
+                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+                    prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
 
-            {!! $homePageData->description !!}
+                    {!! $homePageData->description !!}
 
-        </div>
-    </div>
-</section>
-@endif
+                </div>
+            </div>
+        </section>
+    @endif
 @endsection
 @push('scripts')
     <script>

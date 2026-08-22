@@ -52,7 +52,6 @@
             </div>
 
             {{-- Forms Area --}}
-            {{-- Forms Area --}}
             <div id="payment-forms-area">
                 @foreach ($methods as $method)
                     @php

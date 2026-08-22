@@ -69,7 +69,7 @@
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
                                         class="w-5 h-5 accent-[#FF6A00]">
-                                    <span class="text-md font-medium text-gray-700">{{ $method->name }}</span>
+                                    <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
                                 </label>
 
                                 <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
