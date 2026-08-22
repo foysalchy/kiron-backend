@@ -222,6 +222,8 @@ class FrontendOrderService
                 'courierHistory' => $courierHistory ? [
                     'summary' => $courierHistory->response_data['summary'] ?? null,
                     'checked_at' => $courierHistory->checked_at,
+                    'next_allowed_at' => $courierHistory->checked_at?->addHours(2),
+
                 ] : null,
             ];
         });

@@ -208,7 +208,7 @@ class CompanyRegistrationService
             ]);
 
             // We only need ONE OTP since user & company share the same email
-            $otp = $this->createOtpRecord($company->id, 'user', $company->email);
+            $otp = $this->createOtpRecord($company->id, 'user', $company->email,'email');
 
             DB::commit();
 
@@ -577,54 +577,11 @@ class CompanyRegistrationService
     {
         $record = EmailVerification::where('company_id', $registrationId)
             ->where('type', $type)
+            ->where('method', $method)
             ->latest()
             ->first();
 
         if (! $record) throw ApiException::notFound('Verification record not found.');
-        if ($record->isVerified()) throw ApiException::badRequest('This email is already verified.');
-        if ($record->isExpired()) throw ApiException::badRequest('Code has expired. Please request a new one.');
-        if ($record->otp !== $otp) throw ApiException::badRequest('Invalid verification code.');
-
-        $record->update(['verified_at' => Carbon::now(), 'method' => $method]);
-
-        User::where('company_id', $registrationId)
-            ->where('email', $record->email)
-            ->update([
-                'email_verified_at' => Carbon::now(),
-                'status' => Status::Pending->value,
-            ]);
-
-        Company::where('id', $registrationId)->update(['status' => Status::Pending->value]);
-
-        Log::info("Email verified for company_id: {$registrationId} and email: {$record->email}");
-
-        return User::where('company_id', $registrationId)
-            ->where('email', $record->email)
-            ->with('company')
-            ->firstOrFail();
-    }
-
- public function resendOtp(int $registrationId, string $type, string $method = 'email'): void
-{
-    $company = Company::findOrFail($registrationId);
-
-    $record = EmailVerification::where('company_id', $registrationId)
-        ->where('type', $type)
-        ->where('method', $method) 
-        ->latest()
-        ->first();
-
-    // record na thakle notun banate hobe (dashboard theke first-time verify korar case)
-    if (! $record) {
-        $record = EmailVerification::create([
-            'company_id' => $registrationId,
-            'type'       => $type,
-            'method'     => $method,
-            'email'      => $method === 'email' ? $company->email : $company->phonea,
-            'otp'        => $this->generateOtp(),
-            'expires_at' => Carbon::now()->addMinutes(10),
-        ]);
-    } else {
         if ($record->isVerified()) {
             throw ApiException::badRequest(
                 $method === 'sms'
@@ -632,21 +589,86 @@ class CompanyRegistrationService
                     : 'This email is already verified.'
             );
         }
+        if ($record->isExpired()) throw ApiException::badRequest('Code has expired. Please request a new one.');
+        if ($record->otp !== $otp) throw ApiException::badRequest('Invalid verification code.');
 
-        $record->update([
-            'otp'        => $this->generateOtp(),
-            'expires_at' => Carbon::now()->addMinutes(10),
-        ]);
+        $record->update(['verified_at' => Carbon::now()]);
+
+        $user = User::where('company_id', $registrationId)
+            ->where('is_primary', 1)
+            ->first();
+
+        if (! $user) {
+            throw ApiException::notFound('User not found for this company.');
+        }
+
+        $updateData = [];
+        if ($method === 'email') {
+            $updateData['email_verified_at'] = Carbon::now();
+        } else {
+            $updateData['phone_verified_at'] = Carbon::now();
+        }
+
+        // ✅ user.status shudhu tokhoni Pending banabo jodi user ekhono
+        // Draft/notun obosthai thake — already Active user er status change korbo na
+        if ($user->status !== Status::Active->value) {
+            $updateData['status'] = Status::Pending->value;
+        }
+        $user->update($updateData);
+
+        $company = Company::find($registrationId);
+        if ($company && $company->status !== Status::Active->value) {
+            $company->update(['status' => Status::Pending->value]);
+        }
+
+        Log::info("{$method} verified for company_id: {$registrationId}");
+
+        return $user->load('company');
     }
 
-    if ($method === 'sms') {
-        $this->sendopt($company->phone, $record->otp);
-        Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
-    } else {
-        $this->sendOtpEmail($company->name, $company->email, $record->otp, $type);
-        Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
+    public function resendOtp(int $registrationId, string $type, string $method = 'email'): void
+    {
+        $company = Company::findOrFail($registrationId);
+
+        $record = EmailVerification::where('company_id', $registrationId)
+            ->where('type', $type)
+            ->where('method', $method)
+            ->latest()
+            ->first();
+
+        // record na thakle notun banate hobe (dashboard theke first-time verify korar case)
+        if (!$record) {
+            $record = EmailVerification::create([
+                'company_id' => $registrationId,
+                'type'       => $type,
+                'method'     => $method,
+                'email'      => $method === 'email' ? $company->email : $company->phone,
+                'otp'        => $this->generateOtp(),
+                'expires_at' => Carbon::now()->addMinutes(10),
+            ]);
+        } else {
+            if ($record->isVerified()) {
+                throw ApiException::badRequest(
+                    $method === 'sms'
+                        ? 'This phone number is already verified.'
+                        : 'This email is already verified.'
+                );
+            }
+
+            $record->update([
+                'otp'        => $this->generateOtp(),
+                'expires_at' => Carbon::now()->addMinutes(10),
+            ]);
+        }
+
+        if ($method === 'sms') {
+            $this->sendopt($company->phone, $record->otp);
+            Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to phone: {$company->phone}");
+        } else {
+            $this->sendOtpEmail($company->name, $company->email, $record->otp, $type);
+            Log::info("New OTP {$record->otp} generated for company_id: {$company->id} and sent to email: {$company->email}");
+        }
     }
-}
     public function sendopt($phone, $otp)
     {
         $message = "Your Dorja.io verification code is {$otp}. Use it to complete your registration. Valid for 5 minutes. Do not share this code.";
@@ -659,7 +681,7 @@ class CompanyRegistrationService
         // return 123456;
     }
 
-    private function createOtpRecord(int $companyId, string $type, string $email): string
+    private function createOtpRecord(int $companyId, string $type, string $email,string $method): string
     {
         $otp = $this->generateOtp();
 
@@ -668,6 +690,7 @@ class CompanyRegistrationService
             'company_id' => $companyId,
             'type'       => $type,
             'email'      => $email,
+            'method'      => $method,
             'otp'        => $otp,
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
