@@ -608,7 +608,7 @@
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>
                                 </div>
                             @endif
-                            <span class="shop-name">{{ $setup->shop_name }}</span>
+                            
                         </div>
                         <div class="shop-info">
                             <p>{{ $setup->address }}</p>
