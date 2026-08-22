@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
+use App\Models\Company;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
@@ -58,6 +59,7 @@ class DashboardService
             'top_products' => $topProducts,
             'sales_trend' => $salesTrend,
             'sales_by_category' => $salesByCategory,
+   
 
         ];
     }

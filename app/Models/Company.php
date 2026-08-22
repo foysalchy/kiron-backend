@@ -210,4 +210,23 @@ class Company extends Model
     {
         return $this->logo ? asset('storage/' . $this->logo) : null;
     }
+    public function getVerificationStatus(): array
+    {
+        $emailVerified = EmailVerification::withoutGlobalScope('company')
+            ->where('company_id', $this->id)
+            ->where('method', 'email')
+            ->whereNotNull('verified_at')
+            ->exists();
+
+        $phoneVerified = EmailVerification::withoutGlobalScope('company')
+            ->where('company_id', $this->id)
+            ->where('method', 'sms')
+            ->whereNotNull('verified_at')
+            ->exists();
+
+        return [
+            'email_verified' => $emailVerified,
+            'phone_verified' => $phoneVerified,
+        ];
+    }
 }

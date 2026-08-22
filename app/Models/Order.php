@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -104,22 +105,39 @@ class Order extends Model
             if ($package->order_limit === null)        return;
             if ($package->extra_order_charge === null) return;
 
-            $monthlyCount = self::withoutGlobalScope('company')
-                ->where('company_id', $order->company_id)
-                // ->where('type', self::TYPE_SALES)
-                ->whereIn('type', [self::TYPE_SALES, self::TYPE_LANDING])
-                ->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)
-                ->count();
+            DB::transaction(function () use ($order, $package) {
+                $yearMonth = now()->format('Y-m');
 
-            if ($monthlyCount > $package->order_limit) {
-                ExtraOrderCharge::create([
-                    'company_id'    => $order->company_id,
-                    'order_id'      => $order->id,
-                    'charge_amount' => $package->extra_order_charge,
-                    'month'         => now()->format('Y-m'),
-                ]);
-            }
+                // lockForUpdate দিয়ে row lock করবো, race condition (concurrent order) থেকে বাঁচার জন্য
+                $usage = CompanyMonthlyUsage::withoutGlobalScope('company')
+                    ->where('company_id', $order->company_id)
+                    ->where('year_month', $yearMonth)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$usage) {
+                    $usage = CompanyMonthlyUsage::create([
+                        'company_id'  => $order->company_id,
+                        'year_month'  => $yearMonth,
+                        'order_count' => 0,
+                    ]);
+                }
+
+                $usage->increment('order_count');
+
+     
+
+                if ($usage->order_count > $package->order_limit) {
+                    ExtraOrderCharge::firstOrCreate(
+                        ['order_id' => $order->id], // duplicate charge protect korbe
+                        [
+                            'company_id'    => $order->company_id,
+                            'charge_amount' => $package->extra_order_charge,
+                            'month'         => $yearMonth,
+                        ]
+                    );
+                }
+            });
         });
     }
 
