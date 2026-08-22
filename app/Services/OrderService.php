@@ -755,6 +755,8 @@ class OrderService
                 'new_status' => $getStatus->label(),
             ]);
 
+            app(\App\Services\StatusSyncService::class)->syncOrderStatus($order->fresh());
+
             LogHelper::statusChanged('orders', $order->id, $order->company_id, $logStatus);
 
             return $order->fresh();

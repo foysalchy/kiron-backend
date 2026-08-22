@@ -228,6 +228,10 @@ class OrderController extends Controller
                 ->update(['status' => $validated['status']]);
 
             foreach ($validated['ids'] as $orderId) {
+                $order = Order::find($orderId);
+                if ($order) {
+                    app(\App\Services\StatusSyncService::class)->syncOrderStatus($order);
+                }
                 LogHelper::statusChanged('orders', $orderId, auth()->user()->company_id);
             }
 

@@ -1080,6 +1080,11 @@ Route::prefix('v1')->group(function () {
                     Route::get('/import/{id}', [WocommerceSettingController::class, 'import']);
                     Route::post('/import-product', [WocommerceSettingController::class, 'importProduct']);
                 });
+                //status mappings routes
+                Route::prefix('status-mappings')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Api\StatusMappingController::class, 'index']);
+                    Route::put('/', [\App\Http\Controllers\Api\StatusMappingController::class, 'update']);
+                });
                 //note template settings routes
                 Route::prefix('note-templates')->group(function () {
                     Route::get('/', [NoteTemplateController::class, 'index']);
