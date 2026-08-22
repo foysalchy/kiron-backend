@@ -15,12 +15,12 @@ class WoocommerceWebhookService
         protected OrderService $orderService
     ) {}
 
-    public function handleOrderWebhook(int $settingId, array $orderData)
+    public function handleOrderWebhook(int $settingId, array $orderData, bool $force = false)
     {
         $setting = WocommerceSetting::findOrFail($settingId);
         
-        // Skip if order sync is turned off
-        if (!$setting->order_sync) {
+        // Skip if order sync is turned off and not forced
+        if (!$setting->order_sync && !$force) {
             return;
         }
 

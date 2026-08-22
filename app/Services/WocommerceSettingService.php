@@ -398,6 +398,38 @@ class WocommerceSettingService
             }
         }
     }
+
+    public function syncOldOrders(int $id)
+    {
+        $setting = $this->getSettingById($id);
+        
+        $response = Http::withBasicAuth($setting->consumer_key, $setting->consumer_secret)
+            ->get(rtrim($setting->domain_url, '/') . '/wp-json/wc/v3/orders', [
+                'per_page' => 100,
+                'status' => 'processing,completed,on-hold'
+            ]);
+            
+        if ($response->successful()) {
+            $orders = $response->json();
+            $webhookService = app(WoocommerceWebhookService::class);
+            $count = 0;
+            foreach ($orders as $orderData) {
+                // Check if order already exists
+                $exists = \App\Models\Order::where('company_id', $setting->company_id)
+                    ->where('source_info->source_order_id', $orderData['id'])
+                    ->exists();
+                    
+                if (!$exists) {
+                    $webhookService->handleOrderWebhook($setting->id, $orderData, true);
+                    $count++;
+                }
+            }
+            return ['imported_count' => $count];
+        }
+        
+        throw new \Exception('Failed to fetch historical orders from WooCommerce');
+    }
+
     public function importProducts(int $id, Request $request): array
     {
         $setting = WocommerceSetting::find($id);

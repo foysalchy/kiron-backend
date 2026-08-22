@@ -116,6 +116,13 @@ class WocommerceSettingController extends Controller
 
         return ResponseHelper::success($data, 'WooCommerce order sync updated successfully');
     }
+    public function syncOldOrders(int $id): JsonResponse
+    {
+        $data = $this->wocommerceService->syncOldOrders($id);
+        
+        return ResponseHelper::success($data, 'Historical orders synced successfully.');
+    }
+    
     public function import(Request $request, int $id): JsonResponse
     {
         $data = $this->wocommerceService->importProducts($id, $request);

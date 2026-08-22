@@ -1076,6 +1076,7 @@ Route::prefix('v1')->group(function () {
                     Route::patch('/{id}/toggle-status', [WocommerceSettingController::class, 'toggleStatus']);
                     Route::Put('/{id}/toggle-product-sync', [WocommerceSettingController::class, 'toggleProductSync']);
                     Route::Put('/{id}/toggle-order-sync', [WocommerceSettingController::class, 'toggleOrderSync']);
+                    Route::post('/{id}/sync-old-orders', [WocommerceSettingController::class, 'syncOldOrders']);
                     Route::get('/import/{id}', [WocommerceSettingController::class, 'import']);
                     Route::post('/import-product', [WocommerceSettingController::class, 'importProduct']);
                 });
