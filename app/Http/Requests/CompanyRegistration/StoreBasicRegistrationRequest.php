@@ -16,7 +16,7 @@ class StoreBasicRegistrationRequest extends FormRequest
         return [
             'name'                  => ['required', 'string', 'max:255'],
             'email'                 => ['required', 'email', 'max:255', 'unique:companies,email', 'unique:users,email'],
-            'phone'                 => ['required', 'string', 'max:20'],
+            'phone'                 => ['required', 'string', 'max:20', 'unique:companies,phone'],
             'business_type'         => ['nullable', 'integer', 'in:1,2,3,4,5'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],

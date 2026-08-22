@@ -10,6 +10,7 @@ use App\Helpers\LogHelper;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\CompanyUpdateRequest;
 use App\Models\DomainSetup;
+use App\Models\EmailVerification;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -131,11 +132,22 @@ class CompanyService
             $companyIds = $result->pluck('id');
 
             $domainSetups = DomainSetup::withoutGlobalScopes()->get()->keyBy('company_id');
-            $result->each(function ($company) use ($domainSetups) {
+            $verifications = EmailVerification::withoutGlobalScope('company')
+                ->whereIn('company_id', $companyIds)
+                ->whereNotNull('verified_at')
+                ->get()
+                ->groupBy('company_id');
+            $result->each(function ($company) use ($domainSetups,$verifications) {
                 $company->setRelation(
                     'domainSetup',
                     $domainSetups->get($company->id)
                 );
+                $companyVerifications = $verifications->get($company->id, collect());
+
+                $company->setAttribute('verification_status', [
+                    'email_verified' => $companyVerifications->contains('method', 'email'),
+                    'phone_verified' => $companyVerifications->contains('method', 'sms'),
+                ]);
             });
 
             return $result;
@@ -191,8 +203,8 @@ class CompanyService
 
             $sub->setRelation('extra_order_charges', $charges);
         }
+        $company->setAttribute('verification_status', $company->getVerificationStatus());
 
-        return $company;
 
         return $company;
     }

@@ -270,6 +270,8 @@ class OrderController extends Controller
                     'courierData' => $existing->response_data,
                     'source' => 'cache',
                     'checked_at' => $existing->checked_at,
+                    'next_allowed_at' => $existing->checked_at->addHours(2),
+
                 ]);
             }
             // no cache, fresh fetch needed even without explicit refresh
@@ -295,6 +297,15 @@ class OrderController extends Controller
         try {
             $response = Http::withToken(config('services.bdcourier.key'))
                 ->post("https://bdcourier.com/api/courier-check?phone={$phone}");
+
+            if ($response->status() === 422) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $response->json('errors.phone.0')
+                        ?? $response->json('message')
+                        ?? 'Please enter a valid phone number.',
+                ], 422);
+            }
 
             if (!$response->successful()) {
                 Log::error('Courier API failed: ' . $response->status() . ' - ' . $response->body());
