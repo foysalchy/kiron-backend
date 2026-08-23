@@ -22,7 +22,7 @@ class StatusMappingController extends Controller
     public function update(Request $request)
     {
         $companyId = auth()->user()->company_id;
-        $mappingsData = $request->input('mappings'); // Array of {kiron_status: X, mappings: {woo: Y, pathao: Z}}
+        $mappingsData = $request->input('mappings'); // Array of {self_status: X, mappings: {woo: Y, pathao: Z}}
 
         DB::beginTransaction();
         try {
@@ -30,7 +30,7 @@ class StatusMappingController extends Controller
                 StatusMapping::updateOrCreate(
                     [
                         'company_id' => $companyId,
-                        'kiron_status' => $data['kiron_status']
+                        'self_status' => $data['self_status']
                     ],
                     [
                         'mappings' => $data['mappings']
