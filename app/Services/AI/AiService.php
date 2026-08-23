@@ -35,9 +35,16 @@ class AiService
         }
 
         $provider = self::resolveProvider($providerName, $settings);
-        $prompt = self::buildPrompt($params);
+        $options = [];
+        $type = $params['type'] ?? 'general';
+        if ($type === 'meta_title') {
+            $options['max_tokens'] = 30; // Max ~80 chars
+        } elseif ($type === 'meta_description') {
+            $options['max_tokens'] = 60; // Max ~160 chars
+        }
 
-        return $provider->generate($prompt);
+        $prompt = self::buildPrompt($params);
+        return $provider->generate($prompt, $options);
     }
 
     public static function testConnection(int $companyId, string $providerName, ?string $apiKey = null, ?string $model = null): bool

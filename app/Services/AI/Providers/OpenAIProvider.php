@@ -20,7 +20,7 @@ class OpenAIProvider implements AiProviderInterface
         return $this;
     }
 
-    public function generate(string $prompt): string
+    public function generate(string $prompt, array $options = []): string
     {
         $messages = [];
         
@@ -36,13 +36,19 @@ class OpenAIProvider implements AiProviderInterface
             'content' => $prompt
         ];
 
+        $payload = [
+            'model' => $this->model,
+            'messages' => $messages,
+            'temperature' => $options['temperature'] ?? 0.7,
+        ];
+
+        if (isset($options['max_tokens'])) {
+            $payload['max_tokens'] = $options['max_tokens'];
+        }
+
         $response = Http::withToken($this->apiKey)
             ->timeout(60)
-            ->post('https://api.openai.com/v1/chat/completions', [
-                'model' => $this->model,
-                'messages' => $messages,
-                'temperature' => 0.7,
-            ]);
+            ->post('https://api.openai.com/v1/chat/completions', $payload);
 
         if ($response->failed()) {
             $errorMsg = $response->json('error.message') ?? $response->body();

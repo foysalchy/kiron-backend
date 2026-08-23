@@ -20,7 +20,7 @@ class GeminiProvider implements AiProviderInterface
         return $this;
     }
 
-    public function generate(string $prompt): string
+    public function generate(string $prompt, array $options = []): string
     {
         $payload = [
             'contents' => [
@@ -38,6 +38,18 @@ class GeminiProvider implements AiProviderInterface
                     ['text' => $this->instructions]
                 ]
             ];
+        }
+
+        $generationConfig = [];
+        if (isset($options['max_tokens'])) {
+            $generationConfig['maxOutputTokens'] = $options['max_tokens'];
+        }
+        if (isset($options['temperature'])) {
+            $generationConfig['temperature'] = $options['temperature'];
+        }
+
+        if (!empty($generationConfig)) {
+            $payload['generationConfig'] = $generationConfig;
         }
 
         $response = Http::withHeaders(['Content-Type' => 'application/json'])

@@ -12,7 +12,7 @@ interface AiProviderInterface
     /**
      * Generate content based on a final compiled prompt.
      */
-    public function generate(string $prompt): string;
+    public function generate(string $prompt, array $options = []): string;
 
     /**
      * Test the connection to the provider.
