@@ -23,3 +23,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+test_curl.php
+.env
+.env.*
+!.env.example

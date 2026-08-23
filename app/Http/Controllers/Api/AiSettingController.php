@@ -21,7 +21,7 @@ class AiSettingController extends Controller
                 'openai_status' => false,
                 'openai_model' => 'gpt-4o-mini',
                 'gemini_status' => false,
-                'gemini_model' => 'gemini-1.5-flash-latest',
+                'gemini_model' => 'gemini-flash-latest',
             ]
         );
 
