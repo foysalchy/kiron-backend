@@ -61,7 +61,7 @@ class QuotationService
                 $query->whereNull('converted_to_order_id');
             }
 
-            $sortBy = $filters['sort_by'] ?? 'quotation_date';
+            $sortBy = $filters['sort_by'] ?? 'id';
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
 
@@ -321,7 +321,7 @@ class QuotationService
                 'warehouse_id' => $quotation->warehouse_id,
                 'order_date' => $orderData['order_date'] ?? now()->toDateString(),
                 'reference_no' => $orderData['reference_no'] ?? $quotation->quotation_no,
-                'type' => $orderData['type'] ?? 'sales',
+                'type' =>  'quotation',
                 'status' => $orderData['status'] ?? Status::Pending->value, // Pending
                 'items' => $orderItems,
                 'tax_amount' => $quotation->tax_amount,

@@ -31,7 +31,8 @@ class DashboardOverviewService
 
     public function generate(string $period = 'this_month', ?string $customStart = null, ?string $customEnd = null): array
     {
-        $company = auth()->user()->company; // ba Company::find($id)
+        $user = auth()->user();
+        $company = $user->company;
 
         if ($period === 'custom' && $customStart && $customEnd) {
             $startDate = Carbon::parse($customStart)->toDateString();
@@ -39,7 +40,7 @@ class DashboardOverviewService
         } else {
             [$startDate, $endDate] = $this->resolveDateRange($period);
         }
-        return [
+        $data = [
             'period'           => ['start' => $startDate, 'end' => $endDate, 'label' => $period],
             'products'         => $this->getProductStats(),
             'orders'           => $this->getOrderStats($startDate, $endDate),
@@ -50,8 +51,11 @@ class DashboardOverviewService
             'loyal_customers'  => $this->getLoyalCustomers(),
             'latest_sales'     => $this->getLatestSales(),
             'low_stock'        => $this->getLowStockProducts(),
-            'verification_status' => $company->getVerificationStatus(),
         ];
+        if (!$user->is_super_admin && $company) {
+            $data['verification_status'] = $company->getVerificationStatus();
+        }
+        return $data;
     }
 
     // ══════════════════════════════════════════

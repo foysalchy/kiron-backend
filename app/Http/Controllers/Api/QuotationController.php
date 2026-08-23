@@ -28,7 +28,7 @@ class QuotationController extends Controller
             'date_to' => $request->query('date_to'),
             'search' => $request->query('search'),
             'not_converted' => $request->query('not_converted'),
-            'sort_by' => $request->query('sort_by', 'quotation_date'),
+            'sort_by' => $request->query('sort_by', 'id'),
             'sort_order' => $request->query('sort_order', 'desc'),
             'per_page' => $request->query('per_page', 15),
         ];
