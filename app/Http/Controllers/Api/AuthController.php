@@ -143,6 +143,7 @@ class AuthController extends Controller
                 'profile' => $user->profile,
                 'profile_url' => $user->profile_url,
                 'company' => $user->company,
+                'ai_enabled' => $user->company ? (bool) ($user->company->aiSetting?->openai_status || $user->company->aiSetting?->gemini_status) : false,
                 'billing_required' => $billingRequired,
             ],
             'permissions' => $effectivePermissions,

@@ -94,6 +94,11 @@ class Company extends Model
         return $this->hasMany(User::class);
     }
 
+    public function aiSetting()
+    {
+        return $this->hasOne(AiSetting::class);
+    }
+
     public function primaryUser()
     {
         return $this->hasOne(User::class)->where('is_primary', 1);
