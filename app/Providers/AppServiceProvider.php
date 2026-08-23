@@ -280,6 +280,8 @@ class AppServiceProvider extends ServiceProvider
         foreach ($models as $model) {
             $model::observe(CachedOptionsObserver::class);
         }
+
+        \App\Models\Order::observe(\App\Observers\OrderObserver::class);
     }
 
     private function getGlobalLayoutData($companyId): array

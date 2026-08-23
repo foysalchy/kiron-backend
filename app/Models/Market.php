@@ -16,6 +16,7 @@ class Market extends Model
         'domain_verify',
         'facebook_pixel_id',
         'tiktok_pixel_id',
+        'tiktok_access_token',
         'meta_access_token',
         'google_tag_id',
         'google_measurement_id',

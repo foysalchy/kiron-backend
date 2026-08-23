@@ -30,6 +30,7 @@ class UpdateMarketRequest extends BaseCompanyRequest
                 'domain_verify'         => 'sometimes|nullable|string',
                 'facebook_pixel_id'     => 'sometimes|nullable|string',
                 'tiktok_pixel_id'       => 'sometimes|nullable|string',
+                'tiktok_access_token'   => 'sometimes|nullable|string',
                 'meta_access_token'     => 'sometimes|nullable|string',
                 'google_tag_id'         => 'sometimes|nullable|string',
                 'google_measurement_id' => 'sometimes|nullable|string',

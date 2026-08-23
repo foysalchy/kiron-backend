@@ -204,6 +204,7 @@ Route::prefix('v1')->group(function () {
     });
     Route::post('/wocommerces/webhook/orders/{settingId}', [\App\Http\Controllers\Api\WoocommerceWebhookController::class, 'handle']);
     Route::post('/steadfast/webhook', [\App\Http\Controllers\Api\SteadfastWebhookController::class, 'handle']);
+    Route::post('/pathao/webhook', [\App\Http\Controllers\Api\PathaoWebhookController::class, 'handle']);
     Route::middleware('auth:sanctum', 'company.access')->group(function () {
         Route::post('/clear-cache', function () {
             Artisan::call('cache:clear');

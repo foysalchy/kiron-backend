@@ -17,16 +17,14 @@ class StatusSyncService
 
         $sourceName = $order->source_info['source_name'];
         
-        // Lookup mapping for this kiron_status and company
+        // Lookup mapping for this self_status and company
         $mappingRow = StatusMapping::where('company_id', $order->company_id)
-            ->where('kiron_status', $order->status)
+            ->where('self_status', $order->status)
             ->first();
 
         if (!$mappingRow || empty($mappingRow->mappings[$sourceName])) {
             return;
         }
-
-        $providerStatus = $mappingRow->mappings[$sourceName];
         $sourceOrderId = $order->source_info['source_order_id'] ?? null;
 
         if ($sourceOrderId) {
