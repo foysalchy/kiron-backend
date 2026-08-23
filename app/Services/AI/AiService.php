@@ -81,7 +81,7 @@ class AiService
         if ($providerName === 'gemini') {
             return (new GeminiProvider())->setConfig(
                 $settings->gemini_key,
-                $settings->gemini_model ?? 'gemini-1.5-flash',
+                $settings->gemini_model ?? 'gemini-1.5-flash-latest',
                 $settings->gemini_instructions
             );
         }
