@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class Order extends Model
@@ -88,10 +89,15 @@ class Order extends Model
         // Order number generation
         static::creating(function ($order) {
             if (empty($order->order_no)) {
-                $order->order_no = self::generateOrderNumber($order->type);
+                // ✅ ekta application-level lock, jate ekshathe dui request 
+                // number generate korte na pare
+                $lock = Cache::lock('order-number-generation-' . $order->type, 10);
+
+                $lock->block(5, function () use ($order) {
+                    $order->order_no = self::generateOrderNumber($order->type);
+                });
             }
         });
-
         // Extra charge record
         static::created(function ($order) {
             // if ($order->type !== self::TYPE_SALES) return;
@@ -127,7 +133,7 @@ class Order extends Model
 
                 $usage->increment('order_count');
 
-     
+
 
                 if ($usage->order_count > $package->order_limit) {
                     ExtraOrderCharge::firstOrCreate(
@@ -148,7 +154,6 @@ class Order extends Model
      */
     public static function generateOrderNumber(string $type): string
     {
-        // $prefix = $type === self::TYPE_POS ? 'POS' : 'SALE';
         $prefix = match ($type) {
             self::TYPE_POS => 'POS',
             self::TYPE_LANDING => 'LAND',
@@ -156,7 +161,6 @@ class Order extends Model
         };
         $date = now()->format('Ymd');
 
-        // Get last order number for today and this type
         $lastOrder = self::withoutGlobalScopes()
             ->withTrashed()
             ->where('type', $type)
@@ -164,15 +168,18 @@ class Order extends Model
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($lastOrder) {
-            $lastNumber = (int) substr($lastOrder->order_no, -4);
-            $newNumber = $lastNumber + 1;
-        } else {
-            $newNumber = 1;
+        $newNumber = $lastOrder
+            ? ((int) substr($lastOrder->order_no, -4)) + 1
+            : 1;
+
+        $orderNo = $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+        while (self::withoutGlobalScopes()->withTrashed()->where('order_no', $orderNo)->exists()) {
+            $newNumber++;
+            $orderNo = $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
         }
 
-        return $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        // Example: POS-20260117-0001 or SALE-20260117-0001
+        return $orderNo;
     }
 
     /**

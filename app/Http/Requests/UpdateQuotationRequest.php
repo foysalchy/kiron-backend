@@ -36,7 +36,7 @@ class UpdateQuotationRequest extends BaseCompanyRequest
                 // Check customer
                 'name' => ['required', 'string'],
                 'phone' => ['required', 'string'],
-                'email' => ['required', 'string'],
+                'email' => ['nullable', 'string'],
                 'address' => ['required', 'string'],
 
                 'quotation_date' => ['sometimes', 'required', 'date'],
@@ -70,6 +70,7 @@ class UpdateQuotationRequest extends BaseCompanyRequest
                 'terms_conditions' => ['nullable', 'string'],
                 'note' => ['nullable', 'string'],
                 'internal_note' => ['nullable', 'string'],
+                'status' => ['required'],
             ]
         );
     }
