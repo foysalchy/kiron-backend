@@ -137,8 +137,25 @@ class FrontendOrderService
         // Transform the data to include calculated fields
         $orders->getCollection()->transform(function ($order) use ($courierHistories) {
             $customerTotalOrders = 1;
+            $fakeOrderCount = 0;
+            
+            $phone = $order->customer?->phone ?? $order->shipping_address['phone'] ?? null;
+            
             if ($order->customer_id) {
                 $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
+            }
+            
+            if ($phone) {
+                $fakeOrderCount = Order::where(function($q) use ($phone) {
+                    $q->whereHas('customer', function($cQ) use ($phone) {
+                        $cQ->where('phone', $phone);
+                    })
+                    ->orWhere('shipping_address', 'LIKE', '%"phone":"' . $phone . '"%')
+                    ->orWhere('shipping_address', 'LIKE', '%"phone": "' . $phone . '"%');
+                })
+                ->where('status', Status::Fake->value)
+                ->where('id', '!=', $order->id)
+                ->count();
             }
 
             // ✅ courier history lookup
@@ -154,6 +171,7 @@ class FrontendOrderService
                 'address' => $order->customer?->address ?? '',
                 'paymethod' => $this->getPaymentMethod($order),
                 'totalorder' => $customerTotalOrders,
+                'fake_order_count' => $fakeOrderCount,
                 'status' => $this->getStatusLabel($order->status),
                 'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
