@@ -101,6 +101,7 @@ class PartyService
                 'order_date',
                 'status',
                 'grand_total',
+                'payment_amount',
             ]),
         ])->find($id);
 

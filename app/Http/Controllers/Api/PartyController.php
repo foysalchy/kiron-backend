@@ -61,6 +61,11 @@ class PartyController extends Controller
         $supplier = $this->partyService->getSupplierProfile($id);
         return ResponseHelper::success($supplier, 'Party retrieved successfully');
     }
+    public function payOrderFromWallet(int $id): JsonResponse
+    {
+        $supplier = $this->partyService->payOrderFromWallet($id);
+        return ResponseHelper::success($supplier, 'Party retrieved successfully');
+    }
     public function update(UpdatePartyRequest $request, int $id): JsonResponse
     {
         $party = $this->partyService->updateParty($id, $request->validated());

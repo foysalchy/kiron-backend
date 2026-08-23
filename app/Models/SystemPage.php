@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasPageTypeCache;
 use Illuminate\Database\Eloquent\Model;
 
 class SystemPage extends Model
@@ -10,7 +11,7 @@ class SystemPage extends Model
 
 {
 
-    use CompanyScoped;
+    use CompanyScoped,HasPageTypeCache;
     protected $fillable = [
         'company_id',
         'page_type',
