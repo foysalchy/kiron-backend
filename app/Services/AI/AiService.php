@@ -99,13 +99,13 @@ class AiService
         // Add generation type instructions
         switch ($type) {
             case 'product_description':
-                $prompt .= "Task: Generate a professional, persuasive, and SEO-friendly product description.\n";
+                $prompt .= "Task: Generate a professional, persuasive, and SEO-friendly product description. The output MUST be formatted in valid HTML suitable for a WYSIWYG editor (use <p>, <ul>, <li>, <strong>, etc. as appropriate). Do NOT wrap the response in markdown code blocks like ```html.\n";
                 break;
             case 'meta_title':
-                $prompt .= "Task: Generate an SEO-friendly meta title (max 60 characters).\n";
+                $prompt .= "Task: Generate an SEO-friendly meta title. CRITICAL RULE: The output MUST be strictly under 60 characters. OUTPUT ONLY THE RAW TITLE TEXT, without quotes, labels, markdown, or explanations.\n";
                 break;
             case 'meta_description':
-                $prompt .= "Task: Generate an SEO-friendly meta description (150-160 characters).\n";
+                $prompt .= "Task: Generate an SEO-friendly meta description. CRITICAL RULE: The output MUST be exactly between 120 and 160 characters. OUTPUT ONLY THE RAW DESCRIPTION TEXT, without quotes, labels, markdown, or explanations.\n";
                 break;
             case 'short_description':
                 $prompt .= "Task: Generate a short, punchy product summary (2-3 sentences).\n";

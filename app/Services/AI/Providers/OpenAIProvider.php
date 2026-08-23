@@ -45,7 +45,8 @@ class OpenAIProvider implements AiProviderInterface
             ]);
 
         if ($response->failed()) {
-            throw new Exception("OpenAI API Error: " . $response->body());
+            $errorMsg = $response->json('error.message') ?? $response->body();
+            throw new Exception("OpenAI API Error: " . $errorMsg);
         }
 
         return $response->json('choices.0.message.content') ?? '';
@@ -65,6 +66,7 @@ class OpenAIProvider implements AiProviderInterface
             return true;
         }
 
-        throw new Exception("OpenAI Error: " . $response->body());
+        $errorMsg = $response->json('error.message') ?? $response->body();
+        throw new Exception("OpenAI Error: " . $errorMsg);
     }
 }

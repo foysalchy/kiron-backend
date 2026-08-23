@@ -45,7 +45,8 @@ class GeminiProvider implements AiProviderInterface
             ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", $payload);
 
         if ($response->failed()) {
-            throw new Exception("Gemini API Error: " . $response->body());
+            $errorMsg = $response->json('error.message') ?? $response->body();
+            throw new Exception("Gemini API Error: " . $errorMsg);
         }
 
         return $response->json('candidates.0.content.parts.0.text') ?? '';
@@ -63,6 +64,7 @@ class GeminiProvider implements AiProviderInterface
             return true;
         }
 
-        throw new Exception("Gemini Error: " . $response->body());
+        $errorMsg = $response->json('error.message') ?? $response->body();
+        throw new Exception("Gemini Error: " . $errorMsg);
     }
 }
