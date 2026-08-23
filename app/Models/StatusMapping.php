@@ -11,7 +11,7 @@ class StatusMapping extends Model
 
     protected $fillable = [
         'company_id',
-        'kiron_status',
+        'self_status',
         'mappings',
     ];
 
