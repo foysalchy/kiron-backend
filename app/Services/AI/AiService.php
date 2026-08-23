@@ -40,17 +40,32 @@ class AiService
         return $provider->generate($prompt);
     }
 
-    public static function testConnection(int $companyId, string $providerName): bool
+    public static function testConnection(int $companyId, string $providerName, ?string $apiKey = null, ?string $model = null): bool
     {
         $settings = AiSetting::where('company_id', $companyId)->first();
-        if (!$settings) return false;
-
-        try {
-            $provider = self::resolveProvider($providerName, $settings);
-            return $provider->testConnection();
-        } catch (\Throwable $th) {
-            return false;
+        if (!$settings) {
+            $settings = new AiSetting();
         }
+
+        // If key was provided from frontend, override db value for testing
+        if ($apiKey && !str_contains($apiKey, '••••')) {
+            if ($providerName === 'openai') {
+                $settings->openai_key = $apiKey;
+            } else {
+                $settings->gemini_key = $apiKey;
+            }
+        }
+        
+        if ($model) {
+            if ($providerName === 'openai') {
+                $settings->openai_model = $model;
+            } else {
+                $settings->gemini_model = $model;
+            }
+        }
+
+        $provider = self::resolveProvider($providerName, $settings);
+        return $provider->testConnection();
     }
 
     protected static function resolveProvider(string $providerName, AiSetting $settings): AiProviderInterface

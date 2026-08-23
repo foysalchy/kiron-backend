@@ -53,16 +53,16 @@ class GeminiProvider implements AiProviderInterface
 
     public function testConnection(): bool
     {
-        try {
-            $response = Http::withHeaders(['Content-Type' => 'application/json'])
-                ->timeout(10)
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", [
-                    'contents' => [['parts' => [['text' => 'Hello']]]]
-                ]);
+        $response = Http::withHeaders(['Content-Type' => 'application/json'])
+            ->timeout(10)
+            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}", [
+                'contents' => [['parts' => [['text' => 'Hello']]]]
+            ]);
 
-            return $response->successful();
-        } catch (\Throwable $th) {
-            return false;
+        if ($response->successful()) {
+            return true;
         }
+
+        throw new Exception("Gemini Error: " . $response->body());
     }
 }

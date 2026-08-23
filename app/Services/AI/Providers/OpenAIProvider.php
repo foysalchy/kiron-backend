@@ -53,18 +53,18 @@ class OpenAIProvider implements AiProviderInterface
 
     public function testConnection(): bool
     {
-        try {
-            $response = Http::withToken($this->apiKey)
-                ->timeout(10)
-                ->post('https://api.openai.com/v1/chat/completions', [
-                    'model' => $this->model,
-                    'messages' => [['role' => 'user', 'content' => 'Hello']],
-                    'max_tokens' => 5
-                ]);
+        $response = Http::withToken($this->apiKey)
+            ->timeout(10)
+            ->post('https://api.openai.com/v1/chat/completions', [
+                'model' => $this->model,
+                'messages' => [['role' => 'user', 'content' => 'Hello']],
+                'max_tokens' => 5
+            ]);
 
-            return $response->successful();
-        } catch (\Throwable $th) {
-            return false;
+        if ($response->successful()) {
+            return true;
         }
+
+        throw new Exception("OpenAI Error: " . $response->body());
     }
 }

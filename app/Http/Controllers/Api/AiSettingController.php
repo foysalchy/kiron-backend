@@ -74,18 +74,28 @@ class AiSettingController extends Controller
     public function testConnection(Request $request): JsonResponse
     {
         $request->validate([
-            'provider' => 'required|in:openai,gemini'
+            'provider' => 'required|in:openai,gemini',
+            'api_key' => 'nullable|string',
+            'model' => 'nullable|string',
         ]);
 
         $companyId = auth()->user()->company_id;
         
-        // If testing unsaved key from frontend (optional logic), or just test DB key:
-        $success = AiService::testConnection($companyId, $request->provider);
+        try {
+            $success = AiService::testConnection(
+                $companyId, 
+                $request->provider, 
+                $request->api_key, 
+                $request->model
+            );
 
-        if ($success) {
-            return ResponseHelper::success(null, 'Connection successful.');
+            if ($success) {
+                return ResponseHelper::success(null, 'Connection successful.');
+            }
+            
+            return ResponseHelper::error('Invalid API key or provider unavailable.');
+        } catch (\Exception $e) {
+            return ResponseHelper::error($e->getMessage());
         }
-
-        return ResponseHelper::error('Invalid API key or provider unavailable.');
     }
 }
