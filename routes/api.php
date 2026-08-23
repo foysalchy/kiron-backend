@@ -1642,11 +1642,16 @@ Route::prefix('v1')->group(function () {
                     Route::post('/{id}/remove-user',  [RoleController::class, 'removeUser']);
                 });
 
-                Route::get('/permissions', [PermissionController::class, 'index']);
+                    Route::get('/permissions', [PermissionController::class, 'index']);
                 Route::get('/reports/profit-loss', [ProfitLossReportController::class, 'generate']);
                 Route::get('/reports/sales', [SalesReportController::class, 'generate']);
                 Route::get('/reports/product-wise-sales', [ProductWiseSalesReportController::class, 'generate']);
                 Route::get('/reports/customer', [CustomerReportController::class, 'generate']);
+                Route::get('/reports/courier', [\App\Http\Controllers\Api\CourierReportController::class, 'generate']);
+                Route::get('/reports/cancellation', [\App\Http\Controllers\Api\CancellationReportController::class, 'generate']);
+                Route::get('/reports/marketing-roi', [\App\Http\Controllers\Api\MarketingRoiReportController::class, 'generate']);
+                Route::get('/reports/abandoned-cart', [\App\Http\Controllers\Api\AbandonedCartReportController::class, 'generate']);
+
                 Route::get('/dashboard/overview', [DashboardController::class, 'overview']);
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
                 Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
@@ -1679,6 +1684,12 @@ Route::prefix('v1')->group(function () {
             Route::post('/reminder-settings', [ReminderSettingController::class, 'store']);
             Route::put('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'update']);
             Route::delete('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'destroy']);
+
+            // AI Integration Routes
+            Route::get('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'show']);
+            Route::post('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'update']);
+            Route::post('/settings/ai/test', [\App\Http\Controllers\Api\AiSettingController::class, 'testConnection']);
+            Route::post('/ai/generate', [\App\Http\Controllers\Api\AIGeneratorController::class, 'generate']);
 
             Route::apiResource('/sms-packages', SmsPackageController::class);
             Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);

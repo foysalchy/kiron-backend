@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Services\AI\Providers;
+
+use App\Services\AI\AiProviderInterface;
+use Illuminate\Support\Facades\Http;
+use Exception;
+
+class OpenAIProvider implements AiProviderInterface
+{
+    protected string $apiKey;
+    protected string $model;
+    protected ?string $instructions;
+
+    public function setConfig(string $apiKey, string $model, ?string $instructions = null): self
+    {
+        $this->apiKey = $apiKey;
+        $this->model = $model;
+        $this->instructions = $instructions;
+        return $this;
+    }
+
+    public function generate(string $prompt): string
+    {
+        $messages = [];
+        
+        if ($this->instructions) {
+            $messages[] = [
+                'role' => 'system',
+                'content' => $this->instructions
+            ];
+        }
+
+        $messages[] = [
+            'role' => 'user',
+            'content' => $prompt
+        ];
+
+        $response = Http::withToken($this->apiKey)
+            ->timeout(60)
+            ->post('https://api.openai.com/v1/chat/completions', [
+                'model' => $this->model,
+                'messages' => $messages,
+                'temperature' => 0.7,
+            ]);
+
+        if ($response->failed()) {
+            throw new Exception("OpenAI API Error: " . $response->body());
+        }
+
+        return $response->json('choices.0.message.content') ?? '';
+    }
+
+    public function testConnection(): bool
+    {
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->timeout(10)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => $this->model,
+                    'messages' => [['role' => 'user', 'content' => 'Hello']],
+                    'max_tokens' => 5
+                ]);
+
+            return $response->successful();
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+}

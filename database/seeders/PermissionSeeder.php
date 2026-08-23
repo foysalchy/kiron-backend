@@ -169,6 +169,10 @@ class PermissionSeeder extends Seeder
         $addViewOnly('report_stock',        'Report Stock',             'report_stock');
         $addViewOnly('report_profit_loss',  'Report Profit & Loss',     'accounting_module');
         $addViewOnly('report_audit_logs',   'Report Audit Logs',        'report_audit_logs');
+        $addViewOnly('report_courier',      'Report Courier',           'report_courier');
+        $addViewOnly('report_cancellation', 'Report Cancellation',      'report_cancellation');
+        $addViewOnly('report_marketing',    'Report Marketing ROI',     'report_marketing');
+        $addViewOnly('report_abandoned_cart', 'Report Abandoned Cart',  'report_abandoned_cart');
 
         // ==========================================
         // 14. Support Desk
@@ -224,7 +228,8 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_theme',         'Theme Settings',        'settings_theme');
         $addCrud('settings_meta',         'Meta Settings',        'settings_meta');
         $addCrud('settings_menu',         'Menu Settings',        'settings_menu');
-        $addCrud('settings_marketing',         'Marketing Settings',        'settings_marketing');
+        $addCrud('settings_marketing',    'Marketing Settings',   'settings_marketing');
+        $addCrud('settings_ai',           'AI Integration Settings','settings_ai');
 
         //21. Subscriptions
         $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');
