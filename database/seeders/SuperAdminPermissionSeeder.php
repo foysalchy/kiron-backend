@@ -96,12 +96,11 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('settings_content',      'Content Settings');
         $addCrud('settings_payment',         'Payment Settings');
         $addCrud('settings_ip',              'IP Restriction Settings');
-        $addCrud('settings_reminder',        'Reminder Settings');
-        $addCrud('settings_meta',        'Meta Settings');
-        $addCrud('settings_menu',        'Menu Settings');
-        $addCrud('settings_marketing',         'Marketing Settings');
-
-
+        $addCrud('settings_theme',           'Theme Settings');
+        $addCrud('settings_meta',           'Meta Settings');
+        $addCrud('settings_menu',           'Menu Settings');
+        $addCrud('settings_marketing',      'Marketing Settings');
+        $addCrud('settings_ai',             'AI Integration Settings');
 
         // ── Roles & Permissions ────────────────────────────
         $addCrud('settings_roles',           'Roles');
