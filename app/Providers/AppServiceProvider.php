@@ -273,7 +273,8 @@ class AppServiceProvider extends ServiceProvider
             CustomerReview::class,
             MasterDemo::class,
             PricingPackage::class,
-            DomainSetup::class,
+            DomainSetup::class, 
+            SystemPage::class, 
 
         ];
 

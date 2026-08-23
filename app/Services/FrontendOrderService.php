@@ -81,10 +81,10 @@ class FrontendOrderService
         if (!empty($filters['type'])) {
             if ($filters['type'] === 'woo') {
                 $query->where('orders.type', 'sales')
-                      ->whereJsonContains('orders.source_info->source_name', 'woo');
+                    ->whereJsonContains('orders.source_info->source_name', 'woo');
             } elseif ($filters['type'] === 'sales' || $filters['type'] === 'website') {
                 $query->where('orders.type', 'sales')
-                      ->whereNull('orders.source_info');
+                    ->whereNull('orders.source_info');
             } else {
                 $query->where('orders.type', $filters['type']);
             }
@@ -408,12 +408,40 @@ class FrontendOrderService
     /**
      * Transform single order data
      */
-    private function transformOrderData($order, $assignedUsers)
+    private function transformOrderData($order, $assignedUsers, $customerStats = null)
     {
-        // Get customer total orders count
-        $customerTotalOrders = 1; // Default for walk-in
+        $customerTotalOrders = 1;
+        $deliveredCount = 0;
+        $returnedCount = 0;
+        $cancelledCount = 0;
+        $successRatio = 0;
+
         if ($order->customer_id) {
-            $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
+            if ($customerStats && isset($customerStats[$order->customer_id])) {
+                // list (getOrders) থেকে call হলে bulk data ব্যবহার হবে
+                $stats = $customerStats[$order->customer_id];
+
+                $customerTotalOrders = $stats->sum('total');
+                $deliveredCount = $stats->firstWhere('status', Status::Delivered->value)?->total ?? 0;
+                $returnedCount = $stats->firstWhere('status', Status::Returned->value)?->total ?? 0;
+                $cancelledCount = $stats->firstWhere('status', Status::Cancelled->value)?->total ?? 0;
+            } else {
+
+                $statsQuery = Order::where('customer_id', $order->customer_id)
+                    ->where('status', '!=', Status::Draft->value)
+                    ->select('status', DB::raw('count(*) as total'))
+                    ->groupBy('status')
+                    ->get();
+
+                $customerTotalOrders = $statsQuery->sum('total');
+                $deliveredCount = $statsQuery->firstWhere('status', Status::Delivered->value)?->total ?? 0;
+                $returnedCount = $statsQuery->firstWhere('status', Status::Returned->value)?->total ?? 0;
+                $cancelledCount = $statsQuery->firstWhere('status', Status::Cancelled->value)?->total ?? 0;
+            }
+
+            $successRatio = $customerTotalOrders > 0
+                ? round(($deliveredCount / $customerTotalOrders) * 100, 1)
+                : 0;
         }
 
         return [
@@ -509,6 +537,13 @@ class FrontendOrderService
                     'time_ago' => $payment->created_at->diffForHumans(),
                 ];
             }),
+            'customerOrderStats' => [
+                'total' => $customerTotalOrders,
+                'delivered' => $deliveredCount,
+                'returned' => $returnedCount,
+                'cancelled' => $cancelledCount,
+                'success_ratio' => $successRatio,
+            ],
             'orderDate' => $order->order_date,
             'timeAgo' => $order->created_at->diffForHumans(),
             'warehouse' => $order->warehouse?->name ?? '',

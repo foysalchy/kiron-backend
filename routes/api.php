@@ -677,6 +677,7 @@ Route::prefix('v1')->group(function () {
                     Route::post('{id}/complete', [SalesOrderController::class, 'complete']);
                     Route::post('/{id}/assign-users', [SalesOrderController::class, 'assignUsers']);
                 });
+                Route::post('/parties/{id}/pay-order-from-wallet', [OrderController::class, 'payOrderFromWallet']);
 
                 Route::prefix('fetch-orders')->group(function () {
                     Route::get('/select/order-list-option', [OrderController::class, 'getSelectListOrder']);

@@ -151,6 +151,114 @@ class OrderService
         return $order;
     }
     /**
+     * Pay towards a specific order using the customer's wallet balance.
+     * Customer selects the order; partial payment allowed.
+     *
+     * @param int $customerId
+     * @param int $orderId
+     * @param float $amount
+     * @return Order
+     */
+    public function payOrderFromWallet(int $customerId, int $orderId, float $amount): Order
+    {
+        DB::beginTransaction();
+
+        try {
+            if ($amount <= 0) {
+                throw ApiException::badRequest('Amount must be greater than zero');
+            }
+
+            $party = Party::find($customerId);
+            if (!$party) {
+                throw ApiException::notFound('Customer not found');
+            }
+
+            $order = Order::where('id', $orderId)
+                ->where('customer_id', $customerId)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$order) {
+                throw ApiException::notFound('Order not found for this customer');
+            }
+
+            if ($order->status === Status::Cancelled->value) {
+                throw ApiException::badRequest('Cannot pay for a cancelled order');
+            }
+
+            $orderDue = max(0, $order->grand_total - $order->payment_amount);
+
+            if ($orderDue <= 0) {
+                throw ApiException::badRequest('This order has no due amount');
+            }
+
+            if ($amount > $orderDue) {
+                throw ApiException::badRequest('Amount exceeds order due amount');
+            }
+
+            // Lock party row too, to avoid race conditions on balance
+            $lockedParty = Party::where('id', $customerId)->lockForUpdate()->first();
+
+            if ($lockedParty->balance < $amount) {
+                throw ApiException::badRequest('Insufficient wallet balance');
+            }
+
+            // Deduct from wallet
+            $lockedParty->decrement('balance', $amount);
+
+            // Record payment against the order
+            OrderPayment::create([
+                'order_id'       => $order->id,
+                'amount'         => $amount,
+                'change_amount'  => 0, // wallet payments never generate change
+                'payment_method' => 'wallet',
+                'reference_no'   => null,
+                'note'           => 'Paid from wallet balance',
+            ]);
+
+            // Update order payment fields
+            $newPaymentAmount = $order->payment_amount + $amount;
+            $order->update([
+                'payment_amount' => $newPaymentAmount,
+                'payment_status' => $this->determinePaymentStatus($order->grand_total, $newPaymentAmount),
+            ]);
+
+            // Sync due_amount from single source of truth
+            $this->recalculatePartyDue($customerId);
+
+            LogHelper::custom(
+                'wallet_payment',
+                'orders',
+                $order->id,
+                $order->company_id,
+                "Paid {$amount} from wallet balance"
+            );
+
+            DB::commit();
+
+            Log::info('Order paid from wallet balance', [
+                'order_id'    => $order->id,
+                'customer_id' => $customerId,
+                'amount'      => $amount,
+            ]);
+
+            return $order->fresh()->load([
+                'warehouse',
+                'customer',
+                'coupon',
+                'orderDetails.product',
+                'orderPayments',
+            ]);
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Wallet payment failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to process wallet payment');
+        }
+    }
+    /**
      * Get hold order list
      */
     public function getHoldOrderList(int $id, $type): Collection
@@ -216,7 +324,6 @@ class OrderService
         if ($isDue && $dueAmount > 0 && !empty($data['customer_id'])) {
             Party::where('id', $data['customer_id'])->update([
                 'due_amount' => DB::raw("due_amount + {$dueAmount}"),
-                'balance'    => DB::raw("balance - {$dueAmount}"),
             ]);
         }
 
@@ -352,6 +459,8 @@ class OrderService
                     $data['customer_id'] ?? null
                 );
             }
+            $this->recalculatePartyDue($order->customer_id);
+
             NotificationService::notify(
                 NotificationRecipientResolver::companySuperAdmin($order->company_id),
                 new OrderCreatedNotification($order->id, $order->order_no, $order->company_id)
@@ -421,6 +530,7 @@ class OrderService
             $oldOrderDetails = $order->orderDetails->toArray();
             $oldStatus = $order->status;
             $oldCouponId = $order->coupon_id;
+            $oldCustomerId = $order->customer_id;
 
             // If order was not on hold, restore stock first (we'll deduct new stock later)
             if ($oldStatus != Status::Hold->value) {
@@ -469,19 +579,9 @@ class OrderService
             $data['payment_status'] = $this->determinePaymentStatus($data['grand_total'], $totalPaid);
             $oldDue = max(0, $order->grand_total - $order->payment_amount);
 
-            // Update order
-            $order->update($data);
-            if ($order->customer_id) {
-                $newDue = max(0, $data['grand_total'] - $data['payment_amount']);
-                $dueDifference = $newDue - $oldDue;
 
-                if ($dueDifference > 0) {
-                    Party::where('id', $order->customer_id)->increment('due_amount', $dueDifference);
-                } elseif ($dueDifference < 0) {
-                    $reduceAmount = min(abs($dueDifference), Party::where('id', $order->customer_id)->value('due_amount'));
-                    Party::where('id', $order->customer_id)->decrement('due_amount', $reduceAmount);
-                }
-            }
+            $order->update($data);
+
             // Create new order details
             foreach ($items as $item) {
                 $itemTotal = $this->calculateItemTotal($item);
@@ -530,6 +630,10 @@ class OrderService
                     $data['coupon_discount'],
                     $data['customer_id'] ?? null
                 );
+            }
+            $this->recalculatePartyDue($oldCustomerId);
+            if ($order->customer_id != $oldCustomerId) {
+                $this->recalculatePartyDue($order->customer_id);
             }
 
             LogHelper::updated('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
@@ -735,6 +839,7 @@ class OrderService
             $order->update([
                 'status' => $getStatus->value
             ]);
+            $this->recalculatePartyDue($order->customer_id);
             try {
                 app(SmsSendService::class)->sendStatusBasedSms($order);
             } catch (\Exception $smsError) {
@@ -755,7 +860,7 @@ class OrderService
                 'new_status' => $getStatus->label(),
             ]);
 
-            app(\App\Services\StatusSyncService::class)->syncOrderStatus($order->fresh());
+            //     app(\App\Services\StatusSyncService::class)->syncOrderStatus($order->fresh());
 
             LogHelper::statusChanged('orders', $order->id, $order->company_id, $logStatus);
 
@@ -812,8 +917,10 @@ class OrderService
             $order->orderDetails()->delete();
             $order->orderPayments()->delete();
             $order->orderNotes()->delete();
-
+            $customerId = $order->customer_id;
             $order->delete();
+            $this->recalculatePartyDue($customerId);
+
 
             DB::commit();
 
@@ -945,7 +1052,19 @@ class OrderService
             throw ApiException::serverError('Failed to hold order');
         }
     }
+    private function recalculatePartyDue(?int $customerId): void
+    {
+        if (!$customerId) {
+            return;
+        }
 
+        $totalDue = Order::where('customer_id', $customerId)
+            ->where('status', '!=', Status::Cancelled->value)
+            ->selectRaw('COALESCE(SUM(GREATEST(grand_total - payment_amount, 0)), 0) as total_due')
+            ->value('total_due');
+
+        Party::where('id', $customerId)->update(['due_amount' => $totalDue]);
+    }
     /**
      * Resume held order
      */
@@ -1102,6 +1221,9 @@ class OrderService
     private function restoreOrderStock(Order $order): void
     {
         foreach ($order->orderDetails as $detail) {
+            if (!$detail->product || !$detail->product->manage_stock) {
+                continue;
+            }
             $stockData = [
                 'warehouse_id' => $order->warehouse_id,
                 'bin_id' => null,

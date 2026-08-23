@@ -7,6 +7,7 @@ use App\Models\LandingPage;
 use App\Models\Blog;
 use App\Models\DomainSetup;
 use App\Models\MasterFeature;
+use App\Models\SystemPage;
 
 class CachedOptionsObserver
 {
@@ -68,6 +69,9 @@ class CachedOptionsObserver
 
         if ($model instanceof \App\Models\DomainSetup) {
             \App\Models\DomainSetup::clearSubdomainCache($model->sub_domain);
+        }
+        if ($model instanceof SystemPage) {
+            SystemPage::clearPageTypeCache($model->page_type, $model->company_id);
         }
     }
     public function updating($model)

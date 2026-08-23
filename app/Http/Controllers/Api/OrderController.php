@@ -213,6 +213,21 @@ class OrderController extends Controller
 
         return ResponseHelper::success($data, 'Order product list retrive');
     }
+    public function payOrderFromWallet(Request $request, int $customerId)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'amount'   => 'required|numeric|min:0.01',
+        ]);
+
+        $data = $this->orderService->payOrderFromWallet(
+            $customerId,
+            $validated['order_id'],
+            (float) $validated['amount']
+        );
+
+        return ResponseHelper::success($data, 'Order paid from wallet balance successfully');
+    }
     public function bulkStatusUpdate(Request $request)
     {
         $validated = $request->validate([

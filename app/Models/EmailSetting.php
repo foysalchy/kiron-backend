@@ -2,37 +2,31 @@
 
 namespace App\Models;
 
-use App\Enums\Status;
 use App\Traits\CompanyScoped;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmailSetting extends Model
-{ 
+{
+
     use CompanyScoped;
     protected $fillable = [
         'company_id',
-        'host_name',
-        'port_number',
-        'auth_user',
-        'auth_password',
-        'status',
+        'mail_mailer',
+        'mail_host',
+        'mail_port',
+        'mail_username',
+        'mail_password',
+        'mail_encryption',
+        'mail_from_address',
+        'mail_from_name',
+        'is_verified',
     ];
-    /**
-     * Scopes
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('status', Status::Active->value);
-    }
 
-    public function scopeInactive($query)
-    {
-        return $query->where('status', Status::Inactive->value);
-    }
+    protected $casts = [
+        'mail_password' => 'encrypted',
+    ];
 
-    // Relationships
-    public function company(): BelongsTo
+    public function company()
     {
         return $this->belongsTo(Company::class);
     }
