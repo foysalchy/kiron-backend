@@ -1656,6 +1656,12 @@ Route::prefix('v1')->group(function () {
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
                 Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
                 Route::get('/reports/inventory-stock', [InventoryStockReportController::class, 'generate']);
+                
+                // AI Integration Routes
+                Route::get('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'show']);
+                Route::post('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'update']);
+                Route::post('/settings/ai/test', [\App\Http\Controllers\Api\AiSettingController::class, 'testConnection']);
+                Route::post('/ai/generate', [\App\Http\Controllers\Api\AIGeneratorController::class, 'generate']);
             });
         });
         //pricing plan
@@ -1685,11 +1691,6 @@ Route::prefix('v1')->group(function () {
             Route::put('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'update']);
             Route::delete('/reminder-settings/{reminderSetting}', [ReminderSettingController::class, 'destroy']);
 
-            // AI Integration Routes
-            Route::get('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'show']);
-            Route::post('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'update']);
-            Route::post('/settings/ai/test', [\App\Http\Controllers\Api\AiSettingController::class, 'testConnection']);
-            Route::post('/ai/generate', [\App\Http\Controllers\Api\AIGeneratorController::class, 'generate']);
 
             Route::apiResource('/sms-packages', SmsPackageController::class);
             Route::get('/sms-recharges', [SmsRechargeController::class, 'index']);
