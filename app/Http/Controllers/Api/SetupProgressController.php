@@ -48,10 +48,7 @@ class SetupProgressController extends Controller
 
         // Domain: DomainSetup (has custom domain configured)
         $domain = DomainSetup::where('company_id', $companyId)
-            ->where(function($q) {
-                $q->whereNotNull('domain_name')
-                  ->orWhere('is_custom_domain', 1);
-            })
+            ->whereNotNull('custom_domain')
             ->where('updated_at', '>', $threshold)
             ->exists();
 
