@@ -70,13 +70,15 @@ class SteadfastWebhookController extends Controller
             foreach ($mappings as $mapping) {
                 $providerMappings = $mapping->mappings ?? [];
                 if (isset($providerMappings['steadfast']) && $providerMappings['steadfast'] === $steadfastStatus) {
-                    $kironStatus = $mapping->kiron_status;
+                    $kironStatus = $mapping->self_status;
                     break;
                 }
             }
 
-            if ($kironStatus !== null) {
+            $statusChanged = false;
+            if ($kironStatus !== null && $order->status !== $kironStatus) {
                 $order->status = $kironStatus;
+                $statusChanged = true;
             }
 
             // If status is Delivered or partially delivered, update COD amount
@@ -100,6 +102,11 @@ class SteadfastWebhookController extends Controller
             }
 
             $order->save();
+
+            // Trigger sync to WooCommerce if the status was changed by Steadfast
+            if ($statusChanged) {
+                app(\App\Services\StatusSyncService::class)->syncOrderStatus($order);
+            }
 
             Log::info("Steadfast webhook processed for Order ID: {$order->id}, Consignment: {$consignmentId}, Status: {$steadfastStatus}");
 

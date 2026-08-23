@@ -17,6 +17,15 @@
                 value: {{ $data['product']->sale_price ?? 0 }},
                 currency: '{{ $setup->currency ?? "BDT" }}'
             });
+            @if(!empty($market->tiktok_pixel_id))
+            ttq.track('ViewContent', {
+                content_name: '{{ $data['product']->title }}',
+                content_id: '{{ $data['product']->id }}',
+                content_type: 'product',
+                value: {{ $data['product']->sale_price ?? 0 }},
+                currency: '{{ $setup->currency ?? "BDT" }}'
+            });
+            @endif
             // checkout page
         @elseif($event === 'InitiateCheckout' && isset($data['total']))
             fbq('track', 'InitiateCheckout', {
@@ -24,6 +33,13 @@
                 currency: '{{ $setup->currency ?? "BDT" }}',
                 content_type: 'product'
             });
+            @if(!empty($market->tiktok_pixel_id))
+            ttq.track('InitiateCheckout', {
+                value: {{ $data['total'] }},
+                currency: '{{ $setup->currency ?? "BDT" }}',
+                content_type: 'product'
+            });
+            @endif
             // cart page
         @elseif($event === 'AddToCart' && isset($data['total']))
             fbq('track', 'AddToCart', {
@@ -32,6 +48,14 @@
                 content_type: 'product',
                 content_ids: {!! json_encode($data['ids'] ?? []) !!}
             });
+            @if(!empty($market->tiktok_pixel_id))
+            ttq.track('AddToCart', {
+                value: {{ $data['total'] }},
+                currency: '{{ $setup->currency ?? "BDT" }}',
+                content_type: 'product',
+                content_id: {!! json_encode($data['ids'] ?? []) !!}
+            });
+            @endif
             // order details
         @elseif($event === 'Purchase' && isset($data['order']))
             fbq('track', 'Purchase', {
@@ -39,7 +63,15 @@
                 content_type: 'product',
                 value: {{ $data['order']->grand_total ?? $data['order']->total_amount }},
                 currency: '{{ $setup->currency ?? "BDT" }}'
-            });
+            }, { eventID: 'ORDER_{{ $data['order']->id }}' });
+            @if(!empty($market->tiktok_pixel_id))
+            ttq.track('CompletePayment', {
+                content_id: '{{ $data['order']->id }}',
+                content_type: 'product',
+                value: {{ $data['order']->grand_total ?? $data['order']->total_amount }},
+                currency: '{{ $setup->currency ?? "BDT" }}'
+            }, { event_id: 'ORDER_{{ $data['order']->id }}' });
+            @endif
             // blog details
         @elseif($event === 'ViewBlog' && isset($data['blog']))
             fbq('track', 'ViewContent', {
