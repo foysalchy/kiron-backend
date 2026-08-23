@@ -36,13 +36,6 @@ class AiService
 
         $provider = self::resolveProvider($providerName, $settings);
         $options = [];
-        $type = $params['type'] ?? 'general';
-        if ($type === 'meta_title') {
-            $options['max_tokens'] = 30; // Max ~80 chars
-        } elseif ($type === 'meta_description') {
-            $options['max_tokens'] = 60; // Max ~160 chars
-        }
-
         $prompt = self::buildPrompt($params);
         return $provider->generate($prompt, $options);
     }
