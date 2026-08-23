@@ -45,6 +45,8 @@ use App\Http\Controllers\Api\CustomerPanelController;
 use App\Http\Controllers\Api\CustomerPaymentMethodController;
 use App\Http\Controllers\Api\CustomerReportController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\SetupProgressController;
+use App\Http\Controllers\Api\DeliveryLocationController;
 use App\Http\Controllers\Api\DisposalTypeController;
 use App\Http\Controllers\Api\DomainSetupController;
 use App\Http\Controllers\Api\EditorImagesController;
@@ -238,6 +240,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/profile', [CompanyController::class, 'getProfile']);
         });
         Route::middleware('check.user.status:allow_pending')->group(function () {
+            
+            Route::get('/dashboard/setup-progress', [SetupProgressController::class, 'getProgress']);
 
             Route::prefix('site-settings')->group(function () {
                 Route::get('/', [SiteSettingController::class, 'index']);
