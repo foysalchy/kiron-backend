@@ -75,7 +75,7 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
                 'shipping_address.thana' => 'nullable|string',
                 'hold_ref' => ['nullable', 'string'],
                 'note' => ['nullable', 'string'],
-                'status' => ['nullable'],
+                'status' => ['required'],
             ]
         );
     }
@@ -112,6 +112,10 @@ class UpdateOrderRequest extends UpdateBaseCompanyRequest
 
                     if (! $product) {
                         continue; // product exists rule already handles this
+                    }
+
+                    if (!$product->manage_stock) {                       // ← নতুন guard
+                        continue;                                         // unmanaged product হলে quantity check skip
                     }
 
                     if ($item['quantity'] > $product->available_stock) {
