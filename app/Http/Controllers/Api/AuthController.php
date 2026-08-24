@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Enums\Status;
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\{RegisterRequest, UpdateProfileRequest, UpdatePasswordRequest};
 use App\Helpers\{FileUploadHelper, LogHelper};
+use App\Mail\ResetPasswordOtpMail;
 use App\Models\Company;
 use App\Models\Permission;
 use App\Models\User;
 use App\Models\UserLoginHistory;
+use App\Services\PasswordResetService;
+use App\Services\SmsSendService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\{Auth, Hash, DB, Log};
+use Illuminate\Support\Facades\{Auth, Hash, DB, Log, RateLimiter};
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
@@ -21,6 +25,9 @@ use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
+
+    public function __construct(protected PasswordResetService $passwordResetService) {}
+
     /**
      * Get login history (Super Admin sees all, Others see only their own)
      */
@@ -71,7 +78,7 @@ class AuthController extends Controller
 
 
         $token = $user->createToken('auth_token', ['*'], now()->addDays(30))->plainTextToken;
-        
+
         $effectivePermissions = [];
 
         if ($user->is_super_admin) {
@@ -594,44 +601,39 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
-    public function forgotPassword(Request $request)
+    public function requestOtp(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'method'     => ['required', 'in:email,sms'],
+            'identifier' => ['required', 'string'],
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $data = $this->passwordResetService->requestOtp($request->method, $request->identifier);
 
-        // Always return 200 to avoid user enumeration attacks.
-        if (! $user) {
-            return response()->json([
-                'message' => 'If an account exists for that email, you will receive a reset link shortly.',
-            ]);
-        }
-
-        // Delete any existing token for this email.
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-
-        $token = Str::random(64);
-
-        DB::table('password_reset_tokens')->insert([
-            'email'      => $request->email,
-            'token'      => Hash::make($token),
-            'created_at' => Carbon::now(),
-        ]);
-
-        // Send the email (uses resources/views/emails/reset-password.blade.php)
-        Mail::to($user->email)->send(new \App\Mail\ResetPasswordMail($user, $token));
-
-        return response()->json([
-            'message' => 'If an account exists for that email, you will receive a reset link shortly.',
-        ]);
+        return response()->json($data);
     }
-
     // ──────────────────────────────────────────────────────────────────────────
     // POST /api/v1/auth/reset-password
     // ──────────────────────────────────────────────────────────────────────────
+
+ public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'method'       => ['required', 'in:email,sms'],
+            'identifier'   => ['required', 'string'],
+            'otp'          => ['required', 'digits:6'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $this->passwordResetService->verifyOtpAndReset(
+            $request->method,
+            $request->identifier,
+            $request->otp,
+            $request->new_password,
+        );
+
+        return response()->json(['message' => 'Password reset successfully']);
+    }
     public function resetPassword(Request $request)
     {
         $request->validate([

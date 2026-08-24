@@ -175,16 +175,15 @@ class CompanyService
 
             'domains',
             'loginHistories.user',
+            'currentMonthlyUsage',
         ])
             ->withCount([
-                'products as product_used',
+                'products as product_used' => fn($q) => $q->withoutGlobalScopes(),
                 'users as user_used',
-                'orders as order_used' => fn($q) => $q
-                    ->where('type', Order::TYPE_SALES)
-                    ->whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year),
-                'domains as domain_used',
+                'domains as domain_used' => fn($q) => $q->withoutGlobalScopes(),
+
             ])
+
             ->find($id);
 
 

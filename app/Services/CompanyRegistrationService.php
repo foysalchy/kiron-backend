@@ -208,7 +208,7 @@ class CompanyRegistrationService
             ]);
 
             // We only need ONE OTP since user & company share the same email
-            $otp = $this->createOtpRecord($company->id, 'user', $company->email,'email');
+            $otp = $this->createOtpRecord($company->id, 'user', $company->email, 'email');
 
             DB::commit();
 
@@ -231,6 +231,7 @@ class CompanyRegistrationService
             DomainSetup::create([
                 'company_id' => $company->id,
                 'sub_domain' => $data['sub_domain'],
+                'prefix' => $data['sub_domain'],
                 'template_name' => 'template1'
             ]);
 
@@ -681,7 +682,7 @@ class CompanyRegistrationService
         // return 123456;
     }
 
-    private function createOtpRecord(int $companyId, string $type, string $email,string $method): string
+    private function createOtpRecord(int $companyId, string $type, string $email, string $method): string
     {
         $otp = $this->generateOtp();
 

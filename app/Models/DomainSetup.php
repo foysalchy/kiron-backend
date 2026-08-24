@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DomainSetup extends Model
 {
-    use CompanyScoped,HasSubdomainCache;
+    use CompanyScoped, HasSubdomainCache;
+
     protected $fillable = [
         'company_id',
         'custom_domain',
@@ -19,6 +20,7 @@ class DomainSetup extends Model
         'product_card_template',
         'is_review',
         'status',
+        'prefix'
     ];
     /**
      * Scopes

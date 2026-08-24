@@ -100,8 +100,7 @@ class Order extends Model
         });
         // Extra charge record
         static::created(function ($order) {
-            // if ($order->type !== self::TYPE_SALES) return;
-            if (!in_array($order->type, [self::TYPE_SALES, self::TYPE_LANDING])) return;
+      
 
             $company = \App\Models\Company::with('pricingPackage')
                 ->find($order->company_id);

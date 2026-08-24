@@ -203,18 +203,18 @@ class CompanyDeletionService
             : $query->delete();
     }
 
- 
+
     protected function getCleanPath($path): ?string
     {
         if (!$path) {
             return null;
         }
-        
+
         if (filter_var($path, FILTER_VALIDATE_URL)) {
             $parsedUrl = parse_url($path);
             $path = $parsedUrl['path'] ?? $path;
         }
-        
+
         return ltrim($path, '/');
     }
 
@@ -269,8 +269,8 @@ class CompanyDeletionService
 
             foreach ($rows as $row) {
                 foreach ($columns as $col) {
-                    $value = method_exists($row, 'getRawOriginal') 
-                        ? $row->getRawOriginal($col) 
+                    $value = method_exists($row, 'getRawOriginal')
+                        ? $row->getRawOriginal($col)
                         : $row->{$col};
 
                     if (!$value) {
@@ -437,7 +437,7 @@ class CompanyDeletionService
                 // Product Variations
                 $pvQuery = $this->getBaseQuery(\App\Models\ProductVariation::class)->whereIn('product_id', $productIds);
                 $totalDeletedRows += $this->deleteQuery($pvQuery, \App\Models\ProductVariation::class);
-                
+
                 // Product Galleries
                 $gQuery = $this->getBaseQuery(\App\Models\Gallery::class)->whereIn('product_id', $productIds);
                 $totalDeletedRows += $this->deleteQuery($gQuery, \App\Models\Gallery::class);
@@ -462,38 +462,182 @@ class CompanyDeletionService
             }
 
             $companyModels = [
-                \App\Models\User::class,
-                \App\Models\Party::class,
-                \App\Models\Brand::class,
-                \App\Models\MegaCategory::class,
-                \App\Models\SubCategory::class,
-                \App\Models\MiniCategory::class,
-                \App\Models\ExtraCategory::class,
-                \App\Models\Product::class,
-                \App\Models\Page::class,
-                \App\Models\Slider::class,
-                \App\Models\Blog::class,
-                \App\Models\Employee::class,
-                \App\Models\Resignation::class,
-                \App\Models\Rejoin::class,
-                \App\Models\LeaveApplication::class,
-                \App\Models\LandingPage::class,
-                \App\Models\SiteSetting::class,
-                \App\Models\CustomerPaymentMethod::class,
-                \App\Models\SupportTicket::class,
-                \App\Models\TransactionTransfer::class,
+                \App\Models\AccountGroup::class,
+                \App\Models\AccountType::class,
+                \App\Models\ActionLog::class,
+                \App\Models\AiSetting::class,
+                \App\Models\Area::class,
                 \App\Models\Asset::class,
-                \App\Models\SocialSetting::class,
-                \App\Models\ContentSetting::class,
-                \App\Models\ProductReview::class,
+                \App\Models\AssetCategory::class,
+                \App\Models\AssetDepreciation::class,
+                \App\Models\AssetDisposal::class,
+                \App\Models\AssetPurchase::class,
+                \App\Models\AssignLeaveType::class,
+                \App\Models\Attendance::class,
+                \App\Models\AttributeGroup::class,
+                \App\Models\AttributeValue::class,
+                \App\Models\BarCode::class,
+                \App\Models\Billing::class,
+                \App\Models\Bin::class,
+                \App\Models\Blog::class,
+                \App\Models\Bonus::class,
+                \App\Models\Brand::class,
+                \App\Models\Cart::class,
+                \App\Models\Cell::class,
+                \App\Models\Channel::class,
+                \App\Models\ChannelConnection::class,
+                \App\Models\ChannelGroup::class,
+                \App\Models\ChartOfAccount::class,
+                \App\Models\Company::class,
                 \App\Models\CompanyUpdateRequest::class,
-                \App\Models\Order::class,
-                \App\Models\OrderReturn::class,
-                \App\Models\Purchase::class,
-                \App\Models\PurchaseReturn::class,
-                \App\Models\Requisition::class,
+                \App\Models\ContactMessage::class,
+                \App\Models\ContentSetting::class,
+                \App\Models\Conversation::class,
+                \App\Models\ConversationAssignment::class,
                 \App\Models\Coupon::class,
+                \App\Models\CouponUsage::class,
+                \App\Models\Courier::class,
+                \App\Models\CourierCheckHistory::class,
+                \App\Models\CourierMethod::class,
+                \App\Models\CrmNote::class,
+                \App\Models\Currency::class,
+                \App\Models\CustomerGroup::class,
+                \App\Models\CustomerPaymentMethod::class,
+                \App\Models\CustomerReview::class,
+                \App\Models\Department::class,
+                \App\Models\DisposalType::class,
+                \App\Models\Domain::class,
+                \App\Models\DomainSetup::class,
+                \App\Models\EmailSend::class,
+                \App\Models\EmailSetting::class,
+                \App\Models\EmailTemplate::class,
+                \App\Models\EmailVerification::class,
+                \App\Models\Employee::class,
+                \App\Models\EmployeeSalary::class,
+                \App\Models\EmployeeType::class,
+                \App\Models\ExtraCategory::class,
+                \App\Models\ExtraOrderCharge::class,
+                \App\Models\FirebaseSetting::class,
+                \App\Models\FooterCode::class,
+                \App\Models\Gallery::class,
+                \App\Models\GeneratePayslip::class,
+                \App\Models\Holiday::class,
+                \App\Models\InventoryAudit::class,
+                \App\Models\InventoryAuditItem::class,
+                \App\Models\IpDirectory::class,
+                \App\Models\IpSetting::class,
+                \App\Models\JobTitle::class,
+                \App\Models\KnowledgeBase::class,
+                \App\Models\Label::class,
+                \App\Models\LabelParty::class,
+                \App\Models\LandingPage::class,
+                \App\Models\Lead::class,
+                \App\Models\LeadNote::class,
+                \App\Models\LeadSource::class,
+                \App\Models\LeadStatus::class,
+                \App\Models\LeaveApplication::class,
+                \App\Models\LeaveType::class,
+                \App\Models\Market::class,
+                \App\Models\MasterBrand::class,
+                \App\Models\MasterDemo::class,
+                \App\Models\MasterFeature::class,
+                \App\Models\MegaCategory::class,
+                \App\Models\MenuSetting::class,
+                \App\Models\Message::class,
+                \App\Models\MetaConversationState::class,
+                \App\Models\MiniCategory::class,
+                \App\Models\NoteTemplate::class,
+                \App\Models\OfficeLocation::class,
+                \App\Models\OmniSetting::class,
+                \App\Models\Order::class,
+                \App\Models\OrderDetail::class,
+                \App\Models\OrderNote::class,
+                \App\Models\OrderPayment::class,
+                \App\Models\OrderReturn::class,
+                \App\Models\OrderReturnDetail::class,
+                \App\Models\OrderReturnPayment::class,
+                \App\Models\Page::class,
+                \App\Models\Party::class,
+                \App\Models\PartyActivity::class,
+                \App\Models\PassChange::class,
+                \App\Models\PayHead::class,
+                \App\Models\PayRoll::class,
+                \App\Models\PayRollPayHead::class,
+                \App\Models\PaySlipManager::class,
+                \App\Models\PaymentMethodType::class,
+                \App\Models\PayrollPeriod::class,
+                \App\Models\PayrollSetting::class,
+                \App\Models\Payslip::class,
+                \App\Models\PayslipItem::class,
+                \App\Models\Period::class,
+                \App\Models\PeriodType::class,
+                \App\Models\Permission::class,
+                \App\Models\Position::class,
+                \App\Models\Product::class,
+                \App\Models\ProductGroup::class,
+                \App\Models\ProductReview::class,
+                \App\Models\ProductStockLedger::class,
+                \App\Models\ProductVariation::class,
+                \App\Models\ProductVariationAttribute::class,
+                \App\Models\ProductVariationStock::class,
+                \App\Models\ProductVariationStockLedger::class,
+                \App\Models\ProductView::class,
+                \App\Models\Purchase::class,
+                \App\Models\PurchaseDetail::class,
+                \App\Models\PurchasePayment::class,
+                \App\Models\PurchasePaymentReturn::class,
+                \App\Models\PurchaseReturn::class,
+                \App\Models\PurchaseReturnDetail::class,
+                \App\Models\QuikReply::class,
+                \App\Models\Quotation::class,
+                \App\Models\QuotationItem::class,
+                \App\Models\Rack::class,
+                \App\Models\RecurringJournal::class,
+                \App\Models\Rejoin::class,
+                \App\Models\ReminderLog::class,
+                \App\Models\ReminderSetting::class,
+                \App\Models\Requisition::class,
+                \App\Models\RequisitionDetail::class,
+                \App\Models\ResignRule::class,
+                \App\Models\Resignation::class,
+                \App\Models\Role::class,
+                \App\Models\SearchProduct::class,
+                \App\Models\SiteSetting::class,
+                \App\Models\Slider::class,
+                \App\Models\SmsSend::class,
+                \App\Models\SmsTemplate::class,
+                \App\Models\SmsWallet::class,
+                \App\Models\SocialSetting::class,
+                \App\Models\StatusMapping::class,
+                \App\Models\StockAdjustment::class,
+                \App\Models\StockAdjustmentItem::class,
+                \App\Models\StockMovement::class,
+                \App\Models\StockMovementItem::class,
+                \App\Models\StockMovementRequest::class,
+                \App\Models\StockMovementRequestItem::class,
+                \App\Models\SubCategory::class,
+                \App\Models\Subscription::class,
+                \App\Models\SupportDepartment::class,
+                \App\Models\SupportTicket::class,
+                \App\Models\SupportTicketReply::class,
+                \App\Models\SystemPage::class,
+                \App\Models\TaxGroup::class,
+                \App\Models\TaxRate::class,
+                \App\Models\TransactionExpense::class,
+                \App\Models\TransactionExpenseCategory::class,
+                \App\Models\TransactionIncome::class,
+                \App\Models\TransactionIncomeCategory::class,
+                \App\Models\TransactionJournal::class,
+                \App\Models\TransactionJournalAccount::class,
+                \App\Models\TransactionTransfer::class,
+                \App\Models\TransactionTransferDetails::class,
+                \App\Models\UpdgradePackageRequest::class,
+                \App\Models\User::class,
+                \App\Models\UserLoginHistory::class,
+                \App\Models\VariationGallery::class,
                 \App\Models\Warehouse::class,
+                \App\Models\Wishlist::class,
+                \App\Models\WocommerceSetting::class,
             ];
 
             foreach ($companyModels as $modelClass) {
@@ -502,7 +646,7 @@ class CompanyDeletionService
                 }
                 try {
                     $query = $this->getBaseQuery($modelClass)->where('company_id', $companyId);
-                    
+
                     $count = $this->deleteQuery($query, $modelClass);
                     $totalDeletedRows += $count;
                 } catch (\Throwable $e) {
@@ -530,7 +674,7 @@ class CompanyDeletionService
                 'force_deleted',
                 'company',
                 $companyId,
-                null, 
+                null,
                 "Permanently deleted company {$companyName} ({$filesDeleted} files removed from R2, {$totalDeletedRows} related rows removed)"
             );
 

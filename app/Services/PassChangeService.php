@@ -11,35 +11,32 @@ class PassChangeService
     /**
      * Update Password (ID-less approach)
      */
-    public function updatePass(array $data):PassChange
-    {
-        DB::beginTransaction();
-        try {
-            $password = PassChange::first();
+ public function updatePass(array $data)
+{
+    DB::beginTransaction();
+    try {
+        $user = auth()->user();
 
-            $hashedData = $data;
-            $hashedData['new_password'] = Hash::make($data['new_password']);
-
-            if (!$password) {
-                $password = PassChange::create($hashedData);
-            } else {
-                if (!Hash::check($data['current_password'], $password->new_password)) {
-                    throw ApiException::forbidden('Current password does not match.');
-                }
-                $password->update($hashedData);
-            }
-
-            LogHelper::updated('password', $password->id, $password->company_id, 'Password updated');
-            DB::commit();
-            return $password;
-
-        } catch (ApiException $e) {
-            DB::rollBack();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Actual Error: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to update password');
+        if (!Hash::check($data['current_password'], $user->password)) {
+            throw ApiException::forbidden('Current password does not match.');
         }
+
+        $user->update([
+            'password' => Hash::make($data['new_password']),
+        ]);
+
+        LogHelper::updated('user', $user->id, $user->company_id, 'Password updated');
+
+        DB::commit();
+        return $user;
+
+    } catch (ApiException $e) {
+        DB::rollBack();
+        throw $e;
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Actual Error: ' . $e->getMessage());
+        throw ApiException::serverError('Failed to update password');
     }
+}
 }

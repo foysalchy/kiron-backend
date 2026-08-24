@@ -17,28 +17,19 @@ class UpdatePasswordRequest extends UpdateBaseCompanyRequest
 
     public function rules(): array
     {
-        return array_merge(
-            $this->companyRules(),
-            [
-                'current_password' => ['required', 'string'],
-                'new_password'     => ['required', 'string', 'min:8'],
-                'confirm_password' => ['required', 'same:new_password'],
-            ]
-        );
+        return [
+            'current_password' => ['required', 'string'],
+            'new_password'      => ['required', 'string', 'min:8', 'confirmed'],
+        ];
     }
-    protected function passedValidation()
-    {
-        $this->merge([
-            'new_password' => Hash::make($this->new_password),
-        ]);
-    }
+
     public function messages(): array
     {
         return [
             'current_password.required' => 'Current password is required',
             'new_password.required'     => 'New password is required',
-            'new_password.min'          => 'Password must be at least 8 characters',
-            'confirm_password.same'     => 'Confirmation password does not match',
+            'new_password.min'          => 'New password must be at least 8 characters',
+            'new_password.confirmed'    => 'New password confirmation does not match',
         ];
     }
 

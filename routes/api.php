@@ -157,6 +157,7 @@ use App\Http\Controllers\Api\TransactionInternalTransferController;
 use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserPasswordController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseInventoryController;
 use App\Http\Controllers\Api\WocommerceSettingController;
@@ -191,8 +192,8 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/login', [AuthController::class, 'login']);
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('/customer-payment-methods/public', [CustomerPaymentMethodController::class, 'publicMethod']);
-    Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/auth/reset-password',  [AuthController::class, 'resetPassword']);
+    Route::post('/auth/forgot-password/request-otp', [AuthController::class, 'requestOtp']);
+    Route::post('auth/forgot-password/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::prefix('registration')->group(function () {
         Route::get('pricings', [CompanyRegistrationController::class, 'pricings']);
         Route::post('company', [CompanyRegistrationController::class, 'storeBasic']);
@@ -240,7 +241,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{id}/profile', [CompanyController::class, 'getProfile']);
         });
         Route::middleware('check.user.status:allow_pending')->group(function () {
-            
+
             Route::get('/dashboard/setup-progress', [SetupProgressController::class, 'getProgress']);
 
             Route::prefix('site-settings')->group(function () {
@@ -1591,6 +1592,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}', [UserController::class, 'destroy']);
                     Route::patch('/{id}/toggle-status', [UserController::class, 'toggleStatus']);
                 });
+                Route::post('users/{user}/password-change-request', [UserPasswordController::class, 'changePassword']);
                 Route::prefix('bulk')->group(function () {
                     Route::patch('{resource}/status', [BulkActionController::class, 'updateStatus']);
                     Route::delete('{resource}/delete', [BulkActionController::class, 'bulkDelete']);
@@ -1647,7 +1649,7 @@ Route::prefix('v1')->group(function () {
                     Route::post('/{id}/remove-user',  [RoleController::class, 'removeUser']);
                 });
 
-                    Route::get('/permissions', [PermissionController::class, 'index']);
+                Route::get('/permissions', [PermissionController::class, 'index']);
                 Route::get('/reports/profit-loss', [ProfitLossReportController::class, 'generate']);
                 Route::get('/reports/sales', [SalesReportController::class, 'generate']);
                 Route::get('/reports/product-wise-sales', [ProductWiseSalesReportController::class, 'generate']);
@@ -1661,7 +1663,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/dashboard/full-report', [DashboardController::class, 'fullReport']);
                 Route::get('/reports/balance-sheet', [BalanceSheetReportController::class, 'generate']);
                 Route::get('/reports/inventory-stock', [InventoryStockReportController::class, 'generate']);
-                
+
                 // AI Integration Routes
                 Route::get('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'show']);
                 Route::post('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'update']);
