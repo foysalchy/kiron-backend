@@ -458,7 +458,6 @@ class CompanyDeletionService
                 ->all();
 
             if (!empty($purchaseIds)) {
-                $totalDeletedRows += DB::table('purchase_items')->whereIn('purchase_id', $purchaseIds)->delete();
                 $totalDeletedRows += DB::table('purchase_details')->whereIn('purchase_id', $purchaseIds)->delete();
             }
 
