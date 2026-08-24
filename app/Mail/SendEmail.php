@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Services\TenantMailConfigurator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -9,34 +10,33 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendEmail extends Mailable
+class SendEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-
-    /**
-     * Create a new message instance.
-     */
     public function __construct(
         public string $subjectText,
-        public string $bodyContent)
-    {
+        public string $bodyContent,
+        public ?int $companyId = null,
+        public ?string $companyName = null,
+        public ?string $companyLogo = null,
+        public ?string $supportEmail = null,
+        public ?array $socials =[],
+    ) {
         //
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
+
+        if ($this->companyId) {
+            TenantMailConfigurator::applyForCompany($this->companyId);
+        }
         return new Envelope(
             subject: $this->subjectText,
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -44,11 +44,6 @@ class SendEmail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

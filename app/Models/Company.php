@@ -119,6 +119,12 @@ class Company extends Model
     {
         return $this->hasMany(Product::class);
     }
+  public function currentMonthlyUsage()
+{
+    return $this->hasOne(CompanyMonthlyUsage::class)
+                ->withoutGlobalScopes() 
+                ->where('year_month', now()->format('Y-m'));
+}
     public function coupons()
     {
         return $this->hasMany(Coupon::class);

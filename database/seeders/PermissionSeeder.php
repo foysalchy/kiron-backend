@@ -216,6 +216,7 @@ class PermissionSeeder extends Seeder
         $addCrud('site_settings',           'Site Settings',            'site_settings');
         $addCrud('settings_courier',        'Courier Settings',         'settings_courier');
         $addCrud('settings_payment',        'Payment Settings',         'settings_payment');
+        $addCrud('email_settings',        'Email Setting',         'email_settings');
         $addCrud('settings_roles',          'Role Settings',            'settings_roles');
         $addCrud('settings_domain',         'Domain Settings',          'custom_domain');
         $addCrud('settings_ip',             'IP Restriction Settings',  'ip_restriction');
@@ -229,7 +230,7 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_meta',         'Meta Settings',        'settings_meta');
         $addCrud('settings_menu',         'Menu Settings',        'settings_menu');
         $addCrud('settings_marketing',    'Marketing Settings',   'settings_marketing');
-        $addCrud('settings_ai',           'AI Integration Settings','settings_ai');
+        $addCrud('settings_ai',           'AI Integration Settings', 'settings_ai');
 
         //21. Subscriptions
         $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');

@@ -27,16 +27,15 @@ class CompanyService
                 'primaryUser',
                 'pricingPackage',
                 'currentSubscription.pricingPackage',
+                'currentMonthlyUsage',
                 // 'domainSetup' <- eager load remove kora holo
             ])
                 ->withCount([
-                    'products as product_used',
+                    'products as product_used' => fn($q) => $q->withoutGlobalScopes(),
                     'users as user_used',
-                    'orders as order_used' => fn($q) => $q
-                        ->where('type', Order::TYPE_SALES)
-                        ->whereMonth('created_at', now()->month)
-                        ->whereYear('created_at', now()->year),
-                    'domains as domain_used',
+
+                    'domains as domain_used' => fn($q) => $q->withoutGlobalScopes(),
+
                 ]);
 
             // Existing filters
@@ -137,7 +136,7 @@ class CompanyService
                 ->whereNotNull('verified_at')
                 ->get()
                 ->groupBy('company_id');
-            $result->each(function ($company) use ($domainSetups,$verifications) {
+            $result->each(function ($company) use ($domainSetups, $verifications) {
                 $company->setRelation(
                     'domainSetup',
                     $domainSetups->get($company->id)
