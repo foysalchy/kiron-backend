@@ -449,7 +449,6 @@ class CompanyDeletionService
                 ->all();
 
             if (!empty($orderIds)) {
-                $totalDeletedRows += DB::table('order_items')->whereIn('order_id', $orderIds)->delete();
                 $totalDeletedRows += DB::table('order_details')->whereIn('order_id', $orderIds)->delete();
             }
 
