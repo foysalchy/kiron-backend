@@ -9,10 +9,20 @@ class TenantMailConfigurator
 {
     public static function apply(): void
     {
-        $settings = EmailSetting::first(); // global scope already filters by company
+        $settings = EmailSetting::first(); // web request context, global scope
+        self::override($settings);
+    }
 
+    public static function applyForCompany(int $companyId): void
+    {
+        $settings = EmailSetting::where('company_id', $companyId)->first();
+        self::override($settings);
+    }
+
+    protected static function override(?EmailSetting $settings): void
+    {
         if (!$settings || !$settings->is_verified) {
-            return; // .env default e fall back hobe automatically
+            return; // .env default e fall back
         }
 
         Config::set('mail.mailers.smtp', [
@@ -21,7 +31,7 @@ class TenantMailConfigurator
             'port'       => $settings->mail_port,
             'encryption' => $settings->mail_encryption,
             'username'   => $settings->mail_username,
-            'password'   => $settings->mail_password, // decrypted automatically via cast
+            'password'   => $settings->mail_password,
         ]);
 
         Config::set('mail.from', [

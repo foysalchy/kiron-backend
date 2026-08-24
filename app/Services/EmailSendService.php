@@ -9,7 +9,9 @@ use App\Models\EmailSend;
 use App\Models\EmailTemplate;
 use App\Models\Party;
 use App\Enums\Status;
-use Illuminate\Support\Facades\{DB, Log, Mail};
+use App\Models\SiteSetting;
+use App\Models\SocialSetting;
+use Illuminate\Support\Facades\{DB, Log, Mail, Storage};
 
 class EmailSendService
 {
@@ -134,10 +136,61 @@ class EmailSendService
 
                 $successCount = 0;
                 $failedRecipients = [];
-                $companyName = auth()->user()?->company?->name
-                    ?? \App\Models\Company::find($data['company_id'] ?? null)?->name
-                    ?? 'dorja.io';
-                // 3. Queue emails — subject as-is, body personalized per recipient
+                $classToIconMap = [
+                    'fa-brands fa-facebook'   => 'facebook',
+                    'fa-brands fa-x-twitter'  => 'twitterx',
+                    'fa-brands fa-instagram'  => 'instagram',
+                    'fa-brands fa-linkedin'   => 'linkedin',
+                    'fa-brands fa-youtube'    => 'youtube',
+                    'fa-brands fa-tiktok'     => 'tiktok',
+                    'fa-brands fa-whatsapp'   => 'whatsapp',
+                    'fa-brands fa-telegram'   => 'telegram',
+                    'fa-brands fa-pinterest'  => 'pinterest',
+                    'fa-brands fa-github'     => 'github',
+                    'fa-brands fa-snapchat'   => 'snapchat',
+                    'fa-brands fa-discord'    => 'discord',
+                    'fa-brands fa-reddit'     => 'reddit',
+                    'fa-brands fa-dribbble'   => 'dribbble',
+                    'fa-brands fa-behance'    => 'behance',
+                    'fa-brands fa-vimeo'      => 'vimeo',
+                    'fa-brands fa-skype'      => 'skype',
+                    'fa-brands fa-slack'      => 'slack',
+                    'fa-brands fa-tumblr'     => 'tumblr',
+                ];
+
+                $setting = SiteSetting::first();
+                $socials = SocialSetting::where('status', Status::Active->value)
+                    ->get()
+                    ->map(function ($item) use ($classToIconMap) {
+                        $imageUrl = null;
+                        $class = trim($item->icon_class);
+
+                        if (!empty($item->icon_image)) {
+                            $imageUrl = url($item->icon_image);
+                        }
+                        elseif (!empty($class) && isset($classToIconMap[$class])) {
+                            $iconKey = $classToIconMap[$class];
+                            $themeColor = '13565e';
+                            $imageUrl = "https://img.icons8.com/ios-filled/48/{$themeColor}/{$iconKey}.png";
+                        }
+
+                        return [
+                            'icon_name'  => $item->icon_name,
+                            'icon_image' => $imageUrl,
+                            'link'       => $item->link,
+                        ];
+                    })
+                    ->filter(fn($item) => !empty($item['icon_image'])) 
+                    ->toArray();
+
+                $companyName = $setting->shop_name ?? "dorja.io";
+                $supportEmail = $setting->email ?? null;
+                $logo = $setting?->logo
+                    ? Storage::disk('r2')->url($setting->logo)
+                    : null;
+
+
+                $companyId = $setting->company_id;
                 foreach ($recipients as $index => $recipient) {
                     try {
                         $personalizedBody = $this->replacePlaceholder(
@@ -151,11 +204,19 @@ class EmailSendService
                             'company_name',
                             $companyName
                         );
+                        Log::info('Dispatching email', ['company_id' => $companyId]);
                         Mail::to($recipient['email'])->later(
                             now()->addSeconds($index * 3),
-                            new SendEmail($subject, $personalizedBody)
+                            new SendEmail(
+                                $subject,
+                                $personalizedBody,
+                                $companyId,
+                                $companyName,
+                                $logo,
+                                $supportEmail,
+                                $socials,
+                            )
                         );
-
                         $successCount++;
 
                         Log::info('Email queued successfully', [
@@ -225,7 +286,26 @@ class EmailSendService
             }
         });
     }
+    private function getIconUrlFromClass(?string $iconClass): ?string
+    {
+        if (empty($iconClass)) {
+            return null;
+        }
 
+        $cleanName = str_replace(['fa-brands', 'fa-solid', 'fa-regular', 'fa-square', 'fa-', '-f', ' '], '', $iconClass);
+        $cleanName = trim($cleanName, '- ');
+
+        $mapping = [
+            'linkedin-in' => 'linkedin',
+            'youtube-play' => 'youtube',
+            'paper-plane' => 'telegram',
+        ];
+
+        $iconName = $mapping[$cleanName] ?? $cleanName;
+        $themeColor = '13565e';
+
+        return "https://img.icons8.com/ios-filled/48/{$themeColor}/{$iconName}.png";
+    }
     /**
      * Order status change হলে automated email পাঠানো হয়।
      * Subject as-is যায় (placeholder replace হয় না)।
