@@ -4,6 +4,9 @@
 @endsection
 @push('styles')
     <style>
+        .p-0{
+            padding:0 !important
+        }
         @keyframes marqueeFast {
             0% {
                 transform: translateX(0);
@@ -282,9 +285,9 @@
         </div>
     </section>
     <!-- LATEST OFFERS SECTION  -->
-    <section class="p-0 container mx-auto   px-4 ">
+    <section class=" container mx-auto   px-4 ">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-4 tracking-tight">
             Latest Offers
         </h2>
 
