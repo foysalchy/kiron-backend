@@ -154,7 +154,7 @@
         </div>
 
         <!-- TICKER: Announcement Bar -->
-        <div class="mt-8 mb-10 overflow-hidden bg-white py-4 relative border-y border-gray-50">
+        <div class=" hidden mt-8 mb-10 overflow-hidden bg-white py-4 relative border-y border-gray-50">
             <div class="flex items-center whitespace-nowrap animate-marquee-fast hover:[animation-play-state:paused]">
                 <!-- Ticker Content -->
                 <div
@@ -248,7 +248,7 @@
         </div>
     </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
-   <section class="w-full mx-auto px-4">
+   <section class="w-full mx-auto px-4 mb-4">
     <div class="container mx-auto pt-0">
 
         <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-4">
@@ -291,7 +291,7 @@
 </section>
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
-    <section class=" container mx-auto   p-0  mt-4 ">
+    <section class=" container mx-auto   p-0  ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-4 tracking-tight">
             Latest Offers
