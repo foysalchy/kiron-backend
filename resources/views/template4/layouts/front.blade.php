@@ -10,7 +10,7 @@
 
     <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
+    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? ''}}">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"

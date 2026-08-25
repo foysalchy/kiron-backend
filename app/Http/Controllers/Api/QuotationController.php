@@ -145,9 +145,11 @@ class QuotationController extends Controller
             'status' => ['required'],
         ]);
 
-        $this->quotationService->bulkUpdateStatus($request->ids, (int)$request->status);
+        // ১. সার্ভিসের রিটার্ন করা ডাটা ভেরিয়েবলে রাখুন
+        $data = $this->quotationService->bulkUpdateStatus($request->ids, (int)$request->status);
 
-        return ResponseHelper::success(null, 'Quotations status updated successfully');
+        // ২. null এর জায়গায় $data পাঠিয়ে দিন
+        return ResponseHelper::success($data, 'Quotations status updated successfully');
     }
 
     /**

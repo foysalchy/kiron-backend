@@ -44,7 +44,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
     <meta name="keywords" content="{{ $keywords }}">
 @endif
 
-<meta name="author" content="{{ $setup->shop_name }}">
+<meta name="author" content="{{ $setup->shop_name ?? ''}}">
 <link rel="canonical" href="{{ $canonical }}">
 
 {{-- Open Graph --}}
@@ -53,7 +53,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta property="og:description" content="{{ $description }}">
 <meta property="og:url" content="{{ $canonical }}">
 <meta property="og:image" content="{{ $image }}">
-<meta property="og:site_name" content="{{ $setup->shop_name }}">
+<meta property="og:site_name" content="{{ $setup->shop_name ?? ''}}">
 <meta property="og:locale" content="en_US">
 
 {{-- Twitter --}}
@@ -67,21 +67,21 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {!! json_encode([
     '@context'=>'https://schema.org',
     '@type'=>'Organization',
-    'name'=>$setup->shop_name,
+    'name'=>$setup->shop_name ?? '',
     'url'=>url('/'),
     'logo'=>$organizationLogo,
-    'email'=>$setup->email,
-    'telephone'=>$setup->phone,
-    'foundingDate'=>$setup->established,
+    'email'=>$setup->email ?? '',
+    'telephone'=>$setup->phone ?? '',
+    'foundingDate'=>$setup->established ?? '',
     'sameAs'=>$socialLinks,
     'founder'=>[
         '@type'=>'Person',
-        'name'=>$setup->founder_name,
-        'jobTitle'=>$setup->founder_designation
+        'name'=>$setup->founder_name ?? '',
+        'jobTitle'=>$setup->founder_designation ?? ''
     ],
     'address'=>[
         '@type'=>'PostalAddress',
-        'streetAddress'=>$setup->store_address ?: $setup->corporate_address,
+        'streetAddress'=> ($setup?->store_address ?: $setup?->corporate_address) ?? '',
         'addressCountry'=>'BD'
     ]
 ],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
@@ -92,7 +92,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {!! json_encode([
     '@context'=>'https://schema.org',
     '@type'=>'WebSite',
-    'name'=>$setup->shop_name,
+    'name'=>$setup->shop_name ?? '',
     'url'=>url('/')
 ],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
 </script>
