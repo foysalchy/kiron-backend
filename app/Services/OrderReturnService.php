@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order, Product, ProductStockLedger, ProductVariationStockLedger};
+use App\Models\{OrderReturn, OrderReturnDetail, OrderReturnPayment, Order, Party, Product, ProductStockLedger, ProductVariationStockLedger};
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
@@ -128,9 +128,12 @@ class OrderReturnService
             $totals = $this->calculateTotals($items, $data);
             $data = array_merge($data, $totals);
 
-            // Calculate refund amount
-            $data['refund_amount'] = $totals['grand_total'];
+            $refundAmount = round((float) ($data['refund_amount'] ?? 0), 2);
+            $paymentsTotal = round(array_sum(array_column($payments, 'amount')), 2);
 
+            if ($paymentsTotal > $refundAmount) {
+                throw ApiException::badRequest('Payment total cannot exceed refund amount');
+            }
 
             // Create order return (return_no auto-generated)
             $orderReturn = OrderReturn::create($data);
@@ -169,7 +172,16 @@ class OrderReturnService
                     ]);
                 }
             }
+            if ($orderReturn->status == Status::Cleared->value && $refundAmount > 0) {
+                $unpaidRefund = round($refundAmount - $paymentsTotal, 2);
 
+
+                if ($unpaidRefund > 0) {
+                    if ($order->customer_id) {
+                        Party::where('id', $order->customer_id)->increment('balance', $unpaidRefund);
+                    }
+                }
+            }
             DB::commit();
 
             Log::info('Order return created successfully', [
@@ -211,7 +223,8 @@ class OrderReturnService
             }
 
             $items = $data['items'] ?? null;
-            unset($data['items']);
+            $payments = $data['payments'] ?? null;
+            unset($data['items'], $data['payments']);
 
             // If items provided, recalculate totals
             if ($items) {
@@ -220,7 +233,7 @@ class OrderReturnService
 
                 // Delete old details and create new ones
                 $orderReturn->orderReturnDetails()->delete();
-                $data['refund_amount'] = $totals['grand_total'];
+
 
                 foreach ($items as $item) {
                     $itemTotal = $this->calculateItemTotal($item);
@@ -239,6 +252,43 @@ class OrderReturnService
                 }
             }
 
+            // If payments provided, replace old payments and adjust wallet balance
+            if ($payments !== null) {
+                $refundAmount = round((float) ($data['refund_amount'] ?? $orderReturn->refund_amount), 2);
+                $newPaymentsTotal = round(array_sum(array_column($payments, 'amount')), 2);
+
+                if ($newPaymentsTotal > $refundAmount) {
+                    throw ApiException::badRequest('Payment total cannot exceed refund amount');
+                }
+
+                // Reverse the balance effect of the OLD payments (addPayment had decremented balance per payment)
+                $oldPaymentsTotal = round(
+                    (float) $orderReturn->orderReturnPayments()->sum('amount'),
+                    2
+                );
+                if ($orderReturn->customer_id && $oldPaymentsTotal > 0) {
+                    Party::where('id', $orderReturn->customer_id)->increment('balance', $oldPaymentsTotal);
+                }
+
+                // Delete old payments and create new ones
+                $orderReturn->orderReturnPayments()->delete();
+
+                foreach ($payments as $payment) {
+                    OrderReturnPayment::create([
+                        'order_return_id' => $orderReturn->id,
+                        'amount' => $payment['amount'],
+                        'payment_method' => $payment['payment_method'],
+                        'reference_no' => $payment['reference_no'] ?? null,
+                        'note' => $payment['note'] ?? null,
+                    ]);
+                }
+
+                // Apply the balance effect of the NEW payments
+                if ($orderReturn->customer_id && $newPaymentsTotal > 0) {
+                    Party::where('id', $orderReturn->customer_id)->decrement('balance', $newPaymentsTotal);
+                }
+            }
+
             $orderReturn->update($data);
 
             DB::commit();
@@ -253,6 +303,7 @@ class OrderReturnService
                 'orderReturnDetails.product',
                 'orderReturnDetails.variation.attributes.attributeGroup',
                 'orderReturnDetails.variation.attributes.attributeValue',
+                'orderReturnPayments'
             ]);
         } catch (ApiException $e) {
             DB::rollBack();
@@ -276,6 +327,21 @@ class OrderReturnService
             $orderReturn = $this->getOrderReturnById($id);
             $oldStatus = $orderReturn->status;
 
+            // Block Cleared unless refund amount is fully paid
+            if ($status === Status::Cleared->value) {
+                $refundAmount = round((float) $orderReturn->refund_amount, 2);
+                $paymentsTotal = round(
+                    (float) $orderReturn->orderReturnPayments()->sum('amount'),
+                    2
+                );
+
+                if ($paymentsTotal < $refundAmount) {
+                    throw ApiException::badRequest(
+                        'Cannot mark as Cleared: refund amount is not fully paid (paid ' . $paymentsTotal . ' of ' . $refundAmount . ')'
+                    );
+                }
+            }
+
             // If changing from non-cleared to cleared, add stock
             if ($oldStatus !== Status::Cleared->value && $status === Status::Cleared->value) {
                 $this->addReturnedStockToWarehouse($orderReturn);
@@ -290,7 +356,6 @@ class OrderReturnService
             $orderReturn->update([
                 'status' => $getStatus->value
             ]);
-
 
             DB::commit();
 
@@ -322,21 +387,23 @@ class OrderReturnService
         try {
             $orderReturn = $this->getOrderReturnById($id);
 
-            // Cannot add payment to cancelled return
             if ($orderReturn->isCancelled()) {
                 throw ApiException::badRequest('Cannot add payment to cancelled return');
             }
 
-            // Create payment
+            $amount = round((float) $paymentData['amount'], 2);
+
             OrderReturnPayment::create([
                 'order_return_id' => $id,
-                'amount' => $paymentData['amount'],
+                'amount' => $amount,
                 'payment_method' => $paymentData['payment_method'],
                 'reference_no' => $paymentData['reference_no'] ?? null,
                 'note' => $paymentData['note'] ?? null,
             ]);
 
-
+            if ($orderReturn->customer_id && $amount > 0) {
+                Party::where('id', $orderReturn->customer_id)->decrement('balance', $amount);
+            }
 
             DB::commit();
 
@@ -372,33 +439,51 @@ class OrderReturnService
         try {
             $orderReturn = $this->getOrderReturnById($id);
 
-            // Cannot add payment to cancelled return
+            // Cannot modify refund amount on cancelled return
             if ($orderReturn->isCancelled()) {
-                throw ApiException::badRequest('Cannot modify refund amount to cancelled return');
+                throw ApiException::badRequest('Cannot modify refund amount on cancelled return');
             }
             if ($orderReturn->isCleared()) {
-                throw ApiException::badRequest('Cannot modify refund amount to cleared return');
+                throw ApiException::badRequest('Cannot modify refund amount on cleared return');
             }
 
+            $newAmount = round((float) $amount['amount'], 2);
+
+            if ($newAmount <= 0) {
+                throw ApiException::badRequest('Refund amount must be greater than zero');
+            }
+
+            // New refund amount cannot be less than what's already been paid
+            $paidSoFar = round(
+                (float) $orderReturn->orderReturnPayments()->sum('amount'),
+                2
+            );
+
+            if ($newAmount < $paidSoFar) {
+                throw ApiException::badRequest(
+                    'Refund amount cannot be less than the amount already paid (' . $paidSoFar . ')'
+                );
+            }
 
             $oldAmount = $orderReturn->refund_amount;
-            $orderReturn->refund_amount = $amount['amount'];
+            $orderReturn->refund_amount = $newAmount;
             $orderReturn->update();
-            LogHelper::custom('modify_refund_amount', 'order_return', $id, $orderReturn->company_id, $orderReturn->return_no . ' modify refund amount ' . $oldAmount . ' to ' .  $amount['amount']);
+
+            LogHelper::custom('modify_refund_amount', 'order_return', $id, $orderReturn->company_id, $orderReturn->return_no . ' modify refund amount ' . $oldAmount . ' to ' . $newAmount);
 
             DB::commit();
 
-            Log::info('Payment added to return', ['order_return_id' => $id]);
+            Log::info('Refund amount modified', ['order_return_id' => $id]);
 
-            return $orderReturn;
+            return $orderReturn->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Log::error('Add payment failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to add payment');
+            Log::error('Modify refund amount failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to modify refund amount');
         }
     }
 
@@ -530,6 +615,15 @@ class OrderReturnService
     private function addReturnedStockToWarehouse(OrderReturn $orderReturn): void
     {
         foreach ($orderReturn->orderReturnDetails as $detail) {
+            $product = $detail->product ?? Product::find($detail->product_id);
+
+            if (!$product || !$product->manage_stock) {
+                Log::info('Skipping return stock addition: manage_stock is off', [
+                    'order_return_id' => $orderReturn->id,
+                    'product_id' => $detail->product_id,
+                ]);
+                continue;
+            }
             $stockData = [
                 'warehouse_id' => $orderReturn->warehouse_id,
                 'bin_id' => null,
@@ -565,6 +659,15 @@ class OrderReturnService
     private function removeReturnedStockFromWarehouse(OrderReturn $orderReturn): void
     {
         foreach ($orderReturn->orderReturnDetails as $detail) {
+            $product = $detail->product ?? Product::find($detail->product_id);
+
+            if (!$product || !$product->manage_stock) {
+                Log::info('Skipping return stock addition: manage_stock is off', [
+                    'order_return_id' => $orderReturn->id,
+                    'product_id' => $detail->product_id,
+                ]);
+                continue;
+            }
             $stockData = [
                 'warehouse_id' => $orderReturn->warehouse_id,
                 'bin_id' => null,

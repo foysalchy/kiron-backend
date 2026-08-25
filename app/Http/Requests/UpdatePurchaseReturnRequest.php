@@ -44,8 +44,16 @@ class UpdatePurchaseReturnRequest extends UpdateBaseCompanyRequest
                 'discount_on_all' => ['nullable', 'numeric', 'min:0'],
                 'coupon_discount' => ['nullable', 'numeric', 'min:0'],
                 'round_off' => ['nullable', 'numeric'],
+           
+                'payments' => ['nullable', 'array'],
+                'payments.*.amount' => ['required_with:payments', 'numeric', 'min:0'],
+                'payments.*.payment_method' => ['required_with:payments', 'string', 'in:cash,card,bank,mobile_banking,cheque'],
+                'payments.*.reference_no' => ['nullable', 'string'],
+                'payments.*.note' => ['nullable', 'string'],
+
                 'note' => ['nullable', 'string'],
-                'status' => ['sometimes', 'integer'],
+                'status' => ['nullable'],
+                'refund_amount' => ['nullable'],
             ]
         );
     }

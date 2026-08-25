@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Exceptions\ApiException;
 use App\Models\DomainSetup;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,17 +22,14 @@ class FileUploadHelper
         try {
             $companyId = auth()->user()->company_id;
 
-    
-            $domainSetup = DomainSetup::where('company_id', $companyId)->first();
 
-            $prefix = $domainSetup->prefix ?? 'default';
 
+            $prefix = self::getCompanyPrefix($companyId);
             // shop_1, shop_2 ... এভাবে company-wise folder
             $companyFolder = "{$prefix}_{$companyId}";
 
             // caller যে folder পাঠাবে (e.g. 'products', 'avatars') সেটা company folder-এর ভিতরে যাবে
             $fullFolder = "{$companyFolder}/{$folder}";
-
             if ($preserveName) {
                 $fileName = $file->getClientOriginalName();
                 return $file->storeAs($fullFolder, $fileName, $disk);
@@ -260,5 +258,12 @@ class FileUploadHelper
             Log::error('Multiple files deletion failed', ['error' => $e->getMessage()]);
             return false;
         }
+    }
+    protected static function getCompanyPrefix(int $companyId): string
+    {
+        return Cache::rememberForever("domain_prefix_company_{$companyId}", function () use ($companyId) {
+            $domainSetup = DomainSetup::where('company_id', $companyId)->first();
+            return $domainSetup->prefix ?? 'default';
+        });
     }
 }
