@@ -120,13 +120,13 @@
 
             <!-- LEFT: Dynamic Swiper Slider -->
             <div class="lg:col-span-3 relative group overflow-hidden shadow-lg">
-                <div class="swiper mainHeroSwiper w-full h-[300px] md:h-[450px] lg:h-[450px]">
+                <div class="swiper mainHeroSwiper w-full h-auto">
                     <div class="swiper-wrapper">
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
                                     <img src="{{ $slider->image_url ?? ''}}"
-                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}" height="400" width="1200"
+                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}"  
                                         class="w-full h-full object-cover" @if ($loop->first) fetchpriority="high"
                                         loading="eager" @else loading="lazy" @endif />
                                 </a>
@@ -224,7 +224,7 @@
                     <div
                         class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
 
-                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-4' : 'mt-4' }}">
+                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
                             @if($category->image_url)
                             <img src="{{ $category->image_url }}" height="64" width="64" aria-label="category image"
                                 loading="lazy" alt="{{ $category->name }}" class="w-full h-full object-contain">
@@ -248,10 +248,10 @@
         </div>
     </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
-   <section class="w-full mx-auto px-4 mb-4">
-    <div class="container mx-auto pt-0">
+   <section class="w-full mx-auto px-4 mb-6">
+    <div class="container mx-auto p-0">
 
-        <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-4">
+          <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight mt-6 text-center">
             Product Categories
         </h2>
 
@@ -293,7 +293,7 @@
      @if($latestOffers->isNotEmpty())
     <section class=" container mx-auto   p-0  ">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-4 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
             Latest Offers
         </h2>
 
@@ -348,7 +348,7 @@
     <section class="w-full bg-[#fcfcfc] px-4">
         <div class="p-0 container mx-auto  ">
             <!-- Section Title -->
-            <h2 class="text-2xl font-semibold text-[#041533] mb-4 tracking-tight">
+            <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight">
                 Our Featured Products
             </h2>
 
@@ -363,9 +363,9 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="p-0 container mx-auto   px-4 ">
+    <section class="p-0 container mx-auto   px-4 mb-6">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-6 tracking-tight">
             New Arrival
         </h2>
 
@@ -416,8 +416,8 @@
                 <div
                     class="prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold
-                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
-                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-6
+                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-6
                     prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
 
                     {!! $homePageData->description !!}

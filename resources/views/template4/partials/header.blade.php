@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div class="header-custom-bg text-header py-4 px-4 md:px-10 border-b border-[var(--primary-color)]">
+    <div class="header-custom-bg text-header py-4 px-4 md:px-10  ">
         <div class="container mx-auto flex items-center justify-between gap-4">
             <button id="menu-toggle" aria-label="Open Menu" class="lg:hidden text-2xl focus:outline-none"
                 aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-sidebar">
