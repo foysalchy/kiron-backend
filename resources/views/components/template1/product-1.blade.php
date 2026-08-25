@@ -60,10 +60,10 @@
     <!-- Info Area -->
     <div class="flex flex-col flex-grow">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
-             <p
+            <p
                 class="hind-siliguri-medium md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
-</p>
+            </p>
         </a>
 
         @php
@@ -88,16 +88,25 @@
     <div class="mt-auto pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
             <span class="text-lg font-bold text-brand text-primary">
-                {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+                @if(($setup->currency_position ?? 'left') == 'left')
+                    {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+                @else
+                    {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }} {{ $setup->currency }}
+                @endif
             </span>
+
             @if ($regularPrice > $salePrice)
                 <span class="text-xs text-gray-600 line-through">
-                    {{ $setup->currency }} {{ number_format($regularPrice) }}
+                    @if(($setup->currency_position ?? 'left') == 'left')
+                        {{ $setup->currency }} {{ number_format($regularPrice) }}
+                    @else
+                        {{ number_format($regularPrice) }} {{ $setup->currency }}
+                    @endif
                 </span>
             @endif
         </div>
         @php
-    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
+            $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
         @endphp
 
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
@@ -200,14 +209,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -237,14 +246,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {

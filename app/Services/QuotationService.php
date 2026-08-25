@@ -523,7 +523,7 @@ class QuotationService
     /**
      * Bulk update status for multiple quotations
      */
-    public function bulkUpdateStatus(array $ids, int $status): void
+    public function bulkUpdateStatus(array $ids, int $status): Collection
     {
         DB::beginTransaction();
 
@@ -534,6 +534,9 @@ class QuotationService
 
             DB::commit();
             Log::info('Quotations bulk status updated', ['ids' => $ids, 'status' => $status]);
+
+            // ফিক্স: আপডেট হওয়া ডাটাগুলো ডাটাবেজ থেকে নিয়ে রিটার্ন করুন
+            return Quotation::whereIn('id', $ids)->get();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Bulk status update failed: ' . $e->getMessage());

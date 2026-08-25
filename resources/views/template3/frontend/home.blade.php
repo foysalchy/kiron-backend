@@ -40,6 +40,7 @@
         </div>
     </section>
     <!-- 2. SHOP BY CATEGORY (Sub-Category Grid Layout) -->
+     @if ($categories->isNotEmpty())
     <section class="py-12 md:py-20 container mx-auto px-4 lg:px-0">
         <!-- Section Heading -->
         <div class="flex items-center justify-center gap-4 mb-12">
@@ -94,6 +95,7 @@
         </a>
     </div> --}}
     </section>
+    @endif
     <!-- CATEGORY WISE PRODUCT FILTER SECTION -->
     @foreach ($categories->take(3) as $megaCat)
         @php
@@ -147,7 +149,50 @@
             </section>
         @endif
     @endforeach
+ <!-- PRODUCT GROUPS SECTION -->
+    @foreach ($productGroups as $group)
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6 relative">
 
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">{{ $group->name }}</h2>
+                    <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
+                        <button
+                            class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
+                    </a>
+                </div>
+
+                <!-- Carousel Wrapper -->
+                <div class="relative">
+                    <!-- Left Arrow -->
+                    <button onclick="scrollGroup('track-{{ $group->id }}', -280)" aria-label="Scroll left"
+                        class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+
+                    <!-- Track: ID -->
+                    <div id="track-{{ $group->id }}"
+                        class="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
+                        style="-ms-overflow-style:none; scrollbar-width:none;">
+                        @foreach ($group->products as $product)
+                            <div class="flex-shrink-0 w-[165px] md:w-[350px] h-auto">
+                                <x-template1.product-card :product="$product" />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Right Arrow -->
+                    <button onclick="scrollGroup('track-{{ $group->id }}', 280)" aria-label="Scroll right"
+                        class="cursor-pointer hidden md:flex absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    @endforeach
     <!-- Latest Products SECTION -->
     <section class="py-10 md:py-16 container mx-auto px-4 lg:px-0">
         <!-- Header: Title left, View All right, and a Border bottom -->
