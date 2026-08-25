@@ -20,11 +20,22 @@ class AttendanceService
         try {
             $query = Attendance::with(['employee.department', 'employee.jobTitle', 'employee.employeeType', 'employee.officeLocation']);
 
-            $date = $filters['date'] ?? now()->toDateString();
-            $query->whereDate('date', $date);
+            // Date filtering: range takes priority over single date
+            if (!empty($filters['date_from']) && !empty($filters['date_to'])) {
+                $query->whereDate('date', '>=', $filters['date_from'])
+                      ->whereDate('date', '<=', $filters['date_to']);
+            } elseif (!empty($filters['date'])) {
+                $query->whereDate('date', $filters['date']);
+            } else {
+                $query->whereDate('date', now()->toDateString());
+            }
 
             if (!empty($filters['department_id'])) {
                 $query->whereHas('employee', fn($q) => $q->where('department_id', $filters['department_id']));
+            }
+
+            if (!empty($filters['employee_id'])) {
+                $query->where('employee_id', $filters['employee_id']);
             }
 
             if (isset($filters['status'])) {

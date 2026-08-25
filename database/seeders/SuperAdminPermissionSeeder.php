@@ -58,6 +58,7 @@ class SuperAdminPermissionSeeder extends Seeder
 
         // ── HRM & Payroll ──────────────────────────────────
         $addCrud('hrm_departments',          'HRM Departments');
+        $addViewOnly('hrm_dashboard',        'HRM Dashboard');
         $addCrud('hrm_employees',            'HRM Employees');
         $addCrud('hrm_attendances',          'HRM Attendances');
         $addCrud('hrm_holidays',             'HRM Holidays');

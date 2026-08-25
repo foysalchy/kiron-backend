@@ -71,7 +71,7 @@ class EmployeeService
      */
     public function getEmployeeById(int $id): Employee
     {
-        $employee = Employee::find($id);
+        $employee = Employee::with(['department', 'jobTitle', 'officeLocation', 'employeeType'])->find($id);
 
         if (!$employee) {
             throw ApiException::notFound('Employee');

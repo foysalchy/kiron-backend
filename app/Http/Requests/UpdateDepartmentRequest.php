@@ -29,7 +29,7 @@ class UpdateDepartmentRequest extends UpdateBaseCompanyRequest
             'code'              => ['sometimes', 'required', 'string', 'max:50'],
             'parent_department' => ['nullable', 'string', 'max:255'],
             'in_charge'         => ['nullable', 'string', 'max:255'],
-            'description'       => ['sometimes', 'required', 'string'],
+            'description'       => ['nullable', 'string'],
             'status'            => ['sometimes', 'integer', 'in:0,1'],
         ]);
     }
@@ -40,7 +40,6 @@ class UpdateDepartmentRequest extends UpdateBaseCompanyRequest
             [
                 'name.required'        => 'Department name is required',
                 'code.required'        => 'Department code is required',
-                'description.required' => 'A brief description is required',
             ]
         );
     }

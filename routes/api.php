@@ -845,6 +845,8 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}/force', [JobTitleController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [JobTitleController::class, 'toggleStatus']);
                 });
+                Route::get('/hrm-dashboard', [\App\Http\Controllers\Api\HrmDashboardController::class, 'index']);
+
                 // department Routes
                 Route::prefix('departments')->group(function () {
                     Route::get('/', [DepartmentController::class, 'index']);

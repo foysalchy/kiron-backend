@@ -150,6 +150,7 @@ class PermissionSeeder extends Seeder
         // 12. HRM
         // ==========================================
         $addCrud('hrm_departments',         'HRM Departments',          'hrm_module');
+        $addViewOnly('hrm_dashboard',       'HRM Dashboard',            'hrm_module');
         $addCrud('hrm_employees',           'HRM Employees',            'hrm_module');
         $addCrud('hrm_attendances',         'HRM Attendances',          'hrm_module');
         $addCrud('hrm_holidays',            'HRM Holidays',             'hrm_module');

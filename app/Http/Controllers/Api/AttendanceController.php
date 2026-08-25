@@ -20,6 +20,9 @@ class AttendanceController extends Controller
     {
         $filters = [
             'date'           => $request->query('date'),
+            'date_from'      => $request->query('date_from'),
+            'date_to'        => $request->query('date_to'),
+            'employee_id'    => $request->query('employee_id'),
             'department_id'  => $request->query('department_id'),
             'status'         => $request->query('status'),
             'search'         => $request->query('search'),

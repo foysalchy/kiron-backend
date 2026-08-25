@@ -29,7 +29,7 @@ class StoreDepartmentRequest extends BaseCompanyRequest
             'code'              => ['required', 'string', 'max:50'],
             'parent_department' => ['nullable', 'string', 'max:255'],
             'in_charge'         => ['nullable', 'string', 'max:255'],
-            'description'       => ['required', 'string'],
+            'description'       => ['nullable', 'string'],
             'status'            => ['nullable', 'integer', 'in:0,1'],
         ]);
     }
@@ -38,7 +38,7 @@ class StoreDepartmentRequest extends BaseCompanyRequest
         return array_merge($this->companyMessages(), [
             'name.required'        => 'Department name is required.',
             'code.required'        => 'Department code is required.',
-            'description.required' => 'Department description is required.',
+
         ]);
     }
 
