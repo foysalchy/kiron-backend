@@ -243,10 +243,11 @@
 
 
   @foreach ($productGroups as $group)
-        <section class="mb-12 container mx-auto px-4 lg:px-0">
+        <section class=" px-4  ">
+            <div class="mb-12 container mx-auto p-0">
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
-                  <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight">
+                  <h2 class="text-2xl font-semibold text-[#041533]  tracking-tight">
               {{ $group->name }}
             </h2>
                
@@ -279,12 +280,12 @@
                         class="flex bg-white border border-gray-200 rounded-lg p-3 md:p-4 hover:shadow-md transition-all group">
                         <!-- Left: Product Image -->
                         <div
-                            class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
+                            class="w-[110px] md:w-[75px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ route('product.details', $product->slug) }}" class="block w-full h-full">
                               <img
                                     src="{{ $product->thumbnail_url }}"
                                     alt="{{ $product->title }}"
-                                    class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500 p-2"
+                                    class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500  "
                                 >
                             </a>
                         </div>
@@ -318,16 +319,11 @@
                             </div>
 
                             <!-- Button -->
-                            <div class=" ">
-                                <a href="{{ route('product.details', $product->slug) }}"
-                                    class="block w-full text-center primary-bg text-primary py-2 rounded-full font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
-                                    Order Now
-                                </a>
-                            </div>
+                            
                         </div>
                     </div>
                 @endforeach
-            </div>
+            </div></div>
         </section>
     @endforeach
     
