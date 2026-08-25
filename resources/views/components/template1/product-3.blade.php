@@ -27,12 +27,13 @@
 
     <div class="relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
-           class="hover:border-2 hover:border-[var(--primary-color)] product-card-notch relative block  border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
+           class="hover:border-2 hover:border-[var(--primary-color)]   relative block  border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
             <div class="w-full h-full  flex items-center justify-center">
                 <img
                     src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
-                    alt="{{ $product->title }}" height="300" width="300" loading="lazy"
-                    class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-110"
+                    alt="{{ $product->title }}"
+                    loading="lazy"
+                    class="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110"
                 />
             </div>
         </a>
@@ -58,7 +59,7 @@
 </p>
         </a>
 
-        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1 ">
+        <div class="flex flex-wrap items-center gap-x-2 gap-y-1 ">
             <div class="flex items-center gap-2">
                 <span class="text-[#005c7a] text-lg md:text-xl font-black font-semibold ">
                     {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
