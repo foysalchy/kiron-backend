@@ -243,10 +243,13 @@
 
 
   @foreach ($productGroups as $group)
-        <section class="py-8 md:py-12 container mx-auto px-4 lg:px-0">
+        <section class="mb-12 container mx-auto px-4 lg:px-0">
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[#016738]">{{ $group->name }}</h2>
+                  <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight">
+              {{ $group->name }}
+            </h2>
+               
                     <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
                         <button
                             class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
@@ -278,8 +281,11 @@
                         <div
                             class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ route('product.details', $product->slug) }}" class="block w-full h-full">
-                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
-                                    class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
+                              <img
+                                    src="{{ $product->thumbnail_url }}"
+                                    alt="{{ $product->title }}"
+                                    class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500 p-2"
+                                >
                             </a>
                         </div>
 
@@ -314,8 +320,8 @@
                             <!-- Button -->
                             <div class="mt-3">
                                 <a href="{{ route('product.details', $product->slug) }}"
-                                    class="block w-full text-center primary-bg text-primary py-2 rounded font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
-                                    পণ্য দেখুন
+                                    class="block w-full text-center primary-bg text-primary py-2 rounded-full font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
+                                    Order Now
                                 </a>
                             </div>
                         </div>
