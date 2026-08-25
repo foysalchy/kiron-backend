@@ -248,7 +248,7 @@
         </div>
     </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
-   <section class="w-full mx-auto px-4 mb-6">
+   <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
 
           <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight mt-6 text-center">
@@ -363,9 +363,9 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="p-0 container mx-auto   px-4 mb-6">
+    <section class="p-0 container mx-auto   px-4 mb-12">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-6 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-12 tracking-tight">
             New Arrival
         </h2>
 
