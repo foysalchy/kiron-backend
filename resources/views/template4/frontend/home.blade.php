@@ -318,7 +318,7 @@
                             </div>
 
                             <!-- Button -->
-                            <div class="mt-3">
+                            <div class=" ">
                                 <a href="{{ route('product.details', $product->slug) }}"
                                     class="block w-full text-center primary-bg text-primary py-2 rounded-full font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
                                     Order Now
