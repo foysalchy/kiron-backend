@@ -363,7 +363,8 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="p-0 container mx-auto   px-4 mb-12">
+    <section class="px-4 mb-12">
+        <div class="p-0 container mx-auto   ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-12 tracking-tight">
             New Arrival
@@ -407,7 +408,7 @@
                     </div>
                 </a>
             @endforeach
-        </div>
+        </div></div>
     </section>
     <!-- ABOUT / SEO TEXT SECTION -->
     @if($homePageData->description)
