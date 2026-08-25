@@ -165,7 +165,7 @@
 
     <!-- Featured Products Loop -->
     <section class="w-full bg-[#fcfcfc] px-4">
-        <div class="container mx-auto  ">
+        <div class="p-0 container mx-auto  ">
             <h2 class="text-2xl font-semibold text-[#041533] mb-12 tracking-tight">Our Featured Products</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 @foreach($relatedProducts->take(4) as $product)

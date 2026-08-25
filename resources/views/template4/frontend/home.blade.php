@@ -193,7 +193,7 @@
     </section>
     {{-- <!-- PRODUCT CATEGORIES SECTION -->
     <section class="w-full mx-auto bg-[#fcfcfc] px-4 ">
-        <div class="container mx-auto  ">
+        <div class="p-0 container mx-auto  ">
             <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
                 Product Categories
             </h2>
@@ -282,7 +282,7 @@
         </div>
     </section>
     <!-- LATEST OFFERS SECTION  -->
-    <section class="container mx-auto   px-4 ">
+    <section class="p-0 container mx-auto   px-4 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             Latest Offers
@@ -336,7 +336,7 @@
     </section>
     <!-- OUR FEATURED PRODUCTS SECTION -->
     <section class="w-full bg-[#fcfcfc] px-4">
-        <div class="container mx-auto  ">
+        <div class="p-0 container mx-auto  ">
             <!-- Section Title -->
             <h2 class="text-2xl font-semibold text-[#041533] mb-4 tracking-tight">
                 Our Featured Products
@@ -353,7 +353,7 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="container mx-auto   px-4 ">
+    <section class="p-0 container mx-auto   px-4 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 md:mb-10 tracking-tight">
             New Arrival
@@ -402,7 +402,7 @@
     <!-- ABOUT / SEO TEXT SECTION -->
     @if($homePageData->description)
         <section class="w-full bg-[#fcfcfc] px-4 font-manrope">
-            <div class="container mx-auto  ">
+            <div class="p-0 container mx-auto  ">
                 <div
                     class="prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold
