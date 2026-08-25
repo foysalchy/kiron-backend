@@ -248,44 +248,50 @@
         </div>
     </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
-    <section class="w-full mx-auto  px-4">
-        <div class="container mx-auto py-0">
-            <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-4">
-                Product Categories
-            </h2>
+   <section class="w-full mx-auto px-4">
+    <div class="container mx-auto pt-0">
 
-            <!-- Categories Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                @foreach ($headerCategories as $category)
-                    <a href="{{ route('category.products', $category->slug) }}"
-                        class="bg-white shadow-sm  p-4 h-24 flex items-center justify-between hover:shadow-sm transition-all group">
+        <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-4">
+            Product Categories
+        </h2>
 
-                        
+        <!-- Categories Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
 
-                        <!-- 2. Name on the Far RIGHT -->
-                        <div class="flex-1 text-left ml-4">
-                            <h3
-                                class="font-bold text-[#0f172a] text-sm md:text-base leading-tight group-hover:text-[var(--primary-color)] transition-colors">
-                                {{ $category->name }}
-                            </h3>
-                        </div>
-                        <!-- 1. Image on the Far LEFT -->
-                        <div class="w-14 md:w-18 h-14 md:h-18 shrink-0 flex items-center justify-end overflow-hidden">
-                            @if($category->image_url)
-                                <img src="{{ $category->image_url }}" alt="{{ $category->name }}" height="" width=""
-                                    onerror="this.src='{{ $category->image_url }}'"
-                                    class="w-full h-full object-contain">
-                            @else
-                                <i class="fas fa-layer-group text-2xl text-gray-400"></i>
-                            @endif
-                        </div>
-                    </a>
-                @endforeach
-            </div>
+            @foreach ($headerCategories as $category)
+                <a href="{{ route('category.products', $category->slug) }}"
+                    class="bg-white shadow-sm p-3 min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
+
+                    <!-- Icon / Image -->
+                    <div class="w-16 h-16 mb-2 flex items-center justify-center overflow-hidden">
+                        @if($category->image_url)
+                            <img
+                                src="{{ $category->image_url }}"
+                                alt="{{ $category->name }}"
+                                loading="lazy"
+                                onerror="this.style.display='none'"
+                                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                            >
+                        @else
+                            <i class="fas fa-layer-group text-2xl text-gray-400"></i>
+                        @endif
+                    </div>
+
+                    <!-- Category Name -->
+                    <h3 class="font-semibold text-[#0f172a] text-xs md:text-sm leading-tight
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
+                        {{ $category->name }}
+                    </h3>
+
+                </a>
+            @endforeach
+
         </div>
-    </section>
+    </div>
+</section>
     <!-- LATEST OFFERS SECTION  -->
-    <section class=" container mx-auto   px-4 ">
+     @if($latestOffers->isNotEmpty())
+    <section class=" container mx-auto   p-0  mt-4 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-4 tracking-tight">
             Latest Offers
@@ -337,6 +343,7 @@
             @endforeach
         </div>
     </section>
+    @endif
     <!-- OUR FEATURED PRODUCTS SECTION -->
     <section class="w-full bg-[#fcfcfc] px-4">
         <div class="p-0 container mx-auto  ">
