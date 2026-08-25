@@ -194,59 +194,10 @@
             </div>
         </div>
     </section>
-    {{-- <!-- PRODUCT CATEGORIES SECTION -->
-    <section class="w-full mx-auto bg-[#fcfcfc] px-4 ">
-        <div class="p-0 container mx-auto  ">
-            <h2 class="text-2xl font-semibold text-[#0f172a] mb-12">
-                Product Categories
-            </h2>
+    
 
-            <!-- Categories Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-y-8 gap-x-6">
-                @foreach ($headerCategories as $category)
-                @php
-                $index = $loop->index;
 
-                $isReverse = $index % 2 != 0;
 
-                $isTopNotch = $index >= 6;
-
-                if (!$isTopNotch) {
-                $notchClass = $isReverse ? 'notch-bottom-left' : 'notch-bottom-right';
-                } else {
-                $notchClass = $isReverse ? 'notch-top-left' : 'notch-top-right';
-                }
-                @endphp
-
-                <!-- Dynamic Category Card -->
-                <a href="{{ route('category.products', $category->slug) }}"
-                    class="notch-border hover:-translate-y-1 transition-transform block group">
-                    <div
-                        class="bg-white p-4 h-32 flex {{ $isReverse ? 'flex-row-reverse text-left' : 'flex-row text-right' }} items-center justify-between {{ $notchClass }} border-gray-50 shadow-sm group-hover:shadow-md transition-all">
-
-                        <div class="w-16 h-16 shrink-0 {{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
-                            @if($category->image_url)
-                            <img src="{{ $category->image_url }}" height="64" width="64" aria-label="category image"
-                                loading="lazy" alt="{{ $category->name }}" class="w-full h-full object-contain">
-                            @else
-                            <i class="fas fa-layer-group text-2xl md:text-4xl text-gray-400"></i>
-                            @endif
-                        </div>
-
-                        <div class="{{ !$isTopNotch ? 'mb-6' : 'mt-6' }}">
-                            <h3 class="font-bold text-[#0f172a] text-sm md:text-[15px] leading-tight">
-                                {{ $category->name }}
-                            </h3>
-                            <p class="text-[11px] text-gray-500 mt-1">
-                                {{ $category->products_count ?? '12,203' }} Items
-                            </p>
-                        </div>
-                    </div>
-                </a>
-                @endforeach
-            </div>
-        </div>
-    </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
    <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
@@ -289,6 +240,91 @@
         </div>
     </div>
 </section>
+
+
+  @foreach ($productGroups as $group)
+        <section class="py-8 md:py-12 container mx-auto px-4 lg:px-0">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[#016738]">{{ $group->name }}</h2>
+                    <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
+                        <button
+                            class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
+                            View all
+                        </button>
+                    </a>
+                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                @foreach ($group->products as $product)
+                    @php
+                        $currency = $setup->currency ?? '৳';
+                        $isVar = $product->type !== 'single';
+
+                        $regularPrice = (float) $product->regular_price;
+                        $salePrice = (float) $product->sale_price;
+
+                        $minPrice = 0;
+                        $maxPrice = 0;
+
+                        if ($isVar && $product->variations->count() > 0) {
+                            $minPrice = $product->variations->min('regular_price');
+                            $maxPrice = $product->variations->max('regular_price');
+                        }
+                    @endphp
+
+                    <div
+                        class="flex bg-white border border-gray-200 rounded-lg p-3 md:p-4 hover:shadow-md transition-all group">
+                        <!-- Left: Product Image -->
+                        <div
+                            class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
+                            <a href="{{ route('product.details', $product->slug) }}" class="block w-full h-full">
+                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
+                                    class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
+                            </a>
+                        </div>
+
+                        <!-- Right: Content Area -->
+                        <div class="flex-1 pl-4 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-sm md:text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
+                                    <a href="{{ route('product.details', $product->slug) }}" class="hover:text-[#016738]">
+                                        {{ $product->title }}
+                                    </a>
+                                </h3>
+
+                                <!-- Price Logic (Corrected Fields) -->
+                                <div class="text-[#016738] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
+                                    @if ($isVar && $minPrice > 0)
+                                        {{-- ভ্যারিয়েশন: Lowest - Highest Regular Price --}}
+                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} –
+                                            {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
+                                    @else
+                                        {{-- সিঙ্গেল: Discount থাকলে কাটা দামসহ দেখাবে --}}
+                                        @if ($salePrice < $regularPrice && $salePrice > 0)
+                                            <span
+                                                class="line-through text-gray-400 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
+                                            <span>{{ number_format($salePrice, 0) }}{{ $currency }}</span>
+                                        @elseif($regularPrice > 0)
+                                            <span>{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Button -->
+                            <div class="mt-3">
+                                <a href="{{ route('product.details', $product->slug) }}"
+                                    class="block w-full text-center primary-bg text-primary py-2 rounded font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
+                                    পণ্য দেখুন
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endforeach
+    
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
     <section class=" container mx-auto   p-0  ">
