@@ -246,8 +246,8 @@
     </section> --}}
     <!-- PRODUCT CATEGORIES SECTION -->
     <section class="w-full mx-auto  px-4">
-        <div class="container mx-auto py-6 md:py-10">
-            <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-8">
+        <div class="container mx-auto py-0">
+            <h2 class="text-xl md:text-2xl font-bold text-[#0f172a] mb-4">
                 Product Categories
             </h2>
 
