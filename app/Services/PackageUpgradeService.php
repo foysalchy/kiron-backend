@@ -146,7 +146,7 @@ class PackageUpgradeService
                 };
 
                 // Update previous subscription statuses
-                $company->subscriptions()->update(['status' => Status::Active->value]);
+                $company->subscriptions()->update(['status' => Status::Inactive->value]);
 
                 // Create the active company subscription record
                 $subscription = CompanySubscription::create([
@@ -155,7 +155,7 @@ class PackageUpgradeService
                     'billing_cycle'      => $upgradeRequest->billing_cycle,
                     'amount_paid'        => $upgradeRequest->amount_paid,
                     'payment_method'     => $upgradeRequest->payment_method,
-                    'payment_status'     => 'pending',
+                    'payment_status'     => 'paid',
                     'starts_at'          => $now,
                     'ends_at'            => $endsAt,
                     'status'             => Status::Active->value,

@@ -95,6 +95,7 @@ use App\Http\Controllers\Api\PartyController;
 use App\Http\Controllers\Api\PassChangeController;
 use App\Http\Controllers\Api\PathaoController;
 use App\Http\Controllers\Api\PayHeadController;
+use App\Http\Controllers\Api\PaymentCollectionController;
 use App\Http\Controllers\Api\PaymentMethodTypeController;
 use App\Http\Controllers\Api\PayRollController;
 use App\Http\Controllers\Api\PayRollPayHeadController;
@@ -205,6 +206,7 @@ Route::prefix('v1')->group(function () {
         Route::post('verify-otp', [CompanyRegistrationController::class, 'verifyOtp']);
         Route::post('resend-otp', [CompanyRegistrationController::class, 'resendOtp']);
     });
+
     Route::post('/wocommerces/webhook/orders/{settingId}', [\App\Http\Controllers\Api\WoocommerceWebhookController::class, 'handle']);
     Route::post('/steadfast/webhook', [\App\Http\Controllers\Api\SteadfastWebhookController::class, 'handle']);
     Route::post('/pathao/webhook', [\App\Http\Controllers\Api\PathaoWebhookController::class, 'handle']);
@@ -255,8 +257,12 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/{id}/toggle-status', [SiteSettingController::class, 'toggleStatus']);
             });
         });
+        Route::get('/reports/payment-collection', [PaymentCollectionController::class, 'paymentCollection']);
+        Route::get('/payment-collection/parties', [PaymentCollectionController::class, 'getDueParties']);
+        Route::get('/payment-collection/parties/{partyId}/invoices', [PaymentCollectionController::class, 'getPartyDueInvoices']);
+        Route::post('/payment-collection/parties/{partyId}/settle', [PaymentCollectionController::class, 'settlePayments']);
+        Route::get('/payment-collection/transactions', [PaymentCollectionController::class, 'transactions']); 
         Route::get('/site-basic-data', [SiteSettingController::class, 'basicData']);
-
         Route::get('/company/package-usage', [PackageUsageController::class, 'index']);
         Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addpayment']);
         Route::post('/subscriptions/upgrade-payment', [SubscriptionController::class, 'upgradePayment']);

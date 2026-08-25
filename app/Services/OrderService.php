@@ -24,7 +24,8 @@ class OrderService
 
     public function __construct(
         CouponService $couponService,
-        ProductService $productService
+        ProductService $productService,
+        protected PartyDueService $partyDueService,
     ) {
         $this->productService = $productService;
         $this->couponService = $couponService;
@@ -224,8 +225,7 @@ class OrderService
             ]);
 
             // Sync due_amount from single source of truth
-            $this->recalculatePartyDue($customerId);
-
+            $this->partyDueService->recalculatePartyDue($customerId);
             LogHelper::custom(
                 'wallet_payment',
                 'orders',
@@ -315,18 +315,6 @@ class OrderService
         }
         // Create the order
         $order = $this->createOrder($data, true);
-
-        // ── Due amount: add to customer's balance ────────────────────────────
-        // Frontend sends: is_due (bool), due_amount (decimal)
-        $isDue     = !empty($data['is_due']);
-        $dueAmount = isset($data['due_amount']) ? (float) $data['due_amount'] : 0;
-
-        if ($isDue && $dueAmount > 0 && !empty($data['customer_id'])) {
-            Party::where('id', $data['customer_id'])->update([
-                'due_amount' => DB::raw("due_amount + {$dueAmount}"),
-            ]);
-        }
-
 
 
         return $order;
@@ -459,8 +447,7 @@ class OrderService
                     $data['customer_id'] ?? null
                 );
             }
-            $this->recalculatePartyDue($order->customer_id);
-
+            $this->partyDueService->recalculatePartyDue($order->customer_id);
             NotificationService::notify(
                 NotificationRecipientResolver::companySuperAdmin($order->company_id),
                 new OrderCreatedNotification($order->id, $order->order_no, $order->company_id)
@@ -631,9 +618,9 @@ class OrderService
                     $data['customer_id'] ?? null
                 );
             }
-            $this->recalculatePartyDue($oldCustomerId);
+            $this->partyDueService->recalculatePartyDue($oldCustomerId);
             if ($order->customer_id != $oldCustomerId) {
-                $this->recalculatePartyDue($order->customer_id);
+                $this->partyDueService->recalculatePartyDue($order->customer_id);
             }
 
             LogHelper::updated('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
@@ -839,7 +826,7 @@ class OrderService
             $order->update([
                 'status' => $getStatus->value
             ]);
-            $this->recalculatePartyDue($order->customer_id);
+            $this->partyDueService->recalculatePartyDue($order->customer_id);
             try {
                 app(SmsSendService::class)->sendStatusBasedSms($order);
             } catch (\Exception $smsError) {
@@ -919,7 +906,7 @@ class OrderService
             $order->orderNotes()->delete();
             $customerId = $order->customer_id;
             $order->delete();
-            $this->recalculatePartyDue($customerId);
+            $this->partyDueService->recalculatePartyDue($customerId);
 
 
             DB::commit();

@@ -127,6 +127,7 @@ class OrderReturnController extends Controller
             'status' => [
                 'required',
                 Rule::in([
+                    Status::Draft->value,      
                     Status::Pending->value,      // 2
                     Status::Waiting->value,  // 16
                     Status::Completed->value,  // 16

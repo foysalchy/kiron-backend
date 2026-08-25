@@ -51,7 +51,8 @@ class StoreOrderReturnRequest extends BaseCompanyRequest
                 'payments.*.note' => ['nullable', 'string'],
 
                 'note' => ['nullable', 'string'],
-                'status' => ['nullable'],
+                'status' => ['required'],
+                'refund_amount' => ['nullable'],
             ]
         );
     }

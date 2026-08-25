@@ -57,6 +57,7 @@ class StorePurchaseReturnRequest extends BaseCompanyRequest
 
                 'note' => ['nullable', 'string'],
                 'status' => ['nullable'],
+                'refund_amount' => ['nullable'],
             ]
         );
     }
