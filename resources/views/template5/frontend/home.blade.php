@@ -119,42 +119,84 @@
 </section>
 @endif
 
-<!-- ============ OFFERS (dynamic middle sliders as promo banners) ============ -->
-@if ($middleSliders->count() > 0)
-<section id="offers" class="bg-white grain">
+@if ($latestOffers->count() > 0)
+<section id="offers" class="bg-white text-black grain">
+  <div class="absolute inset-0 bg-[url('https://static.vecteezy.com/system/resources/thumbnails/053/329/746/small/fresh-vegetables-isolated-on-white-background-for-healthy-cooking-free-photo.jpeg')] bg-cover bg-bottom bg-no-repeat opacity-10"></div>
+
   <div class="max-w-7xl mx-auto px-6 lg:px-10 py-20">
 
     <div class="flex items-end justify-between mb-10">
       <div>
-        <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Save more today</span>
-        <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Latest offers</h2>
+        <span class="font-mono text-[11px] tracking-[0.22em] uppercase text-ember">
+          Save more today
+        </span>
+        <h2 class="font-display font-semibold text-3xl sm:text-4xl mt-2">
+          Latest offers
+        </h2>
       </div>
+
+      <a href="{{ route('shop.index') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors">
+        View all offers
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </a>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      @foreach ($middleSliders as $slider)
-        <div class="group shadow bg-white border border-[var(--lumina-ash)]/10 rounded-2xl overflow-hidden hover:border-[var(--lumina-ember)]/40 -translate-y-1">
+
+      @foreach ($latestOffers as $offer)
+        <div class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-ember/40 -translate-y-1">
+
           <div class="h-52 relative overflow-hidden">
-            <a href="{{ $slider->url ?? '#' }}">
-              <img src="{{ $slider->image_url ?? asset('images/template1/frontend/default.webp') }}"
-                   alt="{{ $slider->title }}"
-                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-            </a>
+            <img
+              src="{{ $offer->image_url ?? asset('images/template1/frontend/default.webp') }}"
+              alt="{{ $offer->title ?? 'Offer' }}"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            >
+
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+
+            @if (!empty($offer->badge_text))
+              <span class="absolute top-4 left-4 {{ $offer->badge_color ?? 'bg-ember text-white' }} text-[11px] font-mono tracking-wide px-3 py-1 rounded-full">
+                {{ $offer->badge_text }}
+              </span>
+            @endif
           </div>
+
           <div class="p-6">
-            <h3 class="font-semibold text-lg">{{ $slider->title ?? 'Special Offer' }}</h3>
-            <a href="{{ $slider->url ?? '#' }}" class="block primary-bg primary-bg-hover transition-colors text-sm font-medium px-4 py-3 rounded-full w-full mt-4 text-center text-primary">
-              Order Now
-            </a>
+            <h3 class="font-display font-semibold text-lg">
+              {{ $offer->title }}
+            </h3>
+
+            @if (!empty($offer->description))
+              <p class="text-smoke-300 text-sm mt-1.5 leading-relaxed">
+                {{ $offer->description }}
+              </p>
+            @endif
+
+            <div class="justify-between mt-2">
+              @if (!empty($offer->price))
+                <div class="font-mono">
+                  <span class="text-lg font-semibold text-black">${{ number_format($offer->price, 2) }}</span>
+                  @if (!empty($offer->original_price))
+                    <span class="text-smoke line-through ml-1.5 text-sm">${{ number_format($offer->original_price, 2) }}</span>
+                  @endif
+                </div>
+              @endif
+
+              <a href="{{ $offer->url ?? '#' }}" class="block bg-ember hover:bg-ember-600 transition-colors text-white text-sm font-medium px-4 py-3 rounded-full w-full mt-2 text-center">
+                Order Now
+              </a>
+            </div>
           </div>
         </div>
       @endforeach
+
     </div>
   </div>
 </section>
 @endif
-
 <!-- ============ MENU / PRODUCT GROUPS ============ -->
 @foreach ($productGroups as $group)
 <section id="menu-{{ $group->id }}" class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
