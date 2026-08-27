@@ -212,7 +212,7 @@
 
             @foreach ($headerCategories as $category)
                 <a href="{{ route('category.products', $category->slug) }}"
-                    class="  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
+                    class="bg-white pb-[10px]  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
 
                     <!-- Icon / Image -->
                     <div class="  mb-2 flex items-center justify-center overflow-hidden">
@@ -222,7 +222,7 @@
                                 alt="{{ $category->name }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
-                                class="w-full h-[200px] object-cover transition-transform duration-300 group-hover:scale-110"
+                                class="w-full h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
                             >
                         @else
                             <i class="fas fa-layer-group text-2xl text-gray-400"></i>
@@ -231,7 +231,7 @@
 
                     <!-- Category Name -->
                     <h3 class=" text-[#0f172a] text-xl font-normal leading-tight
-                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2" style="font-weight: 400 !important;color: #333;font-size: 16px !important;padding-top: 8px;">
                         {{ $category->name }}
                     </h3>
 
