@@ -202,9 +202,10 @@
    <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
 
-          <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight mt-6 text-center">
-            Product Categories
+          <h2 class="text-2xl font-semibold text-[#041533]   tracking-tight mt-6 text-center">
+            Featured Category
         </h2>
+        <p class="text-gray-600 text-center mb-4">Buy Your Desired Products from Featured Categories</p>
 
         <!-- Categories Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-3">

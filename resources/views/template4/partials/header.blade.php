@@ -6,40 +6,7 @@
     $menuItems = $customMenu ? $customMenu->items : null;
 @endphp
 <header class="w-full sticky top-0 z-50">
-    <div class="hidden md:block bg-[#3533cd] text-header py-2 px-4 md:px-10">
-        <div class="container mx-auto flex justify-between items-center text-xs md:text-sm">
-            <div class="flex items-center gap-2">
-                <!-- WhatsApp Icon with label -->
-                <i class="fa-brands fa-whatsapp text-header text-lg" aria-hidden="true"></i>
-                <span>Call Or Text Us to Order :
-                    <a href="tel:{{ $setup->phone ?? '+88000000000' }}" class="hover:underline" aria-label="Call us">
-                        {{ $setup->phone ?? '+880 00000000' }}
-                    </a>
-                </span>
-            </div>
-
-            <!-- Desktop Top Bar login/logout section -->
-            @auth('customer')
-                <div class="flex items-center gap-4">
-                    <a href="{{ route('user.dashboard') }}" class="flex items-center gap-2 hover:opacity-80 transition">
-                        <i class="fa-regular fa-circle-user"></i>
-                        <span>{{ auth('customer')->user()->name }}</span>
-                    </a>
-                    <form action="{{ route('user.logout') }}" method="POST" class="inline">
-                        @csrf
-                        <button type="submit" class="text-xs font-bold hover:text-red-300 transition cursor-pointer">
-                            <i class="fa-solid fa-right-from-bracket"></i> LOGOUT
-                        </button>
-                    </form>
-                </div>
-            @else
-                <a href="{{ route('user.login') }}" class="flex items-center gap-2 hover:opacity-80 transition">
-                    <i class="fa-regular fa-user"></i>
-                    <span>Log In / Register</span>
-                </a>
-            @endauth
-        </div>
-    </div>
+   
 
     <div class="header-custom-bg text-header py-4 px-4 md:px-10  ">
         <div class="container mx-auto flex items-center justify-between gap-4">
@@ -103,42 +70,74 @@
                 </div>
             </form>
 
-            <div class="flex items-center gap-4 md:gap-8">
-                <!-- Wishlist Link -->
-                <a href="{{ route('user.dashboard') }}" class="flex items-center gap-3 cursor-pointer group"
-                    aria-label="View your wishlist, currently 0 items">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-regular fa-heart text-xl text-[var(--primary-color)]" aria-hidden="true"></i>
-                    </div>
-                    <div class="hidden xl:block">
-                        <p class="text-sm font-medium leading-tight">My Wishlist</p>
-                        <p class="text-xs opacity-80">
-                            ( @auth('customer')
-                                <span class="wishlist-count-val">
-                                    {{ auth('customer')->check() ? \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count() : 0 }}
-                                </span>
-                            @else
-                                0
-                            @endauth items )
-                        </p>
-                    </div>
-                </a>
+           <div class="flex items-center gap-3 md:gap-5">
 
-                <!-- Shopping Cart Link -->
-                <a href="{{ route('cart.index') }}" class="flex items-center gap-3 cursor-pointer group">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-bag-shopping text-xl text-[var(--primary-color)]"></i>
-                    </div>
+    <!-- Wishlist -->
+    <a href="{{ route('user.dashboard') }}"
+        class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 relative"
+        aria-label="Wishlist">
 
-                    <div class="hidden lg:block">
-                        <p class="text-sm font-medium leading-tight">Shopping Card</p>
-                        <p class="text-xs opacity-80">
-                            ( <span class="cart-count-nav">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</span>
-                            items )
-                        </p>
-                    </div>
-                </a>
-            </div>
+        <i class="fa-regular fa-heart text-lg md:text-xl text-[var(--primary-color)]"></i>
+
+        <span class="wishlist-count-val absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-[var(--primary-color)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            @auth('customer')
+                {{ \App\Models\Wishlist::where('customer_id', auth('customer')->id())->count() }}
+            @else
+                0
+            @endauth
+        </span>
+    </a>
+
+
+    <!-- Shopping Cart -->
+    <a href="{{ route('cart.index') }}"
+        class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 relative"
+        aria-label="Shopping Cart">
+
+        <i class="fa-solid fa-bag-shopping text-lg md:text-xl text-[var(--primary-color)]"></i>
+
+        <span class="cart-count-nav absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-[var(--primary-color)] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
+        </span>
+    </a>
+
+
+    <!-- Customer Account -->
+    @auth('customer')
+
+        <a href="{{ route('user.dashboard') }}"
+            class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200"
+            aria-label="My Account">
+
+            <i class="fa-regular fa-circle-user text-lg md:text-xl text-[var(--primary-color)]"></i>
+
+        </a>
+
+        <form action="{{ route('user.logout') }}" method="POST" class="inline">
+            @csrf
+
+            <button type="submit"
+                class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer"
+                aria-label="Logout">
+
+                <i class="fa-solid fa-right-from-bracket text-lg md:text-xl text-[var(--primary-color)]"></i>
+
+            </button>
+        </form>
+
+    @else
+
+        <a href="{{ route('user.login') }}"
+            class="w-10 h-10 md:w-12 md:h-12 bg-white rounded-full shadow-md flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all duration-200"
+            aria-label="Login">
+
+            <i class="fa-regular fa-user text-lg md:text-xl text-[var(--primary-color)]"></i>
+
+        </a>
+
+    @endauth
+
+</div>
         </div>
 
         <form action="{{ route('shop.index') }}" method="GET" class="lg:hidden mt-4 relative"
