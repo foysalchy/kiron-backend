@@ -126,7 +126,7 @@
                             <div class="swiper-slide">
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
                                     <img src="{{ $slider->image_url ?? ''}}"
-                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}"  
+                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
                                         class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
                                         loading="eager" @else loading="lazy" @endif />
                                 </a>
@@ -194,7 +194,7 @@
             </div>
         </div>
     </section>
-    
+
 
 
 
@@ -251,7 +251,7 @@
                   <h2 class="text-2xl font-semibold text-[#041533]  tracking-tight">
               {{ $group->name }}
             </h2>
-               
+
                     <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
                         <button
                             class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
@@ -320,14 +320,14 @@
                             </div>
 
                             <!-- Button -->
-                            
+
                         </div>
                     </div>
                 @endforeach
             </div></div>
         </section>
     @endforeach
-    
+
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
     <section class=" container mx-auto   p-0 mb-12 ">
@@ -384,7 +384,7 @@
     </section>
     @endif
     <!-- OUR FEATURED PRODUCTS SECTION -->
-    <section class="w-full bg-[#fcfcfc] px-4">
+    <section class="w-full bg-[#fcfcfc] px-4 py-10">
         <div class="p-0 container mx-auto  ">
             <!-- Section Title -->
             <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight">
@@ -402,7 +402,7 @@
         </div>
     </section>
     <!-- NEW ARRIVAL SECTION -->
-    <section class="px-4 mb-12">
+    {{-- <section class="px-4 mb-12">
         <div class="p-0 container mx-auto   ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-12 tracking-tight">
@@ -448,7 +448,7 @@
                 </a>
             @endforeach
         </div></div>
-    </section>
+    </section> --}}
     <!-- ABOUT / SEO TEXT SECTION -->
     @if($homePageData->description)
         <section class="w-full bg-[#fcfcfc] px-4 font-manrope">

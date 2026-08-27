@@ -35,15 +35,15 @@
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
-                        @foreach ($allProductImages as $imgUrl)
-                            <button onclick="changeImage('{{ $imgUrl }}')"
-                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
-                                <img src="{{ $imgUrl }}"
-                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                    class="w-full h-full object-contain" alt="Product Image">
-                            </button>
-                        @endforeach
-                    </div>
+    @foreach ($allProductImages as $imgUrl)
+        <button onclick="changeImage('{{ $imgUrl }}')"
+            class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
+            <img src="{{ $imgUrl }}"
+                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                class="w-full h-full object-contain" alt="Product Image">
+        </button>
+    @endforeach
+</div>
                 </div>
 
                 <!-- Right: Product Purchase Details -->
@@ -68,7 +68,7 @@
                         </span>
                         <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
                     </div>
-                   <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                    <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
                     </div>
 
@@ -107,8 +107,9 @@
                             <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                        <span class="text-sm {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock' }}
+                        {{-- এই অংশটুকু রিপ্লেস করুন --}}
+                        <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
 
@@ -119,27 +120,24 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
-                        <!-- ২. Order Now -->
+                        <!-- ২. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
                         <!--  Wishlist -->
-                        <!-- Wishlist Button Updated -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
+                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
                             {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
-                            <i id="wish-icon-main"
-                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                            <i id="wish-icon-main" class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
