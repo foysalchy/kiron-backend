@@ -13,7 +13,7 @@
     @include('components.template1.product-4', ['product' => $product, 'company' => $company])
 
 @elseif($card == 5)
-    @include('components.template1.product-4', ['product' => $product, 'company' => $company])
+    @include('components.template1.product-5', ['product' => $product, 'company' => $company])
 @endif
 
 @once

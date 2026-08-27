@@ -14,7 +14,7 @@
         </div>
 
         <p class="text-footer/70 text-sm mt-4 leading-relaxed max-w-xs">
-          {{ $setup->shop_description ?? 'Quality products, fast delivery, and a shopping experience you can trust.' }}
+          {{ $setup->description ?? 'Quality products, fast delivery, and a shopping experience you can trust.' }}
         </p>
 
         <div class="flex items-center gap-4 mt-5">
@@ -64,7 +64,7 @@
         <ul class="space-y-2.5 text-sm text-footer/70">
           <li><a href="{{ Route::has('privacy-policy') ? route('privacy-policy') : '#' }}" class="hover:text-brand transition-colors">Privacy Policy</a></li>
           <li><a href="{{ Route::has('terms') ? route('terms') : '#' }}" class="hover:text-brand transition-colors">Terms of Service</a></li>
-          <li><a href="{{ Route::has('contact') ? route('contact') : '#' }}" class="hover:text-brand transition-colors">Contact Us</a></li>
+          <li><a href="{{ Route::has('contact.index') ? route('contact.index') : '#' }}" class="hover:text-brand transition-colors">Contact Us</a></li>
         </ul>
       </div>
 
@@ -75,11 +75,15 @@
 
         <form class="relative" action="{{ Route::has('newsletter.subscribe') ? route('newsletter.subscribe') : '#' }}" method="POST" onsubmit="{{ Route::has('newsletter.subscribe') ? '' : 'return false;' }}">
           @csrf
-          <input
+    <input
             type="email"
-            name="email"
             placeholder="Email address"
-            class="w-full bg-white/10 border border-white/20 rounded-full pl-4 pr-11 py-2.5 text-sm text-footer placeholder:text-footer/50 focus:outline-none focus:ring-2 focus:ring-[var(--lumina-ember)]/40 transition-all"
+            class="w-full bg-gray-50 border border-gray-200 rounded-full
+                   pl-4 pr-11 py-2.5 text-sm text-black
+                   placeholder:text-gray-400
+                   focus:outline-none focus:ring-2
+                   focus:ring-ember/40 focus:border-ember/50
+                   transition-all"
           >
           <button type="submit" aria-label="Subscribe" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full primary-bg primary-bg-hover transition-colors flex items-center justify-center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>

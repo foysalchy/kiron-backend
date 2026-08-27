@@ -128,9 +128,7 @@
         </button>
       </div>
 
-      <span class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
-        {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
-      </span>
+   
     </div>
   </div>
 </section>

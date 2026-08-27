@@ -168,7 +168,7 @@
             <circle cx="17" cy="18" r="2"></circle>
             <circle cx="7" cy="18" r="2"></circle>
           </svg>
-          Delivery time in 2-3 days
+          Delivery time in 1-1.3h
         </p>
       </div>
     </div>

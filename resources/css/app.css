@@ -1,6 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
-@import 'tailwindcss';
-@import 'toastr/build/toastr.min.css';
+@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap");
+@import "tailwindcss";
+@import "toastr/build/toastr.min.css";
 @plugin "@tailwindcss/typography";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -9,36 +9,38 @@
 @source '../**/*.js';
 
 @font-face {
-    font-family: 'Manrope';
-    src: url('../fonts/manrope/Manrope-Regular.ttf') format('truetype');
+    font-family: "Manrope";
+    src: url("../fonts/manrope/Manrope-Regular.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'Manrope';
-    src: url('../fonts/manrope/Manrope-Medium.ttf') format('truetype');
+    font-family: "Manrope";
+    src: url("../fonts/manrope/Manrope-Medium.ttf") format("truetype");
     font-weight: 500;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'Manrope';
-    src: url('../fonts/manrope/Manrope-SemiBold.ttf') format('truetype');
+    font-family: "Manrope";
+    src: url("../fonts/manrope/Manrope-SemiBold.ttf") format("truetype");
     font-weight: 600;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'Manrope';
-    src: url('../fonts/manrope/Manrope-Bold.ttf') format('truetype');
+    font-family: "Manrope";
+    src: url("../fonts/manrope/Manrope-Bold.ttf") format("truetype");
     font-weight: 700;
     font-style: normal;
 }
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans:
+        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
+        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Noto Color Emoji";
     --font-manrope: "Manrope", sans-serif;
 
     /* fonts (matching your old tailwind.config aliases) */
@@ -47,28 +49,28 @@
     --font-mono: "Manrope", monospace;
 
     /* colors */
-    --color-coal: #18130F;
-    --color-coal-900: #0F0C0A;
-    --color-coal-800: #18130F;
-    --color-coal-700: #241D18;
+    --color-coal: #18130f;
+    --color-coal-900: #0f0c0a;
+    --color-coal-800: #18130f;
+    --color-coal-700: #241d18;
     --color-coal-600: #332922;
 
-    --color-ash: #F6F1E6;
-    --color-ash-50: #FBF8F2;
-    --color-ash-100: #F6F1E6;
-    --color-ash-200: #EDE4D2;
+    --color-ash: #f6f1e6;
+    --color-ash-50: #fbf8f2;
+    --color-ash-100: #f6f1e6;
+    --color-ash-200: #ede4d2;
 
-    --color-ember: #D6431F;
-    --color-ember-600: #B8371A;
-    --color-ember-700: #93290F;
-    --color-ember-400: #E6633F;
+    --color-ember: #d6431f;
+    --color-ember-600: #b8371a;
+    --color-ember-700: #93290f;
+    --color-ember-400: #e6633f;
 
-    --color-smoke: #8B8175;
-    --color-smoke-300: #B5AC9E;
+    --color-smoke: #8b8175;
+    --color-smoke-300: #b5ac9e;
 
-    --color-gold: #C99A45;
+    --color-gold: #c99a45;
 
-    --color-char-green: #4C6444;
+    --color-char-green: #4c6444;
 }
 a,
 button,
@@ -76,18 +78,22 @@ button,
 input[type="submit"] {
     cursor: pointer !important;
 }
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Poppins", sans-serif;
     font-weight: 600;
 }
-
 
 #toast-container {
     top: 100px !important;
     right: 20px !important;
 }
 #toast-container > .toast-success {
-    background-color: #FF6A00 !important;
+    background-color: #ff6a00 !important;
     opacity: 1;
 }
 
@@ -107,145 +113,148 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .toast-message {
-    font-family: Google Sans,Roboto,Arial,sans-serif;
+    font-family:
+        Google Sans,
+        Roboto,
+        Arial,
+        sans-serif;
     font-weight: 700;
     font-size: 14px;
 }
-button:hover{
-cursor: pointer;
+button:hover {
+    cursor: pointer;
 }
 
 #cat-slider a:hover img {
     transform: scale(1.1);
 }
 .hind-siliguri-light {
-  font-family: "Hind Siliguri", sans-serif;
-  font-weight: 300;
-  font-style: normal;
+    font-family: "Hind Siliguri", sans-serif;
+    font-weight: 300;
+    font-style: normal;
 }
 
 .hind-siliguri-regular {
-  font-family: "Hind Siliguri", sans-serif;
-  font-weight: 400;
-  font-style: normal;
+    font-family: "Hind Siliguri", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .hind-siliguri-medium {
-  font-family: "Hind Siliguri", sans-serif;
-  font-weight: 500;
-  font-style: normal;
+    font-family: "Hind Siliguri", sans-serif;
+    font-weight: 500;
+    font-style: normal;
 }
 
 .hind-siliguri-semibold {
-  font-family: "Hind Siliguri", sans-serif;
-  font-weight: 600;
-  font-style: normal;
+    font-family: "Hind Siliguri", sans-serif;
+    font-weight: 600;
+    font-style: normal;
 }
 
 .hind-siliguri-bold {
-  font-family: "Hind Siliguri", sans-serif;
-  font-weight: 700;
-  font-style: normal;
+    font-family: "Hind Siliguri", sans-serif;
+    font-weight: 700;
+    font-style: normal;
 }
 
 .container {
-  width: 100%;
-  padding-left: 16px;
-  padding-right: 16px;
-  margin-left: auto;
-  margin-right: auto;
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: auto;
+    margin-right: auto;
 }
-.prose li p{
-  margin: 0px !important;
-
+.prose li p {
+    margin: 0px !important;
 }
 .prose li {
-  margin: 0px !important;
+    margin: 0px !important;
 }
-.prose p{
-  margin-top: 5px !important;
-  margin-bottom: 0;
+.prose p {
+    margin-top: 5px !important;
+    margin-bottom: 0;
 }
-.prose ul{
-  margin-top: 0 !important;
+.prose ul {
+    margin-top: 0 !important;
 }
-.prose a{
-  color: rgb(50, 50, 230);
+.prose a {
+    color: rgb(50, 50, 230);
 }
-.prose h2,.prose h3{
-margin-top: 15px;
-  margin-bottom: 0px;
+.prose h2,
+.prose h3 {
+    margin-top: 15px;
+    margin-bottom: 0px;
 }
 /* Small devices (phones) */
 @media (min-width: 576px) {
-  .container {
-    max-width: 540px;
-  }
+    .container {
+        max-width: 540px;
+    }
 }
 
 /* Tablets */
 @media (min-width: 768px) {
-  .container {
-    max-width: 720px;
-  }
+    .container {
+        max-width: 720px;
+    }
 }
 
 /* Small laptops */
 @media (min-width: 992px) {
-  .container {
-    max-width: 960px;
-  }
+    .container {
+        max-width: 960px;
+    }
 }
 
 /* Desktops */
 @media (min-width: 1200px) {
-  .container {
-    max-width: 1140px;
-  }
+    .container {
+        max-width: 1140px;
+    }
 }
 
 /* Large desktops */
 @media (min-width: 1400px) {
-  .container {
-    max-width: 1320px;
-  }
+    .container {
+        max-width: 1320px;
+    }
 }
 @media (min-width: 1536px) {
-  .container {
-    max-width: 1440px;
-  }
+    .container {
+        max-width: 1440px;
+    }
 }
 html.lenis {
-  height: auto;
+    height: auto;
 }
 
 .lenis.lenis-smooth {
-  scroll-behavior: auto !important;
+    scroll-behavior: auto !important;
 }
 
 .lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
+    overscroll-behavior: contain;
 }
 
 .lenis.lenis-stopped {
-  overflow: hidden;
+    overflow: hidden;
 }
-
 
 .prose h1 {
     margin-top: 0;
     margin-bottom: 5px;
-   font-size: 22px !important;
-  line-height: 28px;
-  font-weight: 400;
+    font-size: 22px !important;
+    line-height: 28px;
+    font-weight: 400;
 }
 
 .prose h2 {
     margin-top: 20px;
     margin-bottom: 0;
     font-size: 22px !important;
-  line-height: 28px;
-  font-weight: 400;
+    line-height: 28px;
+    font-weight: 400;
 }
 
 .prose h3 {
@@ -263,8 +272,8 @@ html.lenis {
     line-height: 20px;
     font-weight: 600;
 }
-.prose hr{
-  margin:10px 0px !important;
+.prose hr {
+    margin: 10px 0px !important;
 }
 .prose h5 {
     margin-top: 0;

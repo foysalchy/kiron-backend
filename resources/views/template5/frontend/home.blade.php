@@ -172,17 +172,61 @@
 <section class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
   <div class="flex items-end justify-between mb-9">
     <div>
-      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone
-      </span>
-      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Our Menu
-      </h2>
+      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone</span>
+      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Our Menu</h2>
+    </div>
+  </div>
+
+  @php
+  $activeFilter = request('category', 'all');
+  @endphp
+
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mt-8 mb-9">
+    <div class="flex flex-wrap gap-2" id="filterPills">
+
+      <a href="{{ route('shop.index') }}"
+        class="pill-btn text-sm font-medium px-4 py-2 rounded-full transition-colors
+         {{ $activeFilter === 'all'
+             ? 'bg-ember text-white'
+             : 'bg-transparent text-smoke border border-coal/15 hover:border-coal/40' }}">
+        All
+      </a>
+
+      @foreach ($categories as $category)
+      <a href="{{ route('category.products',  $category->slug) }}"
+        class="pill-btn text-sm font-medium px-4 py-2 rounded-full transition-colors
+           {{ $activeFilter === $category->slug
+               ? 'bg-ember text-white'
+               : 'bg-transparent text-smoke border border-coal/15 hover:border-coal/40' }}">
+        {{ $category->name }}
+      </a>
+      @endforeach
+
+    </div>
+
+    <div class="flex items-center gap-3">
+      <form action="{{ route('shop.index') }}" method="GET" class="relative">
+        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-smoke pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search food…"
+          class="pl-10 pr-4 py-2.5 rounded-full border border-coal/15 bg-white text-sm w-48 focus:outline-none focus:ring-2 focus:ring-ember/40 focus:border-ember/50">
+      </form>
+
+      <a href="{{ route('shop.index') }}" class="flex items-center gap-2 border border-coal/15 rounded-full px-4 py-2.5 text-sm font-medium hover:border-coal/40 transition-colors">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 6h16M7 12h10M10 18h4" />
+        </svg>
+        Filter
+      </a>
     </div>
   </div>
 
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
     @foreach ($popularProducts as $product)
     <div class="menu-card group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all">
-      <x-template1.product-card :product="$product"  />
+      <x-template1.product-card :product="$product" />
     </div>
     @endforeach
   </div>
