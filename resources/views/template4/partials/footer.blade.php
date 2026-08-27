@@ -1,5 +1,5 @@
     <!-- FOOTER SECTION -->
-    <footer class="footer-custom-bg text-footer pt-20 pb-10" role="contentinfo">
+    <footer class="footer-custom-bg text-footer pt-20 pb-10 mt-6" role="contentinfo">
         <div class="container mx-auto p-4">
             <!-- Top Part: Logo & Menus -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
