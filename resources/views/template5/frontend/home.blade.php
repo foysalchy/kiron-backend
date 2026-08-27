@@ -1,6 +1,6 @@
 @extends('template5.layouts.front')
 @section('meta')
-    @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
+@include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
 @section('content')
 
@@ -11,23 +11,21 @@
   <div id="imageSlider" class="relative w-full h-[500px] md:h-[650px] lg:h-[750px]">
 
     @forelse ($mainSliders as $index => $slider)
-      <div class="image-slide absolute inset-0 w-full h-full {{ $index == 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }} transition-opacity duration-700 ease-in-out">
-        <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
-          <img
-            src="{{ $slider->image_url }}"
-            alt="{{ $slider->title }}"
-            class="w-full h-full object-cover"
-          >
-        </a>
-      </div>
-    @empty
-      <div class="image-slide absolute inset-0 w-full h-full opacity-100">
+    <div class="image-slide absolute inset-0 w-full h-full {{ $index == 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }} transition-opacity duration-700 ease-in-out">
+      <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
         <img
-          src="{{ asset('images/template1/frontend/default.webp') }}"
-          alt="default image"
-          class="w-full h-full object-cover"
-        >
-      </div>
+          src="{{ $slider->image_url }}"
+          alt="{{ $slider->title }}"
+          class="w-full h-full object-cover">
+      </a>
+    </div>
+    @empty
+    <div class="image-slide absolute inset-0 w-full h-full opacity-100">
+      <img
+        src="{{ asset('images/template1/frontend/default.webp') }}"
+        alt="default image"
+        class="w-full h-full object-cover">
+    </div>
     @endforelse
 
   </div>
@@ -36,19 +34,23 @@
   <!-- Previous -->
   <button id="prevImage" type="button"
     class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 text-white hover:bg-[var(--lumina-ember)] transition-all duration-300 flex items-center justify-center">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
   </button>
 
   <!-- Next -->
   <button id="nextImage" type="button"
     class="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 text-white hover:bg-[var(--lumina-ember)] transition-all duration-300 flex items-center justify-center">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
   </button>
 
   <!-- Dots -->
   <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
     @foreach ($mainSliders as $index => $slider)
-      <button class="slider-dot {{ $index == 0 ? 'w-8 bg-[var(--lumina-ember)]' : 'w-2 bg-white/50' }} h-2 rounded-full transition-all" data-slide="{{ $index }}"></button>
+    <button class="slider-dot {{ $index == 0 ? 'w-8 bg-[var(--lumina-ember)]' : 'w-2 bg-white/50' }} h-2 rounded-full transition-all" data-slide="{{ $index }}"></button>
     @endforeach
   </div>
   @endif
@@ -61,28 +63,36 @@
     <div class="group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
       <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7">
-          <path d="M4 4h16l-1.5 12.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5z"/>
-          <path d="M9 9v6M15 9v6M4 4l1-2h14l1 2"/>
+          <path d="M4 4h16l-1.5 12.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5z" />
+          <path d="M9 9v6M15 9v6M4 4l1-2h14l1 2" />
         </svg>
       </div>
       <div>
         <h3 class="font-semibold text-lg">Order Online</h3>
         <p class="text-[var(--lumina-smoke)] text-sm mt-0.5">Everything you need, delivered straight to your door.</p>
         <a href="#menu" class="inline-flex items-center gap-1.5 text-brand font-medium text-sm mt-2">Start Order
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </a>
       </div>
     </div>
 
     <div class="group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
       <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 15h2M14 15h2"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M8 3v4M16 3v4M3 10h18" />
+          <path d="M8 15h2M14 15h2" />
+        </svg>
       </div>
       <div>
         <h3 class="font-semibold text-lg">Track Your Order</h3>
         <p class="text-[var(--lumina-smoke)] text-sm mt-0.5">See exactly where your package is, in real time.</p>
         <a href="#" class="inline-flex items-center gap-1.5 text-brand font-medium text-sm mt-2">Track Now
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
         </a>
       </div>
     </div>
@@ -99,21 +109,23 @@
     </div>
     <a href="{{ route('shop.index') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
       View all
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
     </a>
   </div>
 
   <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-x-4 gap-y-8">
     @foreach ($categories as $category)
-      <a href="{{ url('category/' . $category->slug) }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
-        <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-4 group-hover:ring-[var(--lumina-ember)]/25 group-hover:-translate-y-1 transition-all overflow-hidden">
-          <img src="{{ !empty($category->image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
-               alt="{{ $category->name }}" class="w-full h-full object-cover">
-        </div>
-        <div>
-          <p class="text-sm font-medium">{{ $category->name }}</p>
-        </div>
-      </a>
+    <a href="{{ url('category/' . $category->slug) }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
+      <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-4 group-hover:ring-[var(--lumina-ember)]/25 group-hover:-translate-y-1 transition-all overflow-hidden">
+        <img src="{{ !empty($category->image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
+          alt="{{ $category->name }}" class="w-full h-full object-cover">
+      </div>
+      <div>
+        <p class="text-sm font-medium">{{ $category->name }}</p>
+      </div>
+    </a>
     @endforeach
   </div>
 </section>
@@ -138,111 +150,49 @@
       <a href="{{ route('shop.index') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors">
         View all offers
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-          <path d="M5 12h14M13 6l6 6-6 6"/>
+          <path d="M5 12h14M13 6l6 6-6 6" />
         </svg>
       </a>
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @foreach ($latestOffers->take(4) as $offer)
 
-      @foreach ($latestOffers as $offer)
-        <div class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-ember/40 -translate-y-1">
-
-          <div class="h-52 relative overflow-hidden">
-            <img
-              src="{{ $offer->image_url ?? asset('images/template1/frontend/default.webp') }}"
-              alt="{{ $offer->title ?? 'Offer' }}"
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            >
-
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
-
-            @if (!empty($offer->badge_text))
-              <span class="absolute top-4 left-4 {{ $offer->badge_color ?? 'bg-ember text-white' }} text-[11px] font-mono tracking-wide px-3 py-1 rounded-full">
-                {{ $offer->badge_text }}
-              </span>
-            @endif
-          </div>
-
-          <div class="p-6">
-            <h3 class="font-display font-semibold text-lg">
-              {{ $offer->title }}
-            </h3>
-
-            @if (!empty($offer->description))
-              <p class="text-smoke-300 text-sm mt-1.5 leading-relaxed">
-                {{ $offer->description }}
-              </p>
-            @endif
-
-            <div class="justify-between mt-2">
-              @if (!empty($offer->price))
-                <div class="font-mono">
-                  <span class="text-lg font-semibold text-black">${{ number_format($offer->price, 2) }}</span>
-                  @if (!empty($offer->original_price))
-                    <span class="text-smoke line-through ml-1.5 text-sm">${{ number_format($offer->original_price, 2) }}</span>
-                  @endif
-                </div>
-              @endif
-
-              <a href="{{ $offer->url ?? '#' }}" class="block bg-ember hover:bg-ember-600 transition-colors text-white text-sm font-medium px-4 py-3 rounded-full w-full mt-2 text-center">
-                Order Now
-              </a>
-            </div>
-          </div>
-        </div>
+      <x-template1.offer-card :offer="$offer" />
       @endforeach
-
     </div>
+
   </div>
 </section>
 @endif
-<!-- ============ MENU / PRODUCT GROUPS ============ -->
-@foreach ($productGroups as $group)
-<section id="menu-{{ $group->id }}" class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
-  <div class="flex items-end justify-between mb-9">
-    <div>
-      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone</span>
-      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">{{ $group->name }}</h2>
-    </div>
-    <a href="{{ route('shop.index', ['group' => $group->slug]) }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
-      View all
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-    </a>
-  </div>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    @foreach ($group->products as $product)
-      <div class="menu-card group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all">
-        <x-template1.product-card :product="$product" />
-      </div>
-    @endforeach
-  </div>
-</section>
-@endforeach
 
 <!-- ============ POPULAR PRODUCTS ("YOU MAY LIKE") ============ -->
 @if ($popularProducts->count() > 0)
 <section class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
   <div class="flex items-end justify-between mb-9">
     <div>
-      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Handpicked for you</span>
-      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">You May Like</h2>
+      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone
+      </span>
+      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Our Menu
+      </h2>
     </div>
   </div>
 
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
     @foreach ($popularProducts as $product)
-      <div class="menu-card group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all">
-        <x-template1.product-card :product="$product" />
-      </div>
+    <div class="menu-card group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all">
+      <x-template1.product-card :product="$product"  />
+    </div>
     @endforeach
   </div>
 
   <div class="flex justify-center mt-11">
     <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 border border-[var(--lumina-coal)]/20 hover:border-[var(--lumina-coal)] transition-colors font-medium px-7 py-3.5 rounded-full">
       View Full Menu
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
     </a>
   </div>
 </section>
@@ -255,11 +205,12 @@
     <h2 class="font-semibold text-2xl md:text-3xl mb-8">Frequently Asked Questions</h2>
     <div class="space-y-8">
       @foreach ($faqs as $faq)
-        <div>
-          <h3 class="font-semibold text-lg mb-2">{{ $faq->title ?? '' }}</h3>
-          <div class="text-[var(--lumina-smoke)] text-sm leading-relaxed">{!! $faq->content !!}</div>
-          @if (!$loop->last)<hr class="mt-8 border-gray-200">@endif
-        </div>
+      <div>
+        <h3 class="font-semibold text-lg mb-2">{{ $faq->title ?? '' }}</h3>
+        <div class="text-[var(--lumina-smoke)] text-sm leading-relaxed">{!! $faq->content !!}</div>
+        @if (!$loop->last)
+        <hr class="mt-8 border-gray-200">@endif
+      </div>
       @endforeach
     </div>
   </div>
@@ -270,64 +221,75 @@
 
 @push('scripts')
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function() {
 
-  const slides = document.querySelectorAll(".image-slide");
-  const dots = document.querySelectorAll(".slider-dot");
-  const nextBtn = document.getElementById("nextImage");
-  const prevBtn = document.getElementById("prevImage");
+    const slides = document.querySelectorAll(".image-slide");
+    const dots = document.querySelectorAll(".slider-dot");
+    const nextBtn = document.getElementById("nextImage");
+    const prevBtn = document.getElementById("prevImage");
 
-  if (!slides.length) return;
+    if (!slides.length) return;
 
-  let current = 0;
-  let timer;
+    let current = 0;
+    let timer;
 
-  function showSlide(index) {
-    if (index >= slides.length) index = 0;
-    if (index < 0) index = slides.length - 1;
-    current = index;
+    function showSlide(index) {
+      if (index >= slides.length) index = 0;
+      if (index < 0) index = slides.length - 1;
+      current = index;
 
-    slides.forEach((slide, i) => {
-      if (i === current) {
-        slide.classList.remove("opacity-0", "pointer-events-none");
-        slide.classList.add("opacity-100");
-      } else {
-        slide.classList.remove("opacity-100");
-        slide.classList.add("opacity-0", "pointer-events-none");
-      }
-    });
+      slides.forEach((slide, i) => {
+        if (i === current) {
+          slide.classList.remove("opacity-0", "pointer-events-none");
+          slide.classList.add("opacity-100");
+        } else {
+          slide.classList.remove("opacity-100");
+          slide.classList.add("opacity-0", "pointer-events-none");
+        }
+      });
 
-    dots.forEach((dot, i) => {
-      if (i === current) {
-        dot.classList.remove("w-2", "bg-white/50");
-        dot.classList.add("w-8", "bg-[var(--lumina-ember)]");
-      } else {
-        dot.classList.remove("w-8", "bg-[var(--lumina-ember)]");
-        dot.classList.add("w-2", "bg-white/50");
-      }
-    });
-  }
+      dots.forEach((dot, i) => {
+        if (i === current) {
+          dot.classList.remove("w-2", "bg-white/50");
+          dot.classList.add("w-8", "bg-[var(--lumina-ember)]");
+        } else {
+          dot.classList.remove("w-8", "bg-[var(--lumina-ember)]");
+          dot.classList.add("w-2", "bg-white/50");
+        }
+      });
+    }
 
-  function next() { showSlide(current + 1); }
-  function prev() { showSlide(current - 1); }
+    function next() {
+      showSlide(current + 1);
+    }
 
-  function startAutoSlide() {
-    clearInterval(timer);
-    timer = setInterval(next, 5000);
-  }
+    function prev() {
+      showSlide(current - 1);
+    }
 
-  nextBtn?.addEventListener("click", () => { next(); startAutoSlide(); });
-  prevBtn?.addEventListener("click", () => { prev(); startAutoSlide(); });
+    function startAutoSlide() {
+      clearInterval(timer);
+      timer = setInterval(next, 5000);
+    }
 
-  dots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      showSlide(Number(dot.dataset.slide));
+    nextBtn?.addEventListener("click", () => {
+      next();
       startAutoSlide();
     });
-  });
+    prevBtn?.addEventListener("click", () => {
+      prev();
+      startAutoSlide();
+    });
 
-  showSlide(0);
-  startAutoSlide();
-});
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        showSlide(Number(dot.dataset.slide));
+        startAutoSlide();
+      });
+    });
+
+    showSlide(0);
+    startAutoSlide();
+  });
 </script>
 @endpush

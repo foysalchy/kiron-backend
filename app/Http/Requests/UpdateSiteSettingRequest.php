@@ -31,7 +31,7 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'title'             => ['sometimes', 'required', 'string', 'max:255'],
                 'description'       => ['nullable', 'string'],
                 'logo'              => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-                'favicon'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,ico,svg,webp', 'max:512'],
+                'favicon'           => ['nullable',  'mimes:jpeg,png,jpg,ico,svg,webp', 'max:512'],
                 'phone'             => ['sometimes', 'required', 'string', 'max:20'],
                 'alt_phone'   => ['nullable', 'string', 'max:20'],
                 'email'             => ['sometimes', 'required', 'email', 'max:255'],

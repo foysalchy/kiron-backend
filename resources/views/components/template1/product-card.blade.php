@@ -1,15 +1,18 @@
 @php
 
     $company = getCurrentCompany();
-    $template = $company->product_card_template ?? 2;
+    $card = $company->product_card_template ?? 2;
 @endphp
-@if ($template == 1)
+@if ($card == 1)
     @include('components.template1.product-1', ['product' => $product, 'company' => $company])
-@elseif($template == 2)
+@elseif($card == 2)
     @include('components.template1.product-2', ['product' => $product, 'company' => $company])
-@elseif($template == 3)
+@elseif($card == 3)
     @include('components.template1.product-3', ['product' => $product, 'company' => $company])
-@elseif($template == 4)
+@elseif($card == 4)
+    @include('components.template1.product-4', ['product' => $product, 'company' => $company])
+
+@elseif($card == 5)
     @include('components.template1.product-4', ['product' => $product, 'company' => $company])
 @endif
 
