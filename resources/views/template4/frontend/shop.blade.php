@@ -8,6 +8,70 @@
     ])
 @endsection
 @section('content')
+<section class="bg-white border-t-1 border-t border-gray-300 pb-4">
+        <div class="py-2 md:py-2 container mx-auto px-4 lg:px-0">
+            <div class="lg:hidden mb-3 flex items-center justify-between">
+                <button onclick="toggleMobileSidebar()"
+                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
+                    <i class="fas fa-filter text-[var(--primary-color)]"></i> Filters
+                </button>
+                <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
+            </div>
+
+
+            <!-- Main Card Container -->
+            <div class="archiveTopInfo">
+
+                <!-- Breadcrumb -->
+                <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
+                    <a href="{{route('home')}}" class="hover:text-gray-500 transition-colors">Home</a>
+
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+
+                    <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
+                        {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+                    </a>
+
+                    <!-- Chevron Icon -->
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+
+                    <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                </nav>
+                <div class="meta_info py-4">
+                    {{-- ১. টাইটেল: ছবির মতো প্রফেশনাল হেডিং --}}
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
+                        {{ $category->name ?? 'Shop' }} Price in Bangladesh
+                    </h1>
+
+                    <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">
+                        @if (isset($category->description) && $category->description)
+                            {!! $category->description !!}
+                        @elseif (isset($category->meta_description) && $category->meta_description)
+                            {!! $category->meta_description !!}
+                        @else
+                            @php
+                                $minP = $products->min('sale_price') > 0 ? $products->min('sale_price') : $products->min('regular_price');
+                                $maxP = $products->max('sale_price') > 0 ? $products->max('sale_price') : $products->max('regular_price');
+                                $catName = $category->name ?? 'Product';
+                            @endphp
+
+                            {{ $catName }} price in Bangladesh range from
+                            <span class="font-bold text-gray-800">{{ $setup->currency }} {{ number_format($minP) }}</span> to
+                            <span class="font-bold text-gray-800">{{ $setup->currency }} {{ number_format($maxP) }}</span>,
+                            depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD.
+                        @endif
+                    </div>
+                </div>
+            </div>
+    </div>
+    </section>
     <!-- Mobile Filter Overlay (Right Drawer) -->
     <div id="right-filter-overlay" class="fixed inset-0 bg-black/60 z-[60] hidden lg:hidden transition-opacity"
         aria-hidden="true"></div>

@@ -39,8 +39,7 @@
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350"
-                width="300"
-                class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                width="300" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
         </a>
 
@@ -87,14 +86,23 @@
             </div>
         @endif
         <!-- Price Section -->
-        <div class="flex items-center gap-2 mb-3 ">
+        <div class="flex items-center gap-2 mb-3">
             @if ($regularPrice > $salePrice)
-                <span class="text-gray-500 text-[18px] line-through hind-siliguri-bold">
-                    {{ $setup->currency }} {{ number_format($regularPrice) }}
+                <span class="text-gray-500 text-sm line-through font-semibold">
+                    @if(($setup->currency_position ?? 'left') == 'left')
+                        {{ $setup->currency }} {{ number_format($regularPrice) }}
+                    @else
+                        {{ number_format($regularPrice) }} {{ $setup->currency }}
+                    @endif
                 </span>
             @endif
-            <span class="text-brand  text-[18px]  hind-siliguri-bold">
-                {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+
+            <span class="text-brand text-lg font-semibold">
+                @if(($setup->currency_position ?? 'left') == 'left')
+                    {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+                @else
+                    {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }} {{ $setup->currency }}
+                @endif
             </span>
         </div>
     </div>
@@ -235,14 +243,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -272,14 +280,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {

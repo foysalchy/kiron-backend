@@ -13,52 +13,14 @@
     @endphp
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
-        <!-- 1. Dynamic Breadcrumb -->
-        <nav class="flex items-center space-x-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-4 no-scrollbar">
-            {{-- Home --}}
-            <a href="/" class="hover:text-[var(--primary-color)] flex items-center gap-1">
-                <i class="fas fa-home text-xs"></i> Home
-            </a>
-
-            {{-- ১. Mega Category --}}
-            @php $mega = $product->mega_categories?->first(); @endphp
-            @if ($mega)
-                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
-                <a href="{{ route('category.products', $mega->slug) }}" class="hover:text-[var(--primary-color)]">
-                    {{ $mega->name ?? '' }}
-                </a>
-            @endif
-
-            {{-- ২. Sub Category --}}
-            @php $sub = $product->sub_categories?->first(); @endphp
-            @if ($sub)
-                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
-                <a href="{{ route('category.products', $sub->slug) }}" class="hover:text-[var(--primary-color)]">
-                    {{ $sub->name ?? '' }}
-                </a>
-            @endif
-
-            {{-- ৩. Mini Category --}}
-            @php $mini = $product->mini_categories?->first(); @endphp
-            @if ($mini)
-                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
-                <a href="{{ route('category.products', $mini->slug) }}" class="hover:text-[var(--primary-color)]">
-                    {{ $mini->name ?? '' }}
-                </a>
-            @endif
-            @php $extra = $product->extra_categories?->first(); @endphp
-            @if ($extra)
-                <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
-                <a href="{{ route('category.products', $extra->slug) }}" class="hover:text-[var(--primary-color)]">
-                    {{ $extra->name ?? '' }}
-                </a>
-            @endif
-
-            {{-- ৪. Product Title --}}
-            <i class="fas fa-chevron-right text-[8px] opacity-50"></i>
-            <span class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">
-                {{ $product->title ?? '' }}
-            </span>
+        <!-- 1. Breadcrumb -->
+        <nav
+            class="flex items-center space-x-2 text-sm text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+            <a href="/" class="hover:text-[#FF6A00]">Home</a>
+            <i class="fas fa-chevron-right text-[8px]"></i>
+            <a href="#" class="hover:text-[#FF6A00]">{{ $category->name ?? 'Product Details' }}</a>
+            <i class="fas fa-chevron-right text-[8px]"></i>
+            <span class="text-[#F97316]">{{ $product->title ?? 'Product' }}</span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -69,14 +31,13 @@
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage"
-                            src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
                         @foreach ($allProductImages as $imgUrl)
                             <button onclick="changeImage('{{ $imgUrl }}')"
-                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden">
+                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
                                 <img src="{{ $imgUrl }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                     class="w-full h-full object-contain" alt="Product Image">
@@ -107,17 +68,28 @@
                         </span>
                         <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
                     </div>
-                    <div class="  mb-4 text-[18px] hind-siliguri-medium overflow-hidden relative">
-                        {!! $product->short_description ?? 'No detailed description available for this product.' !!}
+                   <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                        {!! $product->short_description !!}
                     </div>
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-400 text-lg line-through">{{ $setup->currency }}
-                                {{ number_format($product->display_price_data->regular_price) }}</span>
+                            <span id="regular-price" class="text-gray-400 text-lg line-through">
+                                @if(($setup->currency_position ?? 'left') == 'left')
+                                    {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
+                                @else
+                                    {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
+                                @endif
+                            </span>
                         @endif
-                        <span id="sale-price" class="text-3xl font-black secondary-text">{{ $setup->currency }}
-                            {{ number_format($product->display_price_data->sale_price) }}</span>
+
+                        <span id="sale-price" class="text-3xl font-black secondary-text">
+                            @if(($setup->currency_position ?? 'left') == 'left')
+                                {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
+                            @else
+                                {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
+                            @endif
+                        </span>
                     </div>
 
                     <!-- Dynamic Variations Container -->
@@ -135,9 +107,9 @@
                             <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                   <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
-    {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
-</span>
+                        <span class="text-sm {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                            {{ $product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock' }}
+                        </span>
                     </div>
 
                     <!-- Hidden Input for Selected Variation -->
@@ -146,24 +118,25 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
-                  <button id="btn-cart" onclick="handleAddToCart()"
-    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-    class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-    Add To Cart
-</button>
+                        <button id="btn-cart" onclick="handleAddToCart()"
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Add To Cart
+                        </button>
 
                         <!-- ২. Order Now -->
-                     <button id="btn-order" onclick="handleAddToCart(true)"
-    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-    class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-    Order Now
-</button>
+                        <button id="btn-order" onclick="handleAddToCart(true)"
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            Order Now
+                        </button>
+
                         <!--  Wishlist -->
                         <!-- Wishlist Button Updated -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-    class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
-    {{ $isWishlisted ? 'bg-orange-50 text-[var(--primary-color)] border-[var(--primary-color)]' : 'bg-white border-gray-100 text-gray-600' }}">
+                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
+                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -192,56 +165,52 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                    @if ($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                            @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
-                                <div
-                                    class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                                    <div class="text-orange-500 shrink-0">
-                                        @if ($card->icon_file)
-                                            <img src="{{ asset('storage/' . $card->icon_file) }}"
-                                                class="h-5 w-5 object-contain">
-                                        @else
-                                            <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
-                                        @endif
-                                    </div>
-                                    <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
+                     @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                        @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
+                            <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
+                                <div class="text-orange-500 shrink-0">
+                                    @if ($card->icon_file)
+                                        <img src="{{ asset('storage/' . $card->icon_file) }}"
+                                            class="h-5 w-5 object-contain">
+                                    @else
+                                        <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
+                                    @endif
                                 </div>
-                            @endforeach
-                        </div>
+                                <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
+                            </div>
+                        @endforeach
+                    </div>
                     @endif
 
                     <div class="bg-gray-100 py-3 px-3 rounded">
-                        <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
+                    <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
-                        <div class="grid grid-cols-2 gap-2 md:gap-3">
+                    <div class="grid grid-cols-2 gap-2 md:gap-3">
 
-                            <a href="tel:{{ $setup->phone }}"
-                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-phone h-5 w-5 mr-2">
-                                    <path
-                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                    </path>
-                                </svg>
-                                Call Now
-                            </a>
+                        <a href="tel:{{ $setup->phone }}"
+                            class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
+                                <path
+                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                </path>
+                            </svg>
+                            Call Now
+                        </a>
 
-                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
-                                target="_blank"
-                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="lucide lucide-message-circle h-5 w-5 mr-2">
-                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                                </svg>
-                                WhatsApp
-                            </a>
-                        </div>
-                    </div>
+                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                            target="_blank"
+                            class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                            </svg>
+                            WhatsApp
+                        </a>
+                    </div></div>
                 </div>
             </div>
         </div>
@@ -252,7 +221,7 @@
             <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
                 id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
-                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[var(--primary-color)] text-gray-900 bg-white font-bold">Description</button>
+                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
                 <button onclick="switchTab('specification')" id="tab-btn-specification"
                     class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
@@ -295,12 +264,13 @@
                             </span>
                         </div>
 
-                   <div class="flex items-center justify-between py-3 border-b border-gray-100">
-    <span class="font-medium text-gray-500">Availability:</span>
-    <span class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
-        {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
-    </span>
-</div>
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                            <span class="font-medium text-gray-500">Availability:</span>
+                            <span
+                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                            </span>
+                        </div>
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                             <span class="font-medium text-gray-500">Category:</span>
@@ -349,8 +319,7 @@
 
                     <!-- Review Summary Card -->
                     <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
-                        <div class="text-4xl font-bold text-[var(--primary-color)] mb-2">
-                            {{ number_format($avgRating, 1) }}</div>
+                        <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
                         <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
                             @for ($i = 1; $i <= 5; $i++)
                                 <i
@@ -408,7 +377,7 @@
                                             <div class="flex flex-wrap gap-3 mb-4">
                                                 @foreach ($review->images as $img)
                                                     <div
-                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[var(--primary-color)] transition-all cursor-pointer">
+                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
                                                         <img src="{{ asset('storage/' . $img) }}"
                                                             onclick="expandReviewImage(this.src, '{{ $review->id }}')"
                                                             class="w-full h-full object-cover" alt="Review Image">
@@ -497,171 +466,119 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
             document.getElementById('tab-content-' + tabId).classList.remove('hidden');
             document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('text-gray-900', 'border-[var(--primary-color)]', 'bg-white');
+                b.classList.remove('text-gray-900', 'border-[#FF6A00]', 'bg-white');
                 b.classList.add('text-gray-500', 'border-transparent');
             });
-            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[var(--primary-color)]',
-                'bg-white');
+            document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[#FF6A00]', 'bg-white');
         }
 
+        // variation and gallery data
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
-        const valueImages = @json($valueImages ?? []);
-        const defaultGalleries = @json($defaultGalleries ?? []);
-        const groupCategories = @json($groupCategories ?? []);
-
-        let activeFilters = {};
-        attributeGroups.forEach(group => activeFilters[group] = null);
-        let finalSelectedVariationIds = [];
+        let userSelections = {};
+        let originalGalleryHtml = ''; // save main gallery
 
         function renderAttributes() {
-            const container = document.getElementById('dynamic-attributes-container');
-            if (!container) return;
-            container.innerHTML = '';
+        const container = document.getElementById('dynamic-attributes-container');
+        if (!container) return;
+        container.innerHTML = '';
+        let currentlyValidVariations = allVariations;
 
-            let currentlyValidVariations = allVariations;
+        for (let i = 0; i < attributeGroups.length; i++) {
+            const groupName = attributeGroups[i];
+            const isLastGroup = (i === attributeGroups.length - 1);
+            let availableValues = {};
+            currentlyValidVariations.forEach(v => {
+                if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
+            });
 
-            for (let i = 0; i < attributeGroups.length; i++) {
-                const groupName = attributeGroups[i];
-                const isLastGroup = (i === attributeGroups.length - 1);
+            let groupHtml = `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+            for (const [valId, valName] of Object.entries(availableValues)) {
+                const isFilterActive = (activeFilters[groupName] == valId);
+                const isVariationSelected = checkIsSelected(groupName, valId);
+                const activeClass = (isFilterActive || isVariationSelected) ? 'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
 
-                let availableValues = {};
-                currentlyValidVariations.forEach(v => {
-                    if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[
-                        groupName].name;
-                });
+                let btnContent = valueImages[valId] ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}` : valName;
 
-                let groupHtml =
-                    `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
-
-                for (const [valId, valName] of Object.entries(availableValues)) {
-                    const isFilterActive = (activeFilters[groupName] == valId);
-                    const isVariationSelected = checkIsSelected(groupName, valId);
-
-                    const activeClass = (isFilterActive || isVariationSelected) ?
-                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
-                        'border-gray-200 bg-white text-gray-700';
-
-                    // ফিক্স: বাটনের ভেতরে ইমেজ দেখানোর লজিক
-                    let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
-                        : valName;
-
-                    groupHtml +=
-                        `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${btnContent}</button>`;
-                }
-                groupHtml += `</div></div>`;
-                container.innerHTML += groupHtml;
-
-                if (!activeFilters[groupName]) break;
-
-                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
+                groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${btnContent}</button>`;
             }
-            document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
+            groupHtml += `</div></div>`;
+            container.innerHTML += groupHtml;
+            if (!activeFilters[groupName]) break;
+            currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
         }
+        document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
+    }
 
-        function updateGalleryThumbnails(images) {
-            const container = document.getElementById('thumbnail-container');
-            if (!container) return;
+    function handleSelection(group, valId, isLastGroup) {
+        if (!isLastGroup) {
+            activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+            let idx = attributeGroups.indexOf(group);
+            for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+        } else {
+            activeFilters[group] = valId;
+            let matched = allVariations.find(v => {
+                return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+            });
+            if (matched) {
+                let isSingleChoice = false;
+                for (let gName in matched.attributes) { if (groupCategories[gName] === 'single') { isSingleChoice = true; break; } }
 
-            container.innerHTML = '';
-            // ডিফল্ট থাম্বনেইল (প্রোডাক্টের মেইন ইমেজ)
-            container.innerHTML += `
-                <button onclick="changeImage('${images[0]}')"
-                    class="aspect-square rounded-lg border-2 border-[var(--primary-color)] p-1 bg-white overflow-hidden">
-                    <img src="${images[0]}" class="w-full h-full object-contain">
-                </button>
-            `;
-
-            // বাকি ইমেজগুলো লুপে দেখাবে
-            for (let i = 1; i < images.length; i++) {
-                container.innerHTML += `
-                    <button onclick="changeImage('${images[i]}')"
-                        class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[var(--primary-color)] transition-colors overflow-hidden">
-                        <img src="${images[i]}"
-                            onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                            class="w-full h-full object-contain">
-                    </button>
-                `;
-            }
-        }
-
-        function handleSelection(group, valId, isLastGroup) {
-            if (!isLastGroup) {
-                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
-                let idx = attributeGroups.indexOf(group);
-                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-
-                if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-            } else {
-                activeFilters[group] = valId;
-                let matched = allVariations.find(v => {
-                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
-                });
-
-                if (matched) {
-                    // ফিক্স: Single/Multiple ক্যাটাগরি চেক
-                    let isSingleChoice = false;
-                    for (let gName in matched.attributes) {
-                        if (groupCategories[gName] === 'single') {
-                            isSingleChoice = true;
-                            break;
-                        }
-                    }
-
-                    if (isSingleChoice) {
-                        // Single হলে আগের সব বাদ দিয়ে শুধু নতুনটা
-                        finalSelectedVariationIds = [matched.id];
-
+                if (isSingleChoice) {
+                    finalSelectedVariationIds = [matched.id];
+                    let combined = [...(matched.galleries || []), ...defaultGalleries];
+                    updateGalleryThumbnails([...new Set(combined)]);
+                    if (matched.main_image) changeImage(matched.main_image);
+                } else {
+                    const index = finalSelectedVariationIds.indexOf(matched.id);
+                    if (index > -1) {
+                        finalSelectedVariationIds.splice(index, 1);
+                        if(finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                    } else {
+                        finalSelectedVariationIds.push(matched.id);
                         let combined = [...(matched.galleries || []), ...defaultGalleries];
                         updateGalleryThumbnails([...new Set(combined)]);
                         if (matched.main_image) changeImage(matched.main_image);
-                    } else {
-                        // Multiple হলে টগল লজিক
-                        const index = finalSelectedVariationIds.indexOf(matched.id);
-                        if (index > -1) {
-                            finalSelectedVariationIds.splice(index, 1);
-                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-                        } else {
-                            finalSelectedVariationIds.push(matched.id);
-
-                            let combined = [...(matched.galleries || []), ...defaultGalleries];
-                            updateGalleryThumbnails([...new Set(combined)]);
-                            if (matched.main_image) changeImage(matched.main_image);
-                        }
                     }
                 }
+                let formattedPrice = matched.price.toLocaleString();
+                let symbol = "{{ $setup->currency }}";
+                let pos = "{{ $setup->currency_position ?? 'left' }}";
+
+                let priceText = (pos === 'left') ? (symbol + " " + formattedPrice) : (formattedPrice + " " + symbol);
+
+                document.getElementById('sale-price').innerText = priceText;
+                if(matched.main_image) changeImage(matched.main_image);
             }
+        }
+        renderAttributes();
+    }
+
+        function selectOption(group, valId) {
+            userSelections[group] = valId;
             renderAttributes();
         }
 
-        function checkIsSelected(groupName, valId) {
-            return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
-        }
-
+        // add to cart
         function handleAddToCart(isOrderNow = false) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
-            console.log(token,'token')
             const qty = document.getElementById('main-qty').value;
-            let items = [];
+            const productType = '{{ $product->type }}';
 
-            let varIds = document.getElementById('selected-variation-id').value;
-            if ('{{ $product->type }}' === 'variation') {
-                let missingAttribute = attributeGroups.find(group => !activeFilters[group]);
+            let postData = {
+                qty: qty
+            };
 
-                if (missingAttribute) {
-                    toastr.warning(`Please select ${missingAttribute}`);
+            if (productType === 'single') {
+                postData.id = {{ $product->id }};
+            } else {
+                let varId = document.getElementById('selected-variation-id').value;
+                if (!varId) {
+                    toastr.warning('Please select all options (color/size)');
                     return;
                 }
-                varIds.split(',').forEach(id => items.push({
-                    variation_id: id,
-                    qty: qty
-                }));
-            } else {
-                items.push({
-                    id: {{ $product->id }},
-                    qty: qty
-                });
+                postData.variation_id = varId;
             }
 
             fetch("{{ route('cart.add') }}", {
@@ -671,18 +588,22 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
-                    body: JSON.stringify({
-                        items: items
-                    })
+                    body: JSON.stringify(postData)
                 })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
                         document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-                        if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
-                        else toastr.success(data.message);
-                    } else toastr.error(data.message);
-                });
+
+                        if (isOrderNow) {
+                            window.location.href = "{{ route('checkout.index') }}";
+                        } else {
+                            toastr.success(data.message);
+                        }
+                    } else {
+                        toastr.error(data.message);
+                    }
+                }).catch(err => toastr.error("Server error occurred."));
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -713,16 +634,14 @@
                         // temporary disable button to prevent multiple clicks
                         if (data.status === 'added') {
                             // added to change to active style and 'Wishlisted' text
-                            btnWish.classList.add('bg-orange-50', 'text-[var(--primary-color)]',
-                                'border-[var(--primary-color)]');
+                            btnWish.classList.add('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
                             btnWish.classList.remove('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'fas fa-heart text-red-500';
                             wishText.innerText = 'Wishlisted';
                             toastr.success(data.message);
                         } else {
                             // removed to change to default style and 'Wishlist' text
-                            btnWish.classList.remove('bg-orange-50', 'text-[var(--primary-color)]',
-                                'border-[var(--primary-color)]');
+                            btnWish.classList.remove('bg-orange-50', 'text-[#FF6A00]', 'border-[#FF6A00]');
                             btnWish.classList.add('bg-white', 'border-gray-100', 'text-gray-600');
                             wishIcon.className = 'far fa-heart';
                             wishText.innerText = 'Wishlist';

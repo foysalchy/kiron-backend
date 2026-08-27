@@ -50,9 +50,9 @@
 
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" height="80" width="200"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                         alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
-                        class="h-16 md:h-20 w-auto object-contain" />
+                        class="h-16 md:h-16 w-auto object-contain" />
                 </a>
             </div>
 

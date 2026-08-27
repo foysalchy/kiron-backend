@@ -12,7 +12,7 @@
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header">খাঁটি ভাই</span>
                 @endif

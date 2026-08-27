@@ -10,7 +10,7 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex-shrink-0">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.png') }}" alt="{{ $setup->shop_name }}" width="200"
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200"
                     height="48" class="h-8 md:h-12 w-auto">
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span

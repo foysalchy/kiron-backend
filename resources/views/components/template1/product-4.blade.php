@@ -21,7 +21,7 @@
             $discountLabel = $percentage . '%';
         }
     }
-    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;   
+    $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 @endphp
 
 <div
@@ -64,7 +64,7 @@
             <p
                 class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2  min-h-[30px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
-</p>
+            </p>
         </a>
 
         <!-- Price section -->
@@ -100,8 +100,7 @@
         <!-- action button -->
         <button {{ $isOutOfStock ? 'disabled' : '' }}
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            aria-label="cart button"
-            class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-2 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
+            aria-label="cart button" class="w-full text-white text-center text-xs md:text-sm font-bold rounded-lg mt-2 py-3 transition-all cursor-pointer shadow-sm flex items-center justify-center gap-2
             {{ $isOutOfStock ? 'bg-gray-300' : 'bg-[#be123c] hover:bg-red-700 active:scale-95' }}">
 
             @if ($isOutOfStock)
@@ -200,14 +199,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
@@ -235,14 +234,14 @@
                 };
 
                 fetch("{{ route('cart.add') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json', // এটি যোগ করা জরুরি
-                            'X-CSRF-TOKEN': token
-                        },
-                        body: JSON.stringify(postData)
-                    })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify(postData)
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {

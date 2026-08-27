@@ -41,7 +41,7 @@
                     <!-- Thumbnails -->
                     <div
                         class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
-                        
+
                         <!-- Thumbnails (Updated to show all images) -->
                         <div id="thumbnail-container"
                             class="flex md:flex-col gap-2 overflow-x-auto md:overflow-y-auto shrink-0 order-2 md:order-1 md:w-20 lg:w-24 pb-2 md:pb-0 no-scrollbar">
@@ -62,9 +62,8 @@
                             alt="main image" class="w-full h-full object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
-                        <button onclick="toggleWishlist({{ $product->id }})" type="button"
-                            class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
-                            {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
+                        <button onclick="toggleWishlist({{ $product->id }})" type="button" class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
+                                {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
 
                             <i
                                 class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"></i>
@@ -85,13 +84,22 @@
                         </p>
 
                         <div class="flex items-baseline gap-2 md:gap-3 pt-3 md:pt-4">
-                            <span id="sale-price"
-                                class="text-2xl md:text-3xl font-bold text-[var(--primary-color)]">{{ $setup->currency }}
-                                {{ number_format($product->display_price_data->sale_price) }}</span>
+                            <span id="sale-price" class="text-2xl md:text-3xl font-bold text-[var(--primary-color)]">
+                                @if(($setup->currency_position ?? 'left') == 'left')
+                                    {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
+                                @else
+                                    {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
+                                @endif
+                            </span>
+
                             @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                                <span id="regular-price"
-                                    class="text-lg md:text-xl text-gray-400 line-through">{{ $setup->currency }}
-                                    {{ number_format($product->display_price_data->regular_price) }}</span>
+                                <span id="regular-price" class="text-lg md:text-xl text-gray-400 line-through">
+                                    @if(($setup->currency_position ?? 'left') == 'left')
+                                        {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
+                                    @else
+                                        {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
+                                    @endif
+                                </span>
                             @endif
                         </div>
 
@@ -182,8 +190,8 @@
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Features
                         </button>
-                        <button onclick="scrollToSection('section-specifications', this)" role="tab"
-                            aria-selected="false" aria-controls="section-specifications"
+                        <button onclick="scrollToSection('section-specifications', this)" role="tab" aria-selected="false"
+                            aria-controls="section-specifications"
                             class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Specifications
                         </button>
@@ -196,7 +204,8 @@
                     <!-- 1. Description Content (scroll-mt-32 দিয়ে উপরে জায়গা রাখা হয়েছে) -->
                     <div id="section-description"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                        <h2
+                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Description
                         </h2>
                         <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
@@ -207,7 +216,8 @@
                     <!-- 2. Features Content (short_description থেকে ডাটা নেওয়া হয়েছে) -->
                     <div id="section-features"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                        <h2
+                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Features
                         </h2>
                         <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
@@ -218,7 +228,8 @@
                     <!-- 3. Specifications Content -->
                     <div id="section-specifications"
                         class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2 class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                        <h2
+                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
                             Product Specifications
                         </h2>
                         <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
@@ -278,7 +289,8 @@
                                 <div class="min-w-0 flex-1">
                                     <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
                                     <p class="text-xs font-bold text-[var(--primary-color)] mt-1">{{ $setup->currency }}
-                                        {{ number_format($rel->sale_price) }}</p>
+                                        {{ number_format($rel->sale_price) }}
+                                    </p>
                                 </div>
                             </a>
                         @endforeach
@@ -326,10 +338,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                    <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                        onclick="changeImage('${imgUrl}', this)">
-                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
-                    </button>`;
+                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                            onclick="changeImage('${imgUrl}', this)">
+                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                        </button>`;
             });
         }
 
@@ -445,16 +457,16 @@
             }
 
             fetch("{{ route('cart.add') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({
-                        items: items
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    items: items
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -474,15 +486,15 @@
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
             fetch("{{ route('wishlist.toggle') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({
-                        product_id: productId
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    product_id: productId
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'unauthorized') {

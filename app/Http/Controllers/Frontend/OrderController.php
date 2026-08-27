@@ -458,7 +458,7 @@ class OrderController extends FrontendController
                 'orderDetails.product' => function ($query) {
                     $query->withTrashed()->select(['id', 'title', 'slug', 'thumbnail']); // This loads deleted products
                 },
-                'orderDetails.variation:id,product_id,display_name,regular_price,sale_price',
+                'orderDetails.variation',
                 'orderDetails.variation.attributes.attributeValue:id,name',
                 'orderDetails.variation.attributes.attributeGroup:id,name'
             ])

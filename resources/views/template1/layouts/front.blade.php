@@ -101,7 +101,7 @@
     @stack('styles')
 </head>
 
-<body>
+<body class="font-['Poppins',_sans-serif]">
     <!-- HEADER -->
     @include('template1.partials.header')
 
