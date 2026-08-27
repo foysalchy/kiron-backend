@@ -263,7 +263,9 @@ html.lenis {
     line-height: 20px;
     font-weight: 600;
 }
-
+.prose hr{
+  margin:10px 0px !important;
+}
 .prose h5 {
     margin-top: 0;
     margin-bottom: 5px;
