@@ -330,7 +330,7 @@
     
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
-    <section class=" container mx-auto   p-0  ">
+    <section class=" container mx-auto   p-0 pb-12 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
             Latest Offers
