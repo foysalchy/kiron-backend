@@ -132,6 +132,7 @@
             border-radius: 999px;
             opacity: 0;
             transition: opacity .35s ease;
+            pointer-events: none;
         }
         .group:hover .sear-corner::after { opacity: 1; }
 

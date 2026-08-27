@@ -208,21 +208,21 @@
         <p class="text-gray-600 text-center mb-4">Buy Your Desired Products from Featured Categories</p>
 
         <!-- Categories Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
 
             @foreach ($headerCategories as $category)
                 <a href="{{ route('category.products', $category->slug) }}"
-                    class="bg-white shadow-sm p-3 min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
+                    class="bg-white pb-[10px]  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
 
                     <!-- Icon / Image -->
-                    <div class="w-16 h-16 mb-2 flex items-center justify-center overflow-hidden">
+                    <div class="  mb-2 flex items-center justify-center overflow-hidden">
                         @if($category->image_url)
                             <img
                                 src="{{ $category->image_url }}"
                                 alt="{{ $category->name }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
-                                class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110"
+                                class="w-full h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
                             >
                         @else
                             <i class="fas fa-layer-group text-2xl text-gray-400"></i>
@@ -230,8 +230,8 @@
                     </div>
 
                     <!-- Category Name -->
-                    <h3 class="font-semibold text-[#0f172a] text-xs md:text-sm leading-tight
-                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
+                    <h3 class=" text-[#0f172a] text-xl font-normal leading-tight
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2" style="font-weight: 400 !important;color: #333;font-size: 16px !important;padding-top: 8px;">
                         {{ $category->name }}
                     </h3>
 
@@ -330,7 +330,7 @@
 
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
-    <section class="container mx-auto p-0  ">
+    <section class=" container mx-auto   p-0 mb-12 ">
         <!-- Section Title -->
         <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
             Latest Offers
