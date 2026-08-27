@@ -57,9 +57,9 @@
 
                     <!-- Main Image Box -->
                     <div
-                        class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2 aspect-square lg:aspect-[3/4]">
+                        class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2  ">
                         <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
-                            alt="main image" class="w-full h-full object-contain transition-all duration-500" />
+                            alt="main image" class=" m-auto object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
                         <button onclick="toggleWishlist({{ $product->id }})" type="button" class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
@@ -74,11 +74,11 @@
                 <!-- RIGHT COLUMN (Info) -->
                 <div class="lg:col-span-5 flex flex-col gap-y-4 md:gap-y-6">
                     <div>
-                        <h1 class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                        <h1 class="text-xl md:text-2xl lg:text-3xl font-normal text-gray-900 leading-tight">
                             {{ $product->title }}
                         </h1>
 
-                        <p class="text-gray-500 mt-1 md:mt-2 text-lg md:text-xl lg:text-2xl font-medium pt-2 md:pt-4">
+                        <p class="text-gray-500 mt-1 text-lg font-medium pt-2 ">
                             Brand Name: <span
                                 class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
                         </p>
@@ -103,7 +103,7 @@
                             @endif
                         </div>
 
-                        <hr class="my-4 md:my-6 border-gray-200" />
+                        <hr class="my-2 md:my-3 border-gray-200" />
 
                         <!-- Dynamic Variations Container (বিকাশের মতো ভ্যারিয়েশন লজিক এখানে আসবে) -->
                         @if ($product->type === 'variation')
@@ -115,7 +115,7 @@
                             {!! $product->short_description !!}
                         </div>
 
-                        <hr class="my-4 md:my-6 border-gray-200" />
+                        <hr class="my-2 md:my-3 border-gray-200" />
                     </div>
 
                     <div>
@@ -151,16 +151,25 @@
                         </p>
 
                         <!-- Contact Help -->
-                        <div class="mt-6 md:mt-8 border-t border-gray-100 pt-5 md:pt-6">
-                            <p class="font-bold text-gray-800 text-sm md:text-base">Have a question?</p>
-                            <div class="flex flex-wrap gap-4 md:gap-6 mt-4">
+                        <div class="mt-3 md:mt-4 border border-gray-200 rounded-xl p-4 md:p-5 bg-white">
+                            <p class="font-semibold text-gray-800 text-sm md:text-base mb-3">
+                                Have a question?
+                            </p>
+
+                            <div class="flex flex-wrap gap-2 md:gap-3">
+                                <!-- Call -->
                                 <a href="tel:{{ $setup->phone }}"
-                                    class="flex items-center gap-2 font-bold text-gray-800 hover:text-[var(--primary-color)]">
-                                    Call: {{ $setup->phone }}
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-gray-300 hover:bg-gray-50 transition-all duration-200">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                    <span>Call: {{ $setup->phone }}</span>
                                 </a>
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}" target="_blank"
-                                    class="flex items-center gap-2 font-bold text-green-600">
-                                    WhatsApp
+
+                                <!-- WhatsApp -->
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}"
+                                    target="_blank"
+                                    class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-600 transition-all duration-200">
+                                    <i class="fa-brands fa-whatsapp text-base"></i>
+                                    <span>WhatsApp</span>
                                 </a>
                             </div>
                         </div>
