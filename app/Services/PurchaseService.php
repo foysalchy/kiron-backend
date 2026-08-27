@@ -13,10 +13,13 @@ use Illuminate\Support\Facades\{DB, Log};
 class PurchaseService
 {
     protected ProductService $productService;
+    protected PartyDueService $partyDueService;
 
-    public function __construct(ProductService $productService)
+
+    public function __construct(ProductService $productService, PartyDueService $partyDueService)
     {
         $this->productService = $productService;
+        $this->partyDueService = $partyDueService;
     }
 
     /**
@@ -150,6 +153,10 @@ class PurchaseService
                 }
             }
 
+            if ($purchase->supplier_id) {
+                $this->partyDueService->recalculatePartyDue($purchase->supplier_id);
+            }
+
             DB::commit();
 
             Log::info('Purchase created successfully', ['purchase_id' => $purchase->id]);
@@ -238,6 +245,9 @@ class PurchaseService
             }
 
             $purchase->update($data);
+            if ($purchase->supplier_id) {
+                $this->partyDueService->recalculatePartyDue($purchase->supplier_id);
+            }
 
             DB::commit();
 
@@ -358,6 +368,10 @@ class PurchaseService
             ]);
 
             $purchase->updatePaymentStatus();
+
+            if ($purchase->supplier_id) {
+                $this->partyDueService->recalculatePartyDue($purchase->supplier_id);
+            }
 
             DB::commit();
 
