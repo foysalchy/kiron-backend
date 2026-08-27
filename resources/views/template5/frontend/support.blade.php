@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template5.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.faq-meta', ['setup' => $setup])
 @endsection

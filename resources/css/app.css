@@ -39,8 +39,36 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
---font-manrope: "Manrope", sans-serif;
+    --font-manrope: "Manrope", sans-serif;
 
+    /* fonts (matching your old tailwind.config aliases) */
+    --font-display: "Manrope", serif;
+    --font-body: "Manrope", sans-serif;
+    --font-mono: "Manrope", monospace;
+
+    /* colors */
+    --color-coal: #18130F;
+    --color-coal-900: #0F0C0A;
+    --color-coal-800: #18130F;
+    --color-coal-700: #241D18;
+    --color-coal-600: #332922;
+
+    --color-ash: #F6F1E6;
+    --color-ash-50: #FBF8F2;
+    --color-ash-100: #F6F1E6;
+    --color-ash-200: #EDE4D2;
+
+    --color-ember: #D6431F;
+    --color-ember-600: #B8371A;
+    --color-ember-700: #93290F;
+    --color-ember-400: #E6633F;
+
+    --color-smoke: #8B8175;
+    --color-smoke-300: #B5AC9E;
+
+    --color-gold: #C99A45;
+
+    --color-char-green: #4C6444;
 }
 a,
 button,
@@ -202,3 +230,4 @@ html.lenis {
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
