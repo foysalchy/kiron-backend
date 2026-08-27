@@ -119,7 +119,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
 
             <!-- LEFT: Dynamic Swiper Slider -->
-            <div class="lg:col-span-3 relative group overflow-hidden shadow-lg">
+            <div class="lg:col-span-3 relative group overflow-hidden ">
                 <div class="swiper mainHeroSwiper w-full h-auto">
                     <div class="swiper-wrapper">
                         @forelse($mainSliders as $slider)
@@ -127,7 +127,7 @@
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
                                     <img src="{{ $slider->image_url ?? ''}}"
                                         alt="{{ $slider->title ?: 'Promotion Slider Image' }}"  
-                                        class="w-full h-full object-cover" @if ($loop->first) fetchpriority="high"
+                                        class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
                                         loading="eager" @else loading="lazy" @endif />
                                 </a>
                             </div>
@@ -141,7 +141,7 @@
 
             <!-- RIGHT: Side Banner (Dynamic but Static Image) -->
             <div
-                class="hidden lg:block lg:col-span-1 h-[450px] overflow-hidden shadow-lg border border-gray-100 rounded-2xl">
+                class="hidden lg:block lg:col-span-1 h-[450px] overflow-hidden border border-gray-100 rounded-2xl">
                 @php $sideBanner = $sidebarSliders->first(); @endphp
                 @if ($sideBanner)
                     <a href="{{ $sideBanner->url ?? '#' }}" aria-label="{{ $sideBanner->title ?? 'banner Image' }}">
@@ -207,7 +207,7 @@
         </h2>
 
         <!-- Categories Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-3">
 
             @foreach ($headerCategories as $category)
                 <a href="{{ route('category.products', $category->slug) }}"
