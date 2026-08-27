@@ -79,6 +79,14 @@ class CachedOptionsObserver
         if ($model instanceof DomainSetup && $model->isDirty('sub_domain')) {
             DomainSetup::clearSubdomainCache($model->getOriginal('sub_domain'));
         }
+        if ($model instanceof SystemPage) {
+            if ($model->isDirty('page_type') || $model->isDirty('company_id')) {
+                SystemPage::clearPageTypeCache(
+                    $model->getOriginal('page_type'),
+                    $model->getOriginal('company_id')
+                );
+            }
+        }
     }
 
 
