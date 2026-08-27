@@ -159,9 +159,9 @@ class HomeController extends FrontendController
         });
 
         $mainSliders = $allSliders->where('placement', 'hero');
+    
         $sidebarSliders = $allSliders->where('placement', 'right');
         $middleSliders = $allSliders->where('placement', 'middle')->take(3);
-
         // ১১. অল রিভিউস
         $allReviews = Cache::remember("home_reviews_{$companyId}", $ttl, function () use ($companyId) {
             return ProductReview::where('company_id', $companyId)
@@ -170,7 +170,7 @@ class HomeController extends FrontendController
                 ->latest()
                 ->get();
         });
-
+  
         // ভিউতে ডেটা পাঠানো
         return $this->view('frontend.home', compact(
             'categories',

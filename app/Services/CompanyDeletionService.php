@@ -5,8 +5,9 @@ namespace App\Services;
 use App\Models\Company;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use App\Models\DomainSetup;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\{DB, Log, Storage};
+use Illuminate\Support\Facades\{Cache, DB, Log, Storage};
 
 class CompanyDeletionService
 {
@@ -203,127 +204,54 @@ class CompanyDeletionService
             : $query->delete();
     }
 
-
-    protected function getCleanPath($path): ?string
+    public static function getCompanyFolder(int $companyId): string
     {
-        if (!$path) {
-            return null;
-        }
-
-        if (filter_var($path, FILTER_VALIDATE_URL)) {
-            $parsedUrl = parse_url($path);
-            $path = $parsedUrl['path'] ?? $path;
-        }
-
-        return ltrim($path, '/');
+        $prefix = self::getCompanyPrefix($companyId);
+        return "{$prefix}_{$companyId}";
     }
-
-
-    protected function deleteCompanyImages(Company $company): int
+    protected static function getCompanyPrefix(int $companyId): string
     {
-        $deletedCount = 0;
-        $companyId = $company->id;
+        return Cache::rememberForever("domain_prefix_company_{$companyId}", function () use ($companyId) {
+            $domainSetup = DomainSetup::where('company_id', $companyId)->first();
+            return $domainSetup->prefix ?? 'default';
+        });
+    }
+    /**
+     * Company force delete হওয়ার সময় R2 থেকে পুরো company folder (সব sub-folder/file সহ) delete করে
+     */
+    public static function deleteCompanyFolder(int $companyId, string $disk = 'r2'): bool
+    {
+        try {
+            $companyFolder = self::getCompanyFolder($companyId);
 
-        $productIds = $this->getBaseQuery(\App\Models\Product::class)
-            ->where('company_id', $companyId)
-            ->pluck('id')
-            ->all();
-
-        $variationIds = $this->getBaseQuery(\App\Models\ProductVariation::class)
-            ->whereIn('product_id', $productIds)
-            ->pluck('id')
-            ->all();
-
-        foreach ($this->imageSources as $source) {
-            $modelClass = $source['model'];
-            $columns    = $source['columns'];
-            $scope      = $source['scope'];
-
-            if (!class_exists($modelClass)) {
-                Log::warning("Model class does not exist under this namespace. Skipping.", [
-                    'model' => $modelClass
-                ]);
-                continue;
-            }
-
-            if (empty($columns)) {
-                continue;
-            }
-
-            $query = $this->getBaseQuery($modelClass);
-
-            match ($scope) {
-                'self'          => $query->where('id', $companyId),
-                'company_id'    => $query->where('company_id', $companyId),
-                'via_product'   => $query->whereIn('product_id', $productIds),
-                'via_variation' => $query->whereIn('variation_id', $variationIds),
-                default         => null,
-            };
-
-            $rows = $query->get($columns);
-
-            Log::info("Image source query executed", [
-                'model' => $modelClass,
-                'records_found' => $rows->count()
+            Log::info('Attempting to delete R2 company folder', [
+                'company_id' => $companyId,
+                'folder'     => $companyFolder,
             ]);
 
-            foreach ($rows as $row) {
-                foreach ($columns as $col) {
-                    $value = method_exists($row, 'getRawOriginal')
-                        ? $row->getRawOriginal($col)
-                        : $row->{$col};
+            // deleteDirectory স্বয়ংক্রিয়ভাবে ওই prefix-এর নিচের সব file/sub-folder রিকার্সিভলি delete করে
+            $deleted = Storage::disk($disk)->deleteDirectory($companyFolder);
 
-                    if (!$value) {
-                        continue;
-                    }
-
-                    $paths = [];
-                    if (is_array($value)) {
-                        $paths = $value;
-                    } elseif (is_string($value)) {
-                        $decoded = json_decode($value, true);
-                        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                            $paths = $decoded;
-                        } else {
-                            $paths = [$value];
-                        }
-                    }
-
-                    foreach ($paths as $path) {
-                        $cleanPath = $this->getCleanPath($path);
-
-                        if ($cleanPath) {
-                            Log::info("Attempting to delete R2 file", [
-                                'model'  => $modelClass,
-                                'column' => $col,
-                                'path'   => $cleanPath
-                            ]);
-
-                            try {
-                                if (Storage::disk('r2')->delete($cleanPath)) {
-                                    $deletedCount++;
-                                    Log::info("Successfully deleted R2 file", ['path' => $cleanPath]);
-                                } else {
-                                    Log::warning("R2 deletion returned false for file", ['path' => $cleanPath]);
-                                }
-                            } catch (\Throwable $e) {
-                                Log::error("Failed to delete R2 file due to Exception", [
-                                    'path'  => $cleanPath,
-                                    'error' => $e->getMessage()
-                                ]);
-                            }
-                        }
-                    }
-                }
+            if ($deleted) {
+                Log::info('Successfully deleted R2 company folder', [
+                    'company_id' => $companyId,
+                    'folder'     => $companyFolder,
+                ]);
+            } else {
+                Log::warning('R2 folder deletion returned false', [
+                    'company_id' => $companyId,
+                    'folder'     => $companyFolder,
+                ]);
             }
+
+            return $deleted;
+        } catch (\Throwable $e) {
+            Log::error('Failed to delete R2 company folder due to Exception', [
+                'company_id' => $companyId,
+                'error'      => $e->getMessage(),
+            ]);
+            return false;
         }
-
-        Log::info('Deleted R2 images for company', [
-            'company_id' => $company->id,
-            'files_deleted' => $deletedCount,
-        ]);
-
-        return $deletedCount;
     }
 
     public function softDelete(int $id): bool
@@ -411,7 +339,7 @@ class CompanyDeletionService
                 'company_name' => $company->name,
             ]);
 
-            $filesDeleted = $this->deleteCompanyImages($company);
+            $filesDeleted = $this->deleteCompanyFolder($company->id);
 
             $companyId   = $company->id;
             $companyName = $company->name;
@@ -463,7 +391,7 @@ class CompanyDeletionService
 
             $companyModels = [
                 \App\Models\AccountGroup::class,
-                \App\Models\AccountType::class,
+       
                 \App\Models\ActionLog::class,
                 \App\Models\AiSetting::class,
                 \App\Models\Area::class,
@@ -488,22 +416,21 @@ class CompanyDeletionService
                 \App\Models\ChannelConnection::class,
                 \App\Models\ChannelGroup::class,
                 \App\Models\ChartOfAccount::class,
-                \App\Models\Company::class,
+
                 \App\Models\CompanyUpdateRequest::class,
                 \App\Models\ContactMessage::class,
                 \App\Models\ContentSetting::class,
                 \App\Models\Conversation::class,
-                \App\Models\ConversationAssignment::class,
                 \App\Models\Coupon::class,
-                \App\Models\CouponUsage::class,
+
                 \App\Models\Courier::class,
                 \App\Models\CourierCheckHistory::class,
                 \App\Models\CourierMethod::class,
-                \App\Models\CrmNote::class,
+        
                 \App\Models\Currency::class,
                 \App\Models\CustomerGroup::class,
                 \App\Models\CustomerPaymentMethod::class,
-                \App\Models\CustomerReview::class,
+       
                 \App\Models\Department::class,
                 \App\Models\DisposalType::class,
                 \App\Models\Domain::class,
@@ -519,17 +446,16 @@ class CompanyDeletionService
                 \App\Models\ExtraOrderCharge::class,
                 \App\Models\FirebaseSetting::class,
                 \App\Models\FooterCode::class,
-                \App\Models\Gallery::class,
+    
                 \App\Models\GeneratePayslip::class,
                 \App\Models\Holiday::class,
                 \App\Models\InventoryAudit::class,
-                \App\Models\InventoryAuditItem::class,
+    
                 \App\Models\IpDirectory::class,
                 \App\Models\IpSetting::class,
                 \App\Models\JobTitle::class,
                 \App\Models\KnowledgeBase::class,
                 \App\Models\Label::class,
-                \App\Models\LabelParty::class,
                 \App\Models\LandingPage::class,
                 \App\Models\Lead::class,
                 \App\Models\LeadNote::class,
@@ -538,28 +464,22 @@ class CompanyDeletionService
                 \App\Models\LeaveApplication::class,
                 \App\Models\LeaveType::class,
                 \App\Models\Market::class,
-                \App\Models\MasterBrand::class,
-                \App\Models\MasterDemo::class,
-                \App\Models\MasterFeature::class,
+
                 \App\Models\MegaCategory::class,
                 \App\Models\MenuSetting::class,
-                \App\Models\Message::class,
-                \App\Models\MetaConversationState::class,
+
                 \App\Models\MiniCategory::class,
                 \App\Models\NoteTemplate::class,
                 \App\Models\OfficeLocation::class,
                 \App\Models\OmniSetting::class,
                 \App\Models\Order::class,
-                \App\Models\OrderDetail::class,
+        
                 \App\Models\OrderNote::class,
-                \App\Models\OrderPayment::class,
+      
                 \App\Models\OrderReturn::class,
-                \App\Models\OrderReturnDetail::class,
-                \App\Models\OrderReturnPayment::class,
+        
                 \App\Models\Page::class,
                 \App\Models\Party::class,
-                \App\Models\PartyActivity::class,
-                \App\Models\PassChange::class,
                 \App\Models\PayHead::class,
                 \App\Models\PayRoll::class,
                 \App\Models\PayRollPayHead::class,
@@ -571,7 +491,7 @@ class CompanyDeletionService
                 \App\Models\PayslipItem::class,
                 \App\Models\Period::class,
                 \App\Models\PeriodType::class,
-                \App\Models\Permission::class,
+
                 \App\Models\Position::class,
                 \App\Models\Product::class,
                 \App\Models\ProductGroup::class,
@@ -583,11 +503,9 @@ class CompanyDeletionService
                 \App\Models\ProductVariationStockLedger::class,
                 \App\Models\ProductView::class,
                 \App\Models\Purchase::class,
-                \App\Models\PurchaseDetail::class,
                 \App\Models\PurchasePayment::class,
-                \App\Models\PurchasePaymentReturn::class,
                 \App\Models\PurchaseReturn::class,
-                \App\Models\PurchaseReturnDetail::class,
+             
                 \App\Models\QuikReply::class,
                 \App\Models\Quotation::class,
                 \App\Models\QuotationItem::class,
