@@ -6,9 +6,9 @@
     $menuItems = $customMenu ? $customMenu->items : null;
 @endphp
 <header class="w-full sticky top-0 z-50">
-   
 
-    <div class="header-custom-bg text-header py-4 px-4 md:px-10  ">
+
+    <div class="header-custom-bg text-header py-4 px-4 md:px-10 ">
         <div class="container mx-auto flex items-center justify-between gap-4">
             <button id="menu-toggle" aria-label="Open Menu" class="lg:hidden text-2xl focus:outline-none"
                 aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobile-sidebar">
@@ -167,7 +167,7 @@
             </div>
         </form>
     </div>
-
+</header>
     <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100">
         <div class="container mx-auto px-4 md:px-10">
             <ul class="flex items-center justify-center text-sm font-semibold text-gray-700">
@@ -403,7 +403,7 @@
         </nav>
     </div>
     <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-[55]" aria-hidden="true"></div>
-</header>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchConfigs = [{

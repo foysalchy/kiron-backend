@@ -31,6 +31,7 @@ class ProductController extends FrontendController
     }
     public function index(Request $request)
     {
+        $breadcrumb = [['name' => 'All Products', 'slug' => 'shop']];
         $query = Product::with('variations')
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
@@ -66,7 +67,7 @@ class ProductController extends FrontendController
             ->get()
             ->unique('name');
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit','breadcrumb'))->with([
             'category'    => null,
             'allProducts' => $products
         ]);
@@ -74,29 +75,62 @@ class ProductController extends FrontendController
 
     public function categoryProducts(Request $request, $slug)
     {
+        $breadcrumb = [];
         $category = MegaCategory::where('slug', $slug)->first();
         $column = 'mega_category_ids';
 
 
-        if (!$category) {
-            $category = SubCategory::where('slug', $slug)->first();
-            $column = 'sub_category_ids';
+        if ($category) {
+            $column = 'mega_category_ids';
+            $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
         }
+
+        // ২. Sub Category চেক
         if (!$category) {
-            $category = MiniCategory::where('slug', $slug)->first();
-            $column = 'mini_category_ids';
+            $category = SubCategory::with('megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'sub_category_ids';
+                if ($category->megaCategory) {
+                    $breadcrumb[] = ['name' => $category->megaCategory->name, 'slug' => $category->megaCategory->slug];
+                }
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+            }
         }
+
+        // ৩. Mini Category চেক
         if (!$category) {
-        $category = ExtraCategory::where('slug', $slug)->first();
-        $column = 'extra_category_ids';
-    }
+            $category = MiniCategory::with('subCategory.megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'mini_category_ids';
+                $sub = $category->subCategory;
+                $mega = $sub?->megaCategory;
+                if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
+                if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+            }
+        }
+
+        // ৪. Extra Category চেক
+        if (!$category) {
+            $category = ExtraCategory::with('miniCategory.subCategory.megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'extra_category_ids';
+                $mini = $category->miniCategory;
+                $sub = $mini?->subCategory;
+                $mega = $sub?->megaCategory;
+                if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
+                if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
+                if ($mini) $breadcrumb[] = ['name' => $mini->name, 'slug' => $mini->slug];
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+            }
+        }
 
         if (!$category) abort(401);
 
         $query = Product::where('status', Status::Active->value)
-        ->whereJsonContains($column, (int)$category->id) // এখানে $column ব্যবহার হবে
-        ->withCount('reviews')
-        ->withAvg('reviews', 'rating');
+            ->whereJsonContains($column, (int)$category->id) // এখানে $column ব্যবহার হবে
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
 
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
@@ -111,7 +145,7 @@ class ProductController extends FrontendController
             ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit','breadcrumb'))->with([
             'allProducts' => $products
         ]);
     }
@@ -127,69 +161,69 @@ class ProductController extends FrontendController
 
     // Variation Price Support
     private function applyFiltersAndSorting($query, $request)
-{
-    // ১. প্রোডাক্ট আইডি দিয়ে ফিল্টার (গ্রুপ প্রোডাক্টের জন্য)
-    if ($request->filled('filter_product_ids')) {
-        $query->whereIn('id', (array)$request->filter_product_ids);
-    }
+    {
+        // ১. প্রোডাক্ট আইডি দিয়ে ফিল্টার (গ্রুপ প্রোডাক্টের জন্য)
+        if ($request->filled('filter_product_ids')) {
+            $query->whereIn('id', (array)$request->filter_product_ids);
+        }
 
-    // ২. প্রাইস ফিল্টার (মেইন প্রাইস এবং ভ্যারিয়েশন প্রাইস উভয়ই চেক করবে)
-    if ($request->filled('min_price')) {
-        $min = $request->min_price;
-        $query->where(function ($q) use ($min) {
-            $q->where('regular_price', '>=', $min)
-              ->orWhereHas('variations', function ($v) use ($min) {
-                  $v->where('regular_price', '>=', $min);
-              });
-        });
-    }
-
-    if ($request->filled('max_price')) {
-        $max = $request->max_price;
-        $query->where(function ($q) use ($max) {
-            $q->where(function($sq) use ($max){
-                $sq->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
-            })->orWhereHas('variations', function ($v) use ($max) {
-                $v->where('regular_price', '<=', $max);
+        // ২. প্রাইস ফিল্টার (মেইন প্রাইস এবং ভ্যারিয়েশন প্রাইস উভয়ই চেক করবে)
+        if ($request->filled('min_price')) {
+            $min = $request->min_price;
+            $query->where(function ($q) use ($min) {
+                $q->where('regular_price', '>=', $min)
+                    ->orWhereHas('variations', function ($v) use ($min) {
+                        $v->where('regular_price', '>=', $min);
+                    });
             });
-        });
-    }
+        }
 
-    // ৩. ব্র্যান্ড ফিল্টার
-    if ($request->filled('brand')) {
-        $query->whereIn('brand_id', (array)$request->brand);
-    }
-
-    // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
-    if ($request->filled('attributes')) {
-        foreach ($request->attributes as $groupId => $ids) {
-            $ids = array_filter((array)$ids);
-            if (!empty($ids)) {
-                $query->whereHas('variations.attributes', function ($q) use ($ids) {
-                    $q->whereIn('attribute_value_id', $ids);
+        if ($request->filled('max_price')) {
+            $max = $request->max_price;
+            $query->where(function ($q) use ($max) {
+                $q->where(function ($sq) use ($max) {
+                    $sq->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
+                })->orWhereHas('variations', function ($v) use ($max) {
+                    $v->where('regular_price', '<=', $max);
                 });
+            });
+        }
+
+        // ৩. ব্র্যান্ড ফিল্টার
+        if ($request->filled('brand')) {
+            $query->whereIn('brand_id', (array)$request->brand);
+        }
+
+        // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
+        if ($request->filled('attributes')) {
+            foreach ($request->attributes as $groupId => $ids) {
+                $ids = array_filter((array)$ids);
+                if (!empty($ids)) {
+                    $query->whereHas('variations.attributes', function ($q) use ($ids) {
+                        $q->whereIn('attribute_value_id', $ids);
+                    });
+                }
             }
         }
-    }
 
-    // ৫. সার্চ ফিল্টার
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function ($q) use ($search) {
-            $q->where('title', 'like', "%{$search}%")
-              ->orWhere('sku_code', 'like', "%{$search}%");
-        });
-    }
+        // ৫. সার্চ ফিল্টার
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('sku_code', 'like', "%{$search}%");
+            });
+        }
 
-    // ৬. সর্টিং
-    if ($request->sort == 'price_low') {
-        $query->orderBy('regular_price', 'asc');
-    } elseif ($request->sort == 'price_high') {
-        $query->orderBy('regular_price', 'desc');
-    } else {
-        $query->latest();
+        // ৬. সর্টিং
+        if ($request->sort == 'price_low') {
+            $query->orderBy('regular_price', 'asc');
+        } elseif ($request->sort == 'price_high') {
+            $query->orderBy('regular_price', 'desc');
+        } else {
+            $query->latest();
+        }
     }
-}
 
     public function productDetails($slug)
     {
@@ -230,10 +264,10 @@ class ProductController extends FrontendController
                 foreach ($variation->attributes as $attr) {
                     $groupName = $attr->attributeGroup?->name ?? 'Unknown';
 
-            // --- এই ৩টি লাইন যোগ করুন ---
-            if ($attr->attributeGroup && !isset($groupCategories[$groupName])) {
-                $groupCategories[$groupName] = $attr->attributeGroup->category;
-            }
+                    // --- এই ৩টি লাইন যোগ করুন ---
+                    if ($attr->attributeGroup && !isset($groupCategories[$groupName])) {
+                        $groupCategories[$groupName] = $attr->attributeGroup->category;
+                    }
                     $valId = $attr->attributeValue?->id;
 
                     if (!in_array($groupName, $attributeGroups)) $attributeGroups[] = $groupName;
@@ -302,8 +336,17 @@ class ProductController extends FrontendController
         // ডুপ্লিকেট ইমেজ বাদ দেওয়া এবং ইনডেক্স ঠিক করা
         $allProductImages = array_values(array_unique(array_filter($allProductImages)));
 
-        return $this->view('frontend.productDetails', compact('product', 'relatedProducts', 'attributeGroups',
-        'formattedVariations', 'trustBadges', 'valueImages', 'defaultGalleries', 'allProductImages','groupCategories'));
+        return $this->view('frontend.productDetails', compact(
+            'product',
+            'relatedProducts',
+            'attributeGroups',
+            'formattedVariations',
+            'trustBadges',
+            'valueImages',
+            'defaultGalleries',
+            'allProductImages',
+            'groupCategories'
+        ));
     }
     public function flashSale(Request $request)
     { // Filter products that have a discount > 0

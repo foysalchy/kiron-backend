@@ -23,38 +23,36 @@
             <div class="archiveTopInfo">
 
                 <!-- Breadcrumb -->
-                <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                    <a href="{{route('home')}}" class="hover:text-gray-500 transition-colors">Home</a>
-
-                    <!-- Chevron Icon -->
-                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                    </svg>
-
-                    <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
-                        {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
+                <nav class="hidden md:flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                        <i class="fas fa-home text-xs"></i> Home
                     </a>
 
-                    <!-- Chevron Icon -->
-                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                    </svg>
+                    @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                        @foreach($breadcrumb as $item)
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                            </svg>
 
-                    <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
+                            @if($loop->last)
+                                <span class="text-[var(--primary-color)] font-bold">{{ $item['name'] }}</span>
+                            @else
+                                <a href="{{ route('category.products', $item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                    {{ $item['name'] }}
+                                </a>
+                            @endif
+                        @endforeach
+                    @endif
                 </nav>
                 <div class="meta_info py-4">
-                    {{-- ১. টাইটেল: ছবির মতো প্রফেশনাল হেডিং --}}
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
                         {{ $category->name ?? 'Shop' }} Price in Bangladesh
                     </h1>
 
                     <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">
-                        @if (isset($category->description) && $category->description)
-                            {!! $category->description !!}
-                        @elseif (isset($category->meta_description) && $category->meta_description)
-                            {!! $category->meta_description !!}
+                        {{-- এখানে শুধুমাত্র Meta Description দেখাবে, যদি না থাকে তবে অটোমেটিক টেক্সট --}}
+                        @if (isset($category->meta_description) && $category->meta_description)
+                            <p>{!! $category->meta_description !!}</p>
                         @else
                             @php
                                 $minP = $products->min('sale_price') > 0 ? $products->min('sale_price') : $products->min('regular_price');
@@ -70,7 +68,7 @@
                     </div>
                 </div>
             </div>
-    </div>
+        </div>
     </section>
     <!-- Mobile Filter Overlay (Right Drawer) -->
     <div id="right-filter-overlay" class="fixed inset-0 bg-black/60 z-[60] hidden lg:hidden transition-opacity"
@@ -152,9 +150,9 @@
                 <!-- Clear All Option -->
                 <div class="pt-2">
                     <a href="{{ url()->current() }}"
-   class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest min-h-[48px] flex items-center">
-    Clear All Filters
-</a>
+                        class="text-xs text-red-500 font-bold hover:underline uppercase tracking-widest min-h-[48px] flex items-center">
+                        Clear All Filters
+                    </a>
                 </div>
             </div>
 
@@ -419,11 +417,19 @@
                 </div>
             </div>
         </div>
-
         <!-- Pagination -->
         <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6">
             {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
         </div>
+        @if (isset($category->description) && $category->description)
+            <section class="mt-12 pt-10 border-t border-gray-100">
+                <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">About {{ $category->name }}</h2>
+                    {!! $category->description !!}
+                </div>
+            </section>
+        @endif
+
     </div>
 @endsection
 @push('scripts')

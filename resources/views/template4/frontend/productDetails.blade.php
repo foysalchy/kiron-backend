@@ -134,16 +134,25 @@
                             </div>
 
                             <div class="flex-1 flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
+                                <!-- Add to Cart Button -->
                                 <button onclick="handleAddToCart()"
-                                    class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm">
+                                    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                    class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                     Add to Cart
                                 </button>
+
+                                <!-- Buy Now Button -->
                                 <button onclick="handleAddToCart(true)"
-                                    class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm">
+                                    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                    class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
                                     Buy Now
                                 </button>
                             </div>
                         </div>
+                        <p class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            <i class="fas {{ (!$product->manage_stock || $product->available_stock > 0) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                            {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
+                        </p>
 
                         <p class="text-sm md:text-base text-gray-500 mt-5 md:mt-6 leading-relaxed">
                             <span class="font-bold text-gray-700 text-xs md:text-sm">Categories:</span>

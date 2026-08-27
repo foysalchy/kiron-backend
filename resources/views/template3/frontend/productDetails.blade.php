@@ -68,17 +68,28 @@
                         </span>
                         <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
                     </div>
-                    <div class="  mb-4 text-[18px] hind-siliguri-medium overflow-hidden relative">
-                        {!! $product->short_description ?? 'No detailed description available for this product.' !!}
+                    <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                        {!! $product->short_description !!}
                     </div>
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-400 text-lg line-through">{{ $setup->currency }}
-                                {{ number_format($product->display_price_data->regular_price) }}</span>
+                            <span id="regular-price" class="text-gray-400 text-lg line-through">
+                                @if(($setup->currency_position ?? 'left') == 'left')
+                                    {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
+                                @else
+                                    {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
+                                @endif
+                            </span>
                         @endif
-                        <span id="sale-price" class="text-3xl font-black secondary-text">{{ $setup->currency }}
-                            {{ number_format($product->display_price_data->sale_price) }}</span>
+
+                        <span id="sale-price" class="text-3xl font-black secondary-text">
+                            @if(($setup->currency_position ?? 'left') == 'left')
+                                {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
+                            @else
+                                {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
+                            @endif
+                        </span>
                     </div>
 
                     <!-- Dynamic Variations Container -->
@@ -96,8 +107,9 @@
                             <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                        <span class="text-sm {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                            {{ $product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock' }}
+                        {{-- এই অংশটুকু রিপ্লেস করুন --}}
+                        <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
 
@@ -108,27 +120,24 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
-                        <!-- ২. Order Now -->
+                        <!-- ২. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
+                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
                         <!--  Wishlist -->
-                        <!-- Wishlist Button Updated -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-                            {{ $product->available_stock <= 0 ? 'disabled' : '' }}
-                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed
-    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
+                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
-                            <i id="wish-icon-main"
-                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                            <i id="wish-icon-main" class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
@@ -531,6 +540,14 @@
                         if (matched.main_image) changeImage(matched.main_image);
                     }
                 }
+                let formattedPrice = matched.price.toLocaleString();
+                let symbol = "{{ $setup->currency }}";
+                let pos = "{{ $setup->currency_position ?? 'left' }}";
+
+                let priceText = (pos === 'left') ? (symbol + " " + formattedPrice) : (formattedPrice + " " + symbol);
+
+                document.getElementById('sale-price').innerText = priceText;
+                if(matched.main_image) changeImage(matched.main_image);
             }
         }
         renderAttributes();
