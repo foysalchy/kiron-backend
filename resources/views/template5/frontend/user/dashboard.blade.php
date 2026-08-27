@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+@extends('template5.layouts.front')
 
 @section('content')
     <section class="container py-6 mx-auto px-4 lg:px-0">
