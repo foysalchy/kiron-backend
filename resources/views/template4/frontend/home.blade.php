@@ -212,10 +212,10 @@
 
             @foreach ($headerCategories as $category)
                 <a href="{{ route('category.products', $category->slug) }}"
-                    class="bg-white shadow-sm p-3 min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
+                    class="  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
 
                     <!-- Icon / Image -->
-                    <div class="w-16 h-16 mb-2 flex items-center justify-center overflow-hidden">
+                    <div class="w-32 h-32 mb-2 flex items-center justify-center overflow-hidden">
                         @if($category->image_url)
                             <img
                                 src="{{ $category->image_url }}"
@@ -230,7 +230,7 @@
                     </div>
 
                     <!-- Category Name -->
-                    <h3 class="font-semibold text-[#0f172a] text-xs md:text-sm leading-tight
+                    <h3 class=" text-[#0f172a] text-lg font-normal leading-tight
                         group-hover:text-[var(--primary-color)] transition-colors line-clamp-2">
                         {{ $category->name }}
                     </h3>
