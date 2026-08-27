@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AttributeGroup;
 use App\Models\Brand;
 use App\Models\ContentSetting;
+use App\Models\ExtraCategory;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
 use App\Models\Product;
@@ -85,13 +86,17 @@ class ProductController extends FrontendController
             $category = MiniCategory::where('slug', $slug)->first();
             $column = 'mini_category_ids';
         }
+        if (!$category) {
+        $category = ExtraCategory::where('slug', $slug)->first();
+        $column = 'extra_category_ids';
+    }
 
         if (!$category) abort(401);
 
         $query = Product::where('status', Status::Active->value)
-            ->whereJsonContains('mega_category_ids', (int)$category->id)
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating');
+        ->whereJsonContains($column, (int)$category->id) // এখানে $column ব্যবহার হবে
+        ->withCount('reviews')
+        ->withAvg('reviews', 'rating');
 
         $this->applyFiltersAndSorting($query, $request);
         $maxPriceLimit = $this->getMaxPriceLimit();
@@ -122,66 +127,69 @@ class ProductController extends FrontendController
 
     // Variation Price Support
     private function applyFiltersAndSorting($query, $request)
-    {
-        // group product
-        if ($request->filled('filter_product_ids')) {
-            $ids = (array)$request->filter_product_ids;
-            $query->whereIn('id', $ids);
-        }
-        if ($request->filled('min_price')) {
-            $min = $request->min_price;
-            $query->where(function ($q) use ($min) {
-                $q->where('regular_price', '>=', $min)
-                    ->orWhereHas('variations', function ($sq) use ($min) {
-                        $sq->where('regular_price', '>=', $min);
-                    });
+{
+    // ১. প্রোডাক্ট আইডি দিয়ে ফিল্টার (গ্রুপ প্রোডাক্টের জন্য)
+    if ($request->filled('filter_product_ids')) {
+        $query->whereIn('id', (array)$request->filter_product_ids);
+    }
+
+    // ২. প্রাইস ফিল্টার (মেইন প্রাইস এবং ভ্যারিয়েশন প্রাইস উভয়ই চেক করবে)
+    if ($request->filled('min_price')) {
+        $min = $request->min_price;
+        $query->where(function ($q) use ($min) {
+            $q->where('regular_price', '>=', $min)
+              ->orWhereHas('variations', function ($v) use ($min) {
+                  $v->where('regular_price', '>=', $min);
+              });
+        });
+    }
+
+    if ($request->filled('max_price')) {
+        $max = $request->max_price;
+        $query->where(function ($q) use ($max) {
+            $q->where(function($sq) use ($max){
+                $sq->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
+            })->orWhereHas('variations', function ($v) use ($max) {
+                $v->where('regular_price', '<=', $max);
             });
-        }
+        });
+    }
 
-        if ($request->filled('max_price')) {
-            $max = $request->max_price;
-            $query->where(function ($q) use ($max) {
-                $q->where(function ($sub) use ($max) {
-                    $sub->where('regular_price', '<=', $max)->where('regular_price', '>', 0);
-                })
-                    ->orWhereHas('variations', function ($sq) use ($max) {
-                        $sq->where('regular_price', '<=', $max);
-                    });
-            });
-        }
+    // ৩. ব্র্যান্ড ফিল্টার
+    if ($request->filled('brand')) {
+        $query->whereIn('brand_id', (array)$request->brand);
+    }
 
-        if ($request->filled('brand') && !request()->routeIs('brand.products')) {
-            $query->whereIn('brand_id', (array)$request->brand);
-        }
-
-        if ($request->filled('attributes')) {
-            foreach ($request->attributes as $groupId => $ids) {
-                $ids = array_filter((array)$ids);
-                if (!empty($ids)) {
-                    $query->whereHas('variations.attributes', function ($q) use ($ids) {
-                        $q->whereIn('attribute_value_id', $ids);
-                    });
-                }
+    // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
+    if ($request->filled('attributes')) {
+        foreach ($request->attributes as $groupId => $ids) {
+            $ids = array_filter((array)$ids);
+            if (!empty($ids)) {
+                $query->whereHas('variations.attributes', function ($q) use ($ids) {
+                    $q->whereIn('attribute_value_id', $ids);
+                });
             }
         }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('sku_code', 'like', "%{$search}%");
-            });
-        }
-
-        //
-        if ($request->sort == 'price_low') {
-            $query->orderBy('regular_price', 'asc');
-        } elseif ($request->sort == 'price_high') {
-            $query->orderBy('regular_price', 'desc');
-        } else {
-            $query->latest();
-        }
     }
+
+    // ৫. সার্চ ফিল্টার
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('sku_code', 'like', "%{$search}%");
+        });
+    }
+
+    // ৬. সর্টিং
+    if ($request->sort == 'price_low') {
+        $query->orderBy('regular_price', 'asc');
+    } elseif ($request->sort == 'price_high') {
+        $query->orderBy('regular_price', 'desc');
+    } else {
+        $query->latest();
+    }
+}
 
     public function productDetails($slug)
     {

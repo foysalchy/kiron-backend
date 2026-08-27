@@ -71,8 +71,10 @@
                                         </div>
                                     </div>
                                     <div class="col-span-6 sm:col-span-3 text-right mt-2 sm:mt-0">
-                                        <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">{{ $setup->currency }}
-                                            <span class="item-total-price">{{ number_format($item->subtotal) }}</span></span>
+                                        <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
+        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal) : number_format($item->subtotal) . ' ' . $setup->currency }}
+    </span>
+
                                     </div>
                                 </div>
                             @endforeach
@@ -92,8 +94,9 @@
 
                         <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
                             <span class="text-base md:text-lg lg:text-xl text-gray-600">Subtotal</span>
-                            <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">{{ $setup->currency }} <span
-                                    id="summary-subtotal">{{ number_format($subtotal) }}</span></span>
+                             <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
+        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($subtotal) : number_format($subtotal) . ' ' . $setup->currency }}
+    </span>
                         </div>
 
                         <!-- Shipping Selection -->
@@ -106,14 +109,16 @@
                                         <label
                                             class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
                                             <span class="text-left sm:text-right leading-tight">Inside Dhaka:
-                                                {{ $setup->currency }} {{ number_format($setup->inside_charge) }}</span>
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge) : number_format($setup->inside_charge) . ' ' . $setup->currency }}
+                                            </span>
                                             <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }}
                                                 class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
                                         </label>
                                         <label
                                             class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
                                             <span class="text-left sm:text-right leading-tight">Outside Dhaka:
-                                                {{ $setup->currency }} {{ number_format($setup->outside_charge) }}</span>
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge) : number_format($setup->outside_charge) . ' ' . $setup->currency }}
+                                            </span>
                                             <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }}
                                                 class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
                                         </label>
@@ -127,20 +132,24 @@
                             @if ($discount > 0)
                                 <div class="flex justify-between items-center text-green-600">
                                     <span class="text-sm md:text-base">Discount ({{ session('coupon')['coupon_code'] }})</span>
-                                    <span class="text-sm md:text-base font-bold">- {{ $setup->currency }}
-                                        {{ number_format($discount) }}</span>
+                                    <span class="text-sm md:text-base font-bold">-
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($discount) : number_format($discount) . ' ' . $setup->currency }}
+                                    </span>
                                 </div>
                             @endif
+
                             <div class="flex justify-between items-center">
                                 <span class="text-sm md:text-base text-gray-600">Tax</span>
-                                <span class="text-sm md:text-base font-bold text-gray-900">{{ $setup->currency }} 0.00</span>
+                                <span class="text-sm md:text-base font-bold text-gray-900">
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' 0.00' : '0.00 ' . $setup->currency }}
+                                </span>
                             </div>
                         </div>
-
                         <div class="flex justify-between items-center py-4 md:py-5">
                             <span class="text-base md:text-lg font-medium text-gray-500">Total</span>
-                            <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">{{ $setup->currency }} <span
-                                    id="summary-total">{{ number_format($total) }}</span></span>
+                            <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($total) : number_format($total) . ' ' . $setup->currency }}
+                            </span>
                         </div>
 
                         <div class="mt-2 md:mt-4">

@@ -102,8 +102,7 @@
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Inside Dhaka ({{ $setup->currency }}
-                                        {{ number_format($setup->inside_charge, 0) }})
+                                        Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 0) : number_format($setup->inside_charge, 0) . ' ' . $setup->currency }})
                                     </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
@@ -111,8 +110,7 @@
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Outside Dhaka ({{ $setup->currency }}
-                                        {{ number_format($setup->outside_charge, 0) }})
+                                        Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 0) : number_format($setup->outside_charge, 0) . ' ' . $setup->currency }})
                                     </span>
                                 </label>
                             </div>
@@ -150,7 +148,7 @@
                                         @endif
 
                                         <p class="text-[var(--primary-color)] font-semibold text-sm">
-                                            {{ $setup->currency }}{{ number_format($item->price) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
                                         </p>
                                     </div>
 
@@ -192,29 +190,38 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Subtotal:</span>
-                                <span class="text-md font-bold text-gray-900">{{ $setup->currency }}
-                                    {{ number_format($subtotal) }}</span>
+                                <span class="text-md font-bold text-gray-900">
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($subtotal) : number_format($subtotal) . ' ' . $setup->currency }}
+                                </span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between items-center text-green-600">
                                     <span class="text-md font-medium">Discount
                                         {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}:</span>
-                                    <span class="text-md font-bold">- {{ $setup->currency }}
+                                    <span class="text-md font-bold">-
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                         <span id="discount-display">{{ number_format($discount) }}</span>
+                                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                     </span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span class="text-md font-bold text-gray-900"> {{ $setup->currency }} <span
-                                        id="shipping-display">{{ number_format($shipping) }}</span></span>
+                                <span class="text-md font-bold text-gray-900">
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="shipping-display">{{ number_format($shipping) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                </span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
-                                <span class="text-xl font-bold text-[var(--primary-color)]">{{ $setup->currency }} <span
-                                        id="total-display">{{ number_format($total) }}</span></span>
+                                <span class="text-xl font-bold text-[var(--primary-color)]">
+    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+    <span id="total-display">{{ number_format($total) }}</span>
+    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+</span>
                             </div>
                         </div>
 
@@ -423,10 +430,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('shipping-display').innerText = data.shipping_cost;
-
-                        document.getElementById('total-display').innerText = data.grand_total;
-
+                         document.getElementById('shipping-display').innerText = data.shipping_cost.toLocaleString();
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
                         toastr.success(data.message);
                     }
                 })

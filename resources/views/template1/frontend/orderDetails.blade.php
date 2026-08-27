@@ -15,7 +15,7 @@
             </div>
             <div class="flex flex-col items-start md:items-end">
                 <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
-                    {{ $order->status ? $order->status->label() : 'Draft' }}
+                    {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
