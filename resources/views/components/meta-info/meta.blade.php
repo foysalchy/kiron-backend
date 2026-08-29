@@ -14,7 +14,7 @@
 
 <?php
 $titlex = $title ?: $setup->title ?? $setup->shop_name;
-$title = $titlex . ' | dorja.io';
+$title = $titlex ;
 $description = $description ?: $setup->description ?? '';
 $keywords = is_array($keywords) ? implode(',', $keywords) : ($keywords ?: $setup->tags ?? '');
 $canonical = $canonical ?: url()->current();
@@ -40,6 +40,8 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta name="title" content="{{ $title }}">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="description" content="{{ $description }}">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
 @if ($keywords)
     <meta name="keywords" content="{{ $keywords }}">
 @endif

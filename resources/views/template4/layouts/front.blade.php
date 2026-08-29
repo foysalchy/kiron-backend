@@ -2,13 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Explore our shop for the best products. Fast delivery and quality guaranteed.">
+ 
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
-    <title>{{ $setup->shop_name ?? 'Bhaiya Digital' }}</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? ''}}">
 
