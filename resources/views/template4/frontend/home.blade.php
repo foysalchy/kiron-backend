@@ -81,6 +81,11 @@
                         transparent 45px,
                         black 46px);
             }
+            .mainHeroSwiper .swiper-pagination-bullet {
+                width: 8px !important;
+                height: 8px !important;
+                margin: 0 6px !important;
+            }
         }
     </style>
     <style>
@@ -135,7 +140,7 @@
                         @endforelse
                     </div>
 
-                    <div class="swiper-pagination !bottom-8"></div>
+                    <div class="swiper-pagination !bottom-3 md:!bottom-8"></div>
                 </div>
             </div>
 
@@ -330,56 +335,59 @@
 
     <!-- LATEST OFFERS SECTION  -->
      @if($latestOffers->isNotEmpty())
-    <section class=" container mx-auto   p-0 mb-12 ">
-        <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
-            Latest Offers
-        </h2>
+    <section class="w-full bg-[#fcfcfc] px-4">
+        <div class="p-0 container mx-auto">
 
-        <!-- Offers Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
-            @foreach ($latestOffers as $product)
-                <a href="{{ route('product.details', $product->slug) }}" class="block group">
-                    <div
-                        class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
+            <!-- Section Title -->
+            <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
+                Latest Offers
+            </h2>
 
-                        <!-- Left Part: Product Image -->
+            <!-- Offers Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+                @foreach ($latestOffers as $product)
+                    <a href="{{ route('product.details', $product->slug) }}" class="block group">
                         <div
-                            class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                            <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150" alt="{{ $product->title }}"
-                                loading="lazy"
-                                class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
-                        </div>
+                            class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
 
-                        <!-- Right Part: Product Details -->
-                        <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
-                            <!-- Price Section (Dynamic) -->
-                            <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
-                                {{-- বর্তমান অফার প্রাইস --}}
-                                <span class="text-[#9d174d] font-bold text-[13px] md:text-xl leading-none">
-                                    {{ $setup->currency ?? 'BDT' }} {{ number_format($product->sale_price) }}
-                                </span>
-
-                                {{-- আগের রেগুলার প্রাইস --}}
-                                <span class="text-[#52525b] line-through text-[10px] md:text-sm font-semibold leading-none">
-                                    {{ $setup->currency ?? 'BDT' }} {{ number_format($product->regular_price) }}
-                                </span>
+                            <!-- Left Part: Product Image -->
+                            <div
+                                class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
+                                <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150" alt="{{ $product->title }}"
+                                    loading="lazy"
+                                    class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                             </div>
 
-                            <!-- Title (Dynamic) -->
-                            <h3
-                                class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#9d174d] transition-colors">
-                                {{ $product->title }}
-                            </h3>
+                            <!-- Right Part: Product Details -->
+                            <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
+                                <!-- Price Section (Dynamic) -->
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
+                                    {{-- বর্তমান অফার প্রাইস --}}
+                                    <span class="text-[#9d174d] font-bold text-[13px] md:text-xl leading-none">
+                                        {{ $setup->currency ?? 'BDT' }} {{ number_format($product->sale_price) }}
+                                    </span>
 
-                            <!-- Subtitle/Short Description (Dynamic) -->
-                            <p class="text-[#4b5563] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
-                                {{ $product->short_description ?? 'Quality Product' }}
-                            </p>
+                                    {{-- আগের রেগুলার প্রাইস --}}
+                                    <span class="text-[#52525b] line-through text-[10px] md:text-sm font-semibold leading-none">
+                                        {{ $setup->currency ?? 'BDT' }} {{ number_format($product->regular_price) }}
+                                    </span>
+                                </div>
+
+                                <!-- Title (Dynamic) -->
+                                <h3
+                                    class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#9d174d] transition-colors">
+                                    {{ $product->title }}
+                                </h3>
+
+                                <!-- Subtitle/Short Description (Dynamic) -->
+                                <p class="text-[#4b5563] text-[9px] md:text-[12px] font-medium truncate hidden sm:block">
+                                    {{ $product->short_description ?? 'Quality Product' }}
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            @endforeach
+                    </a>
+                @endforeach
+            </div>
         </div>
     </section>
     @endif

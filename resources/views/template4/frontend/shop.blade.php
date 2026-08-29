@@ -415,20 +415,20 @@
                         @endforelse
                     </div>
                 </div>
+                <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6">
+                    {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
+                </div>
+                @if (isset($category->description) && $category->description)
+                    <section class="mt-12  border-t border-gray-100">
+                        <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">About {{ $category->name }}</h2>
+                            {!! $category->description !!}
+                        </div>
+                    </section>
+                @endif
             </div>
         </div>
         <!-- Pagination -->
-        <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6">
-            {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
-        </div>
-        @if (isset($category->description) && $category->description)
-            <section class="mt-12 pt-10 border-t border-gray-100">
-                <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">About {{ $category->name }}</h2>
-                    {!! $category->description !!}
-                </div>
-            </section>
-        @endif
 
     </div>
 @endsection
