@@ -3,7 +3,7 @@
 
     'type' => 'WebPage',
 
-    'title' => 'Order Details #' . ($order->order_no ?? $order->id) . ' - ' . ($setup->shop_name ?? 'Bhaiya Digital'),
+    'title' => 'Order Details #' . ($order->order_no ?? $order->id) . '|' . ($setup->shop_name ?? 'Bhaiya Digital'),
 
     'description' => 'View the summary, shipping status, and item details of your order #' . ($order->order_no ?? $order->id) . '.',
 

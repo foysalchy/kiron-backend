@@ -12,7 +12,7 @@
     @include('components.meta-info.meta', [
         'setup'       => $setup,
         'type'        => 'CollectionPage',
-        'title'       => ($brand->meta_title ?: $brand->name . ' Products') . ' - ' . ($setup->shop_name ?? ''),
+        'title'       => ($brand->meta_title ?: $brand->name . ' Products') . '|' . ($setup->shop_name ?? ''),
         'description' => $brand->meta_description ?: 'Shop the latest collection of authentic ' . $brand->name . ' products.',
         'keywords'    => $brand->meta_keywords ?: $brand->name . ', brand shop',
         'image'       => $brand->image ? asset('storage/' . $brand->image) : $setup->logo_url,

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    
+     @yield('meta')
     <meta name="csrf-token" content="{{ csrf_token() }}">
  
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
@@ -15,7 +15,7 @@
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @yield('meta')
+   
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
         :root {

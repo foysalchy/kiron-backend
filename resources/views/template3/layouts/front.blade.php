@@ -24,7 +24,7 @@
     </noscript>
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @yield('meta')
+   
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
         :root {

@@ -13,7 +13,7 @@
 @include('components.meta-info.meta', [
     'setup' => $setup,
     'type' => 'CollectionPage',
-    'title' => ($pageData->meta_title ?? 'Our Blog') . ' - ' . ($setup->shop_name ?? 'Bhaiya Digital'),
+    'title' => ($pageData->meta_title ?? 'Our Blog') . '|' . ($setup->shop_name ?? 'Bhaiya Digital'),
     'description' => $pageData->meta_description ?? 'Read the latest insights, styles, and shopping tips on our blog.',
     'keywords' => $keywords,
     'image' => $setup->meta_image ? asset('storage/' . $setup->meta_image) : $setup->logo_url,

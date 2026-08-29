@@ -46,7 +46,7 @@
     @include('components.meta-info.meta', [
         'setup'       => $setup,
         'type'        => 'CollectionPage',
-        'title'       => ($activeCategory->meta_title ?? $activeCategory->name ?? 'Category') . ' - ' . ($setup->shop_name ?? ''),
+        'title'       => ($activeCategory->meta_title ?? $activeCategory->name ?? 'Category') . '|' . ($setup->shop_name ?? ''),
         'description' => ($activeCategory->meta_description ?? 'Browse our latest collection of ' . ($activeCategory->name ?? 'products')),
         'keywords'    => is_array($activeCategory->meta_keywords ?? null) ? implode(',', $activeCategory->meta_keywords) : ($activeCategory->meta_keywords ?? ''),
         'image'       => ($activeCategory->image ?? null) ? asset('storage/' . $activeCategory->image) : asset('images/default-share.jpg'),
