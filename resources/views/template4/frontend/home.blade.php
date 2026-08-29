@@ -460,7 +460,7 @@
     <!-- ABOUT / SEO TEXT SECTION -->
     @if($homePageData->description)
         <section class="w-full bg-[#fcfcfc] px-4 font-manrope">
-            <div class="p-0 container mx-auto  ">
+            <div class="p-0 container mx-auto   border border-gray-100 bg-gray-100 p-4">
                 <div
                     class="prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold
