@@ -148,8 +148,8 @@
 
         <div id="mobile-search-expand" class="hidden lg:hidden mt-4 px-2 relative">
     <form action="{{ route('shop.index') }}" method="GET" class="relative z-30" id="mobile-search-container">
-        <input type="text" name="search" id="mobile-search-input" autocomplete="off" placeholder="Search products..."
-            class="w-full py-2.5 px-5 rounded-full bg-white border border-gray-100 shadow-sm focus:outline-none" />
+        <input type="text" name="search" id="mobile-search-input"   placeholder="Search products..."
+            class="w-full py-2.5 px-5 rounded-full bg-white border border-gray-100 shadow-sm text-black" />
         <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-10 flex items-center justify-center text-gray-600">
             <i class="fa-solid fa-magnifying-glass text-lg"></i>
         </button>
