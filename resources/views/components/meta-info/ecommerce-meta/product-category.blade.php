@@ -25,7 +25,7 @@
 
     'type' => 'CollectionPage',
 
-    'title' => $category->meta_title ?: $category->name . '|' . ($setup->shop_name ?? ''),
+    'title' => $category->meta_title ?: $category->name . ' | ' . ($setup->shop_name ?? ''),
 
     'description' => $category->meta_description ?: 'Browse our latest collection of ' . $category->name,
 

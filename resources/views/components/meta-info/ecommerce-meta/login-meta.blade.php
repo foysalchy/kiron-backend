@@ -10,7 +10,7 @@
 
     'type' => 'WebPage',
 
-    'title' => ($pageData->meta_title ?? 'Customer Login') . '|' . ($setup->shop_name ?? 'Bhaiya Digital'),
+    'title' => ($pageData->meta_title ?? 'Customer Login') . ' | ' . ($setup->shop_name ?? 'Bhaiya Digital'),
 
     'description' => $pageData->meta_description ?? 'Login to your account to track your orders, manage your profile, and enjoy a personalized shopping experience.',
 
