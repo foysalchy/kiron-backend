@@ -50,9 +50,8 @@
                     </h1>
 
                     <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">
-                        {{-- এখানে শুধুমাত্র Meta Description দেখাবে, যদি না থাকে তবে অটোমেটিক টেক্সট --}}
                         @if (isset($category->meta_description) && $category->meta_description)
-                            <p>{!! $category->meta_description !!}</p>
+                            <p>{!! $category->meta_description ?? '' !!}</p>
                         @else
                             @php
                                 $minP = $products->min('sale_price') > 0 ? $products->min('sale_price') : $products->min('regular_price');
@@ -75,8 +74,8 @@
         aria-hidden="true"></div>
 
     <!-- ════════════════════════════════════════
-                         RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
-                        ════════════════════════════════════════ -->
+         RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
+        ════════════════════════════════════════ -->
     <aside id="right-filter-drawer"
         class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden flex flex-col ">
 
@@ -421,7 +420,7 @@
                 @if (isset($category->description) && $category->description)
                     <section class="mt-12  border-t border-gray-100">
                         <div class="prose prose-slate max-w-none text-gray-700 leading-relaxed">
-                            <h2 class="text-2xl font-bold text-gray-800 mb-6">About {{ $category->name }}</h2>
+                            {{-- <h2 class="text-2xl font-bold text-gray-800 mb-6">{{ $category->name }}</h2> --}}
                             {!! $category->description !!}
                         </div>
                     </section>
