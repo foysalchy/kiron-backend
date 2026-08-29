@@ -68,7 +68,7 @@
 
             <div class="flex items-center gap-3 md:gap-5">
                 <button id="mobile-search-btn"
-                    class="lg:hidden w-10 h-10 flex items-center justify-center text-[var(--primary-color)] text-xl">
+                    class="lg:hidden w-10 h-10 flex items-center justify-center text-[var(--primary-color)] text-xl bg-white rounded-full">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
                 <div class="hidden lg:flex items-center gap-3 md:gap-5">
