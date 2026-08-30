@@ -34,6 +34,9 @@ class UpdateMarketRequest extends BaseCompanyRequest
                 'meta_access_token'     => 'sometimes|nullable|string',
                 'google_tag_id'         => 'sometimes|nullable|string',
                 'google_measurement_id' => 'sometimes|nullable|string',
+                'instant_purchase_event'=> 'sometimes|nullable|boolean',
+                'purchase_event_status' => 'sometimes|nullable|string',
+                'fire_cancel_event'     => 'sometimes|nullable|boolean',
             ]
         );
     }

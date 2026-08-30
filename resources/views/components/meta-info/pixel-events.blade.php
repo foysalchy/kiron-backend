@@ -67,6 +67,7 @@
             @endif
             // order details
         @elseif($event === 'Purchase' && isset($data['order']))
+            @if(!isset($market->instant_purchase_event) || $market->instant_purchase_event !== false)
             fbq('track', 'Purchase', {
                 content_ids: ['{{ $data['order']->id }}'],
                 content_type: 'product',
@@ -80,6 +81,7 @@
                 value: {{ $data['order']->grand_total ?? $data['order']->total_amount ?? 0 }},
                 currency: '{{ $currencyCode }}'
             }, { event_id: 'ORDER_{{ $data['order']->id }}' });
+            @endif
             @endif
             // blog details
         @elseif($event === 'ViewBlog' && isset($data['blog']))

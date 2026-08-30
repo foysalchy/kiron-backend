@@ -20,6 +20,9 @@ class Market extends Model
         'meta_access_token',
         'google_tag_id',
         'google_measurement_id',
+        'instant_purchase_event',
+        'purchase_event_status',
+        'fire_cancel_event',
     ];
     protected $hidden = [
         'deleted_at',
