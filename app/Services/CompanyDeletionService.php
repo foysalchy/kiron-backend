@@ -443,7 +443,6 @@ class CompanyDeletionService
                 \App\Models\EmployeeSalary::class,
                 \App\Models\EmployeeType::class,
                 \App\Models\ExtraCategory::class,
-                \App\Models\ExtraOrderCharge::class,
                 \App\Models\FirebaseSetting::class,
                 \App\Models\FooterCode::class,
     
@@ -534,7 +533,6 @@ class CompanyDeletionService
                 \App\Models\StockMovementRequest::class,
                 \App\Models\StockMovementRequestItem::class,
                 \App\Models\SubCategory::class,
-                \App\Models\Subscription::class,
                 \App\Models\SupportDepartment::class,
                 \App\Models\SupportTicket::class,
                 \App\Models\SupportTicketReply::class,

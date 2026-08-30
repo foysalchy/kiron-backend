@@ -178,6 +178,8 @@ class CompanyController extends Controller
 
             CompanySubscription::create([
                 'company_id'         => $company->id,
+                'company_name_snapshot'         => $company->name,
+                'company_email_snapshot'         => $company->email,
                 'pricing_package_id'  => $package->id,
                 'billing_cycle'      => $data['billing_cycle'],
                 'amount_paid'        => $amountPaid,
@@ -230,6 +232,8 @@ class CompanyController extends Controller
 
             $subscription = CompanySubscription::create([
                 'company_id'         => $company->id,
+                'company_name_snapshot'         => $company->name,
+                'company_email_snapshot'         => $company->email,
                 'pricing_package_id' => $package->id,
                 'billing_cycle'      => $data['billing_cycle'],
                 'amount_paid'        => $amountPaid,
