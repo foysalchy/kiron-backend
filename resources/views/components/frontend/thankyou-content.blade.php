@@ -34,7 +34,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
             @foreach($relatedProducts as $product)
                 <!-- Dynamic component rendering based on the active template -->
-                <!-- <x-dynamic-component :component=" $templatePrefix . '.product-card' " :product="$product" /> -->
+               
                     <x-template1.product-card :product="$product" />
             @endforeach
         </div>
