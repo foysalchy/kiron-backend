@@ -1,4 +1,4 @@
-<div class="p-0 container mx-auto  ">
+<div class="p-0 container mx-auto  mt-4">
     <!-- Thank You Section -->
     <div class="text-center bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-12">
         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
