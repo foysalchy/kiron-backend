@@ -55,6 +55,7 @@ class Order extends Model
         'hold_ref',
         'return_info',
         'source_info',
+        'pixel_source_info',
     ];
 
     protected $casts = [
@@ -75,6 +76,7 @@ class Order extends Model
         'warehouse_info' => 'array',
         'assigned_to' => 'array',
         'source_info' => 'array',
+        'pixel_source_info' => 'array',
 
 
     ];

@@ -263,6 +263,14 @@ class OrderController extends FrontendController
                 return redirect()->route('order.invoice', $order->id);
             }
             // 4. Address update
+            $sourceInfo = [
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+                'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null,
+                'url' => request()->headers->get('referer') ?? config('app.url'),
+            ];
+
             $order->update([
                 'shipping_address' => [
                     'name'    => $request->name,
@@ -272,6 +280,7 @@ class OrderController extends FrontendController
                     'address' => $request->address,
                     'payment_method' => $request->payment_method,
                 ],
+                'pixel_source_info' => $sourceInfo,
                 'status' => Status::Pending->value,
             ]);
             if ($order->customer) {
