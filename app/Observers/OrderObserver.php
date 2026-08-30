@@ -64,7 +64,18 @@ class OrderObserver
             
             $eventId = 'ORDER_' . $order->id;
             $value = $order->grand_total ?? $order->total_amount ?? 0;
-            $currency = config('app.currency', 'BDT'); // Default to BDT if not set
+            
+            $sysCurrency = config('app.currency', 'BDT');
+            $currencyMap = [
+                '$' => 'USD',
+                '৳' => 'BDT',
+                '€' => 'EUR',
+                '﷼' => 'SAR',
+                '(د.إ' => 'AED',
+                '£' => 'GBP'
+            ];
+            $currency = $currencyMap[$sysCurrency] ?? (strlen($sysCurrency) === 3 ? $sysCurrency : 'BDT');
+            
             $url = request()->headers->get('referer') ?? config('app.url');
 
             // Dispatch Facebook CAPI

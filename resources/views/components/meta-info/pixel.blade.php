@@ -1,6 +1,37 @@
 @php
     // Markets টেবিল থেকে বর্তমান কোম্পানির পিক্সেল আইডি নিয়ে আসা
     $market = \App\Models\Market::where('company_id', $setup->company_id ?? null)->first();
+    
+    // Facebook Advanced Matching Data
+    $customer = auth('customer')->user();
+    $fbUserData = [];
+    if ($customer) {
+        if (!empty($customer->email)) {
+            $fbUserData['em'] = hash('sha256', strtolower(trim($customer->email)));
+        }
+        $phone = preg_replace('/[^0-9]/', '', $customer->phone ?? '');
+        if ($phone) {
+            if (strlen($phone) == 11 && str_starts_with($phone, '01')) {
+                $phone = '88' . $phone;
+            }
+            $fbUserData['ph'] = hash('sha256', $phone);
+        }
+        if (!empty($customer->name)) {
+            $nameParts = explode(' ', trim($customer->name));
+            $fbUserData['fn'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $nameParts[0])));
+            if (count($nameParts) > 1) {
+                $fbUserData['ln'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', end($nameParts))));
+            }
+        }
+        if (!empty($customer->district)) {
+            $fbUserData['ct'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $customer->district)));
+        }
+        if (!empty($customer->division)) {
+            $fbUserData['st'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $customer->division)));
+        }
+        $fbUserData['country'] = hash('sha256', 'bd');
+    }
+    $fbUserDataJson = !empty($fbUserData) ? json_encode($fbUserData) : '{}';
 @endphp
 
 @if($market && !empty($market->facebook_pixel_id))
@@ -14,7 +45,7 @@
         t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '{{ $market->facebook_pixel_id }}');
+        fbq('init', '{{ $market->facebook_pixel_id }}', {!! $fbUserDataJson !!});
         fbq('track', 'PageView');
     </script>
     <noscript>

@@ -1,8 +1,17 @@
-{{-- resources/views/components/meta-info/ecommerce-meta/pixel-events.blade.php --}}
+ 
 @props(['event', 'data' => null])
 
 @php
     $market = \App\Models\Market::where('company_id', $setup->company_id ?? null)->first();
+    $currencyMap = [
+        '$' => 'USD',
+        '৳' => 'BDT',
+        '€' => 'EUR',
+        '﷼' => 'SAR',
+        '(د.إ' => 'AED',
+        '£' => 'GBP'
+    ];
+    $currencyCode = $currencyMap[$setup->currency ?? ''] ?? (strlen($setup->currency ?? '') === 3 ? $setup->currency : 'BDT');
 @endphp
 
 @if($market && !empty($market->facebook_pixel_id))
@@ -15,7 +24,7 @@
                 content_ids: ['{{ $data['product']->id }}'],
                 content_type: 'product',
                 value: {{ $data['product']->sale_price ?? 0 }},
-                currency: '{{ $setup->currency ?? "BDT" }}'
+                currency: '{{ $currencyCode }}'
             });
             @if(!empty($market->tiktok_pixel_id))
             ttq.track('ViewContent', {
@@ -23,20 +32,20 @@
                 content_id: '{{ $data['product']->id }}',
                 content_type: 'product',
                 value: {{ $data['product']->sale_price ?? 0 }},
-                currency: '{{ $setup->currency ?? "BDT" }}'
+                currency: '{{ $currencyCode }}'
             });
             @endif
             // checkout page
         @elseif($event === 'InitiateCheckout' && isset($data['total']))
             fbq('track', 'InitiateCheckout', {
                 value: {{ $data['total'] }},
-                currency: '{{ $setup->currency ?? "BDT" }}',
+                currency: '{{ $currencyCode }}',
                 content_type: 'product'
             });
             @if(!empty($market->tiktok_pixel_id))
             ttq.track('InitiateCheckout', {
                 value: {{ $data['total'] }},
-                currency: '{{ $setup->currency ?? "BDT" }}',
+                currency: '{{ $currencyCode }}',
                 content_type: 'product'
             });
             @endif
@@ -44,14 +53,14 @@
         @elseif($event === 'AddToCart' && isset($data['total']))
             fbq('track', 'AddToCart', {
                 value: {{ $data['total'] }},
-                currency: '{{ $setup->currency ?? "BDT" }}',
+                currency: '{{ $currencyCode }}',
                 content_type: 'product',
                 content_ids: {!! json_encode($data['ids'] ?? []) !!}
             });
             @if(!empty($market->tiktok_pixel_id))
             ttq.track('AddToCart', {
                 value: {{ $data['total'] }},
-                currency: '{{ $setup->currency ?? "BDT" }}',
+                currency: '{{ $currencyCode }}',
                 content_type: 'product',
                 content_id: {!! json_encode($data['ids'] ?? []) !!}
             });
@@ -61,15 +70,15 @@
             fbq('track', 'Purchase', {
                 content_ids: ['{{ $data['order']->id }}'],
                 content_type: 'product',
-                value: {{ $data['order']->grand_total ?? $data['order']->total_amount }},
-                currency: '{{ $setup->currency ?? "BDT" }}'
+                value: {{ $data['order']->grand_total ?? $data['order']->total_amount ?? 0 }},
+                currency: '{{ $currencyCode }}'
             }, { eventID: 'ORDER_{{ $data['order']->id }}' });
             @if(!empty($market->tiktok_pixel_id))
             ttq.track('CompletePayment', {
                 content_id: '{{ $data['order']->id }}',
                 content_type: 'product',
-                value: {{ $data['order']->grand_total ?? $data['order']->total_amount }},
-                currency: '{{ $setup->currency ?? "BDT" }}'
+                value: {{ $data['order']->grand_total ?? $data['order']->total_amount ?? 0 }},
+                currency: '{{ $currencyCode }}'
             }, { event_id: 'ORDER_{{ $data['order']->id }}' });
             @endif
             // blog details
