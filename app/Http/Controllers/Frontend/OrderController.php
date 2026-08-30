@@ -245,7 +245,7 @@ class OrderController extends FrontendController
         if ($currentStatus !== Status::Draft->value) {
             Cart::destroy();
             Session::forget(['coupon', 'current_draft_order_id']);
-            return redirect()->route('order.invoice', $order->id)->with('success', 'Order already placed.');
+            return redirect()->route('order.thankyou', $order->id)->with('success', 'Order already placed.');
         }
 
         try {
@@ -260,7 +260,7 @@ class OrderController extends FrontendController
             }
             $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
             if ($currentStatus !== Status::Draft->value) {
-                return redirect()->route('order.invoice', $order->id);
+                return redirect()->route('order.thankyou', $order->id);
             }
             // 4. Address update
             $sourceInfo = [
@@ -351,7 +351,7 @@ class OrderController extends FrontendController
 
 
 
-            return redirect()->route('order.invoice', $order->id)->with('success', 'Your order has been successfully placed.');
+            return redirect()->route('order.thankyou', $order->id)->with('success', 'Your order has been successfully placed.');
             });
         } catch (\Exception $e) {
             DB::rollBack();
@@ -513,6 +513,29 @@ class OrderController extends FrontendController
             ->findOrFail($id);
 
         return $this->view('frontend.invoice', compact('order'));
+    }
+
+    public function thankyou($id)
+    {
+        $companyId = $this->company_id;
+        $order = Order::where('company_id', $companyId)
+            ->with(['orderDetails.product'])
+            ->findOrFail($id);
+
+        $productIds = $order->orderDetails->pluck('product_id')->toArray();
+        $categoryIds = \App\Models\Product::whereIn('id', $productIds)
+            ->pluck('category_id')
+            ->unique()
+            ->toArray();
+
+        $relatedProducts = \App\Models\Product::whereIn('category_id', $categoryIds)
+            ->whereNotIn('id', $productIds)
+            ->where('status', \App\Enums\Status::Active->value)
+            ->inRandomOrder()
+            ->limit(4)
+            ->get();
+
+        return $this->view('frontend.thankyou', compact('order', 'relatedProducts'));
     }
     public function trackOrder(Request $request)
     {

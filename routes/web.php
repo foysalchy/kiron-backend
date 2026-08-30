@@ -94,6 +94,7 @@ Route::post('/order/confirm', [OrderController::class, 'storeOrder'])->name('ord
 Route::post('/order/partial-save', [OrderController::class, 'partialSave'])->name('order.partial');
 
 Route::get('/invoice/{id}', [OrderController::class, 'invoice'])->name('order.invoice');
+Route::get('/thank-you/{id}', [OrderController::class, 'thankyou'])->name('order.thankyou');
 Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
 Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
 Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');

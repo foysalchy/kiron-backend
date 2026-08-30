@@ -142,7 +142,7 @@ class LandingController extends FrontendController
             $order = $this->orderService->createLandingOrder($orderData);
 
             DB::commit();
-            return redirect()->route('order.invoice', $order->id)->with('success', 'Order placed successfully!');
+            return redirect()->route('order.thankyou', $order->id)->with('success', 'Order placed successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error("Landing Order Error: " . $e->getMessage());
