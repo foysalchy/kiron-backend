@@ -1,4 +1,4 @@
-<div class="max-w-4xl mx-auto px-4 py-12 md:py-16">
+<div class="p-0 container mx-auto  ">
     <!-- Thank You Section -->
     <div class="text-center bg-white p-8 rounded-xl shadow-sm border border-gray-100 mb-12">
         <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
