@@ -127,8 +127,6 @@ class OrderObserver
                     });
                 }
             }
-                );
-            }
 
             // Dispatch TikTok CAPI
             if (!empty($market->tiktok_pixel_id) && !empty($market->tiktok_access_token)) {
