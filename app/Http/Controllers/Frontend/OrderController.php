@@ -523,17 +523,27 @@ class OrderController extends FrontendController
             ->findOrFail($id);
 
         $productIds = $order->orderDetails->pluck('product_id')->toArray();
-        $categoryIds = \App\Models\Product::whereIn('id', $productIds)
-            ->pluck('category_id')
-            ->unique()
-            ->toArray();
+        $orderProducts = \App\Models\Product::whereIn('id', $productIds)->get();
+        $megaCategoryIds = [];
+        foreach ($orderProducts as $p) {
+            if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
+                $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
+            }
+        }
+        $megaCategoryIds = array_unique($megaCategoryIds);
 
-        $relatedProducts = \App\Models\Product::whereIn('category_id', $categoryIds)
-            ->whereNotIn('id', $productIds)
-            ->where('status', \App\Enums\Status::Active->value)
-            ->inRandomOrder()
-            ->limit(4)
-            ->get();
+        $relatedQuery = \App\Models\Product::whereNotIn('id', $productIds)
+            ->where('status', \App\Enums\Status::Active->value);
+
+        if (!empty($megaCategoryIds)) {
+            $relatedQuery->where(function($q) use ($megaCategoryIds) {
+                foreach($megaCategoryIds as $catId) {
+                    $q->orWhereJsonContains('mega_category_ids', $catId);
+                }
+            });
+        }
+
+        $relatedProducts = $relatedQuery->inRandomOrder()->limit(4)->get();
 
         return $this->view('frontend.thankyou', compact('order', 'relatedProducts'));
     }
