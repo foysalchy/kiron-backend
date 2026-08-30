@@ -219,82 +219,114 @@ class SubscriptionController extends Controller
             'data'    => ['payment' => $payment->fresh()],
         ]);
     }
-    public function billing(Request $request): JsonResponse
-    {
-        $query = Company::with([
-            'currentSubscription.pricingPackage',
-            'subscriptions.subscriptionPayments',
+public function billing(Request $request): JsonResponse
+{
+    // ── Existing companies ──
+    $companyQuery = Company::with([
+        'currentSubscription.pricingPackage',
+        'subscriptions.subscriptionPayments',
+        'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
+    ]);
 
-            'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
-        ]);
-
-        // Search
-        if ($request->search) {
-            $query->where(
-                fn($q) => $q
-                    ->where('name',  'like', "%{$request->search}%")
-                    ->orWhere('email', 'like', "%{$request->search}%")
-            );
-        }
-
-        // Status filter — subscription payment_status
-        if ($request->status && $request->status !== 'all') {
-            $status = $request->status === 'failed' ? ['failed', 'cancelled'] : [$request->status];
-            $query->whereHas(
-                'currentSubscription',
-                fn($q) =>
-                $q->whereIn('payment_status', $status)
-            );
-        }
-
-        // Date range — subscription starts_at
-        if ($request->date_from) {
-            $query->whereHas(
-                'currentSubscription',
-                fn($q) =>
-                $q->whereDate('starts_at', '>=', $request->date_from)
-            );
-        }
-        if ($request->date_to) {
-            $query->whereHas(
-                'currentSubscription',
-                fn($q) =>
-                $q->whereDate('starts_at', '<=', $request->date_to)
-            );
-        }
-
-        $companies = $query->latest()->get();
-
-        // Extra charges attach
-        foreach ($companies as $company) {
-            foreach ($company->subscriptions as $sub) {
-                $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
-                $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
-                $sub->setRelation(
-                    'extra_order_charges',
-                    \App\Models\ExtraOrderCharge::with('order:id,order_no')
-                        ->where('company_id', $company->id)
-                        ->whereBetween('month', [$startMonth, $endMonth])
-                        ->get()
-                );
-            }
-        }
-
-        // Stats — always from full dataset (no filter)
-        $allSubs = \App\Models\CompanySubscription::query();
-
-        $stats = [
-            'total_companies'  => Company::count(),
-            'total_paid_amount' => (clone $allSubs)->where('payment_status', 'paid')->sum('amount_paid'),
-            'pending_count'    => (clone $allSubs)->where('payment_status', 'pending')->count(),
-            'pending_amount'   => (clone $allSubs)->where('payment_status', 'pending')->sum('amount_paid'),
-            'unpaid_count'     => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->count(),
-            'unpaid_amount'    => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->sum('amount_paid'),
-        ];
-
-        return response()->json([
-            'data'  => $companies,
-            'stats' => $stats,
-        ]);
+    if ($request->search) {
+        $companyQuery->where(
+            fn($q) => $q
+                ->where('name', 'like', "%{$request->search}%")
+                ->orWhere('email', 'like', "%{$request->search}%")
+        );
     }
+
+    if ($request->status && $request->status !== 'all') {
+        $status = $request->status === 'failed' ? ['failed', 'cancelled'] : [$request->status];
+        $companyQuery->whereHas('currentSubscription', fn($q) => $q->whereIn('payment_status', $status));
+    }
+
+    if ($request->date_from) {
+        $companyQuery->whereHas('currentSubscription', fn($q) => $q->whereDate('starts_at', '>=', $request->date_from));
+    }
+    if ($request->date_to) {
+        $companyQuery->whereHas('currentSubscription', fn($q) => $q->whereDate('starts_at', '<=', $request->date_to));
+    }
+
+    $companies = $companyQuery->latest()->get();
+
+    // Extra charges attach (existing companies)
+    foreach ($companies as $company) {
+        foreach ($company->subscriptions as $sub) {
+            $startMonth = \Carbon\Carbon::parse($sub->starts_at)->format('Y-m');
+            $endMonth   = \Carbon\Carbon::parse($sub->ends_at)->format('Y-m');
+            $sub->setRelation(
+                'extra_order_charges',
+                \App\Models\ExtraOrderCharge::with('order:id,order_no')
+                    ->where('company_id', $company->id)
+                    ->whereBetween('month', [$startMonth, $endMonth])
+                    ->get()
+            );
+        }
+    }
+
+    // ── Orphan subscriptions (company force-deleted) ──
+    $orphanQuery = \App\Models\CompanySubscription::with(['pricingPackage', 'subscriptionPayments'])
+        ->whereDoesntHave('company');
+
+    if ($request->status && $request->status !== 'all') {
+        $status = $request->status === 'failed' ? ['failed', 'cancelled'] : [$request->status];
+        $orphanQuery->whereIn('payment_status', $status);
+    }
+    if ($request->date_from) {
+        $orphanQuery->whereDate('starts_at', '>=', $request->date_from);
+    }
+    if ($request->date_to) {
+        $orphanQuery->whereDate('starts_at', '<=', $request->date_to);
+    }
+
+    $orphanSubs = $orphanQuery->latest()->get();
+
+    // company_id ধরে group করা — একই company id এর subscription গুলো একসাথে
+$deletedCompanies = $orphanSubs->groupBy('company_id')->map(function ($subs, $companyId) {
+    foreach ($subs as $sub) {
+        $sub->setRelation('extra_order_charges', collect());
+    }
+
+    $latestSub = $subs->sortByDesc('starts_at')->first();
+
+    return [
+        'id'                   => 'deleted-' . $companyId,
+        'name'                 => $latestSub->company_name_snapshot ?? 'Deleted Company',
+        'email'                => $latestSub->company_email_snapshot,
+        'deleted'              => true,
+        'original_company_id'  => $companyId,
+        'current_subscription' => $latestSub,
+        'subscriptions'        => $subs->values(),
+    ];
+})->values();
+
+    // Search filter orphan এ apply (নাম না থাকায় শুধু original_company_id দিয়ে সার্চ, চাইলে বাদও দিতে পারেন)
+    if ($request->search) {
+        $deletedCompanies = collect(); // deleted company তে searchable নাম নেই, তাই search চললে বাদ
+    }
+
+    // Company object বানানো (Eloquent collection এর সাথে merge করার জন্য array হিসেবে পাঠাচ্ছি)
+    $allCompanies = $companies->toArray();
+    foreach ($deletedCompanies as $dc) {
+        $allCompanies[] = $dc;
+    }
+
+    // ── Stats — full dataset ──
+    $allSubs = \App\Models\CompanySubscription::query();
+
+    $stats = [
+        'total_companies'   => Company::count(),
+        'total_paid_amount' => (clone $allSubs)->where('payment_status', 'paid')->sum('amount_paid'),
+        'pending_count'     => (clone $allSubs)->where('payment_status', 'pending')->count(),
+        'pending_amount'    => (clone $allSubs)->where('payment_status', 'pending')->sum('amount_paid'),
+        'unpaid_count'      => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->count(),
+        'unpaid_amount'     => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->sum('amount_paid'),
+    ];
+
+    return response()->json([
+        'data'  => $allCompanies,
+        'stats' => $stats,
+    ]);
+}
 }

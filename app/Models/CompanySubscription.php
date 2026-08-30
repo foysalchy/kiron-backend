@@ -27,6 +27,8 @@ class CompanySubscription extends Model
         'ends_at',
         'reminder_sent_at',
         'status',
+        'company_name_snapshot',
+        'company_email_snapshot',
     ];
 
     protected $casts = [
