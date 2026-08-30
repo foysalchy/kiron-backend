@@ -27,6 +27,7 @@ class SiteSetting extends Model
         'lang',
         'currency',
         'currency_position',
+        'country',
         'inside_charge',
         'outside_charge',
         'corporate_address',

@@ -38,6 +38,7 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'lang'             => ['nullable'],
                 'currency'             => ['nullable'],
                 'currency_position'             => ['nullable'],
+                'country'             => ['nullable'],
                 'inside_charge'             => ['nullable'],
                 'outside_charge'             => ['nullable'],
                 'corporate_address' => ['nullable', 'string'],

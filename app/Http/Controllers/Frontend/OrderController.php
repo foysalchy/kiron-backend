@@ -153,6 +153,8 @@ class OrderController extends FrontendController
             $shippingAddress = [
                 'name'    => $data['name']    ?? $customer->name,
                 'phone'   => $data['phone']   ?? $customer->phone,
+                'email'   => $data['email']   ?? $customer->email ?? null,
+                'district'=> $data['district']?? $customer->district ?? null,
                 'address' => $data['address'] ?? $customer->address ?? 'N/A',
             ];
 
@@ -210,6 +212,8 @@ class OrderController extends FrontendController
         $request->validate([
             'name'           => 'required',
             'phone'          => 'required',
+            'email'          => 'nullable|email',
+            'district'       => 'required|string',
             'address'        => 'required',
             'payment_method' => 'required|string',
             'transaction_id' => $isCOD ? 'nullable' : 'required|string|unique:order_payments,transaction_id',
@@ -263,13 +267,20 @@ class OrderController extends FrontendController
                 'shipping_address' => [
                     'name'    => $request->name,
                     'phone'   => $request->phone,
+                    'email'   => $request->email,
+                    'district'=> $request->district,
                     'address' => $request->address,
                     'payment_method' => $request->payment_method,
                 ],
                 'status' => Status::Pending->value,
             ]);
             if ($order->customer) {
-                $order->customer->update(['name' => $request->name, 'address' => $request->address]);
+                $order->customer->update([
+                    'name' => $request->name, 
+                    'email' => $request->email, 
+                    'district' => $request->district, 
+                    'address' => $request->address
+                ]);
             }
 
             // 5. Stock deduct

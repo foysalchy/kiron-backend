@@ -37,6 +37,21 @@
                                         class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
                                 </div>
                             </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">Email (Optional)</label>
+                                    <input type="email" name="email" placeholder="Your email address"
+                                        value="{{ old('email', auth('customer')->user()->email ?? '') }}"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm font-medium text-gray-700">City <span
+                                            class="text-red-500">*</span></label>
+                                    <input type="text" name="district" placeholder="Your city" required
+                                        value="{{ old('district', auth('customer')->user()->district ?? '') }}"
+                                        class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                </div>
+                            </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Address <span
                                         class="text-red-500">*</span></label>

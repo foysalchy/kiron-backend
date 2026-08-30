@@ -29,7 +29,14 @@
         if (!empty($customer->division)) {
             $fbUserData['st'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $customer->division)));
         }
-        $fbUserData['country'] = hash('sha256', 'bd');
+        if (!empty($customer->post_code)) {
+            $fbUserData['zp'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $customer->post_code)));
+        }
+        $country = strtolower(trim($setup->country ?? 'bd'));
+        $fbUserData['country'] = hash('sha256', $country);
+        if (isset($fbUserData['ph'])) {
+            $fbUserData['external_id'] = $fbUserData['ph'];
+        }
     }
     $fbUserDataJson = !empty($fbUserData) ? json_encode($fbUserData) : '{}';
 @endphp

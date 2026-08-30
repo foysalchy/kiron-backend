@@ -27,12 +27,15 @@ class OrderObserver
             
             // Extract from shipping address or fallback to customer
             $shipping = $order->shipping_address ?? [];
-            $email = $order->billing_email ?? $order->customer->email ?? null;
+            $email = $shipping['email'] ?? $order->billing_email ?? $order->customer->email ?? null;
             $phone = $shipping['phone'] ?? $order->billing_phone ?? $order->customer->phone ?? null;
             $name = $shipping['name'] ?? $order->customer->name ?? '';
             $city = $shipping['district'] ?? $order->customer->district ?? '';
             $state = $shipping['division'] ?? $order->customer->division ?? '';
-            $country = 'bd'; // Default to Bangladesh
+            $zip = $shipping['post_code'] ?? $order->customer->post_code ?? '';
+            
+            $setup = \App\Models\SiteSetting::where('company_id', $order->company_id)->first();
+            $country = strtolower(trim($setup->country ?? 'bd'));
 
             // Helper to clean names and cities (lowercase, remove punctuation/spaces)
             $cleanStr = function($str) {
@@ -57,10 +60,12 @@ class OrderObserver
             $hashedLn = $lastName ? hash('sha256', $cleanStr($lastName)) : null;
             $hashedCt = $city ? hash('sha256', $cleanStr($city)) : null;
             $hashedSt = $state ? hash('sha256', $cleanStr($state)) : null;
+            $hashedZip = $zip ? hash('sha256', $cleanStr($zip)) : null;
             $hashedCountry = hash('sha256', $country);
 
-            $fbp = request()->cookie('_fbp');
-            $fbc = request()->cookie('_fbc');
+            // Laravel EncryptCookies middleware strips _fbp and _fbc, so read them natively
+            $fbp = $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null;
+            $fbc = $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null;
             
             $eventId = 'ORDER_' . $order->id;
             $value = $order->grand_total ?? $order->total_amount ?? 0;
@@ -89,7 +94,9 @@ class OrderObserver
                     'ln' => $hashedLn ? [$hashedLn] : null,
                     'ct' => $hashedCt ? [$hashedCt] : null,
                     'st' => $hashedSt ? [$hashedSt] : null,
+                    'zp' => $hashedZip ? [$hashedZip] : null,
                     'country' => [$hashedCountry],
+                    'external_id' => $hashedPhone ? [$hashedPhone] : null,
                     'fbp' => $fbp,
                     'fbc' => $fbc,
                 ]);
