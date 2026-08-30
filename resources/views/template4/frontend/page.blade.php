@@ -34,7 +34,7 @@
                                 prose-p:text-gray-500 prose-p:text-md prose-p:leading-relaxed
                                 prose-p:m-0
                                 prose-strong:text-gray-700 prose-a:text-[var(--primary-color)]">
-                        {!! $page->content !!}
+                           {!! $page->description !!}
                     </div>
                 </div>
             </div>
