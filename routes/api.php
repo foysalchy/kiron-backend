@@ -1237,6 +1237,7 @@ Route::prefix('v1')->group(function () {
                 //market tools route
                 Route::get('/market-tools', [MarketController::class, 'index']);
                 Route::post('/market-tools/update', [MarketController::class, 'update']);
+                Route::post('/market-tools/test-capi', [MarketController::class, 'testCapi']);
 
 
                 //lead-sources routes
