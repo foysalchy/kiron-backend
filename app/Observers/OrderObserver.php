@@ -24,16 +24,43 @@ class OrderObserver
             // Common User Data
             $ip = request()->ip();
             $userAgent = request()->userAgent();
+            
+            // Extract from shipping address or fallback to customer
+            $shipping = $order->shipping_address ?? [];
             $email = $order->billing_email ?? $order->customer->email ?? null;
-            $phone = $order->billing_phone ?? $order->customer->phone ?? null;
-            
-            // Format phone to international if needed, hash email & phone for FB
+            $phone = $shipping['phone'] ?? $order->billing_phone ?? $order->customer->phone ?? null;
+            $name = $shipping['name'] ?? $order->customer->name ?? '';
+            $city = $shipping['district'] ?? $order->customer->district ?? '';
+            $state = $shipping['division'] ?? $order->customer->division ?? '';
+            $country = 'bd'; // Default to Bangladesh
+
+            // Helper to clean names and cities (lowercase, remove punctuation/spaces)
+            $cleanStr = function($str) {
+                return strtolower(preg_replace('/[^a-z0-9]/i', '', $str));
+            };
+
+            // Split name into First and Last
+            $nameParts = explode(' ', trim($name));
+            $firstName = $nameParts[0] ?? '';
+            $lastName = count($nameParts) > 1 ? end($nameParts) : $firstName;
+
+            // Format phone to international (assumes BD numbers mostly, add 88 if missing)
+            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+            if (strlen($cleanPhone) == 11 && str_starts_with($cleanPhone, '01')) {
+                $cleanPhone = '88' . $cleanPhone;
+            }
+
+            // Hash user data
             $hashedEmail = $email ? hash('sha256', strtolower(trim($email))) : null;
-            $hashedPhone = $phone ? hash('sha256', ltrim(trim($phone), '0+')) : null; // simplified
-            
+            $hashedPhone = $cleanPhone ? hash('sha256', $cleanPhone) : null;
+            $hashedFn = $firstName ? hash('sha256', $cleanStr($firstName)) : null;
+            $hashedLn = $lastName ? hash('sha256', $cleanStr($lastName)) : null;
+            $hashedCt = $city ? hash('sha256', $cleanStr($city)) : null;
+            $hashedSt = $state ? hash('sha256', $cleanStr($state)) : null;
+            $hashedCountry = hash('sha256', $country);
+
             $fbp = request()->cookie('_fbp');
             $fbc = request()->cookie('_fbc');
-            $ttp = request()->cookie('_ttp');
             
             $eventId = 'ORDER_' . $order->id;
             $value = $order->grand_total ?? $order->total_amount ?? 0;
@@ -47,6 +74,11 @@ class OrderObserver
                     'client_user_agent' => $userAgent,
                     'em' => $hashedEmail ? [$hashedEmail] : null,
                     'ph' => $hashedPhone ? [$hashedPhone] : null,
+                    'fn' => $hashedFn ? [$hashedFn] : null,
+                    'ln' => $hashedLn ? [$hashedLn] : null,
+                    'ct' => $hashedCt ? [$hashedCt] : null,
+                    'st' => $hashedSt ? [$hashedSt] : null,
+                    'country' => [$hashedCountry],
                     'fbp' => $fbp,
                     'fbc' => $fbc,
                 ]);
