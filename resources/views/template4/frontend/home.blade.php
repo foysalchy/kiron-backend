@@ -213,7 +213,7 @@
         <p class="text-gray-600 text-center mb-4">Buy Your Desired Products from Featured Categories</p>
 
         <!-- Categories Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
 
             @foreach ($headerCategories as $category)
                 <a href="{{ route('category.products', $category->slug) }}"
@@ -227,7 +227,7 @@
                                 alt="{{ $category->name }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
-                                class="w-full h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
+                                class="w-full h-[100px] lg:h-[160px] md:h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
                             >
                         @else
                             <i class="fas fa-layer-group text-2xl text-gray-400"></i>
@@ -236,7 +236,7 @@
 
                     <!-- Category Name -->
                     <h3 class=" text-[#0f172a] text-xl font-normal leading-tight
-                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2" style="font-weight: 400 !important;color: #333;font-size: 16px !important;padding-top: 8px;">
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[14px] md:text-[16px] lg:text-[16px]" style="font-weight: 400 !important;color: #333;padding-top: 8px;">
                         {{ $category->name }}
                     </h3>
 
