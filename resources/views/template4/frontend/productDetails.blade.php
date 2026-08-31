@@ -14,20 +14,24 @@
     @endphp
 
     <section class="bg-[#F9F9F9] py-2">
-        <!-- Breadcrumbs -->
+        <!-- Dynamic Breadcrumbs -->
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-            <a href="/" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
-            <span class="text-gray-400">/</span>
-            <a href="#" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Products</a>
-            @php $mega = $product->mega_categories?->first(); @endphp
-            @if ($mega)
-                <span class="text-gray-400">/</span>
-                <a href="{{ route('category.products', $mega->slug) }}"
-                    class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">{{ $mega->name }}</a>
+
+            <a href="{{ route('home') }}" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+
+            @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                @foreach($breadcrumb as $item)
+                    <span class="text-gray-400">/</span>
+                    <a href="{{ route('category.products', $item['slug']) }}"
+                        class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
+                        {{ $item['name'] }}
+                    </a>
+                @endforeach
             @endif
+
             <span class="text-gray-400">/</span>
-            <span class="text-gray-500 font-normal truncate">{{ $product->title }}</span>
+            <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
     </section>
 
@@ -298,21 +302,23 @@
                     <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
                         <h3 class="font-bold text-gray-900 text-lg">Related Products</h3>
                     </div>
-                    <div class="divide-y divide-gray-200">
-                        @foreach ($relatedProducts->take(5) as $rel)
-                            <a href="{{ route('product.details', $rel->slug) }}"
-                                class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                                <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
-                                    alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
-                                <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
-                                    <p class="text-xs font-bold text-[var(--primary-color)] mt-1">{{ $setup->currency }}
-                                        {{ number_format($rel->sale_price) }}
-                                    </p>
-                                </div>
-                            </a>
-                        @endforeach
+                   <div class="divide-y divide-gray-200">
+            @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
+
+            @foreach ($relatedProducts->take(5) as $rel)
+                <a href="{{ route('product.details', $rel->slug) }}"
+                    class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
+                    <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
+                        alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
+                        <p class="text-xs font-bold text-[var(--primary-color)] mt-1">
+                            {{ $isL ? $setup->currency : '' }} {{ number_format($rel->sale_price) }} {{ !$isL ? $setup->currency : '' }}
+                        </p>
                     </div>
+                </a>
+            @endforeach
+        </div>
                 </div>
             </aside>
         </div>
@@ -336,6 +342,20 @@
                 btn.classList.add('border-2', 'border-[var(--primary-color)]');
                 btn.classList.remove('border-gray-200');
             }
+        }
+        function changeQty(amount) {
+            let qtyVal = document.getElementById('qty-value');
+            let mainQty = document.getElementById('main-qty');
+            let currentQty = parseInt(qtyVal.innerText);
+
+            let newQty = currentQty + amount;
+
+            if (newQty < 1) {
+                newQty = 1;
+            }
+
+            qtyVal.innerText = newQty;
+            mainQty.value = newQty;
         }
 
         const attributeGroups = @json($attributeGroups ?? []);

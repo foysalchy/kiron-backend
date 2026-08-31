@@ -307,18 +307,27 @@
 
                                 <!-- Price Logic (Corrected Fields) -->
                                 <div class="text-[#016738] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
+                                    @php $isLeft = ($setup->currency_position ?? 'left') == 'left'; @endphp
+
                                     @if ($isVar && $minPrice > 0)
                                         {{-- ভ্যারিয়েশন: Lowest - Highest Regular Price --}}
-                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} –
-                                            {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
+                                        <span>
+                                            {{ $isLeft ? $currency : '' }}{{ number_format($minPrice, 0) }}{{ !$isLeft ? $currency : '' }} –
+                                            {{ $isLeft ? $currency : '' }}{{ number_format($maxPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                        </span>
                                     @else
                                         {{-- সিঙ্গেল: Discount থাকলে কাটা দামসহ দেখাবে --}}
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
-                                            <span
-                                                class="line-through text-gray-400 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
-                                            <span>{{ number_format($salePrice, 0) }}{{ $currency }}</span>
+                                            <span class="line-through text-gray-400 text-xs md:text-sm font-bold">
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                            </span>
+                                            <span>
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($salePrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                            </span>
                                         @elseif($regularPrice > 0)
-                                            <span>{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
+                                            <span>
+                                                {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
+                                            </span>
                                         @endif
                                     @endif
                                 </div>
@@ -361,18 +370,19 @@
                             <!-- Right Part: Product Details -->
                             <div class="w-[65%] p-2 md:p-6 flex flex-col justify-center">
                                 <!-- Price Section (Dynamic) -->
+                                @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
+
                                 <div class="flex flex-col sm:flex-row sm:items-center gap-0.5 md:gap-3 mb-1">
                                     {{-- বর্তমান অফার প্রাইস --}}
                                     <span class="text-[#9d174d] font-bold text-[13px] md:text-xl leading-none">
-                                        {{ $setup->currency ?? 'BDT' }} {{ number_format($product->sale_price) }}
+                                        {{ $isL ? $setup->currency : '' }} {{ number_format($product->sale_price) }} {{ !$isL ? $setup->currency : '' }}
                                     </span>
 
                                     {{-- আগের রেগুলার প্রাইস --}}
                                     <span class="text-[#52525b] line-through text-[10px] md:text-sm font-semibold leading-none">
-                                        {{ $setup->currency ?? 'BDT' }} {{ number_format($product->regular_price) }}
+                                        {{ $isL ? $setup->currency : '' }} {{ number_format($product->regular_price) }} {{ !$isL ? $setup->currency : '' }}
                                     </span>
                                 </div>
-
                                 <!-- Title (Dynamic) -->
                                 <h3
                                     class="text-[#041533] font-bold text-[11px] md:text-[15px] leading-tight md:leading-[1.3] mb-1 line-clamp-2 group-hover:text-[#9d174d] transition-colors">

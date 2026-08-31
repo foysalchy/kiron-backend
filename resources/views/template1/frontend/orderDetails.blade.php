@@ -61,10 +61,13 @@
                                     @endif
 
                                     <p class="text-gray-900 font-medium">
-                                        <span class="text-sm">{{ $setup->currency }} {{ number_format($item->unit_price) }}
-                                            × {{ $item->quantity }}</span>
-                                        <span class="text-lg font-bold text-[var(--primary-color)] ml-3">{{ $setup->currency }}
-                                            {{ number_format($item->total) }}</span>
+                                        <span class="text-sm">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($item->unit_price) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                            × {{ $item->quantity }}
+                                        </span>
+                                        <span class="text-lg font-bold text-[var(--primary-color)] ml-3">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($item->total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                        </span>
                                     </p>
                                 </div>
 
@@ -268,25 +271,21 @@
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
-                            <span class="text-gray-900 font-bold">{{ $setup->currency }}
-                                {{ number_format($order->subtotal) }}</span>
+                            <span class="text-gray-900 font-bold">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->subtotal) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Shipping Charge:</span>
-                            <span class="text-gray-900 font-bold">{{ $setup->currency }}
-                                {{ number_format($order->other_charges) }}</span>
+                            <span class="text-gray-900 font-bold">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->other_charges) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
                         @if ($order->coupon_discount > 0)
                             <div class="flex justify-between text-md text-green-600 font-medium">
                                 <span>Discount:</span>
-                                <span class="font-bold">- {{ $setup->currency }}
-                                    {{ number_format($order->coupon_discount) }}</span>
+                                <span class="font-bold"> - {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->coupon_discount) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[var(--primary-color)]">{{ $setup->currency }}
-                                {{ number_format($order->grand_total) }}</span>
+                            <span class="text-xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
                         <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
                             {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>

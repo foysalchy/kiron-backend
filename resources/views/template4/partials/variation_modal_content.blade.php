@@ -9,11 +9,15 @@
             @php $firstVar = $product->variations->first(); @endphp
             <!-- unit price -->
             <p class="text-gray-500 text-sm mt-1">
-                Unit Price: <span id="modal-unit-price">৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}</span>
+                Unit Price: <span id="modal-unit-price"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                {{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}
+                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
             </p>
             <!-- total price -->
             <p class="text-[var(--primary-color)] font-semibold text-xl mt-0.5" id="modal-total-price-display">
-                ৳{{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}
+                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                {{ $firstVar ? number_format($firstVar->final_price) : number_format($product->sale_price) }}
+                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
             </p>
         </div>
     </div>
@@ -32,7 +36,9 @@
 
                     <div class="flex justify-between items-center border border-gray-200 p-3 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-[var(--primary-color)] peer-checked:bg-orange-50 transition-all">
                         <span class="text-sm font-bold text-gray-700">{{ $variation->display_name }}</span>
-                        <span class="text-[var(--primary-color)] ">৳{{ number_format($variation->final_price) }}</span>
+                        <span class="text-[var(--primary-color)] "> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                        {{ number_format($variation->final_price) }}
+                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                     </div>
                 </label>
             @endforeach

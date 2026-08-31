@@ -39,8 +39,9 @@
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-5">
                         @if ($setup && $setup->logo)
-                            <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" height="" width=""
-                                class="h-9 md:h-10 w-auto object-contain">
+                        <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                            alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
+                            class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
                         @else
                             <div class="w-10 h-10 flex items-center justify-center rounded-lg">
                                 <span

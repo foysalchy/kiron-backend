@@ -128,14 +128,20 @@
                 if (selectedVariant && qtyInput && totalDisplay) {
                     const unitPrice = parseFloat(selectedVariant.getAttribute('data-price'));
                     const qty = parseInt(qtyInput.value);
-                    const currency = "{{ $setup->currency }}";
 
-                    // calculate total
+                    // PHP থেকে কারেন্সি এবং পজিশন নেওয়া হচ্ছে
+                    const currency = "{{ $setup->currency }}";
+                    const pos = "{{ $setup->currency_position ?? 'left' }}";
+
                     const total = unitPrice * qty;
 
-                    // update display
-                    unitPriceDisplay.innerText = currency + " " + unitPrice.toLocaleString();
-                    totalDisplay.innerText = currency + " " + total.toLocaleString();
+                    // পজিশন অনুযায়ী ফরম্যাট করা
+                    let unitText = (pos === 'left') ? currency + " " + unitPrice.toLocaleString() : unitPrice.toLocaleString() + " " + currency;
+                    let totalText = (pos === 'left') ? currency + " " + total.toLocaleString() : total.toLocaleString() + " " + currency;
+
+                    // আপডেট ডিসপ্লে
+                    if(unitPriceDisplay) unitPriceDisplay.innerText = unitText;
+                    if(totalDisplay) totalDisplay.innerText = totalText;
                 }
             }
 

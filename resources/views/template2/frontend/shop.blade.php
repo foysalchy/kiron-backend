@@ -22,28 +22,27 @@
         <!-- Main Card Container -->
         <div class="archiveTopInfo">
 
-            <!-- Breadcrumb -->
-            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
+            <nav class="hidden md:flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                        <i class="fas fa-home text-xs"></i> Home
+                    </a>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                    @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                        @foreach($breadcrumb as $item)
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                            </svg>
 
-                <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
-                    {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
-                </a>
-
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
-
-                <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
-            </nav>
+                            @if($loop->last)
+                                <span class="text-[var(--primary-color)] font-bold">{{ $item['name'] }}</span>
+                            @else
+                                <a href="{{ route('category.products', $item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                    {{ $item['name'] }}
+                                </a>
+                            @endif
+                        @endforeach
+                    @endif
+                </nav>
             <div class="meta_info">
                 @if (isset($category->meta_title) && $category->meta_title)
                     <h1 class="text-[24px] py-1">{{$category->meta_title}}</h1>

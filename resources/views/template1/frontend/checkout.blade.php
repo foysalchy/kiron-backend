@@ -233,10 +233,10 @@
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
                                 <span class="text-xl font-bold text-[var(--primary-color)]">
-    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-    <span id="total-display">{{ number_format($total) }}</span>
-    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-</span>
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                <span id="total-display">{{ number_format($total) }}</span>
+                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                            </span>
                             </div>
                         </div>
 

@@ -253,7 +253,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-header">খাঁটি ভাই</span>
             @endif
