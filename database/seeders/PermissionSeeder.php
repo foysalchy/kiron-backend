@@ -223,7 +223,12 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_ip',             'IP Restriction Settings',  'ip_restriction');
         $addCrud('woocommerce_integration', 'WooCommerce Integration',  'woocommerce_sync');
         $addCrud('status_mapping',          'Status Mapping',           'woocommerce_sync');
-        $addCrud('settings_templates',      'Template Settings',        'settings_templates');
+
+        $addCrud('payment_in_out',      'Payment In/Out',        'payment_in_out');
+        $addCrud('sms_wallet',      'Sms Wallet',        'sms_wallet');
+        $addCrud('sms_templates',      'Sms Templates',        'sms_templates');
+        $addCrud('email_templates',      'Email Templates',        'email_templates');
+        $addCrud('note_templates',      'Note Templates',        'note_templates');
         $addCrud('settings_tax',          'Tax Settings',        'settings_tax');
         $addCrud('settings_content',      'Content Settings',        'settings_content');
         $addCrud('settings_invoice',      'Invoice Settings',        'settings_invoice');
