@@ -298,13 +298,30 @@
       body: JSON.stringify({ items })
     })
       .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
-          if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
-          else toastr.success(data.message);
-        } else toastr.error(data.message);
-      });
+                .then(data => {
+                    if (data.status === 'success') {
+                        if (typeof fbq === 'function') {
+                            fbq('track', 'AddToCart', {
+                                content_ids: ['{{ $product->id }}'],
+                                content_type: 'product',
+                                value: {{ $product->sale_price ?? 0 }} * qty,
+                                currency: '{{ $setup->currency ?? "BDT" }}'
+                            });
+                        }
+                        if (typeof ttq === 'function') {
+                            ttq.track('AddToCart', {
+                                content_id: '{{ $product->id }}',
+                                content_type: 'product',
+                                value: {{ $product->sale_price ?? 0 }} * qty,
+                                currency: '{{ $setup->currency ?? "BDT" }}'
+                            });
+                        }
+                        
+                        document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                        if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
+                        else toastr.success(data.message);
+                    } else toastr.error(data.message);
+                });
   }
 
   function toggleWishlist(productId) {

@@ -10,3 +10,12 @@
         'templatePrefix' => 'template4'
     ])
 @endsection
+
+@push('scripts')
+    @if(isset($pixelPurchaseFired) && !$pixelPurchaseFired)
+        @include('components.meta-info.pixel-events', [
+            'event' => 'Purchase',
+            'data'  => ['order' => $order]
+        ])
+    @endif
+@endpush
