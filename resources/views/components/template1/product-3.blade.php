@@ -49,10 +49,10 @@
         </div>
     </div>
 
-    <div class="p-4 flex flex-col flex-grow">
+    <div class="p-4 flex flex-col flex-grow relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
             <p
-                class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
+                class="  md:text-[17px] text-[14px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
             </p>
         </a>
@@ -80,12 +80,13 @@
 
             <div class="basis-full h-0 sm:hidden"></div>
 
-            @if ($discountLabel)
-                <span
-                    class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold  font-black px-2 py-0.5 rounded-full uppercase">
-                    -{{ $discountLabel }} OFF
-                </span>
-            @endif
+           @if ($discountLabel)
+            <span
+                class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                    max-md:absolute max-md:top-1 max-md:left-1">
+                -{{ $discountLabel }} OFF
+            </span>
+        @endif
         </div>
 
         <button {{ $isOutOfStock ? 'disabled' : '' }}

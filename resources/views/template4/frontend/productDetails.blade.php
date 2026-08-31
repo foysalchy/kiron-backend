@@ -15,19 +15,37 @@
 
     <section class="bg-[#F9F9F9] py-2">
         <!-- Breadcrumbs -->
-        <nav aria-label="Breadcrumb"
-            class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-            <a href="/" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
-            <span class="text-gray-400">/</span>
-            <a href="#" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Products</a>
+       <nav aria-label="Breadcrumb"
+            class="container mx-auto px-4 flex items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6 overflow-hidden whitespace-nowrap">
+
+            <a href="/"
+                class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium shrink-0">
+                Home
+            </a>
+
+            <span class="text-gray-400 shrink-0">/</span>
+
+            <a href="#"
+                class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium shrink-0">
+                Products
+            </a>
+
             @php $mega = $product->mega_categories?->first(); @endphp
+
             @if ($mega)
-                <span class="text-gray-400">/</span>
+                <span class="text-gray-400 shrink-0">/</span>
+
                 <a href="{{ route('category.products', $mega->slug) }}"
-                    class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">{{ $mega->name }}</a>
+                    class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium shrink-0">
+                    {{ $mega->name }}
+                </a>
             @endif
-            <span class="text-gray-400">/</span>
-            <span class="text-gray-500 font-normal truncate">{{ $product->title }}</span>
+
+            <span class="text-gray-400 shrink-0">/</span>
+
+            <span class="text-gray-500 font-normal truncate min-w-0">
+                {{ $product->title }}
+            </span>
         </nav>
     </section>
 

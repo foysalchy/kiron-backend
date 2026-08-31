@@ -207,10 +207,10 @@
    <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
 
-          <h2 class="text-2xl font-semibold text-[#041533]   tracking-tight mt-6 text-center">
+          <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533]   tracking-tight mt-6 text-center">
             Featured Category
         </h2>
-        <p class="text-gray-600 text-center mb-4">Buy Your Desired Products from Featured Categories</p>
+        <p class="text-gray-600 text-center mb-4 lg:text-[16px] text-[14px]">Buy Your Desired Products from Featured Categories</p>
 
         <!-- Categories Grid -->
         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
@@ -339,7 +339,7 @@
         <div class="p-0 container mx-auto">
 
             <!-- Section Title -->
-            <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 tracking-tight">
+            <h2 class="text-xl md:text-2xl text-[20px] font-bold text-[#041533] lg:mb-6 mb-3 tracking-tight">
                 Latest Offers
             </h2>
 
@@ -348,7 +348,7 @@
                 @foreach ($latestOffers as $product)
                     <a href="{{ route('product.details', $product->slug) }}" class="block group">
                         <div
-                            class="bg-[#fcfcfc] flex items-center h-28 md:h-40 border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
+                            class="bg-[#fcfcfc] flex items-center  border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
 
                             <!-- Left Part: Product Image -->
                             <div
@@ -395,12 +395,12 @@
     <section class="w-full bg-[#fcfcfc] px-4 py-10">
         <div class="p-0 container mx-auto  ">
             <!-- Section Title -->
-            <h2 class="text-2xl font-semibold text-[#041533] mb-6 tracking-tight">
+            <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] lg:mb-6 mb-3 tracking-tight">
                 Our Featured Products
             </h2>
 
             <!-- Products Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
 
                 @foreach ($popularProducts as $product)
                     <x-template1.product-card :product="$product" />
