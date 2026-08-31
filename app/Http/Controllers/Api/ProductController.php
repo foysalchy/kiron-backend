@@ -24,6 +24,7 @@ class ProductController extends Controller
             'brand_id' => $request->query('brand_id'),
             'status' => $request->query('status'),
             'type' => $request->query('type'),
+            'product_type' => $request->query('product_type'),
             'stock_status' => $request->query('stock_status'),
             'purpose' => $request->query('purpose'),
             'source' => $request->query('source'),

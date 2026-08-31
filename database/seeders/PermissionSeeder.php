@@ -233,9 +233,21 @@ class PermissionSeeder extends Seeder
         $addCrud('settings_marketing',    'Marketing Settings',   'settings_marketing');
         $addCrud('settings_ai',           'AI Integration Settings', 'settings_ai');
 
-        //21. Subscriptions
-        $addViewOnly('billing',           'Subscription & Billing Management',            'subscription');
-        $addViewOnly('company_profile',           'Subscription & Billing Management',            'subscription');
+        // ==========================================
+        // 22. Production / Manufacturing
+        // ==========================================
+        $addCrud('production',              'Production',               'production_module');
+        $addCrud('production_orders',       'Production Orders',        'production_module');
+        $addCrud('boms',                    'Bill of Materials (BOM)',  'production_module');
+        $addCrud('production_planning',     'Production Planning',      'production_module');
+        $addCrud('production_stages',       'Production Stages',        'production_module');
+        $addCrud('work_centers',            'Work Centers',             'production_module');
+        $addCrud('production_wastages',     'Production Wastages',      'production_module');
+        $addCrud('production_qc',           'Quality Control (QC)',     'production_module');
+        $addViewOnly('production_costs',    'Production Costs',         'production_module');
+        $addViewOnly('production_reports',  'Production Reports',       'production_module');
+        $addCrud('production_settings',     'Production Settings',      'production_module');
+
         Permission::insert($permissionsToInsert);
     }
 }

@@ -92,11 +92,30 @@ class ProductService
                 $query->where('stock_status', $filters['stock_status']);
             }
 
+            if (isset($filters['product_type'])) {
+                if ($filters['product_type'] === 'finished') {
+                    $query->where(function ($q) {
+                        $q->whereNull('product_type')
+                            ->orWhere('product_type', 'finished');
+                    });
+                } else {
+                    $query->where('product_type', $filters['product_type']);
+                }
+            }
+
             if (isset($filters['purpose'])) {
                 if ($filters['purpose'] === 'website') {
-                    $query->where('purpose', 'website');
+                    $query->where('purpose', 'website')
+                        ->where(function ($q) {
+                            $q->whereNull('product_type')
+                                ->orWhere('product_type', 'finished');
+                        });
                 } elseif ($filters['purpose'] === 'pos') {
-                    $query->where('purpose', 'pos');
+                    $query->where('purpose', 'pos')
+                        ->where(function ($q) {
+                            $q->whereNull('product_type')
+                                ->orWhere('product_type', 'finished');
+                        });
                 }
             }
 
@@ -213,12 +232,13 @@ class ProductService
 
         try {
             // Handle thumbnail upload
-            if (isset($data['thumbnail'])) {
+            if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'products/thumbnails',
-
                 );
+            } else {
+                $data['thumbnail'] = $data['thumbnail'] ?? null;
             }
 
             // Extract gallery images
@@ -1062,6 +1082,20 @@ class ProductService
     {
         try {
             $product = $this->getProductById($id);
+
+            // Check if used in active BOM
+            $isUsedInBom = \App\Models\BomItem::where('product_id', $id)->exists() 
+                || \App\Models\BillOfMaterial::where('product_id', $id)->exists();
+            if ($isUsedInBom) {
+                throw ApiException::badRequest('Cannot delete this item because it is referenced in a Bill of Materials (BOM) recipe.');
+            }
+
+            // Check if used in active Production Order
+            $isUsedInOrder = \App\Models\ProductionOrder::where('product_id', $id)->whereIn('status', ['draft', 'planned', 'in_progress'])->exists();
+            if ($isUsedInOrder) {
+                throw ApiException::badRequest('Cannot delete this item because it is associated with an active Production Order.');
+            }
+
             $product->delete();
 
             Log::info('Product deleted successfully', ['product_id' => $id]);
@@ -2424,3 +2458,4 @@ class ProductService
         }
     }
 }
+

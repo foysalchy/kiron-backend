@@ -158,6 +158,17 @@ use App\Http\Controllers\Api\TransactionInternalTransferController;
 use App\Http\Controllers\Api\TransactionJournalController;
 use App\Http\Controllers\Api\TypePeriodController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\Production\ProductionDashboardController;
+use App\Http\Controllers\Api\Production\BillOfMaterialController;
+use App\Http\Controllers\Api\Production\WorkCenterController;
+use App\Http\Controllers\Api\Production\ProductionStageController;
+use App\Http\Controllers\Api\Production\ProductionPlanningController;
+use App\Http\Controllers\Api\Production\ProductionOrderController;
+use App\Http\Controllers\Api\Production\ProductionWastageController;
+use App\Http\Controllers\Api\Production\ProductionQualityCheckController;
+use App\Http\Controllers\Api\Production\ProductionCostController;
+use App\Http\Controllers\Api\Production\ProductionReportController;
+use App\Http\Controllers\Api\Production\ProductionSettingController;
 use App\Http\Controllers\Api\UserPasswordController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseInventoryController;
@@ -1678,6 +1689,73 @@ Route::prefix('v1')->group(function () {
                 Route::post('/settings/ai', [\App\Http\Controllers\Api\AiSettingController::class, 'update']);
                 Route::post('/settings/ai/test', [\App\Http\Controllers\Api\AiSettingController::class, 'testConnection']);
                 Route::post('/ai/generate', [\App\Http\Controllers\Api\AIGeneratorController::class, 'generate']);
+
+                // ==========================================
+                // Production / Manufacturing Routes
+                // ==========================================
+                Route::prefix('production')->group(function () {
+                    // Dashboard
+                    Route::get('/dashboard', [ProductionDashboardController::class, 'stats']);
+                    Route::get('/dashboard-stats', [ProductionDashboardController::class, 'stats']);
+                    Route::get('/dashboard-charts', [ProductionDashboardController::class, 'charts']);
+
+                    // Work Centers
+                    Route::patch('work-centers/{id}/toggle-status', [WorkCenterController::class, 'toggleStatus']);
+                    Route::apiResource('work-centers', WorkCenterController::class);
+
+                    // Production Stages
+                    Route::post('stages/reorder', [ProductionStageController::class, 'reorder']);
+                    Route::apiResource('stages', ProductionStageController::class);
+
+                    // Bills of Materials (BOM)
+                    Route::post('boms/{id}/clone', [BillOfMaterialController::class, 'clone']);
+                    Route::post('boms/{id}/calculate-cost', [BillOfMaterialController::class, 'calculateCost']);
+                    Route::apiResource('boms', BillOfMaterialController::class);
+
+                    // Production Planning
+                    Route::post('plans/{id}/convert-to-order', [ProductionPlanningController::class, 'convertToOrder']);
+                    Route::apiResource('plans', ProductionPlanningController::class);
+                    Route::apiResource('planning', ProductionPlanningController::class);
+
+                    // Production Orders
+                    Route::post('orders/check-stock', [ProductionOrderController::class, 'checkStock']);
+                    Route::get('orders/{id}/check-stock', [ProductionOrderController::class, 'checkStock']);
+                    Route::post('orders/{id}/start', [ProductionOrderController::class, 'start']);
+                    Route::post('orders/{id}/progress-stage', [ProductionOrderController::class, 'progressStage']);
+                    Route::post('orders/{id}/complete-stage', [ProductionOrderController::class, 'completeStage']);
+                    Route::post('orders/{id}/consume-materials', [ProductionOrderController::class, 'consumeMaterials']);
+                    Route::post('orders/{id}/log-output', [ProductionOrderController::class, 'logOutput']);
+                    Route::post('orders/{id}/pause', [ProductionOrderController::class, 'pause']);
+                    Route::post('orders/{id}/resume', [ProductionOrderController::class, 'resume']);
+                    Route::post('orders/{id}/complete', [ProductionOrderController::class, 'complete']);
+                    Route::post('orders/{id}/cancel', [ProductionOrderController::class, 'cancel']);
+                    Route::apiResource('orders', ProductionOrderController::class);
+
+                    // Wastages
+                    Route::apiResource('wastages', ProductionWastageController::class);
+
+                    // Quality Control (QC)
+                    Route::apiResource('quality-checks', ProductionQualityCheckController::class);
+
+                    // Production Costs
+                    Route::get('costs', [ProductionCostController::class, 'index']);
+                    Route::post('costs', [ProductionCostController::class, 'store']);
+                    Route::get('costs/order/{orderId}', [ProductionCostController::class, 'byOrder']);
+                    Route::get('costs/{id}', [ProductionCostController::class, 'show']);
+
+                    // Reports
+                    Route::get('reports/summary', [ProductionReportController::class, 'summary']);
+                    Route::get('reports/efficiency', [ProductionReportController::class, 'efficiency']);
+                    Route::get('reports/wastage', [ProductionReportController::class, 'wastage']);
+                    Route::get('reports/cost-analysis', [ProductionReportController::class, 'costAnalysis']);
+                    Route::get('reports/production', [ProductionReportController::class, 'productionReport']);
+                    Route::get('reports/material-consumption', [ProductionReportController::class, 'materialConsumptionReport']);
+                    Route::get('reports/costs', [ProductionReportController::class, 'costReport']);
+
+                    // Settings
+                    Route::get('settings', [ProductionSettingController::class, 'index']);
+                    Route::post('settings', [ProductionSettingController::class, 'store']);
+                });
             });
         });
         //pricing plan

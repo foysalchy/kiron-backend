@@ -14,6 +14,23 @@ class StoreProductRequest extends BaseCompanyRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $merge = [];
+        if (!$this->has('slug') || empty($this->slug)) {
+            $merge['slug'] = \Illuminate\Support\Str::slug($this->title) . '-' . time();
+        }
+        if (!$this->has('manage_stock') || $this->manage_stock === null) {
+            $merge['manage_stock'] = 1;
+        }
+        if (is_array($this->sku_code)) {
+            $merge['sku_code'] = $this->sku_code[0] ?? null;
+        }
+        if (!empty($merge)) {
+            $this->merge($merge);
+        }
+    }
+
     public function rules(): array
     {
         $companyId = $this->input('company_id') ?? $this->user()->company_id;
@@ -25,11 +42,12 @@ class StoreProductRequest extends BaseCompanyRequest
                 'assigned_to' => ['nullable', 'exists:users,id'],
 
                 // Basic Info
-                'title'      => ['required', 'string', 'max:255'],
-                'manage_stock' => ['required'],
-                'slug'       => ['required', 'string', 'max:255', 'unique:products,slug'],
-                'thumbnail'  => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-                'video_link' => ['nullable', 'url'],
+                'title'        => ['required', 'string', 'max:255'],
+                'manage_stock' => ['nullable'],
+                'product_type' => ['nullable', 'string', Rule::in(['raw_material', 'semi_finished', 'finished', 'service'])],
+                'slug'         => ['nullable', 'string', 'max:255', 'unique:products,slug'],
+                'thumbnail'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'video_link'   => ['nullable', 'url'],
 
                 // Categories
                 'mega_category_ids'    => ['nullable', 'array'],
@@ -53,14 +71,14 @@ class StoreProductRequest extends BaseCompanyRequest
                 ],
 
                 // Single Product Fields
-                'regular_price' => ['required_if:type,single', 'nullable', 'numeric', 'min:0'],
+                'regular_price' => ['nullable', 'numeric', 'min:0'],
                 'purchase_price' => ['nullable'],
                 'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
                 'discount'      => ['nullable', 'numeric', 'min:0'],
-                'warehouse_info'                        => ['required_if:type,single', 'nullable', 'array'],
-                'warehouse_info.*.warehouse_id'         => ['required_with:warehouse_info', 'integer', 'exists:warehouses,id'],
+                'warehouse_info'                        => ['nullable', 'array'],
+                'warehouse_info.*.warehouse_id'         => ['nullable', 'integer', 'exists:warehouses,id'],
                 'warehouse_info.*.bin_id'               => ['nullable', 'integer', 'exists:bins,id'],
-                'warehouse_info.*.quantity'             => ['required_with:warehouse_info', 'integer', 'min:0'],
+                'warehouse_info.*.quantity'             => ['nullable', 'numeric', 'min:0'],
 
                 // Variation Product Fields
                 'variations'                                     => ['required_if:type,variation', 'nullable', 'array', 'min:1'],
