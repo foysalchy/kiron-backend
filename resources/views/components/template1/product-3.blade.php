@@ -26,7 +26,7 @@
 @endphp
 
 <div
-    class="max-w-[348px] group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
+    class="max-w-[348px] relative group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
 
     <div class="relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <div class="p-4 flex flex-col flex-grow relative">
+    <div class="p-4 flex flex-col flex-grow ">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
             <p
                 class="  md:text-[17px] text-[14px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">

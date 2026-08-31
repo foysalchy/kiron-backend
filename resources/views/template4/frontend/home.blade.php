@@ -252,7 +252,7 @@
         <section class=" px-4  ">
             <div class="mb-12 container mx-auto p-0">
             <!-- Header -->
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
                   <h2 class="text-2xl font-semibold text-[#041533]  tracking-tight">
               {{ $group->name }}
             </h2>
@@ -339,7 +339,7 @@
         <div class="p-0 container mx-auto">
 
             <!-- Section Title -->
-            <h2 class="text-xl md:text-2xl text-[20px] font-bold text-[#041533] lg:mb-6 mb-3 tracking-tight">
+            <h2 class="text-xl md:text-2xl text-[20px] font-bold text-[#041533] lg:mb-4 mb-3 tracking-tight">
                 Latest Offers
             </h2>
 
@@ -395,7 +395,7 @@
     <section class="w-full bg-[#fcfcfc] px-4 py-10">
         <div class="p-0 container mx-auto  ">
             <!-- Section Title -->
-            <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] lg:mb-6 mb-3 tracking-tight">
+            <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533] lg:mb-4 mb-3 tracking-tight">
                 Our Featured Products
             </h2>
 
@@ -413,7 +413,7 @@
     {{-- <section class="px-4 mb-12">
         <div class="p-0 container mx-auto   ">
         <!-- Section Title -->
-        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-6 mt-12 tracking-tight">
+        <h2 class="text-xl md:text-2xl font-bold text-[#041533] mb-4 mt-12 tracking-tight">
             New Arrival
         </h2>
 
@@ -465,8 +465,8 @@
                     class=" bg-gray-100  border border-gray-200 rounded-lg px-6 py-6
                     prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold
-                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-6
-                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-6
+                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
                     prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
 
                     {!! $homePageData->description !!}
