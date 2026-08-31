@@ -58,14 +58,29 @@ class SendFacebookCapiEvent implements ShouldQueue
             $payload['data'][0]['event_id'] = $this->eventId;
         }
 
+
         try {
-            $response = Http::post("https://graph.facebook.com/v19.0/{$this->pixelId}/events?access_token={$this->accessToken}", $payload);
-            
+
+            $url = "https://graph.facebook.com/v19.0/{$this->pixelId}/events";
+
+            $response = Http::withToken($this->accessToken)
+                ->post($url, [
+                    ...$payload,
+                    'test_event_code' => 'TEST78815',
+                ]);
+
             if (!$response->successful()) {
-                Log::error('Facebook CAPI Error', ['response' => $response->json()]);
+                Log::error('Facebook CAPI Error', [
+                    'status' => $response->status(),
+                    'response' => $response->json(),
+                ]);
             }
+
         } catch (\Exception $e) {
-            Log::error('Facebook CAPI Exception', ['message' => $e->getMessage()]);
+
+            Log::error('Facebook CAPI Exception', [
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 }
