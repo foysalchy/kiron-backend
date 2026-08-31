@@ -65,8 +65,7 @@ class SendFacebookCapiEvent implements ShouldQueue
 
             $response = Http::withToken($this->accessToken)
                 ->post($url, [
-                    ...$payload,
-                    'test_event_code' => 'TEST78815',
+                    ...$payload
                 ]);
 
             if (!$response->successful()) {

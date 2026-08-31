@@ -37,6 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'api/*', // Disable CSRF for API routes
         ]);
+        $middleware->web(append: [
+            \App\Http\Middleware\CaptureTrackingParams::class,
+        ]);
         //     $middleware->web(append: [
         //     \App\Http\Middleware\ClearOrderSession::class,
         // ]);
