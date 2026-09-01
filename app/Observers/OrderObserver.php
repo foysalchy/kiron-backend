@@ -64,8 +64,8 @@ class OrderObserver
             $hashedCountry = hash('sha256', $country);
 
             // Laravel EncryptCookies middleware strips _fbp and _fbc, so read them natively
-            $fbp = $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null;
-            $fbc = $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null;
+            $fbp = $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? session('_fbp') ?? null;
+            $fbc = $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc') ?? null;
             
             $eventId = 'ORDER_' . $order->id;
             $value = $order->grand_total ?? $order->total_amount ?? 0;
@@ -245,8 +245,8 @@ class OrderObserver
             $hashedZip = $zip ? hash('sha256', $cleanStr($zip)) : null;
             $hashedCountry = hash('sha256', $country);
 
-            $fbp = $sourceInfo['fbp'] ?? $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null;
-            $fbc = $sourceInfo['fbc'] ?? $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null;
+            $fbp = $sourceInfo['fbp'] ?? $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? session('_fbp') ?? null;
+            $fbc = $sourceInfo['fbc'] ?? $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? session('_fbc') ?? null;
             
             $eventId = strtoupper($eventName) . '_' . $order->id;
             $value = $order->grand_total ?? $order->total_amount ?? 0;

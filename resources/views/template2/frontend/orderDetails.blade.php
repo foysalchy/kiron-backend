@@ -579,10 +579,5 @@
     </script>
 @endpush
 @push('scripts')
-    @include('components.meta-info.pixel-events', [
-        'event' => 'Purchase',
-        'data' => [
-            'order' => $order
-        ]
-    ])
+    <x-meta-info.ecommerce-meta.order-details-meta />
 @endpush

@@ -26,7 +26,7 @@
 @endphp
 
 <div
-    class="max-w-[348px] group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
+    class="max-w-[348px] relative group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
 
     <div class="relative">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
@@ -49,10 +49,10 @@
         </div>
     </div>
 
-    <div class="p-4 flex flex-col flex-grow">
+    <div class="p-4 flex flex-col flex-grow ">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
             <p
-                class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
+                class="  md:text-[17px] text-[14px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}
             </p>
         </a>
@@ -80,12 +80,13 @@
 
             <div class="basis-full h-0 sm:hidden"></div>
 
-            @if ($discountLabel)
-                <span
-                    class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold  font-black px-2 py-0.5 rounded-full uppercase">
-                    -{{ $discountLabel }} OFF
-                </span>
-            @endif
+           @if ($discountLabel)
+            <span
+                class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                    max-md:absolute max-md:top-1 max-md:left-1">
+                -{{ $discountLabel }} OFF
+            </span>
+        @endif
         </div>
 
         <button {{ $isOutOfStock ? 'disabled' : '' }}
@@ -207,6 +208,22 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
+                            if (typeof fbq === 'function') {
+                                fbq('track', 'AddToCart', {
+                                    content_ids: ['{{ $product->id }}'],
+                                    content_type: 'product',
+                                    value: {{ $product->sale_price ?? 0 }} * (qtyInput ? qtyInput.value : 1),
+                                    currency: '{{ $setup->currency ?? "BDT" }}'
+                                });
+                            }
+                            if (typeof ttq === 'function') {
+                                ttq.track('AddToCart', {
+                                    content_id: '{{ $product->id }}',
+                                    content_type: 'product',
+                                    value: {{ $product->sale_price ?? 0 }} * (qtyInput ? qtyInput.value : 1),
+                                    currency: '{{ $setup->currency ?? "BDT" }}'
+                                });
+                            }
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                             closeModal();
                             if (typeof isOrderNowGlobal !== 'undefined' && isOrderNowGlobal) {
@@ -242,6 +259,22 @@
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
+                            if (typeof fbq === 'function') {
+                                fbq('track', 'AddToCart', {
+                                    content_ids: ['{{ $product->id }}'],
+                                    content_type: 'product',
+                                    value: {{ $product->sale_price ?? 0 }},
+                                    currency: '{{ $setup->currency ?? "BDT" }}'
+                                });
+                            }
+                            if (typeof ttq === 'function') {
+                                ttq.track('AddToCart', {
+                                    content_id: '{{ $product->id }}',
+                                    content_type: 'product',
+                                    value: {{ $product->sale_price ?? 0 }},
+                                    currency: '{{ $setup->currency ?? "BDT" }}'
+                                });
+                            }
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                             if (isOrderNow) {
                                 window.location.href = "{{ route('checkout.index') }}";

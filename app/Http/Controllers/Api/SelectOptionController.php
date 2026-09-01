@@ -109,18 +109,21 @@ class SelectOptionController extends Controller
             'variations.stocks.warehouse',
         ])->orderBy('title', 'asc')->get();
     }
-    public function purchaseProductOptions()
+    public function purchaseProductOptions(Request $request)
     {
-        return Product::with([
+        $query = Product::with([
             'brand',
             'galleries',
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
             'variations.stocks.warehouse',
-        ])
-            ->where('manage_stock', true)
-            ->orderBy('title', 'asc')
-            ->get();
+        ]);
+
+        if ($request->has('product_type') && !empty($request->query('product_type'))) {
+            $query->where('product_type', $request->query('product_type'));
+        }
+
+        return $query->orderBy('title', 'asc')->get();
     }
     public function getProductByWarehouse(Request $request, $warehouseId)
     {

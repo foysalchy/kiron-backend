@@ -35,6 +35,7 @@ class Product extends Model
         'full_description',
         'warehouse_info',
         'type',
+        'product_type',
         'sku_code',
         'stock_status',
         'stock_quantity',
@@ -332,5 +333,25 @@ class Product extends Model
             'regular_price' => (float) $regularPrice,
             'is_variation'  => $isVariation
         ];
+    }
+
+    public function billsOfMaterials(): HasMany
+    {
+        return $this->hasMany(BillOfMaterial::class);
+    }
+
+    public function activeBom(): BelongsTo
+    {
+        return $this->belongsTo(BillOfMaterial::class, 'id', 'product_id')->where('status', 'active');
+    }
+
+    public function productionOrders(): HasMany
+    {
+        return $this->hasMany(ProductionOrder::class);
+    }
+
+    public function usedInBoms(): HasMany
+    {
+        return $this->hasMany(BomItem::class, 'product_id');
     }
 }

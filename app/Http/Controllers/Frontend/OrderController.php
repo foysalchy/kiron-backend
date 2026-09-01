@@ -545,7 +545,13 @@ class OrderController extends FrontendController
 
         $relatedProducts = $relatedQuery->inRandomOrder()->limit(4)->get();
 
-        return $this->view('frontend.thankyou', compact('order', 'relatedProducts'));
+        $sessionKey = 'pixel_purchase_fired_' . $order->id;
+        $pixelPurchaseFired = session()->has($sessionKey);
+        if (!$pixelPurchaseFired) {
+            session()->put($sessionKey, true);
+        }
+
+        return $this->view('frontend.thankyou', compact('order', 'relatedProducts', 'pixelPurchaseFired'));
     }
     public function trackOrder(Request $request)
     {
