@@ -111,7 +111,7 @@
 
         <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-            class="flex-1 py-2 rounded-lg text-sm font-medium transition-all shrink-0 whitespace-nowrap
+            class="flex-1 py-2 rounded-lg text-sm p-2 font-medium transition-all shrink-0 whitespace-nowrap
     {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'w-[50px] max-w-[50px] primary-bg text-primary hover:bg-[#BD4F00] cursor-pointer' }}">
 
             @if ($isOutOfStock)

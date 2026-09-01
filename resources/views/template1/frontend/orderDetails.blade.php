@@ -11,7 +11,7 @@
                     class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
                     <i class="fas fa-arrow-left text-[10px]"></i> Dashboard
                 </a>
-                <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
                 <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
@@ -284,8 +284,8 @@
                             </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                            <span class="text-gray-800 font-bold">Total:</span>
+                            <span class="text-xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
                         <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
                             {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>

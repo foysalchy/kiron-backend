@@ -5,7 +5,7 @@
 
     $menuItems = $customMenu ? $customMenu->items : null;
 @endphp
-<header class="w-full sticky top-0 z-50">
+<header class="w-full ">
 
 
     <div class="header-custom-bg text-header py-4 px-4 md:px-10 ">
@@ -174,7 +174,7 @@
 </div>
     </div>
 </header>
-<nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100">
+<nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100 sticky top-0 z-50">
     <div class="container mx-auto px-4 md:px-10">
         <ul class="flex items-center justify-center text-sm font-semibold text-gray-700">
             @if ($menuItems && count($menuItems) > 0)
@@ -320,15 +320,15 @@
 
 
 <div id="mobile-sidebar"
-    class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[60] flex flex-col">
-
+    class="fixed inset-y-0 left-0 w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out z-[70] flex flex-col h-screen max-h-screen overflow-hidden">
     <div class="p-4 flex justify-between items-center border-b header-custom-bg text-header">
         <h2 class="font-bold text-lg uppercase tracking-wider">All Categories</h2>
         <button id="close-sidebar" aria-label="Close Menu"
             class="text-2xl hover:text-red-400 transition-colors">&times;</button>
     </div>
 
-    <nav class="flex-1 overflow-y-auto ">
+    <!-- scrolling-touch ক্লাসটি মোবাইল স্ক্রলকে অনেক স্মুথ করে -->
+<nav class="flex-1 overflow-y-auto pb-40" style="-webkit-overflow-scrolling: touch;">
        @foreach ($headerCategories as $mega)
         <div class="border-b border-gray-100">
             <!-- মেগা ক্যাটাগরি রো -->

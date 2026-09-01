@@ -372,12 +372,12 @@
     @endif
     @if ($faqs->count() > 0)
         <!-- FAQ SECTION (Styled like You May Like) -->
-        <section class="py-6 md:py-10 container mx-auto px-4 lg:px-0">
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <div class="bg-white rounded-lg shadow-xs p-4 md:p-10 border border-gray-50">
 
                 <!-- Section Header -->
                 <div class="mb-10 border-b border-gray-100 pb-4">
-                    <h2 class="text-xl md:text-3xl font-black uppercase tracking-tight text-gray-900">
+                    <h2 class="text-lg md:text-3xl font-bold uppercase tracking-tight text-gray-900">
                         Frequently Asked Questions
                     </h2>
                 </div>
@@ -388,7 +388,7 @@
                         <div class="faq-item">
                             <!-- Question -->
                             <h3
-                                class="text-lg md:text-xl font-bold text-gray-800 mb-4 uppercase tracking-wide flex items-start gap-3">
+                                class="text-base md:text-xl font-semibold md:font-bold text-gray-800 mb-4 uppercase tracking-wide flex items-start gap-3">
                                 <span class="text-blue-600">Q.</span>
                                 {{ $faq->title ?? '' }}
                             </h3>
@@ -399,7 +399,7 @@
                             </div>
 
                             @if (!$loop->last)
-                                <hr class="mt-10 border-gray-200">
+                                <hr class="md:mt-10 border-gray-200">
                             @endif
                         </div>
                     @empty

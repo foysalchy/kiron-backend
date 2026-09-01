@@ -48,8 +48,7 @@
                                     class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
                             </div>
                         @endif
-                        <span
-                            class="text-lg md:text-xl font-bold tracking-tight">{{ $setup->shop_name ?? 'OrenMart' }}</span>
+                        
                     </div>
                     <p class="text-gray-400 text-[16px] leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}

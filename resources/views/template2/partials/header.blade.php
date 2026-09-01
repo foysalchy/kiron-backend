@@ -1,4 +1,4 @@
-<header class="w-full header-custom-bg sticky top-0 z-50 shadow-sm">
+<header class="w-full header-custom-bg fixed top-0 left-0 right-0 z-50 shadow-sm">
     <!-- 1. Main Header -->
     <div class="container mx-auto px-4 py-3 md:py-4">
         <div class="flex items-center justify-between gap-4 lg:gap-8">
@@ -182,9 +182,9 @@
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white">
             <!-- Category Segment for Mobile -->
-            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[90px] max-w-[110px]">
+            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[100px] flex items-center">
                 <select name="category" id="mobile-category-select"
-                    class="h-full pl-2 pr-6 py-2 text-xs text-header font-bold bg-transparent outline-none truncate appearance-none cursor-pointer">
+                    class="w-full pl-2 pr-6 py-2 text-xs text-header font-semibold bg-transparent outline-none truncate appearance-none cursor-pointer">
                     <option value="">All</option>
                     @foreach ($headerCategories as $cat)
                         <option value="{{ $cat->slug }}"
@@ -278,13 +278,13 @@
         <!-- Navigation Links -->
         <nav class="flex flex-col p-6 gap-5">
             <a href="{{ route('home') }}"
-                class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">হোমপেজ</a>
+                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">হোমপেজ</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">অফার</a>
+                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">অফার</a>
 
             @foreach ($headerCategories as $cat)
                 <a href="{{ route('category.products', $cat->slug) }}"
-                    class="text-[17px] font-bold text-header hover:opacity-80 transition-opacity">
+                    class="text-base font-semibold text-header hover:opacity-80 transition-opacity">
                     {{ $cat->name }}
                 </a>
             @endforeach

@@ -92,7 +92,7 @@
                             </span>
                         @endif
 
-                        <span id="sale-price" class="text-3xl font-black secondary-text">
+                        <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
                                 {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
                             @else

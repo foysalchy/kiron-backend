@@ -4,11 +4,11 @@
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-        <h1 class="text-2xl font-black text-gray-900 mb-8 tracking-tight">Checkout</h1>
+        <h1 class="text-2xl font-black text-gray-900 mb-4 tracking-tight">Checkout</h1>
 
         <form action="{{ route('order.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-2">
 
                 <!-- LEFT COLUMN: Customer & Payment Info -->
                 <div class="lg:col-span-2 lg:order-1 space-y-6">
@@ -16,7 +16,7 @@
                     <!-- 1. Customer Information Card -->
                     <div class="bg-white rounded-xl  shadow-xs overflow-hidden">
                         <div class="p-6">
-                            <h2 class="text-2xl font-semibold text-gray-800 leading-tight">
+                            <h2 class="text-xl md:text-2xl font-semibold text-gray-800 leading-tight">
                                 To confirm your order, enter your name, address, phone number and click confirm
                             </h2>
                         </div>
@@ -231,7 +231,7 @@
                                 </span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
-                                <span class="text-lg font-black text-gray-900">Total to Pay:</span>
+                                <span class="text-lg font-bold text-gray-900">Total to Pay:</span>
                                 <span class="text-xl font-bold text-[var(--primary-color)]">
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                 <span id="total-display">{{ number_format($total) }}</span>
