@@ -6,7 +6,7 @@
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
             <!-- Top Header -->
-            <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div class="flex flex-wrap items-center justify-between gap-3">
                 <h1 class="text-lg md:text-2xl font-bold text-gray-800">
                     Shopping Cart ({{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} Items)
                 </h1>
@@ -80,7 +80,7 @@
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
+                                        <p class="font-bold text-base md:text-xl text-[var(--primary-color)]">
                                             {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($item->subtotal, 0) }}
                                             {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
@@ -177,8 +177,8 @@
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                            <span class="text-lg md:text-2xl font-bold text-gray-800">Total:</span>
+                            <span class="text-lg md:text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                 {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 

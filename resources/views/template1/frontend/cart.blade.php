@@ -170,10 +170,10 @@
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[var(--primary-color)]">
-    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($total, 0) : number_format($total, 0) . ' ' . $setup->currency }}
-</span>
+                            <span class="text-lg md:text-2xl font-semibold md:font-black text-gray-800">Total:</span>
+                            <span class="text-lg md:text-2xl font-semibold md:font-black text-[var(--primary-color)]">
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($total, 0) : number_format($total, 0) . ' ' . $setup->currency }}
+                            </span>
                         </div>
 
                         <!-- Checkout Button -->

@@ -5,9 +5,9 @@
    @yield('meta')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
- 
 
-   
+
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? asset('images/template1/frontend/sell.png') }}">
 
@@ -22,7 +22,7 @@
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-  
+
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
         :root {
@@ -97,6 +97,7 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        
     </style>
     @stack('styles')
 </head>

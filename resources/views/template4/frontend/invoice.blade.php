@@ -472,40 +472,40 @@
             margin-top: 4px;
         }
         @media (max-width: 640px) {
-    .invoice-inner {
-        padding: 20px !important; /* প্যাডিং কমানো হয়েছে */
-    }
-    .invoice-header, .billing-row, .footer-row {
-        flex-direction: column !important;
-        display: flex !important;
-        gap: 20px !important;
-    }
-    .billing-row {
-        grid-template-columns: 1fr !important;
-    }
-    .invoice-meta {
-        text-align: left !important;
-    }
-    .invoice-title {
-        font-size: 28px !important;
-    }
-    .summary-wrapper {
-        justify-content: flex-start !important;
-    }
-    .summary-box {
-        width: 100% !important;
-    }
-    .footer-contact {
-        text-align: left !important;
-    }
-    /* টেবিল রেসপনসিভ করার জন্য */
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
+            .invoice-inner {
+                padding: 20px !important; /* প্যাডিং কমানো হয়েছে */
+            }
+            .invoice-header, .billing-row, .footer-row {
+                flex-direction: column !important;
+                display: flex !important;
+                gap: 20px !important;
+            }
+            .billing-row {
+                grid-template-columns: 1fr !important;
+            }
+            .invoice-meta {
+                text-align: left !important;
+            }
+            .invoice-title {
+                font-size: 28px !important;
+            }
+            .summary-wrapper {
+                justify-content: flex-start !important;
+            }
+            .summary-box {
+                width: 100% !important;
+            }
+            .footer-contact {
+                text-align: left !important;
+            }
+            /* টেবিল রেসপনসিভ করার জন্য */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
 
-}
+        }
 
         /* ── PRINT ── */
         /* ── PRINT OPTIMIZATION ── */

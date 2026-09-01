@@ -60,10 +60,10 @@
         </div>
     </section>
     <!-- TOP CATEGORIES SECTION (Updated as per Image) -->
-    <section class="py-10 md:py-14 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="relative">
             <!-- Section Heading -->
-            <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-10">
+            <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-4">
                 প্রোডাক্ট ক্যাটাগরি
             </h2>
 
@@ -106,7 +106,7 @@
         </div>
     </section>
     @foreach ($productGroups as $group)
-        <section class="py-8 md:py-12 container mx-auto px-4 lg:px-0">
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[#016738]">{{ $group->name }}</h2>
@@ -187,8 +187,6 @@
             </div>
         </section>
     @endforeach
-
-
     <!-- All Products SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
