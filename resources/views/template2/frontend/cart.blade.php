@@ -53,13 +53,16 @@
                                         </div>
                                         <div class="flex items-baseline gap-2">
                                             <p class="font-bold text-gray-700 text-lg">
-                                                {{ $setup->currency }} {{ number_format($item->price, 0) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($item->price, 0) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                             </p>
 
                                             @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
                                                 <span class="text-sm text-gray-400 line-through font-normal pl-1">
-                                                    {{ $setup->currency }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                     {{ number_format($item->options['regular_price'], 0) }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                                 </span>
                                             @endif
                                         </div>
@@ -78,8 +81,9 @@
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
                                         <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
-                                            {{ $setup->currency }}
-                                            {{ number_format($item->subtotal, 0) }}</p>
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                            {{ number_format($item->subtotal, 0) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
                                             class="text-red-400 hover:text-red-600 transition-colors">
                                             <i class="far fa-trash-alt text-lg"></i>
@@ -109,7 +113,7 @@
                                             {{ $shipping_area == 'inside' ? 'checked' : '' }}
                                             class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
-                                            Inside Dhaka ({{ $setup->currency }}
+                                            Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($setup->inside_charge, 0) }})
                                         </span>
                                     </label>
@@ -121,7 +125,7 @@
                                             {{ $shipping_area == 'outside' ? 'checked' : '' }}
                                             class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
-                                            Outside Dhaka ({{ $setup->currency }}
+                                            Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($setup->outside_charge, 0) }})
                                         </span>
                                     </label>
@@ -156,26 +160,26 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6 mb-6">
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Subtotal:</span>
-                                <span>{{ $setup->currency }} {{ number_format($subtotal, 0) }}</span>
+                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
                                     <span>Discount ({{ session('coupon')['coupon_code'] }}):</span>
-                                    <span>- {{ $setup->currency }} {{ number_format($discount, 0) }}</span>
+                                    <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($discount, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Delivery Charge:</span>
-                                <span>{{ $setup->currency }} {{ number_format($shipping, 0) }}</span>
+                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
                             <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ $setup->currency }}
-                                {{ number_format($total, 0) }}</span>
+                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 
                         <!-- Checkout Button -->

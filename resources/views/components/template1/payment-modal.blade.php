@@ -21,7 +21,11 @@
             {{-- Amount Display --}}
             <div class="text-center mb-6">
                 <p class="text-xs text-gray-500 uppercase tracking-wider">Amount to Pay</p>
-                <p class="text-3xl font-black text-[#FF6A00]">{{ $currency }} <span id="modal-amount">0</span></p>
+                <p class="text-3xl font-black text-[#FF6A00]">
+                     {{ ($setup->currency_position ?? 'left') == 'left' ? $currency : '' }}
+                    <span id="modal-amount">0</span>
+                    {{ ($setup->currency_position ?? 'left') == 'right' ? $currency : '' }}
+                </p>
             </div>
 
             {{-- Method Grid --}}
