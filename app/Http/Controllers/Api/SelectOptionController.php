@@ -20,6 +20,8 @@ use App\Models\DisposalType;
 use App\Models\Domain;
 use App\Models\DomainSetup;
 use App\Models\EmailTemplate;
+use App\Models\Department;
+use App\Models\Employee;
 use App\Models\ExtraCategory;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
@@ -96,6 +98,14 @@ class SelectOptionController extends Controller
     public function customersOptions()
     {
         return Party::where('type', 2)->select('id', 'name', 'phone', 'email')->orderBy('name', 'asc')->get();
+    }
+    public function employeeOptions()
+    {
+        return Employee::select('id', 'first_name', 'last_name', 'email', 'phone')->orderBy('first_name', 'asc')->get();
+    }
+    public function departmentOptions()
+    {
+        return Department::select('id', 'name', 'code')->orderBy('name', 'asc')->get();
     }
 
     public function productOptions()

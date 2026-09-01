@@ -334,6 +334,8 @@ Route::prefix('v1')->group(function () {
                     Route::get('/product/bins/{warehouseId}', [SelectOptionController::class, 'productbinOptions']);
                     Route::get('/suppliers', [SelectOptionController::class, 'supplierOptions']);
                     Route::get('/customers', [SelectOptionController::class, 'customersOptions']);
+                    Route::get('/employees', [SelectOptionController::class, 'employeeOptions']);
+                    Route::get('/departments', [SelectOptionController::class, 'departmentOptions']);
                     Route::get('/get-product-by-warehouse/{warehouseId}', [SelectOptionController::class, 'getProductByWarehouse']);
                     Route::get('/get-product-by-warehouse/adjustment/{warehouseId}', [SelectOptionController::class, 'getProductOptionsByWarehouse']);
                     Route::get('/get-product-by-warehouse/{warehouseId}/{binId}', [SelectOptionController::class, 'getProductByWarehouseAndBin']);
@@ -1755,6 +1757,83 @@ Route::prefix('v1')->group(function () {
                     // Settings
                     Route::get('settings', [ProductionSettingController::class, 'index']);
                     Route::post('settings', [ProductionSettingController::class, 'store']);
+                });
+
+                // ==========================================
+                // Project Management Routes
+                // ==========================================
+                Route::prefix('projects')->group(function () {
+                    // Dashboard & Monitoring
+                    Route::get('dashboard-stats', [\App\Http\Controllers\Api\Project\ProjectDashboardController::class, 'stats']);
+                    Route::get('dashboard-charts', [\App\Http\Controllers\Api\Project\ProjectDashboardController::class, 'charts']);
+                    Route::get('monitoring', [\App\Http\Controllers\Api\Project\ProjectMonitoringController::class, 'index']);
+                    Route::get('task-reports', [\App\Http\Controllers\Api\Project\ProjectTaskReportController::class, 'index']);
+                    Route::apiResource('task-statuses', \App\Http\Controllers\Api\Project\ProjectTaskStatusController::class);
+
+                    // Tasks
+                    Route::post('tasks/bulk', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'bulkStore']);
+                    Route::post('tasks/reorder', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'reorder']);
+                    Route::post('tasks/{id}/toggle-complete', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'toggleComplete']);
+                    Route::post('tasks/{id}/start-timer', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'startTimer']);
+                    Route::post('tasks/{id}/stop-timer', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'stopTimer']);
+                    Route::get('tasks/{id}/status-histories', [\App\Http\Controllers\Api\Project\ProjectTaskController::class, 'statusHistories']);
+                    Route::apiResource('tasks', \App\Http\Controllers\Api\Project\ProjectTaskController::class);
+
+                    // Phases
+                    Route::apiResource('phases', \App\Http\Controllers\Api\Project\ProjectPhaseController::class);
+
+                    // Milestones
+                    Route::apiResource('milestones', \App\Http\Controllers\Api\Project\ProjectMilestoneController::class);
+
+                    // Team Members
+                    Route::apiResource('members', \App\Http\Controllers\Api\Project\ProjectTeamController::class);
+
+                    // Time Tracking
+                    Route::apiResource('time-entries', \App\Http\Controllers\Api\Project\ProjectTimeController::class);
+
+                    // Costing
+                    Route::get('costs', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'index']);
+                    Route::post('costs/labor', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'storeLabor']);
+                    Route::delete('costs/labor/{id}', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'destroyLabor']);
+                    Route::post('costs/materials', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'storeMaterial']);
+                    Route::delete('costs/materials/{id}', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'destroyMaterial']);
+                    Route::post('costs/equipment', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'storeEquipment']);
+                    Route::delete('costs/equipment/{id}', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'destroyEquipment']);
+                    Route::post('costs/expenses', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'storeExpense']);
+                    Route::delete('costs/expenses/{id}', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'destroyExpense']);
+                    Route::post('costs/overheads', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'storeOverhead']);
+                    Route::delete('costs/overheads/{id}', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'destroyOverhead']);
+                    Route::post('{projectId}/budgets', [\App\Http\Controllers\Api\Project\ProjectCostController::class, 'saveBudgets']);
+
+                    // Revenue
+                    Route::apiResource('revenues', \App\Http\Controllers\Api\Project\ProjectRevenueController::class);
+
+                    // Documents
+                    Route::apiResource('documents', \App\Http\Controllers\Api\Project\ProjectDocumentController::class);
+
+                    // Discussions
+                    Route::apiResource('discussions', \App\Http\Controllers\Api\Project\ProjectDiscussionController::class);
+
+                    // Reports
+                    Route::get('reports/summary', [\App\Http\Controllers\Api\Project\ProjectReportController::class, 'summary']);
+                    Route::get('reports/materials', [\App\Http\Controllers\Api\Project\ProjectReportController::class, 'materials']);
+                    Route::get('reports/labor', [\App\Http\Controllers\Api\Project\ProjectReportController::class, 'labor']);
+                    Route::get('reports/profitability', [\App\Http\Controllers\Api\Project\ProjectReportController::class, 'profitability']);
+
+                    // Templates
+                    Route::apiResource('templates', \App\Http\Controllers\Api\Project\ProjectTemplateController::class);
+
+                    // Settings
+                    Route::get('settings', [\App\Http\Controllers\Api\Project\ProjectSettingController::class, 'show']);
+                    Route::post('settings', [\App\Http\Controllers\Api\Project\ProjectSettingController::class, 'store']);
+
+                    // Core Projects CRUD & Template Action
+                    Route::post('{id}/apply-template', [\App\Http\Controllers\Api\Project\ProjectController::class, 'applyTemplate']);
+                    Route::get('/', [\App\Http\Controllers\Api\Project\ProjectController::class, 'index']);
+                    Route::post('/', [\App\Http\Controllers\Api\Project\ProjectController::class, 'store']);
+                    Route::get('/{id}', [\App\Http\Controllers\Api\Project\ProjectController::class, 'show']);
+                    Route::put('/{id}', [\App\Http\Controllers\Api\Project\ProjectController::class, 'update']);
+                    Route::delete('/{id}', [\App\Http\Controllers\Api\Project\ProjectController::class, 'destroy']);
                 });
             });
         });

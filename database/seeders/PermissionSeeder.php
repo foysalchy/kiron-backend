@@ -253,6 +253,22 @@ class PermissionSeeder extends Seeder
         $addViewOnly('production_reports',  'Production Reports',       'production_module');
         $addCrud('production_settings',     'Production Settings',      'production_module');
 
+        // ==========================================
+        // 23. Project Management
+        // ==========================================
+        $addCrud('projects',                'Projects',                 'project_module');
+        $addCrud('project_tasks',           'Project Tasks',            'project_module');
+        $addCrud('project_milestones',      'Project Milestones',       'project_module');
+        $addCrud('project_phases',          'Project Phases',           'project_module');
+        $addCrud('project_team',            'Project Team',             'project_module');
+        $addCrud('project_costs',           'Project Costs',            'project_module');
+        $addCrud('project_time',            'Project Time Tracking',    'project_module');
+        $addCrud('project_revenue',         'Project Revenue',          'project_module');
+        $addCrud('project_documents',       'Project Documents',        'project_module');
+        $addCrud('project_discussions',     'Project Discussions',      'project_module');
+        $addViewOnly('project_reports',     'Project Reports',          'project_module');
+        $addCrud('project_settings',        'Project Settings',         'project_module');
+
         Permission::insert($permissionsToInsert);
     }
 }
