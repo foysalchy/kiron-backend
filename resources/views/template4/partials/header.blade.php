@@ -217,6 +217,7 @@
                 @endforeach
             @else
                 @foreach ($headerCategories->take(5) as $mega)
+
                     <li class="group relative">
                         <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
                             class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
@@ -266,7 +267,6 @@
     </div>
 </nav>
 <!-- Mobile Bottom Navigation -->
-<!-- Mobile Bottom Navigation -->
 <div
     class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-[100] py-2 shadow-[0_-2px_15px_rgba(0,0,0,0.08)]">
     <!-- grid-cols-4 ব্যবহার করা হয়েছে যাতে ৪টি আইকন সমান গ্যাপ পায় -->
@@ -274,18 +274,19 @@
 
         <!-- Home -->
         <a href="{{ route('home') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)]">
+            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] {{ request()->routeIs('home') ? 'text-brand' : 'text-gray-500' }}">
             <i class="fa-solid fa-house text-lg"></i>
             <span class="text-[10px] font-bold uppercase">Home</span>
         </a>
 
         <!-- Cart -->
         <a href="{{ route('cart.index') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 relative transition-colors active:text-[var(--primary-color)]">
+            class="flex flex-col items-center gap-1 text-gray-500 relative transition-colors active:text-[var(--primary-color)] {{ request()->routeIs('cart.index') ? 'text-brand' : 'text-gray-500' }}">
             <div class="relative">
                 <i class="fa-solid fa-bag-shopping text-lg"></i>
-                <span
-                    class="absolute -top-2 -right-2 bg-[var(--primary-color)] text-white text-[9px] rounded-full min-w-[15px] h-[15px] flex items-center justify-center font-bold">
+
+                <!-- এখানে 'cart-count-nav' ক্লাসটি যোগ করা হয়েছে -->
+                <span class="cart-count-nav absolute -top-2 -right-2 bg-[var(--primary-color)] text-white text-[9px] rounded-full min-w-[15px] h-[15px] flex items-center justify-center font-bold">
                     {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                 </span>
             </div>
@@ -294,14 +295,14 @@
 
         <!-- Account -->
         <a href="{{ route('user.dashboard') }}"
-            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)]">
+            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] {{ request()->routeIs('user.dashboard') ? 'text-brand' : 'text-gray-500' }}"">
             <i class="fa-regular fa-circle-user text-lg"></i>
             <span class="text-[10px] font-bold uppercase">Account</span>
         </a>
 
         <!-- Menu Button (Triggers Sidebar) -->
         <button id="bottom-menu-open"
-            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] focus:outline-none">
+            class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] focus:outline-none ">
             <i class="fa-solid fa-bars-staggered text-lg"></i>
             <span class="text-[10px] font-bold uppercase">Menu</span>
         </button>
@@ -310,7 +311,6 @@
 </div>
 
 <style>
-    /* মোবাইলে নিচের কন্টেন্ট যেন মেনুর নিচে ঢাকা না পড়ে */
     @media (max-width: 1024px) {
         body {
             padding-bottom: 65px !important;
@@ -329,97 +329,60 @@
     </div>
 
     <nav class="flex-1 overflow-y-auto ">
-        @if ($menuItems && count($menuItems) > 0)
-            @foreach (collect($menuItems)->sortBy('order') as $index => $item)
-                @if (data_get($item, 'visible') === true)
-                    @php
-                        $link = $item['link'] ?? '#';
-                        $finalUrl = str_starts_with($link, 'http') ? $link : url($link);
-                    @endphp
-                    <div class="border-b border-[#f3f3f3]">
-                        <div class="flex justify-between items-center px-5 py-4 group">
-                            <a href="{{ $finalUrl }}" class="text-[#0f172a] font-bold uppercase text-sm flex-1">
-                                {{ $item['label'] }}
-                            </a>
+       @foreach ($headerCategories as $mega)
+        <div class="border-b border-gray-100">
+            <!-- মেগা ক্যাটাগরি রো -->
+            <div class="flex items-center justify-between px-5 py-4 group hover:bg-gray-50">
+                <a href="{{ route('category.products', $mega->slug) }}"
+                    class="text-[#0f172a] font-bold uppercase text-sm flex-1">
+                    {{ $mega->name }}
+                </a>
 
-                            @if (!empty($item['children']))
-                                <button class="accordion-btn text-gray-400 p-2 -mr-2" data-target="m-custom-{{ $index }}">
-                                    <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
-                                </button>
+                {{-- যদি সাব-ক্যাটাগরি থাকে তবেই প্লাস আইকন দেখাবে --}}
+                @if ($mega->subCategories->count() > 0)
+                    <button class="accordion-btn p-2 text-gray-900 focus:outline-none"
+                        data-target="m-cat-{{ $mega->id }}">
+                        <i class="fa-solid fa-plus text-sm font-black"></i>
+                    </button>
+                @endif
+            </div>
+
+            <!-- সাব-ক্যাটাগরি লিস্ট (ডিফল্ট হাইড) -->
+            @if ($mega->subCategories->count() > 0)
+                <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
+                    @foreach ($mega->subCategories as $sub)
+                        <div class="border-b border-gray-200 last:border-0">
+                            <div class="flex items-center justify-between pl-8 pr-5 py-3">
+                                <a href="{{ route('category.products', $sub->slug) }}"
+                                    class="text-sm font-semibold text-gray-700 flex-1">
+                                    {{ $sub->name }}
+                                </a>
+
+                                @if ($sub->miniCategories->count() > 0)
+                                    <button class="accordion-btn p-2 text-gray-900"
+                                        data-target="m-sub-{{ $sub->id }}">
+                                        <i class="fa-solid fa-plus text-[10px] font-black"></i>
+                                    </button>
+                                @endif
+                            </div>
+
+                            <!-- মিনি ক্যাটাগরি লিস্ট -->
+                            @if ($sub->miniCategories->count() > 0)
+                                <div id="m-sub-{{ $sub->id }}" class="hidden bg-white">
+                                    @foreach ($sub->miniCategories as $mini)
+                                        <a href="{{ route('category.products', $mini->slug) }}"
+                                            class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-500 border-b border-gray-50 last:border-0">
+                                            {{ $mini->name }}
+                                        </a>
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
-
-                        {{-- কাস্টম মেনুর সাব-মেনু (Children) --}}
-                        @if (!empty($item['children']))
-                            <div id="m-custom-{{ $index }}" class="hidden bg-gray-50 border-t border-gray-100">
-                                @foreach ($item['children'] as $child)
-                                    @if (data_get($child, 'visible') === true)
-                                        @php
-                                            $cLink = $child['link'] ?? '#';
-                                            $cUrl = str_starts_with($cLink, 'http') ? $cLink : url($cLink);
-                                        @endphp
-                                        <a href="{{ $cUrl }}" class="block px-10 py-3 text-sm border-b border-[#f3f3f3] text-gray-700">
-                                            {{ $child['label'] }}
-                                        </a>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                @endif
-            @endforeach
-        @else
-            @foreach ($headerCategories as $mega)
-                <div class="border-b border-[#f3f3f3]">
-                    <div class="flex justify-between items-center px-5 py-4 group">
-                        <a href="{{ route('category.products', $mega->slug) }}"
-                            class="text-[#0f172a] font-bold uppercase text-sm group-hover:text-header transition-colors flex-1">
-                            {{ $mega->name }}
-                        </a>
-
-                        @if ($mega->subCategories->count() > 0)
-                            <button class="accordion-btn text-gray-400 p-2 -mr-2" aria-label="Toggle {{ $mega->name }} categories"
-                                data-target="m-cat-{{ $mega->id }}">
-                                <i class="fa-solid fa-plus text-xs transition-transform duration-300"></i>
-                            </button>
-                        @endif
-                    </div>
-
-                    @if ($mega->subCategories->count() > 0)
-                        <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
-                            @foreach ($mega->subCategories as $sub)
-                                <div class="border-b border-gray-100 last:border-0">
-                                    <div class="flex justify-between items-center pl-8 pr-5 py-3">
-                                        <a href="{{ route('category.products', $sub->slug) }}"
-                                            class="text-sm font-semibold text-gray-700 hover:text-header flex-1">
-                                            {{ $sub->name }}
-                                        </a>
-
-                                        @if ($sub->miniCategories->count() > 0)
-                                            <button class="accordion-btn text-gray-400 p-1" data-target="m-sub-{{ $sub->id }}">
-                                                <i class="fa-solid fa-plus text-[10px]"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-
-                                    {{-- ৩. মিনি ক্যাটাগরি লিস্ট --}}
-                                    @if ($sub->miniCategories->count() > 0)
-                                        <div id="m-sub-{{ $sub->id }}" class="hidden bg-gray-100/50">
-                                            @foreach ($sub->miniCategories as $mini)
-                                                <a href="{{ route('category.products', $mini->slug) }}"
-                                                    class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-600 border-b border-gray-50 last:border-0 hover:text-header">
-                                                    {{ $mini->name }}
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
+                    @endforeach
                 </div>
-            @endforeach
-        @endif
+            @endif
+        </div>
+    @endforeach
         <div class="p-4 space-y-2 bg-white mt-4">
             @auth('customer')
                 <div class="p-4 bg-purple-50 rounded-xl mb-2">
@@ -570,4 +533,24 @@
             });
         });
     });
+    // ৪. মোবাইল সাইডবার একর্ডিয়ন লজিক (সাব-ক্যাটাগরি দেখানোর জন্য)
+document.querySelectorAll(".accordion-btn").forEach((btn) => {
+    btn.addEventListener("click", function(e) {
+        e.preventDefault(); // লিঙ্ক হিসেবে কাজ করা আটকাবে
+        const targetId = this.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        const icon = this.querySelector("i");
+
+        if (target) {
+            // সাব-ক্যাটাগরি লিস্ট শো/হাইড করা
+            target.classList.toggle("hidden");
+
+            // আইকন প্লাস থেকে মাইনাস করা
+            if (icon) {
+                icon.classList.toggle("fa-plus");
+                icon.classList.toggle("fa-minus");
+            }
+        }
+    });
+});
 </script>

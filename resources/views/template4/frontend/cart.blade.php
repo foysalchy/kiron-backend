@@ -72,8 +72,8 @@
                                     </div>
                                     <div class="col-span-6 sm:col-span-3 text-right mt-2 sm:mt-0">
                                         <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
-        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal) : number_format($item->subtotal) . ' ' . $setup->currency }}
-    </span>
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal) : number_format($item->subtotal) . ' ' . $setup->currency }}
+                                        </span>
 
                                     </div>
                                 </div>
@@ -95,8 +95,8 @@
                         <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
                             <span class="text-base md:text-lg lg:text-xl text-gray-600">Subtotal</span>
                              <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
-        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($subtotal) : number_format($subtotal) . ' ' . $setup->currency }}
-    </span>
+                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($subtotal) : number_format($subtotal) . ' ' . $setup->currency }}
+                            </span>
                         </div>
 
                         <!-- Shipping Selection -->
@@ -107,12 +107,13 @@
                                     <span class="text-sm md:text-base text-gray-600 sm:mt-0.5 shrink-0">Shipping</span>
                                     <div class="flex flex-col gap-3 w-full ml-auto">
                                         <label
-                                            class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
+                                            class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full ">
                                             <span class="text-left sm:text-right leading-tight">Inside Dhaka:
                                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge) : number_format($setup->inside_charge) . ' ' . $setup->currency }}
                                             </span>
                                             <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }}
-                                                class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
+                                            class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
+
                                         </label>
                                         <label
                                             class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
@@ -120,7 +121,7 @@
                                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge) : number_format($setup->outside_charge) . ' ' . $setup->currency }}
                                             </span>
                                             <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }}
-                                                class="shrink-0 w-4 h-4 text-[var(--primary-color)] focus:ring-[var(--primary-color)] border-gray-300" />
+                                            class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
                                         </label>
                                     </div>
                                 </div>

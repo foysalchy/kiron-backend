@@ -92,8 +92,9 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
-                                <h4 class="text-2xl font-semibold text-gray-900">{{ $setup->currency }}
-                                    {{ number_format($totalSpent ?? 0) }}</h4>
+                                <h4 class="text-2xl font-semibold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    {{ number_format($totalSpent ?? 0) }}
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</h4>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -143,8 +144,9 @@
                                         {{ $order->status_label }}
                                     </span>
                                     <div class="flex items-center gap-6">
-                                        <p class="font-semibold text-gray-900">{{ $setup->currency }}
+                                        <p class="font-semibold text-gray-900">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($order->grand_total) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                         </p>
                                         <a href="{{ route('user.order.details', $order->id) }}"
                                             class="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-[#FF6A00]">View</a>
@@ -191,7 +193,9 @@
                                             </span>
 
                                             <p class="text-lg font-bold text-gray-900 leading-none mt-1">
-                                                {{ $setup->currency }} {{ number_format($order->grand_total) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($order->grand_total) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                             </p>
                                         </div>
                                     </div>
@@ -215,8 +219,10 @@
                                                     <p class="text-gray-800 leading-tight">
                                                         {{ $item->product->title ?? 'Product Deleted' }}</p>
                                                     <p class="text-gray-500 font-medium">
-                                                        {{ $setup->currency }} {{ number_format($item->price) }} x
-                                                        {{ $item->quantity }}</p>
+                                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                        {{ number_format($item->price) }}
+                                                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                        x {{ $item->quantity }}</p>
                                                 </div>
                                             </div>
                                         @endforeach

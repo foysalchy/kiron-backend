@@ -10,15 +10,6 @@
 @section('content')
 <section class="bg-white border-t-1 border-t border-gray-300 pb-4">
         <div class="py-2 md:py-2 container mx-auto px-4 lg:px-0">
-            <div class="lg:hidden mb-3 flex items-center justify-between">
-                <button onclick="toggleMobileSidebar()"
-                    class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
-                    <i class="fas fa-filter text-[var(--primary-color)]"></i> Filters
-                </button>
-                <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
-            </div>
-
-
             <!-- Main Card Container -->
             <div class="archiveTopInfo">
 
@@ -54,14 +45,21 @@
                             <p>{!! $category->meta_description ?? '' !!}</p>
                         @else
                             @php
+                                $isL = ($setup->currency_position ?? 'left') == 'left';
+                                $currency = $setup->currency;
+
                                 $minP = $products->min('sale_price') > 0 ? $products->min('sale_price') : $products->min('regular_price');
                                 $maxP = $products->max('sale_price') > 0 ? $products->max('sale_price') : $products->max('regular_price');
                                 $catName = $category->name ?? 'Product';
                             @endphp
 
                             {{ $catName }} price in Bangladesh range from
-                            <span class="font-bold text-gray-800">{{ $setup->currency }} {{ number_format($minP) }}</span> to
-                            <span class="font-bold text-gray-800">{{ $setup->currency }} {{ number_format($maxP) }}</span>,
+                            <span class="font-bold text-gray-800">
+                                {{ $isL ? $currency : '' }} {{ number_format($minP) }} {{ !$isL ? $currency : '' }}
+                            </span> to
+                            <span class="font-bold text-gray-800">
+                                {{ $isL ? $currency : '' }} {{ number_format($maxP) }} {{ !$isL ? $currency : '' }}
+                            </span>,
                             depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD.
                         @endif
                     </div>
@@ -76,7 +74,7 @@
     <!-- ════════════════════════════════════════
          RIGHT SIDEBAR FILTER DRAWER (Mobile Only)
         ════════════════════════════════════════ -->
-    <aside id="right-filter-drawer"
+    <aside id="right-filter-drawer" id="category-menu"
         class="fixed inset-y-0 right-0 z-[70] w-[280px] sm:w-[320px] h-full bg-white shadow-2xl transform translate-x-full transition-transform duration-300 overflow-y-auto lg:hidden flex flex-col ">
 
         <!-- Drawer Header -->
@@ -432,6 +430,13 @@
     </div>
 @endsection
 @push('scripts')
+<script>
+    function toggleCategoryMenu() {
+        const menu = document.getElementById('category-menu');
+        // এটি মোবাইলে ক্লিক করলে টাইটেল ও ডেসক্রিপশনের উপরে ক্যাটাগরি কার্ডটি শো করবে
+        menu.classList.toggle('hidden');
+    }
+</script>
     <script>
         function toggleAccordion(id, btn) {
             const content = document.getElementById(id);

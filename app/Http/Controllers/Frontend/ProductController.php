@@ -227,6 +227,7 @@ class ProductController extends FrontendController
 
     public function productDetails($slug)
     {
+
         $product = Product::with([
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
@@ -335,7 +336,17 @@ class ProductController extends FrontendController
 
         // ডুপ্লিকেট ইমেজ বাদ দেওয়া এবং ইনডেক্স ঠিক করা
         $allProductImages = array_values(array_unique(array_filter($allProductImages)));
+        $breadcrumb = [];
+        // ক্যাটাগরিগুলো সিরিয়াল অনুযায়ী বের করা
+        $mega = $product->mega_categories?->first();
+        $sub = $product->sub_categories?->first();
+        $mini = $product->mini_categories?->first();
+        $extra = $product->extra_categories?->first();
 
+        if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
+        if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
+        if ($mini) $breadcrumb[] = ['name' => $mini->name, 'slug' => $mini->slug];
+        if ($extra) $breadcrumb[] = ['name' => $extra->name, 'slug' => $extra->slug];
         return $this->view('frontend.productDetails', compact(
             'product',
             'relatedProducts',
@@ -345,7 +356,8 @@ class ProductController extends FrontendController
             'valueImages',
             'defaultGalleries',
             'allProductImages',
-            'groupCategories'
+            'groupCategories',
+            'breadcrumb'
         ));
     }
     public function flashSale(Request $request)

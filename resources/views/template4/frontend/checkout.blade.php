@@ -65,11 +65,21 @@
                                             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                         </svg>
                                     </span>
-                                    <input type="text" name="address" placeholder="Search and enter address detail"
-                                        required value="{{ old('address', auth('customer')->user()->address ?? '') }}"
+                                    <input type="text" name="address" placeholder="Search and enter address detail" required
+                                        value="{{ old('address', auth('customer')->user()->address ?? '') }}"
                                         class="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 md:pl-11 md:pr-4 md:py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] transition" />
                                 </div>
                             </div>
+                            @guest('customer')
+                                <div class="space-y-3 pt-2">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="create_account"
+                                            class="w-4 h-4 accent-[var(--primary-color)]">
+                                        <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Create an
+                                            account?</span>
+                                    </label>
+                                </div>
+                            @endguest
                         </div>
                     </section>
 
@@ -87,8 +97,7 @@
                                         <div class="flex items-center gap-3">
                                             <div
                                                 class="radio-ring w-4 h-4 md:w-5 md:h-5 rounded-full border-2 border-gray-300 flex items-center justify-center shrink-0">
-                                                <div
-                                                    class="radio-dot w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-transparent">
+                                                <div class="radio-dot w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-transparent">
                                                 </div>
                                             </div>
                                             <input type="radio" name="payment_method" value="{{ $method->name }}"
@@ -120,10 +129,72 @@
                     class="lg:col-span-4 bg-white p-4 sm:p-5 md:p-6 border border-gray-100 rounded-lg shadow-sm lg:sticky lg:top-24">
                     <h3 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Order Summary</h3>
 
-                    <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
-                        <span class="text-sm md:text-base text-gray-600">Subtotal</span>
-                        <span class="text-sm md:text-base font-bold text-gray-900">{{ $setup->currency }}
-                            {{ number_format($subtotal) }}</span>
+                    <div class="space-y-4 mb-8">
+                        @foreach ($cartContent as $item)
+                            <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
+                                <!-- Actual Product Image -->
+                                <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                                    <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                        class="w-full h-full object-cover">
+                                </div>
+
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1">
+                                        {{ $item->name }}
+                                    </h4>
+
+                                    @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
+                                        <div class="flex flex-wrap gap-1 mb-1">
+                                            @foreach ($item->options->attributes as $key => $value)
+                                                <span
+                                                    class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                    {{ $value }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @elseif($item->options->has('variant'))
+                                        <p class="text-[11px] text-gray-500 font-medium mb-1">
+                                            {{ $item->options->variant }}
+                                        </p>
+                                    @endif
+
+                                    <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . number_format($item->price) : number_format($item->price) . $setup->currency }}
+                                    </p>
+                                </div>
+
+                                <!-- Quantity Display -->
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
+                                    <a href="{{ route('cart.remove', $item->rowId) }}" class="text-red-400 hover:text-red-600">
+                                        <i class="far fa-trash-alt text-xs"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
+                    <!-- 2.5 Coupon Section -->
+                    <div class="mb-6 border-t border-gray-100 pt-6">
+                        <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="coupon-code-input" placeholder="Enter Coupon Code"
+                                value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
+                                class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
+                                {{ session()->has('coupon') ? 'readonly' : '' }}>
+
+                            @if (session()->has('coupon'))
+                                <button type="button" onclick="removeCoupon()"
+                                    class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
+                                    <i class="fas fa-times text-white"></i>
+                                </button>
+                            @else
+                                <button type="button" onclick="applyCoupon()"
+                                    class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
+                                    Apply Now
+                                </button>
+                            @endif
+                        </div>
                     </div>
 
                     <!-- Delivery Area Selector -->
@@ -134,37 +205,50 @@
                                 <span>Inside Dhaka
                                     ({{ $setup->currency }}{{ number_format($setup->inside_charge) }})</span>
                                 <input type="radio" name="delivery_area" value="inside"
-                                    onchange="updateCheckoutShipping(this.value)"
-                                    {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
+                                    onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
                             <label class="flex items-center justify-between cursor-pointer text-sm">
                                 <span>Outside Dhaka
                                     ({{ $setup->currency }}{{ number_format($setup->outside_charge) }})</span>
                                 <input type="radio" name="delivery_area" value="outside"
-                                    onchange="updateCheckoutShipping(this.value)"
-                                    {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
+                                    onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
-                        <span class="text-sm md:text-base text-gray-600">Shipping Charge</span>
-                        <span class="text-sm md:text-base font-bold text-gray-900">{{ $setup->currency }} <span
-                                id="shipping-display">{{ number_format($shipping) }}</span></span>
-                    </div>
+                    <div class="space-y-3 border-t border-gray-100 pt-4">
 
-                    @if ($discount > 0)
-                        <div
-                            class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100 text-green-600 font-bold">
-                            <span>Discount</span>
-                            <span>- {{ $setup->currency }} {{ number_format($discount) }}</span>
+                        <!-- ১. সাবটোটাল (প্রোডাক্টের মোট দাম) -->
+                        <div class="flex justify-between items-center text-gray-700">
+                            <span class="text-sm md:text-base font-medium">Subtotal</span>
+                            <span class="text-sm md:text-base font-bold text-gray-900">
+                                {{ $isL ? $setup->currency : '' }} {{ number_format($subtotal) }} {{ !$isL ? $setup->currency : '' }}
+                            </span>
                         </div>
-                    @endif
 
-                    <div class="flex justify-between items-center py-4 md:py-5">
-                        <span class="text-base md:text-lg font-medium text-gray-500">Total</span>
-                        <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">{{ $setup->currency }} <span
-                                id="total-display">{{ number_format($total) }}</span></span>
+                        <!-- ২. শিপিং চার্জ -->
+                        <div class="flex justify-between items-center text-gray-700">
+                            <span class="text-sm md:text-base font-medium">Shipping Charge</span>
+                            <span class="text-sm md:text-base font-bold text-gray-900">
+                                {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping) }}</span> {{ !$isL ? $setup->currency : '' }}
+                            </span>
+                        </div>
+
+                        <!-- ৩. ডিসকাউন্ট (যদি থাকে) -->
+                        @if ($discount > 0)
+                            <div class="flex justify-between items-center text-green-600 font-bold">
+                                <span>Discount {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span>
+                                <span>- {{ $isL ? $setup->currency : '' }} {{ number_format($discount) }} {{ !$isL ? $setup->currency : '' }}</span>
+                            </div>
+                        @endif
+
+                        <!-- ৪. সর্বমোট (Total) -->
+                        <div class="flex justify-between items-center py-4 border-t border-gray-100 mt-2">
+                            <span class="text-base md:text-lg font-black text-gray-800">Total Payable</span>
+                            <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">
+                                {{ $isL ? $setup->currency : '' }} <span id="total-display">{{ number_format($total) }}</span> {{ !$isL ? $setup->currency : '' }}
+                            </span>
+                        </div>
                     </div>
 
                     <div class="mt-2 md:mt-4">
@@ -254,21 +338,81 @@
                 }
             }
         }
+        function applyCoupon() {
+            const code = document.getElementById('coupon-code-input').value;
+            if (!code) return toastr.warning('Please enter a coupon code');
+
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Applying...';
+            btn.disabled = true;
+
+            fetch("{{ route('coupon.apply') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    coupon_code: code
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        toastr.error(data.message || "Invalid coupon");
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    toastr.error("Server error occurred. Please try again.");
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                });
+        }
+
+        function removeCoupon() {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+
+            fetch("{{ route('coupon.remove') }}", {
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(res => {
+                    location.reload();
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    location.reload();
+                });
+        }
 
         function updateCheckoutShipping(value) {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             fetch("{{ route('cart.shipping') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        area: value
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    area: value
                 })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -296,21 +440,21 @@
         }
 
         /** 3. Draft Order Logic (Blur on Phone) */
-        document.getElementById('customer-phone').addEventListener('blur', function() {
+        document.getElementById('customer-phone').addEventListener('blur', function () {
             let phone = this.value;
             if (phone.length >= 11) {
                 fetch("{{ route('order.partial') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: JSON.stringify({
-                            phone: phone,
-                            name: document.querySelector('input[name="name"]').value,
-                            address: document.querySelector('input[name="address"]').value
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        name: document.querySelector('input[name="name"]').value,
+                        address: document.querySelector('input[name="address"]').value
                     })
+                })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) _activeDraftOrderId = data.order_id;

@@ -10,8 +10,9 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex-shrink-0">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200"
-                    height="48" class="h-8 md:h-12 w-auto">
+                        <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                        alt="{{ $setup->shop_name ?? 'Shop' }} Logo"
+                        class="h-12 md:h-16 w-auto object-contain" />
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
                         class="text-blue-600">ZONE</span></span>
@@ -214,7 +215,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url }}" height="" width="" alt="{{ $setup->shop_name }}"
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="" width="" alt="{{ $setup->shop_name }}"
                     class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-[#016738]">খাঁটি ভাই</span>

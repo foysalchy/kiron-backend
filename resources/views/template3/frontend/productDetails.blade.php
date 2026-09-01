@@ -13,15 +13,24 @@
     @endphp
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
-        <!-- 1. Breadcrumb -->
-        <nav
-            class="flex items-center space-x-2 text-sm text-gray-500  overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
-            <a href="/" class="hover:text-[#FF6A00]">Home</a>
-            <i class="fas fa-chevron-right text-[8px]"></i>
-            <a href="#" class="hover:text-[#FF6A00]">{{ $category->name ?? 'Product Details' }}</a>
-            <i class="fas fa-chevron-right text-[8px]"></i>
-            <span class="text-[#F97316]">{{ $product->title ?? 'Product' }}</span>
-        </nav>
+        <nav aria-label="Breadcrumb"
+        class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
+
+        <a href="{{ route('home') }}" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+
+        @if(isset($breadcrumb) && count($breadcrumb) > 0)
+            @foreach($breadcrumb as $item)
+                <span class="text-gray-400">/</span>
+                <a href="{{ route('category.products', $item['slug']) }}"
+                    class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
+                    {{ $item['name'] }}
+                </a>
+            @endforeach
+        @endif
+
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+    </nav>
 
         <!-- 2. Product Top Info Card -->
         <div class="overflow-hidden mb-8">

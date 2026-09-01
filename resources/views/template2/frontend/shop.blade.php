@@ -22,41 +22,57 @@
         <!-- Main Card Container -->
         <div class="archiveTopInfo">
 
-            <!-- Breadcrumb -->
-            <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
+            <nav class="hidden md:flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <a href="{{ route('home') }}" class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                        <i class="fas fa-home text-xs"></i> Home
+                    </a>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                    @if(isset($breadcrumb) && count($breadcrumb) > 0)
+                        @foreach($breadcrumb as $item)
+                            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                            </svg>
 
-                <a href="{{ route('shop.index') }}" class="text-gray-500 hover:text-[var(--primary-color)] transition-colors">
-                    {{ request()->routeIs('brand.products') ? 'Brand' : 'Category' }}
-                </a>
+                            @if($loop->last)
+                                <span class="text-[var(--primary-color)] font-bold">{{ $item['name'] }}</span>
+                            @else
+                                <a href="{{ route('category.products', $item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                    {{ $item['name'] }}
+                                </a>
+                            @endif
+                        @endforeach
+                    @endif
+                </nav>
+            <div class="meta_info py-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
+                        {{ $category->name ?? 'Shop' }} Price in Bangladesh
+                    </h1>
 
-                <!-- Chevron Icon -->
-                <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
-                </svg>
+                    <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">
+                        @if (isset($category->meta_description) && $category->meta_description)
+                            <p>{!! $category->meta_description ?? '' !!}</p>
+                        @else
+                            @php
+                                $isL = ($setup->currency_position ?? 'left') == 'left';
+                                $currency = $setup->currency;
 
-                <span class="text-brand">{{ $category->name ?? 'Shop' }}</span>
-            </nav>
-            <div class="meta_info">
-                @if (isset($category->meta_title) && $category->meta_title)
-                    <h1 class="text-[24px] py-1">{{$category->meta_title}}</h1>
-                @endif
-                <!-- Description Section -->
-                @if (isset($category->meta_description) && $category->meta_description)
-                        <p class="text-[15px] text-gray-600 l">
-                            {!! $category->meta_description !!}
-                        </p>
-                @endif
+                                $minP = $products->min('sale_price') > 0 ? $products->min('sale_price') : $products->min('regular_price');
+                                $maxP = $products->max('sale_price') > 0 ? $products->max('sale_price') : $products->max('regular_price');
+                                $catName = $category->name ?? 'Product';
+                            @endphp
+
+                            {{ $catName }} price in Bangladesh range from
+                            <span class="font-bold text-gray-800">
+                                {{ $isL ? $currency : '' }} {{ number_format($minP) }} {{ !$isL ? $currency : '' }}
+                            </span> to
+                            <span class="font-bold text-gray-800">
+                                {{ $isL ? $currency : '' }} {{ number_format($maxP) }} {{ !$isL ? $currency : '' }}
+                            </span>,
+                            depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD.
+                        @endif
+                    </div>
             </div>
         </div>
-</div>
     </section>
     <!-- SHOP PAGE SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0 pt-0">
@@ -105,9 +121,17 @@
                                     Filter
                                 </button>
                                 <span class="text-[10px] text-gray-500 font-medium">
-                                    {{ $setup->currency }} <span id="display-min">{{ request('min_price', 0) }}</span> —
-                                    {{ $setup->currency }} <span
-                                        id="display-max">{{ request('max_price', (int) $maxPriceLimit) }}</span>
+                                    {{-- Minimum Price --}}
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="display-min">{{ request('min_price', 0) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+
+                                    —
+
+                                    {{-- Maximum Price --}}
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="display-max">{{ request('max_price', (int) $maxPriceLimit) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                 </span>
                             </div>
                         </div>

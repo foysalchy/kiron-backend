@@ -153,9 +153,16 @@ class CartController extends FrontendController
         }
     }
 
-    public function removeCoupon()
+    public function removeCoupon(Request $request)
     {
         session()->forget('coupon');
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'The coupon has been removed.'
+            ]);
+        }
+
         return back()->with('success', 'The coupon has been removed.');
     }
     // product add to cart
