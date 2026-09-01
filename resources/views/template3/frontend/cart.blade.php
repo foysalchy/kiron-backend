@@ -38,24 +38,31 @@
 
                                     <!-- Details -->
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1">
-                                            {{ $item->name }}
-                                        </h3>
+                                        <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
+                                            class="group/title">
+                                            <h3
+                                                class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
+                                                {{ $item->name ?? '' }}
+                                            </h3>
+                                        </a>
                                         <div class="flex items-center gap-2 mb-2">
                                             <span
-                                                class="bg-orange-50 text-[#FF6A00] text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                                class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
                                                 {{ $item->options->variant ?? 'Product' }}
                                             </span>
                                         </div>
                                         <div class="flex items-baseline gap-2">
                                             <p class="font-bold text-gray-700 text-lg">
-                                                {{ $setup->currency }} {{ number_format($item->price, 0) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($item->price, 0) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                             </p>
 
                                             @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
                                                 <span class="text-sm text-gray-400 line-through font-normal pl-1">
-                                                    {{ $setup->currency }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                     {{ number_format($item->options['regular_price'], 0) }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                                 </span>
                                             @endif
                                         </div>
@@ -65,16 +72,18 @@
                                     <div
                                         class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
                                         <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[#FF6A00] hover:bg-gray-50 transition-colors">-</button>
+                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                         <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
                                         <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[#FF6A00] hover:bg-gray-50 transition-colors">+</button>
+                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                     </div>
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-black text-base md:text-xl text-[#FF6A00]">{{ $setup->currency }}
-                                            {{ number_format($item->subtotal, 0) }}</p>
+                                        <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                            {{ number_format($item->subtotal, 0) }}
+                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
                                             class="text-red-400 hover:text-red-600 transition-colors">
                                             <i class="far fa-trash-alt text-lg"></i>
@@ -99,22 +108,24 @@
                                 <div class="space-y-2">
                                     {{-- ১. Inside Charge (Dynamic) --}}
                                     <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="inside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                            {{ $shipping_area == 'inside' ? 'checked' : '' }}
+                                            class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
-                                            Inside Dhaka ({{ $setup->currency }}
+                                            Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($setup->inside_charge, 0) }})
                                         </span>
                                     </label>
 
                                     {{-- ২. Outside Charge (Dynamic) --}}
                                     <label
-                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[#FF6A00] bg-orange-50' : 'border-gray-100' }}">
+                                        class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="outside" onchange="this.form.submit()"
-                                            {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[#FF6A00]">
+                                            {{ $shipping_area == 'outside' ? 'checked' : '' }}
+                                            class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
-                                            Outside Dhaka ({{ $setup->currency }}
+                                            Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                             {{ number_format($setup->outside_charge, 0) }})
                                         </span>
                                     </label>
@@ -149,30 +160,30 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6 mb-6">
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Subtotal:</span>
-                                <span>{{ $setup->currency }} {{ number_format($subtotal, 0) }}</span>
+                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between font-bold text-green-600">
                                     <span>Discount ({{ session('coupon')['coupon_code'] }}):</span>
-                                    <span>- {{ $setup->currency }} {{ number_format($discount, 0) }}</span>
+                                    <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($discount, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Delivery Charge:</span>
-                                <span>{{ $setup->currency }} {{ number_format($shipping, 0) }}</span>
+                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
                             <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[#FF6A00]">{{ $setup->currency }}
-                                {{ number_format($total, 0) }}</span>
+                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 
                         <!-- Checkout Button -->
-                        <a href="{{ route('checkout.index') }}"
+                        <a href="{{ url('/checkout') }}"
                             class="block w-full text-center primary-bg hover:bg-[#e65f00] text-primary py-3.5 rounded-xl font-bold text-lg shadow-lg transition-all mb-4">
                             Checkout
                         </a>
@@ -204,7 +215,8 @@
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800">Your cart is currently empty!</h2>
                 <a href="{{ route('shop.index') }}"
-                    class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold">Start shopping</a>
+                    class="inline-block mt-8 bg-[var(--primary-color)] text-primary px-10 py-3 rounded-xl font-bold">Start
+                    shopping</a>
             </div>
         @endif
     </section>

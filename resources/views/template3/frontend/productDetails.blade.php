@@ -459,15 +459,18 @@
             container.classList.add('hidden');
         }
         // geneal function
-        function changeImage(src) {
+        function changeImage(src, btn) {
             document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.thumb-btn').forEach(b => {
+                b.classList.remove('border-2', 'border-[var(--primary-color)]');
+                b.classList.add('border-gray-200');
+            });
+            if (btn) {
+                btn.classList.add('border-2', 'border-[var(--primary-color)]');
+                btn.classList.remove('border-gray-200');
+            }
         }
 
-        function changeQty(val) {
-            let q = document.getElementById('main-qty');
-            let newVal = parseInt(q.value) + val;
-            if (newVal >= 1) q.value = newVal;
-        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
@@ -479,124 +482,168 @@
             document.getElementById('tab-btn-' + tabId).classList.add('text-gray-900', 'border-[#FF6A00]', 'bg-white');
         }
 
-        // variation and gallery data
+        function changeQty(amount) {
+            let mainQty = document.getElementById('main-qty');
+
+            if (mainQty) {
+                let currentQty = parseInt(mainQty.value) || 1;
+                let newQty = currentQty + amount;
+
+                if (newQty < 1) {
+                    newQty = 1;
+                }
+
+                mainQty.value = newQty;
+            }
+        }
+
         const attributeGroups = @json($attributeGroups ?? []);
         const allVariations = @json($formattedVariations ?? []);
-        let userSelections = {};
-        let originalGalleryHtml = ''; // save main gallery
+        const valueImages = @json($valueImages ?? []);
+        const defaultGalleries = @json($defaultGalleries ?? []);
+        const groupCategories = @json($groupCategories ?? []);
+
+        let activeFilters = {};
+        attributeGroups.forEach(group => activeFilters[group] = null);
+        let finalSelectedVariationIds = [];
+
+        function updateGalleryThumbnails(images) {
+            const container = document.getElementById('thumbnail-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            images.forEach((imgUrl, index) => {
+                const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
+                container.innerHTML += `
+                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                            onclick="changeImage('${imgUrl}', this)">
+                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                        </button>`;
+            });
+        }
 
         function renderAttributes() {
-        const container = document.getElementById('dynamic-attributes-container');
-        if (!container) return;
-        container.innerHTML = '';
-        let currentlyValidVariations = allVariations;
+            const container = document.getElementById('dynamic-attributes-container');
+            if (!container) return;
+            container.innerHTML = '';
 
-        for (let i = 0; i < attributeGroups.length; i++) {
-            const groupName = attributeGroups[i];
-            const isLastGroup = (i === attributeGroups.length - 1);
-            let availableValues = {};
-            currentlyValidVariations.forEach(v => {
-                if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
-            });
+            let currentlyValidVariations = allVariations;
 
-            let groupHtml = `<div class="mb-4"><h3 class="text-[17px] font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
-            for (const [valId, valName] of Object.entries(availableValues)) {
-                const isFilterActive = (activeFilters[groupName] == valId);
-                const isVariationSelected = checkIsSelected(groupName, valId);
-                const activeClass = (isFilterActive || isVariationSelected) ? 'border-[#FF6A00] bg-orange-50 text-[#FF6A00]' : 'border-gray-200 bg-white text-gray-700';
+            for (let i = 0; i < attributeGroups.length; i++) {
+                const groupName = attributeGroups[i];
+                const isLastGroup = (i === attributeGroups.length - 1);
 
-                let btnContent = valueImages[valId] ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}` : valName;
+                let availableValues = {};
+                currentlyValidVariations.forEach(v => {
+                    if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
+                });
 
-                groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-[17px] font-bold transition-all ${activeClass}">${btnContent}</button>`;
+                let groupHtml = `<div class="mb-4"><h3 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+
+                for (const [valId, valName] of Object.entries(availableValues)) {
+                    const isFilterActive = (activeFilters[groupName] == valId);
+                    const isVariationSelected = checkIsSelected(groupName, valId);
+
+                    const activeClass = (isFilterActive || isVariationSelected) ?
+                        'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
+                        'border-gray-200 bg-white text-gray-700';
+
+                    // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
+                    let btnContent = valueImages[valId]
+                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
+                        : valName;
+
+                    groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;
+                }
+                groupHtml += `</div></div>`;
+                container.innerHTML += groupHtml;
+
+                if (!activeFilters[groupName]) break;
+                currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
             }
-            groupHtml += `</div></div>`;
-            container.innerHTML += groupHtml;
-            if (!activeFilters[groupName]) break;
-            currentlyValidVariations = currentlyValidVariations.filter(v => v.attributes[groupName].id == activeFilters[groupName]);
+            document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
-        document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
-    }
 
     function handleSelection(group, valId, isLastGroup) {
-        if (!isLastGroup) {
-            activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
-            let idx = attributeGroups.indexOf(group);
-            for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-        } else {
-            activeFilters[group] = valId;
-            let matched = allVariations.find(v => {
-                return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
-            });
-            if (matched) {
-                let isSingleChoice = false;
-                for (let gName in matched.attributes) { if (groupCategories[gName] === 'single') { isSingleChoice = true; break; } }
+            if (!isLastGroup) {
+                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+                let idx = attributeGroups.indexOf(group);
+                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+                if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+            } else {
+                activeFilters[group] = valId;
+                let matched = allVariations.find(v => {
+                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                });
 
-                if (isSingleChoice) {
-                    finalSelectedVariationIds = [matched.id];
-                    let combined = [...(matched.galleries || []), ...defaultGalleries];
-                    updateGalleryThumbnails([...new Set(combined)]);
-                    if (matched.main_image) changeImage(matched.main_image);
-                } else {
-                    const index = finalSelectedVariationIds.indexOf(matched.id);
-                    if (index > -1) {
-                        finalSelectedVariationIds.splice(index, 1);
-                        if(finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-                    } else {
-                        finalSelectedVariationIds.push(matched.id);
+                if (matched) {
+                    let isSingleChoice = false;
+                    for (let gName in matched.attributes) {
+                        if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
+                    }
+
+                    if (isSingleChoice) {
+                        finalSelectedVariationIds = [matched.id];
                         let combined = [...(matched.galleries || []), ...defaultGalleries];
                         updateGalleryThumbnails([...new Set(combined)]);
-                        if (matched.main_image) changeImage(matched.main_image);
+                        if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                        document.getElementById('sale-price').innerText = '{{ $setup->currency }} ' + matched.price.toLocaleString();
+                    } else {
+                        const index = finalSelectedVariationIds.indexOf(matched.id);
+                        if (index > -1) {
+                            finalSelectedVariationIds.splice(index, 1);
+                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                        } else {
+                            finalSelectedVariationIds.push(matched.id);
+                            let combined = [...(matched.galleries || []), ...defaultGalleries];
+                            updateGalleryThumbnails([...new Set(combined)]);
+                            if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                        }
                     }
                 }
-                let formattedPrice = matched.price.toLocaleString();
-                let symbol = "{{ $setup->currency }}";
-                let pos = "{{ $setup->currency_position ?? 'left' }}";
-
-                let priceText = (pos === 'left') ? (symbol + " " + formattedPrice) : (formattedPrice + " " + symbol);
-
-                document.getElementById('sale-price').innerText = priceText;
-                if(matched.main_image) changeImage(matched.main_image);
             }
-        }
-        renderAttributes();
-    }
-
-        function selectOption(group, valId) {
-            userSelections[group] = valId;
             renderAttributes();
         }
 
-        // add to cart
+        function checkIsSelected(groupName, valId) {
+            return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
+        }
+
         function handleAddToCart(isOrderNow = false) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
             const qty = document.getElementById('main-qty').value;
-            const productType = '{{ $product->type }}';
+            let items = [];
 
-            let postData = {
-                qty: qty
-            };
+            let varIds = document.getElementById('selected-variation-id').value;
+            if ('{{ $product->type }}' === 'variation') {
+                let missingAttribute = attributeGroups.find(group => !activeFilters[group]);
 
-            if (productType === 'single') {
-                postData.id = {{ $product->id }};
-            } else {
-                let varId = document.getElementById('selected-variation-id').value;
-                if (!varId) {
-                    toastr.warning('Please select all options (color/size)');
+                if (missingAttribute) {
+                    toastr.warning(`Please select ${missingAttribute}`);
                     return;
                 }
-                postData.variation_id = varId;
+                varIds.split(',').forEach(id => items.push({
+                    variation_id: id,
+                    qty: qty
+                }));
+            } else {
+                items.push({
+                    id: {{ $product->id }},
+                    qty: qty
+                });
             }
 
             fetch("{{ route('cart.add') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify(postData)
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    items: items
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -616,18 +663,12 @@
                                 currency: '{{ $setup->currency ?? "BDT" }}'
                             });
                         }
-                        
-                        document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
 
-                        if (isOrderNow) {
-                            window.location.href = "{{ route('checkout.index') }}";
-                        } else {
-                            toastr.success(data.message);
-                        }
-                    } else {
-                        toastr.error(data.message);
-                    }
-                }).catch(err => toastr.error("Server error occurred."));
+                        document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
+                        if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
+                        else toastr.success(data.message);
+                    } else toastr.error(data.message);
+                });
         }
 
         document.addEventListener("DOMContentLoaded", () => {

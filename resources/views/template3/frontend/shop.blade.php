@@ -106,9 +106,13 @@
                                     Filter
                                 </button>
                                 <span class="text-[10px] text-gray-500 font-medium">
-                                    {{ $setup->currency }} <span id="display-min">{{ request('min_price', 0) }}</span> —
-                                    {{ $setup->currency }} <span
-                                        id="display-max">{{ request('max_price', (int) $maxPriceLimit) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="display-min">{{ request('min_price', 0) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                    —
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                    <span id="display-max">{{ request('max_price', (int) $maxPriceLimit) }}</span>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                 </span>
                             </div>
                         </div>

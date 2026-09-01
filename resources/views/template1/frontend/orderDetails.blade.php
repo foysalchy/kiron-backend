@@ -1,6 +1,6 @@
 @extends('template1.layouts.front')
 @section('meta')
-    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup])
+    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup, 'order' => $order])
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -577,6 +577,4 @@
         });
     </script>
 @endpush
-@push('scripts')
-    <x-meta-info.ecommerce-meta.order-details-meta />
-@endpush
+

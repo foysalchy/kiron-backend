@@ -1841,7 +1841,7 @@
                 </h2>
 
                 <!-- Search Box -->
-                <div class="mt-8 max-w-xl mx-auto">
+                <div class="mt-8 max-w-xl mx-auto px-5">
                     <input type="text" id="faqSearch" placeholder="Search FAQ..."
                         class="w-full px-5 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400" />
                 </div>

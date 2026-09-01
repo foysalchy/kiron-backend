@@ -9,7 +9,8 @@
             <h3 class="text-xs font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
             <p class="text-[10px] text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}</p>
             <div class="flex justify-between items-center mt-1">
-                <span class="text-xs font-bold text-[var(--primary-color)]">{{ $item->qty }} × {{ number_format($item->price, 0) }}৳</span>
+                <span class="text-xs font-bold text-[var(--primary-color)]">{{ $item->qty }} ×
+    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                 <button onclick="removeCartItem('{{ $item->rowId }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
             </div>
         </div>
@@ -33,14 +34,18 @@
                 listContainer.innerHTML = html;
             }
 
-            // নতুন সাবটোটাল আপডেট (কম্পোনেন্টের ভেতর থেকে ডাটা নিচ্ছে)
-            const newSubtotal = document.getElementById('new-cart-subtotal')?.innerText;
-            const subtotalValEl = document.getElementById('mini-cart-subtotal-val');
-            if (newSubtotal && subtotalValEl) {
-                subtotalValEl.innerText = newSubtotal + '৳';
-            }
-        }).catch(err => console.error('Cart Refresh Error:', err));
-}
+        const newSubtotal = document.getElementById('new-cart-subtotal')?.innerText;
+        const subtotalValEl = document.getElementById('mini-cart-subtotal-val');
+
+        if (newSubtotal && subtotalValEl) {
+            const pos = "{{ $setup->currency_position ?? 'left' }}";
+            const currency = "{{ $setup->currency }}";
+
+            // পজিশন অনুযায়ী টেক্সট সেট করা
+            subtotalValEl.innerText = (pos === 'left') ? (currency + newSubtotal) : (newSubtotal + currency);
+        }
+                }).catch(err => console.error('Cart Refresh Error:', err));
+        }
 
     function removeCartItem(rowId) {
     // সাবডোমেইন এবং রাউট অনুযায়ী সঠিক পাথ (/cart/remove/ID)

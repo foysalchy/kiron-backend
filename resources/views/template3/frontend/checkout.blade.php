@@ -63,7 +63,8 @@
                             @guest('customer')
                                 <div class="space-y-3 pt-2">
                                     <label class="flex items-center gap-3 cursor-pointer group">
-                                        <input type="checkbox" name="create_account" class="w-4 h-4 accent-[#FF6A00]">
+                                        <input type="checkbox" name="create_account"
+                                            class="w-4 h-4 accent-[var(--primary-color)]">
                                         <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900">Create an
                                             account?</span>
                                     </label>
@@ -80,10 +81,10 @@
                             @php $slug = strtolower(trim($method->name)); @endphp
                             <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
                                 <label
-                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[#FF6A00] has-[:checked]:border-[#FF6A00] has-[:checked]:bg-orange-50 transition-all">
+                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
                                     <input type="radio" name="payment_method" value="{{ $method->name }}"
                                         onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
-                                        class="w-5 h-5 accent-[#FF6A00]">
+                                        class="w-5 h-5 accent-[var(--primary-color)]">
                                     <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
                                 </label>
 
@@ -108,16 +109,14 @@
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         <div class="mb-8">
-                            <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery
-                                Method</h2>
+                            <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery Method</h2>
                             <div class="space-y-2">
                                 <label class="flex items-center gap-3 cursor-pointer group">
                                     <input type="radio" name="delivery_area" value="inside"
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Inside Dhaka ({{ $setup->currency }}
-                                        {{ number_format($setup->inside_charge, 0) }})
+                                        Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($setup->inside_charge, 0) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})
                                     </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
@@ -125,8 +124,7 @@
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Outside Dhaka ({{ $setup->currency }}
-                                        {{ number_format($setup->outside_charge, 0) }})
+                                        Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($setup->outside_charge, 0) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }})
                                     </span>
                                 </label>
                             </div>
@@ -152,7 +150,7 @@
                                             <div class="flex flex-wrap gap-1 mb-1">
                                                 @foreach ($item->options->attributes as $key => $value)
                                                     <span
-                                                        class="bg-orange-50 text-[#FF6A00] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                                                        class="bg-orange-50 text-[var(--primary-color)] text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                                                         {{ $value }}
                                                     </span>
                                                 @endforeach
@@ -163,8 +161,8 @@
                                             </p>
                                         @endif
 
-                                        <p class="text-[#FF6A00] font-semibold text-sm">
-                                            {{ $setup->currency }}{{ number_format($item->price) }}
+                                        <p class="text-[var(--primary-color)] font-semibold text-sm">
+                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                         </p>
                                     </div>
 
@@ -206,29 +204,28 @@
                         <div class="space-y-4 border-t border-gray-100 pt-6">
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Subtotal:</span>
-                                <span class="text-md font-bold text-gray-900">{{ $setup->currency }}
-                                    {{ number_format($subtotal) }}</span>
+                                <span class="text-md font-bold text-gray-900">
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($subtotal) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                </span>
                             </div>
 
                             @if ($discount > 0)
                                 <div class="flex justify-between items-center text-green-600">
                                     <span class="text-md font-medium">Discount
                                         {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}:</span>
-                                    <span class="text-md font-bold">- {{ $setup->currency }}
-                                        <span id="discount-display">{{ number_format($discount) }}</span>
-                                    </span>
+                                    <span class="text-md font-bold">- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($discount) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                                 </div>
                             @endif
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span class="text-md font-bold text-gray-900"> {{ $setup->currency }} <span
-                                        id="shipping-display">{{ number_format($shipping) }}</span></span>
+                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
-                                <span class="text-xl font-bold text-[#FF6A00]">{{ $setup->currency }} <span
-                                        id="total-display">{{ number_format($total) }}</span></span>
+                                <span class="text-xl font-bold text-[var(--primary-color)]">
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="total-display">{{ number_format($total) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                </span>
                             </div>
                         </div>
 
@@ -265,9 +262,11 @@
             if (firstRadio) {
                 firstRadio.checked = true;
                 _checkoutSlug = firstRadio.value;
-                const slug = firstRadio.value;
-                handlePaymentSelection(slug, firstRadio.closest('label')?.querySelector('span.text-md')?.innerText
-                    ?.trim() ?? slug);
+                handlePaymentSelection(
+                    firstRadio.value,
+                    firstRadio.closest('label')?.querySelector('span.text-md')?.innerText?.trim() ?? firstRadio
+                    .value
+                );
             }
         });
 
@@ -305,7 +304,7 @@
         // ── Radio border + badge highlight ──
         function highlightMethod(slug, name) {
             document.querySelectorAll('.payment-method-label').forEach(l => {
-                l.classList.remove('border-[#FF6A00]', 'bg-orange-50');
+                l.classList.remove('border-[var(--primary-color)]', 'bg-orange-50');
                 l.classList.add('border-gray-200');
             });
             document.querySelectorAll('[id^="badge-"]').forEach(b => b.classList.add('hidden'));
@@ -313,7 +312,7 @@
             const lbl = document.getElementById('label-' + slug);
             if (lbl) {
                 lbl.classList.remove('border-gray-200');
-                lbl.classList.add('border-[#FF6A00]', 'bg-orange-50');
+                lbl.classList.add('border-[var(--primary-color)]', 'bg-orange-50');
             }
             const badge = document.getElementById('badge-' + slug);
             if (badge) badge.classList.remove('hidden');
@@ -340,7 +339,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': token,
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({
@@ -390,7 +389,7 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-CSRF-TOKEN': token
                             },
                             body: JSON.stringify({
                                 phone: phone,
@@ -425,7 +424,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-CSRF-TOKEN': token,
                         'X-Requested-With': 'XMLHttpRequest'
                     },
                     body: JSON.stringify({

@@ -46,7 +46,7 @@
                     </button>
                     <div class="max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
                         <div
-                                class="prose prose-slate max-w-none
+                                class="prose prose-slate max-w-none px-5
                                 prose-p:text-gray-500 prose-p:text-md prose-p:leading-relaxed
                                 prose-p:m-0
                                 prose-strong:text-gray-700 prose-a:text-[var(--primary-color)]">

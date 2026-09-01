@@ -1,6 +1,6 @@
 @extends('template4.layouts.front')
 @section('meta')
-    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup])
+    @include('components.meta-info.ecommerce-meta.order-details-meta', ['setup' => $setup,'order' => $order])
 @endsection
 @section('content')
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
@@ -11,7 +11,7 @@
                     class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
                     <i class="fas fa-arrow-left text-[10px]"></i> Dashboard
                 </a>
-                <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
                 <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
@@ -45,7 +45,7 @@
 
                                 <div class="flex-1 text-center sm:text-left">
                                     {{-- 2. Safe Title Check --}}
-                                    <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
+                                    <h4 class="text-base font-bold text-gray-800 mb-1 leading-tight">
                                         {{ $item->product->title ?? 'Product Not Available' }}
                                     </h4>
 
@@ -590,6 +590,4 @@
         });
     </script>
 @endpush
-@push('scripts')
-    <x-meta-info.ecommerce-meta.order-details-meta />
-@endpush
+
