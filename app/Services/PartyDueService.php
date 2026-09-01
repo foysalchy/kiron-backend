@@ -315,6 +315,17 @@ private function calculateSupplierDue(int $supplierId): float
             ]);
             $this->recalculatePartyDue($partyId);
 
+            // Auto Double-Entry Voucher in Advanced Mode
+            AutoAccountingService::postPaymentCollectionJournal(
+                $party->company_id,
+                $direction,
+                $totalAmount,
+                $partyId,
+                $paymentMode,
+                $note['reference_no'] ?? null,
+                $paymentDate
+            );
+
             LogHelper::custom(
                 'payment_collection',
                 'parties',

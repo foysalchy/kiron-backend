@@ -169,6 +169,13 @@ class TransactionInternalService
             LogHelper::created('transaction_transfer', $transfer->id, $transfer->company_id, $transfer->reference_number);
             DB::commit();
 
+            // Auto Double-Entry Contra Voucher
+            try {
+                \App\Services\AutoAccountingService::postTransferJournal($transfer);
+            } catch (\Exception $accErr) {
+                Log::warning("Transfer auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Transaction Internal Transfer Created successfully', ['transfer_id' => $transfer->id]);
 
             return $transfer->load(['fromAccount', 'details.transferTo']);
@@ -230,6 +237,14 @@ class TransactionInternalService
 
             LogHelper::updated('transaction_transfer', $transfer->id, $transfer->company_id, $transfer->reference_number);
             DB::commit();
+
+            // Auto Double-Entry Contra Voucher
+            try {
+                \App\Services\AutoAccountingService::postTransferJournal($transfer->fresh());
+            } catch (\Exception $accErr) {
+                Log::warning("Transfer update auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Transaction Internal Transfer Updated successfully', ['transfer_id' => $transfer->id]);
 
             return $transfer->fresh(['fromAccount', 'details.transferTo']);

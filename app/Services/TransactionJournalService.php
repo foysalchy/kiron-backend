@@ -18,7 +18,12 @@ class TransactionJournalService
     public function getAllJournals(array $filters = [], bool $paginate = true)
     {
         try {
-            $query = TransactionJournal::with(['accounts.chartOfAccount', 'creator']);
+            $query = TransactionJournal::with(['accounts.chartOfAccount.accountGroup', 'party:id,name,phone', 'creator:id,name']);
+
+            // Filter by Voucher Type
+            if (!empty($filters['voucher_type']) && $filters['voucher_type'] !== 'all') {
+                $query->where('voucher_type', $filters['voucher_type']);
+            }
 
             // Filter by Status
             if (!empty($filters['status'])) {
@@ -33,17 +38,22 @@ class TransactionJournalService
             // Apply Date Filters
             $query = $this->applyDateRange($query, $filters);
 
-            // Search by Reference Number
+            // Search by Reference Number, Voucher No, or Narration
             if (isset($filters['search']) && $filters['search'] !== '') {
-                $query->where('reference_number', 'like', "%{$filters['search']}%");
+                $s = $filters['search'];
+                $query->where(function ($q) use ($s) {
+                    $q->where('reference_number', 'like', "%{$s}%")
+                      ->orWhere('voucher_no', 'like', "%{$s}%")
+                      ->orWhere('narration', 'like', "%{$s}%");
+                });
             }
 
-            // Calculate Footer Sums (Clone query to avoid affecting results)
+            // Calculate Footer Sums
             $totalDebitSum = (clone $query)->sum('total_debit');
 
             $results = $paginate
-                ? $query->latest('date')->paginate($filters['per_page'] ?? 25)
-                : $query->latest('date')->get();
+                ? $query->latest('date')->latest('id')->paginate($filters['per_page'] ?? 25)
+                : $query->latest('date')->latest('id')->get();
 
             return [
                 'items' => $results,
@@ -96,7 +106,7 @@ class TransactionJournalService
      */
     public function getJournalById(int $id): TransactionJournal
     {
-        $journal = TransactionJournal::with(['accounts.chartOfAccount', 'creator'])->find($id);
+        $journal = TransactionJournal::with(['accounts.chartOfAccount.accountGroup', 'party', 'creator'])->find($id);
         if (!$journal) {
             throw ApiException::notFound('Journal record');
         }
@@ -111,6 +121,27 @@ class TransactionJournalService
         DB::beginTransaction();
         try {
             $data['created_by'] = auth()->id();
+
+            if (empty($data['reference_number'])) {
+                $prefix = match(strtolower($data['voucher_type'] ?? 'journal')) {
+                    'payment' => 'PV',
+                    'receipt' => 'RV',
+                    'contra'  => 'CV',
+                    'sales'   => 'SV',
+                    'purchase'=> 'PB',
+                    default   => 'JV',
+                };
+                $data['reference_number'] = $prefix . '-' . date('Ymd') . '-' . rand(1000, 9999);
+            }
+            if (empty($data['voucher_no'])) {
+                $data['voucher_no'] = $data['reference_number'];
+            }
+            if (empty($data['voucher_type'])) {
+                $data['voucher_type'] = 'journal';
+            }
+            if (empty($data['narration']) && !empty($data['description'])) {
+                $data['narration'] = $data['description'];
+            }
 
             if (isset($data['file'])) {
                 $data['file'] = FileUploadHelper::upload(
@@ -132,11 +163,13 @@ class TransactionJournalService
 
             // Create Detail records (accounts)
             foreach ($data['items'] as $item) {
-                $journal->accounts()->create([
-                    'chart_of_account_id' => $item['chart_of_account_id'],
-                    'debit'               => $item['debit'] ?? 0,
-                    'credit'              => $item['credit'] ?? 0,
-                ]);
+                if (($item['debit'] ?? 0) > 0 || ($item['credit'] ?? 0) > 0) {
+                    $journal->accounts()->create([
+                        'chart_of_account_id' => $item['chart_of_account_id'],
+                        'debit'               => $item['debit'] ?? 0,
+                        'credit'              => $item['credit'] ?? 0,
+                    ]);
+                }
             }
 
             LogHelper::created('transaction_journal', $journal->id, $journal->company_id, $journal->reference_number);

@@ -17,14 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-//  php artisan db:seed --class=SuperAdminSeeder
-//          php artisan db:seed --class=PermissionSeeder
-//         php artisan db:seed --class=SuperAdminPermissionSeeder
-//         php artisan db:seed --class=SystemPageSeeder 
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Seed TallyPrime Default Account Groups and Chart of Accounts
+        $this->call(DefaultAccountingSeeder::class);
     }
 }

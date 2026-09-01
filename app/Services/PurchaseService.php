@@ -159,6 +159,13 @@ class PurchaseService
 
             DB::commit();
 
+            // Auto Double-Entry Voucher in Advanced Mode
+            try {
+                \App\Services\AutoAccountingService::postPurchaseJournal($purchase);
+            } catch (\Exception $accError) {
+                Log::warning("Purchase auto-journal failed: " . $accError->getMessage());
+            }
+
             Log::info('Purchase created successfully', ['purchase_id' => $purchase->id]);
             LogHelper::created('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);
 
@@ -250,6 +257,13 @@ class PurchaseService
             }
 
             DB::commit();
+
+            // Auto Double-Entry Voucher in Advanced Mode
+            try {
+                \App\Services\AutoAccountingService::postPurchaseJournal($purchase->fresh());
+            } catch (\Exception $accError) {
+                Log::warning("Purchase update auto-journal failed: " . $accError->getMessage());
+            }
 
             Log::info('Purchase updated successfully', ['purchase_id' => $purchase->id]);
             LogHelper::updated('purchase', $purchase->id, $purchase->company_id, 'Total Quantities : ' . $purchase->total_quantities);

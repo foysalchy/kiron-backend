@@ -93,15 +93,19 @@ class SteadfastWebhookController extends Controller
                 }
             }
 
-            // Update other_charges with the delivery charge from Steadfast
+            // Update courier_charge in courier_info from Steadfast (preserves customer's other_charges)
             $deliveryCharge = $payload['delivery_charge'] ?? null;
             if ($deliveryCharge !== null) {
-                $order->other_charges = $deliveryCharge;
-                // Optionally update grand_total if needed:
-                // $order->grand_total = $order->subtotal + $order->other_charges - $order->discount_on_all - $order->coupon_discount + $order->round_off;
+                $courierInfo = is_array($order->courier_info) ? $order->courier_info : (json_decode($order->courier_info, true) ?: []);
+                $courierInfo['courier_charge'] = (float)$deliveryCharge;
+                $courierInfo['delivery_charge'] = (float)$deliveryCharge;
+                $order->courier_info = $courierInfo;
             }
 
             $order->save();
+
+            // Auto-post courier expense journal
+            \App\Services\AutoAccountingService::postCourierExpenseJournal($order);
 
             // Trigger sync to WooCommerce if the status was changed by Steadfast
             if ($statusChanged) {

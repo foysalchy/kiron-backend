@@ -18,6 +18,11 @@ class TransactionJournalAccount extends Model
         return $this->belongsTo(TransactionJournal::class, 'transaction_journal_id');
     }
 
+    public function transactionJournal(): BelongsTo
+    {
+        return $this->belongsTo(TransactionJournal::class, 'transaction_journal_id');
+    }
+
     public function chartOfAccount(): BelongsTo
     {
         return $this->belongsTo(ChartOfAccount::class);

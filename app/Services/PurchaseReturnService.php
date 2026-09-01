@@ -188,6 +188,13 @@ class PurchaseReturnService
 
             DB::commit();
 
+            // Auto Double-Entry Voucher for Purchase Return
+            try {
+                \App\Services\AutoAccountingService::postPurchaseReturnJournal($purchaseReturn);
+            } catch (\Exception $accErr) {
+                Log::warning("Purchase return auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Purchase return created successfully', [
                 'purchase_return_id' => $purchaseReturn->id,
                 'status' => $purchaseReturn->status
@@ -294,6 +301,13 @@ class PurchaseReturnService
             $purchaseReturn->update($data);
 
             DB::commit();
+
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postPurchaseReturnJournal($purchaseReturn->fresh());
+            } catch (\Exception $accErr) {
+                Log::warning("Purchase return update auto-journal failed: " . $accErr->getMessage());
+            }
 
             Log::info('Purchase return updated successfully', ['purchase_return_id' => $purchaseReturn->id]);
             LogHelper::updated('purchase_return', $purchaseReturn->id, $purchaseReturn->company_id, 'total quantities ' . $purchaseReturn->total_quantities . ' refund amount ' . $purchaseReturn->refund_amount);

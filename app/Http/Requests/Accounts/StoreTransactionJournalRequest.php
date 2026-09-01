@@ -25,10 +25,17 @@ class StoreTransactionJournalRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'date'        => ['required', 'date'],
-            'description' => ['nullable', 'string'],
-            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'],
-            'status'      => ['nullable', 'integer'],
+            'reference_number' => ['nullable', 'string', 'max:100'],
+            'voucher_type'     => ['nullable', 'string', 'max:50'],
+            'voucher_no'       => ['nullable', 'string', 'max:100'],
+            'source_type'      => ['nullable', 'string', 'max:50'],
+            'source_id'        => ['nullable', 'integer'],
+            'party_id'         => ['nullable', 'exists:parties,id'],
+            'date'             => ['required', 'date'],
+            'description'      => ['nullable', 'string'],
+            'narration'        => ['nullable', 'string'],
+            'file'             => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx,xls,xlsx', 'max:5120'],
+            'status'           => ['nullable', 'integer'],
 
             // Journal items validation
             'items'                       => ['required', 'array', 'min:2'],

@@ -25,10 +25,17 @@ class UpdateTransactionJournalRequest extends UpdateBaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
-            'date'        => ['sometimes', 'required', 'date'],
-            'description' => ['nullable', 'string'],
-            'file'        => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,webp,doc,docx,xls,xlsx', 'max:5120'],
-            'status'      => ['sometimes', 'integer'],
+            'reference_number' => ['nullable', 'string', 'max:100'],
+            'voucher_type'     => ['nullable', 'string', 'max:50'],
+            'voucher_no'       => ['nullable', 'string', 'max:100'],
+            'source_type'      => ['nullable', 'string', 'max:50'],
+            'source_id'        => ['nullable', 'integer'],
+            'party_id'         => ['nullable', 'exists:parties,id'],
+            'date'             => ['sometimes', 'required', 'date'],
+            'description'      => ['nullable', 'string'],
+            'narration'        => ['nullable', 'string'],
+            'file'             => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,webp,doc,docx,xls,xlsx', 'max:5120'],
+            'status'           => ['sometimes', 'integer'],
 
             'items'                       => ['sometimes', 'array', 'min:1'],
             'items.*.id'                  => ['sometimes', 'nullable', 'integer', 'exists:transaction_journal_accounts,id'],

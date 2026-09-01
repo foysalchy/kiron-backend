@@ -184,6 +184,13 @@ class OrderReturnService
             }
             DB::commit();
 
+            // Auto Double-Entry Voucher for Sales Return
+            try {
+                \App\Services\AutoAccountingService::postOrderReturnJournal($orderReturn);
+            } catch (\Exception $accErr) {
+                Log::warning("Order return auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Order return created successfully', [
                 'order_return_id' => $orderReturn->id,
                 'status' => $orderReturn->status
@@ -292,6 +299,13 @@ class OrderReturnService
             $orderReturn->update($data);
 
             DB::commit();
+
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postOrderReturnJournal($orderReturn->fresh());
+            } catch (\Exception $accErr) {
+                Log::warning("Order return update auto-journal failed: " . $accErr->getMessage());
+            }
 
             Log::info('Order return updated successfully', ['order_return_id' => $orderReturn->id]);
             LogHelper::updated('order_return', $orderReturn->id, $orderReturn->company_id, 'total quantities ' . $orderReturn->total_quantities . ' refund amount ' . $orderReturn->refund_amount);

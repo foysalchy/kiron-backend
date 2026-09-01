@@ -93,6 +93,9 @@ class CompanyRegistrationService
                 ]);
             }
 
+            // Seed default Tally Account Groups and Chart of Accounts for new company
+            \App\Services\DefaultAccountingSeederService::seedDefaultAccountsForCompany($company->id);
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             DB::commit();

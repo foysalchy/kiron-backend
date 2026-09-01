@@ -81,18 +81,19 @@ class PathaoWebhookController extends Controller
 
             // Process delivery fee and payment if it's delivered
             if ($pathaoEvent === 'order.delivered') {
-                // For pathao, we don't have a direct COD amount in the webhook payload example,
-                // but if we do, we could parse it here. We will just map the delivery fee for now.
                 $deliveryFee = $payload['delivery_fee'] ?? null;
                 if ($deliveryFee !== null) {
-                    $order->other_charges = $deliveryFee;
+                    $courierInfo = is_array($order->courier_info) ? $order->courier_info : (json_decode($order->courier_info, true) ?: []);
+                    $courierInfo['courier_charge'] = (float)$deliveryFee;
+                    $courierInfo['delivery_charge'] = (float)$deliveryFee;
+                    $order->courier_info = $courierInfo;
                 }
-                
-                // If there's an amount collected, it might be in payment_amount or collected_amount
-                // We'll leave payment_amount logic for later if Pathao sends the collected amount in the payload
             }
 
             $order->save();
+
+            // Auto-post courier expense journal
+            \App\Services\AutoAccountingService::postCourierExpenseJournal($order);
 
             // Trigger sync to WooCommerce if the status was changed by Pathao
             if ($statusChanged) {

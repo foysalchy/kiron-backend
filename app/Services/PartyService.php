@@ -42,12 +42,36 @@ class PartyService
                 }
             }
             if (isset($filters['balance'])) {
-                if ($filters['balance'] === 'pay') {
-                    // Balance > 0
-                    $query->whereRaw('(balance + 0) > 0');
-                } elseif ($filters['balance'] === 'receive') {
-                    // Balance < 0
-                    $query->whereRaw('(balance + 0) < 0');
+                $type = $filters['type'] ?? null;
+                if ($type == Party::TYPE_CUSTOMER || $type == 2) {
+                    if ($filters['balance'] === 'receive') {
+                        // Customer Due to Receive
+                        $query->where(function ($q) {
+                            $q->where('due_amount', '>', 0)
+                              ->orWhereRaw('(balance + 0) < 0');
+                        });
+                    } elseif ($filters['balance'] === 'pay') {
+                        // Customer Advance / Store Credit
+                        $query->whereRaw('(balance + 0) > 0');
+                    }
+                } elseif ($type == Party::TYPE_SUPPLIER || $type == 1) {
+                    if ($filters['balance'] === 'pay') {
+                        // Supplier Due to Pay
+                        $query->where(function ($q) {
+                            $q->where('due_amount', '>', 0)
+                              ->orWhereRaw('(balance + 0) < 0');
+                        });
+                    } elseif ($filters['balance'] === 'receive') {
+                        // Supplier Advance Given
+                        $query->whereRaw('(balance + 0) > 0');
+                    }
+                } else {
+                    if ($filters['balance'] === 'receive' || $filters['balance'] === 'pay') {
+                        $query->where(function ($q) {
+                            $q->where('due_amount', '>', 0)
+                              ->orWhereRaw('(balance + 0) != 0');
+                        });
+                    }
                 }
             }
 

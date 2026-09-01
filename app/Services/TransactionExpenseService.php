@@ -149,6 +149,13 @@ class TransactionExpenseService
             LogHelper::created('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
             DB::commit();
 
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postExpenseJournal($expense);
+            } catch (\Exception $accErr) {
+                Log::warning("Expense auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Transaction Expense created successfully', ['expense_id' => $expense->id]);
 
             return $expense->load(['expenseFrom', 'categories.chartOfAccount']);
@@ -193,6 +200,13 @@ class TransactionExpenseService
 
             LogHelper::updated('transaction_expense', $expense->id, $expense->company_id, $expense->reference_number);
             DB::commit();
+
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postExpenseJournal($expense->fresh());
+            } catch (\Exception $accErr) {
+                Log::warning("Expense update auto-journal failed: " . $accErr->getMessage());
+            }
 
             Log::info('Transaction Expense updated successfully', ['expense_id' => $expense->id]);
 

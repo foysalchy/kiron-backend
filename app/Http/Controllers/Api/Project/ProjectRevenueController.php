@@ -39,6 +39,13 @@ class ProjectRevenueController extends Controller
         $validated['outstanding_amount'] = max(0, $amount - $received);
 
         $revenue = ProjectRevenue::create($validated);
+
+        try {
+            \App\Services\AutoAccountingService::postProjectRevenueJournal($revenue);
+        } catch (\Exception $accError) {
+            \Illuminate\Support\Facades\Log::warning("Project revenue auto-journal failed: " . $accError->getMessage());
+        }
+
         return ResponseHelper::created($revenue, 'Revenue recorded');
     }
 
@@ -53,6 +60,13 @@ class ProjectRevenueController extends Controller
         }
 
         $revenue->update($data);
+
+        try {
+            \App\Services\AutoAccountingService::postProjectRevenueJournal($revenue);
+        } catch (\Exception $accError) {
+            \Illuminate\Support\Facades\Log::warning("Project revenue auto-journal failed: " . $accError->getMessage());
+        }
+
         return ResponseHelper::success($revenue, 'Revenue updated');
     }
 

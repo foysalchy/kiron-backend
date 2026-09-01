@@ -227,6 +227,8 @@ class CompanyService
             $company = Company::create($data);
             LogHelper::created('company', $company->id, $company->id);
 
+            // Seed default Tally Account Groups and Chart of Accounts for new company
+            \App\Services\DefaultAccountingSeederService::seedDefaultAccountsForCompany($company->id);
 
             DB::commit();
 

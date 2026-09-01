@@ -145,6 +145,14 @@ class TransactionIncomeService
 
             LogHelper::created('transaction_income', $income->id, $income->company_id, $income->reference_number);
             DB::commit();
+
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postIncomeJournal($income);
+            } catch (\Exception $accErr) {
+                Log::warning("Income auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Transaction Income created successfully', ['income_id' => $income->id]);
 
             return $income->load(['incomeTo', 'categories.chartOfAccount']);
@@ -187,6 +195,14 @@ class TransactionIncomeService
 
             LogHelper::updated('transaction_income', $income->id, $income->company_id, $income->reference_number);
             DB::commit();
+
+            // Auto Double-Entry Voucher
+            try {
+                \App\Services\AutoAccountingService::postIncomeJournal($income->fresh());
+            } catch (\Exception $accErr) {
+                Log::warning("Income update auto-journal failed: " . $accErr->getMessage());
+            }
+
             Log::info('Transaction Income updated successfully', ['income_id' => $income->id]);
             return $income->fresh(['incomeTo', 'categories.chartOfAccount']);
         } catch (ApiException $e) {

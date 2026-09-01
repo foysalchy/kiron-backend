@@ -455,6 +455,14 @@ class OrderService
 
             LogHelper::created('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
             DB::commit();
+
+            // Auto Double-Entry Voucher in Advanced Mode
+            try {
+                \App\Services\AutoAccountingService::postOrderJournal($order);
+            } catch (\Exception $accError) {
+                Log::warning("Order auto-journal failed: " . $accError->getMessage());
+            }
+
             try {
                 app(SmsSendService::class)->sendStatusBasedSms($order);
             } catch (\Exception $smsError) {
@@ -625,6 +633,13 @@ class OrderService
 
             LogHelper::updated('orders', $order->id, $order->company_id, 'total amount ' . $order->grand_total);
             DB::commit();
+
+            // Auto Double-Entry Voucher in Advanced Mode
+            try {
+                \App\Services\AutoAccountingService::postOrderJournal($order->fresh());
+            } catch (\Exception $accError) {
+                Log::warning("Order update auto-journal failed: " . $accError->getMessage());
+            }
 
             Log::info('Order updated successfully', [
                 'order_id' => $order->id,

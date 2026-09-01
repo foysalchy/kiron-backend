@@ -1443,6 +1443,31 @@ Route::prefix('v1')->group(function () {
                     Route::delete('{id}/force', [TransactionInternalTransferController::class, 'forceDestroy']);
                     Route::patch('/{id}/update-status', [TransactionInternalTransferController::class, 'updateStatus']);
                 });
+
+                // Accounting Settings & Mode Switcher
+                Route::prefix('accounting-settings')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Api\AccountingSettingController::class, 'show']);
+                    Route::post('/', [\App\Http\Controllers\Api\AccountingSettingController::class, 'update']);
+                    Route::post('/seed-defaults', [\App\Http\Controllers\Api\AccountingSettingController::class, 'seedDefaults']);
+                    Route::post('/close-fy', [\App\Http\Controllers\Api\AccountingSettingController::class, 'closeFinancialYear']);
+                });
+
+                // Finance & Accounting Dashboard
+                Route::prefix('accounting-dashboard')->group(function () {
+                    Route::get('stats', [\App\Http\Controllers\Api\AccountingDashboardController::class, 'stats']);
+                    Route::get('charts', [\App\Http\Controllers\Api\AccountingDashboardController::class, 'charts']);
+                    Route::get('recent-activity', [\App\Http\Controllers\Api\AccountingDashboardController::class, 'recentActivity']);
+                    Route::get('order-profitability', [\App\Http\Controllers\Api\AccountingDashboardController::class, 'orderProfitability']);
+                });
+
+                // TallyPrime Accounting Reports
+                Route::prefix('accounting-reports')->group(function () {
+                    Route::get('day-book', [\App\Http\Controllers\Api\AccountingReportController::class, 'dayBook']);
+                    Route::get('general-ledger', [\App\Http\Controllers\Api\AccountingReportController::class, 'generalLedger']);
+                    Route::get('trial-balance', [\App\Http\Controllers\Api\AccountingReportController::class, 'trialBalance']);
+                    Route::get('profit-loss', [\App\Http\Controllers\Api\AccountingReportController::class, 'profitAndLoss']);
+                    Route::get('balance-sheet', [\App\Http\Controllers\Api\AccountingReportController::class, 'balanceSheet']);
+                });
                 //recurring-journals routes
                 Route::prefix('recurring-journals')->group(function () {
                     Route::get('/', [RecurringJournalController::class, 'index']);

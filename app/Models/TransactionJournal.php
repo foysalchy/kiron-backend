@@ -17,14 +17,21 @@ class TransactionJournal extends Model
         'company_id',
         'created_by',
         'reference_number',
+        'voucher_type',
+        'voucher_no',
+        'source_type',
+        'source_id',
+        'party_id',
         'date',
         'description',
+        'narration',
         'file',
         'total_debit',
         'total_credit',
         'status',
     ];
     protected $hidden = ['deleted_at'];
+
     // Relationships
     public function company(): BelongsTo
     {
@@ -38,6 +45,11 @@ class TransactionJournal extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function party(): BelongsTo
+    {
+        return $this->belongsTo(Party::class, 'party_id');
     }
 
     //company scope
