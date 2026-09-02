@@ -50,9 +50,33 @@ class HomeController extends FrontendController
         $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
                 ->with(['brand:id,company_id,name,slug,logo', 'variations'])
-                ->where('discount', '>', 0)
                 ->where('status', Status::Active->value)
-                ->latest()
+                ->where(function ($q) {
+                    $q->where('discount', '>', 0)
+                        ->orWhereHas('variations', function ($vq) {
+                            $vq->where('discount', '>', 0);
+                        });
+                })
+                // নোট: 'product_variations' এবং 'product_id' — আপনার আসল variation টেবিল/কলাম নাম অনুযায়ী বসান
+                ->selectRaw('products.*, (
+                SELECT MAX(
+                    CASE WHEN pv.discount_type = \'percent\'
+                        THEN (pv.regular_price * pv.discount / 100)
+                        ELSE pv.discount
+                    END
+                )
+                FROM product_variations pv
+                WHERE pv.product_id = products.id
+                  AND pv.discount > 0
+            ) as variation_max_discount_amount')
+                ->selectRaw("
+                CASE WHEN products.discount_type = 'percent'
+                    THEN (products.regular_price * products.discount / 100)
+                    ELSE products.discount
+                END as product_discount_amount
+            ")
+                ->orderByRaw('GREATEST(COALESCE(product_discount_amount, 0), COALESCE(variation_max_discount_amount, 0)) DESC')
+                ->orderByDesc('created_at')
                 ->take(12)
                 ->get();
         });
@@ -159,7 +183,7 @@ class HomeController extends FrontendController
         });
 
         $mainSliders = $allSliders->where('placement', 'hero');
-    
+
         $sidebarSliders = $allSliders->where('placement', 'right');
         $middleSliders = $allSliders->where('placement', 'middle')->take(3);
         // ১১. অল রিভিউস
@@ -170,7 +194,7 @@ class HomeController extends FrontendController
                 ->latest()
                 ->get();
         });
-  
+
         // ভিউতে ডেটা পাঠানো
         return $this->view('frontend.home', compact(
             'categories',
@@ -189,6 +213,20 @@ class HomeController extends FrontendController
             'homePageData'
         ));
     }
+    public function allCategories()
+    {
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+
+        $categories = Cache::remember("home_categories_{$companyId}", $ttl, function () use ($companyId) {
+            return MegaCategory::where('company_id', $companyId)
+                ->select('id', 'name', 'company_id', 'slug', 'image')
+                ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')
+                ->get();
+        });
+
+        return $this->view('frontend.allcategories', compact('categories'));
+    }
     public function filterSubCategory(Request $request)
     {
         $companyId = $this->company_id;
@@ -200,7 +238,7 @@ class HomeController extends FrontendController
             $products = Product::where('status', Status::Active->value)
                 ->where('company_id', $companyId)
                 ->whereJsonContains('sub_category_ids', $subId)
-                ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock','manage_stock'])
+                ->select(['id', 'company_id', 'title', 'slug', 'thumbnail', 'sale_price', 'regular_price', 'discount', 'type', 'available_stock', 'manage_stock'])
                 ->with(['variations'])
                 ->latest()->take(6)->get();
 

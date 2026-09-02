@@ -35,7 +35,7 @@ class UpdateJobTitleRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'title.required' => 'The job title is required',
+                'title.required' => 'Designation is required',
                 'status.in'      => 'Status must be either 0 (Inactive) or 1 (Active)',
             ]
         );

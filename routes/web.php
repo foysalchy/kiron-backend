@@ -47,6 +47,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
 Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/categories', [HomeController::class, 'allCategories'])->name('categories.all');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
 
@@ -77,6 +78,7 @@ Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wi
 Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
 Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
+Route::get('/menu/filter', [ProductController::class, 'filterMenu'])->name('menu.filter');
 Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
 Route::get('/flash-sale', [ProductController::class, 'flashSale'])->name('flash.sale');
 Route::get('/search-suggestions', [ProductController::class, 'searchSuggestions'])->name('search.suggestions');

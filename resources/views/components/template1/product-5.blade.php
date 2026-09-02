@@ -23,7 +23,7 @@
 
 <article
     onclick="window.location.href='{{ $productUrl }}'"
-    class="menu-card group sear-corner bg-white border border-coal/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all cursor-pointer flex flex-col h-full">
+    class="menu-card group sear-corner bg-white border border-coal/10 rounded-2xl overflow-hidden hover:shadow-[0_10px_25px_-10px_rgba(24,19,15,0.3)]hover:-translate-y-1 transition-all cursor-pointer flex flex-col h-full">
 
   <div class="h-40 relative overflow-hidden">
     <img

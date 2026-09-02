@@ -112,6 +112,7 @@
                             </div>
                         </div>
 
+
                         <!-- ② Filter By Brand header — Toggle Button -->
                         <button type="button" onclick="toggleAllFilters()"
                             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50">
@@ -124,34 +125,73 @@
 
                         <!-- ③ ALL FILTERS PANEL (Initially Hidden) -->
                         <div id="all-filters-panel"
-                            class="{{ request()->has('brand') || request()->has('attributes') ? '' : 'hidden' }}">
+                            class="{{ request()->has('mega_category') || request()->has('attributes') ? '' : 'hidden' }}">
 
                             <!-- Brand List -->
-                            <div class="px-4 pt-2 pb-3 border-b border-gray-50">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Brands</h3>
-                                <div class="flex flex-col gap-0 text-gray-800 font-medium">
-                                    @foreach ($brands as $brand)
-                                        @php $isSelectedBrand = in_array($brand->id, (array)request('brand')); @endphp
-                                        <label class="flex items-center justify-between py-1.5 cursor-pointer group">
-                                            <span
-                                                class="text-sm group-hover:text-[var(--primary-color)] {{ $isSelectedBrand ? 'text-[var(--primary-color)]' : '' }}">
-                                                {{ $brand->name }}
-                                            </span>
-                                            <div class="relative flex items-center">
-                                                <input type="checkbox" name="brand[]" value="{{ $brand->id }}"
-                                                    onchange="this.form.submit()" {{ $isSelectedBrand ? 'checked' : '' }}
-                                                    class="absolute opacity-0 w-4 h-4 cursor-pointer z-10">
-                                                <div
-                                                    class="w-4 h-4 border {{ $isSelectedBrand ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/10' : 'border-gray-300' }} rounded-full group-hover:border-[var(--primary-color)] shrink-0 flex items-center justify-center">
-                                                    @if ($isSelectedBrand)
-                                                        <div class="w-1.5 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </label>
-                                    @endforeach
+                           <div class="px-4 pt-2 pb-3 border-b border-gray-50">
+    <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Categories</h3>
+    <div class="flex flex-col gap-0 text-gray-800 font-medium">
+        @foreach ($categories as $category)
+            @php
+                $isSelectedMega = in_array($category->id, (array) request('mega_category'));
+            @endphp
+            <div class="border-b border-gray-50 last:border-0">
+                <div class="flex items-center justify-between py-1.5">
+                    <label class="flex items-center gap-2 cursor-pointer group flex-1">
+                        <div class="relative flex items-center">
+                            <input type="checkbox" name="mega_category[]" value="{{ $category->id }}"
+                                onchange="this.form.submit()" {{ $isSelectedMega ? 'checked' : '' }}
+                                class="absolute opacity-0 w-4 h-4 cursor-pointer z-10">
+                            <div
+                                class="w-4 h-4 border {{ $isSelectedMega ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/10' : 'border-gray-300' }} rounded-full group-hover:border-[var(--primary-color)] shrink-0 flex items-center justify-center">
+                                @if ($isSelectedMega)
+                                    <div class="w-1.5 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
+                                @endif
+                            </div>
+                        </div>
+                        <span
+                            class="text-sm group-hover:text-[var(--primary-color)] {{ $isSelectedMega ? 'text-[var(--primary-color)]' : '' }}">
+                            {{ $category->name }}
+                        </span>
+                    </label>
+
+                    @if ($category->subCategories->count() > 0)
+                    <button type="button" class="filter-accordion-btn p-1 text-gray-400 hover:text-gray-700"
+                        data-target="filter-sub-{{ $category->id }}">
+                        <i class="fa-solid fa-chevron-down text-[10px] transition-transform"></i>
+                    </button>
+                    @endif
+                </div>
+
+                @if ($category->subCategories->count() > 0)
+                <div id="filter-sub-{{ $category->id }}" class="hidden pl-6 flex flex-col gap-0 pb-1">
+                    @foreach ($category->subCategories as $sub)
+                        @php $isSelectedSub = in_array($sub->id, (array) request('sub_category')); @endphp
+                        <label class="flex items-center gap-2 py-1 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="checkbox" name="sub_category[]" value="{{ $sub->id }}"
+                                    onchange="this.form.submit()" {{ $isSelectedSub ? 'checked' : '' }}
+                                    class="absolute opacity-0 w-3.5 h-3.5 cursor-pointer z-10">
+                                <div
+                                    class="w-3.5 h-3.5 border {{ $isSelectedSub ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/10' : 'border-gray-300' }} rounded-full group-hover:border-[var(--primary-color)] shrink-0 flex items-center justify-center">
+                                    @if ($isSelectedSub)
+                                        <div class="w-1 h-1 bg-[var(--primary-color)] rounded-full"></div>
+                                    @endif
                                 </div>
                             </div>
+                            <span
+                                class="text-xs text-gray-600 group-hover:text-[var(--primary-color)] {{ $isSelectedSub ? 'text-[var(--primary-color)]' : '' }}">
+                                {{ $sub->name }}
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+        @endforeach
+    </div>
+</div>
+
 
                             <!-- Dynamic Attributes (Color, Size, Style) -->
                             @foreach ($attributeGroups as $group)
@@ -192,7 +232,7 @@
                     <!-- Shop Header -->
                     <div class="px-5 py-3.5 flex items-center justify-between">
                         <h2 class="text-base md:text-xl font-bold text-gray-900 mb-1">
-                            {{ $category ? $category->name : 'All Products' }}
+                All items ({{ $products->total() }})
                         </h2>
                         <div class="relative">
                             <form action="" method="GET" id="sortForm">
@@ -359,4 +399,20 @@
 
         window.onload = updateSlider;
     </script>
+    
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.filter-accordion-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.getElementById(this.getAttribute('data-target'));
+            const icon = this.querySelector('i');
+            if (target) {
+                target.classList.toggle('hidden');
+                icon.classList.toggle('rotate-180');
+            }
+        });
+    });
+});
+</script>
 @endpush

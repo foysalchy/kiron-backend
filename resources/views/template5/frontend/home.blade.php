@@ -3,12 +3,30 @@
 @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
 @section('content')
-
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+</style>
 <!-- ============ HERO ============ -->
 <section class="relative bg-hero overflow-hidden">
 
   <!-- Slider -->
-  <div id="imageSlider" class="relative w-full h-[500px] md:h-[650px] lg:h-[750px]">
+  <div id="imageSlider" class="relative min-h-[500px]">
 
     @forelse ($mainSliders as $index => $slider)
     <div class="image-slide absolute inset-0 w-full h-full {{ $index == 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }} transition-opacity duration-700 ease-in-out">
@@ -58,7 +76,7 @@
 </section>
 
 <!-- floating info cards -->
-<section class="max-w-7xl mx-auto px-6 lg:px-10 -mt-16 lg:-mt-20 relative z-20 mb-20">
+<section class="max-w-7xl mx-auto px-6 lg:px-10 -mt-16 lg:-mt-20 relative z-20 mb-2 md:mb-10">
   <div class="grid sm:grid-cols-2 gap-5">
     <div class="group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
       <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
@@ -107,16 +125,18 @@
       <span class="text-[11px] tracking-[0.22em] uppercase text-brand">What are you looking for?</span>
       <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Browse by category</h2>
     </div>
-    <a href="{{ route('shop.index') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
+    @if ($categories->count() > 8)
+    <a href="{{ route('categories.all') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
       View all
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
         <path d="M5 12h14M13 6l6 6-6 6" />
       </svg>
     </a>
+    @endif
   </div>
 
   <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-x-4 gap-y-8">
-    @foreach ($categories as $category)
+    @foreach ($categories->take(8) as $category)
     <a href="{{ url('category/' . $category->slug) }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
       <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-4 group-hover:ring-[var(--lumina-ember)]/25 group-hover:-translate-y-1 transition-all overflow-hidden">
         <img src="{{ !empty($category->image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
@@ -128,14 +148,24 @@
     </a>
     @endforeach
   </div>
+
+  @if ($categories->count() > 8)
+  <div class="sm:hidden mt-8 text-center">
+    <a href="{{ route('categories.all') }}" class="inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
+      View all
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  </div>
+  @endif
 </section>
 @endif
-
 @if ($latestOffers->count() > 0)
-<section id="offers" class="bg-white text-black grain">
-  <div class="absolute inset-0 bg-[url('https://static.vecteezy.com/system/resources/thumbnails/053/329/746/small/fresh-vegetables-isolated-on-white-background-for-healthy-cooking-free-photo.jpeg')] bg-cover bg-bottom bg-no-repeat opacity-10"></div>
+<section id="offers" class="relative bg-white text-black grain">
+  <div class="absolute inset-0 bg-[url('https://static.vecteezy.com/system/resources/thumbnails/053/329/746/small/fresh-vegetables-isolated-on-white-background-for-healthy-cooking-free-photo.jpeg')] bg-cover bg-bottom bg-no-repeat opacity-10 pointer-events-none"></div>
 
-  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-20">
+  <div class="relative max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12">
 
     <div class="flex items-end justify-between mb-10">
       <div>
@@ -147,7 +177,7 @@
         </h2>
       </div>
 
-      <a href="{{ route('shop.index') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors">
+      <a href="{{ route('shop.index', ['offers' => 1]) }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors">
         View all offers
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
           <path d="M5 12h14M13 6l6 6-6 6" />
@@ -155,80 +185,81 @@
       </a>
     </div>
 
-    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       @foreach ($latestOffers->take(4) as $offer)
 
       <x-template1.offer-card :offer="$offer" />
       @endforeach
     </div>
 
+    <!-- মোবাইলে View all বাটন গ্রিডের নিচে -->
+    <div class="sm:hidden flex justify-center mt-8">
+      <a href="{{ route('shop.index', ['offers' => 1]) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors border border-coal/15 rounded-full px-5 py-2.5">
+        View all offers
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </a>
+    </div>
+
   </div>
 </section>
 @endif
 
-
 <!-- ============ POPULAR PRODUCTS ("YOU MAY LIKE") ============ -->
 @if ($popularProducts->count() > 0)
-<section class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
-  <div class="flex items-end justify-between mb-9">
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12 reveal" id="menu">
+  <div class="flex items-end justify-between mb-2">
     <div>
       <span class="text-[11px] tracking-[0.22em] uppercase text-brand">Something for everyone</span>
       <h2 class="font-semibold text-3xl sm:text-4xl mt-2">Our Menu</h2>
     </div>
   </div>
 
-  @php
-  $activeFilter = request('category', 'all');
-  @endphp
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mt-8 mb-9">
 
-  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mt-8 mb-9">
-    <div class="flex flex-wrap gap-2" id="filterPills">
+  <div class="flex flex-nowrap gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 custom-scrollbar" id="filterPills">
+    <button type="button" data-slug="all"
+      class="pill-btn active shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-ember text-white whitespace-nowrap">
+      All
+    </button>
 
-      <a href="{{ route('shop.index') }}"
-        class="pill-btn text-sm font-medium px-4 py-2 rounded-full transition-colors
-         {{ $activeFilter === 'all'
-             ? 'bg-ember text-white'
-             : 'bg-transparent text-smoke border border-coal/15 hover:border-coal/40' }}">
-        All
-      </a>
+    @foreach ($categories as $category)
+    <button type="button" data-slug="{{ $category->slug }}"
+      class="pill-btn shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-transparent text-smoke border border-coal/15 hover:border-coal/40 whitespace-nowrap">
+      {{ $category->name }}
+    </button>
+    @endforeach
+  </div>
 
-      @foreach ($categories as $category)
-      <a href="{{ route('category.products',  $category->slug) }}"
-        class="pill-btn text-sm font-medium px-4 py-2 rounded-full transition-colors
-           {{ $activeFilter === $category->slug
-               ? 'bg-ember text-white'
-               : 'bg-transparent text-smoke border border-coal/15 hover:border-coal/40' }}">
-        {{ $category->name }}
-      </a>
-      @endforeach
-
-    </div>
-
-    <div class="flex items-center gap-3">
-      <form action="{{ route('shop.index') }}" method="GET" class="relative">
-        <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-smoke pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.5-3.5" />
-        </svg>
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search food…"
-          class="pl-10 pr-4 py-2.5 rounded-full border border-coal/15 bg-white text-sm w-48 focus:outline-none focus:ring-2 focus:ring-ember/40 focus:border-ember/50">
-      </form>
-
-      <a href="{{ route('shop.index') }}" class="flex items-center gap-2 border border-coal/15 rounded-full px-4 py-2.5 text-sm font-medium hover:border-coal/40 transition-colors">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 6h16M7 12h10M10 18h4" />
-        </svg>
-        Filter
-      </a>
+  <div class="flex items-center gap-3 w-full lg:w-auto shrink-0">
+    <div class="relative w-full lg:w-auto">
+      <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 text-smoke pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
+      <input type="text" id="menuSearchInput" autocomplete="off" placeholder="Search food…"
+        class="pl-10 pr-4 py-2.5 rounded-full border border-coal/15 bg-white text-sm w-full lg:w-48 focus:outline-none focus:ring-2 focus:ring-ember/40 focus:border-ember/50">
     </div>
   </div>
 
-  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    @foreach ($popularProducts as $product)
+</div>
+
+  <div id="menuLoading" class="hidden text-center py-10 text-smoke text-sm">
+    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...
+  </div>
+
+<div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @foreach ($popularProducts as $product)
     <div class="menu-card group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl overflow-hidden hover:shadow-[0_24px_50px_-24px_rgba(24,19,15,0.35)] hover:-translate-y-1 transition-all">
       <x-template1.product-card :product="$product" />
     </div>
     @endforeach
+  </div>
+
+  <div id="menuNoResults" class="hidden text-center py-16 text-smoke text-sm">
+    <i class="fa-solid fa-utensils text-3xl mb-3 text-coal/20 block"></i>
+    No items found.
   </div>
 
   <div class="flex justify-center mt-11">
@@ -240,11 +271,13 @@
     </a>
   </div>
 </section>
+
+
 @endif
 
 <!-- ============ FAQ ============ -->
 @if ($faqs->count() > 0)
-<section class="max-w-7xl mx-auto px-6 lg:px-10 py-16 reveal">
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-6 md:py-12 reveal">
   <div class="bg-white rounded-2xl border border-[var(--lumina-coal)]/10 p-6 md:p-10">
     <h2 class="font-semibold text-2xl md:text-3xl mb-8">Frequently Asked Questions</h2>
     <div class="space-y-8">
@@ -335,5 +368,71 @@
     showSlide(0);
     startAutoSlide();
   });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const pills = document.querySelectorAll('#filterPills .pill-btn');
+    const searchInput = document.getElementById('menuSearchInput');
+    const grid = document.getElementById('menuGrid');
+    const loading = document.getElementById('menuLoading');
+    const noResults = document.getElementById('menuNoResults');
+
+    let activeCategory = 'all';
+    let debounceTimer;
+
+    function setActivePill(slug) {
+        pills.forEach(p => {
+            const isActive = p.getAttribute('data-slug') === slug;
+            p.classList.toggle('active', isActive);
+            p.classList.toggle('bg-ember', isActive);
+            p.classList.toggle('text-white', isActive);
+            p.classList.toggle('bg-transparent', !isActive);
+            p.classList.toggle('text-smoke', !isActive);
+            p.classList.toggle('border', !isActive);
+            p.classList.toggle('border-coal/15', !isActive);
+        });
+    }
+
+    function loadMenu() {
+        loading.classList.remove('hidden');
+        grid.classList.add('hidden');
+        noResults.classList.add('hidden');
+
+        const params = new URLSearchParams({
+            category: activeCategory,
+            search: searchInput.value.trim(),
+        });
+
+        fetch(`{{ route('menu.filter') }}?${params.toString()}`)
+            .then(res => res.text())
+            .then(html => {
+                loading.classList.add('hidden');
+                grid.innerHTML = html;
+
+                if (grid.children.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    grid.classList.remove('hidden');
+                }
+            })
+            .catch(() => {
+                loading.classList.add('hidden');
+                grid.classList.remove('hidden');
+            });
+    }
+
+    pills.forEach(pill => {
+        pill.addEventListener('click', function () {
+            activeCategory = this.getAttribute('data-slug');
+            setActivePill(activeCategory);
+            loadMenu();
+        });
+    });
+
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(loadMenu, 400);
+    });
+});
 </script>
 @endpush

@@ -64,22 +64,112 @@ class ProductController extends FrontendController
 
         $maxPriceLimit = $this->getMaxPriceLimit();
         $this->applyFiltersAndSorting($query, $request);
+        if ($request->boolean('offers')) {
+
+            $query->reorder();
+            $query->selectRaw("products.*, (
+                SELECT MAX(
+                    CASE WHEN pv.discount_type = 'percent'
+                        THEN (pv.regular_price * pv.discount / 100)
+                        ELSE pv.discount
+                    END
+                )
+                FROM product_variations pv
+                WHERE pv.product_id = products.id
+                  AND pv.discount > 0
+            ) as variation_max_discount_amount")
+                ->selectRaw("
+                CASE WHEN products.discount_type = 'percent'
+                    THEN (products.regular_price * products.discount / 100)
+                    ELSE products.discount
+                END as product_discount_amount
+            ")
+                ->where(function ($q) {
+                    $q->where('products.discount', '>', 0)
+                        ->orWhereHas('variations', function ($vq) {
+                            $vq->where('discount', '>', 0);
+                        });
+                })
+                ->orderByRaw('GREATEST(COALESCE(product_discount_amount, 0), COALESCE(variation_max_discount_amount, 0)) DESC')
+                ->orderByDesc('products.created_at');
+        }
+
+
+
 
         $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $brands          = Brand::get();
+        $categories = MegaCategory::where('status', Status::Active->value)
+            ->select('id', 'name', 'company_id', 'slug', 'image')
+            ->with('subCategories:id,mega_category_id,name,slug')->get();
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit', 'breadcrumb'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'maxPriceLimit', 'breadcrumb'))->with([
             'category'    => null,
             'allProducts' => $products
         ]);
     }
+
+    public function filterMenu(Request $request)
+    {
+        $query = Product::where('status', Status::Active->value)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
+
+        if ($request->filled('category') && $request->category !== 'all') {
+            $slug = $request->category;
+            $column = null;
+            $category = null;
+
+            $category = MegaCategory::where('slug', $slug)->first();
+            if ($category) {
+                $column = 'mega_category_ids';
+            }
+
+            if (!$category) {
+                $category = SubCategory::where('slug', $slug)->first();
+                if ($category) {
+                    $column = 'sub_category_ids';
+                }
+            }
+
+            if (!$category) {
+                $category = MiniCategory::where('slug', $slug)->first();
+                if ($category) {
+                    $column = 'mini_category_ids';
+                }
+            }
+
+            if (!$category) {
+                $category = ExtraCategory::where('slug', $slug)->first();
+                if ($category) {
+                    $column = 'extra_category_ids';
+                }
+            }
+
+            if ($category && $column) {
+                $query->whereJsonContains($column, (int) $category->id);
+            }
+        }
+
+        // সার্চ ফিল্টার
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . trim($request->search) . '%');
+        }
+
+        $products = $query->latest()->take(12)->get();
+        $products = Product::loadCategoriesForCollection($products);
+
+
+        return $this->view('partials.menu-grid', compact('products'));
+    }
+
 
     public function categoryProducts(Request $request, $slug)
     {
@@ -147,13 +237,16 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $brands = Brand::get();
+            $categories = MegaCategory::where('status', Status::Active->value)
+            ->select('id', 'name', 'company_id', 'slug', 'image')
+            ->with('subCategories:id,mega_category_id,name,slug')->get();
 
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values')
             ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands','categories', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
             'allProducts' => $products
         ]);
     }
@@ -200,6 +293,25 @@ class ProductController extends FrontendController
         // ৩. ব্র্যান্ড ফিল্টার
         if ($request->filled('brand')) {
             $query->whereIn('brand_id', (array)$request->brand);
+        }
+        // applyFiltersAndSorting() মেথডের ভিতরে যোগ করুন
+
+        if ($request->filled('mega_category')) {
+            $megaIds = (array) $request->mega_category;
+            $query->where(function ($q) use ($megaIds) {
+                foreach ($megaIds as $id) {
+                    $q->orWhereJsonContains('mega_category_ids', (int) $id);
+                }
+            });
+        }
+
+        if ($request->filled('sub_category')) {
+            $subIds = (array) $request->sub_category;
+            $query->where(function ($q) use ($subIds) {
+                foreach ($subIds as $id) {
+                    $q->orWhereJsonContains('sub_category_ids', (int) $id);
+                }
+            });
         }
 
         // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
