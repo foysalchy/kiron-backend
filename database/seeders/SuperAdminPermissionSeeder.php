@@ -107,6 +107,10 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('settings_roles',           'Roles');
         $addViewOnly('permissions',          'Permissions');
 
+        // ── Risk Management ───────────────────────────────
+        $addViewOnly('risk_management',      'Risk Management Overview');
+        $addCrud('risk_controls',            'Risk & Credit Controls');
+
         Permission::insert($permissions);
     }
 }

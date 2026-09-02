@@ -360,6 +360,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/disposal-types', [SelectOptionController::class, 'disposalTypeOptions']);
                     Route::get('/account-groups', [SelectOptionController::class, 'accountGroupOptions']);
                     Route::get('/account-expenses', [SelectOptionController::class, 'accountExpenseOptions']);
+                    Route::get('/payment-accounts', [SelectOptionController::class, 'paymentAccountOptions']);
                     Route::get('/income-accounts', [SelectOptionController::class, 'incomeAccountOptions']);
                     Route::get('/account-charts', [SelectOptionController::class, 'accountChartOptions']);
                     Route::get('/support-departments', [SelectOptionController::class, 'supportDepartmentOptions']);
@@ -1467,6 +1468,17 @@ Route::prefix('v1')->group(function () {
                     Route::get('trial-balance', [\App\Http\Controllers\Api\AccountingReportController::class, 'trialBalance']);
                     Route::get('profit-loss', [\App\Http\Controllers\Api\AccountingReportController::class, 'profitAndLoss']);
                     Route::get('balance-sheet', [\App\Http\Controllers\Api\AccountingReportController::class, 'balanceSheet']);
+                });
+
+                // Enterprise Risk Management & Credit Controls
+                Route::prefix('risk-management')->group(function () {
+                    Route::get('overview', [\App\Http\Controllers\Api\RiskManagementController::class, 'overview']);
+                    Route::get('customers/{id}/profile', [\App\Http\Controllers\Api\RiskManagementController::class, 'customerProfile']);
+                    Route::get('check-credit', [\App\Http\Controllers\Api\RiskManagementController::class, 'checkCredit']);
+                    Route::get('dead-stock', [\App\Http\Controllers\Api\RiskManagementController::class, 'deadStock']);
+                    Route::get('liquidity', [\App\Http\Controllers\Api\RiskManagementController::class, 'liquidity']);
+                    Route::get('settings', [\App\Http\Controllers\Api\RiskManagementController::class, 'getSettings']);
+                    Route::post('settings', [\App\Http\Controllers\Api\RiskManagementController::class, 'updateSettings']);
                 });
                 //recurring-journals routes
                 Route::prefix('recurring-journals')->group(function () {

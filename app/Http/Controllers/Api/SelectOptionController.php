@@ -513,6 +513,32 @@ class SelectOptionController extends Controller
 
         return $accounts;
     }
+
+    public function paymentAccountOptions()
+    {
+        $groupIds = AccountGroup::where('account_type', 'Assets')
+            ->pluck('id');
+
+        $accounts = ChartOfAccount::whereIn('account_group_id', $groupIds)
+            ->whereNotIn('name', [
+                'Stock-in-Hand / Inventory',
+                'Work-in-Progress (WIP) Inventory',
+                'Finished Goods Inventory',
+                'Sundry Debtors (Accounts Receivable)',
+            ])
+            ->orderBy('name', 'asc')
+            ->get();
+
+        if ($accounts->isEmpty()) {
+            $accounts = ChartOfAccount::where('name', 'like', '%Cash%')
+                ->orWhere('name', 'like', '%Bank%')
+                ->orderBy('name', 'asc')
+                ->get();
+        }
+
+        return $accounts;
+    }
+
     public function incomeAccountOptions()
     {
         $groupIds = AccountGroup::where('account_type', 'Income')

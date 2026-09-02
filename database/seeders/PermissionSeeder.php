@@ -269,6 +269,12 @@ class PermissionSeeder extends Seeder
         $addViewOnly('project_reports',     'Project Reports',          'project_module');
         $addCrud('project_settings',        'Project Settings',         'project_module');
 
+        // ==========================================
+        // 24. Enterprise Risk Management & Credit Controls
+        // ==========================================
+        $addViewOnly('risk_management',     'Risk Management Overview', 'risk_management');
+        $addCrud('risk_controls',           'Risk & Credit Controls',   'risk_management');
+
         Permission::insert($permissionsToInsert);
     }
 }

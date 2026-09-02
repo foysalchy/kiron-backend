@@ -381,9 +381,19 @@ class OrderService
             if (!isset($data['status'])) {
                 $data['status'] = Status::Pending->value;
             }
-            // if ($data['payment_status'] == Order::PAYMENT_PAID && $data['status'] != Status::Hold->value) {
-            //     $data['status'] = Status::Delivered->value;
-            // }
+
+            // Enterprise Risk Pre-Flight Policy Validation
+            $companyId = $data['company_id'] ?? auth()->user()->company_id ?? 27;
+            $dueAmount = max(0, (float)$data['grand_total'] - $totalPaid);
+            \App\Services\RiskManagementService::validateOrderPreFlight(
+                (int)$companyId,
+                $data['customer_id'] ?? null,
+                $items,
+                $dueAmount,
+                isset($data['order_date']) ? (string)$data['order_date'] : null,
+                !empty($data['bypass_risk'])
+            );
+
             // Create order
             $order = Order::create($data);
             // Create order details and deduct stock
@@ -719,8 +729,16 @@ class OrderService
             }
 
             $order->update(['status' => Status::Cancelled->value]);
+            $this->partyDueService->recalculatePartyDue($order->customer_id);
 
             DB::commit();
+
+            // Auto Double-Entry Reversal in Advanced Accounting Mode
+            try {
+                \App\Services\AutoAccountingService::postOrderCancellationOrReturnJournal($order->fresh(), 'Cancelled');
+            } catch (\Exception $accErr) {
+                Log::warning("Order cancel auto-journal failed: " . $accErr->getMessage());
+            }
 
             Log::info('Order cancelled', ['order_id' => $id]);
             LogHelper::custom('cancelled', 'order', $id, $order->company_id);
@@ -822,7 +840,14 @@ class OrderService
             }
             $wasHoldOrDraft = $oldStatus == Status::Hold->value || $oldStatus == Status::Draft->value;
 
-            if ($getStatus == Status::Cancelled) {
+            $isCancellationOrReturn = in_array($getStatus, [
+                Status::Cancelled,
+                Status::Returned,
+                Status::ReturnReceived,
+                Status::ReturntoCourier,
+            ]);
+
+            if ($isCancellationOrReturn) {
                 if (!$wasHoldOrDraft) {
                     $this->restoreOrderStock($order);
                 }
@@ -855,6 +880,15 @@ class OrderService
             $logStatus = "{$getOldStatus->label()} → {$getStatus->label()}";
 
             DB::commit();
+
+            // Auto Double-Entry Reversal for Cancelled or Returned Orders in Advanced Accounting Mode
+            if ($isCancellationOrReturn) {
+                try {
+                    \App\Services\AutoAccountingService::postOrderCancellationOrReturnJournal($order->fresh(), $getStatus->label());
+                } catch (\Exception $accErr) {
+                    Log::warning("Order cancellation/return auto-journal failed: " . $accErr->getMessage());
+                }
+            }
 
             Log::info('Order status changed', [
                 'order_id'   => $id,
