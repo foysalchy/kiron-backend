@@ -694,7 +694,28 @@ class OrderService
                 fn($value) => !is_null($value)
             );
 
-            $data['shipping_address'] = array_merge($existingAddress, $newAddress);
+            $mergedAddress = array_merge($existingAddress, $newAddress);
+            $data['shipping_address'] = $mergedAddress;
+
+            // Customer/Party details sync if order has customer_id
+            if ($order->customer_id) {
+                $customer = \App\Models\Party::find($order->customer_id);
+                if ($customer) {
+                    $customerUpdates = [];
+                    if (!empty($mergedAddress['name'])) {
+                        $customerUpdates['name'] = $mergedAddress['name'];
+                    }
+                    if (!empty($mergedAddress['phone'])) {
+                        $customerUpdates['phone'] = $mergedAddress['phone'];
+                    }
+                    if (!empty($mergedAddress['address'])) {
+                        $customerUpdates['address'] = $mergedAddress['address'];
+                    }
+                    if (!empty($customerUpdates)) {
+                        $customer->update($customerUpdates);
+                    }
+                }
+            }
         }
 
 
@@ -702,6 +723,11 @@ class OrderService
         $order->save();
 
         return $order->fresh();
+    }
+
+    public function updateShipping(int $id, array $data, ?string $type = null): Order
+    {
+        return $this->updateShiping($id, $data, $type);
     }
     /**
      * Cancel order

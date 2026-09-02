@@ -429,4 +429,46 @@ class ProductController extends Controller
             'available' => !$existsInProducts && !$existsInVariations,
         ]);
     }
+
+    public function bulkUpdateWarehouse(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_ids' => 'required|array|min:1',
+            'product_ids.*' => 'required|integer',
+            'warehouse_id' => 'required|integer',
+            'bin_id' => 'nullable',
+        ]);
+
+        $data = $this->productService->bulkUpdateWarehouse(
+            $validated['product_ids'],
+            (int) $validated['warehouse_id'],
+            !empty($validated['bin_id']) ? (int) $validated['bin_id'] : null
+        );
+
+        return ResponseHelper::success($data, 'Products warehouse updated successfully');
+    }
+
+    public function bulkUpdateCategory(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'product_ids' => 'required|array|min:1',
+            'product_ids.*' => 'required|integer',
+            'mega_category_ids' => 'nullable|array',
+            'mega_category_ids.*' => 'nullable|integer',
+            'sub_category_ids' => 'nullable|array',
+            'sub_category_ids.*' => 'nullable|integer',
+            'mini_category_ids' => 'nullable|array',
+            'mini_category_ids.*' => 'nullable|integer',
+            'extra_category_ids' => 'nullable|array',
+            'extra_category_ids.*' => 'nullable|integer',
+        ]);
+
+        $data = $this->productService->bulkUpdateCategory(
+            $validated['product_ids'],
+            $validated
+        );
+
+        return ResponseHelper::success($data, 'Products category updated successfully');
+    }
 }
+

@@ -183,7 +183,12 @@ class OrderController extends Controller
 
         $data = $this->orderService->updateShiping($id, $validated, $request->type);
 
-        return ResponseHelper::success($data, 'Status Changed Successfully');
+        return ResponseHelper::success($data, 'Shipping address updated successfully');
+    }
+
+    public function updateShipping(Request $request, $id)
+    {
+        return $this->updateShiping($request, $id);
     }
     public function addPayment(AddPaymentRequest $request, $id)
     {
