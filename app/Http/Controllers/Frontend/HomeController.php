@@ -80,6 +80,7 @@ class HomeController extends FrontendController
                 ->take(12)
                 ->get();
         });
+      
 
         $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
