@@ -110,32 +110,58 @@
         <script>
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            // product variation modal related scripts
+            let modalSelectedIds = [];
+
+            // ১. ভ্যারিয়েশন সিলেকশন লজিক (সংশোধিত)
+            function handleModalSelection(btn, varId, price, type) {
+                const activeClasses = ['border-[var(--primary-color)]', 'bg-orange-50', 'ring-1', 'ring-[var(--primary-color)]'];
+
+                // টাইপটি ছোট হাতের অক্ষরে চেক করা হচ্ছে যাতে ভুল না হয়
+                const isMultiple = (type.toLowerCase() === 'multiple');
+
+                if (isMultiple) {
+                    // মাল্টিপল টাইপ: টগল (Add/Remove) লজিক
+                    if (modalSelectedIds.includes(varId)) {
+                        modalSelectedIds = modalSelectedIds.filter(id => id !== varId);
+                        btn.classList.remove(...activeClasses);
+                    } else {
+                        modalSelectedIds.push(varId);
+                        btn.classList.add(...activeClasses);
+                    }
+                } else {
+                    // সিঙ্গেল টাইপ: রেডিও লজিক
+                    modalSelectedIds = [varId];
+                    document.querySelectorAll('.modal-var-btn').forEach(el => el.classList.remove(...activeClasses));
+                    btn.classList.add(...activeClasses);
+                }
+
+                // আইডিগুলো হিডেন ইনপুটে রাখা
+                document.getElementById('modal-selected-ids').value = modalSelectedIds.join(',');
+                updateModalTotal();
+            }
+
             function updateModalTotal() {
-                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-                const qtyInput = document.getElementById('modal-qty');
+                const qty = parseInt(document.getElementById('modal-qty').value) || 1;
                 const totalDisplay = document.getElementById('modal-total-price-display');
-                const unitPriceDisplay = document.getElementById('modal-unit-price');
+                const currency = "{{ $setup->currency }}";
+                const pos = "{{ $setup->currency_position ?? 'left' }}";
 
-                if (selectedVariant && qtyInput && totalDisplay) {
-                    const unitPrice = parseFloat(selectedVariant.getAttribute('data-price'));
-                    const qty = parseInt(qtyInput.value);
+                let totalSum = 0;
+                document.querySelectorAll('.modal-var-btn.bg-orange-50').forEach(el => {
+                    totalSum += parseFloat(el.getAttribute('data-price') || 0);
+                });
 
-                    // PHP থেকে কারেন্সি এবং পজিশন নেওয়া হচ্ছে
-                    const currency = "{{ $setup->currency }}";
-                    const pos = "{{ $setup->currency_position ?? 'left' }}";
+                const finalTotal = totalSum * qty;
 
-                    const total = unitPrice * qty;
-
-                    // পজিশন অনুযায়ী ফরম্যাট করা
-                    let unitText = (pos === 'left') ? currency + " " + unitPrice.toLocaleString() : unitPrice.toLocaleString() + " " + currency;
-                    let totalText = (pos === 'left') ? currency + " " + total.toLocaleString() : total.toLocaleString() + " " + currency;
-
-                    // আপডেট ডিসপ্লে
-                    if(unitPriceDisplay) unitPriceDisplay.innerText = unitText;
-                    if(totalDisplay) totalDisplay.innerText = totalText;
+                if (totalDisplay) {
+                    if (totalSum > 0) {
+                        totalDisplay.innerText = (pos === 'left') ? currency + " " + finalTotal.toLocaleString() : finalTotal.toLocaleString() + " " + currency;
+                    } else {
+                        totalDisplay.innerText = (pos === 'left') ? currency + " 0" : "0 " + currency;
+                    }
                 }
             }
+
 
             // quantity change function for variation modal
             function changeQty(val) {
@@ -149,22 +175,29 @@
                 }
             }
 
-            // modal open function with loading state
             function openVariationModal(id) {
+                modalSelectedIds = []; // শুরুতে ক্লিয়ার
                 const modal = document.getElementById('variation-modal');
                 const contentArea = document.getElementById('modal-content-area');
                 if (!modal) return;
 
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
-                contentArea.innerHTML =
-                    '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[#FF6A00]"></i></div>';
+                contentArea.innerHTML = '<div class="py-10 text-center"><i class="fas fa-spinner fa-spin text-2xl text-[var(--primary-color)]"></i></div>';
 
                 fetch("/product-variation/" + id)
                     .then(res => res.text())
                     .then(html => {
                         contentArea.innerHTML = html;
 
+                        const firstBtn = contentArea.querySelector('.modal-var-btn');
+                        if (firstBtn) {
+                            const firstId = parseInt(firstBtn.getAttribute('data-var-id'));
+                            if (!modalSelectedIds.includes(firstId)) {
+                                modalSelectedIds.push(firstId);
+                            }
+                            document.getElementById('modal-selected-ids').value = modalSelectedIds.join(',');
+                        }
                         updateModalTotal();
                     });
             }
@@ -177,64 +210,42 @@
                 }
             }
 
-            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন (Variation Modal এর জন্য)
             function processAddVariation() {
-                const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
-                const qtyInput = document.getElementById('modal-qty');
-                const token = document.querySelector('meta[name="csrf-token"]').content;
-
-                if (!selectedVariant) {
-                    toastr.warning("Please select an option.");
-                    return;
+                if (modalSelectedIds.length === 0) {
+                    toastr.warning("Please select at least one option."); return;
                 }
 
-                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
-                const postData = {
-                    items: [{
-                        variation_id: selectedVariant.value,
-                        qty: qtyInput ? qtyInput.value : 1
-                    }]
-                };
+                const qty = document.getElementById('modal-qty').value;
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                const items = modalSelectedIds.map(id => ({ variation_id: id, qty: qty }));
 
                 fetch("{{ route('cart.add') }}", {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json', // এটি যোগ করা জরুরি
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify(postData)
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': token },
+                    body: JSON.stringify({ items: items })
                 })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 'success') {
+                            // আপনার বিদ্যমান পিক্সেল ট্র্যাকিং লজিক
                             if (typeof fbq === 'function') {
-                                fbq('track', 'AddToCart', {
-                                    content_ids: ['{{ $product->id }}'],
-                                    content_type: 'product',
-                                    value: {{ $product->sale_price ?? 0 }} * (qtyInput ? qtyInput.value : 1),
-                                    currency: '{{ $setup->currency ?? "BDT" }}'
-                                });
+                                fbq('track', 'AddToCart', { content_ids: ['{{ $product->id }}'], content_type: 'product', value: {{ $product->sale_price ?? 0 }} * qty, currency: '{{ $setup->currency ?? "BDT" }}' });
                             }
                             if (typeof ttq === 'function') {
-                                ttq.track('AddToCart', {
-                                    content_id: '{{ $product->id }}',
-                                    content_type: 'product',
-                                    value: {{ $product->sale_price ?? 0 }} * (qtyInput ? qtyInput.value : 1),
-                                    currency: '{{ $setup->currency ?? "BDT" }}'
-                                });
+                                ttq.track('AddToCart', { content_id: '{{ $product->id }}', content_type: 'product', value: {{ $product->sale_price ?? 0 }} * qty, currency: '{{ $setup->currency ?? "BDT" }}' });
                             }
+
                             document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                             closeModal();
+                            modalSelectedIds = []; // রিসেট
+
                             if (typeof isOrderNowGlobal !== 'undefined' && isOrderNowGlobal) {
                                 window.location.href = "{{ route('checkout.index') }}";
                             } else {
                                 toastr.success(data.message);
                             }
-                        } else {
-                            toastr.error(data.message || "Something went wrong.");
                         }
-                    }).catch(err => toastr.error("Server error."));
+                    });
             }
 
             function addSingleToCart(id, isOrderNow = false) {

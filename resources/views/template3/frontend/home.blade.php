@@ -41,11 +41,11 @@
     </section>
     <!-- 2. SHOP BY CATEGORY (Sub-Category Grid Layout) -->
      @if ($categories->isNotEmpty())
-    <section class="py-12 md:py-20 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Section Heading -->
-        <div class="flex items-center justify-center gap-4 mb-12">
+        <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
             <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
-            <h2 class="text-2xl md:text-[28px] font-bold text-black uppercase tracking-tighter text-center">
+            <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
                 SHOP BY CATEGORY
             </h2>
             <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
@@ -71,7 +71,7 @@
                     class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
                     <div class="p-6">
                         <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
-                        <h3 class="text-xl md:text-2xl font-black text-gray-900 uppercase leading-none mb-4">
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
                             {{ $subCat->name }}
                         </h3>
                     </div>
@@ -99,17 +99,22 @@
     <!-- CATEGORY WISE PRODUCT FILTER SECTION -->
     @foreach ($categories->take(3) as $megaCat)
         @php
-            $firstSub = $megaCat->subCategories->first();
-        @endphp
+        // ১. প্রোডাক্ট আছে এমন প্রথম সাব-ক্যাটাগরি খুঁজে বের করা
+        $activeSub = $megaCat->subCategories->filter(function($sub) {
+            return \App\Models\Product::where('status', 1)
+                ->whereJsonContains('sub_category_ids', (int) $sub->id)
+                ->exists();
+                })->first();
+            @endphp
 
-        @if ($firstSub)
-            <section class="py-10 md:py-16 container mx-auto px-4 lg:px-0" id="mega-section-{{ $megaCat->id }}">
+        @if ($activeSub)
+            <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0" id="mega-section-{{ $megaCat->id }}">
 
                 <!-- Header: Category Name & Sub-Category Tabs -->
                 <div
                     class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-2 mb-8 gap-4">
                     <!-- Mega Category Name -->
-                    <h2 class="text-3xl md:text-[28px] font-black uppercase text-gray-900">
+                    <h2 class="text-2xl md:text-[28px] font-bold uppercase text-gray-900">
                         {{ $megaCat->name }}
                     </h2>
 
@@ -130,7 +135,7 @@
                     class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-5 transition-all duration-300">
                     @php
                         $initialProducts = \App\Models\Product::where('status', 1)
-                            ->whereJsonContains('sub_category_ids', (int) $firstSub->id)
+                            ->whereJsonContains('sub_category_ids', (int) $activeSub->id)
                             ->take(6)
                             ->get();
                     @endphp
@@ -149,14 +154,14 @@
             </section>
         @endif
     @endforeach
- <!-- PRODUCT GROUPS SECTION -->
+    <!-- PRODUCT GROUPS SECTION -->
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6 relative">
 
                 <!-- Header -->
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight">{{ $group->name }}</h2>
+                    <h2 class="text-lg md:text-[28px] font-bold uppercase tracking-tight">{{ $group->name }}</h2>
                     <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
                         <button
                             class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
@@ -194,11 +199,11 @@
         </section>
     @endforeach
     <!-- Latest Products SECTION -->
-    <section class="py-10 md:py-16 container mx-auto px-4 lg:px-0">
+    <section class="py-4 md:6 container mx-auto px-4 lg:px-0">
         <!-- Header: Title left, View All right, and a Border bottom -->
         <div class="flex items-end justify-between border-b border-gray-200 pb-2 mb-8">
             <!-- Section Title -->
-            <h2 class="text-2xl md:text-[28px] font-black uppercase text-gray-900 leading-none">
+            <h2 class="text-2xl md:text-[28px] font-bold uppercase text-gray-900 leading-none">
                 Latest Products
             </h2>
 
@@ -226,7 +231,7 @@
     </section>
     <!-- DUAL BANNER SECTION -->
     @if ($middleSliders->count() > 0)
-        <section class="py-10 md:py-16 container mx-auto px-4 lg:px-0">
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
 
                 @foreach ($middleSliders->take(2) as $slider)
@@ -253,7 +258,7 @@
     @endif
     <!-- Customer Review Section -->
     @if (isset($allReviews) && $allReviews->isNotEmpty())
-        <section class="py-16 bg-[#f8fafc]">
+        <section class="py-4 md:py-6 bg-[#f8fafc]">
             <div class="container mx-auto px-4">
                 <!-- Section Header -->
                 <div class="text-center mb-12">

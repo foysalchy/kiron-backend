@@ -200,9 +200,6 @@
         </div>
     </section>
 
-
-
-
     <!-- PRODUCT CATEGORIES SECTION -->
    <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
@@ -245,7 +242,7 @@
 
         </div>
     </div>
-</section>
+    </section>
 
 
   @foreach ($productGroups as $group)
