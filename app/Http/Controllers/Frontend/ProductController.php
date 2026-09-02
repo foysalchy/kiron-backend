@@ -24,11 +24,19 @@ class ProductController extends FrontendController
 
     public function getVariationModal($id)
     {
-        $product = Product::with(['variations.attributes.attributeValue', 'variations.attributes.attributeGroup'])
-            ->findOrFail($id);
+        $product = Product::with(['variations.attributes.attributeValue', 'variations.attributes.attributeGroup'])->findOrFail($id);
 
-        return $this->view('partials/variation_modal_content', compact('product'));
+        $groupCategories = [];
+        foreach ($product->variations as $variation) {
+            foreach ($variation->attributes as $attr) {
+                if ($attr->attributeGroup) {
+                    $groupCategories[$attr->attributeGroup->name] = $attr->attributeGroup->category;
+                }
+            }
+        }
+        return $this->view('partials/variation_modal_content', compact('product', 'groupCategories'));
     }
+
     public function index(Request $request)
     {
         $breadcrumb = [['name' => 'All Products', 'slug' => 'shop']];
@@ -67,7 +75,7 @@ class ProductController extends FrontendController
             ->get()
             ->unique('name');
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit','breadcrumb'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'maxPriceLimit', 'breadcrumb'))->with([
             'category'    => null,
             'allProducts' => $products
         ]);
@@ -145,7 +153,7 @@ class ProductController extends FrontendController
             ->where('status', Status::Active->value)
             ->get()
             ->unique('name');
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit','breadcrumb'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
             'allProducts' => $products
         ]);
     }

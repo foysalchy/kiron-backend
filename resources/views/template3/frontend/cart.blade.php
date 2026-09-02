@@ -27,69 +27,77 @@
 
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
-                                <div
-                                    class="flex flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
-                                    <!-- Image -->
-                                    <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
-                                        <img src="{{ $item->options->thumbnail }}"
-                                            onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                            class="w-full h-full object-cover">
-                                    </div>
+                               <div class="flex flex-col sm:flex-row items-start md:items-center gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
 
-                                    <!-- Details -->
-                                    <div class="flex-1">
-                                        <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
-                                            class="group/title">
-                                            <h3
-                                                class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
-                                                {{ $item->name ?? '' }}
-                                            </h3>
-                                        </a>
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span
-                                                class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
-                                                {{ $item->options->variant ?? 'Product' }}
-                                            </span>
-                                        </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <p class="font-bold text-gray-700 text-lg">
-                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                                {{ number_format($item->price, 0) }}
-                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                            </p>
+    <!-- ইমেজ এবং ডিটেইলস সেকশন (মোবাইলে এটি এক লাইনে থাকবে) -->
+    <div class="flex flex-row items-start gap-3 md:gap-6 flex-1 w-full">
+        <!-- Image -->
+        <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0">
+            <img src="{{ $item->options->thumbnail }}"
+                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                class="w-full h-full object-cover">
+        </div>
 
-                                            @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                                                <span class="text-sm text-gray-400 line-through font-normal pl-1">
-                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                                    {{ number_format($item->options['regular_price'], 0) }}
-                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
+        <!-- Details -->
+        <div class="flex-1 min-w-0">
+            <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}" class="group/title">
+                <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors line-clamp-2">
+                    {{ $item->name ?? '' }}
+                </h3>
+            </a>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="text-[var(--primary-color)] text-[10px] md:text-xs font-bold px-2 py-0.5 rounded uppercase border border-[var(--primary-color)]/20">
+                    {{ $item->options->variant ?? 'Product' }}
+                </span>
+            </div>
 
-                                    <!-- Qty Controls -->
-                                    <div
-                                        class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-                                        <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
-                                    </div>
+            <!-- Price Section (আপনার অরিজনাল লজিক অপরিবর্তিত) -->
+            <div class="flex items-baseline flex-wrap gap-2">
+                <p class="font-bold text-gray-700 text-base md:text-lg">
+                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                    {{ number_format($item->price, 0) }}
+                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                </p>
 
-                                    <!-- Price & Delete -->
-                                    <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                            {{ number_format($item->subtotal, 0) }}
-                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
-                                        <a href="{{ route('cart.remove', $item->rowId) }}"
-                                            class="text-red-400 hover:text-red-600 transition-colors">
-                                            <i class="far fa-trash-alt text-lg"></i>
-                                        </a>
-                                    </div>
-                                </div>
+                @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
+                    <span class="text-xs md:text-sm text-gray-400 line-through font-normal">
+                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                        {{ number_format($item->options['regular_price'], 0) }}
+                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                    </span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- কিউটিওয়াই এবং টোটাল প্রাইস (মোবাইলে এটি নিচে একটি লাইনে আসবে) -->
+    <div class="flex flex-row items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pt-3 sm:pt-0 border-t sm:border-0 border-gray-100">
+
+        <!-- Qty Controls -->
+        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
+            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
+            <span class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
+            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
+        </div>
+
+        <!-- Subtotal & Delete -->
+        <div class="flex items-center gap-3 md:gap-4 min-w-fit">
+            <div class="text-right">
+                <p class="font-black text-base md:text-xl text-[var(--primary-color)] whitespace-nowrap">
+                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                    {{ number_format($item->subtotal, 0) }}
+                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                </p>
+            </div>
+            <a href="{{ route('cart.remove', $item->rowId) }}"
+                class="text-red-400 hover:text-red-600 transition-colors p-1">
+                <i class="far fa-trash-alt text-lg"></i>
+            </a>
+        </div>
+    </div>
+</div>
                             @endforeach
                         </div>
                     </div>
@@ -177,8 +185,8 @@
                         </div>
 
                         <div class="border-t border-gray-200 pt-6 mb-8 flex justify-between items-center">
-                            <span class="text-lg font-black text-gray-800">Total:</span>
-                            <span class="text-2xl font-black text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                            <span class="text-2xl font-bold text-gray-800">Total:</span>
+                            <span class="text-2xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                 {{ number_format($total, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
 

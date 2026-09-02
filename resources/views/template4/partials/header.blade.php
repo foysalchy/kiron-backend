@@ -33,7 +33,7 @@
 
                 <!-- Suggestions Dropdown -->
                 <div id="search-suggestions"
-                    class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
+                    class="hidden absolute top-[90%] left-0 w-full bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-60 overflow-hidden pt-4 pb-2">
                     <div id="suggestion-content">
                         <div class="pb-2">
                             <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular

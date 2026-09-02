@@ -218,9 +218,9 @@
                 <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="" width="" alt="{{ $setup->shop_name }}"
                     class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold text-[#016738]">খাঁটি ভাই</span>
+                <span class="text-xl font-bold [var(--primary-color)]">খাঁটি ভাই</span>
             @endif
-            <button onclick="toggleMobileMenu()" class="text-[#016738] text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="[var(--primary-color)] text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -241,13 +241,13 @@
         <!-- Navigation Links -->
         <nav class="flex flex-col p-6 gap-5">
             <a href="{{ route('home') }}"
-                class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">হোমপেজ</a>
+                class="text-lg font-bold [var(--primary-color)] hover:opacity-80 transition-opacity">হোমপেজ</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">অফার</a>
+                class="text-lg font-bold [var(--primary-color)] hover:opacity-80 transition-opacity">অফার</a>
 
             @foreach ($headerCategories as $cat)
                 <a href="{{ route('category.products', $cat->slug) }}"
-                    class="text-[17px] font-bold text-[#016738] hover:opacity-80 transition-opacity">
+                    class="text-lg font-bold [var(--primary-color)] hover:opacity-80 transition-opacity">
                     {{ $cat->name }}
                 </a>
             @endforeach

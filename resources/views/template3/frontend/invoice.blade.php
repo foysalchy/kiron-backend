@@ -472,6 +472,66 @@
             margin-top: 4px;
         }
 
+        @media (max-width: 640px) {
+            .toolbar {
+                padding: 8px 12px !important;
+                /* চারপাশের ফাঁকা জায়গা কমানো হয়েছে */
+            }
+
+            .toolbar-left {
+                gap: 8px !important;
+            }
+
+            .toolbar-title {
+                font-size: 14px !important;
+                white-space: nowrap;
+            }
+
+            .invoice-inner {
+                padding: 20px !important;
+            }
+
+            .invoice-header,
+            .billing-row,
+            .footer-row {
+                flex-direction: column !important;
+                display: flex !important;
+                gap: 20px !important;
+            }
+
+            .billing-row {
+                grid-template-columns: 1fr !important;
+            }
+
+            .invoice-meta {
+                text-align: left !important;
+            }
+
+            .invoice-title {
+                font-size: 28px !important;
+            }
+
+            .summary-wrapper {
+                justify-content: flex-start !important;
+            }
+
+            .summary-box {
+                width: 100% !important;
+            }
+
+            .footer-contact {
+                text-align: left !important;
+            }
+
+            /* টেবিল রেসপনসিভ করার জন্য */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+        }
+
         /* ── PRINT ── */
         /* ── PRINT OPTIMIZATION ── */
         @media print {
@@ -602,7 +662,7 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url }}">
+                                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="Shop Logo">
                             @else
                                 <div class="logo-placeholder">
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>
@@ -681,8 +741,12 @@
                                         @endif
                                     </td>
                                     <td class="td-center">{{ $item->quantity }}</td>
-                                    <td class="td-right">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->unit_price, 0) : number_format($item->unit_price, 0) . ' ' . $setup->currency }}</td>
-                                    <td class="td-right-bold" style="padding-right:0;"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->total, 0) : number_format($item->total, 0) . ' ' . $setup->currency }}</td>
+                                    <td class="td-right">
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->unit_price, 0) : number_format($item->unit_price, 0) . ' ' . $setup->currency }}
+                                    </td>
+                                    <td class="td-right-bold" style="padding-right:0;">
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->total, 0) : number_format($item->total, 0) . ' ' . $setup->currency }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -694,7 +758,7 @@
                     <div class="summary-box">
                         <div class="summary-row">
                             <span>Subtotal:</span>
-                             <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->subtotal, 0) : number_format($order->subtotal, 0) . ' ' . $setup->currency }}</span>
+                            <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->subtotal, 0) : number_format($order->subtotal, 0) . ' ' . $setup->currency }}</span>
                         </div>
                         <div class="summary-row">
                             <span>Delivery Charge:</span>
@@ -703,13 +767,15 @@
                         @if ($order->coupon_discount > 0)
                             <div class="summary-row discount">
                                 <span>Coupon Discount:</span>
-                                <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->coupon_discount, 0) : number_format($order->coupon_discount, 0) . ' ' . $setup->currency }}</span>
+                                <span>-
+                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->coupon_discount, 0) : number_format($order->coupon_discount, 0) . ' ' . $setup->currency }}</span>
                             </div>
                         @endif
                         <div class="summary-divider"></div>
                         <div class="summary-total">
                             <span class="label">Total Paid:</span>
-                            <span class="amount">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->grand_total, 0) : number_format($order->grand_total, 0) . ' ' . $setup->currency }}</span>
+                            <span
+                                class="amount">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->grand_total, 0) : number_format($order->grand_total, 0) . ' ' . $setup->currency }}</span>
                         </div>
                     </div>
                 </div>

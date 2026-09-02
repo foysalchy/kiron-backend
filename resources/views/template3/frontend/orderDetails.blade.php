@@ -288,8 +288,8 @@
                             </div>
                         @endif
                         <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <span class="text-gray-800 font-black">Total:</span>
-                            <span class="text-xl font-black text-[var(--primary-color)]">
+                            <span class="text-[var(--primary-color)] text-2xl font-bold">Total:</span>
+                            <span class="text-2xl font-bold text-[var(--primary-color)]">
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                             </span>
                         </div>
