@@ -34,12 +34,22 @@ class Party extends Authenticatable
         'address',
         'balance',
         'due_amount',
+        'credit_limit',
+        'credit_days',
+        'risk_level',
         'profile',
         'password',
         'status',
         'fb_psid',
         'ig_id',
         'ig_username'
+    ];
+
+    protected $casts = [
+        'credit_limit' => 'float',
+        'credit_days'  => 'integer',
+        'balance'      => 'float',
+        'due_amount'   => 'float',
     ];
 
 

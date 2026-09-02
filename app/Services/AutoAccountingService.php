@@ -39,6 +39,57 @@ class AutoAccountingService
     }
 
     /**
+     * Resolve COGS account
+     */
+    public static function resolveCogsAccount(int $companyId, ?AccountingSetting $setting): ?int
+    {
+        if ($setting?->default_cogs_account_id) {
+            return $setting->default_cogs_account_id;
+        }
+        $acc = ChartOfAccount::withoutGlobalScopes()
+            ->where('company_id', $companyId)
+            ->where('name', 'like', '%Cost of Goods Sold%')
+            ->first();
+        return $acc?->id;
+    }
+
+    /**
+     * Resolve Inventory account
+     */
+    public static function resolveInventoryAccount(int $companyId, ?AccountingSetting $setting): ?int
+    {
+        if ($setting?->default_inventory_account_id) {
+            return $setting->default_inventory_account_id;
+        }
+        $acc = ChartOfAccount::withoutGlobalScopes()
+            ->where('company_id', $companyId)
+            ->where(function ($q) {
+                $q->where('name', 'like', '%Stock-in-Hand%')
+                  ->orWhere('name', 'like', '%Inventory%');
+            })
+            ->first();
+        return $acc?->id;
+    }
+
+    /**
+     * Calculate Total Cost of Goods Sold (COGS) for an order
+     */
+    public static function calculateOrderCogs(Order $order): float
+    {
+        $order->loadMissing(['orderDetails.product', 'orderDetails.variation']);
+        $totalCogs = 0;
+        foreach ($order->orderDetails as $detail) {
+            $unitCost = (float)($detail->variation->purchase_price ?? $detail->product->purchase_price ?? 0);
+            if ($unitCost <= 0) {
+                $unitCost = (float)($detail->product->cost_price ?? 0);
+            }
+            $qty = (float)($detail->quantity ?? 1);
+            $totalCogs += ($unitCost * $qty);
+        }
+        return round($totalCogs, 2);
+    }
+
+    /**
      * 1. Post Order / Sales Journal (POS or eCommerce)
      */
     public static function postOrderJournal(Order $order): ?TransactionJournal
@@ -111,6 +162,18 @@ class AutoAccountingService
             }
             if ($taxAmount > 0 && $vatAccountId) {
                 $items[] = ['chart_of_account_id' => $vatAccountId, 'debit' => 0, 'credit' => $taxAmount];
+            }
+
+            // ── COGS & INVENTORY (Perpetual Inventory System) ──
+            $cogsAccountId = self::resolveCogsAccount($companyId, $setting);
+            $inventoryAccountId = self::resolveInventoryAccount($companyId, $setting);
+            $totalCogs = self::calculateOrderCogs($order);
+
+            if ($totalCogs > 0 && $cogsAccountId && $inventoryAccountId) {
+                // Dr. Cost of Goods Sold (Expense in P&L)
+                $items[] = ['chart_of_account_id' => $cogsAccountId, 'debit' => $totalCogs, 'credit' => 0];
+                // Cr. Merchandise Inventory (Asset in Balance Sheet)
+                $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => 0, 'credit' => $totalCogs];
             }
 
             if (empty($items)) return null;
@@ -189,12 +252,40 @@ class AutoAccountingService
                 $items[] = ['chart_of_account_id' => $receivableAccountId, 'debit' => 0, 'credit' => $adjustedDue];
             }
 
+            // ── COGS & INVENTORY REVERSAL ──
+            $cogsAccountId = self::resolveCogsAccount($companyId, $setting);
+            $inventoryAccountId = self::resolveInventoryAccount($companyId, $setting);
+
+            $orderReturn->loadMissing(['orderReturnDetails.product', 'orderReturnDetails.variation']);
+            $returnCogs = 0;
+            foreach ($orderReturn->orderReturnDetails as $retDetail) {
+                $unitCost = (float)($retDetail->variation->purchase_price ?? $retDetail->product->purchase_price ?? 0);
+                if ($unitCost <= 0) {
+                    $unitCost = (float)($retDetail->product->cost_price ?? 0);
+                }
+                $returnCogs += ($unitCost * (float)($retDetail->quantity ?? 1));
+            }
+            $returnCogs = round($returnCogs, 2);
+
+            if ($returnCogs > 0 && $cogsAccountId && $inventoryAccountId) {
+                // Dr. Inventory (restore asset in Balance Sheet)
+                $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => $returnCogs, 'credit' => 0];
+                // Cr. COGS (reduce expense in P&L)
+                $items[] = ['chart_of_account_id' => $cogsAccountId, 'debit' => 0, 'credit' => $returnCogs];
+            }
+
+            $customerName = 'Customer';
+            if ($orderReturn->customer_id) {
+                $cust = Party::withoutGlobalScopes()->find($orderReturn->customer_id);
+                if ($cust) $customerName = $cust->name;
+            }
+
             $voucherNo = 'SRV-' . ($orderReturn->return_no ?? $orderReturn->id);
-            $narration = "Sales Return Voucher #{$orderReturn->return_no} for Order #{$orderReturn->order_id}";
+            $narration = "Sales Return #{$orderReturn->return_no} - Credit Note for customer {$customerName}";
 
             return self::saveVoucher(
                 $companyId,
-                'journal',
+                'sales_return',
                 $voucherNo,
                 'order_return',
                 $orderReturn->id,
@@ -206,6 +297,117 @@ class AutoAccountingService
             );
         } catch (\Exception $e) {
             Log::error('Failed to auto-post order return journal: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 1.2 Post eCommerce Order Cancellation / Courier Return Journal
+     */
+    public static function postOrderCancellationOrReturnJournal(Order $order, string $newStatus = 'cancelled'): ?TransactionJournal
+    {
+        try {
+            $companyId = $order->company_id;
+            if (!self::isEnabled($companyId)) return null;
+
+            $setting = self::getSetting($companyId);
+            if (!$setting) return null;
+
+            // Check if there was an original sales journal for this order
+            $salesJournal = TransactionJournal::withoutGlobalScopes()
+                ->where('company_id', $companyId)
+                ->where('source_type', 'order')
+                ->where('source_id', $order->id)
+                ->first();
+
+            // If no sales journal was ever posted, nothing to reverse
+            if (!$salesJournal) return null;
+
+            // Check if cancellation/return journal already exists
+            $existingReturnJournal = TransactionJournal::withoutGlobalScopes()
+                ->where('company_id', $companyId)
+                ->where('source_type', 'order_cancellation')
+                ->where('source_id', $order->id)
+                ->first();
+
+            $salesAccountId = $setting->default_sales_return_account_id
+                ?? ($setting->default_web_sales_account_id ?? $setting->default_pos_sales_account_id);
+            $receivableAccountId = $setting->default_receivable_account_id;
+            $cashAccountId = $setting->default_cash_account_id;
+            $courierExpenseAccountId = $setting->default_courier_expense_account_id;
+
+            $items = [];
+            $totalAmount = (float)($order->grand_total ?? $order->total_amount ?? 0);
+            $paidAmount = (float)($order->payment_amount ?? $order->paid_amount ?? 0);
+            $dueAmount = max(0, round($totalAmount - $paidAmount, 2));
+
+            // Reverse Sales: Debit Sales Return
+            if ($totalAmount > 0 && $salesAccountId) {
+                $items[] = ['chart_of_account_id' => $salesAccountId, 'debit' => $totalAmount, 'credit' => 0];
+            }
+
+            // Reverse Customer Receivable: Credit Accounts Receivable
+            if ($dueAmount > 0 && $receivableAccountId) {
+                $items[] = ['chart_of_account_id' => $receivableAccountId, 'debit' => 0, 'credit' => $dueAmount];
+            }
+
+            // If customer had made a payment and it is refunded:
+            if ($paidAmount > 0 && $cashAccountId) {
+                $items[] = ['chart_of_account_id' => $cashAccountId, 'debit' => 0, 'credit' => $paidAmount];
+            }
+
+            // Courier Delivery & Return Expense (Merchant's RTO Loss)
+            $courierCost = 0;
+            if (!empty($order->courier_info)) {
+                $cInfo = is_array($order->courier_info) ? $order->courier_info : json_decode($order->courier_info, true);
+                $courierCost = (float)($cInfo['courier_charge'] ?? $cInfo['delivery_charge'] ?? $cInfo['delivery_fee'] ?? 0);
+            }
+            if ($courierCost <= 0 && (float)($order->other_charges ?? 0) > 0) {
+                $courierCost = (float)$order->other_charges;
+            }
+
+            if ($courierCost > 0 && $courierExpenseAccountId && $cashAccountId) {
+                $items[] = ['chart_of_account_id' => $courierExpenseAccountId, 'debit' => $courierCost, 'credit' => 0];
+                $items[] = ['chart_of_account_id' => $cashAccountId, 'debit' => 0, 'credit' => $courierCost];
+            }
+
+            // ── COGS & INVENTORY REVERSAL ──
+            $cogsAccountId = self::resolveCogsAccount($companyId, $setting);
+            $inventoryAccountId = self::resolveInventoryAccount($companyId, $setting);
+            $totalCogs = self::calculateOrderCogs($order);
+
+            if ($totalCogs > 0 && $cogsAccountId && $inventoryAccountId) {
+                // Reversal: Dr. Inventory (goods returned to warehouse)
+                $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => $totalCogs, 'credit' => 0];
+                // Reversal: Cr. COGS (remove cost from P&L)
+                $items[] = ['chart_of_account_id' => $cogsAccountId, 'debit' => 0, 'credit' => $totalCogs];
+            }
+
+            if (empty($items)) return null;
+
+            $customerName = 'Walk-in';
+            if ($order->customer_id) {
+                $cust = Party::withoutGlobalScopes()->find($order->customer_id);
+                if ($cust) $customerName = $cust->name;
+            }
+
+            $voucherNo = 'CRV-' . ($order->order_no ?? $order->id);
+            $narration = "eCommerce Order #{$order->order_no} status: {$newStatus} (Sales reversed & courier return loss adjusted for {$customerName})";
+
+            return self::saveVoucher(
+                $companyId,
+                'journal',
+                $voucherNo,
+                'order_cancellation',
+                $order->id,
+                $order->customer_id ?? null,
+                Carbon::now(),
+                $narration,
+                $items,
+                $existingReturnJournal
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to auto-post order cancellation/return journal: ' . $e->getMessage());
             return null;
         }
     }

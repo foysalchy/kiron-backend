@@ -2457,5 +2457,117 @@ class ProductService
             return 'in_stock';
         }
     }
+
+    /**
+     * Bulk update warehouse (and optional bin) for products
+     */
+    public function bulkUpdateWarehouse(array $productIds, int $warehouseId, ?int $binId = null): array
+    {
+        $warehouse = Warehouse::find($warehouseId);
+        if (!$warehouse) {
+            throw ApiException::notFound('Warehouse not found');
+        }
+
+        if ($binId) {
+            $bin = Bin::where('id', $binId)->first();
+            if (!$bin) {
+                throw ApiException::notFound('Bin not found');
+            }
+        }
+
+        $products = Product::whereIn('id', $productIds)->with('variations')->get();
+        if ($products->isEmpty()) {
+            throw ApiException::notFound('No products found for the provided IDs');
+        }
+
+        $updatedCount = 0;
+
+        DB::transaction(function () use ($products, $warehouseId, $binId, &$updatedCount) {
+            foreach ($products as $product) {
+                if ($product->type === 'single') {
+                    $existingInfo = $product->warehouse_info;
+                    $totalQty = 0;
+                    if (!empty($existingInfo) && is_array($existingInfo)) {
+                        $totalQty = collect($existingInfo)->sum('quantity');
+                    } else {
+                        $totalQty = (int) ($product->stock_quantity ?? 0);
+                    }
+
+                    $warehouseInfo = [
+                        [
+                            'warehouse_id' => $warehouseId,
+                            'bin_id'       => $binId,
+                            'quantity'     => (int) $totalQty,
+                        ]
+                    ];
+
+                    $product->warehouse_info = $warehouseInfo;
+                    $product->save();
+                    $updatedCount++;
+                } elseif ($product->type === 'variation') {
+                    foreach ($product->variations as $variation) {
+                        $existingStocks = ProductVariationStock::where('product_variation_id', $variation->id)->get();
+                        $varQty = $existingStocks->isNotEmpty()
+                            ? $existingStocks->sum('quantity')
+                            : (int) ($variation->stock_quantity ?? 0);
+
+                        ProductVariationStock::where('product_variation_id', $variation->id)->delete();
+                        ProductVariationStock::create([
+                            'product_variation_id' => $variation->id,
+                            'warehouse_id'         => $warehouseId,
+                            'bin_id'               => $binId,
+                            'quantity'             => $varQty,
+                        ]);
+                    }
+                    $product->touch();
+                    $updatedCount++;
+                }
+            }
+        });
+
+        return [
+            'updated_count' => $updatedCount,
+            'warehouse_id'  => $warehouseId,
+            'bin_id'        => $binId,
+        ];
+    }
+
+    /**
+     * Bulk update category mapping for products
+     */
+    public function bulkUpdateCategory(array $productIds, array $categoryData): array
+    {
+        $products = Product::whereIn('id', $productIds)->get();
+        if ($products->isEmpty()) {
+            throw ApiException::notFound('No products found for the provided IDs');
+        }
+
+        $megaCategoryIds = array_values(array_filter(array_map('intval', (array) ($categoryData['mega_category_ids'] ?? []))));
+        $subCategoryIds  = array_values(array_filter(array_map('intval', (array) ($categoryData['sub_category_ids'] ?? []))));
+        $miniCategoryIds = array_values(array_filter(array_map('intval', (array) ($categoryData['mini_category_ids'] ?? []))));
+        $extraCategoryIds = array_values(array_filter(array_map('intval', (array) ($categoryData['extra_category_ids'] ?? []))));
+
+        $updatedCount = 0;
+
+        DB::transaction(function () use ($products, $megaCategoryIds, $subCategoryIds, $miniCategoryIds, $extraCategoryIds, &$updatedCount) {
+            foreach ($products as $product) {
+                $product->update([
+                    'mega_category_ids'  => $megaCategoryIds,
+                    'sub_category_ids'   => $subCategoryIds,
+                    'mini_category_ids'  => $miniCategoryIds,
+                    'extra_category_ids' => $extraCategoryIds,
+                ]);
+                $updatedCount++;
+            }
+        });
+
+        return [
+            'updated_count'      => $updatedCount,
+            'mega_category_ids'  => $megaCategoryIds,
+            'sub_category_ids'   => $subCategoryIds,
+            'mini_category_ids'  => $miniCategoryIds,
+            'extra_category_ids' => $extraCategoryIds,
+        ];
+    }
 }
 

@@ -133,6 +133,16 @@ class TransactionExpenseService
             //Calculate Total Amount from items array
             $totalAmount = collect($data['items'])->sum('amount');
 
+            // Liquidity & Negative Cash Guard
+            if (!empty($data['expense_from_id'])) {
+                $companyId = $data['company_id'] ?? Auth::user()->company_id ?? 27;
+                \App\Services\RiskManagementService::validatePaymentLiquidity(
+                    (int)$companyId,
+                    (int)$data['expense_from_id'],
+                    (float)$totalAmount
+                );
+            }
+
             // Create Master record
             $expense = TransactionExpense::create(array_merge($data, [
                 'total_amount' => $totalAmount

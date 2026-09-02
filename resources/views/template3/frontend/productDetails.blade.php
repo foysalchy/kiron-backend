@@ -44,15 +44,15 @@
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
-    @foreach ($allProductImages as $imgUrl)
-        <button onclick="changeImage('{{ $imgUrl }}')"
-            class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
-            <img src="{{ $imgUrl }}"
-                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                class="w-full h-full object-contain" alt="Product Image">
-        </button>
-    @endforeach
-</div>
+                        @foreach ($allProductImages as $imgUrl)
+                            <button onclick="changeImage('{{ $imgUrl }}')"
+                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
+                                <img src="{{ $imgUrl }}"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                    class="w-full h-full object-contain" alt="Product Image">
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
 
                 <!-- Right: Product Purchase Details -->
@@ -92,7 +92,7 @@
                             </span>
                         @endif
 
-                        <span id="sale-price" class="text-3xl font-black secondary-text">
+                        <span id="sale-price" class="text-xl md:text-3xl font-bold secondary-text">
                             @if(($setup->currency_position ?? 'left') == 'left')
                                 {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
                             @else
