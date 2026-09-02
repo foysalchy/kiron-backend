@@ -33,7 +33,7 @@ class StoreJobTitleRequest extends BaseCompanyRequest
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
-            'title.required' => 'The job title is required.',
+            'title.required' => 'Designations is required.',
         ]);
     }
 

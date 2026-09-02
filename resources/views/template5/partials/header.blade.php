@@ -14,9 +14,10 @@
         <i class="fas fa-bars"></i>
       </button>
 
-      <a href="{{ $homeUrl }}" class="flex items-baseline gap-2 shrink-0">
+      <a href="{{ $homeUrl }}" class="flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none">
         @if($setup->logo_url ?? false)
-        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}" style="max-height: 100%; width: 100px;">
+        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}"
+          class="w-[200px] max-w-full h-auto max-h-16 object-contain">
         @else
         <span class="font-semibold text-xl text-header">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
         @endif
@@ -25,33 +26,27 @@
       <nav class="hidden lg:flex items-center gap-10 text-sm bg-[#f8f7f7] py-4 border border-[#e0e0e0] px-4 rounded-full">
         <a href="{{ $homeUrl }}#menu" class="text-black hover:text-brand transition-colors">Menu</a>
         <a href="#" class="text-black hover:text-brand transition-colors">Reservations</a>
-        <a href="#" class="text-black hover:text-brand transition-colors">Experience</a>
+
         <a href="{{ $homeUrl }}#offers" class="text-black hover:text-brand transition-colors">Offers</a>
       </nav>
 
       <div class="flex items-center gap-5">
-        <button aria-label="Search" class="hidden sm:flex text-header/80 hover:text-brand transition-colors">
+        <button id="desktop-search-btn" aria-label="Search" class="hidden sm:flex text-header/80 hover:text-brand transition-colors">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="11" cy="11" r="7" />
             <path d="m20 20-3.5-3.5" />
           </svg>
         </button>
 
-        <a href="{{ $cartUrl }}" class="hidden sm:inline-flex items-center gap-2 primary-bg primary-bg-hover transition-colors text-sm font-medium px-5 py-2.5 rounded-full">
-          Order Now
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </a>
 
-        <button aria-label="Cart" class="relative text-header hover:text-brand transition-colors" onclick="window.location.href='{{ $cartUrl }}'">
+        <button onclick="toggleCartDrawer()" aria-label="Cart" class="relative text-header hover:text-brand transition-colors">
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6" />
             <circle cx="9" cy="21" r="1" />
             <circle cx="18" cy="21" r="1" />
           </svg>
           <span id="cart-count-badge" class="cart-count-nav absolute -top-2 -right-2 primary-bg text-[10px] font-mono w-4 h-4 rounded-full flex items-center justify-center">
-                {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
+            {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
           </span>
         </button>
 
@@ -119,6 +114,53 @@
     </div>
   </div>
 
+  <!-- ============ SEARCH EXPAND ============ -->
+  <div id="header-search-expand" class="hidden border-t border-coal/10 bg-white relative">
+    <div class="max-w-3xl mx-auto px-6 py-4 relative">
+      <form action="{{ route('shop.index') }}" method="GET" class="relative z-30" id="header-search-container">
+        <input type="text" name="search" id="header-search-input" autocomplete="off"
+          placeholder="Search by  name"
+          class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-[#f8f7f7] border border-gray-100" />
+        <button type="submit"
+          class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-brand">
+          <i class="fa-solid fa-magnifying-glass text-lg"></i>
+        </button>
+      </form>
+
+      <!-- Suggestions Dropdown -->
+      <div id="search-suggestions"
+        class="hidden absolute top-[calc(100%-8px)] left-6 right-6 bg-white mt-1 rounded-b-2xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-4 pb-2">
+        <div id="suggestion-content">
+          <div class="pb-2">
+            <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
+            @foreach ($popularSearches as $item)
+            <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+              class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-history text-gray-300 text-xs"></i>
+                <span>{{ $item->keyword }}</span>
+              </div>
+            </a>
+            @endforeach
+          </div>
+          <div class="border-t border-gray-50 pt-2 pb-2">
+            <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Trending Products</p>
+            @foreach ($relatedProducts as $p)
+            <a href="{{ route('product.details', $p->slug) }}"
+              class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <img src="{{ $p->thumbnail_url }}" alt="product image"
+                class="w-8 h-8 rounded object-cover border border-gray-100">
+              <span class="truncate">{{ $p->title }}</span>
+            </a>
+            @endforeach
+          </div>
+        </div>
+        <!-- Live Results (typed by user) -->
+        <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ MOBILE MENU DRAWER ============ -->
   <div id="mobile-menu" class="hidden lg:hidden fixed inset-0 z-[1100] flex">
     <div class="absolute inset-0 bg-black/50" onclick="toggleMobileMenu()"></div>
@@ -133,24 +175,52 @@
       </div>
 
       @auth('customer')
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-coal/10 bg-white">
-          <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-ember">
-            <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
-              class="w-full h-full object-cover">
-          </div>
-          <div>
-            <p class="text-sm font-bold text-coal">{{ auth('customer')->user()->name }}</p>
-            <p class="text-xs text-smoke">{{ auth('customer')->user()->email }}</p>
-          </div>
+      <div class="flex items-center gap-3 px-5 py-4 border-b border-coal/10 bg-white">
+        <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-ember">
+          <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+            class="w-full h-full object-cover">
         </div>
+        <div>
+          <p class="text-sm font-bold text-coal">{{ auth('customer')->user()->name }}</p>
+          <p class="text-xs text-smoke">{{ auth('customer')->user()->email }}</p>
+        </div>
+      </div>
       @else
-        <div class="flex gap-3 px-5 py-4 border-b border-coal/10 bg-white">
-          <a href="{{ route('user.login') }}"
-            class="flex-1 text-center py-2 border border-ember text-ember rounded-lg text-sm font-bold">Login</a>
-          <a href="{{ route('user.register') }}"
-            class="flex-1 text-center py-2 bg-ember text-white rounded-lg text-sm font-bold">Register</a>
-        </div>
+      <div class="flex gap-3 px-5 py-4 border-b border-coal/10 bg-white">
+        <a href="{{ route('user.login') }}"
+          class="flex-1 text-center py-2 border border-ember text-ember rounded-lg text-sm font-bold">Login</a>
+        <a href="{{ route('user.register') }}"
+          class="flex-1 text-center py-2 bg-ember text-white rounded-lg text-sm font-bold">Register</a>
+      </div>
       @endauth
+
+      <!-- Mobile Search -->
+      <div class="px-5 py-3 border-b border-coal/10 bg-white">
+        <form action="{{ route('shop.index') }}" method="GET" class="relative" id="mobile-search-container">
+          <input type="text" name="search" id="mobile-search-input" autocomplete="off"
+            placeholder="Search products..."
+            class="w-full py-2.5 px-5 rounded-full bg-[#f8f7f7] border border-gray-100 text-black text-sm" />
+          <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 w-10 h-8 flex items-center justify-center text-gray-600">
+            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+          </button>
+        </form>
+
+        <div id="mobile-search-suggestions"
+          class="hidden relative bg-white mt-1 rounded-xl shadow-lg border border-gray-100 z-[110] overflow-hidden pt-2 pb-2">
+          <div id="mobile-suggestion-content">
+            <div class="pb-2">
+              <p class="text-[10px] font-bold text-gray-600 uppercase px-4 py-2 tracking-wider">Popular Searches</p>
+              @foreach ($popularSearches as $item)
+              <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                {{ $item->keyword }}
+              </a>
+              @endforeach
+            </div>
+          </div>
+          <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
+        </div>
+      </div>
 
       <nav class="flex-1 px-4 py-3">
         <p class="text-[10px] font-bold text-smoke uppercase px-2 py-2 tracking-wider">Navigation</p>
@@ -176,27 +246,82 @@
       </nav>
 
       @auth('customer')
-        <div class="border-t border-coal/10 p-4 bg-white">
-          <a href="{{ route('user.dashboard') }}"
-            class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-ash text-sm font-medium text-coal mb-1">
-            <i class="fas fa-tachometer-alt w-4 text-smoke"></i> Dashboard
-          </a>
-          <form action="{{ route('user.logout') }}" method="POST">
-            @csrf
-            <button type="submit"
-              class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-red-50 text-sm font-medium text-red-500 transition-colors"
-              aria-label="Logout">
-              <i class="fa-solid fa-right-from-bracket w-4"></i> Logout
-            </button>
-          </form>
-        </div>
+      <div class="border-t border-coal/10 p-4 bg-white">
+        <a href="{{ route('user.dashboard') }}"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-ash text-sm font-medium text-coal mb-1">
+          <i class="fas fa-tachometer-alt w-4 text-smoke"></i> Dashboard
+        </a>
+        <form action="{{ route('user.logout') }}" method="POST">
+          @csrf
+          <button type="submit"
+            class="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-red-50 text-sm font-medium text-red-500 transition-colors"
+            aria-label="Logout">
+            <i class="fa-solid fa-right-from-bracket w-4"></i> Logout
+          </button>
+        </form>
+      </div>
       @endauth
     </div>
   </div>
+  <!-- Cart Drawer Overlay -->
+  <div id="cart-overlay" onclick="toggleCartDrawer()"
+    class="fixed inset-0 bg-black/50 z-[1100] hidden transition-opacity duration-300"></div>
 
+  <!-- Cart Drawer Panel -->
+  <div id="cart-drawer"
+    class="fixed top-0 right-0 h-full w-[350px] max-w-[95vw] sm:max-w-[90vw] bg-white z-[1200] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="text-lg font-bold text-gray-800">Shopping Cart</h2>
+      <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Products List -->
+    <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
+      <!-- কম্পোনেন্ট কল করা হলো -->
+      <x-template1.cart-drawer-items />
+    </div>
+
+    <!-- Footer -->
+    @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
+    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer">
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
+        <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
+          {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
+        </span>
+      </div>
+
+      <div class="space-y-3">
+        <a href="{{ route('cart.index') }}"
+          class="block w-full text-center primary-bg text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+          VIEW CART
+        </a>
+        <a href="{{ route('checkout.index') }}"
+          class="block w-full text-center bg-black text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+          CHECKOUT
+        </a>
+      </div>
+    </div>
+    @endif
+  </div>
 </header>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) {
+      mobileMenu.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          toggleMobileMenu();
+        });
+      });
+    }
+  });
+
   function toggleMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     if (!menu) return;
@@ -210,11 +335,105 @@
   }
 
   // dropdown-এর বাইরে ক্লিক করলে বন্ধ হবে
-  document.addEventListener('click', function (e) {
+  document.addEventListener('click', function(e) {
     const menu = document.getElementById('account-menu');
     const dropdown = document.getElementById('account-dropdown');
     if (menu && dropdown && !menu.contains(e.target)) {
       dropdown.classList.add('hidden');
     }
+  });
+
+  // ============ SEARCH LOGIC ============
+  document.addEventListener('DOMContentLoaded', function() {
+
+    // Desktop search toggle
+    const desktopSearchBtn = document.getElementById('desktop-search-btn');
+    const headerSearchExpand = document.getElementById('header-search-expand');
+
+    if (desktopSearchBtn) {
+      desktopSearchBtn.addEventListener('click', function() {
+        headerSearchExpand.classList.toggle('hidden');
+        const input = document.getElementById('header-search-input');
+        if (input && !headerSearchExpand.classList.contains('hidden')) {
+          input.focus();
+        }
+      });
+    }
+
+    const searchConfigs = [{
+        input: document.getElementById('header-search-input'),
+        suggestions: document.getElementById('search-suggestions'),
+        results: document.getElementById('live-search-results'),
+        defaultContent: document.getElementById('suggestion-content'),
+      },
+      {
+        input: document.getElementById('mobile-search-input'),
+        suggestions: document.getElementById('mobile-search-suggestions'),
+        results: document.getElementById('mobile-live-search-results'),
+        defaultContent: document.getElementById('mobile-suggestion-content'),
+      }
+    ];
+
+    let debounceTimer;
+
+    searchConfigs.forEach(config => {
+      if (!config.input) return;
+
+      config.input.addEventListener('focus', () => {
+        config.suggestions.classList.remove('hidden');
+      });
+
+      config.input.addEventListener('input', function() {
+        const query = this.value.trim();
+        clearTimeout(debounceTimer);
+
+        if (query.length > 1) {
+          debounceTimer = setTimeout(() => {
+            if (config.defaultContent) config.defaultContent.classList.add('hidden');
+            config.results.classList.remove('hidden');
+            config.results.innerHTML =
+              '<div class="px-5 py-3 text-xs text-gray-600"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
+
+            fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}`)
+              .then(res => res.json())
+              .then(data => {
+                config.results.innerHTML = '';
+                if (data.length > 0) {
+                  data.forEach(item => {
+                    const link = document.createElement('a');
+                    link.href = "{{ url('product') }}/" + item.slug;
+                    link.className =
+                      "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
+                    link.innerHTML = `
+                                        <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='${item.thumbnail_url}'">
+                                        <span class="truncate">${item.title}</span>
+                                    `;
+                    config.results.appendChild(link);
+                  });
+                } else {
+                  config.results.innerHTML =
+                    '<div class="px-5 py-3 text-xs text-gray-600">No products found.</div>';
+                }
+              });
+          }, 400);
+        } else {
+          if (config.defaultContent) config.defaultContent.classList.remove('hidden');
+          config.results.classList.add('hidden');
+        }
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      searchConfigs.forEach(config => {
+        if (config.input && !config.input.contains(e.target) && !config.suggestions.contains(e.target)) {
+          config.suggestions.classList.add('hidden');
+        }
+      });
+      // desktop search box বন্ধ করা (ইনপুট এবং বাটনের বাইরে ক্লিক করলে)
+      if (headerSearchExpand && desktopSearchBtn &&
+        !headerSearchExpand.contains(e.target) && !desktopSearchBtn.contains(e.target)) {
+        headerSearchExpand.classList.add('hidden');
+      }
+    });
   });
 </script>
