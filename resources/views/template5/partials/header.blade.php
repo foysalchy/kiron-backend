@@ -17,7 +17,7 @@
       <a href="{{ $homeUrl }}" class="flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none">
         @if($setup->logo_url ?? false)
         <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}"
-          class="w-[200px] max-w-full h-auto max-h-16 object-contain">
+          class="w-[100px] max-w-full h-auto max-h-16 object-contain">
         @else
         <span class="font-semibold text-xl text-header">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
         @endif

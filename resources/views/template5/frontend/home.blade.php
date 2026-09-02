@@ -26,8 +26,7 @@
 <section class="relative bg-hero overflow-hidden">
 
   <!-- Slider -->
-  <div id="imageSlider" class="relative min-h-[500px]">
-
+<div id="imageSlider" class="relative aspect-[4/3] md:aspect-[16/9] lg:aspect-[21/9] w-full">
     @forelse ($mainSliders as $index => $slider)
     <div class="image-slide absolute inset-0 w-full h-full {{ $index == 0 ? 'opacity-100' : 'opacity-0 pointer-events-none' }} transition-opacity duration-700 ease-in-out">
       <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
