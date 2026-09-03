@@ -56,30 +56,30 @@
   </div>
 
   <!-- Thumbnail Gallery with Arrows -->
-  <div class="relative group/gallery">
-    <!-- Left Arrow -->
-    <button type="button" onclick="scrollThumbnails(-1)"
-      class="flex absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
-      <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
+<div class="relative group/gallery">
+  <!-- Left Arrow -->
+  <button type="button" id="thumb-arrow-left" onclick="scrollThumbnails(-1)"
+    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+    <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
 
-    <div id="thumbnail-container" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing px-8 md:px-10">
-      @foreach ($allProductImages as $index => $imgUrl)
-        <button onclick="changeImage('{{ $imgUrl }}')"
-          class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50' }}">
-          <img src="{{ $imgUrl }}"
-               onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
-               class="w-full h-full object-cover pointer-events-none">
-        </button>
-      @endforeach
-    </div>
-
-    <!-- Right Arrow -->
-    <button type="button" onclick="scrollThumbnails(1)"
-      class="flex absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
-      <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
+  <div id="thumbnail-container" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ count($allProductImages) > 3 ? 'px-8 md:px-10' : '' }}">
+    @foreach ($allProductImages as $index => $imgUrl)
+      <button onclick="changeImage('{{ $imgUrl }}')"
+        class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50' }}">
+        <img src="{{ $imgUrl }}"
+             onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
+             class="w-full h-full object-cover pointer-events-none">
+      </button>
+    @endforeach
   </div>
+
+  <!-- Right Arrow -->
+  <button type="button" id="thumb-arrow-right" onclick="scrollThumbnails(1)"
+    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+    <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+  </button>
+</div>
 </div>
 
     <!-- Product Info -->
@@ -253,6 +253,8 @@
 }
 function updateGalleryThumbnails(images) {
     const container = document.getElementById('thumbnail-container');
+    const leftArrow = document.getElementById('thumb-arrow-left');
+    const rightArrow = document.getElementById('thumb-arrow-right');
     if (!container) return;
 
     container.innerHTML = '';
@@ -264,8 +266,16 @@ function updateGalleryThumbnails(images) {
         </button>`;
     });
 
-    // DOM নতুন করে render হওয়ার পর drag scroll আবার init করা প্রয়োজন হয় না,
-    // কারণ event listener container-এর উপর বসানো, ভেতরের content বদলালেও listener থেকে যায়
+    // ============ Arrow visibility + container padding dynamically আপডেট ============
+    const showArrows = images.length > 3;
+
+    if (leftArrow) leftArrow.classList.toggle('hidden', !showArrows);
+    if (leftArrow) leftArrow.classList.toggle('flex', showArrows);
+    if (rightArrow) rightArrow.classList.toggle('hidden', !showArrows);
+    if (rightArrow) rightArrow.classList.toggle('flex', showArrows);
+
+    container.classList.toggle('px-8', showArrows);
+    container.classList.toggle('md:px-10', showArrows);
 }
 
 function handleSelection(group, valId, isLastGroup) {

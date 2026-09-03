@@ -35,7 +35,7 @@
         </div>
     </div>
 @empty
-    <div class="py-10 text-center text-gray-400 text-sm">আপনার কার্ট খালি</div>
+    <div class="py-10 text-center text-gray-400 text-sm">Your cart is empty</div>
 @endforelse
 
 <div id="new-cart-count" class="hidden">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</div>
