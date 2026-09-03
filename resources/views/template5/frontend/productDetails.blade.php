@@ -105,28 +105,33 @@
 
       <input type="hidden" id="selected-variation-id" value="">
 
-      <div class="flex items-center gap-5 mt-auto">
-        <div class="flex items-center border border-coal/15 rounded-full bg-white h-12 w-32">
-          <button type="button" onclick="changeQty(-1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">-</button>
-          <span id="main-qty" class="flex-1 text-center font-medium">1</span>
-          <button type="button" onclick="changeQty(1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">+</button>
-        </div>
+<div class="flex items-center gap-5 mt-auto">
+  <div class="flex items-center border border-coal/15 rounded-full bg-white h-12 w-32">
+    <button type="button" onclick="changeQty(-1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">-</button>
+    <span id="main-qty" class="flex-1 text-center font-medium">1</span>
+    <button type="button" onclick="changeQty(1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">+</button>
+  </div>
 
-        <button id="btn-cart" onclick="handleAddToCart()"
+  <button id="btn-order" onclick="handleAddToCart(true)"
+    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+    class="p-2 mb:p-0 flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-full flex items-center justify-center gap-2 text-xs md:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+    Order Now
+  </button>
 
-        class="p-2 mb:p-0 flex-1 bg-ember hover:bg-ember-600 transition-colors text-white h-12 rounded-full flex items-center justify-center gap-2 text-xs md:text-lg font-medium">
-          Add to Cart
-        </button>
+  <button id="btn-cart" onclick="handleAddToCart()"
+    class="p-2 mb:p-0 flex-1 bg-ember hover:bg-ember-600 transition-colors text-white h-12 rounded-full flex items-center justify-center gap-2 text-xs md:text-lg font-medium">
+    Add to Cart
+  </button>
 
-        <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-          class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors
-          {{ $isWishlisted ? 'border-ember text-ember bg-ember/5' : 'border-coal/15 text-coal hover:border-ember hover:text-ember' }}">
-          <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
-               fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-      </div>
+  <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
+    class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors
+    {{ $isWishlisted ? 'border-ember text-ember bg-ember/5' : 'border-coal/15 text-coal hover:border-ember hover:text-ember' }}">
+    <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
+         fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+  </button>
+</div>
 
    
     </div>

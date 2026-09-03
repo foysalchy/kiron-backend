@@ -48,15 +48,9 @@
 
   <div class="p-5 flex flex-col flex-1">
 
-    <p class="font-display font-semibold text-base leading-snug line-clamp-2 min-h-[40px] group-hover:text-ember transition-colors">
+    <p class="font-display font-semibold text-base leading-snug line-clamp-2  group-hover:text-ember transition-colors">
       {{ $product->title }}
     </p>
-
-    @if (!empty($product->short_description))
-      <p class="text-smoke text-xs mt-1 leading-relaxed line-clamp-2">
-        {{ Str::limit(strip_tags($product->short_description), 50) }}
-      </p>
-    @endif
 
     @if ($company->is_review == 1)
       <div class="flex items-center gap-1 mt-2.5">
@@ -68,8 +62,9 @@
       </div>
     @endif
 
-    <div class="flex items-center justify-between mt-auto pt-3">
-      <div class="flex flex-col">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mt-auto pt-1">
+
+      <div class="flex items-center gap-1.5 flex-wrap">
         <span class="font-mono font-semibold">
           @if(($setup->currency_position ?? 'left') == 'left')
             {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
@@ -89,30 +84,47 @@
         @endif
       </div>
 
-     <button
-    {{ $isOutOfStock ? 'disabled' : '' }}
-    aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
-    onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
-    class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
-    {{ $isOutOfStock
-        ? 'bg-smoke-300 text-white cursor-not-allowed'
-        : 'bg-ember hover:bg-ember-600 text-white cursor-pointer' }}"
->
-    @if ($isOutOfStock)
-        <i class="fas fa-exclamation-circle text-xs"></i>
-    @else
-        <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.4"
-        >
-            <path d="M12 5v14M5 12h14"/>
-        </svg>
-    @endif
-</button>
+<div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+
+    <!-- Order Now Button -->
+    <button
+        {{ $isOutOfStock ? 'disabled' : '' }}
+        aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}"
+        onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
+        class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
+        {{ $isOutOfStock
+            ? 'bg-smoke-300 text-white cursor-not-allowed'
+            : 'secondary-bg text-secondary hover:bg-yellow-500 cursor-pointer' }}"
+    >
+        @if ($isOutOfStock)
+            <i class="fas fa-exclamation-circle text-xs"></i>
+        @else
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                <path d="M13 2 4 14h6l-1 8 9-12h-6z"/>
+            </svg>
+        @endif
+    </button>
+
+    <!-- Add to Cart Button -->
+    <button
+        {{ $isOutOfStock ? 'disabled' : '' }}
+        aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
+        onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
+        class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
+        {{ $isOutOfStock
+            ? 'bg-smoke-300 text-white cursor-not-allowed'
+            : 'bg-ember hover:bg-ember-600 text-white cursor-pointer' }}"
+    >
+        @if ($isOutOfStock)
+            <i class="fas fa-exclamation-circle text-xs"></i>
+        @else
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+        @endif
+    </button>
+
+</div>
     </div>
 
   </div>
@@ -122,7 +134,6 @@
         <script>
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            // product variation modal related scripts
             function updateModalTotal() {
                 const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
                 const qtyInput = document.getElementById('modal-qty');
@@ -133,23 +144,19 @@
                     const unitPrice = parseFloat(selectedVariant.getAttribute('data-price'));
                     const qty = parseInt(qtyInput.value);
 
-                    // PHP থেকে কারেন্সি এবং পজিশন নেওয়া হচ্ছে
                     const currency = "{{ $setup->currency }}";
                     const pos = "{{ $setup->currency_position ?? 'left' }}";
 
                     const total = unitPrice * qty;
 
-                    // পজিশন অনুযায়ী ফরম্যাট করা
                     let unitText = (pos === 'left') ? currency + " " + unitPrice.toLocaleString() : unitPrice.toLocaleString() + " " + currency;
                     let totalText = (pos === 'left') ? currency + " " + total.toLocaleString() : total.toLocaleString() + " " + currency;
 
-                    // আপডেট ডিসপ্লে
                     if(unitPriceDisplay) unitPriceDisplay.innerText = unitText;
                     if(totalDisplay) totalDisplay.innerText = totalText;
                 }
             }
 
-            // quantity change function for variation modal
             function changeQty(val) {
                 let qtyInput = document.getElementById('modal-qty');
                 if (qtyInput) {
@@ -161,8 +168,8 @@
                 }
             }
 
-            // modal open function with loading state
-            function openVariationModal(id) {
+            function openVariationModal(id, isOrderNow = false) {
+                isOrderNowGlobal = isOrderNow;
                 const modal = document.getElementById('variation-modal');
                 const contentArea = document.getElementById('modal-content-area');
                 if (!modal) return;
@@ -176,7 +183,6 @@
                     .then(res => res.text())
                     .then(html => {
                         contentArea.innerHTML = html;
-
                         updateModalTotal();
                     });
             }
@@ -189,7 +195,6 @@
                 }
             }
 
-            // ১. ভ্যারিয়েশন অ্যাড করার ফাংশন (Variation Modal এর জন্য)
             function processAddVariation() {
                 const selectedVariant = document.querySelector('input[name="selected_variant"]:checked');
                 const qtyInput = document.getElementById('modal-qty');
@@ -200,7 +205,6 @@
                     return;
                 }
 
-                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
                 const postData = {
                     items: [{
                         variation_id: selectedVariant.value,
@@ -212,7 +216,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
                     body: JSON.stringify(postData)
@@ -249,11 +253,9 @@
                     }).catch(err => toastr.error("Server error."));
             }
 
-            // ২. সরাসরি সিঙ্গেল প্রোডাক্ট অ্যাড করার ফাংশন
             function addSingleToCart(id, isOrderNow = false) {
                 const token = document.querySelector('meta[name="csrf-token"]').content;
 
-                // ডাটা 'items' অ্যারের ভেতরে পাঠাতে হবে
                 const postData = {
                     items: [{
                         id: id,
@@ -265,7 +267,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json', // এটি যোগ করা জরুরি
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': token
                     },
                     body: JSON.stringify(postData)

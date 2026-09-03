@@ -119,7 +119,13 @@
             background: repeating-linear-gradient(115deg, var(--lumina-ember) 0 10px, transparent 10px 22px);
             opacity: .55;
         }
-        .sear-corner { position: relative; overflow: hidden; }
+     .sear-corner{
+          background: url('1.png') no-repeat;
+    background-size: cover;     
+    background-position: center;
+
+  }
+    .sear-corner { position: relative; overflow: hidden; }
         .sear-corner::after {
             content: "";
             position: absolute; top: -20px; right: -20px; width: 70px; height: 70px;

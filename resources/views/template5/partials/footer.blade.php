@@ -95,8 +95,8 @@
 
     <!-- Bottom -->
     <div class="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row justify-between gap-3 text-xs text-footer/50">
-      <p>&copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Bhaiya Digital' }}. All rights reserved.</p>
-      <p>Powered by {{ config('app.name', 'Bhaiya Digital') }}</p>
+      <p>&copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Dorja.io' }}. All rights reserved.</p>
+      <p>Powered by Dorja.io</p>
     </div>
   </div>
 </footer>

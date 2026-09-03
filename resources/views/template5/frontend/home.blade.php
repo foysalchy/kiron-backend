@@ -21,6 +21,25 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
   }
+#menuGrid {
+    transition: opacity 0.25s ease;
+}
+#menuGrid.fading {
+    opacity: 0;
+}
+
+.menu-loader {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid rgba(24, 19, 15, 0.1);
+    border-top-color: var(--lumina-ember, #D6431F);
+    animation: menu-spin 0.7s linear infinite;
+}
+
+@keyframes menu-spin {
+    to { transform: rotate(360deg); }
+}
 </style>
 <!-- ============ HERO ============ -->
 <section class="relative bg-hero overflow-hidden">
@@ -75,41 +94,33 @@
 </section>
 
 <!-- floating info cards -->
-<section class="max-w-7xl mx-auto px-6 lg:px-10 -mt-16 lg:-mt-20 relative z-20 mb-2 md:mb-10">
+<section class="max-w-7xl mx-auto px-6 lg:px-10 -mt-16 lg:-mt-20 relative z-20 mb-2">
   <div class="grid sm:grid-cols-2 gap-5">
-    <div class="group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
-      <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7">
-          <path d="M4 4h16l-1.5 12.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5z" />
-          <path d="M9 9v6M15 9v6M4 4l1-2h14l1 2" />
-        </svg>
-      </div>
+    <div class="group sear-corner bg-white border border-coal/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
+     <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7">
+        <path d="M4 4h16l-1.5 12.5a2 2 0 0 1-2 1.5H7.5a2 2 0 0 1-2-1.5z"/>
+        <path d="M9 9v6M15 9v6M4 4l1-2h14l1 2"/>
+      </svg>
+    </div>
       <div>
-        <h3 class="font-semibold text-lg">Order Online</h3>
-        <p class="text-[var(--lumina-smoke)] text-sm mt-0.5">Everything you need, delivered straight to your door.</p>
-        <a href="#menu" class="inline-flex items-center gap-1.5 text-brand font-medium text-sm mt-2">Start Order
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+        <h3 class="font-display font-semibold text-lg">Order Online</h3>
+        <p class="text-smoke text-sm mt-0.5">Gourmet cuisine delivered straight to your door.</p>
+        <a href="#menu" class="inline-flex items-center gap-1.5 text-ember font-medium text-sm mt-2">Start Order
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
     </div>
 
-    <div class="group sear-corner bg-white border border-[var(--lumina-coal)]/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
-      <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7">
-          <rect x="3" y="5" width="18" height="16" rx="2" />
-          <path d="M8 3v4M16 3v4M3 10h18" />
-          <path d="M8 15h2M14 15h2" />
-        </svg>
+    <div class="group sear-corner bg-white border border-coal/10 rounded-2xl p-6 flex items-center gap-5 shadow-[0_20px_50px_-20px_rgba(24,19,15,0.25)] hover:-translate-y-1 transition-transform">
+     <div class="w-16 h-16 shrink-0 rounded-xl bg-red-100 flex items-center justify-center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.7"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 15h2M14 15h2"/></svg>
       </div>
       <div>
-        <h3 class="font-semibold text-lg">Track Your Order</h3>
-        <p class="text-[var(--lumina-smoke)] text-sm mt-0.5">See exactly where your package is, in real time.</p>
-        <a href="#" class="inline-flex items-center gap-1.5 text-brand font-medium text-sm mt-2">Track Now
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
+        <h3 class="font-display font-semibold text-lg">Book a Table</h3>
+        <p class="text-smoke text-sm mt-0.5">Reserve your spot for an unforgettable evening.</p>
+        <a href="#" class="inline-flex items-center gap-1.5 text-ember font-medium text-sm mt-2">Reservations
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
     </div>
@@ -244,9 +255,10 @@
 
 </div>
 
-  <div id="menuLoading" class="hidden text-center py-10 text-smoke text-sm">
-    <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading...
-  </div>
+<div id="menuLoading" class="hidden py-16 flex flex-col items-center justify-center gap-4">
+  <div class="menu-loader"></div>
+  <span class="text-sm text-smoke tracking-wide">Loading dishes…</span>
+</div>
 
 <div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       @foreach ($popularProducts as $product)
@@ -392,15 +404,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function loadMenu() {
+function loadMenu() {
+    noResults.classList.add('hidden');
+    grid.classList.add('fading');
+
+    const params = new URLSearchParams({
+        category: activeCategory,
+        search: searchInput.value.trim(),
+    });
+
+    setTimeout(() => {
         loading.classList.remove('hidden');
         grid.classList.add('hidden');
-        noResults.classList.add('hidden');
-
-        const params = new URLSearchParams({
-            category: activeCategory,
-            search: searchInput.value.trim(),
-        });
 
         fetch(`{{ route('menu.filter') }}?${params.toString()}`)
             .then(res => res.text())
@@ -412,13 +427,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     noResults.classList.remove('hidden');
                 } else {
                     grid.classList.remove('hidden');
+                    requestAnimationFrame(() => {
+                        grid.classList.remove('fading');
+                    });
                 }
             })
             .catch(() => {
                 loading.classList.add('hidden');
-                grid.classList.remove('hidden');
+                grid.classList.remove('hidden', 'fading');
             });
-    }
+    }, 200);
+}
 
     pills.forEach(pill => {
         pill.addEventListener('click', function () {
