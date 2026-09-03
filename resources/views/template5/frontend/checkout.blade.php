@@ -170,13 +170,20 @@
                             </div>
 
                             <!-- Quantity Display -->
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                <a href="{{ route('cart.remove', $item->rowId) }}"
-                                    class="text-red-400 hover:text-red-600">
-                                    <i class="far fa-trash-alt text-xs"></i>
-                                </a>
-                            </div>
+                        <!-- Quantity Controls -->
+<div class="flex flex-col items-end gap-2">
+    <div class="flex items-center border border-gray-200 rounded-full h-8 w-20">
+        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+            class="w-7 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)]">-</button>
+        <span class="flex-1 text-center text-xs font-bold">{{ $item->qty }}</span>
+        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+            class="w-7 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)]">+</button>
+    </div>
+    <a href="{{ route('cart.remove', $item->rowId) }}"
+        class="text-red-400 hover:text-red-600 text-xs">
+        <i class="far fa-trash-alt"></i> Remove
+    </a>
+</div>
                         </div>
                         @endforeach
                     </div>
@@ -495,6 +502,35 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
             }, 50);
         });
+</script>
+<script>
+    function updateCheckoutQty(rowId, newQty) {
+        if (newQty < 1) return;
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch("{{ route('cart.update') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    rowId: rowId,
+                    qty: newQty
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // qty change করলে subtotal/shipping/total সব রিক্যালকুলেট হবে,
+                // তাই সহজ ও নির্ভরযোগ্য উপায় হলো পেজ রিলোড
+                location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                toastr.error("Quantity update failed. Please try again.");
+            });
+    }
 </script>
 @endpush
 @push('scripts')
