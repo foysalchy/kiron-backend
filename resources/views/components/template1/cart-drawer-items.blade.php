@@ -1,3 +1,5 @@
+@props(['removeMessage' => 'The item has been removed from the cart.'])
+
 @php $cartItems = \Gloudemans\Shoppingcart\Facades\Cart::content(); @endphp
 
 @forelse($cartItems as $item)
@@ -11,16 +13,17 @@
             <div class="flex justify-between items-center mt-1">
                 <span class="text-xs font-bold text-[var(--primary-color)]">{{ $item->qty }} ×
     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
-                <button onclick="removeCartItem('{{ $item->rowId }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
+                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
             </div>
         </div>
     </div>
 @empty
-    <div class="py-10 text-center text-gray-400 text-sm">আপনার কার্ট খালি</div>
+    <div class="py-10 text-center text-gray-400 text-sm">Your cart is empty</div>
 @endforelse
 
-{{-- সাবটোটাল ডাটা (লুকানো থাকবে, শুধু JS এর জন্য) --}}
 <div id="new-cart-subtotal" class="hidden">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}</div>
+<div id="new-cart-count" class="hidden">{{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}</div>
+
 <script>
     function refreshMiniCart() {
     fetch("{{ route('cart.drawer.items') }}")
@@ -40,25 +43,27 @@
         if (newSubtotal && subtotalValEl) {
             const pos = "{{ $setup->currency_position ?? 'left' }}";
             const currency = "{{ $setup->currency }}";
-
-            // পজিশন অনুযায়ী টেক্সট সেট করা
             subtotalValEl.innerText = (pos === 'left') ? (currency + newSubtotal) : (newSubtotal + currency);
         }
+
+        const newCount = parseInt(document.getElementById('new-cart-count')?.innerText) || 0;
+        const footerWrapper = document.getElementById('mini-cart-footer');
+        if (footerWrapper) {
+            footerWrapper.style.display = newCount > 0 ? '' : 'none';
+        }
+
                 }).catch(err => console.error('Cart Refresh Error:', err));
         }
 
-    function removeCartItem(rowId) {
-    // সাবডোমেইন এবং রাউট অনুযায়ী সঠিক পাথ (/cart/remove/ID)
+    function removeCartItem(rowId, customMessage) {
     fetch(`/cart/remove/${rowId}`, {
         headers: {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
     .then(res => {
-        // রিমুভ সফল হলে ড্রয়ার রিফ্রেশ করবে
         refreshMiniCart();
 
-        // কার্ট কাউন্টার ডাইনামিকালি আপডেট
         document.querySelectorAll('.cart-count-nav').forEach(el => {
             let currentCount = parseInt(el.innerText);
             if (currentCount > 0) {
@@ -66,7 +71,7 @@
             }
         });
 
-        toastr.success('পণ্যটি কার্ট থেকে সরানো হয়েছে');
+        toastr.success(customMessage || 'The item has been removed from the cart.');
     })
     .catch(err => console.error('Error removing item:', err));
 }
@@ -76,7 +81,7 @@
         const overlay = document.getElementById('cart-overlay');
 
         if (drawer.classList.contains('translate-x-full')) {
-            refreshMiniCart(); // ড্রয়ার খোলার সময় আপডেট ডাটা আনবে
+            refreshMiniCart();
             drawer.classList.remove('translate-x-full');
             overlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -87,4 +92,3 @@
         }
     }
 </script>
-

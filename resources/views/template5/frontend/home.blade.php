@@ -234,7 +234,7 @@
       All
     </button>
 
-    @foreach ($categories as $category)
+    @foreach ($categories->take(8)  as $category)
     <button type="button" data-slug="{{ $category->slug }}"
       class="pill-btn shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-transparent text-smoke border border-coal/15 hover:border-coal/40 whitespace-nowrap">
       {{ $category->name }}

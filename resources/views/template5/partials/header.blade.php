@@ -278,14 +278,14 @@
     </div>
 
     <!-- Products List -->
-    <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
+  <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
       <!-- কম্পোনেন্ট কল করা হলো -->
       <x-template1.cart-drawer-items />
     </div>
 
     <!-- Footer -->
-    @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
-    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer">
+    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer"
+         style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
       <div class="flex justify-between items-center mb-4">
         <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
         <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
@@ -304,7 +304,6 @@
         </a>
       </div>
     </div>
-    @endif
   </div>
 </header>
 
