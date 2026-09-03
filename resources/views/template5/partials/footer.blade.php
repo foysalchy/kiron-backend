@@ -72,23 +72,26 @@
       <div>
         <h4 class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Newsletter</h4>
         <p class="text-footer/70 text-sm mb-4">Subscribe to receive exclusive offers and updates.</p>
+<form id="newsletter-form-2" class="relative">
+  @csrf
+  <input
+    type="email"
+    name="email"
+    id="subscriber-email-2"
+    placeholder="Email address"
+    required
+    class="w-full bg-gray-50 border border-gray-200 rounded-full
+           pl-4 pr-11 py-2.5 text-sm text-black
+           placeholder:text-gray-400
+           focus:outline-none focus:ring-2
+           focus:ring-ember/40 focus:border-ember/50
+           transition-all"
+  >
+  <button type="submit" id="subscribe-btn-2" aria-label="Subscribe" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full primary-bg primary-bg-hover transition-colors flex items-center justify-center">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </button>
+</form>
 
-        <form class="relative" action="{{ Route::has('newsletter.subscribe') ? route('newsletter.subscribe') : '#' }}" method="POST" onsubmit="{{ Route::has('newsletter.subscribe') ? '' : 'return false;' }}">
-          @csrf
-    <input
-            type="email"
-            placeholder="Email address"
-            class="w-full bg-gray-50 border border-gray-200 rounded-full
-                   pl-4 pr-11 py-2.5 text-sm text-black
-                   placeholder:text-gray-400
-                   focus:outline-none focus:ring-2
-                   focus:ring-ember/40 focus:border-ember/50
-                   transition-all"
-          >
-          <button type="submit" aria-label="Subscribe" class="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full primary-bg primary-bg-hover transition-colors flex items-center justify-center">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </button>
-        </form>
       </div>
 
     </div>
@@ -100,3 +103,44 @@
     </div>
   </div>
 </footer>
+<script>
+    document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('subscriber-email').value;
+        const btn = document.getElementById('subscribe-btn');
+        const originalText = btn.innerHTML;
+
+        // লোডিং স্টেট
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch("{{ route('newsletter.subscribe') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+                if (response.ok) {
+                    toastr.success(data.message);
+                    document.getElementById('subscriber-email').value = ''; // ইনপুট ক্লিয়ার
+                } else {
+                    toastr.error(data.message || 'Validation error');
+                }
+            })
+            .catch(error => {
+                toastr.error('Something went wrong. Please try again.');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
+    });
+</script>

@@ -59,39 +59,39 @@ class CartController extends FrontendController
         $total = ($subtotal - $discount) + $shipping;
 
         $productIds = [];
-    foreach($cartContent as $item) {
-        // ভ্যারিয়েশন আইডি থাকলে মেইন প্রোডাক্ট আইডি বের করা
-        $productIds[] = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
-    }
+        foreach ($cartContent as $item) {
+            // ভ্যারিয়েশন আইডি থাকলে মেইন প্রোডাক্ট আইডি বের করা
+            $productIds[] = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
+        }
 
-    $megaCategoryIds = [];
-    if (!empty($productIds)) {
-        $productsInCart = Product::whereIn('id', $productIds)->get();
-        foreach ($productsInCart as $p) {
-            if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
-                $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
+        $megaCategoryIds = [];
+        if (!empty($productIds)) {
+            $productsInCart = Product::whereIn('id', $productIds)->get();
+            foreach ($productsInCart as $p) {
+                if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
+                    $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
+                }
             }
         }
-    }
-    $megaCategoryIds = array_unique($megaCategoryIds);
+        $megaCategoryIds = array_unique($megaCategoryIds);
 
-    // কোয়েরি তৈরি করা
-    $relatedQuery = Product::where('status', Status::Active->value)
-        ->whereNotIn('id', $productIds);
+        // কোয়েরি তৈরি করা
+        $relatedQuery = Product::where('status', Status::Active->value)
+            ->whereNotIn('id', $productIds);
 
-    if (!empty($megaCategoryIds)) {
-        $relatedQuery->where(function($q) use ($megaCategoryIds) {
-            foreach($megaCategoryIds as $catId) {
-                $q->orWhereJsonContains('mega_category_ids', $catId);
-            }
-        });
-    }
+        if (!empty($megaCategoryIds)) {
+            $relatedQuery->where(function ($q) use ($megaCategoryIds) {
+                foreach ($megaCategoryIds as $catId) {
+                    $q->orWhereJsonContains('mega_category_ids', $catId);
+                }
+            });
+        }
 
-    // যদি কার্ট খালি থাকে বা রিলেটেড কিছু না পায় তবে লেটেস্ট প্রোডাক্ট দেখাবে
-    $relatedProducts = $relatedQuery->inRandomOrder()->limit(8)->get();
-    if($relatedProducts->isEmpty()){
-        $relatedProducts = Product::where('status', Status::Active->value)->latest()->limit(8)->get();
-    }
+        // যদি কার্ট খালি থাকে বা রিলেটেড কিছু না পায় তবে লেটেস্ট প্রোডাক্ট দেখাবে
+        $relatedProducts = $relatedQuery->inRandomOrder()->limit(8)->get();
+        if ($relatedProducts->isEmpty()) {
+            $relatedProducts = Product::where('status', Status::Active->value)->latest()->limit(8)->get();
+        }
 
 
         return $this->view(
@@ -524,7 +524,20 @@ class CartController extends FrontendController
                 ->where('product_id', $productId)
                 ->update(['quantity' => $request->qty, 'status' => CartTrack::ADDED]);
         }
+
         Cart::update($request->rowId, $request->qty);
+
+        // AJAX request হলে JSON response
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Cart has been updated.',
+                'cart_count' => Cart::count(),
+                'subtotal' => Cart::subtotal(),
+            ]);
+        }
+
+        // সাধারণ form submit হলে আগের মতোই redirect
         return back()->with('success', 'Cart has been updated.');
     }
 

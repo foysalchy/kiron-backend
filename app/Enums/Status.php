@@ -121,6 +121,31 @@ enum Status: int
 
     return $result;
   }
+  public static function getOrderTracking(int $currentStatus): array
+{
+    $flow = self::ORDER_FLOW;
+
+    // ORDER_FLOW-তে current status এর position (index) খুঁজে বের করা
+    $currentIndex = -1;
+    foreach ($flow as $index => $status) {
+        if ($status->value === $currentStatus) {
+            $currentIndex = $index;
+            break;
+        }
+    }
+
+    $result = [];
+
+    foreach ($flow as $index => $status) {
+        $result[] = [
+            'status' => $status,
+            'is_completed' => $currentIndex !== -1 && $index <= $currentIndex,
+            'is_current' => $index === $currentIndex,
+        ];
+    }
+
+    return $result;
+}
   public function slug(): string
   {
     return strtolower($this->name);

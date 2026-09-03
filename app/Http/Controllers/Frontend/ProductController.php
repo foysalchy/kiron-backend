@@ -415,6 +415,7 @@ if ($request->filled('mega_category') || $request->filled('sub_category')) {
                 ];
             }
         }
+
         $defaultGalleries = $product->galleries->map(fn($g) => $g->image_url)->toArray();
         array_unshift($defaultGalleries, $product->thumbnail_url);
         //  \Log::info($formattedVariations);

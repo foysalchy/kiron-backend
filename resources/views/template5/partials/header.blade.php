@@ -284,26 +284,27 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer"
-         style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-        <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
-          {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
-        </span>
-      </div>
+<div class="p-4 border-t bg-gray-50" id="mini-cart-footer"
+     style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
+  <div class="flex justify-between items-center mb-4">
+    <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
+    <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val"
+          data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
+      {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
+    </span>
+  </div>
 
-      <div class="space-y-3">
-        <a href="{{ route('cart.index') }}"
-          class="block w-full text-center primary-bg text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
-          VIEW CART
-        </a>
-        <a href="{{ route('checkout.index') }}"
-          class="block w-full text-center bg-black text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
-          CHECKOUT
-        </a>
-      </div>
-    </div>
+  <div class="space-y-3">
+    <a href="{{ route('cart.index') }}"
+      class="block w-full text-center primary-bg text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+      VIEW CART
+    </a>
+    <a href="{{ route('checkout.index') }}"
+      class="block w-full text-center bg-black text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+      CHECKOUT
+    </a>
+  </div>
+</div>
   </div>
 </header>
 
