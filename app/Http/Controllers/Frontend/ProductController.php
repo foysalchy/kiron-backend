@@ -296,23 +296,19 @@ class ProductController extends FrontendController
         }
         // applyFiltersAndSorting() মেথডের ভিতরে যোগ করুন
 
-        if ($request->filled('mega_category')) {
-            $megaIds = (array) $request->mega_category;
-            $query->where(function ($q) use ($megaIds) {
-                foreach ($megaIds as $id) {
-                    $q->orWhereJsonContains('mega_category_ids', (int) $id);
-                }
-            });
-        }
+if ($request->filled('mega_category') || $request->filled('sub_category')) {
+    $megaIds = (array) $request->mega_category;
+    $subIds  = (array) $request->sub_category;
 
-        if ($request->filled('sub_category')) {
-            $subIds = (array) $request->sub_category;
-            $query->where(function ($q) use ($subIds) {
-                foreach ($subIds as $id) {
-                    $q->orWhereJsonContains('sub_category_ids', (int) $id);
-                }
-            });
+    $query->where(function ($q) use ($megaIds, $subIds) {
+        foreach ($megaIds as $id) {
+            $q->orWhereJsonContains('mega_category_ids', (int) $id);
         }
+        foreach ($subIds as $id) {
+            $q->orWhereJsonContains('sub_category_ids', (int) $id);
+        }
+    });
+}
 
         // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
         if ($request->filled('attributes')) {
