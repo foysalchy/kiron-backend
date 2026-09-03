@@ -60,6 +60,26 @@
             background-color: var(--header-bg) !important;
             color: var(--header-text) !important;
         }
+    
+  .nav-link {
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.2s ease;
+  }
+  .nav-link.active {
+    color: var(--primary-color) !important;
+  }
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--primary-color);
+  }
+
 
         .footer-custom-bg {
             background-color: var(--footer-bg) !important;
@@ -232,6 +252,8 @@
                 toastr.warning("{{ Session::get('warning') }}");
             @endif
         });
+
+        
     </script>
 
 

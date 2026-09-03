@@ -13,22 +13,20 @@
       <button type="button" class="lg:hidden text-2xl text-coal focus:outline-none shrink-0" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
         <i class="fas fa-bars"></i>
       </button>
-<a href="{{ $homeUrl }}" class="relative flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
-  @if($setup->logo_url ?? false)
-  <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}"
-    class="w-[100px] max-w-full z-10">
-  <span class="absolute -bottom-1 left-0 h-[2.5px] w-full bg-gradient-to-r from-ember via-ember/60 to-transparent scale-x-0 origin-left group-hover/logo:scale-x-100 transition-transform duration-500"></span>
-  @else
-  <span class="font-semibold text-xl text-header">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
-  @endif
-</a>
-
-      <nav class="hidden lg:flex items-center gap-10 text-sm bg-[#f8f7f7] py-4 border border-[#e0e0e0] px-4 rounded-full">
-        <a href="{{ $homeUrl }}#menu" class="text-black hover:text-brand transition-colors">Menu</a>
-        <a href="#" class="text-black hover:text-brand transition-colors">Reservations</a>
-
-        <a href="{{ $homeUrl }}#offers" class="text-black hover:text-brand transition-colors">Offers</a>
-      </nav>
+      <a href="{{ $homeUrl }}" class="relative flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
+        @if($setup->logo_url ?? false)
+        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}"
+          class="w-[100px] max-w-full z-10">
+        <span class="absolute -bottom-1 left-0 h-[2.5px] w-full bg-gradient-to-r from-ember via-ember/60 to-transparent scale-x-0 origin-left group-hover/logo:scale-x-100 transition-transform duration-500"></span>
+        @else
+        <span class="font-semibold text-xl text-header">{{ $setup->shop_name ?? 'Bhaiya Digital' }}</span>
+        @endif
+      </a>
+<nav class="hidden lg:flex items-center gap-10 text-sm bg-[#f8f7f7] py-4 border border-[#e0e0e0] px-4 rounded-full">
+  <a href="{{ $homeUrl }}#menu" data-nav-target="menu" class="nav-link text-black hover:text-brand transition-colors">Menu</a>
+  <a href="#" class="text-black hover:text-brand transition-colors">Reservations</a>
+  <a href="{{ $homeUrl }}#offers" data-nav-target="offers" class="nav-link text-black hover:text-brand transition-colors">Offers</a>
+</nav>
 
       <div class="flex items-center gap-5">
         <button id="desktop-search-btn" aria-label="Search" class="hidden sm:flex text-header/80 hover:text-brand transition-colors">
@@ -311,41 +309,79 @@
 </header>
 
 <script>
-document.addEventListener('click', function(e) {
-  const link = e.target.closest('a[href*="#"]');
-  if (!link) return;
+  document.addEventListener('click', function(e) {
+    const link = e.target.closest('a[href*="#"]');
+    if (!link) return;
 
-  const href = link.getAttribute('href');
-  const hashIndex = href.indexOf('#');
-  if (hashIndex === -1) return;
+    const href = link.getAttribute('href');
+    const hashIndex = href.indexOf('#');
+    if (hashIndex === -1) return;
 
-  const hash = href.substring(hashIndex + 1);
-  if (!hash) return;
+    const hash = href.substring(hashIndex + 1);
+    if (!hash) return;
 
-  const targetEl = document.getElementById(hash);
-  if (!targetEl) return;
+    const targetEl = document.getElementById(hash);
+    if (!targetEl) return;
 
-  e.preventDefault();
-  e.stopImmediatePropagation();
+    e.preventDefault();
+    e.stopImmediatePropagation();
 
-  // মোবাইল sidebar খোলা থাকলে বন্ধ করে দেওয়া হচ্ছে
-  const mobileMenu = document.getElementById('mobile-menu');
-  if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-    toggleMobileMenu();
+    // মোবাইল sidebar খোলা থাকলে বন্ধ করে দেওয়া হচ্ছে
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+      toggleMobileMenu();
+    }
+
+    const headerHeight = document.querySelector('header')?.offsetHeight || 100;
+    const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - (headerHeight + 10);
+
+    // sidebar close animation-এর জন্য সামান্য delay দিয়ে scroll করা হচ্ছে
+    setTimeout(() => {
+      window.scrollTo({
+        top: targetPosition,
+        behavior: 'smooth'
+      });
+    }, mobileMenu && !mobileMenu.classList.contains('hidden') ? 50 : 0);
+
+  }, true);
+  document.addEventListener('DOMContentLoaded', function () {
+  const navLinks = document.querySelectorAll('.nav-link[data-nav-target]');
+  if (!navLinks.length) return;
+
+  const sections = [];
+  navLinks.forEach(link => {
+    const id = link.getAttribute('data-nav-target');
+    const el = document.getElementById(id);
+    if (el) sections.push({ id, el, link });
+  });
+
+  function setActive(id) {
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('data-nav-target') === id);
+    });
   }
 
-  const headerHeight = document.querySelector('header')?.offsetHeight || 100;
-  const targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - (headerHeight + 10);
-
-  // sidebar close animation-এর জন্য সামান্য delay দিয়ে scroll করা হচ্ছে
-  setTimeout(() => {
-    window.scrollTo({
-      top: targetPosition,
-      behavior: 'smooth'
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const match = sections.find(s => s.el === entry.target);
+        if (match) setActive(match.id);
+      }
     });
-  }, mobileMenu && !mobileMenu.classList.contains('hidden') ? 50 : 0);
+  }, {
+    root: null,
+    rootMargin: '-40% 0px -50% 0px',
+    threshold: 0
+  });
 
-}, true);
+  sections.forEach(s => observer.observe(s.el));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', function () {
+      setActive(this.getAttribute('data-nav-target'));
+    });
+  });
+});
   document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileMenu) {
