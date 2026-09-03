@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 class Party extends Authenticatable
 {
@@ -18,7 +19,7 @@ class Party extends Authenticatable
     // Type constants
     const TYPE_SUPPLIER = 1;
     const TYPE_CUSTOMER = 2;
-    
+
 
     protected $fillable = [
         'company_id',
@@ -132,7 +133,9 @@ class Party extends Authenticatable
 
     public function getProfileUrlAttribute(): ?string
     {
-        return $this->profile ? asset('storage/' . $this->profile) : null;
+        return $this->profile
+            ? Storage::disk('r2')->url($this->profile)
+            : null;
     }
 
     // Helper methods

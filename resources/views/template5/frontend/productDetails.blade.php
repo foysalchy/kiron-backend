@@ -41,35 +41,49 @@
   </div>
 
   <div class="grid lg:grid-cols-2 gap-12 lg:gap-20">
-    <!-- Image Gallery -->
-    <div class="space-y-4">
-      <div class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
-        <img id="mainImage"
-             src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
-             alt="{{ $product->title }}"
-             class="w-full h-full object-cover">
+<div class="space-y-4 min-w-0">
+  <div class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
+    <img id="mainImage"
+         src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
+         alt="{{ $product->title }}"
+         class="w-full h-full object-cover">
 
-        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-          <span class="absolute top-5 left-5 bg-ember text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
-            {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% Off
-          </span>
-        @endif
-      </div>
+    @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
+      <span class="absolute top-5 left-5 bg-ember text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
+        {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% Off
+      </span>
+    @endif
+  </div>
 
-      <div id="thumbnail-container" class="grid grid-cols-4 gap-4">
-        @foreach ($allProductImages as $index => $imgUrl)
-          <button onclick="changeImage('{{ $imgUrl }}')"
-            class="h-24 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50' }}">
-            <img src="{{ $imgUrl }}"
-                 onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
-                 class="w-full h-full object-cover">
-          </button>
-        @endforeach
-      </div>
+  <!-- Thumbnail Gallery with Arrows -->
+  <div class="relative group/gallery">
+    <!-- Left Arrow -->
+    <button type="button" onclick="scrollThumbnails(-1)"
+      class="flex absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+      <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+
+    <div id="thumbnail-container" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing px-8 md:px-10">
+      @foreach ($allProductImages as $index => $imgUrl)
+        <button onclick="changeImage('{{ $imgUrl }}')"
+          class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50' }}">
+          <img src="{{ $imgUrl }}"
+               onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
+               class="w-full h-full object-cover pointer-events-none">
+        </button>
+      @endforeach
     </div>
 
+    <!-- Right Arrow -->
+    <button type="button" onclick="scrollThumbnails(1)"
+      class="flex absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+      <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
     <!-- Product Info -->
-    <div class="flex flex-col justify-center">
+<div class="flex flex-col">
       <div class="flex items-center gap-2 mb-3">
         <div class="flex items-center">
           @for ($i = 1; $i <= 5; $i++)
@@ -87,12 +101,12 @@
 
       <h1 class="font-display font-semibold text-4xl sm:text-5xl text-coal leading-tight mb-2">{{ $product->title }}</h1>
 
-      <p class="text-xl font-mono font-semibold text-ember mb-6">
-        {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
-        @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-          <span class="text-smoke line-through ml-1.5 text-base">{{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}</span>
-        @endif
-      </p>
+<p class="text-xl font-mono font-semibold text-ember mb-6">
+  <span id="main-sale-price">{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}</span>
+  <span id="main-regular-price" class="text-smoke line-through ml-1.5 text-base {{ $product->display_price_data->regular_price > $product->display_price_data->sale_price ? '' : 'hidden' }}">
+    {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
+  </span>
+</p>
 
       <div class="text-smoke leading-relaxed mb-8">
         {!! $product->short_description ?? 'No detailed description available for this product.' !!}
@@ -105,32 +119,46 @@
 
       <input type="hidden" id="selected-variation-id" value="">
 
-<div class="flex items-center gap-5 mt-auto">
-  <div class="flex items-center border border-coal/15 rounded-full bg-white h-12 w-32">
-    <button type="button" onclick="changeQty(-1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">-</button>
-    <span id="main-qty" class="flex-1 text-center font-medium">1</span>
-    <button type="button" onclick="changeQty(1)" class="w-10 flex items-center justify-center text-coal hover:text-ember transition-colors">+</button>
+<div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 mt-2">
+
+  <!-- Row 1 (mobile): Qty + Wishlist একসাথে, ঠিকভাবে align করা -->
+  <div class="flex items-center justify-between sm:justify-start gap-3 sm:contents">
+
+    <!-- Qty Selector -->
+    <div class="flex items-center justify-between border border-coal/15 rounded-full bg-white h-12 w-32 sm:order-1">
+      <button type="button" onclick="changeQty(-1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-ember transition-colors">-</button>
+      <span id="main-qty" class="flex-1 text-center font-medium">1</span>
+      <button type="button" onclick="changeQty(1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-ember transition-colors">+</button>
+    </div>
+
+    <!-- Wishlist Button -->
+    <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
+      class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
+      {{ $isWishlisted ? 'border-ember text-ember bg-ember/5' : 'border-coal/15 text-coal hover:border-ember hover:text-ember' }}">
+      <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
+           fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+    </button>
+
   </div>
 
-  <button id="btn-order" onclick="handleAddToCart(true)"
-    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-    class="p-2 mb:p-0 flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-full flex items-center justify-center gap-2 text-xs md:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-    Order Now
-  </button>
+  <!-- Row 2 (mobile): Order Now + Add to Cart পাশাপাশি -->
+  <div class="flex items-center gap-3 sm:contents">
 
-  <button id="btn-cart" onclick="handleAddToCart()"
-    class="p-2 mb:p-0 flex-1 bg-ember hover:bg-ember-600 transition-colors text-white h-12 rounded-full flex items-center justify-center gap-2 text-xs md:text-lg font-medium">
-    Add to Cart
-  </button>
+    <button id="btn-order" onclick="handleAddToCart(true)"
+      {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+      class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 text-secondary rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+      Order Now
+    </button>
 
-  <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-    class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors
-    {{ $isWishlisted ? 'border-ember text-ember bg-ember/5' : 'border-coal/15 text-coal hover:border-ember hover:text-ember' }}">
-    <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
-         fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-    </svg>
-  </button>
+    <button id="btn-cart" onclick="handleAddToCart()"
+      class="flex-1 sm:order-3 sm:flex-1 h-12 bg-ember hover:bg-ember-600 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">
+      Add to Cart
+    </button>
+
+  </div>
+
 </div>
 
    
@@ -209,8 +237,21 @@
     }
     document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
   }
+  function updatePriceDisplay(price) {
+    const saleEl = document.getElementById('main-sale-price');
+    const regularEl = document.getElementById('main-regular-price');
+    const currency = "{{ $setup->currency }}";
 
-  function updateGalleryThumbnails(images) {
+    if (saleEl) {
+        saleEl.innerText = currency + ' ' + Math.round(price).toLocaleString();
+    }
+
+    // Variation-এ আলাদা regular price data নেই, তাই strikethrough হাইড করে দেওয়া হচ্ছে
+    if (regularEl) {
+        regularEl.classList.add('hidden');
+    }
+}
+function updateGalleryThumbnails(images) {
     const container = document.getElementById('thumbnail-container');
     if (!container) return;
 
@@ -218,13 +259,16 @@
     images.forEach((img, i) => {
       container.innerHTML += `
         <button onclick="changeImage('${img}')"
-          class="h-24 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50'}">
-          <img src="${img}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover">
+          class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50'}">
+          <img src="${img}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
         </button>`;
     });
-  }
 
-  function handleSelection(group, valId, isLastGroup) {
+    // DOM নতুন করে render হওয়ার পর drag scroll আবার init করা প্রয়োজন হয় না,
+    // কারণ event listener container-এর উপর বসানো, ভেতরের content বদলালেও listener থেকে যায়
+}
+
+function handleSelection(group, valId, isLastGroup) {
     if (!isLastGroup) {
       activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
       let idx = attributeGroups.indexOf(group);
@@ -239,6 +283,9 @@
         for (let gName in matched.attributes) {
           if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
         }
+
+        // ============ প্রাইস আপডেট (নতুন) ============
+        updatePriceDisplay(matched.price);
 
         if (isSingleChoice) {
           finalSelectedVariationIds = [matched.id];
@@ -260,8 +307,7 @@
       }
     }
     renderAttributes();
-  }
-
+}
   function checkIsSelected(groupName, valId) {
     return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
   }
@@ -275,6 +321,68 @@
     let newVal = parseInt(q.innerText) + val;
     if (newVal >= 1) q.innerText = newVal;
   }
+function scrollThumbnails(direction) {
+    const container = document.getElementById('thumbnail-container');
+    if (!container) return;
+
+    const scrollAmount = 110;
+    container.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+    });
+}
+function initThumbnailDragScroll() {
+    const container = document.getElementById('thumbnail-container');
+    if (!container) return;
+
+    let isDown = false;
+    let startX;
+    let scrollLeftStart;
+    let hasDragged = false;
+
+    container.addEventListener('mousedown', (e) => {
+        isDown = true;
+        hasDragged = false;
+        startX = e.pageX - container.offsetLeft;
+        scrollLeftStart = container.scrollLeft;
+    });
+
+    container.addEventListener('mouseleave', () => {
+        isDown = false;
+    });
+
+    container.addEventListener('mouseup', () => {
+        isDown = false;
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - container.offsetLeft;
+        const walk = (x - startX) * 1.5; // drag speed multiplier
+        if (Math.abs(walk) > 5) hasDragged = true; // সামান্য নড়াচড়াকে drag হিসেবে ধরা হবে না
+        container.scrollLeft = scrollLeftStart - walk;
+    });
+
+    // Drag করার পর accidental click (thumbnail change) আটকানো
+    container.addEventListener('click', (e) => {
+        if (hasDragged) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }, true);
+}
+document.addEventListener("DOMContentLoaded", () => {
+    if (attributeGroups.length > 0) renderAttributes();
+    initThumbnailDragScroll();
+
+    // scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => io.observe(el));
+});
 
   function handleAddToCart(isOrderNow = false) {
     const token = document.querySelector('meta[name="csrf-token"]').content;

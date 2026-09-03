@@ -4,23 +4,24 @@
 @endsection
 @section('content')
 <style>
-  .custom-scrollbar::-webkit-scrollbar {
-    height: 5px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
+.thumb-scrollbar::-webkit-scrollbar {
+    height: 6px;
+}
+.thumb-scrollbar::-webkit-scrollbar-track {
     background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.35);
-  }
-  .custom-scrollbar {
+}
+.thumb-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--lumina-ember, #D6431F);
+    border-radius: 999px;
+    opacity: 0.5;
+}
+.thumb-scrollbar::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
+}
+.thumb-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-  }
+    scrollbar-color: var(--lumina-ember, #D6431F) transparent;
+}
 #menuGrid {
     transition: opacity 0.25s ease;
 }
@@ -228,7 +229,7 @@
 
 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mt-8 mb-9">
 
-  <div class="flex flex-nowrap gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 custom-scrollbar" id="filterPills">
+  <div class="flex flex-nowrap gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 thumb-scrollbar" id="filterPills">
     <button type="button" data-slug="all"
       class="pill-btn active shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-ember text-white whitespace-nowrap">
       All

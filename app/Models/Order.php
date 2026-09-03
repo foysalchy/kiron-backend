@@ -77,6 +77,7 @@ class Order extends Model
         'assigned_to' => 'array',
         'source_info' => 'array',
         'pixel_source_info' => 'array',
+        
 
 
     ];
