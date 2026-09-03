@@ -18,8 +18,8 @@
     <div class="lg:col-span-2 space-y-6">
 
       @foreach ($cartContent as $item)
-        <div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative sear-corner">
-        <a href="{{ route('cart.remove', $item->rowId) }}"
+<div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">   
+       <a href="{{ route('cart.remove', $item->rowId) }}"
    class="absolute top-4 right-4 z-20 text-smoke hover:text-red-500 transition-colors pointer-events-auto">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
 </a>
@@ -92,7 +92,7 @@
                      {{ $shipping_area == 'inside' ? 'checked' : '' }}
                      class="accent-ember">
               <span class="text-sm font-medium text-coal">
-                Inside Dhaka ({{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }})
+                Regular Delivery ({{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }})
               </span>
             </label>
 
@@ -101,7 +101,7 @@
                      {{ $shipping_area == 'outside' ? 'checked' : '' }}
                      class="accent-ember">
               <span class="text-sm font-medium text-coal">
-                Outside Dhaka ({{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }})
+                Quick Bite ({{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }})
               </span>
             </label>
           </form>

@@ -3,7 +3,7 @@
 
     'type'=>'Product',
 
-    'title'=>$product->meta_title ?: $product->name,
+    'title'=>$product->meta_title ?: $product->title,
 
     'description'=>$product->meta_description,
 
