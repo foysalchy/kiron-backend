@@ -471,6 +471,41 @@
             font-weight: 500;
             margin-top: 4px;
         }
+        @media (max-width: 640px) {
+            .invoice-inner {
+                padding: 20px !important; /* প্যাডিং কমানো হয়েছে */
+            }
+            .invoice-header, .billing-row, .footer-row {
+                flex-direction: column !important;
+                display: flex !important;
+                gap: 20px !important;
+            }
+            .billing-row {
+                grid-template-columns: 1fr !important;
+            }
+            .invoice-meta {
+                text-align: left !important;
+            }
+            .invoice-title {
+                font-size: 28px !important;
+            }
+            .summary-wrapper {
+                justify-content: flex-start !important;
+            }
+            .summary-box {
+                width: 100% !important;
+            }
+            .footer-contact {
+                text-align: left !important;
+            }
+            /* টেবিল রেসপনসিভ করার জন্য */
+            .table-responsive {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+        }
 
         /* ── PRINT ── */
         /* ── PRINT OPTIMIZATION ── */
@@ -608,7 +643,7 @@
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>
                                 </div>
                             @endif
-                            
+
                         </div>
                         <div class="shop-info">
                             <p>{{ $setup->address }}</p>
@@ -681,10 +716,8 @@
                                         @endif
                                     </td>
                                     <td class="td-center">{{ $item->quantity }}</td>
-                                    <td class="td-right">{{ $setup->currency }}
-                                        {{ number_format($item->unit_price, 0) }}</td>
-                                    <td class="td-right-bold" style="padding-right:0;">{{ $setup->currency }}
-                                        {{ number_format($item->total, 0) }}</td>
+                                    <td class="td-right">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->unit_price, 0) : number_format($item->unit_price, 0) . ' ' . $setup->currency }}</td>
+                                    <td class="td-right-bold" style="padding-right:0;"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->total, 0) : number_format($item->total, 0) . ' ' . $setup->currency }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -696,23 +729,22 @@
                     <div class="summary-box">
                         <div class="summary-row">
                             <span>Subtotal:</span>
-                            <span>{{ $setup->currency }} {{ number_format($order->subtotal, 0) }}</span>
+                             <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->subtotal, 0) : number_format($order->subtotal, 0) . ' ' . $setup->currency }}</span>
                         </div>
                         <div class="summary-row">
                             <span>Delivery Charge:</span>
-                            <span>{{ $setup->currency }} {{ number_format($order->other_charges, 0) }}</span>
+                            <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->other_charges, 0) : number_format($order->other_charges, 0) . ' ' . $setup->currency }}</span>
                         </div>
                         @if ($order->coupon_discount > 0)
                             <div class="summary-row discount">
                                 <span>Coupon Discount:</span>
-                                <span>- {{ $setup->currency }} {{ number_format($order->coupon_discount, 0) }}</span>
+                                <span>- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->coupon_discount, 0) : number_format($order->coupon_discount, 0) . ' ' . $setup->currency }}</span>
                             </div>
                         @endif
                         <div class="summary-divider"></div>
                         <div class="summary-total">
                             <span class="label">Total Paid:</span>
-                            <span class="amount">{{ $setup->currency }}
-                                {{ number_format($order->grand_total, 0) }}</span>
+                            <span class="amount">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->grand_total, 0) : number_format($order->grand_total, 0) . ' ' . $setup->currency }}</span>
                         </div>
                     </div>
                 </div>
