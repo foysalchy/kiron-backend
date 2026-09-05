@@ -42,7 +42,7 @@
             <select name="referral_group_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm bg-white">
                 @foreach($groups as $grp)
                     <option value="{{ $grp->id }}" {{ old('referral_group_id') == $grp->id ? 'selected' : '' }}>
-                        {{ $grp->name }} (Up to {{ $grp->default_commission_rate }}% base commission + Tiered Bonuses)
+                        {{ $grp->name }} ({{ $grp->default_commission_rate }}% base commission + Buyer gets {{ $grp->buyer_discount_rate ?? 0 }}% signup discount)
                     </option>
                 @endforeach
             </select>

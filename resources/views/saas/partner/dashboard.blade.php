@@ -148,8 +148,8 @@
 
     <!-- Tier Milestone & Rank Roadmap Ladder Section -->
     @if(!empty($stats['tier_info']['all_tiers']) && count($stats['tier_info']['all_tiers']) > 0)
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-100">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-5">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-4 border-b border-slate-100">
             <div>
                 <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-award text-amber-500 text-lg"></i>
@@ -159,9 +159,39 @@
                     Your commission percentage automatically unlocks higher rates as your total referred subscription sales grow!
                 </p>
             </div>
-            <div class="text-xs bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600">
-                Total Sales Made: <strong class="text-brand-600 font-bold">{{ $partner->total_sales_count }}</strong>
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="text-xs bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200 font-semibold flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-tag text-emerald-600"></i>
+                    Customer Signup Discount: <strong class="font-extrabold text-emerald-700 text-sm">{{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% OFF</strong>
+                </div>
+                <div class="text-xs bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 font-medium">
+                    Total Sales Made: <strong class="text-brand-600 font-bold">{{ $partner->total_sales_count }}</strong>
+                </div>
             </div>
+        </div>
+
+        <!-- Customer Benefit Callout Banner -->
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shrink-0 shadow-md shadow-emerald-600/20 mt-0.5 sm:mt-0">
+                    <i class="fa-solid fa-gift text-lg"></i>
+                </div>
+                <div>
+                    <div class="text-sm font-bold text-slate-900 flex items-center gap-2 flex-wrap">
+                        <span>Customer Join Benefit:</span>
+                        <span class="bg-emerald-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                            {{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% Instant Discount
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-0.5">
+                        Any customer or business signing up using your code <strong class="font-mono text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">{{ $partner->referral_code }}</strong> or link will automatically receive a <strong>{{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% discount</strong> on their subscription packages.
+                    </p>
+                </div>
+            </div>
+            <button onclick="copyToClipboard('refLink', 'linkBtn2')" id="linkBtn2"
+                class="shrink-0 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fa-regular fa-copy"></i> Copy Referral Link
+            </button>
         </div>
 
         <!-- Tier Grid -->
@@ -191,11 +221,15 @@
                     <div class="mt-3">
                         <div class="text-2xl font-black text-slate-900">
                             {{ $tier['commission_rate'] }}%
-                            <span class="text-xs font-medium text-slate-500">commission</span>
+                            <span class="text-xs font-medium text-slate-500">partner commission</span>
                         </div>
                         <div class="text-xs text-slate-600 mt-1 font-medium">
                             <i class="fa-solid fa-bullseye text-slate-400 mr-1"></i>
                             Sales Target: <strong>{{ $tier['min_sales'] }} – {{ $tier['max_sales'] ? $tier['max_sales'] : '∞' }} sales</strong>
+                        </div>
+                        <div class="mt-2 text-[11px] text-emerald-700 bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1 font-semibold">
+                            <i class="fa-solid fa-tag text-emerald-500 text-[10px]"></i>
+                            Customer gets: {{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% signup discount
                         </div>
                     </div>
                 </div>
