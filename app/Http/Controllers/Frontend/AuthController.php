@@ -60,34 +60,29 @@ class AuthController extends FrontendController
     public function storeLogin(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'login'    => 'required|string',
+            'password' => 'required|string',
         ]);
+
+        $loginInput = $request->login;
+
+        // Email নাকি Phone সেটা detect করা
+        $field = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         $credentials = [
-            'email' => $request->email,
+            $field     => $loginInput,
             'password' => $request->password,
-            'type' => Party::TYPE_CUSTOMER
         ];
 
-        if (Auth::guard('customer')->attempt($credentials, $request->remember)) {
-
-            $user = Auth::guard('customer')->user();
-
-            if ($user->status == Status::Pending->value) {
-                $user->status = Status::Active->value;
-                $user->save();
-            }
-
+        if (Auth::guard('customer')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('user.dashboard'))->with('success', 'Login successful. Welcome back!');
+            return redirect()->intended(route('home'));
         }
 
-        throw ValidationException::withMessages([
-            'email' => ['Email or password is incorrect.'],
-        ]);
+        return back()->withErrors([
+            'login' => 'The provided credentials do not match our records.',
+        ])->withInput($request->only('login'));
     }
-
     // logout function
     public function logout(Request $request)
     {
