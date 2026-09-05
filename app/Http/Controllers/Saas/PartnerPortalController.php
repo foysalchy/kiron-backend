@@ -298,7 +298,7 @@ class PartnerPortalController extends Controller
 
         // Delete old token and insert new
         DB::table('password_reset_tokens')->where('email', $identifier)->delete();
-        if ($pending['identifier'] && $pending['identifier'] !== $identifier) {
+        if (!empty($pending['identifier']) && $pending['identifier'] !== $identifier) {
             DB::table('password_reset_tokens')->where('email', $pending['identifier'])->delete();
         }
 
