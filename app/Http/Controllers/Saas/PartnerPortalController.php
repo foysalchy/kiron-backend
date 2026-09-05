@@ -48,7 +48,7 @@ class PartnerPortalController extends Controller
             return back()->withErrors(['email' => 'Invalid email or password'])->withInput();
         }
 
-        if ($partner->status !== 'active') {
+        if (!in_array($partner->status, [1, '1', 'active'])) {
             return back()->withErrors(['email' => 'Your partner account is suspended or inactive. Please contact support.'])->withInput();
         }
 
@@ -62,7 +62,7 @@ class PartnerPortalController extends Controller
         if (session('partner_id')) {
             return redirect()->route('partner.dashboard');
         }
-        $groups = ReferralGroup::where('status', 'active')->get();
+        $groups = ReferralGroup::whereIn('status', [1, '1', 'active'])->get();
         return view('saas.partner.register', compact('groups'));
     }
 

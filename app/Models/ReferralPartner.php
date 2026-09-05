@@ -103,4 +103,14 @@ class ReferralPartner extends Authenticatable
             'next_tier'   => null,
         ];
     }
+
+    public function getReferralLinkAttribute(): string
+    {
+        return url('/register?ref=' . $this->referral_code);
+    }
+
+    public function getTotalSalesCountAttribute(): int
+    {
+        return $this->commissions()->where('status', 'approved')->count();
+    }
 }

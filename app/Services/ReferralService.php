@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\Status;
-use App\Exceptions\ApiException;
 use App\Models\Company;
 use App\Models\CompanySubscription;
 use App\Models\ReferralAttribution;
@@ -11,7 +10,6 @@ use App\Models\ReferralCommission;
 use App\Models\ReferralGroup;
 use App\Models\ReferralPartner;
 use App\Models\ReferralWithdrawal;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -30,7 +28,10 @@ class ReferralService
         }
 
         $code = trim(strtoupper($code));
-        $partner = ReferralPartner::with('group')->where('referral_code', $code)->where('status', 1)->first();
+        $partner = ReferralPartner::with('group')
+            ->where('referral_code', $code)
+            ->whereIn('status', [1, '1', 'active'])
+            ->first();
 
         if (!$partner) {
             return null;
@@ -48,17 +49,21 @@ class ReferralService
     }
 
     /**
-     * Attribute a company registration to a referral partner.
+     * Record attribution when a company signs up with a referral code.
      */
-    public function attributeReferral(int $partnerId, int $companyId, string $code, float $discountRate = 0, float $discountAmount = 0): ReferralAttribution
+    public function recordAttribution(string $code, int $companyId): ?ReferralAttribution
     {
+        $validation = $this->validateReferralCode($code);
+        if (!$validation) {
+            return null;
+        }
+
         return ReferralAttribution::firstOrCreate(
             ['company_id' => $companyId],
             [
-                'referral_partner_id'   => $partnerId,
-                'referral_code_used'    => $code,
-                'buyer_discount_rate'   => $discountRate,
-                'buyer_discount_amount' => $discountAmount,
+                'referral_partner_id'   => $validation['partner_id'],
+                'referral_code_used'    => $validation['referral_code'],
+                'buyer_discount_rate'   => $validation['buyer_discount_rate'],
                 'status'                => 'registered',
             ]
         );
@@ -80,7 +85,7 @@ class ReferralService
             }
 
             $partner = ReferralPartner::with('group.tiers')->find($attribution->referral_partner_id);
-            if (!$partner || $partner->status != 1) {
+            if (!$partner || !in_array($partner->status, [1, '1', 'active'])) {
                 DB::commit();
                 return null;
             }
@@ -114,7 +119,10 @@ class ReferralService
             $partner->increment('total_earned', $commissionAmount);
 
             // Update attribution status to active
-            $attribution->update(['status' => 'subscribed_active']);
+            $attribution->update([
+                'status' => 'subscribed_active',
+                'first_subscribed_at' => now(),
+            ]);
 
             DB::commit();
             Log::info("Referral commission #{$commission->id} created: {$commissionAmount} for partner #{$partner->id}");
@@ -132,16 +140,20 @@ class ReferralService
      */
     public function registerPartner(array $data): ReferralPartner
     {
-        $defaultGroup = ReferralGroup::where('status', 1)->first();
+        $groupId = $data['referral_group_id'] ?? null;
+        if (!$groupId) {
+            $defaultGroup = ReferralGroup::whereIn('status', [1, '1', 'active'])->first();
+            $groupId = $defaultGroup?->id;
+        }
 
-        // Generate unique code (e.g. REF-XYZ123)
+        // Generate unique code (e.g. DORJA-XYZ123)
         $code = 'REF-' . strtoupper(Str::random(6));
         while (ReferralPartner::where('referral_code', $code)->exists()) {
             $code = 'REF-' . strtoupper(Str::random(6));
         }
 
         return ReferralPartner::create([
-            'referral_group_id' => $defaultGroup?->id,
+            'referral_group_id' => $groupId,
             'name'              => $data['name'],
             'email'             => $data['email'],
             'phone'             => $data['phone'] ?? null,
@@ -149,16 +161,19 @@ class ReferralService
             'referral_code'     => $code,
             'payout_method'     => $data['payout_method'] ?? 'bkash',
             'payout_details'    => $data['payout_details'] ?? null,
-            'status'            => 1,
+            'status'            => 'active',
         ]);
     }
 
     /**
      * Partner submits a withdrawal request.
      */
-    public function requestWithdrawal(ReferralPartner $partner, array $data): ReferralWithdrawal
+    public function requestWithdrawal($partner, float $amount, string $paymentMethod, string $accountDetails, ?string $note = null): ReferralWithdrawal
     {
-        $amount = floatval($data['amount']);
+        if (!$partner instanceof ReferralPartner) {
+            $partner = ReferralPartner::findOrFail($partner);
+        }
+
         if ($amount < 500) {
             throw new \Exception('Minimum withdrawal amount is ৳ 500.00');
         }
@@ -175,10 +190,10 @@ class ReferralService
                 'referral_partner_id' => $partner->id,
                 'request_no'          => $requestNo,
                 'amount'              => $amount,
-                'payout_method'       => $data['payout_method'] ?? ($partner->payout_method ?: 'bkash'),
-                'account_details'     => $data['account_details'] ?? $partner->payout_details,
+                'payment_method'      => $paymentMethod,
+                'account_details'     => $accountDetails,
                 'status'              => 'pending',
-                'admin_note'          => $data['note'] ?? null,
+                'notes'               => $note,
             ]);
 
             // Deduct from wallet balance
@@ -195,7 +210,7 @@ class ReferralService
     /**
      * Super Admin approves a withdrawal request.
      */
-    public function approveWithdrawal(int $withdrawalId, User $admin, array $data): ReferralWithdrawal
+    public function approveWithdrawal(int $withdrawalId, ?string $transactionReference = null, ?string $adminNotes = null): ReferralWithdrawal
     {
         DB::beginTransaction();
         try {
@@ -206,10 +221,9 @@ class ReferralService
 
             $withdrawal->update([
                 'status'                => 'approved',
-                'processed_by'          => $admin->id,
                 'processed_at'          => Carbon::now(),
-                'transaction_reference' => $data['transaction_reference'] ?? null,
-                'admin_note'            => $data['admin_note'] ?? null,
+                'transaction_reference' => $transactionReference,
+                'admin_notes'           => $adminNotes,
             ]);
 
             // Increment partner total withdrawn
@@ -226,7 +240,7 @@ class ReferralService
     /**
      * Super Admin rejects a withdrawal request.
      */
-    public function rejectWithdrawal(int $withdrawalId, User $admin, array $data): ReferralWithdrawal
+    public function rejectWithdrawal(int $withdrawalId, ?string $adminNotes = null): ReferralWithdrawal
     {
         DB::beginTransaction();
         try {
@@ -237,9 +251,8 @@ class ReferralService
 
             $withdrawal->update([
                 'status'       => 'rejected',
-                'processed_by' => $admin->id,
                 'processed_at' => Carbon::now(),
-                'admin_note'   => $data['admin_note'] ?? ($data['reason'] ?? 'Rejected by admin'),
+                'admin_notes'  => $adminNotes ?? 'Rejected by admin',
             ]);
 
             // Refund back to partner's wallet balance
@@ -254,47 +267,40 @@ class ReferralService
     }
 
     /**
-     * Get aggregated stats for a partner's portal dashboard.
+     * Get aggregated dashboard stats for partner portal.
      */
-    public function getPartnerDashboardData(ReferralPartner $partner): array
+    public function getPartnerDashboardStats($partner): array
     {
-        $partner->load('group.tiers');
+        if (!$partner instanceof ReferralPartner) {
+            $partner = ReferralPartner::with('group.tiers')->findOrFail($partner);
+        }
 
         $totalAttributions = $partner->attributions()->count();
 
-        // Count active vs inactive referred companies based on company status or subscription
+        // Count active vs inactive referred companies
         $activeCount = $partner->attributions()
             ->whereHas('company', function ($q) {
-                $q->where('status', Status::Active->value);
+                $q->where('status', 1)->orWhere('status', '1')->orWhere('status', 'active');
             })->count();
 
         $inactiveCount = max(0, $totalAttributions - $activeCount);
 
-        $recentAttributions = $partner->attributions()
-            ->with(['company.subscription.pricingPackage', 'company.user'])
-            ->latest()
-            ->take(10)
-            ->get();
-
-        $recentCommissions = $partner->commissions()
-            ->with('company')
-            ->latest()
-            ->take(10)
-            ->get();
-
-        $tierProgress = $partner->getCurrentCommissionRate();
+        $tierInfo = $partner->getCurrentCommissionRate();
+        $currentRate = $tierInfo['rate'] ?? ($partner->group->default_commission_rate ?? 20.00);
 
         return [
-            'partner'             => $partner,
-            'total_referrals'     => $totalAttributions,
-            'active_referrals'    => $activeCount,
-            'inactive_referrals'  => $inactiveCount,
-            'wallet_balance'      => $partner->wallet_balance,
-            'total_earned'        => $partner->total_earned,
-            'total_withdrawn'     => $partner->total_withdrawn,
-            'tier_progress'       => $tierProgress,
-            'recent_attributions' => $recentAttributions,
-            'recent_commissions'  => $recentCommissions,
+            'total_referrals'         => $totalAttributions,
+            'active_referrals'        => $activeCount,
+            'inactive_referrals'      => $inactiveCount,
+            'wallet_balance'          => $partner->wallet_balance,
+            'total_earned'            => $partner->total_earned,
+            'total_withdrawn'         => $partner->total_withdrawn,
+            'current_commission_rate' => $currentRate,
+            'tier_info'               => [
+                'current_tier_name' => $tierInfo['tier_name'] ?? 'Standard Tier',
+                'next_tier'         => $tierInfo['next_tier'] ?? null,
+                'sales_needed'      => $tierInfo['next_tier']['target_left'] ?? 0,
+            ],
         ];
     }
 }
