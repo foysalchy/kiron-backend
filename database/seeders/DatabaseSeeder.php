@@ -19,5 +19,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed TallyPrime Default Account Groups and Chart of Accounts
         $this->call(DefaultAccountingSeeder::class);
+
+        // Seed Default Referral Groups, Tier Milestones & Partner
+        $this->call(ReferralGroupSeeder::class);
     }
 }
