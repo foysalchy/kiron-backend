@@ -49,7 +49,9 @@ class ReferralPartnerController extends Controller
 
         // Append current dynamic commission rate for each partner
         $partners->getCollection()->transform(function ($partner) {
-            $partner->current_commission_rate = $partner->getCurrentCommissionRate();
+            $tierInfo = $partner->getCurrentCommissionRate();
+            $partner->current_commission_rate = is_array($tierInfo) ? ($tierInfo['rate'] ?? 20.00) : $tierInfo;
+            $partner->tier_info = $tierInfo;
             return $partner;
         });
 
@@ -68,7 +70,9 @@ class ReferralPartnerController extends Controller
             'withdrawals',
         ])->findOrFail($id);
 
-        $partner->current_commission_rate = $partner->getCurrentCommissionRate();
+        $tierInfo = $partner->getCurrentCommissionRate();
+        $partner->current_commission_rate = is_array($tierInfo) ? ($tierInfo['rate'] ?? 20.00) : $tierInfo;
+        $partner->tier_info = $tierInfo;
 
         return response()->json([
             'status' => 'success',
