@@ -9,6 +9,9 @@ use App\Services\PartnerPasswordResetService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Carbon\Carbon;
 
 class PartnerPortalController extends Controller
 {
@@ -141,26 +144,135 @@ class PartnerPortalController extends Controller
             return redirect()->route('partner.dashboard');
         }
         $groups = ReferralGroup::whereIn('status', [1, '1', 'active'])->get();
-        return view('saas.partner.register', compact('groups'));
+        $pending = session('pending_partner_registration', []);
+        return view('saas.partner.register', compact('groups', 'pending'));
     }
 
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:referral_partners,email',
-            'phone' => 'nullable|string|max:50',
-            'password' => 'required|string|min:6|confirmed',
+            'name'              => 'required|string|max:255',
+            'email'             => 'required|email|unique:referral_partners,email',
+            'phone'             => 'nullable|string|max:50',
+            'password'          => 'required|string|min:6|confirmed',
             'referral_group_id' => 'nullable|exists:referral_groups,id',
         ]);
 
         try {
-            $partner = $this->referralService->registerPartner($request->all());
+            $otp = (string) random_int(100000, 999999);
+            $email = trim($request->email);
+
+            // Store OTP token in password_reset_tokens
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            DB::table('password_reset_tokens')->insert([
+                'email'      => $email,
+                'token'      => Hash::make($otp),
+                'created_at' => Carbon::now(),
+            ]);
+
+            // Store pending registration data in session
+            session([
+                'pending_partner_registration' => [
+                    'name'              => $request->name,
+                    'email'             => $email,
+                    'phone'             => $request->phone,
+                    'password'          => $request->password,
+                    'referral_group_id' => $request->referral_group_id,
+                ]
+            ]);
+
+            // Send OTP email
+            Mail::to($email)->send(new \App\Mail\CustomerResetPasswordOtpMail($request->name, $email, $otp));
+
+            return redirect()->route('partner.register.verify-form')
+                ->with('success', 'A 6-digit verification code has been sent to ' . $email . '. Please enter it to complete your registration.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['email' => 'Failed to send verification email: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    public function showVerifyEmailForm()
+    {
+        if (session('partner_id')) {
+            return redirect()->route('partner.dashboard');
+        }
+
+        $pending = session('pending_partner_registration');
+        if (!$pending || empty($pending['email'])) {
+            return redirect()->route('partner.register')->withErrors(['email' => 'Please fill in the registration form first.']);
+        }
+
+        $email = $pending['email'];
+        return view('saas.partner.verify-email', compact('email', 'pending'));
+    }
+
+    public function verifyEmailAndRegister(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|digits:6',
+        ]);
+
+        $pending = session('pending_partner_registration');
+        if (!$pending || empty($pending['email'])) {
+            return redirect()->route('partner.register')->withErrors(['email' => 'Session expired. Please fill in the registration form again.']);
+        }
+
+        $email = $pending['email'];
+        $record = DB::table('password_reset_tokens')->where('email', $email)->first();
+
+        if (!$record) {
+            return back()->withErrors(['otp' => 'Verification code has expired or is invalid. Please request a new one.']);
+        }
+
+        if (Carbon::parse($record->created_at)->addMinutes(10)->isPast()) {
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            return back()->withErrors(['otp' => 'Verification code expired. Please request a new one.']);
+        }
+
+        if (!Hash::check(trim($request->otp), $record->token)) {
+            return back()->withErrors(['otp' => 'Invalid verification code. Please check your email and try again.']);
+        }
+
+        try {
+            // Create verified partner account
+            $partner = $this->referralService->registerPartner($pending);
+
+            // Clean up OTP & session
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            session()->forget('pending_partner_registration');
+
+            // Auto-login
             session(['partner_id' => $partner->id, 'partner_name' => $partner->name]);
 
-            return redirect()->route('partner.dashboard')->with('success', 'Your partner account has been created successfully!');
+            return redirect()->route('partner.dashboard')
+                ->with('success', 'Congratulations! Your partner account has been verified and created successfully.');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()])->withInput();
+            return back()->withErrors(['otp' => 'Registration failed: ' . $e->getMessage()]);
+        }
+    }
+
+    public function resendRegisterOtp()
+    {
+        $pending = session('pending_partner_registration');
+        if (!$pending || empty($pending['email'])) {
+            return redirect()->route('partner.register');
+        }
+
+        $email = $pending['email'];
+        $otp = (string) random_int(100000, 999999);
+
+        DB::table('password_reset_tokens')->where('email', $email)->delete();
+        DB::table('password_reset_tokens')->insert([
+            'email'      => $email,
+            'token'      => Hash::make($otp),
+            'created_at' => Carbon::now(),
+        ]);
+
+        try {
+            Mail::to($email)->send(new \App\Mail\CustomerResetPasswordOtpMail($pending['name'] ?? 'Partner', $email, $otp));
+            return back()->with('success', 'A new 6-digit verification code has been sent to ' . $email);
+        } catch (\Exception $e) {
+            return back()->withErrors(['otp' => 'Failed to resend code: ' . $e->getMessage()]);
         }
     }
 

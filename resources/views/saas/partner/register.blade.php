@@ -16,21 +16,21 @@
         @csrf
         <div>
             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Full Name / Organization *</label>
-            <input type="text" name="name" value="{{ old('name') }}" required
+            <input type="text" name="name" value="{{ old('name', $pending['name'] ?? '') }}" required
                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"
                 placeholder="John Doe or Acme Consultants">
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address *</label>
-                <input type="email" name="email" value="{{ old('email') }}" required
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address (OTP will be sent) *</label>
+                <input type="email" name="email" value="{{ old('email', $pending['email'] ?? '') }}" required
                     class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"
                     placeholder="partner@example.com">
             </div>
             <div>
                 <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Phone Number</label>
-                <input type="text" name="phone" value="{{ old('phone') }}"
+                <input type="text" name="phone" value="{{ old('phone', $pending['phone'] ?? '') }}"
                     class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"
                     placeholder="+880 1700 000000">
             </div>
@@ -41,7 +41,7 @@
             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Partner Category / Group</label>
             <select name="referral_group_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm bg-white">
                 @foreach($groups as $grp)
-                    <option value="{{ $grp->id }}" {{ old('referral_group_id') == $grp->id ? 'selected' : '' }}>
+                    <option value="{{ $grp->id }}" {{ old('referral_group_id', $pending['referral_group_id'] ?? '') == $grp->id ? 'selected' : '' }}>
                         {{ $grp->name }} ({{ $grp->default_commission_rate }}% base commission + Buyer gets {{ $grp->buyer_discount_rate ?? 0 }}% signup discount)
                     </option>
                 @endforeach
@@ -65,8 +65,9 @@
         </div>
 
         <div class="pt-2">
-            <button type="submit" class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition duration-150">
-                Register & Get Referral Link
+            <button type="submit" class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition duration-150 flex items-center justify-center gap-2">
+                <span>Continue & Verify Email</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
         </div>
     </form>

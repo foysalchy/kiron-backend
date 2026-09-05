@@ -30,6 +30,9 @@ Route::prefix('partner')->name('partner.')->group(function () {
     Route::post('/login', [PartnerPortalController::class, 'login'])->name('login.submit');
     Route::get('/register', [PartnerPortalController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [PartnerPortalController::class, 'register'])->name('register.submit');
+    Route::get('/register/verify-email', [PartnerPortalController::class, 'showVerifyEmailForm'])->name('register.verify-form');
+    Route::post('/register/verify-email', [PartnerPortalController::class, 'verifyEmailAndRegister'])->name('register.verify-submit');
+    Route::post('/register/resend-otp', [PartnerPortalController::class, 'resendRegisterOtp'])->name('register.resend-otp');
     Route::post('/logout', [PartnerPortalController::class, 'logout'])->name('logout');
 
     // Partner Forgot & Reset Password

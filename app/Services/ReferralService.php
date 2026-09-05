@@ -165,7 +165,7 @@ class ReferralService
             'referral_code'     => $code,
             'payout_method'     => $data['payout_method'] ?? 'bkash',
             'payout_details'    => $data['payout_details'] ?? null,
-            'status'            => 'active',
+            'status'            => 1,
         ]);
     }
 
