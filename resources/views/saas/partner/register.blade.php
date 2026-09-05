@@ -23,16 +23,43 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address (OTP will be sent) *</label>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address *</label>
                 <input type="email" name="email" value="{{ old('email', $pending['email'] ?? '') }}" required
                     class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"
                     placeholder="partner@example.com">
             </div>
             <div>
-                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Phone Number</label>
-                <input type="text" name="phone" value="{{ old('phone', $pending['phone'] ?? '') }}"
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Phone Number (Required for SMS OTP)</label>
+                <input type="text" name="phone" id="reg-phone" value="{{ old('phone', $pending['phone'] ?? '') }}"
                     class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"
                     placeholder="+880 1700 000000">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Receive Verification Code Via *</label>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="relative flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-brand-300 cursor-pointer transition bg-slate-50/50 has-[:checked]:bg-brand-50/50 has-[:checked]:border-brand-500 has-[:checked]:ring-1 has-[:checked]:ring-brand-500">
+                    <input type="radio" name="verify_method" value="email" {{ old('verify_method', $pending['verify_method'] ?? 'email') === 'email' ? 'checked' : '' }} class="text-brand-600 focus:ring-brand-500">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-envelope text-brand-600 text-sm"></i>
+                        <div>
+                            <span class="block text-xs font-bold text-slate-900">Email OTP</span>
+                            <span class="block text-[10px] text-slate-500">Sent to your Email</span>
+                        </div>
+                    </div>
+                </label>
+
+                <label class="relative flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-brand-300 cursor-pointer transition bg-slate-50/50 has-[:checked]:bg-brand-50/50 has-[:checked]:border-brand-500 has-[:checked]:ring-1 has-[:checked]:ring-brand-500">
+                    <input type="radio" name="verify_method" value="sms" {{ old('verify_method', $pending['verify_method'] ?? '') === 'sms' ? 'checked' : '' }} class="text-brand-600 focus:ring-brand-500">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-comment-sms text-brand-600 text-sm"></i>
+                        <div>
+                            <span class="block text-xs font-bold text-slate-900">SMS OTP</span>
+                            <span class="block text-[10px] text-slate-500">Sent to your Phone</span>
+                        </div>
+                    </div>
+                </label>
             </div>
         </div>
 
@@ -66,7 +93,7 @@
 
         <div class="pt-2">
             <button type="submit" class="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-md shadow-brand-500/20 transition duration-150 flex items-center justify-center gap-2">
-                <span>Continue & Verify Email</span>
+                <span>Continue & Verify Account</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
         </div>

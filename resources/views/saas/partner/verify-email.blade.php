@@ -1,17 +1,23 @@
 @extends('saas.partner.layout')
 
-@section('title', 'Verify Partner Email')
+@section('title', 'Verify Partner Account')
 
 @section('content')
 <div class="max-w-md mx-auto my-8 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
     <div class="text-center mb-6">
         <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold border border-brand-100">
-            <i class="fa-solid fa-envelope-circle-check"></i>
+            @if(($verifyMethod ?? 'email') === 'sms')
+                <i class="fa-solid fa-comment-sms"></i>
+            @else
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            @endif
         </div>
-        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Verify Your Email</h2>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
+            {{ ($verifyMethod ?? 'email') === 'sms' ? 'Verify Your Phone Number' : 'Verify Your Email' }}
+        </h2>
         <p class="text-sm text-slate-500 mt-1">
-            We sent a 6-digit verification code to <br>
-            <span class="font-bold text-slate-800">{{ $email }}</span>
+            We sent a 6-digit verification code via {{ ($verifyMethod ?? 'email') === 'sms' ? 'SMS to' : 'Email to' }} <br>
+            <span class="font-bold text-slate-800">{{ $identifier ?? $email }}</span>
         </p>
     </div>
 
@@ -35,17 +41,40 @@
         </button>
     </form>
 
-    <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
-        <form action="{{ route('partner.register.resend-otp') }}" method="POST" class="inline">
-            @csrf
-            <span>Didn't receive the code? </span>
-            <button type="submit" class="font-semibold text-brand-600 hover:text-brand-700 hover:underline">
-                Resend Code
-            </button>
-        </form>
-        <a href="{{ route('partner.register') }}" class="text-slate-500 hover:text-slate-700 hover:underline">
-            Edit Details
-        </a>
+    <div class="mt-5 pt-4 border-t border-slate-100 space-y-3 text-xs text-slate-500">
+        <div class="flex items-center justify-between">
+            <form action="{{ route('partner.register.resend-otp') }}" method="POST" class="inline">
+                @csrf
+                <input type="hidden" name="method" value="{{ $verifyMethod ?? 'email' }}">
+                <span>Didn't receive the code? </span>
+                <button type="submit" class="font-semibold text-brand-600 hover:text-brand-700 hover:underline">
+                    Resend Code
+                </button>
+            </form>
+            <a href="{{ route('partner.register') }}" class="text-slate-500 hover:text-slate-700 hover:underline">
+                Edit Details
+            </a>
+        </div>
+
+        @if(($verifyMethod ?? 'email') === 'email' && !empty($phone))
+            <form action="{{ route('partner.register.resend-otp') }}" method="POST" class="text-center pt-1">
+                @csrf
+                <input type="hidden" name="method" value="sms">
+                <span>Want to verify via SMS instead? </span>
+                <button type="submit" class="font-semibold text-brand-600 hover:text-brand-700 hover:underline">
+                    Send OTP to {{ $phone }}
+                </button>
+            </form>
+        @elseif(($verifyMethod ?? 'email') === 'sms' && !empty($email))
+            <form action="{{ route('partner.register.resend-otp') }}" method="POST" class="text-center pt-1">
+                @csrf
+                <input type="hidden" name="method" value="email">
+                <span>Want to verify via Email instead? </span>
+                <button type="submit" class="font-semibold text-brand-600 hover:text-brand-700 hover:underline">
+                    Send OTP to {{ $email }}
+                </button>
+            </form>
+        @endif
     </div>
 
     <div class="mt-6 pt-6 border-t border-slate-100 text-center text-sm text-slate-600">

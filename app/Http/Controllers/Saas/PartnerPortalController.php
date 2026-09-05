@@ -150,22 +150,36 @@ class PartnerPortalController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
+        $verifyMethod = $request->input('verify_method', 'email');
+
+        $rules = [
             'name'              => 'required|string|max:255',
             'email'             => 'required|email|unique:referral_partners,email',
-            'phone'             => 'nullable|string|max:50',
+            'verify_method'     => 'required|in:email,sms',
             'password'          => 'required|string|min:6|confirmed',
             'referral_group_id' => 'nullable|exists:referral_groups,id',
+        ];
+
+        if ($verifyMethod === 'sms') {
+            $rules['phone'] = 'required|string|min:10|max:50';
+        } else {
+            $rules['phone'] = 'nullable|string|max:50';
+        }
+
+        $request->validate($rules, [
+            'phone.required' => 'A valid phone number is required for SMS verification.',
         ]);
 
         try {
             $otp = (string) random_int(100000, 999999);
             $email = trim($request->email);
+            $phone = $request->phone ? trim($request->phone) : null;
+            $identifier = $verifyMethod === 'sms' ? $phone : $email;
 
             // Store OTP token in password_reset_tokens
-            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            DB::table('password_reset_tokens')->where('email', $identifier)->delete();
             DB::table('password_reset_tokens')->insert([
-                'email'      => $email,
+                'email'      => $identifier,
                 'token'      => Hash::make($otp),
                 'created_at' => Carbon::now(),
             ]);
@@ -175,19 +189,28 @@ class PartnerPortalController extends Controller
                 'pending_partner_registration' => [
                     'name'              => $request->name,
                     'email'             => $email,
-                    'phone'             => $request->phone,
+                    'phone'             => $phone,
                     'password'          => $request->password,
                     'referral_group_id' => $request->referral_group_id,
+                    'verify_method'     => $verifyMethod,
+                    'identifier'        => $identifier,
                 ]
             ]);
 
-            // Send OTP email
-            Mail::to($email)->send(new \App\Mail\CustomerResetPasswordOtpMail($request->name, $email, $otp));
+            // Dispatch OTP via chosen channel
+            if ($verifyMethod === 'sms') {
+                $message = "Your Dorja Partner verification code is: {$otp}. Valid for 10 minutes.";
+                app(SmsSendService::class)->sendToGateway([$phone], $message);
+                $destination = 'SMS (' . $phone . ')';
+            } else {
+                Mail::to($email)->send(new \App\Mail\CustomerResetPasswordOtpMail($request->name, $email, $otp));
+                $destination = 'Email (' . $email . ')';
+            }
 
             return redirect()->route('partner.register.verify-form')
-                ->with('success', 'A 6-digit verification code has been sent to ' . $email . '. Please enter it to complete your registration.');
+                ->with('success', 'A 6-digit verification code has been sent via ' . $destination . '. Please enter it to complete your registration.');
         } catch (\Exception $e) {
-            return back()->withErrors(['email' => 'Failed to send verification email: ' . $e->getMessage()])->withInput();
+            return back()->withErrors(['email' => 'Failed to send verification code: ' . $e->getMessage()])->withInput();
         }
     }
 
@@ -202,8 +225,12 @@ class PartnerPortalController extends Controller
             return redirect()->route('partner.register')->withErrors(['email' => 'Please fill in the registration form first.']);
         }
 
+        $verifyMethod = $pending['verify_method'] ?? 'email';
+        $identifier = $pending['identifier'] ?? ($verifyMethod === 'sms' ? $pending['phone'] : $pending['email']);
         $email = $pending['email'];
-        return view('saas.partner.verify-email', compact('email', 'pending'));
+        $phone = $pending['phone'] ?? null;
+
+        return view('saas.partner.verify-email', compact('pending', 'verifyMethod', 'identifier', 'email', 'phone'));
     }
 
     public function verifyEmailAndRegister(Request $request)
@@ -217,20 +244,22 @@ class PartnerPortalController extends Controller
             return redirect()->route('partner.register')->withErrors(['email' => 'Session expired. Please fill in the registration form again.']);
         }
 
-        $email = $pending['email'];
-        $record = DB::table('password_reset_tokens')->where('email', $email)->first();
+        $verifyMethod = $pending['verify_method'] ?? 'email';
+        $identifier = $pending['identifier'] ?? ($verifyMethod === 'sms' ? ($pending['phone'] ?? '') : $pending['email']);
+        
+        $record = DB::table('password_reset_tokens')->where('email', $identifier)->first();
 
         if (!$record) {
             return back()->withErrors(['otp' => 'Verification code has expired or is invalid. Please request a new one.']);
         }
 
         if (Carbon::parse($record->created_at)->addMinutes(10)->isPast()) {
-            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            DB::table('password_reset_tokens')->where('email', $identifier)->delete();
             return back()->withErrors(['otp' => 'Verification code expired. Please request a new one.']);
         }
 
         if (!Hash::check(trim($request->otp), $record->token)) {
-            return back()->withErrors(['otp' => 'Invalid verification code. Please check your email and try again.']);
+            return back()->withErrors(['otp' => 'Invalid verification code. Please check and try again.']);
         }
 
         try {
@@ -238,7 +267,7 @@ class PartnerPortalController extends Controller
             $partner = $this->referralService->registerPartner($pending);
 
             // Clean up OTP & session
-            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            DB::table('password_reset_tokens')->where('email', $identifier)->delete();
             session()->forget('pending_partner_registration');
 
             // Auto-login
@@ -251,26 +280,50 @@ class PartnerPortalController extends Controller
         }
     }
 
-    public function resendRegisterOtp()
+    public function resendRegisterOtp(Request $request)
     {
         $pending = session('pending_partner_registration');
         if (!$pending || empty($pending['email'])) {
             return redirect()->route('partner.register');
         }
 
-        $email = $pending['email'];
+        $method = $request->input('method', $pending['verify_method'] ?? 'email');
+        
+        if ($method === 'sms' && empty($pending['phone'])) {
+            return back()->withErrors(['otp' => 'No phone number provided. Please edit registration details to add a phone number.']);
+        }
+
+        $identifier = $method === 'sms' ? $pending['phone'] : $pending['email'];
         $otp = (string) random_int(100000, 999999);
 
-        DB::table('password_reset_tokens')->where('email', $email)->delete();
+        // Delete old token and insert new
+        DB::table('password_reset_tokens')->where('email', $identifier)->delete();
+        if ($pending['identifier'] && $pending['identifier'] !== $identifier) {
+            DB::table('password_reset_tokens')->where('email', $pending['identifier'])->delete();
+        }
+
         DB::table('password_reset_tokens')->insert([
-            'email'      => $email,
+            'email'      => $identifier,
             'token'      => Hash::make($otp),
             'created_at' => Carbon::now(),
         ]);
 
+        // Update session
+        $pending['verify_method'] = $method;
+        $pending['identifier'] = $identifier;
+        session(['pending_partner_registration' => $pending]);
+
         try {
-            Mail::to($email)->send(new \App\Mail\CustomerResetPasswordOtpMail($pending['name'] ?? 'Partner', $email, $otp));
-            return back()->with('success', 'A new 6-digit verification code has been sent to ' . $email);
+            if ($method === 'sms') {
+                $message = "Your Dorja Partner verification code is: {$otp}. Valid for 10 minutes.";
+                app(SmsSendService::class)->sendToGateway([$pending['phone']], $message);
+                $channelName = "SMS to " . $pending['phone'];
+            } else {
+                Mail::to($pending['email'])->send(new \App\Mail\CustomerResetPasswordOtpMail($pending['name'] ?? 'Partner', $pending['email'], $otp));
+                $channelName = "Email to " . $pending['email'];
+            }
+
+            return back()->with('success', 'A new 6-digit verification code has been sent via ' . $channelName);
         } catch (\Exception $e) {
             return back()->withErrors(['otp' => 'Failed to resend code: ' . $e->getMessage()]);
         }
