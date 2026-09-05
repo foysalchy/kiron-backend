@@ -154,7 +154,7 @@ class OrderController extends FrontendController
                 'name'    => $data['name']    ?? $customer->name,
                 'phone'   => $data['phone']   ?? $customer->phone,
                 'email'   => $data['email']   ?? $customer->email ?? null,
-                'district'=> $data['district']?? $customer->district ?? null,
+                'district' => $data['district'] ?? $customer->district ?? null,
                 'address' => $data['address'] ?? $customer->address ?? 'N/A',
             ];
 
@@ -251,107 +251,110 @@ class OrderController extends FrontendController
         try {
             return DB::transaction(function () use ($request, $orderId, $isCOD) {
                 $order = Order::where('company_id', $this->company_id)
-                ->where('id', $orderId)
-                ->lockForUpdate()
-                ->first();
+                    ->where('id', $orderId)
+                    ->lockForUpdate()
+                    ->first();
 
-            if (!$order) {
-                throw new \Exception('Order not found.');
-            }
-            $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
-            if ($currentStatus !== Status::Draft->value) {
-                return redirect()->route('order.thankyou', $order->id);
-            }
-            // 4. Address update
-            $sourceInfo = [
-                'ip' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-                'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
-                'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null,
-                'url' => request()->headers->get('referer') ?? config('app.url'),
-            ];
-
-            $order->update([
-                'shipping_address' => [
-                    'name'    => $request->name,
-                    'phone'   => $request->phone,
-                    'email'   => $request->email,
-                    'district'=> $request->district,
-                    'address' => $request->address,
-                    'payment_method' => $request->payment_method,
-                ],
-                'pixel_source_info' => $sourceInfo,
-                'status' => Status::Pending->value,
-            ]);
-            if ($order->customer) {
-                $order->customer->update([
-                    'name' => $request->name, 
-                    'email' => $request->email, 
-                    'district' => $request->district, 
-                    'address' => $request->address
-                ]);
-            }
-
-            // 5. Stock deduct
-            $stockResult = $this->finalizeOrderAndDeductStock($order);
-            if (!$stockResult['success']) {
-                throw new \Exception($stockResult['error']);
-            }
-            // 6. Payment create
-            $transactionId = $request->transaction_id;
-            if ($isCOD) {
-                $transactionId = 'COD-' . ($order->order_no ?? $order->id) . '-' . time();
-            }
-
-            $screenshotPaths = [];
-            if ($request->hasFile('screenshots')) {
-                foreach ($request->file('screenshots') as $image) {
-                    $screenshotPaths[] = FileUploadHelper::uploadImage($image, 'payments/screenshots');
+                if (!$order) {
+                    throw new \Exception('Order not found.');
                 }
-            }
+                $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
+                if ($currentStatus !== Status::Draft->value) {
+                    return redirect()->route('order.thankyou', $order->id);
+                }
+                // 4. Address update
+                $sourceInfo = [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'fbp' => $_COOKIE['_fbp'] ?? request()->cookie('_fbp') ?? null,
+                    'fbc' => $_COOKIE['_fbc'] ?? request()->cookie('_fbc') ?? null,
+                    'url' => request()->headers->get('referer') ?? config('app.url'),
+                ];
 
-            $senderInfo = array_filter([
-                'sender_number' => $request->sender_number,
-                'screenshot'    => $screenshotPaths,
-                'bank_name'     => $request->bank_name,
-                'branch_name'   => $request->branch_name,
-                'card_type'     => $request->card_type,
-            ]);
+                $order->update([
+                    'shipping_address' => [
+                        'name'    => $request->name,
+                        'phone'   => $request->phone,
+                        'email'   => $request->email,
+                        'district' => $request->district,
+                        'address' => $request->address,
+                        'payment_method' => $request->payment_method,
+                    ],
+                    'pixel_source_info' => $sourceInfo,
+                    'status' => Status::Pending->value,
+                ]);
+                if ($order->customer) {
+                    $order->customer->update([
+                        'name' => $request->name,
+                        'email' => $request->email,
+                        'district' => $request->district,
+                        'address' => $request->address
+                    ]);
+                }
 
-            OrderPayment::create([
-                'order_id'       => $order->id,
-                'payment_method' => $request->payment_method,
-                'transaction_id' => $transactionId,
-                'reference_no'   => $request->reference_no,
-                'sender_number'   => $request->sender_number,
-                'amount'         => $request->amount ?? $order->grand_total ?? 0,
-                'change_amount'  => 0,
-                'sender_info'    => $senderInfo,
-                'note'           => $request->note,
-            ]);
+                // 5. Stock deduct
+                $stockResult = $this->finalizeOrderAndDeductStock($order);
+                if (!$stockResult['success']) {
+                    throw new \Exception($stockResult['error']);
+                }
+                // 6. Payment create
+                $transactionId = $request->transaction_id;
+                if ($isCOD) {
+                    $transactionId = 'COD-' . ($order->order_no ?? $order->id) . '-' . time();
+                }
 
-            $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
+                $screenshotPaths = [];
+                if ($request->hasFile('screenshots')) {
+                    foreach ($request->file('screenshots') as $image) {
+                        $screenshotPaths[] = FileUploadHelper::uploadImage($image, 'payments/screenshots');
+                    }
+                }
 
-            // 7. Cart tracking
-            foreach (Cart::content() as $item) {
-                $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
-                CartTrack::where('session_id', session()->getId())
-                    ->where('product_id', $cleanProductId)
-                    ->where('variation_id', $item->options->variation_id ?? null)
-                    ->update(['status' => CartTrack::PURCHASED]);
-            }
+                $senderInfo = array_filter([
+                    'sender_number' => $request->sender_number,
+                    'screenshot'    => $screenshotPaths,
+                    'bank_name'     => $request->bank_name,
+                    'branch_name'   => $request->branch_name,
+                    'card_type'     => $request->card_type,
+                ]);
 
-            DB::commit();
+                if (!$isCOD) {
+                    OrderPayment::create([
+                        'order_id'       => $order->id,
+                        'payment_method' => $request->payment_method,
+                        'transaction_id' => $transactionId,
+                        'reference_no'   => $request->reference_no,
+                        'sender_number'   => $request->sender_number,
+                        'amount'         => $request->amount ?? $order->grand_total ?? 0,
+                        'change_amount'  => 0,
+                        'sender_info'    => $senderInfo,
+                        'note'           => $request->note,
+                    ]);
+                }
 
-            Cart::destroy();
-            Session::forget(['coupon', 'current_draft_order_id']);
 
-            Log::info('Order confirmed', ['order_id' => $order->id, 'status' => $order->status]);
+                $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
+
+                // 7. Cart tracking
+                foreach (Cart::content() as $item) {
+                    $cleanProductId = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
+                    CartTrack::where('session_id', session()->getId())
+                        ->where('product_id', $cleanProductId)
+                        ->where('variation_id', $item->options->variation_id ?? null)
+                        ->update(['status' => CartTrack::PURCHASED]);
+                }
+
+                DB::commit();
+
+                Cart::destroy();
+                Session::forget(['coupon', 'current_draft_order_id']);
+
+                Log::info('Order confirmed', ['order_id' => $order->id, 'status' => $order->status]);
 
 
 
 
-            return redirect()->route('order.thankyou', $order->id)->with('success', 'Your order has been successfully placed.');
+                return redirect()->route('order.thankyou', $order->id)->with('success', 'Your order has been successfully placed.');
             });
         } catch (\Exception $e) {
             DB::rollBack();
@@ -362,11 +365,11 @@ class OrderController extends FrontendController
 
     private function finalizeOrderAndDeductStock($order)
     {
-         $statusVal = $order->status instanceof Status ? $order->status->value : (int)$order->status;
+        $statusVal = $order->status instanceof Status ? $order->status->value : (int)$order->status;
 
-    if ($statusVal !== Status::Draft->value) {
-        return ['success' => true, 'message' => 'Stock already deducted.'];
-    }
+        if ($statusVal !== Status::Draft->value) {
+            return ['success' => true, 'message' => 'Stock already deducted.'];
+        }
         $warehouseData = $order->warehouse_info;
 
         if (empty($warehouseData)) {
@@ -536,8 +539,8 @@ class OrderController extends FrontendController
             ->where('status', \App\Enums\Status::Active->value);
 
         if (!empty($megaCategoryIds)) {
-            $relatedQuery->where(function($q) use ($megaCategoryIds) {
-                foreach($megaCategoryIds as $catId) {
+            $relatedQuery->where(function ($q) use ($megaCategoryIds) {
+                foreach ($megaCategoryIds as $catId) {
                     $q->orWhereJsonContains('mega_category_ids', $catId);
                 }
             });
@@ -622,30 +625,52 @@ class OrderController extends FrontendController
     public function requestReturn(Request $request, $id)
     {
         $request->validate([
-            'reason'   => 'required|string|max:1000',
-            'images.*' => 'nullable|image|max:2048'
+            'order_detail_ids'   => 'required|array|min:1',
+            'order_detail_ids.*' => 'integer',
+            'reason'             => 'required|string|max:1000',
+            'images.*'           => 'nullable|image|max:2048'
         ]);
 
-        $order = Order::findOrFail($id);
+        $order = Order::with('orderDetails')->findOrFail($id);
 
-        // Prevent duplicate requests
+        // Duplicate request আটকানো (order-লেভেলে already ReturnRequest থাকলে)
         if ($order->status == Status::ReturnRequest->value) {
-            return back()->with('error', 'Return request already submitted.');
+            return back()->with('error', 'Return request already submitted for this order.');
+        }
+
+        // Selected order_detail_ids এই order-এরই কিনা যাচাই (security)
+        $validItemIds = $order->orderDetails->pluck('id')->toArray();
+        $selectedIds = array_intersect($request->order_detail_ids, $validItemIds);
+
+        if (empty($selectedIds)) {
+            return back()->with('error', 'Invalid items selected for return.');
         }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns',);
+                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns');
             }
         }
+
+        $returnedItems = $order->orderDetails
+            ->whereIn('id', $selectedIds)
+            ->map(function ($item) {
+                return [
+                    'order_detail_id' => $item->id,
+                    'product_id'      => $item->product_id,
+                    'product_title'   => $item->product->title ?? 'N/A',
+                    'quantity'        => $item->quantity,
+                ];
+            })->values()->toArray();
 
         $order->update([
             'status' => Status::ReturnRequest->value,
             'return_info' => [
+                'items'      => $returnedItems,
                 'reason'     => $request->reason,
                 'images'     => $imagePaths,
-                'request_at' => now()->toDateTimeString(),
+                'requested_at' => now()->toDateTimeString(),
             ]
         ]);
 

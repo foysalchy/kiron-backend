@@ -327,17 +327,17 @@
                     </svg>
                     Support
                 </a>
-                @if ($order->status == \App\Enums\Status::ReturnRequest->value)
-                <button disabled
-                    class="w-full py-2.5 bg-gray-100 text-gray-400 rounded-md text-sm font-bold cursor-not-allowed">
-                    Return Requested
-                </button>
-                @else
-                <button onclick="openReturnModal()"
-                    class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-3 cursor-pointer">
-                    <i class="fas fa-undo h-4 w-4"></i> Return Request
-                </button>
-                @endif
+                 <!-- @if ($order->status == \App\Enums\Status::ReturnRequest->value)
+            <button disabled
+                class="w-full py-2.5 bg-gray-100 text-gray-400 rounded-md text-sm font-bold cursor-not-allowed">
+                Return Requested
+            </button>
+        @elseif ($order->status == \App\Enums\Status::Delivered->value)
+            <button onclick="openReturnModal()"
+                class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-3 cursor-pointer">
+                <i class="fas fa-undo h-4 w-4"></i> Return Request
+            </button>
+        @endif -->
             </div>
         </div>
 
@@ -346,13 +346,38 @@
 </section>
 <div id="return-modal"
     class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 relative shadow-2xl max-h-[90vh] overflow-y-auto">
         <button onclick="closeReturnModal()"
             class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl cursor-pointer">&times;</button>
-        <h2 class="text-xl font-bold text-gray-800 mb-6">Request a Return</h2>
+        <h2 class="text-xl font-bold text-gray-800 mb-1">Request a Return</h2>
+        <p class="text-sm text-gray-500 mb-6">Select the item(s) you want to return.</p>
 
         <form action="{{ route('order.return', $order->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
+
+            {{-- ============ Item Checklist ============ --}}
+            <div class="mb-6 space-y-2">
+                @foreach ($order->orderDetails as $item)
+                    <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:border-red-300 transition-colors has-[:checked]:border-red-400 has-[:checked]:bg-red-50">
+                        <input type="checkbox" name="order_detail_ids[]" value="{{ $item->id }}"
+                            class="w-4 h-4 accent-red-500 shrink-0">
+                        <img src="{{ $item->product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                            class="w-12 h-12 rounded-lg object-cover border shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-gray-800 truncate">{{ $item->product->title ?? 'Product Not Available' }}</p>
+                            @if ($item->variation)
+                                <p class="text-xs text-gray-400">
+                                    @foreach ($item->variation->attributes as $attr)
+                                        {{ $attr->attributeValue->name ?? '' }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </p>
+                            @endif
+                            <p class="text-xs text-gray-500">Qty: {{ $item->quantity }}</p>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+
             <div class="mb-4">
                 <label class="text-sm font-bold text-gray-700 mb-2 block">Reason for Return:</label>
                 <textarea name="reason" rows="4" required
@@ -360,19 +385,20 @@
                     placeholder="Describe the issue with the product..."></textarea>
             </div>
 
-            <div class="mb-6">
-                <label class="text-sm font-bold text-gray-700 mb-2 block">Upload Proof (Images):</label>
-                <div class="flex flex-wrap gap-2" id="return-image-preview">
-                    <label
-                        class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-red-500">
-                        <input type="file" name="images[]" multiple accept="image/*" class="hidden"
-                            onchange="handleReturnPreview(this)">
-                        <i class="fas fa-camera text-gray-400"></i>
-                    </label>
-                </div>
-            </div>
+    <div class="mb-6">
+    <label class="text-sm font-bold text-gray-700 mb-2 block">Upload Proof (Images):</label>
+    <p class="text-xs text-gray-400 mb-2">You can upload up to 5 images.</p>
+    <div class="flex flex-wrap gap-2" id="return-image-preview">
+        <label
+            class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-red-500">
+            <input type="file" name="images[]" multiple accept="image/*" class="hidden"
+                onchange="handleReturnPreview(this)">
+            <i class="fas fa-camera text-gray-400"></i>
+        </label>
+    </div>
+</div>
 
-            <button type="submit"
+            <button type="submit" id="return-submit-btn"
                 class="w-full primary-bg text-primary py-3 rounded-xl font-bold hover:bg-red-600 transition-all">Submit
                 Request</button>
         </form>
@@ -448,37 +474,98 @@
 @endsection
 @push('scripts')
 <script>
-    let returnFiles = new DataTransfer();
 
-    function openReturnModal() {
-        document.getElementById('return-modal').classList.remove('hidden');
-        document.getElementById('return-modal').classList.add('flex');
+function openReturnModal() {
+    document.getElementById('return-modal').classList.remove('hidden');
+    document.getElementById('return-modal').classList.add('flex');
+}
+
+function closeReturnModal() {
+    const modal = document.getElementById('return-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+        modal.querySelector('form').reset();
+
+        returnFiles = new DataTransfer();
+
+        const previews = modal.querySelectorAll('.return-preview-item');
+        previews.forEach(el => el.remove());
     }
+}
 
-    function closeReturnModal() {
-        document.getElementById('return-modal').classList.add('hidden');
-        document.getElementById('return-modal').classList.remove('flex');
+// Form submit-এর আগে চেক করা অন্তত একটা checkbox selected আছে কিনা
+document.addEventListener('DOMContentLoaded', function () {
+    const returnForm = document.querySelector('#return-modal form');
+    if (returnForm) {
+        returnForm.addEventListener('submit', function (e) {
+            const checked = returnForm.querySelectorAll('input[name="order_detail_ids[]"]:checked');
+            if (checked.length === 0) {
+                e.preventDefault();
+                toastr.warning('Please select at least one item to return.');
+            }
+        });
     }
+});
 
-    function handleReturnPreview(input) {
-        const container = document.getElementById('return-image-preview');
-        const label = container.querySelector('label');
+let returnFiles = new DataTransfer();
 
-        if (input.files) {
-            Array.from(input.files).forEach(file => {
-                returnFiles.items.add(file);
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const div = document.createElement('div');
-                    div.className = 'w-16 h-16 rounded-xl border overflow-hidden shrink-0 relative';
-                    div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
-                    container.insertBefore(div, label);
-                };
-                reader.readAsDataURL(file);
-            });
-            input.files = returnFiles.files;
+function handleReturnPreview(input) {
+    const container = document.getElementById('return-image-preview');
+    const label = container.querySelector('label');
+
+    if (input.files) {
+        const newFiles = Array.from(input.files);
+        const currentCount = returnFiles.files.length;
+
+        // সর্বোচ্চ ৫টা ছবি আপলোড সীমা
+        if (currentCount + newFiles.length > 5) {
+            toastr.error("You can only upload a maximum of 5 images.");
+            input.value = "";
+            return;
         }
+
+        newFiles.forEach(file => {
+            returnFiles.items.add(file);
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const div = document.createElement('div');
+                div.className = 'return-preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
+                div.innerHTML = `
+                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeReturnImage(this, '${file.name}')"
+                        class="absolute top-0 right-0 bg-red-500 text-white p-1 cursor-pointer">
+                        <i class="fas fa-times text-[10px]"></i>
+                    </button>
+                `;
+                container.insertBefore(div, label);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // input-এর সাথে আমাদের custom container sync করা
+        input.files = returnFiles.files;
     }
+}
+
+// ============ নতুন: ইমেজ রিমুভ ফাংশন ============
+function removeReturnImage(element, fileName) {
+    const input = document.querySelector('#return-modal input[name="images[]"]');
+
+    const newDataTransfer = new DataTransfer();
+    Array.from(returnFiles.files).forEach(file => {
+        if (file.name !== fileName) {
+            newDataTransfer.items.add(file);
+        }
+    });
+    returnFiles = newDataTransfer;
+    input.files = returnFiles.files;
+
+    // DOM থেকে preview সরানো
+    element.parentElement.remove();
+}
     // multiple file upload
     let reviewFilesContainer = new DataTransfer();
 

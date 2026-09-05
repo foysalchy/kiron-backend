@@ -46,7 +46,7 @@
     </button>
   </div>
 
-  <div class="p-5 flex flex-col flex-1">
+  <div class="p-2 md:p-5 flex flex-col flex-1">
 
     <p class="font-display font-semibold text-base leading-snug line-clamp-2  group-hover:text-ember transition-colors">
       {{ $product->title }}
@@ -87,24 +87,17 @@
 <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
 
     <!-- Order Now Button -->
-    <button
-        {{ $isOutOfStock ? 'disabled' : '' }}
-        aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}"
-        onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
-        class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
-        {{ $isOutOfStock
-            ? 'bg-smoke-300 text-white cursor-not-allowed'
-            : 'secondary-bg text-secondary hover:bg-yellow-500 cursor-pointer' }}"
-    >
-        @if ($isOutOfStock)
-            <i class="fas fa-exclamation-circle text-xs"></i>
-        @else
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-                <path d="M13 2 4 14h6l-1 8 9-12h-6z"/>
-            </svg>
-        @endif
-    </button>
-
+<button
+    {{ $isOutOfStock ? 'disabled' : '' }}
+    aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}"
+    onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
+    class="flex-1 h-9 px-2 md:px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
+    {{ $isOutOfStock
+        ? 'bg-smoke-300 text-white cursor-not-allowed'
+        : 'secondary-bg text-secondary hover:bg-yellow-500 cursor-pointer' }}"
+>
+    {{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}
+</button>
     <!-- Add to Cart Button -->
     <button
         {{ $isOutOfStock ? 'disabled' : '' }}

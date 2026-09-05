@@ -145,35 +145,37 @@
             });
     }
 
-    function removeCartItem(rowId, customMessage) {
-        const card = document.querySelector(`[data-row-id="${rowId}"]`);
-        if (card) card.remove();
+function removeCartItem(rowId, customMessage) {
+    const card = document.querySelector(`[data-row-id="${rowId}"]`);
+    if (card) card.remove();
 
-        recalculateOverallSubtotal();
+    recalculateOverallSubtotal();
 
-        fetch(`/cart/remove/${rowId}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(res => {
-                refreshMiniCart();
+    fetch(`/cart/remove/${rowId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            refreshMiniCart();
 
+            // ============ পরিবর্তন: ম্যানুয়াল decrement বাদ দিয়ে server থেকে আসল cart_count ব্যবহার ============
+            if (data && data.cart_count !== undefined) {
                 document.querySelectorAll('.cart-count-nav').forEach(el => {
-                    let currentCount = parseInt(el.innerText);
-                    if (currentCount > 0) {
-                        el.innerText = currentCount - 1;
-                    }
+                    el.innerText = data.cart_count;
                 });
+            }
 
-                toastr.success(customMessage || 'The item has been removed from the cart.');
-            })
-            .catch(err => {
-                console.error('Error removing item:', err);
-                toastr.error('Failed to remove item.');
-                refreshMiniCart();
-            });
-    }
+            toastr.success((data && data.message) || customMessage || 'The item has been removed from the cart.');
+        })
+        .catch(err => {
+            console.error('Error removing item:', err);
+            toastr.error('Failed to remove item.');
+            refreshMiniCart();
+        });
+}
 
     function toggleCartDrawer() {
         const drawer = document.getElementById('cart-drawer');

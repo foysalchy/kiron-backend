@@ -50,61 +50,61 @@
 
         <!-- Account (desktop) -->
         <div class="relative cursor-pointer hidden lg:block" id="account-menu">
-          <div onclick="toggleAccount(event)"
-            class="flex items-center gap-1.5 hover-text transition-colors select-none">
-            @auth('customer')
-            <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-              <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
-                alt="User" class="w-full h-full object-cover">
-            </div>
-            @else
-            <i class="fa-regular fa-user text-xl"></i>
-            @endauth
-            <span class="hidden lg:block text-[16px]">Account</span>
-            <i class="fas fa-chevron-down text-xs text-gray-400 hidden lg:block"></i>
-          </div>
+<div onclick="toggleAccount(event)"
+    class="flex items-center gap-1.5 text-gray-700 hover:text-[var(--primary-color)] transition-colors select-none">
+    @auth('customer')
+    <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+        <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+            alt="User" class="w-full h-full object-cover">
+    </div>
+    @else
+    <i class="fa-regular fa-user text-xl"></i>
+    @endauth
+    <span class="hidden lg:block text-[16px]">Account</span>
+    <i class="fas fa-chevron-down text-xs text-gray-400 hidden lg:block"></i>
+</div>
 
           <!-- Dropdown -->
-          <div id="account-dropdown"
-            class="hidden absolute right-0 top-[calc(100%+10px)] w-56 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
-            @auth('customer')
-            <div class="px-5 py-4 border-b border-gray-50">
-              <p class="text-sm font-medium text-gray-900 truncate">{{ auth('customer')->user()->name }}</p>
-              <p class="text-xs text-gray-500 truncate mt-0.5">{{ auth('customer')->user()->email }}</p>
-            </div>
-            <div class="py-2">
-              <a href="{{ route('user.dashboard') }}?section=orders"
-                class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
-                <i class="fas fa-box text-gray-400 w-4"></i>
-                Dashboard
-              </a>
-            </div>
-            <div class="border-t border-gray-100 py-1">
-              <form action="{{ route('user.logout') }}" method="POST">
-                @csrf
-                <button type="submit"
-                  class="w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
-                  aria-label="Logout">
-                  <i class="fa-solid fa-right-from-bracket w-4"></i>
-                  Logout
-                </button>
-              </form>
-            </div>
-            @else
-            <div class="py-2">
-              <a href="{{ route('user.login') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
-                <i class="fa-solid fa-right-to-bracket text-gray-400 text-sm"></i>
-                Login
-              </a>
-              <a href="{{ route('user.register') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover-text hover:bg-orange-50 transition-colors">
-                <i class="fa-solid fa-user-plus text-gray-400 text-sm"></i>
-                Register
-              </a>
-            </div>
-            @endauth
-          </div>
+       <div id="account-dropdown"
+    class="hidden absolute right-0 top-[calc(100%+10px)] w-56 bg-white rounded-lg shadow-lg border border-gray-100 z-50 overflow-hidden">
+    @auth('customer')
+    <div class="px-5 py-4 border-b border-gray-50">
+        <p class="text-sm font-medium text-gray-900 truncate">{{ auth('customer')->user()->name }}</p>
+        <p class="text-xs text-gray-500 truncate mt-0.5">{{ auth('customer')->user()->email }}</p>
+    </div>
+    <div class="py-2">
+        <a href="{{ route('user.dashboard') }}?section=orders"
+            class="flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
+            <i class="fas fa-box text-gray-400 w-4"></i>
+            Dashboard
+        </a>
+    </div>
+    <div class="border-t border-gray-100 py-1">
+        <form action="{{ route('user.logout') }}" method="POST">
+            @csrf
+            <button type="submit"
+                class="w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                aria-label="Logout">
+                <i class="fa-solid fa-right-from-bracket w-4"></i>
+                Logout
+            </button>
+        </form>
+    </div>
+    @else
+    <div class="py-2">
+        <a href="{{ route('user.login') }}"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
+            <i class="fa-solid fa-right-to-bracket text-gray-400 text-sm"></i>
+            Login
+        </a>
+        <a href="{{ route('user.register') }}"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
+            <i class="fa-solid fa-user-plus text-gray-400 text-sm"></i>
+            Register
+        </a>
+    </div>
+    @endauth
+</div>
         </div>
 
       </div>
