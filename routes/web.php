@@ -7,6 +7,7 @@ use App\Http\Controllers\Frontend\BlogController;
 use App\Http\Controllers\Frontend\BrandController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\ContctController;
+use App\Http\Controllers\Frontend\CustomerPasswordResetController;
 use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\LandingController;
 use App\Http\Controllers\Frontend\OrderController;
@@ -64,6 +65,9 @@ Route::get('/register', [AuthController::class, 'register'])->name('user.registe
 Route::post('/register', [AuthController::class, 'storeRegister'])->name('user.register.store');
 Route::get('/login', [AuthController::class, 'login'])->name('user.login');
 Route::post('/login', [AuthController::class, 'storeLogin'])->name('user.login.store');
+Route::get('/forgot-password', [CustomerPasswordResetController::class, 'showForgotPasswordForm'])->name('password.forgot');
+Route::post('/password/otp/request', [CustomerPasswordResetController::class, 'requestOtp'])->name('password.otp.request');
+Route::post('/password/otp/verify', [CustomerPasswordResetController::class, 'verifyOtp'])->name('password.otp.verify');
 Route::middleware(['auth:customer'])->group(function () {
     Route::get('/profile', [AuthController::class, 'profile'])->name('user.profile');
     Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('user.profile.update');
