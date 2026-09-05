@@ -56,51 +56,86 @@ class ReferralPartner extends Authenticatable
      */
     public function getCurrentCommissionRate(): array
     {
-        $group = $this->group()->with('tiers')->first();
+        $group = null;
+        if ($this->referral_group_id) {
+            $group = ReferralGroup::with(['tiers' => function ($q) {
+                $q->orderBy('min_sales', 'asc');
+            }])->find($this->referral_group_id);
+        }
+
         if (!$group) {
-            return [
-                'rate'      => 20.00,
-                'tier_name' => 'Default (20%)',
-                'next_tier' => null,
+            $group = ReferralGroup::with(['tiers' => function ($q) {
+                $q->orderBy('min_sales', 'asc');
+            }])->whereIn('status', [1, '1', 'active'])->first();
+        }
+
+        // Count completed sales / converted active referrals
+        $salesCount = max(
+            $this->commissions()->whereIn('status', ['approved', 'credited'])->count(),
+            $this->attributions()->whereHas('company', function ($q) {
+                $q->where('status', 1)->orWhere('status', '1')->orWhere('status', 'active');
+            })->count()
+        );
+
+        $currentTier = null;
+        $nextTier = null;
+        $allTiers = [];
+
+        $tiersCollection = ($group && $group->tiers && $group->tiers->isNotEmpty()) ? $group->tiers : collect([
+            (object)['id' => 1, 'name' => 'Bronze Rank (1-100 sales)', 'min_sales' => 1, 'max_sales' => 100, 'commission_rate' => 20.00],
+            (object)['id' => 2, 'name' => 'Silver Rank (101-300 sales)', 'min_sales' => 101, 'max_sales' => 300, 'commission_rate' => 30.00],
+            (object)['id' => 3, 'name' => 'Gold Rank (301+ sales)', 'min_sales' => 301, 'max_sales' => null, 'commission_rate' => 35.00],
+        ]);
+
+        foreach ($tiersCollection as $tier) {
+            $max = $tier->max_sales ?? PHP_INT_MAX;
+            $tierName = $tier->name ?? $tier->tier_name ?? "Tier ({$tier->min_sales}-" . ($tier->max_sales ?? '∞') . ")";
+            
+            $isCurrent = ($salesCount >= ($tier->min_sales <= 1 ? 0 : $tier->min_sales) && $salesCount <= $max);
+            $isUnlocked = ($salesCount >= $tier->min_sales);
+            $salesNeeded = max(0, $tier->min_sales - $salesCount);
+
+            if ($isCurrent) {
+                $currentTier = $tier;
+            } elseif ($salesCount < $tier->min_sales && !$nextTier) {
+                $nextTier = $tier;
+            }
+
+            $allTiers[] = [
+                'id'              => $tier->id ?? 0,
+                'name'            => $tierName,
+                'min_sales'       => $tier->min_sales,
+                'max_sales'       => $tier->max_sales,
+                'commission_rate' => $tier->commission_rate,
+                'is_current'      => $isCurrent,
+                'is_unlocked'     => $isUnlocked,
+                'sales_needed'    => $salesNeeded,
             ];
         }
 
-        // Count completed sales
-        $salesCount = $this->commissions()->where('status', 'approved')->count();
-
-        if ($group->is_tiered && $group->tiers->isNotEmpty()) {
-            $currentTier = null;
-            $nextTier = null;
-
-            foreach ($group->tiers as $tier) {
-                $max = $tier->max_sales ?? PHP_INT_MAX;
-                if ($salesCount >= $tier->min_sales && $salesCount <= $max) {
-                    $currentTier = $tier;
-                } elseif ($salesCount < $tier->min_sales && !$nextTier) {
-                    $nextTier = $tier;
-                }
-            }
-
-            if ($currentTier) {
-                return [
-                    'rate'         => $currentTier->commission_rate,
-                    'tier_name'    => $currentTier->tier_name ?: "Tier ({$currentTier->min_sales}-" . ($currentTier->max_sales ?? '∞') . ")",
-                    'sales_count'  => $salesCount,
-                    'next_tier'    => $nextTier ? [
-                        'name'        => $nextTier->tier_name,
-                        'min_sales'   => $nextTier->min_sales,
-                        'target_left' => max(0, $nextTier->min_sales - $salesCount),
-                        'rate'        => $nextTier->commission_rate,
-                    ] : null,
-                ];
+        // Default to first tier if not matched
+        if (!$currentTier && count($allTiers) > 0) {
+            $allTiers[0]['is_current'] = true;
+            $currentTier = $tiersCollection->first();
+            if (count($allTiers) > 1) {
+                $nextTier = $tiersCollection->get(1);
             }
         }
 
+        $currentRate = $currentTier ? $currentTier->commission_rate : ($group?->default_commission_rate ?? 20.00);
+        $currentName = $currentTier ? ($currentTier->name ?? $currentTier->tier_name ?? 'Bronze Rank') : 'Bronze Rank';
+
         return [
-            'rate'        => $group->default_commission_rate,
-            'tier_name'   => $group->name,
-            'sales_count' => $salesCount,
-            'next_tier'   => null,
+            'rate'         => $currentRate,
+            'tier_name'    => $currentName,
+            'sales_count'  => $salesCount,
+            'next_tier'    => $nextTier ? [
+                'name'        => $nextTier->name ?? $nextTier->tier_name ?? 'Silver Rank',
+                'min_sales'   => $nextTier->min_sales,
+                'target_left' => max(0, $nextTier->min_sales - $salesCount),
+                'rate'        => $nextTier->commission_rate,
+            ] : null,
+            'all_tiers'    => $allTiers,
         ];
     }
 

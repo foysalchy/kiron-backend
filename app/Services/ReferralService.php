@@ -298,8 +298,10 @@ class ReferralService
             'current_commission_rate' => $currentRate,
             'tier_info'               => [
                 'current_tier_name' => $tierInfo['tier_name'] ?? 'Standard Tier',
+                'sales_count'       => $tierInfo['sales_count'] ?? 0,
                 'next_tier'         => $tierInfo['next_tier'] ?? null,
                 'sales_needed'      => $tierInfo['next_tier']['target_left'] ?? 0,
+                'all_tiers'         => $tierInfo['all_tiers'] ?? [],
             ],
         ];
     }

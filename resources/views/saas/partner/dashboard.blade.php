@@ -12,18 +12,18 @@
                 <div class="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase text-brand-100 border border-white/10">
                     <span>{{ $partner->group ? $partner->group->name : 'Standard Partner' }}</span>
                     <span>•</span>
-                    <span>{{ $stats['current_commission_rate'] }}% Current Commission</span>
+                    <span class="text-amber-300 font-bold">{{ $stats['tier_info']['current_tier_name'] }}</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Welcome back, {{ $partner->name }}!</h1>
                 <p class="text-indigo-100 text-sm max-w-xl">
-                    Share your unique referral link or code with businesses. When they register and subscribe, you earn recurring commissions!
+                    Share your unique referral link or code. When referred businesses subscribe, your commissions automatically increase as you hit higher sales milestone tiers!
                 </p>
             </div>
 
             <!-- Referral Link & Code Box -->
             <div class="w-full lg:w-auto bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 space-y-3">
                 <div>
-                    <label class="block text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-1">Your Referral Link</label>
+                    <label class="block text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-1">Your Unique Referral Link</label>
                     <div class="flex items-center bg-white rounded-xl p-1 shadow-inner">
                         <input type="text" id="refLink" readonly value="{{ $partner->referral_link }}" 
                             class="bg-transparent text-slate-800 text-xs sm:text-sm font-medium px-3 py-1.5 focus:outline-none w-full sm:w-80">
@@ -38,7 +38,7 @@
                     <span class="text-xs text-indigo-100">Referral Code: <strong class="text-white font-mono bg-white/20 px-2 py-0.5 rounded">{{ $partner->referral_code }}</strong></span>
                     @if($partner->group && $partner->group->buyer_discount_rate > 0)
                         <span class="text-xs text-emerald-300 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
-                            🎉 Your referrals get {{ $partner->group->buyer_discount_rate }}% discount!
+                            🎉 Referrals get {{ $partner->group->buyer_discount_rate }}% discount!
                         </span>
                     @endif
                 </div>
@@ -46,15 +46,26 @@
         </div>
 
         <!-- Tier & Milestone Progress Bar -->
-        @if(isset($stats['tier_info']['next_tier']))
+        @if(!empty($stats['tier_info']['next_tier']))
         <div class="mt-6 pt-6 border-t border-white/15">
-            <div class="flex justify-between items-center text-xs font-medium text-indigo-100 mb-2">
-                <span>Current Tier: <strong class="text-white">{{ $stats['tier_info']['current_tier_name'] }} ({{ $stats['current_commission_rate'] }}%)</strong></span>
-                <span>Next Milestone: <strong class="text-amber-300">{{ $stats['tier_info']['next_tier']['name'] }} ({{ $stats['tier_info']['next_tier']['commission_rate'] }}%)</strong> ({{ $stats['tier_info']['sales_needed'] }} more sales needed)</span>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center text-xs font-medium text-indigo-100 mb-2 gap-1">
+                <span>
+                    Current Rank: <strong class="text-white font-bold">{{ $stats['tier_info']['current_tier_name'] }}</strong> ({{ $stats['current_commission_rate'] }}% Commission)
+                </span>
+                <span class="text-amber-200 font-semibold flex items-center gap-1">
+                    <span>🚀 Next Rank: <strong class="text-white">{{ $stats['tier_info']['next_tier']['name'] }}</strong> ({{ $stats['tier_info']['next_tier']['rate'] }}% Commission)</span>
+                    <span class="bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-300/30">
+                        {{ $stats['tier_info']['sales_needed'] }} more sales needed
+                    </span>
+                </span>
             </div>
-            <div class="w-full bg-black/25 rounded-full h-2.5 overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-400 to-amber-300 h-2.5 rounded-full transition-all duration-500" 
-                     style="width: {{ min(100, max(5, ($partner->total_sales_count / max(1, $stats['tier_info']['next_tier']['min_sales'])) * 100)) }}%"></div>
+            <div class="w-full bg-black/25 rounded-full h-3 overflow-hidden p-0.5">
+                <div class="bg-gradient-to-r from-emerald-400 via-amber-300 to-amber-400 h-2 rounded-full transition-all duration-500" 
+                     style="width: {{ min(100, max(8, ($partner->total_sales_count / max(1, $stats['tier_info']['next_tier']['min_sales'])) * 100)) }}%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-indigo-200 mt-1">
+                <span>{{ $partner->total_sales_count }} sales completed</span>
+                <span>Goal: {{ $stats['tier_info']['next_tier']['min_sales'] }} sales</span>
             </div>
         </div>
         @endif
@@ -135,6 +146,83 @@
         </div>
     </div>
 
+    <!-- Tier Milestone & Rank Roadmap Ladder Section -->
+    @if(!empty($stats['tier_info']['all_tiers']) && count($stats['tier_info']['all_tiers']) > 0)
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-award text-amber-500 text-lg"></i>
+                    Commission Ranks & Sales Milestone Roadmap
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Your commission percentage automatically unlocks higher rates as your total referred subscription sales grow!
+                </p>
+            </div>
+            <div class="text-xs bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600">
+                Total Sales Made: <strong class="text-brand-600 font-bold">{{ $partner->total_sales_count }}</strong>
+            </div>
+        </div>
+
+        <!-- Tier Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-{{ min(4, count($stats['tier_info']['all_tiers'])) }} gap-4">
+            @foreach($stats['tier_info']['all_tiers'] as $tier)
+            <div class="rounded-2xl p-5 border transition-all duration-200 flex flex-col justify-between {{ $tier['is_current'] ? 'bg-gradient-to-b from-brand-50/70 to-indigo-50/40 border-brand-500 shadow-md ring-2 ring-brand-500/20' : ($tier['is_unlocked'] ? 'bg-emerald-50/30 border-emerald-200' : 'bg-slate-50/70 border-slate-200 opacity-90') }}">
+                <div>
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold uppercase tracking-wider {{ $tier['is_current'] ? 'text-brand-700' : ($tier['is_unlocked'] ? 'text-emerald-700' : 'text-slate-500') }}">
+                            {{ $tier['name'] }}
+                        </span>
+                        @if($tier['is_current'])
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-brand-600 text-white shadow-sm">
+                                ★ ACTIVE RANK
+                            </span>
+                        @elseif($tier['is_unlocked'])
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                <i class="fa-solid fa-check mr-1 text-[8px]"></i> Achieved
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-200 text-slate-600">
+                                <i class="fa-solid fa-lock mr-1 text-[8px]"></i> Locked
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="text-2xl font-black text-slate-900">
+                            {{ $tier['commission_rate'] }}%
+                            <span class="text-xs font-medium text-slate-500">commission</span>
+                        </div>
+                        <div class="text-xs text-slate-600 mt-1 font-medium">
+                            <i class="fa-solid fa-bullseye text-slate-400 mr-1"></i>
+                            Sales Target: <strong>{{ $tier['min_sales'] }} – {{ $tier['max_sales'] ? $tier['max_sales'] : '∞' }} sales</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t {{ $tier['is_current'] ? 'border-brand-200' : 'border-slate-200' }} text-xs">
+                    @if($tier['is_current'])
+                        <div class="text-brand-700 font-bold flex items-center">
+                            <i class="fa-solid fa-circle-dot mr-1.5 text-brand-600 animate-pulse"></i>
+                            Currently Earning at this rate
+                        </div>
+                    @elseif($tier['is_unlocked'])
+                        <div class="text-emerald-600 font-semibold flex items-center">
+                            <i class="fa-solid fa-circle-check mr-1.5"></i>
+                            Milestone completed
+                        </div>
+                    @else
+                        <div class="text-slate-500">
+                            <strong class="text-amber-600 font-bold">{{ $tier['sales_needed'] }}</strong> more sales needed to upgrade
+                        </div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <!-- Recent Tables Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
@@ -184,7 +272,7 @@
                     <div>
                         <div class="font-semibold text-slate-900 text-sm">{{ $comm->company->name ?? 'Referred Business' }}</div>
                         <div class="text-xs text-slate-500">
-                            Invoice: ৳{{ number_format($comm->invoice_amount, 2) }} ({{ $comm->commission_rate }}% rate) • {{ $comm->created_at->format('M d, Y') }}
+                            Invoice: ৳{{ number_format($comm->invoice_amount ?? $comm->sale_amount ?? 0, 2) }} ({{ $comm->commission_rate }}% rate) • {{ $comm->created_at->format('M d, Y') }}
                         </div>
                     </div>
                     <div class="text-right">
