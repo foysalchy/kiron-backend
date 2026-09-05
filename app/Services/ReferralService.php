@@ -125,7 +125,7 @@ class ReferralService
             // Update attribution status to active
             $attribution->update([
                 'status' => 'subscribed_active',
-                'first_subscribed_at' => now(),
+                'first_subscribed_at' => $attribution->first_subscribed_at ?: now(),
             ]);
 
             DB::commit();

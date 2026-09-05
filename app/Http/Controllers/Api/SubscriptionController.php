@@ -233,6 +233,7 @@ public function billing(Request $request): JsonResponse
         'currentSubscription.pricingPackage',
         'subscriptions.subscriptionPayments',
         'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
+        'referralAttribution.referralPartner.group'
     ]);
 
     if ($request->search) {

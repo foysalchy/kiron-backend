@@ -297,6 +297,11 @@ Route::prefix('v1')->group(function () {
                 Route::post('/impersonate/company/{company}', [AuthController::class, 'impersonateCompany']);
                 Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
                 Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
+                
+                // SaaS Dashboard
+                Route::get('/saas-dashboard/stats', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getStats']);
+                Route::get('/saas-dashboard/charts', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getCharts']);
+                Route::get('/saas-dashboard/overdue-invoices', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getOverdueInvoices']);
             });
 
             Route::get('/menu-settings', [MenuSettingController::class, 'index']);
