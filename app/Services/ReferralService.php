@@ -122,11 +122,13 @@ class ReferralService
             $partner->increment('wallet_balance', $commissionAmount);
             $partner->increment('total_earned', $commissionAmount);
 
-            // Update attribution status to active
+            // Update attribution status to active and set first_subscribed_at only once
             $attribution->update([
-                'status' => 'subscribed_active',
+                'status'              => 'subscribed_active',
                 'first_subscribed_at' => $attribution->first_subscribed_at ?: now(),
             ]);
+            // Increment total commission earned on attribution
+            $attribution->increment('total_commission_earned', $commissionAmount);
 
             DB::commit();
             Log::info("Referral commission #{$commission->id} created: {$commissionAmount} for partner #{$partner->id}");
