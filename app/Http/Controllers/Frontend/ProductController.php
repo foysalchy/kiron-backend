@@ -171,86 +171,86 @@ class ProductController extends FrontendController
     }
 
 
-  public function categoryProducts(Request $request, $slug)
-{
-    $breadcrumb = [];
-    $category = MegaCategory::where('slug', $slug)->first();
-    $column = 'mega_category_ids';
-
-    if ($category) {
+    public function categoryProducts(Request $request, $slug)
+    {
+        $breadcrumb = [];
+        $category = MegaCategory::where('slug', $slug)->first();
         $column = 'mega_category_ids';
-        $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
-    }
 
-    if (!$category) {
-        $category = SubCategory::with('megaCategory')->where('slug', $slug)->first();
         if ($category) {
-            $column = 'sub_category_ids';
-            if ($category->megaCategory) {
-                $breadcrumb[] = ['name' => $category->megaCategory->name, 'slug' => $category->megaCategory->slug];
+            $column = 'mega_category_ids';
+            $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+        }
+
+        if (!$category) {
+            $category = SubCategory::with('megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'sub_category_ids';
+                if ($category->megaCategory) {
+                    $breadcrumb[] = ['name' => $category->megaCategory->name, 'slug' => $category->megaCategory->slug];
+                }
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
             }
-            $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
         }
-    }
 
-    if (!$category) {
-        $category = MiniCategory::with('subCategory.megaCategory')->where('slug', $slug)->first();
-        if ($category) {
-            $column = 'mini_category_ids';
-            $sub = $category->subCategory;
-            $mega = $sub?->megaCategory;
-            if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
-            if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
-            $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+        if (!$category) {
+            $category = MiniCategory::with('subCategory.megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'mini_category_ids';
+                $sub = $category->subCategory;
+                $mega = $sub?->megaCategory;
+                if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
+                if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+            }
         }
-    }
 
-    if (!$category) {
-        $category = ExtraCategory::with('miniCategory.subCategory.megaCategory')->where('slug', $slug)->first();
-        if ($category) {
-            $column = 'extra_category_ids';
-            $mini = $category->miniCategory;
-            $sub = $mini?->subCategory;
-            $mega = $sub?->megaCategory;
-            if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
-            if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
-            if ($mini) $breadcrumb[] = ['name' => $mini->name, 'slug' => $mini->slug];
-            $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+        if (!$category) {
+            $category = ExtraCategory::with('miniCategory.subCategory.megaCategory')->where('slug', $slug)->first();
+            if ($category) {
+                $column = 'extra_category_ids';
+                $mini = $category->miniCategory;
+                $sub = $mini?->subCategory;
+                $mega = $sub?->megaCategory;
+                if ($mega) $breadcrumb[] = ['name' => $mega->name, 'slug' => $mega->slug];
+                if ($sub) $breadcrumb[] = ['name' => $sub->name, 'slug' => $sub->slug];
+                if ($mini) $breadcrumb[] = ['name' => $mini->name, 'slug' => $mini->slug];
+                $breadcrumb[] = ['name' => $category->name, 'slug' => $category->slug];
+            }
         }
+
+        if (!$category) abort(401);
+
+        $query = Product::where('status', Status::Active->value)
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating');
+
+
+        if (!$request->filled('mega_category') && !$request->filled('sub_category')) {
+            $query->whereJsonContains($column, (int) $category->id);
+        }
+
+        $this->applyFiltersAndSorting($query, $request);
+        $maxPriceLimit = $this->getMaxPriceLimit();
+
+        $products = $query->paginate(12)->appends($request->query());
+        $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
+
+        $brands = Brand::get();
+        $categories = MegaCategory::where('status', Status::Active->value)
+            ->select('id', 'name', 'company_id', 'slug', 'image')
+            ->with('subCategories:id,mega_category_id,name,slug')->get();
+
+        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+            ->with('values')
+            ->where('status', Status::Active->value)
+            ->get()
+            ->unique('name');
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
+            'allProducts' => $products
+        ]);
     }
-
-    if (!$category) abort(401);
-
-    $query = Product::where('status', Status::Active->value)
-        ->withCount('reviews')
-        ->withAvg('reviews', 'rating');
-
-    
-    if (!$request->filled('mega_category') && !$request->filled('sub_category')) {
-        $query->whereJsonContains($column, (int) $category->id);
-    }
-
-    $this->applyFiltersAndSorting($query, $request);
-    $maxPriceLimit = $this->getMaxPriceLimit();
-
-    $products = $query->paginate(12)->appends($request->query());
-    $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
-
-    $brands = Brand::get();
-    $categories = MegaCategory::where('status', Status::Active->value)
-        ->select('id', 'name', 'company_id', 'slug', 'image')
-        ->with('subCategories:id,mega_category_id,name,slug')->get();
-
-    $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-        ->with('values')
-        ->where('status', Status::Active->value)
-        ->get()
-        ->unique('name');
-
-    return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
-        'allProducts' => $products
-    ]);
-}
 
     // highest price limit
     private function getMaxPriceLimit()
@@ -297,19 +297,19 @@ class ProductController extends FrontendController
         }
         // applyFiltersAndSorting() মেথডের ভিতরে যোগ করুন
 
-if ($request->filled('mega_category') || $request->filled('sub_category')) {
-    $megaIds = (array) $request->mega_category;
-    $subIds  = (array) $request->sub_category;
+        if ($request->filled('mega_category') || $request->filled('sub_category')) {
+            $megaIds = (array) $request->mega_category;
+            $subIds  = (array) $request->sub_category;
 
-    $query->where(function ($q) use ($megaIds, $subIds) {
-        foreach ($megaIds as $id) {
-            $q->orWhereJsonContains('mega_category_ids', (int) $id);
+            $query->where(function ($q) use ($megaIds, $subIds) {
+                foreach ($megaIds as $id) {
+                    $q->orWhereJsonContains('mega_category_ids', (int) $id);
+                }
+                foreach ($subIds as $id) {
+                    $q->orWhereJsonContains('sub_category_ids', (int) $id);
+                }
+            });
         }
-        foreach ($subIds as $id) {
-            $q->orWhereJsonContains('sub_category_ids', (int) $id);
-        }
-    });
-}
 
         // ৪. অ্যাট্রিবিউট ফিল্টার (Color, Size ইত্যাদি)
         if ($request->filled('attributes')) {
@@ -382,7 +382,6 @@ if ($request->filled('mega_category') || $request->filled('sub_category')) {
                 foreach ($variation->attributes as $attr) {
                     $groupName = $attr->attributeGroup?->name ?? 'Unknown';
 
-                    // --- এই ৩টি লাইন যোগ করুন ---
                     if ($attr->attributeGroup && !isset($groupCategories[$groupName])) {
                         $groupCategories[$groupName] = $attr->attributeGroup->category;
                     }
@@ -395,19 +394,18 @@ if ($request->filled('mega_category') || $request->filled('sub_category')) {
                         'name' => $attr->attributeValue?->name ?? 'Unknown'
                     ];
 
-                    // ভ্যারিয়েশনের ইমেজকে ভ্যালু আইডির সাথে ম্যাপ করা (যেমন: Red ID => Red Image)
                     if ($variation->image && $valId && !isset($valueImages[$valId])) {
                         $valueImages[$valId] = $variation->image_url;
                     }
                 }
 
-                // এই ভ্যারিয়েশনের নিজস্ব গ্যালারি + মেইন ইমেজ
                 $varGalleries = $variation->galleries->map(fn($g) => $g->image_url)->toArray();
                 if ($variation->image) array_unshift($varGalleries, $variation->image_url);
 
                 $formattedVariations[] = [
                     'id' => $variation->id,
                     'price' => $variation->final_price,
+                    'regular_price' => $variation->regular_price,
                     'attributes' => $attrs,
                     'main_image' => $variation->image_url ?? $product->thumbnail_url,
                     'galleries' => $varGalleries,
