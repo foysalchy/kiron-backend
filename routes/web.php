@@ -20,8 +20,26 @@ use App\Http\Controllers\Saas\SeoController;
 use App\Http\Controllers\Frontend\WishlistController;
 use App\Http\Controllers\Saas\IndexController as SaasIndexController;
 use App\Http\Controllers\Saas\MasterBrandController;
+use App\Http\Controllers\Saas\PartnerPortalController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
+
+// Partner & Referral Web Portal Routes
+Route::prefix('partner')->name('partner.')->group(function () {
+    Route::get('/login', [PartnerPortalController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [PartnerPortalController::class, 'login'])->name('login.submit');
+    Route::get('/register', [PartnerPortalController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [PartnerPortalController::class, 'register'])->name('register.submit');
+    Route::post('/logout', [PartnerPortalController::class, 'logout'])->name('logout');
+
+    Route::get('/dashboard', [PartnerPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/referrals', [PartnerPortalController::class, 'referrals'])->name('referrals');
+    Route::get('/earnings', [PartnerPortalController::class, 'earnings'])->name('earnings');
+    Route::get('/withdrawals', [PartnerPortalController::class, 'withdrawals'])->name('withdrawals');
+    Route::post('/withdrawals/request', [PartnerPortalController::class, 'requestWithdrawal'])->name('withdrawals.request');
+    Route::get('/profile', [PartnerPortalController::class, 'profile'])->name('profile');
+    Route::post('/profile/update', [PartnerPortalController::class, 'updateProfile'])->name('profile.update');
+});
 
 Route::get('/git-pull', function () {
     $output = shell_exec('cd /var/www/html/managesuite && git pull 2>&1');

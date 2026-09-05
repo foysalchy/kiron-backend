@@ -124,6 +124,9 @@ use App\Http\Controllers\Api\ResignationController;
 use App\Http\Controllers\Api\SlideController;
 use App\Http\Controllers\Api\RequisitionController;
 use App\Http\Controllers\Api\ResignRuleController;
+use App\Http\Controllers\Api\ReferralGroupController;
+use App\Http\Controllers\Api\ReferralPartnerController;
+use App\Http\Controllers\Api\ReferralWithdrawalController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\Saas\CustomerReviewController;
 use App\Http\Controllers\Api\Saas\MasterBrandController;
@@ -1921,6 +1924,13 @@ Route::prefix('v1')->group(function () {
                 Route::get('/package-upgrades', [PackageUpgradeController::class, 'index']);
                 Route::post('/package-upgrades/{id}/status-update', [PackageUpgradeController::class, 'updateStatus']);
                 Route::post('/registration/register-seller', [CompanyRegistrationController::class, 'register']);
+
+                // Referral & Partner Program Management
+                Route::apiResource('/referral-groups', ReferralGroupController::class);
+                Route::apiResource('/referral-partners', ReferralPartnerController::class);
+                Route::get('/referral-withdrawals', [ReferralWithdrawalController::class, 'index']);
+                Route::post('/referral-withdrawals/{id}/approve', [ReferralWithdrawalController::class, 'approve']);
+                Route::post('/referral-withdrawals/{id}/reject', [ReferralWithdrawalController::class, 'reject']);
             });
         });
         //bkash route

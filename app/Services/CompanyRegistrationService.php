@@ -96,6 +96,16 @@ class CompanyRegistrationService
             // Seed default Tally Account Groups and Chart of Accounts for new company
             \App\Services\DefaultAccountingSeederService::seedDefaultAccountsForCompany($company->id);
 
+            // Record Referral Attribution if referral code provided
+            $refCode = $data['referral_code'] ?? $data['ref'] ?? request()->cookie('dorja_ref') ?? request()->get('ref');
+            if (!empty($refCode)) {
+                try {
+                    app(\App\Services\ReferralService::class)->recordAttribution($refCode, $company->id);
+                } catch (\Throwable $th) {
+                    Log::warning('Referral attribution failed: ' . $th->getMessage());
+                }
+            }
+
             $token = $user->createToken('auth_token')->plainTextToken;
 
             DB::commit();
