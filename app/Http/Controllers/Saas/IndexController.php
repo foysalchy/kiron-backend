@@ -224,6 +224,15 @@ class IndexController extends Controller
         return view('saas.frontend.pricingList', compact('pricingPlans'));
     }
 
+    public function partnerProgram()
+    {
+        $groups = \App\Models\ReferralGroup::with(['tiers' => function ($q) {
+            $q->orderBy('min_sales', 'asc');
+        }])->whereIn('status', [1, '1', 'active'])->get();
+
+        return view('saas.frontend.partnerLanding', compact('groups'));
+    }
+
     public function contact()
     {
         return view('saas.frontend.contact');

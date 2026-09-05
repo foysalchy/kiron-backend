@@ -20,11 +20,12 @@
 
         <!-- Navigation Links (Desktop) -->
         <nav class="hidden lg:flex items-center space-x-8">
-            <a href="{{ route('saas.index') }}" class="text-[#00555c] font-semibold text-lg">Home</a>
+            <a href="{{ route('saas.index') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Home</a>
             <a href="{{ route('saas.feature.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Features</a>
             <a href="{{ route('saas.index') }}#intergation"
                 class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Integration</a>
             <a href="{{ route('saas.package.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Pricing</a>
+            <a href="{{ route('saas.partner') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Partner</a>
             <a href="{{ route('saas.faq.list') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">FAQ</a>
             <a href="{{ route('saas.contact') }}" class="text-gray-700 hover:text-[#00555c] font-semibold text-lg transition">Contact</a>
         </nav>
@@ -67,6 +68,7 @@
                 <a href="{{ route('saas.index') }}#intergation"
                     class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Integration</a>
                 <a href="{{ route('saas.package.list') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Pricing</a>
+                <a href="{{ route('saas.partner') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Partner</a>
                 <a href="{{ route('saas.contact') }}" class="text-gray-700 font-semibold text-lg border-b border-gray-50 pb-2">Contact</a>
                 <div class="pt-4">
                     <a href="https://app.dorja.io"

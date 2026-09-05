@@ -56,6 +56,8 @@ Route::get('/git-pull', function () {
     ]);
 });
 
+Route::get('/partners', [SaasIndexController::class, 'partnerProgram'])->name('saas.partner');
+
 Route::domain('dorja.io')->group(function () {
     Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
     Route::get('/features', [SaasIndexController::class, 'features'])->name('saas.feature.list');
@@ -64,6 +66,7 @@ Route::domain('dorja.io')->group(function () {
     Route::get('/blog/{slug}', [SaasIndexController::class, 'blogPostDetails'])->name('saas.blog.details');
     Route::get('/faqs', [SaasIndexController::class, 'faqList'])->name('saas.faq.list');
     Route::get('/pricing', [SaasIndexController::class, 'packageList'])->name('saas.package.list');
+    Route::get('/partners', [SaasIndexController::class, 'partnerProgram'])->name('saas.partner.domain');
     Route::get('/contact', [SaasIndexController::class, 'contact'])->name('saas.contact');
     Route::post('/contact/send', [SaasIndexController::class, 'send'])->name('saas.contact.send');
     Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap.saas.index');
