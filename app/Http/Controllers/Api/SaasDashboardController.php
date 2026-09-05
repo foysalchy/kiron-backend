@@ -50,11 +50,11 @@ class SaasDashboardController extends Controller
         $totalDueCommission = ReferralWithdrawal::where('status', 'pending')->sum('amount');
 
         // ── Lead Stats (SaaS Leads where company_id is null) ──
-        $totalLeads = Lead::whereNull('company_id')->count();
+        $totalLeads = Lead::whereNull('leads.company_id')->count();
         
         $leadsByStatus = DB::table('leads')
-            ->whereNull('company_id')
             ->leftJoin('lead_statuses', 'leads.lead_status_id', '=', 'lead_statuses.id')
+            ->whereNull('leads.company_id')
             ->select('lead_statuses.name as status_name', DB::raw('count(leads.id) as count'))
             ->groupBy('lead_statuses.id', 'lead_statuses.name')
             ->get();
