@@ -153,9 +153,19 @@ class CompanyRegistrationService
                 throw new \Exception("No pricing tier found for billing cycle: {$billing}");
             }
 
-            $amountPaid = $tier->discount_price > 0 && $tier->discount_price < $tier->regular_price
-                ? $tier->discount_price
-                : $tier->regular_price;
+            $basePrice = ($tier->discount_price > 0 && $tier->discount_price < $tier->regular_price)
+                ? (float)$tier->discount_price
+                : (float)$tier->regular_price;
+
+            // Apply referral buyer discount if company registered via referral code
+            $attribution = \App\Models\ReferralAttribution::where('company_id', $company->id)->first();
+            $buyerDiscountRate = $attribution ? floatval($attribution->buyer_discount_rate ?? 0) : 0;
+
+            $amountPaid = $basePrice;
+            if ($buyerDiscountRate > 0) {
+                $referralDiscountAmount = round(($basePrice * $buyerDiscountRate) / 100, 2);
+                $amountPaid = max(0, round($basePrice - $referralDiscountAmount, 2));
+            }
 
             $now       = Carbon::now();
             $trialDays = (int) $pricing->trial_days;
