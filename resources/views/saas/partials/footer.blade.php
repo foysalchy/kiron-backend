@@ -69,11 +69,17 @@
                      <li>
                          <a href="{{route('saas.blog.list')}}" class="hover:text-white transition">Blog</a>
                      </li>
-                      <li>
+                     <li>
                          <a href="https://app.dorja.io/register" class="hover:text-white transition">Register</a>
                      </li>
-                      <li>
+                     <li>
                          <a href="https://app.dorja.io/" class="hover:text-white transition">Login</a>
+                     </li>
+                     <li>
+                         <a href="{{ route('partner.login') }}" class="hover:text-white transition">Partner Login</a>
+                     </li>
+                     <li>
+                         <a href="{{ route('partner.register') }}" class="hover:text-white transition">Become a Partner</a>
                      </li>
                  </ul>
              </div>

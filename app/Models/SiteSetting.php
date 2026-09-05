@@ -34,6 +34,7 @@ class SiteSetting extends Model
         'store_address',
         'tags',
         'copy_right',
+        'sms_forget_password',
         'status',
         'meta_image',
         'founder_name',
@@ -41,6 +42,10 @@ class SiteSetting extends Model
         'established',
     ];
     protected $hidden = ['deleted_at'];
+
+    protected $casts = [
+        'sms_forget_password' => 'boolean',
+    ];
 
 
     protected $appends = ['logo_url', 'favicon_url'];

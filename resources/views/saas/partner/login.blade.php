@@ -24,6 +24,7 @@
         <div>
             <div class="flex justify-between items-center mb-1">
                 <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Password</label>
+                <a href="{{ route('partner.password.forgot') }}" class="text-xs text-brand-600 hover:text-brand-700 font-medium">Forgot Password?</a>
             </div>
             <input type="password" name="password" required
                 class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm"

@@ -32,6 +32,12 @@ Route::prefix('partner')->name('partner.')->group(function () {
     Route::post('/register', [PartnerPortalController::class, 'register'])->name('register.submit');
     Route::post('/logout', [PartnerPortalController::class, 'logout'])->name('logout');
 
+    // Partner Forgot & Reset Password
+    Route::get('/forgot-password', [PartnerPortalController::class, 'showForgotPasswordForm'])->name('password.forgot');
+    Route::post('/forgot-password/request-otp', [PartnerPortalController::class, 'requestPasswordResetOtp'])->name('password.request-otp');
+    Route::get('/reset-password', [PartnerPortalController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [PartnerPortalController::class, 'resetPassword'])->name('password.update');
+
     Route::get('/dashboard', [PartnerPortalController::class, 'dashboard'])->name('dashboard');
     Route::get('/referrals', [PartnerPortalController::class, 'referrals'])->name('referrals');
     Route::get('/earnings', [PartnerPortalController::class, 'earnings'])->name('earnings');

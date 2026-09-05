@@ -18,7 +18,16 @@ class CustomerPasswordResetController extends FrontendController
 
     public function showForgotPasswordForm()
     {
-        return  $this->view('frontend.user.forgot-password');
+        $company = getCurrentCompany();
+        $siteSetting = \App\Models\SiteSetting::where(function ($q) use ($company) {
+            if ($company && $company->company_id) {
+                $q->where('company_id', $company->company_id);
+            }
+        })->first();
+
+        $smsEnabled = $siteSetting ? (bool)($siteSetting->sms_forget_password ?? true) : true;
+
+        return $this->view('frontend.user.forgot-password', compact('smsEnabled'));
     }
 
     public function requestOtp(Request $request)
@@ -27,6 +36,22 @@ class CustomerPasswordResetController extends FrontendController
             'method'     => ['required', 'in:email,sms'],
             'identifier' => ['required', 'string'],
         ]);
+
+        $company = getCurrentCompany();
+        $siteSetting = \App\Models\SiteSetting::where(function ($q) use ($company) {
+            if ($company && $company->company_id) {
+                $q->where('company_id', $company->company_id);
+            }
+        })->first();
+
+        $smsEnabled = $siteSetting ? (bool)($siteSetting->sms_forget_password ?? true) : true;
+
+        if ($request->method === 'sms' && !$smsEnabled) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'SMS password reset is disabled for this store. Please use Email.',
+            ], 422);
+        }
 
         try {
             $data = $this->passwordResetService->requestOtp($request->method, $request->identifier);

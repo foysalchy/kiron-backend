@@ -53,7 +53,7 @@
 
                     <!-- Forgot Password Link -->
                     <div class="text-left">
-                        <a href="#"  style="color:var(--primary-color)"  class="  text-sm font-medium hover:underline">Forgot Your Password?</a>
+                        <a href="{{ route('password.forgot') }}"  style="color:var(--primary-color)"  class="text-sm font-medium hover:underline">Forgot Your Password?</a>
                     </div>
 
                     <!-- Login Button -->

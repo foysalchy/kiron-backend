@@ -1,4 +1,4 @@
-@extends('template5.layouts.front')
+@extends('template2.layouts.front')
 @section('content')
 <section class="container py-6 mx-auto">
     <div class="bg-white rounded-lg border border-gray-200 shadow-xs max-w-lg mx-auto overflow-hidden">
@@ -99,24 +99,26 @@
         const label = document.getElementById('identifier-label');
         const input = document.getElementById('identifier-input');
 
-        if (method === 'email') {
-            emailBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
-            emailBtn.classList.remove('text-gray-500');
-            smsBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
-            smsBtn.classList.add('text-gray-500');
+        if (emailBtn && smsBtn) {
+            if (method === 'email') {
+                emailBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
+                emailBtn.classList.remove('text-gray-500');
+                smsBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
+                smsBtn.classList.add('text-gray-500');
 
-            label.innerText = 'Email Address';
-            input.type = 'email';
-            input.placeholder = 'user@example.com';
-        } else {
-            smsBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
-            smsBtn.classList.remove('text-gray-500');
-            emailBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
-            emailBtn.classList.add('text-gray-500');
+                label.innerText = 'Email Address';
+                input.type = 'email';
+                input.placeholder = 'user@example.com';
+            } else {
+                smsBtn.classList.add('bg-white', 'shadow-sm', 'text-gray-900');
+                smsBtn.classList.remove('text-gray-500');
+                emailBtn.classList.remove('bg-white', 'shadow-sm', 'text-gray-900');
+                emailBtn.classList.add('text-gray-500');
 
-            label.innerText = 'Phone Number';
-            input.type = 'tel';
-            input.placeholder = '01XXXXXXXXX';
+                label.innerText = 'Phone Number';
+                input.type = 'tel';
+                input.placeholder = '01XXXXXXXXX';
+            }
         }
 
         input.value = '';
@@ -125,12 +127,17 @@
 
     function showError(elId, message) {
         const el = document.getElementById(elId);
-        el.innerText = message;
-        el.classList.remove('hidden');
+        if (el) {
+            el.innerText = message;
+            el.classList.remove('hidden');
+        }
     }
 
     function hideError(elId) {
-        document.getElementById(elId).classList.add('hidden');
+        const el = document.getElementById(elId);
+        if (el) {
+            el.classList.add('hidden');
+        }
     }
 
     function requestOtp(isResend = false) {
@@ -168,7 +175,11 @@
                 document.getElementById('sent-to-identifier').innerText = identifier;
                 document.getElementById('step-1').classList.add('hidden');
                 document.getElementById('step-2').classList.remove('hidden');
-                toastr.success(data.message);
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(data.message);
+                } else {
+                    alert(data.message);
+                }
             } else {
                 showError('identifier-error', data.message || 'Something went wrong.');
             }
@@ -231,7 +242,9 @@
         .then(async res => {
             const data = await res.json();
             if (res.ok && data.status === 'success') {
-                toastr.success(data.message);
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(data.message);
+                }
                 setTimeout(() => {
                     window.location.href = "{{ route('user.login') }}";
                 }, 1500);

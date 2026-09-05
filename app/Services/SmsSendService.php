@@ -230,10 +230,19 @@ class SmsSendService
     public function sendToGateway(array $numbers, string $message): array
     {
         $recipientString = implode(',', array_unique($numbers));
+        $gatewayUrl = config('services.sms_gateway.url');
+
+        if (empty($gatewayUrl)) {
+            Log::warning('SMS Gateway URL is not configured in .env. Skipping HTTP request.', [
+                'numbers' => $recipientString,
+                'message' => $message,
+            ]);
+            return ['response_code' => 202, 'status' => 'skipped_no_config'];
+        }
 
         $response = Http::asForm()
             ->timeout(30)
-            ->post(config('services.sms_gateway.url'), [
+            ->post($gatewayUrl, [
                 'api_key'  => config('services.sms_gateway.api_key'),
                 'senderid' => config('services.sms_gateway.sender_id'),
                 'number'   => $recipientString,

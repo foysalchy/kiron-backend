@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Saas;
 use App\Http\Controllers\Controller;
 use App\Models\ReferralPartner;
 use App\Models\ReferralGroup;
+use App\Services\PartnerPasswordResetService;
 use App\Services\ReferralService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,10 +13,12 @@ use Illuminate\Support\Facades\Hash;
 class PartnerPortalController extends Controller
 {
     protected ReferralService $referralService;
+    protected PartnerPasswordResetService $passwordResetService;
 
-    public function __construct(ReferralService $referralService)
+    public function __construct(ReferralService $referralService, PartnerPasswordResetService $passwordResetService)
     {
         $this->referralService = $referralService;
+        $this->passwordResetService = $passwordResetService;
     }
 
     protected function getAuthenticatedPartner()
@@ -64,6 +67,72 @@ class PartnerPortalController extends Controller
         session(['partner_id' => $partner->id, 'partner_name' => $partner->name]);
 
         return redirect()->route('partner.dashboard')->with('success', 'Welcome back, ' . $partner->name . '!');
+    }
+
+    public function showForgotPasswordForm()
+    {
+        if (session('partner_id')) {
+            return redirect()->route('partner.dashboard');
+        }
+        return view('saas.partner.forgot-password');
+    }
+
+    public function requestPasswordResetOtp(Request $request)
+    {
+        $request->validate([
+            'method'     => 'required|in:email,sms',
+            'identifier' => 'required|string',
+        ]);
+
+        try {
+            $data = $this->passwordResetService->requestOtp($request->method, trim($request->identifier));
+
+            return redirect()->route('partner.password.reset', [
+                'method'     => $request->method,
+                'identifier' => trim($request->identifier),
+            ])->with('success', $data['message']);
+        } catch (\Exception $e) {
+            return back()->withErrors(['identifier' => $e->getMessage()])->withInput();
+        }
+    }
+
+    public function showResetPasswordForm(Request $request)
+    {
+        if (session('partner_id')) {
+            return redirect()->route('partner.dashboard');
+        }
+
+        $method = $request->query('method', 'email');
+        $identifier = $request->query('identifier', '');
+
+        if (empty($identifier)) {
+            return redirect()->route('partner.password.forgot');
+        }
+
+        return view('saas.partner.reset-password', compact('method', 'identifier'));
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'method'                => 'required|in:email,sms',
+            'identifier'            => 'required|string',
+            'otp'                   => 'required|digits:6',
+            'password'              => 'required|string|min:6|confirmed',
+        ]);
+
+        try {
+            $this->passwordResetService->verifyOtpAndReset(
+                $request->method,
+                trim($request->identifier),
+                trim($request->otp),
+                $request->password
+            );
+
+            return redirect()->route('partner.login')->with('success', 'Your password has been reset successfully! You can now log in.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['otp' => $e->getMessage()])->withInput();
+        }
     }
 
     public function showRegisterForm()
