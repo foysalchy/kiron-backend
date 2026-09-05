@@ -27,9 +27,13 @@ class ReferralService
             return null;
         }
 
-        $code = trim(strtoupper($code));
+        $code = trim($code);
         $partner = ReferralPartner::with('group')
-            ->where('referral_code', $code)
+            ->where(function ($q) use ($code) {
+                $q->where('referral_code', $code)
+                  ->orWhere('referral_code', strtoupper($code))
+                  ->orWhereRaw('LOWER(referral_code) = ?', [strtolower($code)]);
+            })
             ->whereIn('status', [1, '1', 'active'])
             ->first();
 

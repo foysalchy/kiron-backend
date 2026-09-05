@@ -9,6 +9,7 @@ use App\Services\CompanyRegistrationService;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\UnifiedSellerRegistrationRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 
 class CompanyRegistrationController extends Controller
@@ -17,10 +18,72 @@ class CompanyRegistrationController extends Controller
         protected CompanyRegistrationService $registrationService
     ) {}
 
-    public function pricings(): JsonResponse
+    public function pricings(Request $request): JsonResponse
     {
+        $user = auth('sanctum')->user() ?? $request->user();
+        $companyId = $user?->company_id ?? $request->get('company_id') ?? $request->get('registration_id');
+
+        $attribution = null;
+        if ($companyId) {
+            $attribution = \App\Models\ReferralAttribution::where('company_id', $companyId)->first();
+        }
+
+        $rate = 0;
+        $referralCode = null;
+
+        if ($attribution) {
+            $rate = (float)($attribution->buyer_discount_rate ?? 0);
+            $referralCode = $attribution->referral_code_used ?? null;
+
+            if ($rate <= 0 && isset($attribution->referral_partner_id)) {
+                $partner = \App\Models\ReferralPartner::with('group')->find($attribution->referral_partner_id);
+                if ($partner && $partner->group) {
+                    $rate = (float)($partner->group->buyer_discount_rate ?? 0);
+                    $referralCode = $referralCode ?: $partner->referral_code;
+                }
+            }
+        }
+
+        if ($rate <= 0) {
+            $refCode = $request->get('ref') ?? $request->get('referral') ?? $request->cookie('dorja_ref');
+            if ($refCode) {
+                $validation = app(\App\Services\ReferralService::class)->validateReferralCode($refCode);
+                if ($validation) {
+                    $rate = (float)($validation['buyer_discount_rate'] ?? 0);
+                    $referralCode = $validation['referral_code'] ?? $refCode;
+                }
+            }
+        }
+
         $plans = $this->registrationService->getActivePricings();
-        return ResponseHelper::success($plans, 'Pricing plans fetched successfully');
+
+        if ($rate > 0 && $referralCode) {
+            foreach ($plans as $plan) {
+                $plan->referral_code = $referralCode;
+                $plan->buyer_discount_rate = $rate;
+                if ($plan->tiers) {
+                    foreach ($plan->tiers as $tier) {
+                        $basePrice = ($tier->discount_price > 0 && $tier->discount_price < $tier->regular_price)
+                            ? (float)$tier->discount_price
+                            : (float)$tier->regular_price;
+                        $discountAmount = round(($basePrice * $rate) / 100, 2);
+                        $tier->referral_discount_amount = $discountAmount;
+                        $tier->final_price_with_referral = max(0, round($basePrice - $discountAmount, 2));
+                        $tier->referral_discount_rate = $rate;
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'success'  => true,
+            'message'  => 'Pricing plans fetched successfully',
+            'data'     => $plans,
+            'referral' => ($rate > 0 && $referralCode) ? [
+                'code'                => $referralCode,
+                'buyer_discount_rate' => $rate,
+            ] : null,
+        ]);
     }
 
     public function storeBasic(StoreBasicRegistrationRequest $request): JsonResponse
