@@ -101,6 +101,13 @@ class AutoAccountingService
             $setting = self::getSetting($companyId);
             if (!$setting) return null;
 
+            $isPos = ($order->type === 'pos') || ($order->type === Order::TYPE_POS);
+            $isLandingPage = ($order->channel === 'landing_page') || ($order->source === 'landing_page');
+
+            if ($isPos && $setting->sync_pos_orders === false) return null;
+            if ($isLandingPage && $setting->sync_landing_page_orders === false) return null;
+            if (!$isPos && !$isLandingPage && $setting->sync_website_orders === false) return null;
+
             // Prevent duplicate auto-posting for same order
             $existing = TransactionJournal::withoutGlobalScopes()
                 ->where('company_id', $companyId)
@@ -215,7 +222,7 @@ class AutoAccountingService
             if (!self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_sales_returns === false) return null;
 
             $existing = TransactionJournal::withoutGlobalScopes()
                 ->where('company_id', $companyId)
@@ -311,7 +318,7 @@ class AutoAccountingService
             if (!self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_sales_returns === false) return null;
 
             // Check if there was an original sales journal for this order
             $salesJournal = TransactionJournal::withoutGlobalScopes()
@@ -422,7 +429,7 @@ class AutoAccountingService
             if (!self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_purchase_returns === false) return null;
 
             $existing = TransactionJournal::withoutGlobalScopes()
                 ->where('company_id', $companyId)
@@ -490,7 +497,7 @@ class AutoAccountingService
             if (!self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_purchases === false) return null;
 
             $existing = TransactionJournal::withoutGlobalScopes()
                 ->where('company_id', $companyId)
@@ -571,6 +578,9 @@ class AutoAccountingService
             $setting = self::getSetting($companyId);
             if (!$setting) return null;
 
+            if ($direction === 'in' && $setting->sync_customer_receipts === false) return null;
+            if ($direction === 'out' && $setting->sync_supplier_payments === false) return null;
+
             $isBank = str_contains(strtolower($paymentMethod), 'bank') || str_contains(strtolower($paymentMethod), 'card');
             $assetAccount = $isBank
                 ? ($setting->default_bank_account_id ?? $setting->default_cash_account_id)
@@ -630,7 +640,7 @@ class AutoAccountingService
             if (!self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_project_revenue === false) return null;
 
             $existing = TransactionJournal::withoutGlobalScopes()
                 ->where('company_id', $companyId)
@@ -690,7 +700,7 @@ class AutoAccountingService
             if ($totalSalary <= 0 || !self::isEnabled($companyId)) return null;
 
             $setting = self::getSetting($companyId);
-            if (!$setting) return null;
+            if (!$setting || $setting->sync_payroll === false) return null;
 
             $salaryAccountId = $setting->default_salary_expense_account_id;
             $bankAccountId = $setting->default_bank_account_id ?? $setting->default_cash_account_id;
@@ -793,6 +803,9 @@ class AutoAccountingService
             $companyId = $expense->company_id;
             if (!self::isEnabled($companyId)) return null;
 
+            $setting = self::getSetting($companyId);
+            if (!$setting || $setting->sync_expense_entries === false) return null;
+
             $fromAccountId = $expense->expense_from_id;
             if (!$fromAccountId) return null;
 
@@ -850,6 +863,9 @@ class AutoAccountingService
         try {
             $companyId = $income->company_id;
             if (!self::isEnabled($companyId)) return null;
+
+            $setting = self::getSetting($companyId);
+            if (!$setting || $setting->sync_income_entries === false) return null;
 
             $toAccountId = $income->income_to_id;
             if (!$toAccountId) return null;

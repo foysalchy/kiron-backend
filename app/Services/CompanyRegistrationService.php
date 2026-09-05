@@ -135,12 +135,9 @@ class CompanyRegistrationService
             $company = Company::findOrFail($data['registration_id']);
             $billing = $data['billing_cycle'] ?? 'monthly';
 
-            // Load package with the matching tier
-            $pricing = PricingPackage::with(['tiers' => function ($q) use ($billing) {
-                $q->where('billing_cycle', $billing);
-            }])->findOrFail($data['pricing_package_id']);
-
-            $tier = $pricing->tiers->first();
+            // Load package with all tiers
+            $pricing = PricingPackage::with('tiers')->findOrFail($data['pricing_package_id']);
+            $tier = $this->resolveTier($pricing, $billing);
 
             if (!$tier) {
                 throw new \Exception("No pricing tier found for billing cycle: {$billing}");
@@ -391,11 +388,8 @@ class CompanyRegistrationService
             // 4. Process Subscription pricing tier details and durations
             $billing = $data['billing_cycle'] ?? 'monthly';
 
-            $pricing = PricingPackage::with(['tiers' => function ($q) use ($billing) {
-                $q->where('billing_cycle', $billing);
-            }])->findOrFail($data['pricing_package_id']);
-
-            $tier = $pricing->tiers->first();
+            $pricing = PricingPackage::with('tiers')->findOrFail($data['pricing_package_id']);
+            $tier = $this->resolveTier($pricing, $billing);
 
             if (!$tier) {
                 throw new \Exception("No pricing tier found for billing cycle: {$billing}");
@@ -792,5 +786,40 @@ class CompanyRegistrationService
             'meta_keywords' => "online shopping, {$shop_name}",
             'description' => "Welcome to {$shop_name}, your online shopping destination."
         ];
+    }
+
+    /**
+     * Resolve tier for a given billing cycle with dynamic fallback if tier does not exist.
+     */
+    private function resolveTier(PricingPackage $pricing, string $billing)
+    {
+        $tier = $pricing->tiers->firstWhere('billing_cycle', $billing);
+        if (!$tier) {
+            $monthlyTier = $pricing->tiers->firstWhere('billing_cycle', 'monthly') ?? $pricing->tiers->first();
+            if ($monthlyTier) {
+                $multiplier = match ($billing) {
+                    'yearly'    => 12,
+                    'quarterly' => 3,
+                    default     => 1,
+                };
+                $discountFactor = match ($billing) {
+                    'yearly'    => 0.80, // 20% yearly discount
+                    'quarterly' => 0.90, // 10% quarterly discount
+                    default     => 1.0,
+                };
+                $monthlyBase = ($monthlyTier->discount_price > 0 && $monthlyTier->discount_price < $monthlyTier->regular_price)
+                    ? $monthlyTier->discount_price
+                    : $monthlyTier->regular_price;
+                $calculatedRegular  = $monthlyTier->regular_price * $multiplier;
+                $calculatedDiscount = round($monthlyBase * $multiplier * $discountFactor, 2);
+
+                $tier = $pricing->tiers()->create([
+                    'billing_cycle'  => $billing,
+                    'regular_price'  => $calculatedRegular,
+                    'discount_price' => $calculatedDiscount,
+                ]);
+            }
+        }
+        return $tier;
     }
 }

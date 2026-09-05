@@ -218,7 +218,7 @@ class IndexController extends Controller
     public function packageList()
     {
         $pricingPlans = Cache::remember('saas_packages_list', $this->ttl, function () {
-            return PricingPackage::where('status', Status::Active->value)->get();
+            return PricingPackage::with('tiers')->where('status', Status::Active->value)->get();
         });
 
         return view('saas.frontend.pricingList', compact('pricingPlans'));
