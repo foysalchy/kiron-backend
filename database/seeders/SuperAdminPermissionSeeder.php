@@ -116,6 +116,10 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('referral_partners',        'Affiliate Partners');
         $addCrud('referral_withdrawals',     'Partner Payout Requests');
 
+        // ── Subscription & Company Profile ──────────────────
+        $addCrud('billing',                  'Billing & Subscription');
+        $addCrud('company_profile',          'Company Profile');
+
         Permission::insert($permissions);
     }
 }

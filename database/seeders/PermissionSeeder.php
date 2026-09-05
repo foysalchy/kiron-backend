@@ -275,6 +275,12 @@ class PermissionSeeder extends Seeder
         $addViewOnly('risk_management',     'Risk Management Overview', 'risk_management');
         $addCrud('risk_controls',           'Risk & Credit Controls',   'risk_management');
 
+        // ==========================================
+        // 25. Subscription & Company Profile
+        // ==========================================
+        $addCrud('billing',                 'Billing & Subscription',   'subscription');
+        $addCrud('company_profile',         'Company Profile',          'subscription');
+
         Permission::insert($permissionsToInsert);
     }
 }
