@@ -23,7 +23,14 @@ use App\Http\Controllers\Saas\MasterBrandController;
 use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/git-pull', function () {
+    $output = shell_exec('cd /var/www/html/managesuite && git pull 2>&1');
 
+    return response()->json([
+        'status' => 'success',
+        'output' => $output,
+    ]);
+});
 
 Route::domain('dorja.io')->group(function () {
     Route::get('/', [SaasIndexController::class, 'home'])->name('saas.index');
