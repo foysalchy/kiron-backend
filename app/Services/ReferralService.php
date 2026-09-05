@@ -287,6 +287,7 @@ class ReferralService
 
         $tierInfo = $partner->getCurrentCommissionRate();
         $currentRate = $tierInfo['rate'] ?? ($partner->group->default_commission_rate ?? 20.00);
+        $buyerDiscount = floatval($partner->group?->buyer_discount_rate ?? 5.00);
 
         return [
             'total_referrals'         => $totalAttributions,
@@ -296,6 +297,7 @@ class ReferralService
             'total_earned'            => $partner->total_earned,
             'total_withdrawn'         => $partner->total_withdrawn,
             'current_commission_rate' => $currentRate,
+            'buyer_discount_rate'     => $buyerDiscount,
             'tier_info'               => [
                 'current_tier_name' => $tierInfo['tier_name'] ?? 'Standard Tier',
                 'sales_count'       => $tierInfo['sales_count'] ?? 0,

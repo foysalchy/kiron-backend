@@ -24,7 +24,16 @@ class PartnerPortalController extends Controller
         if (!$partnerId) {
             return null;
         }
-        return ReferralPartner::with('group.tiers')->find($partnerId);
+        $partner = ReferralPartner::with('group.tiers')->find($partnerId);
+        if ($partner && !$partner->group) {
+            $defaultGroup = ReferralGroup::with('tiers')->whereIn('status', [1, '1', 'active'])->first();
+            if ($defaultGroup) {
+                $partner->referral_group_id = $defaultGroup->id;
+                $partner->save();
+                $partner->setRelation('group', $defaultGroup);
+            }
+        }
+        return $partner;
     }
 
     public function showLoginForm()

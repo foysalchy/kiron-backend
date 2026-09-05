@@ -3,6 +3,9 @@
 @section('title', 'Partner Dashboard')
 
 @section('content')
+@php
+    $buyerDiscount = floatval($stats['buyer_discount_rate'] ?? ($partner->group->buyer_discount_rate ?? 5));
+@endphp
 <div class="space-y-6">
 
     <!-- Hero / Referral Link Banner -->
@@ -36,9 +39,9 @@
 
                 <div class="flex items-center justify-between pt-1">
                     <span class="text-xs text-indigo-100">Referral Code: <strong class="text-white font-mono bg-white/20 px-2 py-0.5 rounded">{{ $partner->referral_code }}</strong></span>
-                    @if($partner->group && $partner->group->buyer_discount_rate > 0)
+                    @if($buyerDiscount > 0)
                         <span class="text-xs text-emerald-300 font-semibold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30">
-                            🎉 Referrals get {{ $partner->group->buyer_discount_rate }}% discount!
+                            🎉 Referrals get {{ $buyerDiscount }}% discount!
                         </span>
                     @endif
                 </div>
@@ -162,7 +165,7 @@
             <div class="flex items-center gap-2 flex-wrap">
                 <div class="text-xs bg-emerald-50 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-200 font-semibold flex items-center gap-1.5 shadow-sm">
                     <i class="fa-solid fa-tag text-emerald-600"></i>
-                    Customer Signup Discount: <strong class="font-extrabold text-emerald-700 text-sm">{{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% OFF</strong>
+                    Customer Signup Discount: <strong class="font-extrabold text-emerald-700 text-sm">{{ $buyerDiscount }}% OFF</strong>
                 </div>
                 <div class="text-xs bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 font-medium">
                     Total Sales Made: <strong class="text-brand-600 font-bold">{{ $partner->total_sales_count }}</strong>
@@ -180,11 +183,11 @@
                     <div class="text-sm font-bold text-slate-900 flex items-center gap-2 flex-wrap">
                         <span>Customer Join Benefit:</span>
                         <span class="bg-emerald-600 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
-                            {{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% Instant Discount
+                            {{ $buyerDiscount }}% Instant Discount
                         </span>
                     </div>
                     <p class="text-xs text-slate-600 mt-0.5">
-                        Any customer or business signing up using your code <strong class="font-mono text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">{{ $partner->referral_code }}</strong> or link will automatically receive a <strong>{{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% discount</strong> on their subscription packages.
+                        Any customer or business signing up using your code <strong class="font-mono text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">{{ $partner->referral_code }}</strong> or link will automatically receive a <strong>{{ $buyerDiscount }}% discount</strong> on their subscription packages.
                     </p>
                 </div>
             </div>
@@ -229,7 +232,7 @@
                         </div>
                         <div class="mt-2 text-[11px] text-emerald-700 bg-emerald-50/80 px-2.5 py-1 rounded-lg border border-emerald-100 flex items-center gap-1 font-semibold">
                             <i class="fa-solid fa-tag text-emerald-500 text-[10px]"></i>
-                            Customer gets: {{ $partner->group ? ($partner->group->buyer_discount_rate ?? 0) : 0 }}% signup discount
+                            Customer gets: {{ $buyerDiscount }}% signup discount
                         </div>
                     </div>
                 </div>
