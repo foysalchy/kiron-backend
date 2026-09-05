@@ -111,6 +111,11 @@ class SuperAdminPermissionSeeder extends Seeder
         $addViewOnly('risk_management',      'Risk Management Overview');
         $addCrud('risk_controls',            'Risk & Credit Controls');
 
+        // ── Referral & Partner Program ─────────────────────
+        $addCrud('referral_groups',          'Referral Groups & Tiers');
+        $addCrud('referral_partners',        'Affiliate Partners');
+        $addCrud('referral_withdrawals',     'Partner Payout Requests');
+
         Permission::insert($permissions);
     }
 }

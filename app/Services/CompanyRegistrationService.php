@@ -159,7 +159,22 @@ class CompanyRegistrationService
 
             // Apply referral buyer discount if company registered via referral code
             $attribution = \App\Models\ReferralAttribution::where('company_id', $company->id)->first();
+            if (!$attribution) {
+                $refCode = $data['referral_code'] ?? $data['ref'] ?? request()->cookie('dorja_ref') ?? request()->get('ref') ?? request()->input('referral_code');
+                if (!empty($refCode)) {
+                    try {
+                        $attribution = app(\App\Services\ReferralService::class)->recordAttribution($refCode, $company->id);
+                    } catch (\Throwable $th) {
+                        Log::warning('Referral attribution in subscription failed: ' . $th->getMessage());
+                    }
+                }
+            }
+
             $buyerDiscountRate = $attribution ? floatval($attribution->buyer_discount_rate ?? 0) : 0;
+            if ($buyerDiscountRate <= 0 && $attribution && isset($attribution->referral_partner_id)) {
+                $partner = \App\Models\ReferralPartner::with('group')->find($attribution->referral_partner_id);
+                $buyerDiscountRate = floatval($partner?->group?->buyer_discount_rate ?? 0);
+            }
 
             $amountPaid = $basePrice;
             if ($buyerDiscountRate > 0) {

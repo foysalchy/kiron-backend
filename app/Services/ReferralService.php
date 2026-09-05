@@ -62,7 +62,7 @@ class ReferralService
             return null;
         }
 
-        return ReferralAttribution::firstOrCreate(
+        return ReferralAttribution::updateOrCreate(
             ['company_id' => $companyId],
             [
                 'referral_partner_id'   => $validation['partner_id'],

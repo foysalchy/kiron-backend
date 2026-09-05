@@ -20,6 +20,7 @@ class StoreBasicRegistrationRequest extends FormRequest
             'business_type'         => ['nullable', 'integer', 'in:1,2,3,4,5'],
             'password'              => ['required', 'string', 'min:8', 'confirmed'],
             'password_confirmation' => ['required', 'string'],
+            'referral_code'         => ['nullable', 'string', 'max:50'],
         ];
     }
 
