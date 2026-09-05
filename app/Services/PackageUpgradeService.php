@@ -184,6 +184,16 @@ class PackageUpgradeService
                 // Sync pricing package code directly to company model
                 $company->pricing_package_id = $package->id;
                 $company->save();
+
+                // ── Trigger affiliate commission (same as normal payment approval) ──
+                try {
+                    app(ReferralService::class)->processSubscriptionCommission(
+                        $subscription,
+                        (float) $subscription->amount_paid
+                    );
+                } catch (\Exception $e) {
+                    Log::error('Referral commission failed on upgrade approval: ' . $e->getMessage());
+                }
             }
 
             LogHelper::statusChanged(

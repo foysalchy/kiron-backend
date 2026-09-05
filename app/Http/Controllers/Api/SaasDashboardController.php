@@ -73,6 +73,15 @@ class SaasDashboardController extends Controller
             $q->whereNotNull('trial_ends_at')->where('trial_ends_at', '>=', Carbon::now());
         })->count();
 
+        // Paid = active subscription AND not on free trial
+        $paidSellers = Company::whereHas('currentSubscription', function ($q) {
+            $q->where('ends_at', '>=', Carbon::now())
+              ->where(function ($q2) {
+                  $q2->whereNull('trial_ends_at')
+                     ->orWhere('trial_ends_at', '<', Carbon::now());
+              });
+        })->count();
+
         $inactiveSellers = $totalSellers - $activeSellers;
 
         // ── Financial Stats (period-scoped) ──
@@ -119,6 +128,7 @@ class SaasDashboardController extends Controller
                     'total'      => $totalSellers,
                     'new'        => $newSellers,
                     'active'     => $activeSellers,
+                    'paid'       => $paidSellers,
                     'inactive'   => $inactiveSellers,
                     'free_trial' => $freeTrialSellers,
                 ],

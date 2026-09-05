@@ -200,6 +200,11 @@ class Company extends Model
     {
         return $this->hasMany(ExtraOrderCharge::class);
     }
+
+    public function referralAttribution()
+    {
+        return $this->hasOne(ReferralAttribution::class);
+    }
     // Scopes
     public function scopeActive($query)
     {
