@@ -205,6 +205,13 @@ class SubscriptionController extends Controller
 
             $payment->update(['subscription_id' => $newSubscription->id]);
 
+            // Process Referral Commission for the successful payment
+            try {
+                app(\App\Services\ReferralService::class)->processSubscriptionCommission($newSubscription, $payment->amount);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Commission error on payment approval: ' . $e->getMessage());
+            }
+
             return response()->json([
                 'message' => 'Payment marked successful and subscription activated.',
                 'data'    => [

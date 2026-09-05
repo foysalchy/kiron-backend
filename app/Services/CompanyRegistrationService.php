@@ -208,7 +208,9 @@ class CompanyRegistrationService
                 'ends_at'            => $endsAt,
                 'status'             => Status::Active->value,
             ]);
-            if (in_array($data['payment_method'], ['manual', 'bank'])) {
+            $isFreeTrial = isset($data['transaction_id']) && str_starts_with($data['transaction_id'], 'FREE-TRIAL-');
+
+            if (in_array($data['payment_method'], ['manual', 'bank']) && !$isFreeTrial) {
                 $documentPath = null;
 
                 if (isset($data['document']) && $data['document'] instanceof \Illuminate\Http\UploadedFile) {
