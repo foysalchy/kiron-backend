@@ -39,6 +39,9 @@ class ReferralGroupController extends Controller
             'tiers.*.max_sales' => 'nullable|integer|min:0',
             'tiers.*.commission_rate' => 'required|numeric|min:0|max:100',
             'tiers.*.badge_color' => 'nullable|string|max:50',
+            'is_recurring' => 'nullable|boolean',
+            'recurring_rates' => 'nullable|array',
+            'recurring_rates.*' => 'numeric|min:0|max:100',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -50,6 +53,8 @@ class ReferralGroupController extends Controller
                 'cookie_lifetime_days' => $request->cookie_lifetime_days ?? 30,
                 'description' => $request->description,
                 'status' => $request->status ?? 'active',
+                'is_recurring' => $request->has('is_recurring') ? $request->is_recurring : true,
+                'recurring_rates' => $request->recurring_rates,
             ]);
 
             if ($request->has('tiers') && is_array($request->tiers)) {
@@ -101,6 +106,9 @@ class ReferralGroupController extends Controller
             'tiers.*.max_sales' => 'nullable|integer|min:0',
             'tiers.*.commission_rate' => 'required|numeric|min:0|max:100',
             'tiers.*.badge_color' => 'nullable|string|max:50',
+            'is_recurring' => 'nullable|boolean',
+            'recurring_rates' => 'nullable|array',
+            'recurring_rates.*' => 'numeric|min:0|max:100',
         ]);
 
         return DB::transaction(function () use ($request, $group) {
@@ -111,6 +119,8 @@ class ReferralGroupController extends Controller
                 'cookie_lifetime_days' => $request->cookie_lifetime_days ?? 30,
                 'description' => $request->description,
                 'status' => $request->status ?? $group->status,
+                'is_recurring' => $request->has('is_recurring') ? $request->is_recurring : $group->is_recurring,
+                'recurring_rates' => $request->has('recurring_rates') ? $request->recurring_rates : $group->recurring_rates,
             ]);
 
             if ($request->has('tiers')) {

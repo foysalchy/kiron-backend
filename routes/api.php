@@ -89,6 +89,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\OrderNoteController;
 use App\Http\Controllers\Api\OrderReturnController;
 use App\Http\Controllers\Api\PackageUpgradeController;
+use App\Http\Controllers\Api\SubscriptionRefundController;
 use App\Http\Controllers\Api\PackageUsageController;
 use App\Http\Controllers\Api\PageController;
 use App\Http\Controllers\Api\PartyController;
@@ -285,6 +286,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('/companies/{id}/subscription/upgrade', [CompanyController::class, 'upgradeSubscriptionSuperAdmin']);
         Route::post('/subscriptions/upgrade/prev', [CompanyController::class, 'upgradeSubscription']);
         Route::post('/subscriptions/upgrade', [PackageUpgradeController::class, 'store']);
+        Route::post('/subscriptions/refund-request', [SubscriptionRefundController::class, 'store']);
         Route::post('/companies/{id}/update-requests', [CompanyController::class, 'storeUpdateRequest']);
         Route::post('/companies/update-requests/{reqId}', [CompanyController::class, 'updateUpdateRequest']);
         Route::delete('/companies/update-requests/{reqId}', [CompanyController::class, 'deleteUpdateRequest']);
@@ -1928,6 +1930,10 @@ Route::prefix('v1')->group(function () {
                 });
                 Route::get('/package-upgrades', [PackageUpgradeController::class, 'index']);
                 Route::post('/package-upgrades/{id}/status-update', [PackageUpgradeController::class, 'updateStatus']);
+                
+                Route::get('/subscription-refunds', [SubscriptionRefundController::class, 'index']);
+                Route::put('/subscription-refunds/{id}/status', [SubscriptionRefundController::class, 'updateStatus']);
+                
                 Route::post('/registration/register-seller', [CompanyRegistrationController::class, 'register']);
 
                 // Referral & Partner Program Management

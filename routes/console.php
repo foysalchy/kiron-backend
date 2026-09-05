@@ -17,3 +17,6 @@ Schedule::command('billing:generate monthly')->monthlyOn(1, '00:00');
 
 Schedule::command('subscriptions:send-expiry-reminders')
     ->dailyAt('08:00');
+
+Schedule::command('referral:release-commissions')
+    ->dailyAt('01:00');

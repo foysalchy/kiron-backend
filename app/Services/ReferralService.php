@@ -100,9 +100,39 @@ class ReferralService
                 return null;
             }
 
+            // Check how many previous payments/commissions exist for this attribution
+            $previousCommissionsCount = ReferralCommission::where('referral_attribution_id', $attribution->id)->count();
+            $paymentNumber = $previousCommissionsCount + 1;
+
+            $group = $partner->group;
+            
+            // If group does NOT allow recurring commissions and this is not the first payment
+            if ($group && !$group->is_recurring && $paymentNumber > 1) {
+                DB::commit();
+                return null;
+            }
+
             // Determine rate from current partner's tier rank
             $tierInfo = $partner->getCurrentCommissionRate();
             $commissionRate = floatval($tierInfo['rate'] ?? 20.00);
+            $tierApplied = $tierInfo['tier_name'] ?? 'Default';
+
+            // Check if there are custom declining rates for recurring payments
+            if ($group && $group->is_recurring && !empty($group->recurring_rates)) {
+                $rates = is_array($group->recurring_rates) ? $group->recurring_rates : json_decode($group->recurring_rates, true);
+                if (is_array($rates) && count($rates) > 0) {
+                    $rateIndex = $paymentNumber - 1;
+                    if (isset($rates[$rateIndex])) {
+                        $commissionRate = floatval($rates[$rateIndex]);
+                        $tierApplied = "Recurring Payment #{$paymentNumber}";
+                    } else {
+                        // If payment number exceeds array length, use the last value
+                        $commissionRate = floatval(end($rates));
+                        $tierApplied = "Recurring Payment #{$paymentNumber} (Capped)";
+                    }
+                }
+            }
+
             $commissionAmount = round(($saleAmount * $commissionRate) / 100, 2);
 
             $commission = ReferralCommission::create([
@@ -113,14 +143,13 @@ class ReferralService
                 'sale_amount'             => $saleAmount,
                 'commission_rate'         => $commissionRate,
                 'commission_amount'       => $commissionAmount,
-                'tier_applied'            => $tierInfo['tier_name'] ?? 'Default',
-                'status'                  => 'approved',
-                'notes'                   => "Commission on subscription ID #{$subscription->id}",
+                'tier_applied'            => $tierApplied,
+                'status'                  => 'pending',
+                'notes'                   => "Commission on subscription ID #{$subscription->id} (Pending 7-day hold)",
             ]);
 
-            // Update partner wallet balance and total earned
-            $partner->increment('wallet_balance', $commissionAmount);
-            $partner->increment('total_earned', $commissionAmount);
+            // Update partner pending balance
+            $partner->increment('pending_balance', $commissionAmount);
 
             // Update attribution status to active and set first_subscribed_at only once
             $attribution->update([

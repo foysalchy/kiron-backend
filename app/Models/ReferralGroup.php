@@ -16,6 +16,8 @@ class ReferralGroup extends Model
         'default_commission_rate' => 'decimal:2',
         'buyer_discount_rate'     => 'decimal:2',
         'is_tiered'               => 'boolean',
+        'is_recurring'            => 'boolean',
+        'recurring_rates'         => 'array',
         'status'                  => 'integer',
     ];
 
