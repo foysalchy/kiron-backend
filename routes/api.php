@@ -173,6 +173,8 @@ use App\Http\Controllers\Api\Production\ProductionQualityCheckController;
 use App\Http\Controllers\Api\Production\ProductionCostController;
 use App\Http\Controllers\Api\Production\ProductionReportController;
 use App\Http\Controllers\Api\Production\ProductionSettingController;
+use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\Api\UserPasswordController;
 use App\Http\Controllers\Api\WarehouseController;
 use App\Http\Controllers\Api\WarehouseInventoryController;
@@ -557,6 +559,26 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}/restore', [AreaController::class, 'restore']);
                     Route::delete('/{id}/force', [AreaController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [AreaController::class, 'toggleStatus']);
+                });
+                
+                // Table Routes
+                Route::prefix('tables')->group(function () {
+                    Route::get('/', [TableController::class, 'index']);
+                    Route::post('/', [TableController::class, 'store']);
+                    Route::get('/{id}', [TableController::class, 'show']);
+                    Route::post('/update/{id}', [TableController::class, 'update']);
+                    Route::delete('/{id}', [TableController::class, 'destroy']);
+                    Route::patch('/{id}/toggle-status', [TableController::class, 'toggleStatus']);
+                });
+
+                // Reservation Routes
+                Route::prefix('reservations')->group(function () {
+                    Route::get('/', [ReservationController::class, 'index']);
+                    Route::post('/', [ReservationController::class, 'store']);
+                    Route::get('/{id}', [ReservationController::class, 'show']);
+                    Route::post('/update/{id}', [ReservationController::class, 'update']);
+                    Route::patch('/{id}/status', [ReservationController::class, 'updateStatus']);
+                    Route::delete('/{id}', [ReservationController::class, 'destroy']);
                 });
                 // Rack Routes
                 Route::prefix('racks')->group(function () {

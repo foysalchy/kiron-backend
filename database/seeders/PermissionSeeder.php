@@ -137,6 +137,10 @@ class PermissionSeeder extends Seeder
         $addCrud('cms_blogs',               'CMS Blogs',                'cms_blogs');
         $addCrud('social_settings',         'Social Settings',          'social_settings');
 
+        //reservation
+        $addCrud('tables',            'Tables',             'tables');
+        $addCrud('reservations',            'Reservations',             'reservations');
+
         // ==========================================
         // 11. Accounting
         // ==========================================

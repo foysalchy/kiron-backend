@@ -274,8 +274,8 @@ class AppServiceProvider extends ServiceProvider
             MasterDemo::class,
             PricingPackage::class,
             DomainSetup::class, 
-       
-
+            \App\Models\Table::class,
+            \App\Models\Reservation::class,
         ];
 
         foreach ($models as $model) {

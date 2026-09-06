@@ -24,7 +24,7 @@
       </a>
 <nav class="hidden lg:flex items-center gap-10 text-sm bg-[#f8f7f7] py-4 border border-[#e0e0e0] px-4 rounded-full">
   <a href="{{ $homeUrl }}#menu" data-nav-target="menu" class="nav-link text-black hover:text-brand transition-colors">Menu</a>
-  <a href="#" class="text-black hover:text-brand transition-colors">Reservations</a>
+  <a href="{{ route('reservation.index') }}" class="nav-link text-black hover:text-brand transition-colors">Reservations</a>
   <a href="{{ $homeUrl }}#offers" data-nav-target="offers" class="nav-link text-black hover:text-brand transition-colors">Offers</a>
 </nav>
 
@@ -229,7 +229,7 @@
         <a href="{{ $homeUrl }}#menu" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white text-sm font-medium text-coal transition-colors">
           <i class="fas fa-utensils w-4 text-smoke"></i> Menu
         </a>
-        <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white text-sm font-medium text-coal transition-colors">
+        <a href="{{ route('reservation.index') }}" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white text-sm font-medium text-coal transition-colors">
           <i class="fas fa-calendar-check w-4 text-smoke"></i> Reservations
         </a>
         <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-white text-sm font-medium text-coal transition-colors">
