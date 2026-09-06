@@ -77,24 +77,24 @@
                 <div class="space-y-3 p-6 bg-white rounded-xl   shadow-sm mt-6">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h3>
 
-                    @foreach ($paymentMethods as $method)
-                    @php $slug = strtolower(trim($method->name)); @endphp
-                    <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
-                        <label
-                            class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
-                            <input type="radio" name="payment_method" value="{{ $method->name }}"
-                                onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
-                                class="w-5 h-5 accent-[var(--primary-color)]">
-                            <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
-                        </label>
+                        @foreach ($paymentMethods as $method)
+                            @php $slug = strtolower(trim($method->name)); @endphp
+                            <div class="payment-option border-b border-gray-50 last:border-0 pb-4">
+                                <label
+                                    class="flex items-center space-x-4 p-4 border-2 border-gray-100 rounded-xl cursor-pointer hover:border-[var(--primary-color)] has-[:checked]:border-[var(--primary-color)] has-[:checked]:bg-orange-50 transition-all">
+                                    <input type="radio" name="payment_method" value="{{ $method->name }}"
+                                        onchange="handlePaymentSelection('{{ $slug }}', '{{ $method->name }}')"
+                                        class="w-5 h-5 accent-[var(--primary-color)]">
+                                    <span class="text-md font-medium text-gray-700 capitalize">{{ $method->name }}</span>
+                                </label>
 
-                        <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
-                            <div class="bg-gray-50 p-4 rounded-xl border border-orange-100">
-                                <div class="form-injection-point"></div>
+                                <div id="checkout-anchor-{{ $slug }}" class="mt-4 hidden transition-all">
+                                    <div class="bg-gray-50 p-4 rounded-xl border border-orange-100">
+                                        <div class="form-injection-point"></div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    @endforeach
+                        @endforeach
                 </div>
 
                 {{-- Payment Forms Repository --}}
@@ -256,34 +256,29 @@
     <input type="hidden" name="area" id="shipping-area-input">
     </form> --}}
 </section>
-<x-template1.payment-checkout :methods="$paymentMethods" :currency="$setup->currency" />
 @endsection
 
 
 @push('scripts')
 <script>
-    let _activeDraftOrderId = @json($draftOrderId ?? null);
-    let _checkoutTotal = {
-        {
-            $total
-        }
-    };
-    let _checkoutSlug = '';
+        let _activeDraftOrderId = @json($draftOrderId ?? null);
+        let _checkoutTotal = {{ $total }};
+        let _checkoutSlug = '';
 
 
     // ── Page load: auto-select first method ──
-    document.addEventListener('DOMContentLoaded', function() {
-        const firstRadio = document.querySelector('input[name="payment_method"]');
-        if (firstRadio) {
-            firstRadio.checked = true;
-            _checkoutSlug = firstRadio.value;
-            handlePaymentSelection(
-                firstRadio.value,
-                firstRadio.closest('label')?.querySelector('span.text-md')?.innerText?.trim() ?? firstRadio
-                .value
-            );
-        }
-    });
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstRadio = document.querySelector('input[name="payment_method"]');
+            if (firstRadio) {
+                firstRadio.checked = true;
+                _checkoutSlug = firstRadio.value;
+                handlePaymentSelection(
+                    firstRadio.value,
+                    firstRadio.closest('label')?.querySelector('span.text-md')?.innerText?.trim() ?? firstRadio
+                    .value
+                );
+            }
+        });
 
     // ── Radio label click → open modal ──
     function checkoutSelectMethod(slug, name) {

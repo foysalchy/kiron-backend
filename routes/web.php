@@ -81,10 +81,13 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
 
 
 
-//landing page
 Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/reservation', [App\Http\Controllers\Frontend\ReservationController::class, 'index'])->name('reservation.index');
+Route::get('/reservation/availability', [App\Http\Controllers\Frontend\ReservationController::class, 'availability'])->name('reservation.availability');
+Route::post('/reservation/store', [App\Http\Controllers\Frontend\ReservationController::class, 'store'])->name('reservation.store');
+Route::post('/reservation/status', [App\Http\Controllers\Frontend\ReservationController::class, 'checkStatus'])->name('reservation.status')->middleware('throttle:10,1');
 Route::get('/categories', [HomeController::class, 'allCategories'])->name('categories.all');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
