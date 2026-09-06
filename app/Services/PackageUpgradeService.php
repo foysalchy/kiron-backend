@@ -151,6 +151,7 @@ class PackageUpgradeService
                 // Create the active company subscription record
                 $subscription = CompanySubscription::create([
                     'company_id'         => $company->id,
+                    'upgrade_request_id' => $upgradeRequest->id,
                     'pricing_package_id' => $package->id,
                     'billing_cycle'      => $upgradeRequest->billing_cycle,
                     'amount_paid'        => $upgradeRequest->amount_paid,

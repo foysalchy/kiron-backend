@@ -301,6 +301,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/impersonate/company/{company}', [AuthController::class, 'impersonateCompany']);
                 Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
                 Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
+                Route::get('/billing/entries', [SubscriptionController::class, 'unifiedBillingList']);
                 
                 // SaaS Dashboard
                 Route::get('/saas-dashboard/stats', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getStats']);

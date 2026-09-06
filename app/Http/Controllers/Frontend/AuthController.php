@@ -12,7 +12,8 @@ use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Reservation;
+
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
@@ -188,6 +189,11 @@ class AuthController extends FrontendController
         $totalSpent = $allOrders->where('status', 'delivered')->sum('grand_total');
         $wishlistCount = $wishlistItems->count();
 
+        // Fetch reservations for the authenticated customer
+        $reservations = Reservation::where('guest_phone', $user->phone ?? null)
+            ->orderBy('reservation_date', 'desc')
+            ->paginate(10);
+
         return  $this->view('frontend.user.dashboard', compact(
             'user',
             'totalOrders',
@@ -197,6 +203,7 @@ class AuthController extends FrontendController
             'allOrders',
             'wishlistItems',
             'paymentMethods',
+            'reservations',
 
         ));
     }

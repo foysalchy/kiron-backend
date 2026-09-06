@@ -13,38 +13,49 @@ use Illuminate\Support\Str;
 class FileUploadHelper
 {
 
-    public static function upload(
-        UploadedFile $file,
-        string $folder = 'uploads',
-        string $disk = 'r2',
-        bool $preserveName = false
-    ): string {
-        try {
-            $companyId = auth()->user()->company_id;
+public static function upload(
+    UploadedFile $file,
+    string $folder = 'uploads',
+    string $disk = 'r2',
+    bool $preserveName = false
+): string {
+    try {
+        $user = auth()->user();
 
+        $companyId = $user?->company_id;
 
-
-            $prefix = self::getCompanyPrefix($companyId);
-            // shop_1, shop_2 ... এভাবে company-wise folder
+        if ($companyId === null) {
+            // Super Admin / user without company
+            $companyFolder = 'admin';
+        } else {
+            $prefix = self::getCompanyPrefix((int) $companyId);
             $companyFolder = "{$prefix}_{$companyId}";
-
-            // caller যে folder পাঠাবে (e.g. 'products', 'avatars') সেটা company folder-এর ভিতরে যাবে
-            $fullFolder = "{$companyFolder}/{$folder}";
-            if ($preserveName) {
-                $fileName = $file->getClientOriginalName();
-                return $file->storeAs($fullFolder, $fileName, $disk);
-            }
-
-            return $file->store($fullFolder, $disk);
-        } catch (\Exception $e) {
-            Log::error('File upload failed', [
-                'folder' => $folder,
-                'disk' => $disk,
-                'error' => $e->getMessage()
-            ]);
-            throw ApiException::serverError('Failed to upload file');
         }
+
+        $fullFolder = "{$companyFolder}/{$folder}";
+
+        if ($preserveName) {
+            $fileName = $file->getClientOriginalName();
+
+            return $file->storeAs(
+                $fullFolder,
+                $fileName,
+                $disk
+            );
+        }
+
+        return $file->store($fullFolder, $disk);
+
+    } catch (\Exception $e) {
+        Log::error('File upload failed', [
+            'folder' => $folder,
+            'disk' => $disk,
+            'error' => $e->getMessage()
+        ]);
+
+        throw ApiException::serverError('Failed to upload file');
     }
+}
 
     /**
      * Upload image with validation

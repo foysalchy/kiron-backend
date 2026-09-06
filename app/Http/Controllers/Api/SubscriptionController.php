@@ -273,6 +273,21 @@ public function billing(Request $request): JsonResponse
         }
     }
 
+    // ── NEW: Package upgrade requests, grouped by company ──
+    // Loaded without global scopes so soft-deleted / restricted companies still show their requests.
+    $upgradeRequests = \App\Models\UpdgradePackageRequest::withoutGlobalScopes()
+        ->with(['pricingPackage']) // target package being requested
+        ->get();
+
+    $upgradesByCompany = $upgradeRequests->groupBy('company_id');
+
+    foreach ($companies as $company) {
+        $company->setRelation(
+            'upgrade_requests',
+            $upgradesByCompany->get($company->id, collect())->values()
+        );
+    }
+
     // ── Orphan subscriptions (company force-deleted) ──
     $orphanQuery = \App\Models\CompanySubscription::with(['pricingPackage', 'subscriptionPayments'])
         ->whereDoesntHave('company');
@@ -291,23 +306,25 @@ public function billing(Request $request): JsonResponse
     $orphanSubs = $orphanQuery->latest()->get();
 
     // company_id ধরে group করা — একই company id এর subscription গুলো একসাথে
-$deletedCompanies = $orphanSubs->groupBy('company_id')->map(function ($subs, $companyId) {
-    foreach ($subs as $sub) {
-        $sub->setRelation('extra_order_charges', collect());
-    }
+    $deletedCompanies = $orphanSubs->groupBy('company_id')->map(function ($subs, $companyId) use ($upgradesByCompany) {
+        foreach ($subs as $sub) {
+            $sub->setRelation('extra_order_charges', collect());
+        }
 
-    $latestSub = $subs->sortByDesc('starts_at')->first();
+        $latestSub = $subs->sortByDesc('starts_at')->first();
 
-    return [
-        'id'                   => 'deleted-' . $companyId,
-        'name'                 => $latestSub->company_name_snapshot ?? 'Deleted Company',
-        'email'                => $latestSub->company_email_snapshot,
-        'deleted'              => true,
-        'original_company_id'  => $companyId,
-        'current_subscription' => $latestSub,
-        'subscriptions'        => $subs->values(),
-    ];
-})->values();
+        return [
+            'id'                   => 'deleted-' . $companyId,
+            'name'                 => $latestSub->company_name_snapshot ?? 'Deleted Company',
+            'email'                => $latestSub->company_email_snapshot,
+            'deleted'              => true,
+            'original_company_id'  => $companyId,
+            'current_subscription' => $latestSub,
+            'subscriptions'        => $subs->values(),
+            // NEW: attach any upgrade requests that belonged to this now-deleted company
+            'upgrade_requests'     => $upgradesByCompany->get($companyId, collect())->values(),
+        ];
+    })->values();
 
     // Search filter orphan এ apply (নাম না থাকায় শুধু original_company_id দিয়ে সার্চ, চাইলে বাদও দিতে পারেন)
     if ($request->search) {
@@ -330,6 +347,10 @@ $deletedCompanies = $orphanSubs->groupBy('company_id')->map(function ($subs, $co
         'pending_amount'    => (clone $allSubs)->where('payment_status', 'pending')->sum('amount_paid'),
         'unpaid_count'      => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->count(),
         'unpaid_amount'     => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->sum('amount_paid'),
+        // NEW: surfaced so the frontend can badge pending upgrade requests the same way it badges pending payments
+        'pending_upgrades_count' => \App\Models\UpdgradePackageRequest::withoutGlobalScopes()
+            ->where('status', \App\Enums\Status::Pending ?? 0)
+            ->count(),
     ];
 
     return response()->json([
@@ -337,4 +358,128 @@ $deletedCompanies = $orphanSubs->groupBy('company_id')->map(function ($subs, $co
         'stats' => $stats,
     ]);
 }
+
+    public function unifiedBillingList(Request $request): JsonResponse
+    {
+        $search = $request->query('search');
+        $statusFilter = $request->query('status'); // all, paid, pending, failed
+        $packageId = $request->query('pricing_package_id');
+
+        // Fetch regular subscriptions & approved upgrades
+        $subsQuery = CompanySubscription::with([
+            'company.pricingPackage',
+            'pricingPackage',
+            'upgradeRequest.pricingPackage',
+            'subscriptionPayments'
+        ]);
+
+        if ($search) {
+            $subsQuery->whereHas('company', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        if ($packageId) {
+            $subsQuery->where('pricing_package_id', $packageId);
+        }
+        if ($statusFilter && $statusFilter !== 'all') {
+            $mappedStatus = $statusFilter === 'failed' ? ['failed', 'cancelled'] : [$statusFilter];
+            $subsQuery->whereIn('payment_status', $mappedStatus);
+        }
+
+        $subs = $subsQuery->get()->map(function ($s) {
+            return [
+                'entry_type'      => 'subscription',
+                'id'              => $s->id,
+                'company'         => $s->company,
+                'current_package' => $s->upgrade_request_id ? ($s->company->pricingPackage ?? null) : $s->pricingPackage,
+                'target_package'  => $s->upgrade_request_id ? ($s->upgradeRequest->pricingPackage ?? null) : null,
+                'is_upgrade'      => $s->upgrade_request_id !== null,
+                'billing_cycle'   => $s->billing_cycle,
+                'amount_paid'     => $s->amount_paid,
+                'payment_method'  => $s->payment_method,
+                'payment_status'  => $s->payment_status,
+                'transaction_id'  => $s->transaction_id,
+                'status'          => $s->status,
+                'created_at'      => $s->created_at,
+                // Extra fields for view modal if needed
+                'document_path'       => $s->subscriptionPayments->last()->meta['document_path'] ?? null,
+                'account_holder_name' => $s->subscriptionPayments->last()->meta['account_holder_name'] ?? null,
+                'sender_number'       => $s->subscriptionPayments->last()->sender_number ?? null,
+            ];
+        });
+
+        // Fetch pending upgrades
+        $pendingUpgradesQuery = \App\Models\UpdgradePackageRequest::with([
+            'company.pricingPackage',
+            'pricingPackage'
+        ])->where('status', Status::Pending->value);
+
+        if ($search) {
+            $pendingUpgradesQuery->whereHas('company', function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        if ($packageId) {
+            $pendingUpgradesQuery->where('pricing_package_id', $packageId);
+        }
+        if ($statusFilter && $statusFilter !== 'all') {
+            // Pending upgrades are inherently "pending"
+            if ($statusFilter !== 'pending') {
+                $pendingUpgradesQuery->where('id', -1); // Force empty if looking for paid/failed
+            }
+        }
+
+        $upgrades = $pendingUpgradesQuery->get()->map(function ($u) {
+            return [
+                'entry_type'      => 'upgrade_request',
+                'id'              => $u->id,
+                'company'         => $u->company,
+                'current_package' => $u->company->pricingPackage ?? null,
+                'target_package'  => $u->pricingPackage,
+                'is_upgrade'      => true,
+                'billing_cycle'   => $u->billing_cycle,
+                'amount_paid'     => $u->amount_paid,
+                'payment_method'  => $u->payment_method,
+                'payment_status'  => 'pending',
+                'transaction_id'  => $u->transaction_id,
+                'status'          => $u->status,
+                'created_at'      => $u->created_at,
+                'document_path'       => $u->document_path,
+                'account_holder_name' => $u->account_holder_name,
+                'sender_number'       => $u->number,
+            ];
+        });
+
+        // Merge and Sort
+        $combined = $subs->concat($upgrades)->sortByDesc('created_at')->values();
+
+        // Paginate manually
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage() ?: 1;
+        $perPage = $request->query('per_page', 15);
+        $paginated = new \Illuminate\Pagination\LengthAwarePaginator(
+            $combined->forPage($page, $perPage)->values(),
+            $combined->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        // Stats
+        $allSubs = CompanySubscription::query();
+        $stats = [
+            'total_companies'   => Company::count(),
+            'total_paid_amount' => (clone $allSubs)->where('payment_status', 'paid')->sum('amount_paid'),
+            'pending_count'     => (clone $allSubs)->where('payment_status', 'pending')->count() + \App\Models\UpdgradePackageRequest::where('status', Status::Pending->value)->count(),
+            'pending_amount'    => (clone $allSubs)->where('payment_status', 'pending')->sum('amount_paid') + \App\Models\UpdgradePackageRequest::where('status', Status::Pending->value)->sum('amount_paid'),
+            'unpaid_count'      => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->count(),
+            'unpaid_amount'     => (clone $allSubs)->whereIn('payment_status', ['failed', 'cancelled'])->sum('amount_paid'),
+        ];
+
+        return response()->json([
+            'data'  => $paginated,
+            'stats' => $stats,
+        ]);
+    }
 }
