@@ -127,7 +127,7 @@
                                     {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                 <span class="text-sm font-medium text-gray-700 group-hover:text-black">
                                     Quick Bite({{ $setup->currency }}
-                                    {{ number_format($setup->outside_charge, 0) }})
+                                    {{ ($setup->outside_charge) }})
                                 </span>
                             </label>
                         </div>
@@ -444,8 +444,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById('shipping-display').innerText = data.shipping_cost;
-
+                    // Update DOM with formatted numbers so the view matches PHP's number_format()
+                    document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toLocaleString();
                     document.getElementById('total-display').innerText = data.grand_total;
 
                     toastr.success(data.message);

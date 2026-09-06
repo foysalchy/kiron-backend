@@ -14,7 +14,8 @@ class ReservationController extends FrontendController
 {
     public function index()
     {
-        return $this->view('frontend.reservation');
+        $customer = auth()->guard('customer')->user();
+        return $this->view('frontend.reservation', compact('customer'));
     }
 
     public function availability(Request $request)

@@ -117,7 +117,9 @@ Route::middleware(['auth:customer'])->group(function () {
     Route::get('/order/details/{id}', [OrderController::class, 'orderDetails'])->name('user.order.details');
     Route::post('/order/return/{id}', [OrderController::class, 'requestReturn'])->name('order.return');
     Route::post('/order/review/store', [OrderController::class, 'storeReview'])->name('user.review.store');
-});
+// My Reservations page
+    Route::get('/dashboard/reservations', [App\Http\Controllers\Frontend\ReservationDashboardController::class, 'myReservations'])->name('dashboard.reservations');
+    });
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
 Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');

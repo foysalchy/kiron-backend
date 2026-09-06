@@ -13,6 +13,7 @@ class CompanySubscription extends Model
 
     protected $fillable = [
         'company_id',
+        'upgrade_request_id',
         'pricing_package_id',
         'billing_cycle',
         'amount_paid',
@@ -45,6 +46,10 @@ class CompanySubscription extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function upgradeRequest(): BelongsTo
+    {
+        return $this->belongsTo(UpdgradePackageRequest::class, 'upgrade_request_id');
+    }
 
     public function pricingPackage()
     {
