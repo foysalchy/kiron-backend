@@ -396,7 +396,7 @@
         .summary-total .amount {
             font-size: 24px;
             font-weight: 700;
-            color: #FF6A00;
+            color: var(--primary-color);
         }
 
         /* ── Footer Info ── */

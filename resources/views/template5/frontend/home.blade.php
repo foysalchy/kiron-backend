@@ -11,7 +11,7 @@
     background: transparent;
 }
 .thumb-scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--lumina-ember, #D6431F);
+    background-color: var(--primary-color, #D6431F);
     border-radius: 999px;
     opacity: 0.5;
 }
@@ -20,7 +20,7 @@
 }
 .thumb-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--lumina-ember, #D6431F) transparent;
+    scrollbar-color: var(--primary-color, #D6431F) transparent;
 }
 #menuGrid {
     transition: opacity 0.25s ease;
@@ -34,7 +34,7 @@
     height: 42px;
     border-radius: 50%;
     border: 3px solid rgba(24, 19, 15, 0.1);
-    border-top-color: var(--lumina-ember, #D6431F);
+    border-top-color: var(--primary-color, #D6431F);
     animation: menu-spin 0.7s linear infinite;
 }
 
@@ -70,7 +70,7 @@
   @if ($mainSliders->count() > 1)
   <!-- Previous -->
   <button id="prevImage" type="button"
-    class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 text-white hover:bg-[var(--lumina-ember)] transition-all duration-300 flex items-center justify-center">
+    class="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 text-white hover:bg-[var(--primary-color)] transition-all duration-300 flex items-center justify-center">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M15 18l-6-6 6-6" />
     </svg>
@@ -87,7 +87,7 @@
   <!-- Dots -->
   <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
     @foreach ($mainSliders as $index => $slider)
-    <button class="slider-dot {{ $index == 0 ? 'w-8 bg-[var(--lumina-ember)]' : 'w-2 bg-white/50' }} h-2 rounded-full transition-all" data-slide="{{ $index }}"></button>
+    <button class="slider-dot {{ $index == 0 ? 'w-8 bg-[var(--primary-color)]' : 'w-2 bg-white/50' }} h-2 rounded-full transition-all" data-slide="{{ $index }}"></button>
     @endforeach
   </div>
   @endif
@@ -107,7 +107,7 @@
       <div>
         <h3 class="font-display font-semibold text-lg">Order Online</h3>
         <p class="text-smoke text-sm mt-0.5">Gourmet cuisine delivered straight to your door.</p>
-        <a href="#menu" class="inline-flex items-center gap-1.5 text-ember font-medium text-sm mt-2">Start Order
+        <a href="#menu" class="inline-flex items-center gap-1.5 text-[var(--primary-color)] font-medium text-sm mt-2">Start Order
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
@@ -120,7 +120,7 @@
       <div>
         <h3 class="font-display font-semibold text-lg">Book a Table</h3>
         <p class="text-smoke text-sm mt-0.5">Reserve your spot for an unforgettable evening.</p>
-        <a href="#" class="inline-flex items-center gap-1.5 text-ember font-medium text-sm mt-2">Reservations
+        <a href="#" class="inline-flex items-center gap-1.5 text-[var(--primary-color)] font-medium text-sm mt-2">Reservations
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
       </div>
@@ -149,7 +149,7 @@
   <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-x-4 gap-y-8">
     @foreach ($categories->take(8) as $category)
     <a href="{{ url('category/' . $category->slug) }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
-      <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-4 group-hover:ring-[var(--lumina-ember)]/25 group-hover:-translate-y-1 transition-all overflow-hidden">
+      <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-1 group-hover:ring-[var(--primary-color)] group-hover:-translate-y-1 transition-all overflow-hidden">
         <img src="{{ !empty($category->image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
           alt="{{ $category->name }}" class="w-full h-full object-cover">
       </div>
@@ -180,7 +180,7 @@
 
     <div class="flex items-end justify-between mb-10">
       <div>
-        <span class="font-mono text-[11px] tracking-[0.22em] uppercase text-ember">
+        <span class="font-mono text-[11px] tracking-[0.22em] uppercase text-[var(--primary-color)]">
           Save more today
         </span>
         <h2 class="font-display font-semibold text-3xl sm:text-4xl mt-2">
@@ -188,7 +188,7 @@
         </h2>
       </div>
 
-      <a href="{{ route('shop.index', ['offers' => 1]) }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-ember transition-colors">
+      <a href="{{ route('shop.index', ['offers' => 1]) }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-[var(--primary-color)] transition-colors">
         View all offers
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
           <path d="M5 12h14M13 6l6 6-6 6" />
@@ -231,7 +231,7 @@
 
   <div class="flex flex-nowrap gap-2 overflow-x-auto lg:overflow-visible pb-3 lg:pb-0 thumb-scrollbar" id="filterPills">
     <button type="button" data-slug="all"
-      class="pill-btn active shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-ember text-white whitespace-nowrap">
+      class="pill-btn active shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-[var(--primary-color)] text-white whitespace-nowrap">
       All
     </button>
 
@@ -250,7 +250,7 @@
         <path d="m20 20-3.5-3.5" />
       </svg>
       <input type="text" id="menuSearchInput" autocomplete="off" placeholder="Search food…"
-        class="pl-10 pr-4 py-2.5 rounded-full border border-coal/15 bg-white text-sm w-full lg:w-48 focus:outline-none focus:ring-2 focus:ring-ember/40 focus:border-ember/50">
+        class="pl-10 pr-4 py-2.5 rounded-full border border-coal/15 bg-white text-sm w-full lg:w-48 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)]">
     </div>
   </div>
 
@@ -275,7 +275,7 @@
   </div>
 
   <div class="flex justify-center mt-11">
-    <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 border border-[var(--lumina-coal)]/20 hover:border-[var(--lumina-coal)] transition-colors font-medium px-7 py-3.5 rounded-full">
+    <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 border border-[var(--primary-color)]/20 hover:border-[var(--primary-color)] transition-colors font-medium px-7 py-3.5 rounded-full">
       View Full Menu
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <path d="M5 12h14M13 6l6 6-6 6" />
@@ -396,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function () {
         pills.forEach(p => {
             const isActive = p.getAttribute('data-slug') === slug;
             p.classList.toggle('active', isActive);
-            p.classList.toggle('bg-ember', isActive);
+            p.classList.toggle('bg-[var(--primary-color)]', isActive);
             p.classList.toggle('text-white', isActive);
             p.classList.toggle('bg-transparent', !isActive);
             p.classList.toggle('text-smoke', !isActive);

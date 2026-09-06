@@ -22,18 +22,18 @@
 
   <!-- Dynamic Breadcrumb -->
   <div class="mb-6 flex items-center gap-2 text-sm text-smoke overflow-x-auto whitespace-nowrap no-scrollbar">
-    <a href="{{ url('/') }}" class="hover:text-ember transition-colors">Home</a>
+    <a href="{{ url('/') }}" class="hover:text-[var(--primary-color)] transition-colors">Home</a>
 
     @php $mega = $product->mega_categories?->first(); @endphp
     @if ($mega)
       <span>/</span>
-      <a href="{{ route('category.products', $mega->slug) }}" class="hover:text-ember transition-colors">{{ $mega->name }}</a>
+      <a href="{{ route('category.products', $mega->slug) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $mega->name }}</a>
     @endif
 
     @php $sub = $product->sub_categories?->first(); @endphp
     @if ($sub)
       <span>/</span>
-      <a href="{{ route('category.products', $sub->slug) }}" class="hover:text-ember transition-colors">{{ $sub->name }}</a>
+      <a href="{{ route('category.products', $sub->slug) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $sub->name }}</a>
     @endif
 
     <span>/</span>
@@ -49,7 +49,7 @@
          class="w-full h-full object-cover">
 
     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-      <span class="absolute top-5 left-5 bg-ember text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
+      <span class="absolute top-5 left-5 bg-[var(--primary-color)] text-white text-xs font-mono uppercase tracking-wide px-3 py-1.5 rounded-full">
         {{ number_format((($product->display_price_data->regular_price - $product->display_price_data->sale_price) / $product->display_price_data->regular_price) * 100) }}% Off
       </span>
     @endif
@@ -59,14 +59,14 @@
 <div class="relative group/gallery">
   <!-- Left Arrow -->
   <button type="button" id="thumb-arrow-left" onclick="scrollThumbnails(-1)"
-    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
     <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
   </button>
 
   <div id="thumbnail-container" class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ count($allProductImages) > 3 ? 'px-8 md:px-10' : '' }}">
     @foreach ($allProductImages as $index => $imgUrl)
       <button onclick="changeImage('{{ $imgUrl }}')"
-        class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50' }}">
+        class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
         <img src="{{ $imgUrl }}"
              onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
              class="w-full h-full object-cover pointer-events-none">
@@ -76,7 +76,7 @@
 
   <!-- Right Arrow -->
   <button type="button" id="thumb-arrow-right" onclick="scrollThumbnails(1)"
-    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-ember hover:text-white hover:border-ember transition-colors">
+    class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
     <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 18l6-6-6-6"/></svg>
   </button>
 </div>
@@ -100,7 +100,7 @@
       </div>
 
       <h1 class="font-display font-semibold text-4xl sm:text-5xl text-coal leading-tight mb-2">{{ $product->title }}</h1>
-<p class="text-xl font-mono font-semibold text-ember mb-6">
+<p class="text-xl font-mono font-semibold text-[var(--primary-color)] mb-6">
   <span id="main-sale-price">{{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}</span>
   <span id="main-regular-price" class="text-smoke line-through ml-1.5 text-base {{ $product->display_price_data->regular_price > $product->display_price_data->sale_price ? '' : 'hidden' }}">
     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
@@ -125,15 +125,15 @@
 
     <!-- Qty Selector -->
     <div class="flex items-center justify-between border border-coal/15 rounded-full bg-white h-12 w-32 sm:order-1">
-      <button type="button" onclick="changeQty(-1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-ember transition-colors">-</button>
+      <button type="button" onclick="changeQty(-1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-[var(--primary-color)] transition-colors">-</button>
       <span id="main-qty" class="flex-1 text-center font-medium">1</span>
-      <button type="button" onclick="changeQty(1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-ember transition-colors">+</button>
+      <button type="button" onclick="changeQty(1)" class="w-10 h-full flex items-center justify-center text-coal hover:text-[var(--primary-color)] transition-colors">+</button>
     </div>
 
     <!-- Wishlist Button -->
     <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
       class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
-      {{ $isWishlisted ? 'border-ember text-ember bg-ember/5' : 'border-coal/15 text-coal hover:border-ember hover:text-ember' }}">
+      {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
       <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
            fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -152,7 +152,7 @@
     </button>
 
     <button id="btn-cart" onclick="handleAddToCart()"
-      class="flex-1 sm:order-3 sm:flex-1 h-12 bg-ember hover:bg-ember-600 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">
+      class="flex-1 sm:order-3 sm:flex-1 h-12 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">
       Add to Cart
     </button>
 
@@ -223,8 +223,8 @@ function renderAttributes() {
         const isVariationSelected = checkIsSelected(groupName, valId);
 
         const activeClass = (isFilterActive || isVariationSelected)
-          ? 'border-2 border-ember text-ember bg-ember/5'
-          : 'border border-coal/15 text-coal hover:border-coal';
+          ? 'border-2 border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5'
+          : 'border border-coal/15 text-coal hover:border-[var(--primary-color)]';
 
         let btnContent = valueImages[valId]
           ? `<img src="${valueImages[valId]}" class="w-6 h-6 rounded-full object-cover mr-2 inline-block"> ${valName}`
@@ -290,7 +290,7 @@ function updateGalleryThumbnails(images) {
     images.forEach((img, i) => {
       container.innerHTML += `
         <button onclick="changeImage('${img}')"
-          class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-ember ring-offset-2 ring-2 ring-ember/20' : 'border-coal/10 hover:border-ember/50'}">
+          class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
           <img src="${img}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
         </button>`;
     });
@@ -490,12 +490,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.status === 'unauthorized') {
           toastr.warning(data.message);
         } else if (data.status === 'added') {
-          btnWish.classList.add('border-ember', 'text-ember', 'bg-ember/5');
+          btnWish.classList.add('border-[var(--primary-color)]', 'text-[var(--primary-color)]', 'bg-[var(--primary-color)]/5');
           btnWish.classList.remove('border-coal/15', 'text-coal');
           wishIcon.setAttribute('fill', '#D6431F');
           toastr.success(data.message);
         } else {
-          btnWish.classList.remove('border-ember', 'text-ember', 'bg-ember/5');
+          btnWish.classList.remove('border-[var(--primary-color)]', 'text-[var(--primary-color)]', 'bg-[var(--primary-color)]/5');
           btnWish.classList.add('border-coal/15', 'text-coal');
           wishIcon.setAttribute('fill', 'none');
           toastr.info(data.message);

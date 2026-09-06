@@ -40,19 +40,19 @@
                             <i class="far fa-user w-5 text-center"></i> Overview
                         </button>
                         <button onclick="showSection('orders', this)"
-                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="fas fa-shopping-bag w-5 text-center"></i> My Order
                         </button>
                         <button onclick="showSection('wishlist', this)"
-                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-heart w-5 text-center"></i> Wishlist
                         </button>
                         <button onclick="showSection('edit', this)"
-                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-edit w-5 text-center"></i> Profile update
                         </button>
                         <button onclick="showSection('password', this)"
-                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[#FF6A00] rounded-xl text-sm font-semibold transition-all">
+                            class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="fas fa-lock w-5 text-center"></i> Password Change
                         </button>
                     </nav>
@@ -299,7 +299,7 @@
                                     </div>
                                     <h2 class="text-xl font-bold text-gray-800">Your wishlist is currently empty.</h2>
                                     <a href="{{ route('shop.index') }}"
-                                        class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">শপিং
+                                        class="inline-block mt-8 bg-[var(--primary-color)] text-white px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-[var(--primary-hover-color)] transition-all">শপিং
                                         Start Shopping</a>
                                 </div>
                             @endif
@@ -362,7 +362,7 @@
                                         <label class="text-sm font-bold text-gray-700">Change Profile Picture</label>
                                         <input type="file" name="profile" id="profile-input"
                                             onchange="previewImage(this)"
-                                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-[#FF6A00] hover:file:bg-orange-100">
+                                            class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg- file:text-[var(--primary-color)] hover:file:bg-orange-100">
                                         @error('profile')
                                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                         @enderror
@@ -371,7 +371,7 @@
                             </div>
 
                             <button type="submit"
-                                class="bg-[#FF6A00] text-primary px-8 py-3 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all shadow-md">
+                                class="bg-[var(--primary-color)] text-white px-8 py-3 rounded-lg text-sm font-bold hover:bg-[var(--primary-hover-color)] transition-all shadow-md">
                                 Save information
                             </button>
                         </form>
@@ -406,7 +406,7 @@
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-[#016738] outline-none text-sm">
                             </div>
                             <button type="submit"
-                                class="bg-[#FF6A00] text-primary px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
+                                class="bg-[var(--primary-color)] text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-all shadow-sm">Update</button>
                         </form>
                     </div>
                 </div>
