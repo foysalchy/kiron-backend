@@ -25,14 +25,14 @@
     <style>
         :root {
             /* Lumina Cuisine palette used as the fallback default; still overridable per-shop via $themeColor */
-            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#D6431F' }};
+            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#FF0000' }};
 
             --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
 
             --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#ffffff' }};
             --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#B8371A' }};
 
-            --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#C99A45') }};
+            --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#000000') }};
             --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#18130F') }};
 
             --header-bg: {{ $themeColor->theme_template['header_color'] ?? '#ffffff' }};
@@ -50,6 +50,10 @@
             --lumina-smoke: #8B8175;
             --lumina-gold: #C99A45;
         }
+        #toast-container > .toast-success {
+    background-color: var(--primary-color) !important;
+    opacity: 1;
+}
 
         body {
             font-family: 'Manrope', sans-serif;
@@ -232,7 +236,9 @@
                 "closeButton": true,
                 "progressBar": true,
                 "positionClass": "toast-top-right",
-                "timeOut": "3000"
+                "timeOut": "3000",
+        
+                
             };
             @if ($errors->any())
                 @foreach ($errors->all() as $error)

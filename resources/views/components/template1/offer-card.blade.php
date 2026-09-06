@@ -12,7 +12,7 @@
     $isOutOfStock = $offer->manage_stock ? ($offer->available_stock <= 0) : false;
 @endphp
 
-<a href="{{ route('product.details', $offer->slug ?? $offer->id) }}" class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-ember/40 -translate-y-1 flex flex-col h-full">
+<a href="{{ route('product.details', $offer->slug ?? $offer->id) }}" class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-[var(--primary-color)]/40 -translate-y-1 flex flex-col h-full">
 
   <div class="h-36 sm:h-52 relative overflow-hidden">
     <img
@@ -24,7 +24,7 @@
     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
 
     @if ($regularPrice > $salePrice)
-      <span class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-ember text-white text-[9px] sm:text-[11px] font-mono tracking-wide px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+      <span class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-[var(--primary-color)] text-white text-[9px] sm:text-[11px] font-mono tracking-wide px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
         @php
           $discountPercent = $regularPrice > 0 ? round((($regularPrice - $salePrice) / $regularPrice) * 100) : 0;
         @endphp
@@ -35,7 +35,7 @@
 
   <div class="p-3 sm:p-6 flex flex-col flex-1">
 
-    <p class="font-display font-semibold text-sm sm:text-lg text-gray-800 line-clamp-2 min-h-[20px] sm:min-h-[28px] group-hover:text-[#BD4F00] transition-colors">
+    <p class="font-display font-semibold text-sm sm:text-lg text-gray-800 line-clamp-2 min-h-[20px] sm:min-h-[28px] group-hover:text-[var(--primary-color)] transition-colors">
       {{ $offer->title }}
     </p>
 
@@ -74,7 +74,7 @@
       type="button"
       {{ $isOutOfStock ? 'disabled' : '' }}
       onclick="event.preventDefault(); event.stopPropagation(); {{ $offer->type === 'single' ? "addSingleToCart($offer->id, true)" : "openVariationModal($offer->id, true)" }}"
-      class="block bg-ember group-hover:bg-ember-600 transition-colors text-white text-xs sm:text-sm font-medium px-3 py-2 sm:px-4 sm:py-3 rounded-full w-full mt-2 sm:mt-3 text-center {{ $isOutOfStock ? 'opacity-60 cursor-not-allowed' : '' }}"
+      class="block bg-[var(--primary-color)] group-hover:bg-[var(--primary-color)]/90 transition-colors text-white text-xs sm:text-sm font-medium px-3 py-2 sm:px-4 sm:py-3 rounded-full w-full mt-2 sm:mt-3 text-center {{ $isOutOfStock ? 'opacity-60 cursor-not-allowed' : '' }}"
     >
       {{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}
     </button>

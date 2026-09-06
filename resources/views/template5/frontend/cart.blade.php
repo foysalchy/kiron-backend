@@ -31,7 +31,7 @@
 
           <div class="flex-1 w-full">
             <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}" class="group/title">
-              <h3 class="font-display font-semibold text-lg group-hover/title:text-ember transition-colors">
+              <h3 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
                 {{ $item->name ?? '' }}
               </h3>
             </a>
@@ -42,7 +42,7 @@
 
             <div class="flex items-center justify-between mt-4">
               <div>
-                <span class="font-mono font-semibold text-ember text-lg">
+                <span class="font-mono font-semibold text-[var(--primary-color)] text-lg">
                   {{ $setup->currency }} {{ number_format($item->price, 0) }}
                 </span>
                 @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
@@ -53,9 +53,9 @@
               </div>
 
               <div class="flex items-center border border-coal/15 rounded-full bg-ash/50 h-9 w-24">
-                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-ember">-</button>
+                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">-</button>
                 <span class="flex-1 text-center font-medium text-sm">{{ $item->qty }}</span>
-                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-ember">+</button>
+                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">+</button>
               </div>
             </div>
 
@@ -69,7 +69,7 @@
       @endforeach
 
       <div class="pt-6 border-t border-coal/10">
-        <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 text-ember hover:text-ember-700 font-medium transition-colors">
+        <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 text-[var(--primary-color)] hover:text-[var(--primary-color)]/80 font-medium transition-colors">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
           Continue Shopping
         </a>
@@ -87,19 +87,19 @@
           <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form" class="space-y-2">
             @csrf
 
-            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors {{ $shipping_area == 'inside' ? 'border-ember bg-ember/5' : 'border-coal/15 hover:border-coal/30' }}">
+            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 hover:border-coal/30' }}">
               <input type="radio" name="area" value="inside" onchange="this.form.submit()"
                      {{ $shipping_area == 'inside' ? 'checked' : '' }}
-                     class="accent-ember">
+                     class="accent-[var(--primary-color)]">
               <span class="text-sm font-medium text-coal">
                 Regular Delivery ({{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }})
               </span>
             </label>
 
-            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors {{ $shipping_area == 'outside' ? 'border-ember bg-ember/5' : 'border-coal/15 hover:border-coal/30' }}">
+            <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 hover:border-coal/30' }}">
               <input type="radio" name="area" value="outside" onchange="this.form.submit()"
                      {{ $shipping_area == 'outside' ? 'checked' : '' }}
-                     class="accent-ember">
+                     class="accent-[var(--primary-color)]">
               <span class="text-sm font-medium text-coal">
                 Quick Bite ({{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }})
               </span>
@@ -155,7 +155,7 @@
           </div>
         </div>
 
-        <a href="{{ url('/checkout') }}" class="w-full bg-ember hover:bg-ember-600 transition-colors text-white h-12 rounded-full flex items-center justify-center gap-2 font-medium">
+        <a href="{{ url('/checkout') }}" class="w-full bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/80 transition-colors text-white h-12 rounded-full flex items-center justify-center gap-2 font-medium">
           Proceed to Checkout
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
@@ -190,7 +190,7 @@
       <i class="fas fa-shopping-basket text-3xl text-smoke"></i>
     </div>
     <h2 class="font-display font-semibold text-2xl text-coal">Your cart is currently empty!</h2>
-    <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 mt-8 bg-ember hover:bg-ember-600 transition-colors text-white px-8 py-3 rounded-full font-medium">
+    <a href="{{ route('shop.index') }}" class="inline-flex items-center gap-2 mt-8 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/80 transition-colors text-white px-8 py-3 rounded-full font-medium">
       Start Shopping
     </a>
   </div>

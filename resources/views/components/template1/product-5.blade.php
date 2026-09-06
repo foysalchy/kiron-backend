@@ -37,7 +37,7 @@
     <button type="button"
       onclick="event.stopPropagation(); toggleWishlist({{ $product->id }})"
       aria-label="wishlist"
-      class="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:text-ember transition-colors">
+      class="absolute top-3 right-3 z-30 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:text-[var(--primary-color)] transition-colors">
       <svg id="wish-icon-{{ $product->id }}" width="15" height="15" viewBox="0 0 24 24"
         fill="{{ $isWishlisted ? '#D6431F' : 'none' }}"
         stroke="{{ $isWishlisted ? '#D6431F' : 'currentColor' }}" stroke-width="2">
@@ -48,7 +48,7 @@
 
   <div class="p-2 md:p-5 flex flex-col flex-1">
 
-    <p class="font-display font-semibold text-base leading-snug line-clamp-2  group-hover:text-ember transition-colors">
+    <p class="font-display font-semibold text-base leading-snug line-clamp-2  group-hover:text-[var(--primary-color)] transition-colors">
       {{ $product->title }}
     </p>
 
@@ -94,7 +94,7 @@
     class="flex-1 h-9 px-2 md:px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
     {{ $isOutOfStock
         ? 'bg-smoke-300 text-white cursor-not-allowed'
-        : 'secondary-bg text-secondary hover:bg-yellow-500 cursor-pointer' }}"
+        : 'bg-[var(--secondary-color)] text-white hover:bg-[var(--secondary-color)]/90 cursor-pointer' }}"
 >
     {{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}
 </button>
@@ -106,7 +106,7 @@
         class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
         {{ $isOutOfStock
             ? 'bg-smoke-300 text-white cursor-not-allowed'
-            : 'bg-ember hover:bg-ember-600 text-white cursor-pointer' }}"
+            : 'bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 text-white cursor-pointer' }}"
     >
         @if ($isOutOfStock)
             <i class="fas fa-exclamation-circle text-xs"></i>

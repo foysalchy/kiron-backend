@@ -24,17 +24,17 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Your Name <span
-                                        class="text-red-500">*</span></label>
+                                        class="text-[var(--primary-color)]">*</span></label>
                                 <input type="text" name="name" placeholder="Enter your full name" required
                                     value="{{ old('name', auth('customer')->user()->name ?? '') }}"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-[var(--primary-color)]/20 transition-all">
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">Phone Number <span
-                                        class="text-red-500">*</span></label>
+                                        class="text-[var(--primary-color)]">*</span></label>
                                 <input type="tel" name="phone" placeholder="Your mobile number" required
                                     value="{{ old('phone', auth('customer')->user()->phone ?? '') }}"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">
+                                    class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-[var(--primary-color)]/20 transition-all">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
@@ -46,7 +46,7 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-700">City <span
-                                        class="text-red-500">*</span></label>
+                                        class="text-[var(--primary-color)]">*</span></label>
                                 <input type="text" name="district" placeholder="Your city" required
                                     value="{{ old('district', auth('customer')->user()->district ?? '') }}"
                                     class="w-full px-4 py-3 rounded-lg border border-gray-200 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 transition-all">
@@ -54,9 +54,9 @@
                         </div>
                         <div class="space-y-2 mt-5">
                             <label class="text-sm font-medium text-gray-700">Your Address <span
-                                    class="text-red-500">*</span></label>
+                                    class="text-[var(--primary-color)]">*</span></label>
                             <textarea name="address" placeholder="Your address" rows="3" required
-                                class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[#016738] focus:ring-4 focus:ring-green-50 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
+                                class="w-full px-3 py-2 rounded-lg border border-gray-200 outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-[var(--primary-color)]/20 transition-all">{{ old('address', auth('customer')->user()->address ?? '') }}</textarea>
                         </div>
 
                         <!-- Checkboxes -->
@@ -235,7 +235,7 @@
                         </div>
                         <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                             <span class="text-lg font-black text-gray-900">Total to Pay:</span>
-                            <span class="text-xl font-bold text-[var(--primary-color)]">{{ $setup->currency }} <span
+                            <span class="text-xl font-bold text-[var(--secondary-color)]">{{ $setup->currency }} <span
                                     id="total-display">{{ number_format($total) }}</span></span>
                         </div>
                     </div>

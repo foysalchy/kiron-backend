@@ -139,7 +139,7 @@
                         <!-- Dot -->
                         <div
                             class="absolute -left-8 top-2 w-4 h-4 rounded-full border-2 border-white z-10
-                    {{ $isCurrent ? 'bg-orange-500 shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
+                    {{ $isCurrent ? 'bg-[var(--primary-color)] shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ($isCompleted ? 'bg-green-500' : 'bg-gray-200') }}">
                             @if ($isCompleted && !$isCurrent)
                             <i
                                 class="fas fa-check text-[8px] text-primary flex items-center justify-center h-full"></i>
@@ -149,7 +149,7 @@
                         <!-- Label -->
                         <p
                             class="font-bold text-md leading-none mb-1
-                    {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
+                    {{ $isCurrent ? 'text-[var(--primary-color)]' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
                             {{ $status->label() }}
                         </p>
 

@@ -261,7 +261,7 @@
                     </div>
 
                     <!-- Product Grid  -->
-                    <div class="p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    <div class="p-3 md:p-4 grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
 
                         @forelse($products as $product)
                             <x-template1.product-card :product="$product" />
