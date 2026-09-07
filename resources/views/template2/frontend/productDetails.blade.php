@@ -16,7 +16,8 @@
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
 
-            <a href="{{ route('home') }}" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+            <a href="{{ route('home') }}"
+                class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
 
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
@@ -44,15 +45,15 @@
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
-    @foreach ($allProductImages as $imgUrl)
-        <button onclick="changeImage('{{ $imgUrl }}')"
-            class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
-            <img src="{{ $imgUrl }}"
-                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                class="w-full h-full object-contain" alt="Product Image">
-        </button>
-    @endforeach
-</div>
+                        @foreach ($allProductImages as $imgUrl)
+                            <button onclick="changeImage('{{ $imgUrl }}')"
+                                class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
+                                <img src="{{ $imgUrl }}"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                    class="w-full h-full object-contain" alt="Product Image">
+                            </button>
+                        @endforeach
+                    </div>
                 </div>
 
                 <!-- Right: Product Purchase Details -->
@@ -77,7 +78,8 @@
                         </span>
                         <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
                     </div>
-                    <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                    <div
+                        class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
                     </div>
 
@@ -117,7 +119,8 @@
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         {{-- Replace this part --}}
-                        <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                        <span
+                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
@@ -128,15 +131,13 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- 1. Add To Cart -->
-                        <button id="btn-cart" onclick="handleAddToCart()"
-                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
                         <!-- 2. Order Now Button -->
-                        <button id="btn-order" onclick="handleAddToCart(true)"
-                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
@@ -144,9 +145,10 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
-                            <i id="wish-icon-main" class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                            <i id="wish-icon-main"
+                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
@@ -158,8 +160,7 @@
                                 style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
                                 <div class="shrink-0">
                                     @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) }}"
-                                            class="h-5 w-5 object-contain">
+                                        <img src="{{ asset('storage/' . $item->icon_file) }}" class="h-5 w-5 object-contain">
                                     @else
                                         <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
                                     @endif
@@ -172,52 +173,52 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                     @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                        @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
-                            <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                                <div class="text-orange-500 shrink-0">
-                                    @if ($card->icon_file)
-                                        <img src="{{ asset('storage/' . $card->icon_file) }}"
-                                            class="h-5 w-5 object-contain">
-                                    @else
-                                        <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
-                                    @endif
+                    @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
+                                <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
+                                    <div class="text-orange-500 shrink-0">
+                                        @if ($card->icon_file)
+                                            <img src="{{ asset('storage/' . $card->icon_file) }}" class="h-5 w-5 object-contain">
+                                        @else
+                                            <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
+                                        @endif
+                                    </div>
+                                    <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
                                 </div>
-                                <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
                     @endif
 
                     <div class="bg-gray-100 py-3 px-3 rounded">
-                    <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
+                        <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
-                    <div class="grid grid-cols-2 gap-2 md:gap-3">
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
 
-                        <a href="tel:{{ $setup->phone }}"
-                            class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                </path>
-                            </svg>
-                            Call Now
-                        </a>
+                            <a href="tel:{{ $setup->phone }}"
+                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                    </path>
+                                </svg>
+                                Call Now
+                            </a>
 
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
-                            target="_blank"
-                            class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
-                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                            </svg>
-                            WhatsApp
-                        </a>
-                    </div></div>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                                target="_blank"
+                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                </svg>
+                                WhatsApp
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -225,8 +226,7 @@
         <!-- 3. TABS SECTION -->
         <div class="bg-white rounded-lg shadow-xs   relative overflow-hidden mb-12">
             <!-- Tab Buttons -->
-            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
-                id="tabs-nav">
+            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar" id="tabs-nav">
                 <button onclick="switchTab('description')" id="tab-btn-description"
                     class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
@@ -273,8 +273,7 @@
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                             <span class="font-medium text-gray-500">Availability:</span>
-                            <span
-                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                            <span class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
                                 {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
                             </span>
                         </div>
@@ -361,7 +360,8 @@
                                         <!-- Header Line: Name, Stars, Date -->
                                         <div class="flex items-center gap-3 mb-2">
                                             <h4 class="text-md font-bold text-gray-900">
-                                                {{ $review->customer->name ?? 'Customer' }}</h4>
+                                                {{ $review->customer->name ?? 'Customer' }}
+                                            </h4>
 
                                             <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                                 @for ($i = 1; $i <= 5; $i++)
@@ -491,10 +491,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                            onclick="changeImage('${imgUrl}', this)">
-                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
-                        </button>`;
+                                <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                    onclick="changeImage('${imgUrl}', this)">
+                                    <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                </button>`;
             });
         }
 
@@ -732,5 +732,3 @@
 @push('scripts')
     @include('components.meta-info.pixel-events', ['event' => 'ViewContent', 'data' => ['product' => $product]])
 @endpush
-
-
