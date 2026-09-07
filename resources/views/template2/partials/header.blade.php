@@ -1,4 +1,4 @@
-<header class="w-full header-custom-bg fixed top-0 left-0 right-0 z-50 shadow-sm">
+<header class="w-full header-custom-bg relative">
     <!-- 1. Main Header -->
     <div class="container mx-auto px-4 py-3 md:py-4">
         <div class="flex items-center justify-between gap-4 lg:gap-8">
@@ -225,7 +225,7 @@
     </div>
 
     <!-- 2. Desktop Bottom Nav (Hidden on Mobile) -->
-    <nav class="primary-bg hidden md:block">
+    <nav class="primary-bg hidden md:block transition-all duration-300 w-full" id="desktop-bottom-nav">
         <div class="container mx-auto">
             <div
                 class="flex items-center justify-center text-primary py-3 text-lg overflow-x-auto no-scrollbar flex-nowrap">
@@ -479,6 +479,20 @@
         if (wrapper && !wrapper.contains(e.target)) {
             if (menu) menu.classList.add('hidden');
             if (chevron) chevron.classList.remove('rotate-180');
+        }
+    });
+
+    // Sticky Desktop Navigation on Scroll
+    document.addEventListener('DOMContentLoaded', function() {
+        const bottomNav = document.getElementById('desktop-bottom-nav');
+        if (bottomNav) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 120) {
+                    bottomNav.classList.add('fixed', 'top-0', 'left-0', 'right-0', 'z-50', 'shadow-md');
+                } else {
+                    bottomNav.classList.remove('fixed', 'top-0', 'left-0', 'right-0', 'z-50', 'shadow-md');
+                }
+            });
         }
     });
 </script>
