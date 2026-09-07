@@ -1,9 +1,9 @@
-<!-- FOOTER -->
-<footer class="text-footer">
+﻿<!-- FOOTER -->
+<footer class="footer-custom-bg text-footer">
 
     <!-- 1. Top Features Row -->
     @if ($footerFeatures->count() > 0)
-        <div class="footer-custom-bg p-6">
+        <div class="p-6">
             <div class="container mx-auto">
                 <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     @foreach ($footerFeatures as $feature)
@@ -20,7 +20,7 @@
                             <div>
                                 <h4 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
                                     {{ $feature->title }}</h4>
-                                <p class="text-gray-400 text-xs md:text-sm mt-0.5">
+                                <p class="opacity-90 text-xs md:text-sm mt-0.5">
                                     {{ $feature->subtitle ?? $feature->text_content }}</p>
                             </div>
                         </div>
@@ -30,7 +30,7 @@
         </div>
     @endif
 
-    <div class="bg-gray-900">
+    <div>
         <!-- 2. Main Footer Content -->
         <div class="container mx-auto px-4 py-10 md:py-16">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
@@ -50,11 +50,11 @@
                         @endif
                         
                     </div>
-                    <p class="text-gray-400 text-[16px] leading-relaxed mb-5">
+                    <p class="opacity-90 text-[16px] leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
                     </p>
                     <ul class="space-y-3 text-[16px]">
-                        <li class="flex items-start gap-3 text-gray-200">
+                        <li class="flex items-start gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="text-orange-500 mt-0.5 shrink-0">
@@ -65,7 +65,7 @@
                             </svg>
                             <span>{{ $setup->corporate_address ?? 'Dhaka, Bangladesh' }}</span>
                         </li>
-                        <li class="flex items-center gap-3 text-gray-200">
+                        <li class="flex items-center gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="text-orange-500 shrink-0">
@@ -77,7 +77,7 @@
                                 {{ $setup->phone }}
                             </a>
                         </li>
-                        <li class="flex items-center gap-3 text-gray-200">
+                        <li class="flex items-center gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="text-orange-500 shrink-0">
@@ -96,13 +96,13 @@
                     <h4 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h4>
                     <ul class="space-y-2.5 text-sm">
                         <li><a href="{{ route('contact.index') }}"
-                                class="text-[16px] text-gray-400 hover-text transition-colors">Contact Us</a></li>
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Contact Us</a></li>
                         <li><a href="{{ route('order.track') }}"
-                                class="text-[16px] text-gray-400 hover-text transition-colors">Track Order</a></li>
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Track Order</a></li>
                         <li><a href="{{ route('faq.index') }}"
-                                class="text-[16px] text-gray-400 hover-text transition-colors">Help & Support</a></li>
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Help & Support</a></li>
                         <li><a href="{{ route('blog.index') }}"
-                                class="text-[16px] text-gray-400 hover-text transition-colors">Blog</a></li>
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Blog</a></li>
                     </ul>
                 </div>
 
@@ -113,7 +113,7 @@
                         @foreach ($footerPages as $page)
                             <li>
                                 <a href="{{ url('page', ['slug' => $page->slug]) }}"
-                                    class="text-[16px] text-gray-400 hover:text-[var(--primary-color)] transition-colors">
+                                    class="text-[16px] opacity-90 hover:underline transition-colors">
                                     {{ $page->title }}
                                 </a>
                             </li>
@@ -124,7 +124,7 @@
                 <!-- Column 4: Newsletter -->
                 <div>
                     <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
-                    <p class="text-gray-300 text-[16px] mb-4">Subscribe to get updates on new products and exclusive
+                    <p class="opacity-90 text-[16px] mb-4">Subscribe to get updates on new products and exclusive
                         offers.
                     </p>
                     <form id="newsletter-form">
@@ -143,7 +143,7 @@
                         @foreach ($socialLinks as $social)
                             <a href="{{ $social->link }}" target="_blank"
                                 aria-label="Follow us on {{ $social->name }}"
-                                class="text-gray-300 text-lg transition-all duration-300"
+                                class="opacity-90 text-lg transition-all duration-300"
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
                                 @if ($social->icon_image)
@@ -161,14 +161,14 @@
         </div>
 
         <!-- 3. Bottom Bar -->
-        <div class="border-t border-gray-800 py-5">
+        <div class="border-t border-white/40 py-5">
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div
-                    class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm text-gray-400 text-center">
-                    <p>© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
+                    class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm opacity-90 text-center">
+                    <p>Â© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="text-xs md:text-sm text-gray-400">We Accept:</span>
+                    <span class="text-xs md:text-sm opacity-90">We Accept:</span>
                     <div class="flex gap-2">
                         @foreach ($footerBottomRight as $item)
                             <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
@@ -196,7 +196,7 @@
         const btn = document.getElementById('subscribe-btn');
         const originalText = btn.innerHTML;
 
-        // লোডিং স্টেট
+        // à¦²à§‹à¦¡à¦¿à¦‚ à¦¸à§à¦Ÿà§‡à¦Ÿ
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
@@ -215,7 +215,7 @@
                 const data = await response.json();
                 if (response.ok) {
                     toastr.success(data.message);
-                    document.getElementById('subscriber-email').value = ''; // ইনপুট ক্লিয়ার
+                    document.getElementById('subscriber-email').value = ''; // à¦‡à¦¨à¦ªà§à¦Ÿ à¦•à§à¦²à¦¿à§Ÿà¦¾à¦°
                 } else {
                     toastr.error(data.message || 'Validation error');
                 }
@@ -229,3 +229,4 @@
             });
     });
 </script>
+

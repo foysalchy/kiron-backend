@@ -26,7 +26,7 @@
                     <!-- Category Dropdown -->
                     <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px] max-w-[200px]">
                         <select name="category" id="header-category-select"
-                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header font-bold bg-transparent outline-none appearance-none cursor-pointer">
+                            class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header  bg-transparent outline-none appearance-none cursor-pointer">
                             <option value="">All</option>
                             @foreach ($headerCategories as $cat)
                                 <option value="{{ $cat->slug }}"
@@ -45,7 +45,7 @@
                         class="flex-1 px-4 py-2 text-base text-black outline-none placeholder:text-gray-500">
                     <!-- Search Button -->
                     <button type="submit"
-                        class="primary-bg text-primary px-8 py-2 text-lg font-bold hover:bg-opacity-95 transition-colors">খুঁজুন</button>
+                        class="primary-bg text-primary px-8 py-2 text-lg   hover:bg-opacity-95 transition-colors">খুঁজুন</button>
                 </div>
 
                 <!-- Search Suggestions Dropdown -->
