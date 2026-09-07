@@ -97,7 +97,8 @@
                             </div>
 
                             <!-- Category Name -->
-                            <span class="text-base md:text-lg font-bold text-gray-900 text-center leading-tight">
+                            <span class=" text-[#0f172a] text-xl font-normal leading-tight
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[14px] md:text-[16px] lg:text-[16px]">
                                 {{ $category->name }}
                             </span>
                         </a>
