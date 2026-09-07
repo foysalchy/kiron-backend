@@ -1,4 +1,4 @@
-﻿@extends('template2.layouts.front')
+@extends('template2.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
@@ -69,7 +69,7 @@
             <p class="text-center text-xl text-black mb-4 mt-0">Buy Your Desired Products from Featured Categories</p>
 
             <!-- Carousel Wrapper -->
-            <div class="relative group px-2 md:px-6">
+            <div class="relative px-2 md:px-6">
 
                 <!-- Navigation Buttons (Green as per Image) -->
                 <button onclick="scrollCats(-240)" aria-label="Scroll left"
