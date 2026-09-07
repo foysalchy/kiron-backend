@@ -216,7 +216,7 @@
         </div>
     </section>
      @if($homePageData->description)
-        <section class="w-full bg-[#fcfcfc] px-4 font-manrope">
+        <section class="w-full  px-4 font-manrope">
             <div class="p-0 container mx-auto    ">
                 <div
                     class=" bg-gray-100  border border-gray-200 rounded-lg px-6 py-6
