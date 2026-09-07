@@ -284,24 +284,21 @@ class CompanyRegistrationService
                 $manageWarehouse = (bool) $data['manage_warehouse'];
 
                 $company->update(['manage_warehouse' => $manageWarehouse]);
+            }
+            $exists = Warehouse::where('company_id', $company->id)
+                ->where('is_default', 1)
+                ->exists();
 
-                if (!$manageWarehouse) {
-                    $exists = Warehouse::where('company_id', $company->id)
-                        ->where('is_default', 1)
-                        ->exists();
+            if (!$exists) {
+                $warehouse = Warehouse::create([
+                    'company_id' => $company->id,
+                    'name'       => 'Default Warehouse',
+                    'location'   => null,
+                    'is_default' => 1,
+                    'status'     => Status::Active->value,
+                ]);
 
-                    if (!$exists) {
-                        $warehouse = Warehouse::create([
-                            'company_id' => $company->id,
-                            'name'       => 'Default Warehouse',
-                            'location'   => null,
-                            'is_default' => 1,
-                            'status'     => Status::Active->value,
-                        ]);
-
-                        $company->update(['default_warehouse_id' => $warehouse->id]);
-                    }
-                }
+                $company->update(['default_warehouse_id' => $warehouse->id]);
             }
 
             // Activate Company
