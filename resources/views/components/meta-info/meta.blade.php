@@ -40,7 +40,9 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta name="title" content="{{ $title }}">
 @if (!($setup->allow_search_engine_index ?? false))
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-@endif
+    @else
+        <meta name="robots" content="index, follow, archive, snippet">
+    @endif
 <meta name="description" content="{{ $description }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
