@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+﻿@extends('template2.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.product-details-meta', ['setup' => $setup])
 @endsection
@@ -116,7 +116,7 @@
                             <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
-                        {{-- এই অংশটুকু রিপ্লেস করুন --}}
+                        {{-- Replace this part --}}
                         <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
@@ -127,14 +127,14 @@
 
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
-                        <!-- ১. Add To Cart -->
+                        <!-- 1. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()"
                             {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
-                        <!-- ২. Order Now Button -->
+                        <!-- 2. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)"
                             {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
@@ -524,7 +524,7 @@
                         'border-[var(--primary-color)] bg-orange-50 text-[var(--primary-color)]' :
                         'border-gray-200 bg-white text-gray-700';
 
-                    // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
+                    // Logic to show image on variation button
                     let btnContent = valueImages[valId]
                         ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
                         : valName;
@@ -678,7 +678,7 @@
 
                     allIcons.forEach(icon => {
                         if (data.status === 'added') {
-                            // SVG সাপোর্ট (Template 1)
+                            // SVG support
                             icon.setAttribute('fill', '#ef4444');
                             icon.setAttribute('stroke', '#ef4444');
                             icon.classList.replace('fa-regular', 'fa-solid');
@@ -732,4 +732,5 @@
 @push('scripts')
     @include('components.meta-info.pixel-events', ['event' => 'ViewContent', 'data' => ['product' => $product]])
 @endpush
+
 

@@ -1,4 +1,4 @@
-<header class="w-full header-custom-bg relative">
+﻿<header class="w-full header-custom-bg relative">
     <!-- 1. Main Header -->
     <div class="container mx-auto px-4 py-3 md:py-4">
         <div class="flex items-center justify-between gap-4 lg:gap-8">
@@ -14,7 +14,7 @@
                 @if ($setup && $setup->logo)
                     <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
-                    <span class="text-xl md:text-2xl font-bold text-header">খাঁটি ভাই</span>
+                    <span class="text-xl md:text-2xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
                 @endif
             </a>
 
@@ -45,7 +45,7 @@
                         class="flex-1 px-4 py-2 text-base text-black outline-none placeholder:text-gray-500">
                     <!-- Search Button -->
                     <button type="submit"
-                        class="primary-bg text-primary px-8 py-2 text-lg   hover:bg-opacity-95 transition-colors">খুঁজুন</button>
+                        class="primary-bg text-primary px-8 py-2 text-lg   hover:bg-opacity-95 transition-colors">Search</button>
                 </div>
 
                 <!-- Search Suggestions Dropdown -->
@@ -54,8 +54,8 @@
 
                     <div id="suggestion-content">
                         <div class="pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">জনপ্রিয়
-                                সার্চ</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Popular
+                                Search</p>
                             @forelse($popularSearches ?? [] as $item)
                                 <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
                                     class="flex items-center justify-between px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
@@ -82,7 +82,7 @@
                         </div>
                     </div>
 
-                    <!-- লাইভ সার্চ রেজাল্ট (টাইপ করলে এখানে দেখাবে) -->
+                    <!-- লাইভ Search রেজাল্ট (টাইপ করলে এখানে দেখাবে) -->
                     <div id="live-search-results" class="hidden py-2 border-t border-gray-50"></div>
                 </div>
             </form>
@@ -124,22 +124,22 @@
                         <div id="desktop-account-menu"
                             class="hidden absolute right-0 mt-3 w-52 bg-white border border-gray-100 rounded-lg shadow-xl z-50 py-2">
                             <div class="px-4 py-2 border-b border-gray-50 mb-2">
-                                <p class="text-xs text-gray-400">লগইন করা আছে</p>
+                                <p class="text-xs text-gray-400">Logged In</p>
                                 <p class="text-sm font-bold text-gray-800 truncate">{{ auth('customer')->user()->email }}
                                 </p>
                             </div>
 
                             <a href="{{ route('user.dashboard') }}"
                                 class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
-                                <i class="fas fa-th-large w-4 text-gray-400"></i> ড্যাশবোর্ড
+                                <i class="fas fa-th-large w-4 text-gray-400"></i> Dashboard
                             </a>
                             <a href="{{ route('user.dashboard') }}?section=orders"
                                 class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
-                                <i class="fas fa-box w-4 text-gray-400"></i> আমার অর্ডারসমূহ
+                                <i class="fas fa-box w-4 text-gray-400"></i> My Orders
                             </a>
                             <a href="{{ route('user.profile') }}"
                                 class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-header transition-colors">
-                                <i class="fas fa-user-edit w-4 text-gray-400"></i> প্রোফাইল আপডেট
+                                <i class="fas fa-user-edit w-4 text-gray-400"></i> Update Profile
                             </a>
 
                             <div class="border-t border-gray-50 mt-2 pt-1">
@@ -147,7 +147,7 @@
                                     @csrf
                                     <button type="submit"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-500 hover:bg-red-50 transition-colors">
-                                        <i class="fas fa-sign-out-alt w-4"></i> লগআউট করুন
+                                        <i class="fas fa-sign-out-alt w-4"></i> Logout
                                     </button>
                                 </form>
                             </div>
@@ -171,7 +171,7 @@
                 <a href="tel:{{ $setup->phone ?? '' }}"
                     class="hidden lg:flex items-center gap-2 primary-bg text-primary px-4 py-2.5 rounded-md font-medium">
                     <i class="fas fa-phone-alt text-sm"></i>
-                    <span>কল করুন</span>
+                    <span>Call Us</span>
                 </a>
             </div>
         </div>
@@ -211,9 +211,9 @@
         <div id="mobile-search-suggestions"
             class="hidden absolute top-full left-4 right-4 bg-white mt-1 rounded-b-lg shadow-2xl border border-gray-100 z-[3500] overflow-hidden pt-2">
             <div id="mobile-suggestion-content">
-                <!-- পপুলার ও ট্রেন্ডিং ডাটা এখানে ডেক্সটপের মতোই থাকবে -->
+                <!-- Popular and trending data will be same as desktop -->
                 <div class="pb-2">
-                    <p class="text-[9px] font-bold text-gray-400 uppercase px-4 py-2">জনপ্রিয় সার্চ</p>
+                    <p class="text-[9px] font-bold text-gray-400 uppercase px-4 py-2">Popular Searches</p>
                     @foreach ($popularSearches ?? [] as $item)
                         <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
                             class="block px-4 py-2 text-xs text-gray-700 hover:bg-gray-50">{{ $item->keyword }}</a>
@@ -230,9 +230,9 @@
             <div
                 class="flex items-center justify-center text-primary text-lg overflow-x-auto no-scrollbar flex-nowrap">
                 <a href="{{ route('home') }}"
-                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0 whitespace-nowrap flex-shrink-0">হোমপেজ</a>
+                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0 whitespace-nowrap flex-shrink-0">Home</a>
                 <a href="{{ route('flash.sale') }}"
-                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">অফার</a>
+                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">Offers</a>
                 @foreach ($headerCategories->take(9) as $cat)
                     <a href="{{ route('category.products', $cat->slug) }}"
                         class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">{{ $cat->name }}</a>
@@ -255,14 +255,14 @@
             @if ($setup && $setup->logo)
                 <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold text-header">খাঁটি ভাই</span>
+                <span class="text-xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
             @endif
             <button onclick="toggleMobileMenu()" class="text-header text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
-        <!-- User Brief Info (লগইন থাকলে নাম দেখাবে) -->
+        <!-- User Brief Info -->
         @auth('customer')
             <div class="px-6 py-4 bg-gray-50 border-b border-gray-100 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full primary-bg text-primary flex items-center justify-center font-bold">
@@ -278,9 +278,9 @@
         <!-- Navigation Links -->
         <nav class="flex flex-col p-6 gap-5">
             <a href="{{ route('home') }}"
-                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">হোমপেজ</a>
+                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">Home</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">অফার</a>
+                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">Offers</a>
 
             @foreach ($headerCategories as $cat)
                 <a href="{{ route('category.products', $cat->slug) }}"
@@ -297,29 +297,29 @@
                 <a href="{{ route('user.dashboard') }}"
                     class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                     <i class="fas fa-tachometer-alt"></i>
-                    <span>আমার ড্যাশবোর্ড</span>
+                    <span>My Dashboard</span>
                 </a>
 
                 <form action="{{ route('user.logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full text-center text-red-500 font-bold text-sm py-2 hover:underline">
-                        লগআউট করুন
+                        Logout
                     </button>
                 </form>
             @else
-                <!-- লগইন / রেজিস্টার বাটন (লগইন না থাকলে) -->
+                <!-- Login / Register বাটন (লগইন না থাকলে) -->
                 <a href="{{ route('user.login') }}"
                     class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                     <i class="fas fa-user-circle text-xl"></i>
-                    <span>লগইন / রেজিস্টার</span>
+                    <span>Login / Register</span>
                 </a>
             @endauth
 
-            <!-- কল করুন বাটন (সব সময় থাকবে) -->
+            <!-- Call Us বাটন (সব সময় থাকবে) -->
             <a href="tel:{{ $setup->phone ?? '' }}"
                 class="flex items-center justify-center gap-3 primary-bg text-primary py-3 rounded shadow-sm font-bold text-base hover:bg-opacity-95 transition-all">
                 <i class="fas fa-phone-alt"></i>
-                <span>কল করুন</span>
+                <span>Call Us</span>
             </a>
         </div>
     </div>
@@ -342,7 +342,7 @@
 
     <!-- Products List -->
     <div class="flex-1 overflow-y-auto p-4" id="mini-cart-list">
-        <!-- কম্পোনেন্ট কল করা হলো -->
+        <!-- Component called -->
         <x-template1.cart-drawer-items />
     </div>
 
@@ -373,7 +373,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         function setupSearch(inputId, categorySelectId, suggestionBoxId, contentId, resultsId, containerId) {
             const input = document.getElementById(inputId);
-            const categorySelect = document.getElementById(categorySelectId); // ক্যাটাগরি সিলেক্ট আইডি
+            const categorySelect = document.getElementById(categorySelectId); // Category select ID
             const suggestionBox = document.getElementById(suggestionBoxId);
             const defaultContent = document.getElementById(contentId);
             const liveResults = document.getElementById(resultsId);
@@ -390,7 +390,7 @@
 
             input.addEventListener('input', function() {
                 const query = this.value.trim();
-                const selectedCategory = categorySelect.value; // বর্তমান সিলেক্ট করা ক্যাটাগরি নিন
+                const selectedCategory = categorySelect.value; // Get currently selected category
 
                 clearTimeout(debounceTimer);
                 if (abortController) abortController.abort();
@@ -401,9 +401,9 @@
                         defaultContent.classList.add('hidden');
                         liveResults.classList.remove('hidden');
                         liveResults.innerHTML =
-                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>খোঁজা হচ্ছে...</div>';
+                            '<div class="px-5 py-3 text-xs text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>Searching...</div>';
 
-                        // ক্যাটাগরি স্লাগটি প্যারামিটার হিসেবে পাঠানো হচ্ছে
+                        // Sending category slug as parameter
                         fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}&category=${selectedCategory}`, {
                                 signal: abortController.signal
                             })
@@ -425,7 +425,7 @@
                                     });
                                 } else {
                                     liveResults.innerHTML =
-                                        '<div class="px-5 py-3 text-xs text-gray-400">পণ্য পাওয়া যায়নি।</div>';
+                                        '<div class="px-5 py-3 text-xs text-gray-400">No products found.</div>';
                                 }
                             })
                             .catch(err => {
@@ -438,7 +438,7 @@
                 }
             });
 
-            // বাইরে ক্লিক করলে বন্ধ করা
+            // Close when clicked outside
             document.addEventListener('click', (e) => {
                 if (container && !container.contains(e.target)) {
                     suggestionBox.classList.add('hidden');
@@ -446,11 +446,11 @@
             });
         }
 
-        // ডেক্সটপ সার্চ অ্যাক্টিভেট
+        // ডেক্সটপ Search অ্যাক্টিভেট
         setupSearch('header-search-input', 'header-category-select', 'search-suggestions', 'suggestion-content',
             'live-search-results', 'header-search-container');
 
-        // মোবাইল সার্চ অ্যাক্টিভেট
+        // মোবাইল Search অ্যাক্টিভেট
         setupSearch('mobile-search-input', 'mobile-category-select', 'mobile-search-suggestions',
             'mobile-suggestion-content', 'mobile-live-results', 'mobile-search-container');
     });
@@ -486,13 +486,48 @@
     document.addEventListener('DOMContentLoaded', function() {
         const bottomNav = document.getElementById('desktop-bottom-nav');
         if (bottomNav) {
+            // Create a wrapper to prevent layout jump
+            const wrapper = document.createElement('div');
+            wrapper.className = 'hidden md:block w-full';
+            bottomNav.parentNode.insertBefore(wrapper, bottomNav);
+            wrapper.appendChild(bottomNav);
+
+            // Inject animation styles
+            if (!document.getElementById('sticky-nav-style')) {
+                const style = document.createElement('style');
+                style.id = 'sticky-nav-style';
+                style.innerHTML = `
+                    @keyframes slideDownNav {
+                        from { transform: translateY(-100%); }
+                        to { transform: translateY(0); }
+                    }
+                    .smooth-sticky-nav {
+                        position: fixed !important;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        z-index: 50;
+                        animation: slideDownNav 0.35s ease-in-out;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
             window.addEventListener('scroll', function() {
-                if (window.scrollY > 120) {
-                    bottomNav.classList.add('fixed', 'top-0', 'left-0', 'right-0', 'z-50', 'shadow-md');
+                if (window.scrollY > 150) {
+                    if (!bottomNav.classList.contains('smooth-sticky-nav')) {
+                        wrapper.style.height = bottomNav.offsetHeight + 'px';
+                        bottomNav.classList.add('smooth-sticky-nav');
+                    }
                 } else {
-                    bottomNav.classList.remove('fixed', 'top-0', 'left-0', 'right-0', 'z-50', 'shadow-md');
+                    if (bottomNav.classList.contains('smooth-sticky-nav')) {
+                        bottomNav.classList.remove('smooth-sticky-nav');
+                        wrapper.style.height = 'auto';
+                    }
                 }
             });
         }
     });
 </script>
+

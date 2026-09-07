@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+﻿@extends('template2.layouts.front')
 
 @section('content')
     <section class="container py-6 mx-auto px-4 lg:px-0">
@@ -309,7 +309,7 @@
                                     </div>
                                     <h2 class="text-xl font-bold text-gray-800">Your wishlist is currently empty.</h2>
                                     <a href="{{ route('shop.index') }}"
-                                        class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">শপিং
+                                        class="inline-block mt-8 bg-[#FF6A00] text-primary px-10 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-600 transition-all">Shopping
                                         Start Shopping</a>
                                 </div>
                             @endif
@@ -326,7 +326,7 @@
                             class="space-y-6">
                             @csrf
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- নাম -->
+                                <!-- Name -->
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Name</label>
                                     <input type="text" name="name" value="{{ old('name', $user->name) }}"
@@ -336,7 +336,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- ইমেইল -->
+                                <!-- Email -->
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Email</label>
                                     <input type="email" name="email" value="{{ old('email', $user->email) }}"
@@ -346,7 +346,7 @@
                                     @enderror
                                 </div>
 
-                                <!-- ফোন -->
+                                <!-- Phone -->
                                 <div>
                                     <label class="text-sm font-bold text-gray-700">Phone</label>
                                     <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
@@ -493,7 +493,7 @@
         }
     </script>
     <script>
-        // ১. ভ্যালিডেশন এররগুলো দেখানোর জন্য (যেমন: Transaction ID Already Used)
+        // 1. For showing validation errors
         @if ($errors->any())
             @foreach ($errors->all() as $error)
                 toastr.error("{{ $error }}", "Error", {
@@ -504,14 +504,15 @@
             @endforeach
         @endif
 
-        // ২. সাকসেস মেসেজ দেখানোর জন্য
+        // 2. For showing success message
         @if (session('success'))
             toastr.success("{{ session('success') }}", "Success");
         @endif
 
-        // ৩. জেনারেল এরর মেসেজ দেখানোর জন্য
+        // 3. For showing general error message
         @if (session('error'))
             toastr.error("{{ session('error') }}", "Error");
         @endif
     </script>
 @endpush
+
