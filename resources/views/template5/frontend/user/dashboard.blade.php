@@ -43,7 +43,10 @@
                             class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="fas fa-shopping-bag w-5 text-center"></i> My Order
                         </button>
-
+                        <button onclick="showSection('reservations', this)"
+    class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
+    <i class="fas fa-calendar-check w-5 text-center"></i> My Reservations
+</button>
                         <button onclick="showSection('wishlist', this)"
                             class="nav-link shrink-0 lg:w-full flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 text-gray-600 hover:bg-orange-50 hover:text-[var(--primary-color)] rounded-xl text-sm font-semibold transition-all">
                             <i class="far fa-heart w-5 text-center"></i> Wishlist
@@ -273,7 +276,11 @@
                         </div>
                     </div>
                 </div>
-        <!-- 3. SECTION: WISHLIST (Initially Hidden) -->
+
+<div id="reservations-section" class="dashboard-content hidden space-y-6">
+    @include('template5.frontend.user.my_reservations')
+</div>
+                <!-- 3. SECTION: WISHLIST (Initially Hidden) -->
                 <div id="wishlist-section" class="dashboard-content hidden space-y-6">
                     <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden">
                         <!-- Header -->
