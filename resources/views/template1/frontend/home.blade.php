@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+﻿@extends('template1.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
@@ -267,7 +267,7 @@
             <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
                 @foreach ($middleSliders as $slider)
-                    {{-- এখানে h-40 (মোবাইলে) এবং md:h-64 (ডেস্কটপে) বা আপনার পছন্দমতো হাইট দিন --}}
+                    {{-- à¦à¦–à¦¾à¦¨à§‡ h-40 (à¦®à§‹à¦¬à¦¾à¦‡à¦²à§‡) à¦à¦¬à¦‚ md:h-64 (à¦¡à§‡à¦¸à§à¦•à¦Ÿà¦ªà§‡) à¦¬à¦¾ à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à¦®à¦¤à§‹ à¦¹à¦¾à¦‡à¦Ÿ à¦¦à¦¿à¦¨ --}}
                     <div
                         class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
                         <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
@@ -362,7 +362,7 @@
                 <!-- View More Button -->
                 <div class="flex justify-center mt-10">
                     <a href="{{ route('shop.index') }}"
-                        class="primary-bg text-primary hover:bg-gray-50 primary-bg-hover hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                        class="primary-bg text-primary hover:bg-[var(--secondary-color)] hover:text-[var(--secondary-text)] hover:font-semibold font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
                         View More
                     </a>
                 </div>
@@ -527,3 +527,4 @@
         }
     </script>
 @endpush
+

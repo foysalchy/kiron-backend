@@ -57,7 +57,7 @@
                         <li class="flex items-start gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="text-orange-500 mt-0.5 shrink-0">
+                                stroke-linejoin="round" class="text-[var(--primary-color)] mt-0.5 shrink-0">
                                 <path
                                     d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0">
                                 </path>
@@ -68,23 +68,23 @@
                         <li class="flex items-center gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="text-orange-500 shrink-0">
+                                stroke-linejoin="round" class="text-[var(--primary-color)] shrink-0">
                                 <path
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                 </path>
                             </svg>
-                            <a href="tel:{{ $setup->phone ?? ''}}" class="hover:text-orange-500 transition-colors">
+                            <a href="tel:{{ $setup->phone ?? ''}}" class="hover:text-[var(--primary-color)] transition-colors">
                                 {{ $setup->phone ?? ''}}
                             </a>
                         </li>
                         <li class="flex items-center gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="text-orange-500 shrink-0">
+                                stroke-linejoin="round" class="text-[var(--primary-color)] shrink-0">
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
-                            <a href="mailto:{{ $setup->email ?? ''}}" class="hover:text-orange-500 transition-colors">
+                            <a href="mailto:{{ $setup->email ?? ''}}" class="hover:text-[var(--primary-color)] transition-colors">
                                 {{ $setup->email ?? ''}}
                             </a>
                         </li>
@@ -128,7 +128,7 @@
                     </p>
                     <div class="flex mb-5">
                         <input type="email" placeholder="Enter your email"
-                            class="bg-[#1A222F] border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
+                            class="  border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm focus:outline-none focus:border-[#BD4F00]">
                         <button
                             class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap">
                             Subscribe
@@ -183,4 +183,5 @@
     </div>
 
 </footer>
+
 

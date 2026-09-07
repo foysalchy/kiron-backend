@@ -1,4 +1,4 @@
-@extends('template2.layouts.front')
+﻿@extends('template2.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
 @endsection
@@ -64,7 +64,7 @@
         <div class="relative">
             <!-- Section Heading -->
             <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-4">
-                প্রোডাক্ট ক্যাটাগরি
+                à¦ªà§à¦°à§‹à¦¡à¦¾à¦•à§à¦Ÿ à¦•à§à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿
             </h2>
 
             <!-- Carousel Wrapper -->
@@ -120,7 +120,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 @foreach ($group->products as $product)
                     @php
-                        $currency = $setup->currency ?? '৳';
+                        $currency = $setup->currency ?? 'à§³';
                         $isVar = $product->type !== 'single';
 
                         $regularPrice = (float) $product->regular_price;
@@ -158,11 +158,11 @@
                                 <!-- Price Logic (Corrected Fields) -->
                                 <div class="text-[#016738] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
                                     @if ($isVar && $minPrice > 0)
-                                        {{-- ভ্যারিয়েশন: Lowest - Highest Regular Price --}}
-                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} –
+                                        {{-- à¦­à§à¦¯à¦¾à¦°à¦¿à§Ÿà§‡à¦¶à¦¨: Lowest - Highest Regular Price --}}
+                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} â€“
                                             {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
                                     @else
-                                        {{-- সিঙ্গেল: Discount থাকলে কাটা দামসহ দেখাবে --}}
+                                        {{-- à¦¸à¦¿à¦™à§à¦—à§‡à¦²: Discount à¦¥à¦¾à¦•à¦²à§‡ à¦•à¦¾à¦Ÿà¦¾ à¦¦à¦¾à¦®à¦¸à¦¹ à¦¦à§‡à¦–à¦¾à¦¬à§‡ --}}
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
                                             <span
                                                 class="line-through text-gray-400 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
@@ -178,7 +178,7 @@
                             <div class="mt-3">
                                 <a href="{{ route('product.details', $product->slug) }}"
                                     class="block w-full text-center primary-bg text-primary py-2 rounded font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
-                                    পণ্য দেখুন
+                                    à¦ªà¦£à§à¦¯ à¦¦à§‡à¦–à§à¦¨
                                 </a>
                             </div>
                         </div>
@@ -207,7 +207,7 @@
             <!-- View More Button -->
             <div class="flex justify-center mt-10">
                 <a href="{{ route('shop.index') }}"
-                    class="primary-bg text-primary hover:bg-gray-50 primary-bg-hover hover:font-semibold text-[#ff9800] font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
+                    class="primary-bg text-primary hover:bg-[var(--secondary-color)] hover:text-[var(--secondary-text)] hover:font-semibold font-semibold  py-2.5 px-6 md:py-2 md:px-4 text-xs md:text-sm rounded-md transition-colors shadow-sm">
                     View More
                 </a>
             </div>
@@ -223,14 +223,14 @@
         const totalSlides = {{ count($mainSliders) }};
         let mainInterval;
 
-        // স্লাইডার আপডেট করার ফাংশন
+        // à¦¸à§à¦²à¦¾à¦‡à¦¡à¦¾à¦° à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾à¦° à¦«à¦¾à¦‚à¦¶à¦¨
         function updateSliderUI() {
             if (mainSlider) {
                 mainSlider.style.transform = `translateX(-${mainIdx * 100}%)`;
             }
         }
 
-        // পরবর্তী স্লাইড
+        // à¦ªà¦°à¦¬à¦°à§à¦¤à§€ à¦¸à§à¦²à¦¾à¦‡à¦¡
         function nextSlide() {
             if (totalSlides > 0) {
                 mainIdx = (mainIdx + 1) % totalSlides;
@@ -239,7 +239,7 @@
             }
         }
 
-        // পূর্ববর্তী স্লাইড
+        // à¦ªà§‚à¦°à§à¦¬à¦¬à¦°à§à¦¤à§€ à¦¸à§à¦²à¦¾à¦‡à¦¡
         function prevSlide() {
             if (totalSlides > 0) {
                 mainIdx = (mainIdx - 1 + totalSlides) % totalSlides;
@@ -248,20 +248,20 @@
             }
         }
 
-        // অটো স্লাইড টাইমার রিসেট
+        // à¦…à¦Ÿà§‹ à¦¸à§à¦²à¦¾à¦‡à¦¡ à¦Ÿà¦¾à¦‡à¦®à¦¾à¦° à¦°à¦¿à¦¸à§‡à¦Ÿ
         function resetInterval() {
             clearInterval(mainInterval);
             startInterval();
         }
 
-        // অটো স্লাইড শুরু
+        // à¦…à¦Ÿà§‹ à¦¸à§à¦²à¦¾à¦‡à¦¡ à¦¶à§à¦°à§
         function startInterval() {
             if (totalSlides > 1) {
                 mainInterval = setInterval(nextSlide, 5000);
             }
         }
 
-        // পেজ লোড হলে শুরু হবে
+        // à¦ªà§‡à¦œ à¦²à§‹à¦¡ à¦¹à¦²à§‡ à¦¶à§à¦°à§ à¦¹à¦¬à§‡
         document.addEventListener('DOMContentLoaded', () => {
             if (mainSlider && totalSlides > 0) {
                 startInterval();
@@ -279,7 +279,7 @@
             }
         });
 
-        // অন্যান্য স্ক্রল ফাংশন
+        // à¦…à¦¨à§à¦¯à¦¾à¦¨à§à¦¯ à¦¸à§à¦•à§à¦°à¦² à¦«à¦¾à¦‚à¦¶à¦¨
         function scrollCats(distance) {
             document.getElementById('cat-slider').scrollBy({
                 left: distance,
@@ -310,3 +310,4 @@
         }
     </script>
 @endpush
+

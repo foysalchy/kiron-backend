@@ -228,14 +228,14 @@
     <nav class="primary-bg hidden md:block transition-all duration-300 w-full" id="desktop-bottom-nav">
         <div class="container mx-auto">
             <div
-                class="flex items-center justify-center text-primary py-3 text-lg overflow-x-auto no-scrollbar flex-nowrap">
+                class="flex items-center justify-center text-primary text-lg overflow-x-auto no-scrollbar flex-nowrap">
                 <a href="{{ route('home') }}"
-                    class="px-4 hover:text-yellow-400 transition-colors font-medium border-r border-white/30 last:border-0 whitespace-nowrap flex-shrink-0">হোমপেজ</a>
+                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0 whitespace-nowrap flex-shrink-0">হোমপেজ</a>
                 <a href="{{ route('flash.sale') }}"
-                    class="px-4 hover:text-yellow-400 transition-colors font-medium border-r border-white/30 last:border-0">অফার</a>
+                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">অফার</a>
                 @foreach ($headerCategories->take(9) as $cat)
                     <a href="{{ route('category.products', $cat->slug) }}"
-                        class="px-4 hover:text-yellow-400 transition-colors font-medium border-r border-white/30 last:border-0">{{ $cat->name }}</a>
+                        class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">{{ $cat->name }}</a>
                 @endforeach
             </div>
         </div>
