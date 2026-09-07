@@ -1,4 +1,4 @@
-﻿<header class="w-full header-custom-bg relative">
+<header class="w-full header-custom-bg relative">
     <!-- 1. Main Header -->
     <div class="container mx-auto px-4 py-3 md:py-4">
         <div class="flex items-center justify-between gap-4 lg:gap-8">

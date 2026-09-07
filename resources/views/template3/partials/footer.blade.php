@@ -1,4 +1,4 @@
-﻿<!-- FOOTER -->
+<!-- FOOTER -->
 <footer class="footer-custom-bg text-footer">
 
     <!-- 1. Top Features Row -->
