@@ -86,10 +86,10 @@
                 <div id="cat-slider" class="flex items-stretch gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2">
                     @foreach ($categories as $category)
                         <a href="{{ url('category/' . $category->slug) }}"
-                            class="flex flex-col items-center justify-between min-w-[160px] md:min-w-[210px] bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 group">
+                            class="flex flex-col items-center justify-between min-w-[100px] w-[100px] md:w-auto md:min-w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
 
                             <!-- Image Wrapper -->
-                            <div class="w-full h-32  flex items-center justify-center mb-4">
+                            <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
                                 <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
                                     onerror="this.onerror=null;this.src='{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}';"
                                     class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
@@ -97,8 +97,7 @@
                             </div>
 
                             <!-- Category Name -->
-                            <span class=" text-[#0f172a] text-xl font-normal leading-tight
-                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[14px] md:text-[16px] lg:text-[16px]">
+                            <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[11px] md:text-[16px]">
                                 {{ $category->name }}
                             </span>
                         </a>
