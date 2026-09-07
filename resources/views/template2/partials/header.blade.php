@@ -4,15 +4,15 @@
         <div class="flex items-center justify-between gap-4 lg:gap-8">
 
             <!-- Mobile Menu Toggle (Visible only on Mobile) -->
-            <button onclick="toggleMobileMenu()"
-                class="md:hidden text-header text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="md:hidden text-header text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
 
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 sm:h-10 md:h-14 w-auto">
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}"
+                        class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
                 @endif
@@ -29,8 +29,7 @@
                             class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header  bg-transparent outline-none appearance-none cursor-pointer">
                             <option value="">All</option>
                             @foreach ($headerCategories as $cat)
-                                <option value="{{ $cat->slug }}"
-                                    {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                                <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
                                     {{ $cat->name }}
                                 </option>
                             @endforeach
@@ -70,7 +69,8 @@
                             @endforelse
                         </div>
                         <div class="border-t border-gray-50 pt-2 pb-2">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending products</p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
+                                products</p>
                             @foreach ($relatedProducts ?? [] as $p)
                                 <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                     class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
@@ -91,8 +91,8 @@
             <div class="flex items-center gap-3 sm:gap-4 lg:gap-6">
                 <!-- Cart Icon -->
                 <button onclick="toggleCartDrawer()" class="relative group outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
@@ -154,8 +154,7 @@
                         </div>
                     @else
                         <!-- Guest User Icon -->
-                        <a href="{{ route('user.login') }}"
-                            class="flex items-center gap-2 text-header group/login">
+                        <a href="{{ route('user.login') }}" class="flex items-center gap-2 text-header group/login">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
@@ -182,13 +181,13 @@
         <form action="{{ route('shop.index') }}" method="GET"
             class="flex border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white">
             <!-- Category Segment for Mobile -->
-            <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[100px] flex items-center">
+            <div
+                class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[100px] flex items-center">
                 <select name="category" id="mobile-category-select"
                     class="w-full pl-2 pr-6 py-2 text-xs text-header font-semibold bg-transparent outline-none truncate appearance-none cursor-pointer">
                     <option value="">All</option>
                     @foreach ($headerCategories as $cat)
-                        <option value="{{ $cat->slug }}"
-                            {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                        <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
                             {{ $cat->name }}
                         </option>
                     @endforeach
@@ -198,9 +197,8 @@
                 </div>
             </div>
 
-            <input type="text" name="search" id="mobile-search-input" autocomplete="off"
-                value="{{ request('search') }}" placeholder="Find some product ..."
-                class="flex-1 px-3 py-2 text-sm outline-none">
+            <input type="text" name="search" id="mobile-search-input" autocomplete="off" value="{{ request('search') }}"
+                placeholder="Find some product ..." class="flex-1 px-3 py-2 text-sm outline-none">
 
             <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
                 <i class="fas fa-search"></i>
@@ -225,19 +223,86 @@
     </div>
 
     <!-- 2. Desktop Bottom Nav (Hidden on Mobile) -->
-    <nav class="primary-bg hidden md:block transition-all duration-300 w-full" id="desktop-bottom-nav">
+    <style>
+        /* Ensure category dropdowns show reliably on desktop hover */
+        #desktop-bottom-nav .nav-dropdown-item:hover>.nav-dropdown-menu {
+            display: block !important;
+        }
+
+        #desktop-bottom-nav .nav-sub-item:hover>.nav-sub-dropdown-menu {
+            display: block !important;
+        }
+    </style>
+    <nav class="primary-bg hidden md:block transition-all duration-300 w-full relative z-40" id="desktop-bottom-nav">
         <div class="container mx-auto">
-            <div
-                class="flex items-center justify-center text-primary text-lg overflow-x-auto no-scrollbar flex-nowrap">
-                <a href="{{ route('home') }}"
-                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0 whitespace-nowrap flex-shrink-0">Home</a>
-                <a href="{{ route('flash.sale') }}"
-                    class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">Offers</a>
-                @foreach ($headerCategories->take(9) as $cat)
-                    <a href="{{ route('category.products', $cat->slug) }}"
-                        class="px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/30 last:border-0">{{ $cat->name }}</a>
+            <ul
+                class="flex items-center justify-center text-primary text-sm lg:text-base font-medium flex-wrap lg:flex-nowrap">
+                <li class="flex-shrink-0">
+                    <a href="{{ route('home') }}"
+                        class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                        Home
+                    </a>
+                </li>
+                <li class="flex-shrink-0">
+                    <a href="{{ route('flash.sale') }}"
+                        class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                        Offers
+                    </a>
+                </li>
+                @foreach ($headerCategories->take(9) as $mega)
+                    @php
+                        $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
+                    @endphp
+                    <li class="nav-dropdown-item group relative flex-shrink-0">
+                        <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                            class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                            <span>{{ $mega->name }}</span>
+                            @if ($hasSub)
+                                <i
+                                    class="fa-solid fa-chevron-down text-[10px] opacity-70 group-hover:rotate-180 transition-transform duration-200"></i>
+                            @endif
+                        </a>
+
+                        @if ($hasSub)
+                            <div class="nav-dropdown-menu absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
+                                <ul
+                                    class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2 rounded-b-md text-gray-700 text-sm font-medium">
+                                    @foreach ($mega->subCategories as $sub)
+                                        @php
+                                            $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
+                                        @endphp
+                                        <li
+                                            class="nav-sub-item group/sub px-4 py-2.5 hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
+                                            <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                                class="group-hover/sub:text-[var(--primary-color,#016738)] text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
+                                                {{ $sub->name }}
+                                            </a>
+                                            @if ($hasMini)
+                                                <i
+                                                    class="fa-solid fa-chevron-right text-xs text-gray-400 group-hover/sub:text-[var(--primary-color,#016738)] group-hover/sub:translate-x-0.5 transition-transform"></i>
+                                            @endif
+
+                                            @if ($hasMini)
+                                                <ul
+                                                    class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-60 min-h-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
+                                                    @foreach ($sub->miniCategories as $mini)
+                                                        <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
+                                                            <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                                class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-xs font-medium transition-colors">
+                                                                {{ $mini->name }}
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    </li>
                 @endforeach
-            </div>
+            </ul>
         </div>
     </nav>
 </header>
@@ -253,11 +318,12 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" class="h-8 w-auto">
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}"
+                    class="h-8 w-auto">
             @else
-                <span class="text-xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
+                <span class="text-xl font-bold text-black">{{ $setup->shop_name ?? 'Shop Name' }}</span>
             @endif
-            <button onclick="toggleMobileMenu()" class="text-header text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" class="text-black text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -276,18 +342,69 @@
         @endauth
 
         <!-- Navigation Links -->
-        <nav class="flex flex-col p-6 gap-5">
+        <nav class="flex-1 overflow-y-auto p-4 space-y-1" style="-webkit-overflow-scrolling: touch;">
             <a href="{{ route('home') }}"
-                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">Home</a>
+                class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Home</a>
             <a href="{{ route('flash.sale') }}"
-                class="text-base font-semibold text-header hover:opacity-80 transition-opacity">Offers</a>
+                class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Offers</a>
 
-            @foreach ($headerCategories as $cat)
-                <a href="{{ route('category.products', $cat->slug) }}"
-                    class="text-base font-semibold text-header hover:opacity-80 transition-opacity">
-                    {{ $cat->name }}
-                </a>
-            @endforeach
+            <div class="pt-2 mt-2 border-t border-gray-100">
+                <p class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Categories</p>
+                @foreach ($headerCategories as $mega)
+                    @php
+                        $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
+                    @endphp
+                    <div class="border-b border-gray-100 last:border-0">
+                        <div class="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg">
+                            <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                                class="text-sm font-semibold uppercase text-black flex-1">
+                                {{ $mega->name }}
+                            </a>
+                            @if ($hasSub)
+                                <button type="button" class="accordion-btn p-1.5 text-black focus:outline-none"
+                                    data-target="m2-cat-{{ $mega->id }}">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                </button>
+                            @endif
+                        </div>
+
+                        @if ($hasSub)
+                            <div id="m2-cat-{{ $mega->id }}" class="hidden bg-gray-50 rounded-lg mb-1 border-t border-gray-100">
+                                @foreach ($mega->subCategories as $sub)
+                                    @php
+                                        $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
+                                    @endphp
+                                    <div class="border-b border-gray-200/60 last:border-0">
+                                        <div class="flex items-center justify-between pl-6 pr-3 py-2">
+                                            <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                                class="text-xs font-medium text-black flex-1">
+                                                {{ $sub->name }}
+                                            </a>
+                                            @if ($hasMini)
+                                                <button type="button" class="accordion-btn p-1 text-black"
+                                                    data-target="m2-sub-{{ $sub->id }}">
+                                                    <i class="fa-solid fa-plus text-[10px]"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+
+                                        @if ($hasMini)
+                                            <div id="m2-sub-{{ $sub->id }}" class="hidden bg-white pl-8 pr-3 py-1">
+                                                @foreach ($sub->miniCategories as $mini)
+                                                    <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                        class="block py-1.5 text-[11px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
+                                                        {{ $mini->name }}
+                                                    </a>
+                                                @endforeach
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
         </nav>
 
         <!-- Bottom Actions -->
@@ -370,7 +487,7 @@
     @endif
 </div>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         function setupSearch(inputId, categorySelectId, suggestionBoxId, contentId, resultsId, containerId) {
             const input = document.getElementById(inputId);
             const categorySelect = document.getElementById(categorySelectId); // Category select ID
@@ -388,7 +505,7 @@
                 suggestionBox.classList.remove('hidden');
             });
 
-            input.addEventListener('input', function() {
+            input.addEventListener('input', function () {
                 const query = this.value.trim();
                 const selectedCategory = categorySelect.value; // Get currently selected category
 
@@ -405,8 +522,8 @@
 
                         // Sending category slug as parameter
                         fetch(`{{ route('search.suggestions') }}?q=${encodeURIComponent(query)}&category=${selectedCategory}`, {
-                                signal: abortController.signal
-                            })
+                            signal: abortController.signal
+                        })
                             .then(res => res.json())
                             .then(data => {
                                 liveResults.innerHTML = '';
@@ -471,7 +588,7 @@
     }
 
     // Close dropdown when clicking outside
-    window.addEventListener('click', function(e) {
+    window.addEventListener('click', function (e) {
         const wrapper = document.getElementById('desktop-account-wrapper');
         const menu = document.getElementById('desktop-account-menu');
         const chevron = document.getElementById('account-chevron');
@@ -483,7 +600,7 @@
     });
 
     // Sticky Desktop Navigation on Scroll
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const bottomNav = document.getElementById('desktop-bottom-nav');
         if (bottomNav) {
             // Create a wrapper to prevent layout jump
@@ -514,7 +631,7 @@
                 document.head.appendChild(style);
             }
 
-            window.addEventListener('scroll', function() {
+            window.addEventListener('scroll', function () {
                 if (window.scrollY > 150) {
                     if (!bottomNav.classList.contains('smooth-sticky-nav')) {
                         wrapper.style.height = bottomNav.offsetHeight + 'px';
@@ -528,6 +645,24 @@
                 }
             });
         }
+
+        // Mobile Sidebar Accordion logic (for subcategories & mini-categories)
+        document.querySelectorAll(".accordion-btn").forEach((btn) => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const targetId = this.getAttribute('data-target');
+                const target = document.getElementById(targetId);
+                const icon = this.querySelector("i");
+
+                if (target) {
+                    target.classList.toggle("hidden");
+                    if (icon) {
+                        icon.classList.toggle("fa-plus");
+                        icon.classList.toggle("fa-minus");
+                    }
+                }
+            });
+        });
     });
 </script>
-

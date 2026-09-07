@@ -61,7 +61,7 @@
       muted
       loop
       playsinline
-      poster="{{ asset('images/template1/frontend/default.webp') }}">
+      >
       <source src="{{ asset('videos/restaurant.mp4') }}" type="video/mp4">
       Your browser does not support video playback.
     </video>
@@ -97,7 +97,7 @@
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
           </a>
-          
+
           <a href="{{ route('shop.index') }}"
              class="inline-flex items-center justify-center gap-2 border border-white/30 text-white font-medium px-8 py-3.5 rounded-full hover:bg-white hover:text-black hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 w-full sm:w-auto">
             View Menu
