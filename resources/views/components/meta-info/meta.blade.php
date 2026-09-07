@@ -38,7 +38,9 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="title" content="{{ $title }}">
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+@if (!($setup->allow_search_engine_index ?? false))
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+@endif
 <meta name="description" content="{{ $description }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 

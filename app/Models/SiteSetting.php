@@ -35,6 +35,7 @@ class SiteSetting extends Model
         'tags',
         'copy_right',
         'sms_forget_password',
+        'allow_search_engine_index',
         'status',
         'meta_image',
         'founder_name',
@@ -45,6 +46,7 @@ class SiteSetting extends Model
 
     protected $casts = [
         'sms_forget_password' => 'boolean',
+        'allow_search_engine_index' => 'boolean',
     ];
 
 

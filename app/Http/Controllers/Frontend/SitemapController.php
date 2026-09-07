@@ -26,16 +26,29 @@ class SitemapController extends Controller
 
         $companyId = $currentStore->company_id;
 
+        // Fetch site setting to check if indexing is allowed
+        $setup = SiteSetting::where('company_id', $companyId)->first();
+        $allowIndex = $setup ? (bool)($setup->allow_search_engine_index ?? false) : false;
+        
         $robotsContent = Cache::remember(
-            "robots_{$companyId}",
+            "robots_{$companyId}_" . ($allowIndex ? 'index' : 'noindex'),
             now()->addHours(6),
-            function () {
+            function () use ($allowIndex) {
+                if (!$allowIndex) {
+                    return <<<ROBOTS
+User-agent: *
+Disallow: /
+Noindex: /
+Nofollow: /
+ROBOTS;
+                }
+
+                $url = url('/');
                 return <<<ROBOTS
-    User-agent: *
-    Disallow: /
-    Noindex: /
-    Nofollow: /
-    ROBOTS;
+User-agent: *
+Allow: /
+Sitemap: {$url}/sitemap.xml
+ROBOTS;
             }
         );
 
