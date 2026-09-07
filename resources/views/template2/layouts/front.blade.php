@@ -97,12 +97,12 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        
+
     </style>
     @stack('styles')
 </head>
 
-<body>
+<body class="font-['Poppins',_sans-serif]">
     <!-- HEADER -->
     @include('template2.partials.header')
 

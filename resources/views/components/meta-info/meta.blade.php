@@ -14,7 +14,7 @@
 
 <?php
 $titlex = $title ?: $setup->title ?? $setup->shop_name;
-$title = $titlex ;
+$title = $titlex;
 $description = $description ?: $setup->description ?? '';
 $keywords = is_array($keywords) ? implode(',', $keywords) : ($keywords ?: $setup->tags ?? '');
 $canonical = $canonical ?: url()->current();
@@ -44,7 +44,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
         <meta name="robots" content="index, follow, archive, snippet">
     @endif
 <meta name="description" content="{{ $description }}">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
 @if ($keywords)
     <meta name="keywords" content="{{ $keywords }}">
@@ -71,186 +71,186 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {{-- Organization --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'Organization',
-    'name'=>$setup->shop_name ?? '',
-    'url'=>url('/'),
-    'logo'=>$organizationLogo,
-    'email'=>$setup->email ?? '',
-    'telephone'=>$setup->phone ?? '',
-    'foundingDate'=>$setup->established ?? '',
-    'sameAs'=>$socialLinks,
-    'founder'=>[
-        '@type'=>'Person',
-        'name'=>$setup->founder_name ?? '',
-        'jobTitle'=>$setup->founder_designation ?? ''
+    '@context' => 'https://schema.org',
+    '@type' => 'Organization',
+    'name' => $setup->shop_name ?? '',
+    'url' => url('/'),
+    'logo' => $organizationLogo,
+    'email' => $setup->email ?? '',
+    'telephone' => $setup->phone ?? '',
+    'foundingDate' => $setup->established ?? '',
+    'sameAs' => $socialLinks,
+    'founder' => [
+        '@type' => 'Person',
+        'name' => $setup->founder_name ?? '',
+        'jobTitle' => $setup->founder_designation ?? ''
     ],
-    'address'=>[
-        '@type'=>'PostalAddress',
-        'streetAddress'=> ($setup?->store_address ?: $setup?->corporate_address) ?? '',
-        'addressCountry'=>'BD'
+    'address' => [
+        '@type' => 'PostalAddress',
+        'streetAddress' => ($setup?->store_address ?: $setup?->corporate_address) ?? '',
+        'addressCountry' => 'BD'
     ]
-],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
 {{-- Website --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'WebSite',
-    'name'=>$setup->shop_name ?? '',
-    'url'=>url('/')
-],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
+    '@context' => 'https://schema.org',
+    '@type' => 'WebSite',
+    'name' => $setup->shop_name ?? '',
+    'url' => url('/')
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
 {{-- WebPage --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'WebPage',
-    'name'=>$title,
-    'description'=>$description,
-    'url'=>$canonical,
-    'primaryImageOfPage'=>$image
-],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT) !!}
+    '@context' => 'https://schema.org',
+    '@type' => 'WebPage',
+    'name' => $title,
+    'description' => $description,
+    'url' => $canonical,
+    'primaryImageOfPage' => $image
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
 {{-- Breadcrumb --}}
 @if (count($breadcrumb))
     <script type="application/ld+json">
-{!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'BreadcrumbList',
-    'itemListElement'=>collect($breadcrumb)->values()->map(function($item,$index){
+    {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
 
-        return [
-            '@type'=>'ListItem',
-            'position'=>$index+1,
-            'name'=>$item['name'],
-            'item'=>$item['url']
-        ];
+                return [
+                    '@type' => 'ListItem',
+                    'position' => $index + 1,
+                    'name' => $item['name'],
+                    'item' => $item['url']
+                ];
 
-    })->toArray()
-],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
-</script>
+            })->toArray()
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
 @endif
 
 
 {{-- BlogPosting --}}
 @if ($type == 'BlogPosting')
     <script type="application/ld+json">
-{!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'BlogPosting',
-    'headline'=>$schema['headline'] ?? $title,
-    'description'=>$description,
-    'image'=>[
-        '@type'=>'ImageObject',
-        'url'=>$image
-    ],
-    'mainEntityOfPage'=>[
-        '@type'=>'WebPage',
-        '@id'=>$canonical
-    ],
-    'author'=>[
-        '@type'=>'Person',
-        'name'=>$schema['author'] ?? ($setup->founder_name ?? '')
-    ],
-    'publisher'=>[
-        '@type'=>'Organization',
-        'name'=>$setup->shop_name,
-        'logo'=>[
-            '@type'=>'ImageObject',
-            'url'=>$organizationLogo
-        ]
-    ],
-    'datePublished'=>isset($schema['published'])
-        ? \Carbon\Carbon::parse($schema['published'])->toIso8601String()
-        : now()->toIso8601String(),
-    'dateModified'=>isset($schema['updated'])
-        ? \Carbon\Carbon::parse($schema['updated'])->toIso8601String()
-        : now()->toIso8601String()
-],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
-</script>
+    {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $schema['headline'] ?? $title,
+            'description' => $description,
+            'image' => [
+                '@type' => 'ImageObject',
+                'url' => $image
+            ],
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => $canonical
+            ],
+            'author' => [
+                '@type' => 'Person',
+                'name' => $schema['author'] ?? ($setup->founder_name ?? '')
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => $setup->shop_name,
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $organizationLogo
+                ]
+            ],
+            'datePublished' => isset($schema['published'])
+                ? \Carbon\Carbon::parse($schema['published'])->toIso8601String()
+                : now()->toIso8601String(),
+            'dateModified' => isset($schema['updated'])
+                ? \Carbon\Carbon::parse($schema['updated'])->toIso8601String()
+                : now()->toIso8601String()
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
 @endif
 
 
 @if ($type == 'ContactPage')
     <script type="application/ld+json">
-{!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'ContactPage',
-    'name' => $title,
-    'description' => $description,
-    'url' => $canonical
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
+    {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'ContactPage',
+            'name' => $title,
+            'description' => $description,
+            'url' => $canonical
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
 @endif
 
 
 @if ($type == 'FAQPage' && count($faq))
     <script type="application/ld+json">
-{!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'FAQPage',
+    {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
 
-    'mainEntity' => collect($faq)->map(function ($item) {
+            'mainEntity' => collect($faq)->map(function ($item) {
 
-        return [
-            '@type' => 'Question',
+                return [
+                    '@type' => 'Question',
 
-            'name' => data_get($item, 'question')
-                ?? data_get($item, 'title'),
+                    'name' => data_get($item, 'question')
+                        ?? data_get($item, 'title'),
 
-            'acceptedAnswer' => [
-                '@type' => 'Answer',
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
 
-                'text' => strip_tags(
-                    data_get($item, 'answer')
-                    ?? data_get($item, 'content')
-                )
-            ]
+                        'text' => strip_tags(
+                            data_get($item, 'answer')
+                            ?? data_get($item, 'content')
+                        )
+                    ]
 
-        ];
+                ];
 
-    })->toArray()
+            })->toArray()
 
-], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-</script>
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
 @endif
 
 {{-- Product --}}
 @if ($type == 'Product')
     <script type="application/ld+json">
-{!! json_encode([
-    '@context'=>'https://schema.org',
-    '@type'=>'Product',
+    {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
 
-    'name'=>$schema['name'] ?? $title,
+            'name' => $schema['name'] ?? $title,
 
-    'description'=>$description,
+            'description' => $description,
 
-    'image'=>$image,
+            'image' => $image,
 
-    'sku'=>$schema['sku'] ?? null,
+            'sku' => $schema['sku'] ?? null,
 
-    'brand'=>[
-        '@type'=>'Brand',
-        'name'=>$setup->shop_name
-    ],
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => $setup->shop_name
+            ],
 
-    'offers'=>[
-        '@type'=>'Offer',
+            'offers' => [
+                '@type' => 'Offer',
 
-        'url'=>$canonical,
+                'url' => $canonical,
 
-        'priceCurrency'=>$schema['currency'] ?? 'BDT',
+                'priceCurrency' => $schema['currency'] ?? 'BDT',
 
-        'price'=>$schema['price'] ?? 0,
+                'price' => $schema['price'] ?? 0,
 
-        'availability'=>$schema['availability'] ?? 'https://schema.org/InStock'
-    ]
+                'availability' => $schema['availability'] ?? 'https://schema.org/InStock'
+            ]
 
-],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_PRETTY_PRINT) !!}
-</script>
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
+    </script>
 @endif

@@ -524,7 +524,7 @@
                                 currency: '{{ $setup->currency ?? "BDT" }}'
                             });
                         }
-                        
+
                         document.querySelectorAll('.cart-count-nav').forEach(el => el.innerText = data.cart_count);
                         if (isOrderNow) window.location.href = "{{ route('checkout.index') }}";
                         else toastr.success(data.message);
