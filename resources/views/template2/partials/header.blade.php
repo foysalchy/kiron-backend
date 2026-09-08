@@ -49,7 +49,7 @@
 
                 <!-- Search Suggestions Dropdown -->
                 <div id="search-suggestions"
-                    class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-20 overflow-hidden pt-2">
+                    class="hidden absolute top-full left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-50 overflow-hidden pt-2">
 
                     <div id="suggestion-content">
                         <div class="pb-2">
