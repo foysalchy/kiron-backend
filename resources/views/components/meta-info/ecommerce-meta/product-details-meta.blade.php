@@ -1,38 +1,82 @@
-@include('components.meta-info.meta', [
-    'setup' => $setup,
+@php
+    $product = $product ?? null;
+    if (!$product) {
+        return;
+    }
 
-    'type' => 'Product',
+    $rawMetaTitle = trim($product->meta_title ?? '');
+    $metaTitle = (!empty($rawMetaTitle) && !in_array(strtolower($rawMetaTitle), ['null', 'undefined'])) ? $rawMetaTitle : null;
 
-    'title' => !empty($product->meta_title) ? $product->meta_title : $product->title,
+    $productTitle = $metaTitle ?: $product->title;
+    $shopName = $setup->shop_name ?? '';
 
-    'description' => Str::limit(strip_tags($product->meta_description ?? $product->short_description ?? $product->full_description ?? ''), 160),
+    // Page title: Product Title | Shop Name
+    $pageTitle = $productTitle;
+    if ($shopName && !str_contains(strtolower($pageTitle), strtolower($shopName))) {
+        $pageTitle .= ' | ' . $shopName;
+    }
 
-    'keywords' => $product->meta_keywords,
+    $rawMetaDesc = trim($product->meta_description ?? '');
+    $customMetaDesc = (!empty($rawMetaDesc) && !in_array(strtolower($rawMetaDesc), ['null', 'undefined'])) ? $rawMetaDesc : null;
 
-    'image' => $product->thumbnail_url ?? asset('images/no-image.png'),
+    $metaDescription = $customMetaDesc
+        ?: ($product->short_description ? \Illuminate\Support\Str::limit(strip_tags($product->short_description), 160) : ($setup->description ?? ''));
 
-    'canonical' => route('product.details', $product->slug),
+    $rawKeywords = $product->meta_keywords;
+    $metaKeywords = (is_array($rawKeywords) ? implode(',', array_filter($rawKeywords, fn($k) => !in_array(strtolower(trim($k)), ['null', 'undefined']))) : ((!empty($rawKeywords) && !in_array(strtolower(trim($rawKeywords)), ['null', 'undefined'])) ? $rawKeywords : ($setup->tags ?? '')));
 
-    'breadcrumb' => [
+    $metaImage = $product->thumbnail_url
+        ?: ($product->thumbnail ? asset('storage/' . $product->thumbnail) : ($setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('storage/' . ($setup->logo ?? ''))));
+
+    $canonicalUrl = route('product.details', $product->slug);
+
+    $breadcrumbItems = [
         [
             'name' => 'Home',
-            'url' => url('/')
+            'url' => url('/'),
         ],
         [
             'name' => 'Products',
-            'url' => route('shop.index')
+            'url' => route('shop.index'),
         ],
-        [
-            'name' => $product->title,
-            'url' => route('product.details', $product->slug)
-        ]
-    ],
+    ];
 
+    if (!empty($breadcrumb) && (is_array($breadcrumb) || $breadcrumb instanceof \Illuminate\Support\Collection)) {
+        foreach ($breadcrumb as $item) {
+            $name = is_array($item) ? ($item['name'] ?? '') : ($item->name ?? '');
+            $slug = is_array($item) ? ($item['slug'] ?? '') : ($item->slug ?? '');
+            if ($name) {
+                $breadcrumbItems[] = [
+                    'name' => $name,
+                    'url' => $slug ? route('category.products', $slug) : url()->current(),
+                ];
+            }
+        }
+    }
+
+    $breadcrumbItems[] = [
+        'name' => $product->title,
+        'url' => $canonicalUrl,
+    ];
+
+    $price = $product->sale_price ?? $product->regular_price ?? 0;
+    $isInStock = !isset($product->available_stock) || $product->available_stock > 0;
+@endphp
+
+@include('components.meta-info.meta', [
+    'setup' => $setup,
+    'type' => 'Product',
+    'title' => $pageTitle,
+    'description' => $metaDescription,
+    'keywords' => $metaKeywords,
+    'image' => $metaImage,
+    'canonical' => $canonicalUrl,
+    'breadcrumb' => $breadcrumbItems,
     'schema' => [
         'name' => $product->title,
-        'sku' => is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code,
-        'price' => $product->display_price_data->sale_price ?? 0,
-        'currency' => $setup->currency ?? 'BDT',
-        'availability' => ($product->available_stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
-    ]
+        'sku' => is_array($product->sku_code) ? implode(', ', $product->sku_code) : ($product->sku_code ?? null),
+        'price' => $price,
+        'currency' => 'BDT',
+        'availability' => $isInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    ],
 ])
