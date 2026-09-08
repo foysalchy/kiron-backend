@@ -207,7 +207,51 @@
 </section>
 
 <!-- ============ CATEGORIES (dynamic) ============ -->
-@if ($categories->count() > 0)
+@if (!empty($featureCategory) && count($featureCategory['items']) > 0)
+<section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 reveal">
+  <div class="flex items-end justify-between mb-10">
+    <div>
+      <span class="text-[11px] tracking-[0.22em] uppercase text-brand">What are you looking for?</span>
+      <h2 class="font-semibold text-3xl sm:text-4xl mt-2">{{ $featureCategory['name'] ?? 'Browse by category' }}</h2>
+    </div>
+    @if (count($featureCategory['items']) > 8)
+    <a href="{{ route('categories.all') }}" class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
+      View all
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+    @endif
+  </div>
+
+  <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-x-4 gap-y-8">
+    @foreach (collect($featureCategory['items'])->take(8) as $tItem)
+      @if (data_get($tItem, 'visible') === true)
+      <a href="{{ url($tItem['link'] ?? '#') }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
+        <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-1 group-hover:ring-[var(--primary-color)] group-hover:-translate-y-1 transition-all overflow-hidden">
+          <img src="{{ !empty($tItem['image']) ? $tItem['image'] : asset('images/template1/frontend/default.webp') }}"
+            alt="{{ $tItem['label'] }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
+        </div>
+        <div>
+          <p class="text-sm font-medium">{{ $tItem['label'] }}</p>
+        </div>
+      </a>
+      @endif
+    @endforeach
+  </div>
+
+  @if (count($featureCategory['items']) > 8)
+  <div class="sm:hidden mt-8 text-center">
+    <a href="{{ route('categories.all') }}" class="inline-flex items-center gap-1.5 text-sm font-medium hover:text-brand transition-colors">
+      View all
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  </div>
+  @endif
+</section>
+@elseif (isset($categories) && $categories->count() > 0)
 <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 reveal">
   <div class="flex items-end justify-between mb-10">
     <div>

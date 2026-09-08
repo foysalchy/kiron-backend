@@ -60,6 +60,56 @@
         </div>
     </section>
     <!-- TOP CATEGORIES SECTION (Updated as per Image) -->
+    @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <div class="relative">
+            <!-- Section Heading -->
+            <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-0">
+              {{ $featureCategory['name'] ?? 'Featured Category' }}
+            </h2>
+            <p class="text-center text-xl text-black mb-4 mt-0">Buy Your Desired Products from Featured Categories</p>
+
+            <!-- Carousel Wrapper -->
+            <div class="relative px-2 md:px-6">
+
+                <!-- Navigation Buttons (Green as per Image) -->
+                <button onclick="scrollCats(-240)" aria-label="Scroll left"
+                    class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+
+                <button onclick="scrollCats(240)" aria-label="Scroll right"
+                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+
+                <!-- Categories Scroll Area -->
+                <div id="cat-slider" class="flex items-stretch gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2">
+                    @foreach ($featureCategory['items'] as $tItem)
+                        @if (data_get($tItem, 'visible') === true)
+                            <a href="{{ url($tItem['link'] ?? '#') }}"
+                                class="flex flex-col items-center justify-between min-w-[100px] w-[100px] md:w-auto md:min-w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
+
+                                <!-- Image Wrapper -->
+                                <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
+                                    <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/default.webp') }}"
+                                        onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
+                                        class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
+                                        alt="{{ $tItem['label'] }}">
+                                </div>
+
+                                <!-- Category Name -->
+                                <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[11px] md:text-[16px]">
+                                    {{ $tItem['label'] }}
+                                </span>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </section>
+    @elseif (isset($categories) && $categories->count() > 0)
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="relative">
             <!-- Section Heading -->
@@ -106,6 +156,7 @@
             </div>
         </div>
     </section>
+    @endif
     @foreach ($productGroups as $group)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <!-- Header -->

@@ -201,6 +201,52 @@
     </section>
 
     <!-- PRODUCT CATEGORIES SECTION -->
+    @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
+   <section class="w-full mx-auto px-4 mb-12">
+    <div class="container mx-auto p-0">
+
+          <h2 class="lg:text-2xl text-[20px] font-semibold text-[#041533]   tracking-tight mt-6 text-center">
+            {{ $featureCategory['name'] ?? 'Featured Category' }}
+        </h2>
+        <p class="text-gray-600 text-center mb-4 lg:text-[16px] text-[14px]">Buy Your Desired Products from Featured Categories</p>
+
+        <!-- Categories Grid -->
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
+
+            @foreach ($featureCategory['items'] as $tItem)
+                @if (data_get($tItem, 'visible') === true)
+                <a href="{{ url($tItem['link'] ?? '#') }}"
+                    class="bg-white pb-[10px]  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
+
+                    <!-- Icon / Image -->
+                    <div class="  mb-2 flex items-center justify-center overflow-hidden">
+                        @if(!empty($tItem['image']))
+                            <img
+                                src="{{ $tItem['image'] }}"
+                                alt="{{ $tItem['label'] }}"
+                                loading="lazy"
+                                onerror="this.style.display='none'"
+                                class="w-full h-[100px] lg:h-[160px] md:h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
+                            >
+                        @else
+                            <i class="fas fa-layer-group text-2xl text-gray-400"></i>
+                        @endif
+                    </div>
+
+                    <!-- Category Name -->
+                    <h3 class=" text-[#0f172a] text-xl font-normal leading-tight
+                        group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[14px] md:text-[16px] lg:text-[16px]" style="font-weight: 400 !important;color: #333;padding-top: 8px;">
+                        {{ $tItem['label'] }}
+                    </h3>
+
+                </a>
+                @endif
+            @endforeach
+
+        </div>
+    </div>
+    </section>
+    @elseif (isset($headerCategories) && $headerCategories->count() > 0)
    <section class="w-full mx-auto px-4 mb-12">
     <div class="container mx-auto p-0">
 
@@ -243,6 +289,7 @@
         </div>
     </div>
     </section>
+    @endif
 
 
   @foreach ($productGroups as $group)

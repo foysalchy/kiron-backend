@@ -40,7 +40,47 @@
         </div>
     </section>
     <!-- 2. SHOP BY CATEGORY (Sub-Category Grid Layout) -->
-     @if ($categories->isNotEmpty())
+    @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
+    <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+        <!-- Section Heading -->
+        <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
+            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+            <h2 class="text-2xl md:text-[28px] font-bold uppercase tracking-tighter text-center">
+                {{ $featureCategory['name'] ?? 'SHOP BY CATEGORY' }}
+            </h2>
+            <div class="h-[2px] bg-black flex-1 hidden md:block"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @php
+                $bgColors = [
+                    'bg-orange-50', 'bg-blue-50', 'bg-green-50', 'bg-slate-50',
+                    'bg-red-50', 'bg-indigo-50', 'bg-yellow-50', 'bg-teal-50',
+                ];
+            @endphp
+            @foreach (collect($featureCategory['items'])->take(8) as $index => $tItem)
+                @if (data_get($tItem, 'visible') === true)
+                <div class="{{ $bgColors[$index % count($bgColors)] }} rounded-sm border border-gray-300 flex flex-col relative group overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Trending Now</p>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-900 uppercase leading-none mb-4">
+                            {{ $tItem['label'] }}
+                        </h3>
+                    </div>
+                    <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
+                        <img src="{{ $tItem['image'] ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                            alt="{{ $tItem['label'] }}">
+                    </div>
+                    <a href="{{ url($tItem['link'] ?? '#') }}"
+                        class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
+                        SHOP NOW
+                    </a>
+                </div>
+                @endif
+            @endforeach
+        </div>
+    </section>
+    @elseif ($categories->isNotEmpty())
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Section Heading -->
         <div class="flex items-center justify-center gap-4 mb-4 md:mb-12">
@@ -86,14 +126,6 @@
                 </div>
             @endforeach
         </div>
-
-        {{-- <div class="flex justify-end mt-12">
-        <a href="{{ route('shop.index') }}"
-           class="inline-flex items-end gap-3 primary-bg text-primary px-10 py-4 rounded-md font-black uppercase text-sm md:text-base tracking-widest shadow-xl hover:opacity-95 transition-all">
-            VIEW ALL CATEGORIES
-            <i class="fas fa-arrow-circle-right text-lg"></i>
-        </a>
-    </div> --}}
     </section>
     @endif
     <!-- CATEGORY WISE PRODUCT FILTER SECTION -->
