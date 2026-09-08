@@ -211,6 +211,7 @@ class HomeController extends FrontendController
                 ->latest()
                 ->get();
         });
+    
 
         // ভিউতে ডেটা পাঠানো
         return $this->view('frontend.home', compact(

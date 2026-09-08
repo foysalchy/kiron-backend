@@ -1,6 +1,7 @@
 @php
     $customMenu = \App\Models\MenuSetting::where('company_id', $setup->company_id ?? null)
         ->where('status', \App\Enums\Status::Active->value)
+        ->where('type', 'menu')
         ->first();
 
     $menuItems = $customMenu ? $customMenu->items : null;
@@ -147,31 +148,34 @@
         </div>
 
         <div id="mobile-search-expand" class="hidden lg:hidden mt-4 px-2 relative">
-    <form action="{{ route('shop.index') }}" method="GET" class="relative z-30" id="mobile-search-container">
-        <input type="text" name="search" id="mobile-search-input"   placeholder="Search products..."
-            class="w-full py-2.5 px-5 rounded-full bg-white border border-gray-100 shadow-sm text-black" />
-        <button type="submit" class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-10 flex items-center justify-center text-gray-600">
-            <i class="fa-solid fa-magnifying-glass text-lg"></i>
-        </button>
-    </form>
+            <form action="{{ route('shop.index') }}" method="GET" class="relative z-30" id="mobile-search-container">
+                <input type="text" name="search" id="mobile-search-input" placeholder="Search products..."
+                    class="w-full py-2.5 px-5 rounded-full bg-white border border-gray-100 shadow-sm text-black" />
+                <button type="submit"
+                    class="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-10 flex items-center justify-center text-gray-600">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i>
+                </button>
+            </form>
 
-    <!-- মোবাইল সাজেশন ড্রপডাউন (এটি বাদ পড়েছিল) -->
-    <div id="mobile-search-suggestions" class="hidden absolute top-[100%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[110] overflow-hidden pt-4 pb-2">
-        <div id="mobile-suggestion-content">
-            <div class="pb-2">
-                <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular Searches</p>
-                @foreach ($popularSearches as $item)
-                    <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
-                        class="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0">
-                        {{ $item->keyword }}
-                    </a>
-                @endforeach
+            <!-- মোবাইল সাজেশন ড্রপডাউন (এটি বাদ পড়েছিল) -->
+            <div id="mobile-search-suggestions"
+                class="hidden absolute top-[100%] left-0 w-full bg-white mt-1 rounded-b-xl shadow-2xl border border-gray-100 z-[110] overflow-hidden pt-4 pb-2">
+                <div id="mobile-suggestion-content">
+                    <div class="pb-2">
+                        <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Popular
+                            Searches</p>
+                        @foreach ($popularSearches as $item)
+                            <a href="{{ route('shop.index', ['search' => $item->keyword]) }}"
+                                class="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                                {{ $item->keyword }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+                <!-- লাইভ সার্চ রেজাল্ট এখানে আসবে -->
+                <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
             </div>
         </div>
-        <!-- লাইভ সার্চ রেজাল্ট এখানে আসবে -->
-        <div id="mobile-live-search-results" class="hidden py-2 border-t border-gray-50"></div>
-    </div>
-</div>
     </div>
 </header>
 <nav class="hidden lg:block shadow-sm bg-white border-b border-gray-100 sticky top-0 z-50">
@@ -286,7 +290,8 @@
                 <i class="fa-solid fa-bag-shopping text-lg"></i>
 
                 <!-- এখানে 'cart-count-nav' ক্লাসটি যোগ করা হয়েছে -->
-                <span class="cart-count-nav absolute -top-2 -right-2 bg-[var(--primary-color)] text-white text-[9px] rounded-full min-w-[15px] h-[15px] flex items-center justify-center font-bold">
+                <span
+                    class="cart-count-nav absolute -top-2 -right-2 bg-[var(--primary-color)] text-white text-[9px] rounded-full min-w-[15px] h-[15px] flex items-center justify-center font-bold">
                     {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
                 </span>
             </div>
@@ -296,7 +301,7 @@
         <!-- Account -->
         <a href="{{ route('user.dashboard') }}"
             class="flex flex-col items-center gap-1 text-gray-500 transition-colors active:text-[var(--primary-color)] {{ request()->routeIs('user.dashboard') ? 'text-brand' : 'text-gray-500' }}"">
-            <i class="fa-regular fa-circle-user text-lg"></i>
+            <i class=" fa-regular fa-circle-user text-lg"></i>
             <span class="text-[10px] font-bold uppercase">Account</span>
         </a>
 
@@ -328,61 +333,59 @@
     </div>
 
     <!-- scrolling-touch ক্লাসটি মোবাইল স্ক্রলকে অনেক স্মুথ করে -->
-<nav class="flex-1 overflow-y-auto pb-40" style="-webkit-overflow-scrolling: touch;">
-       @foreach ($headerCategories as $mega)
-        <div class="border-b border-gray-100">
-            <!-- মেগা ক্যাটাগরি রো -->
-            <div class="flex items-center justify-between px-5 py-4 group hover:bg-gray-50">
-                <a href="{{ url($mega->slug) }}"
-                    class="text-[#0f172a] font-bold uppercase text-sm flex-1">
-                    {{ $mega->name }}
-                </a>
+    <nav class="flex-1 overflow-y-auto pb-40" style="-webkit-overflow-scrolling: touch;">
+        @foreach ($headerCategories as $mega)
+            <div class="border-b border-gray-100">
+                <!-- মেগা ক্যাটাগরি রো -->
+                <div class="flex items-center justify-between px-5 py-4 group hover:bg-gray-50">
+                    <a href="{{ route('category.products', $mega->slug) }}"
+                        class="text-[#0f172a] font-bold uppercase text-sm flex-1">
+                        {{ $mega->name }}
+                    </a>
 
-                {{-- যদি সাব-ক্যাটাগরি থাকে তবেই প্লাস আইকন দেখাবে --}}
+                    {{-- যদি সাব-ক্যাটাগরি থাকে তবেই প্লাস আইকন দেখাবে --}}
+                    @if ($mega->subCategories->count() > 0)
+                        <button class="accordion-btn p-2 text-gray-900 focus:outline-none" data-target="m-cat-{{ $mega->id }}">
+                            <i class="fa-solid fa-plus text-sm font-black"></i>
+                        </button>
+                    @endif
+                </div>
+
+                <!-- সাব-ক্যাটাগরি লিস্ট (ডিফল্ট হাইড) -->
                 @if ($mega->subCategories->count() > 0)
-                    <button class="accordion-btn p-2 text-gray-900 focus:outline-none"
-                        data-target="m-cat-{{ $mega->id }}">
-                        <i class="fa-solid fa-plus text-sm font-black"></i>
-                    </button>
-                @endif
-            </div>
+                    <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
+                        @foreach ($mega->subCategories as $sub)
+                            <div class="border-b border-gray-200 last:border-0">
+                                <div class="flex items-center justify-between pl-8 pr-5 py-3">
+                                    <a href="{{ route('category.products', $sub->slug) }}"
+                                        class="text-sm font-semibold text-gray-700 flex-1">
+                                        {{ $sub->name }}
+                                    </a>
 
-            <!-- সাব-ক্যাটাগরি লিস্ট (ডিফল্ট হাইড) -->
-            @if ($mega->subCategories->count() > 0)
-                <div id="m-cat-{{ $mega->id }}" class="hidden bg-gray-50 border-t border-gray-100">
-                    @foreach ($mega->subCategories as $sub)
-                        <div class="border-b border-gray-200 last:border-0">
-                            <div class="flex items-center justify-between pl-8 pr-5 py-3">
-                                <a href="{{ url($sub->slug) }}"
-                                    class="text-sm font-semibold text-gray-700 flex-1">
-                                    {{ $sub->name }}
-                                </a>
+                                    @if ($sub->miniCategories->count() > 0)
+                                        <button class="accordion-btn p-2 text-gray-900" data-target="m-sub-{{ $sub->id }}">
+                                            <i class="fa-solid fa-plus text-[10px] font-black"></i>
+                                        </button>
+                                    @endif
+                                </div>
 
+                                <!-- মিনি ক্যাটাগরি লিস্ট -->
                                 @if ($sub->miniCategories->count() > 0)
-                                    <button class="accordion-btn p-2 text-gray-900"
-                                        data-target="m-sub-{{ $sub->id }}">
-                                        <i class="fa-solid fa-plus text-[10px] font-black"></i>
-                                    </button>
+                                    <div id="m-sub-{{ $sub->id }}" class="hidden bg-white">
+                                        @foreach ($sub->miniCategories as $mini)
+                                            <a href="{{ route('category.products', $mini->slug) }}"
+                                                class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-500 border-b border-gray-50 last:border-0">
+                                                {{ $mini->name }}
+                                            </a>
+                                        @endforeach
+                                    </div>
                                 @endif
                             </div>
-
-                            <!-- মিনি ক্যাটাগরি লিস্ট -->
-                            @if ($sub->miniCategories->count() > 0)
-                                <div id="m-sub-{{ $sub->id }}" class="hidden bg-white">
-                                    @foreach ($sub->miniCategories as $mini)
-                                        <a href="{{ url($mini->slug) }}"
-                                            class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-500 border-b border-gray-50 last:border-0">
-                                            {{ $mini->name }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-    @endforeach
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        @endforeach
         <div class="p-4 space-y-2 bg-white mt-4">
             @auth('customer')
                 <div class="p-4 bg-purple-50 rounded-xl mb-2">
@@ -534,23 +537,23 @@
         });
     });
     // ৪. মোবাইল সাইডবার একর্ডিয়ন লজিক (সাব-ক্যাটাগরি দেখানোর জন্য)
-document.querySelectorAll(".accordion-btn").forEach((btn) => {
-    btn.addEventListener("click", function(e) {
-        e.preventDefault(); // লিঙ্ক হিসেবে কাজ করা আটকাবে
-        const targetId = this.getAttribute('data-target');
-        const target = document.getElementById(targetId);
-        const icon = this.querySelector("i");
+    document.querySelectorAll(".accordion-btn").forEach((btn) => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault(); // লিঙ্ক হিসেবে কাজ করা আটকাবে
+            const targetId = this.getAttribute('data-target');
+            const target = document.getElementById(targetId);
+            const icon = this.querySelector("i");
 
-        if (target) {
-            // সাব-ক্যাটাগরি লিস্ট শো/হাইড করা
-            target.classList.toggle("hidden");
+            if (target) {
+                // সাব-ক্যাটাগরি লিস্ট শো/হাইড করা
+                target.classList.toggle("hidden");
 
-            // আইকন প্লাস থেকে মাইনাস করা
-            if (icon) {
-                icon.classList.toggle("fa-plus");
-                icon.classList.toggle("fa-minus");
+                // আইকন প্লাস থেকে মাইনাস করা
+                if (icon) {
+                    icon.classList.toggle("fa-plus");
+                    icon.classList.toggle("fa-minus");
+                }
             }
-        }
+        });
     });
-});
 </script>

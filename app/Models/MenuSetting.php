@@ -51,7 +51,7 @@ class MenuSetting extends Model
      */
     public function resolvedItems(): array
     {
-        
+
         $items = collect($this->items ?? []);
         if ($items->isEmpty()) {
             return [];
@@ -91,7 +91,7 @@ class MenuSetting extends Model
                     'ref_id'  => $item['ref_id'],
                     'label'   => $item['label'] ?: $fresh->name,
                     'slug'    => $fresh->slug,
-                    'image'   => $fresh->image,
+                    'image'   => $fresh->image_url,
                     'link'    => "category/{$fresh->slug}",
                     'visible' => $item['visible'] ?? true,
                     'order'   => $item['order'] ?? 0,

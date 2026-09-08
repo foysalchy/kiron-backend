@@ -76,9 +76,8 @@
                                 </a>
                             </div>
                         @empty
-                            <div class="min-w-full h-full"><img
-                                    src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
-                                    class="w-full h-full object-cover"></div>
+                            <div class="min-w-full h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
+                                    alt="default image" class="w-full h-full object-cover"></div>
                         @endforelse
                     </div>
 
@@ -113,31 +112,59 @@
     </section>
 
     <!-- TOP CATEGORIES SECTION -->
-    @if ($categories->count() > 0)
+    @if (!empty($featureCategory) && count($featureCategory['items']) > 0)
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
-            <!-- Main Card Container -->
             <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
-
-                <!-- Section Heading -->
                 <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
-                    Top Categories
+                    {{ $featureCategory['name'] ?? 'Top Categories' }}
                 </h2>
-
-                <!-- Carousel Wrapper -->
                 <div class="relative group">
-
-                    <!-- Navigation Buttons -->
                     <button onclick="scrollCats(-200)" aria-label="Scroll left"
                         class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                     </button>
-
                     <button onclick="scrollCats(200)" aria-label="Scroll right"
                         class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                     </button>
+                    <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
+                        @foreach ($featureCategory['items'] as $tItem)
+                            @if (data_get($tItem, 'visible') === true)
 
-                    <!-- Categories Scroll Area (Dynamic) -->
+                                <a href="{{ url($tItem['link'] ?? '#') }}"
+                                    class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
+                                    <div
+                                        class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
+                                        <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/default.webp') }}"
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            alt="{{ $tItem['label'] }}"
+                                            onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
+                                    </div>
+                                    <span class="md:text-md text-sm text-gray-800 text-center w-full px-1">
+                                        {{ $tItem['label'] }}
+                                    </span>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </section>
+    @elseif (isset($categories) && $categories->count() > 0)
+        <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
+            <div class="bg-white rounded-lg shadow-xs  md:p-6 p-2 relative">
+                <h2 class="text-lg font-bold text-gray-900 uppercase tracking-tight mb-8 px-2">
+                    Top Categories
+                </h2>
+                <div class="relative group">
+                    <button onclick="scrollCats(-200)" aria-label="Scroll left"
+                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
+                    <button onclick="scrollCats(200)" aria-label="Scroll right"
+                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
+                    </button>
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($categories as $category)
                             <a href="{{ url($category->slug) }}"
@@ -149,7 +176,7 @@
                                         alt="{{ $category->name }}"
                                         onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
                                 </div>
-                                <span class="md:text-md text-sm   text-gray-800 text-center   w-full px-1">
+                                <span class="md:text-md text-sm text-gray-800 text-center w-full px-1">
                                     {{ $category->name ?? '' }}
                                 </span>
                             </a>
@@ -267,7 +294,8 @@
             <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
                 @foreach ($middleSliders as $slider)
-                    {{-- à¦à¦–à¦¾à¦¨à§‡ h-40 (à¦®à§‹à¦¬à¦¾à¦‡à¦²à§‡) à¦à¦¬à¦‚ md:h-64 (à¦¡à§‡à¦¸à§à¦•à¦Ÿà¦ªà§‡) à¦¬à¦¾ à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à¦®à¦¤à§‹ à¦¹à¦¾à¦‡à¦Ÿ à¦¦à¦¿à¦¨ --}}
+                    {{-- à¦à¦–à¦¾à¦¨à§‡ h-40 (à¦®à§‹à¦¬à¦¾à¦‡à¦²à§‡) à¦à¦¬à¦‚ md:h-64 (à¦¡à§‡à¦¸à§à¦•à¦Ÿà¦ªà§‡) à¦¬à¦¾
+                    à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à¦®à¦¤à§‹ à¦¹à¦¾à¦‡à¦Ÿ à¦¦à¦¿à¦¨ --}}
                     <div
                         class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
                         <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
@@ -312,8 +340,7 @@
                     </button>
 
                     <!-- Brands Scroll Area -->
-                    <div id="brand-track"
-                        class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
+                    <div id="brand-track" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($brands as $brand)
                             @if (!empty($brand->slug))
                                 <a href="{{ url($brand->slug) }}"
@@ -328,8 +355,7 @@
                                     </div>
 
                                     <!-- Brand Name -->
-                                    <span
-                                        class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
+                                    <span class="text-xs md:text-sm font-semibold text-gray-800 text-center truncate w-full px-1">
                                         {{ $brand->name ?? '' }}
                                     </span>
                                 </a>
@@ -527,4 +553,3 @@
         }
     </script>
 @endpush
-
