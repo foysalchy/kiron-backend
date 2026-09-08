@@ -392,7 +392,7 @@
                                             <div id="m2-sub-{{ $sub->id }}" class="hidden bg-white pl-8 pr-3 py-1">
                                                 @foreach ($sub->miniCategories as $mini)
                                                     <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                        class="block py-1.5 text-[11px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
+                                                        class="block py-1.5 text-[15px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
                                                         {{ $mini->name }}
                                                     </a>
                                                 @endforeach
