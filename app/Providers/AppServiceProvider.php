@@ -408,6 +408,15 @@ class AppServiceProvider extends ServiceProvider
                     ->take(50)
                     ->get()
             ),
+
+            'footerCodes' => Cache::remember(
+                "layout_footer_codes_{$suffix}",
+                $ttl,
+                fn() =>
+                $applyLogic(\App\Models\FooterCode::class)
+                    ->where('status', 1)
+                    ->get()
+            ),
         ];
     }
 }
