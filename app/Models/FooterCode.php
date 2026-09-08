@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FooterCode extends Model
 {
-    use CompanyScoped;
+    use CompanyScoped, HasGlobalLayoutCache;
 
     protected $fillable = [
         'company_id',
@@ -19,6 +20,11 @@ class FooterCode extends Model
     /**
      * Scopes
      */
+
+    public static function globalLayoutSections(): array
+    {
+        return ['footer_codes'];
+    }
     public function scopeActive($query)
     {
         return $query->where('status', Status::Active->value);
