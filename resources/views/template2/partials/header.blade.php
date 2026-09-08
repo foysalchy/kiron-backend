@@ -284,7 +284,7 @@
 
                                             @if ($hasMini)
                                                 <ul
-                                                    class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-60 min-h-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
+                                                    class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full min-h-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                             <a href="{{ url($mini->slug ?? $mini->id) }}"
@@ -377,7 +377,7 @@
                                     <div class="border-b border-gray-200/60 last:border-0">
                                         <div class="flex items-center justify-between pl-6 pr-3 py-2">
                                             <a href="{{ url($sub->slug ?? $sub->id) }}"
-                                                class="text-xs font-medium text-black flex-1">
+                                                class="font-medium text-black flex-1">
                                                 {{ $sub->name }}
                                             </a>
                                             @if ($hasMini)
