@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\MegaCategory;
 use App\Models\SubCategory;
 use App\Models\MiniCategory;
+use App\Models\ExtraCategory;
 use App\Models\Page;
 use App\Models\Brand;
 use App\Models\LandingPage;
@@ -26,6 +27,7 @@ class DynamicRouteController extends Controller
             ->unionAll(DB::query()->selectRaw("'mega_category'")->from((new MegaCategory)->getTable())->where('slug', $slug))
             ->unionAll(DB::query()->selectRaw("'sub_category'")->from((new SubCategory)->getTable())->where('slug', $slug))
             ->unionAll(DB::query()->selectRaw("'mini_category'")->from((new MiniCategory)->getTable())->where('slug', $slug))
+            ->unionAll(DB::query()->selectRaw("'extra_category'")->from((new ExtraCategory)->getTable())->where('slug', $slug))
             ->unionAll(DB::query()->selectRaw("'page'")->from((new Page)->getTable())->where('slug', $slug))
             ->unionAll(DB::query()->selectRaw("'brand'")->from((new Brand)->getTable())->where('slug', $slug))
             ->unionAll(DB::query()->selectRaw("'landing_page'")->from((new LandingPage)->getTable())->where('slug', $slug))
@@ -40,18 +42,10 @@ class DynamicRouteController extends Controller
                 return app(ProductController::class)->productDetails($slug);
 
             case 'mega_category':
-                return app(ProductController::class)->categoryProducts($request, $slug);
-
             case 'sub_category':
-                $subCategory = SubCategory::where('slug', $slug)->first();
-                $megaSlug = $subCategory->megaCategory->slug ?? 'category';
-                return app(ProductController::class)->subcategoryProducts($request, $megaSlug, $slug);
-
             case 'mini_category':
-                $miniCategory = MiniCategory::where('slug', $slug)->first();
-                $subSlug = $miniCategory->subCategory->slug ?? 'subcategory';
-                $megaSlug = $miniCategory->subCategory->megaCategory->slug ?? 'category';
-                return app(ProductController::class)->minicategoryProducts($request, $megaSlug, $subSlug, $slug);
+            case 'extra_category':
+                return app(ProductController::class)->categoryProducts($request, $slug);
 
             case 'page':
                 return app(AboutController::class)->showPage($slug);
