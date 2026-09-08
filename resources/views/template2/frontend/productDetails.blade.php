@@ -42,11 +42,11 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-lg shadow-xs ">
 
                 <!-- Left: Image Gallery -->
-                <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
+                <div class="  lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
-                        class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
+                        class="  mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                         <img id="mainImage" src="{{ $product->thumbnail_url }}"
-                            class="w-full h-full object-contain transition-transform duration-500">
+                            class="m-auto  object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
                         @foreach ($allProductImages as $imgUrl)
