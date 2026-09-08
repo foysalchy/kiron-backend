@@ -37,7 +37,7 @@ class DynamicRouteController extends Controller
         // Delegate to the appropriate controller based on the resolved type
         switch ($resolvedType) {
             case 'product':
-                return app(ProductController::class)->productDetails($request, $slug);
+                return app(ProductController::class)->productDetails($slug);
 
             case 'mega_category':
                 return app(ProductController::class)->categoryProducts($request, $slug);
@@ -60,10 +60,10 @@ class DynamicRouteController extends Controller
                 return app(ProductController::class)->brandProducts($request, $slug);
 
             case 'landing_page':
-                return app(LandingController::class)->index($request, $slug);
+                return app(LandingController::class)->index($slug);
 
             case 'blog':
-                return app(BlogController::class)->blogDetails($request, $slug);
+                return app(BlogController::class)->blogDetails($slug);
 
             default:
                 abort(404);
