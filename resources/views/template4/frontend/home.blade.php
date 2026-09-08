@@ -259,7 +259,7 @@
         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7 gap-3">
 
             @foreach ($headerCategories as $category)
-                <a href="{{ route('category.products', $category->slug) }}"
+                <a href="{{ url($category->slug) }}"
                     class="bg-white pb-[10px]  min-h-[120px] flex flex-col items-center justify-center text-center rounded-lg hover:shadow-md transition-all duration-300 group">
 
                     <!-- Icon / Image -->
@@ -331,7 +331,7 @@
                         <!-- Left: Product Image -->
                         <div
                             class="w-[110px] md:w-[75px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
-                            <a href="{{ route('product.details', $product->slug) }}" class="block w-full h-full">
+                            <a href="{{ url($product->slug) }}" class="block w-full h-full">
                               <img
                                     src="{{ $product->thumbnail_url }}"
                                     alt="{{ $product->title }}"
@@ -344,7 +344,7 @@
                         <div class="flex-1 pl-4 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-sm md:text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
-                                    <a href="{{ route('product.details', $product->slug) }}" class="hover:text-[#016738]">
+                                    <a href="{{ url($product->slug) }}" class="hover:text-[#016738]">
                                         {{ $product->title }}
                                     </a>
                                 </h3>
@@ -399,7 +399,7 @@
             <!-- Offers Grid -->
             <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
                 @foreach ($latestOffers as $product)
-                    <a href="{{ route('product.details', $product->slug) }}" class="block group">
+                    <a href="{{ url($product->slug) }}" class="block group">
                         <div
                             class="bg-[#fcfcfc] flex items-center  border border-[#F0E9F2] shadow-md transition-all duration-300 rounded-sm overflow-hidden hover:shadow-xl">
 
@@ -474,7 +474,7 @@
         <!-- Grid: 2 columns on mobile, 4 columns on desktop -->
         <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
             @foreach ($newArrivals as $product)
-                <a href="{{ route('product.details', $product->slug) }}" class="block group">
+                <a href="{{ url($product->slug) }}" class="block group">
                     <div
                         class="flex items-center h-24 md:h-[140px] bg-[#f9f9f9] border border-[#F0E9F2] shadow-md md:shadow-lg transition-all hover:shadow-xl rounded-sm overflow-hidden">
 

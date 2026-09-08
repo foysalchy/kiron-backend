@@ -94,11 +94,11 @@
                         </div>
 
                         <!-- Read More Button (Main Link) -->
-                        <a href="{{ route('blog.details', ['slug' => $blog->slug]) }}"
+                        <a href="{{ url($blog->slug) }}"
                             class="after:absolute after:inset-0 after:z-10 block w-full text-center primary-bg hover:bg-blue-600 text-primary font-bold py-3 rounded-lg transition-all duration-300 text-sm">
                             Read More <i class="fas fa-arrow-right ml-2 text-xs"></i>
                         </a>
-                        {{-- <a href="{{ route('landing', ['slug' => $landing->slug]) }}" class="btn btn-primary">landing</a> --}}
+                        {{-- <a href="{{ url($landing->slug) }}" class="btn btn-primary">landing</a> --}}
                     </div>
                 </div>
             @empty

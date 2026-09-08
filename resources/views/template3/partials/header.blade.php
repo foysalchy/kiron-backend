@@ -82,7 +82,7 @@
                         <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending
                             Products</p>
                         @foreach ($relatedProducts ?? [] as $p)
-                            <a href="{{ route('product.details', $p->slug) }}"
+                            <a href="{{ url($p->slug) }}"
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                 <img src="{{ $p->thumbnail_url }}" height="" width=""
                                     class="w-6 h-6 rounded object-cover border border-gray-100">
@@ -305,7 +305,7 @@
                     <p class="text-[10px] font-bold text-gray-400 uppercase px-5 py-2 tracking-wider">Trending Products
                     </p>
                     @foreach ($relatedProducts ?? [] as $p)
-                        <a href="{{ route('product.details', $p->slug) }}"
+                        <a href="{{ url($p->slug) }}"
                             class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                             <img src="{{ $p->thumbnail_url }}" height="" width=""
                                 class="w-6 h-6 rounded object-cover border border-gray-100">

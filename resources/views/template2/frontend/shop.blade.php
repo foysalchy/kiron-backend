@@ -36,7 +36,7 @@
                             @if($loop->last)
                                 <span class="text-[var(--primary-color)] font-bold">{{ $item['name'] }}</span>
                             @else
-                                <a href="{{ route('category.products', $item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
+                                <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">
                                     {{ $item['name'] }}
                                 </a>
                             @endif

@@ -23,7 +23,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <span class="text-gray-400">/</span>
-                    <a href="{{ route('category.products', $item['slug']) }}"
+                    <a href="{{ url($item['slug']) }}"
                         class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
                         {{ $item['name'] }}
                     </a>
@@ -306,7 +306,7 @@
             @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
 
             @foreach ($relatedProducts->take(5) as $rel)
-                <a href="{{ route('product.details', $rel->slug) }}"
+                <a href="{{ url($rel->slug) }}"
                     class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
                     <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                         alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />

@@ -29,7 +29,7 @@
     class="max-w-[348px] relative group cursor-pointer bg-white border border-[#ddd] rounded-2xl flex flex-col h-full overflow-hidden transition-all duration-300 hover:shadow-md">
 
     <div class="relative">
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}"
+        <a href="{{ url($product->slug ?? $product->id) }}"
             class="hover:border-2 hover:border-[var(--primary-color)]   relative block  border-b border-gray-100 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] bg-[#f9f9f9]">
             <div class="w-full h-full  flex items-center justify-center">
                 <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
@@ -50,7 +50,7 @@
     </div>
 
     <div class="p-4 flex flex-col flex-grow ">
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow">
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block flex-grow">
             <p
                 class="  md:text-[17px] text-[14px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}

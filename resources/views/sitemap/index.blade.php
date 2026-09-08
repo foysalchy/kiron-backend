@@ -29,7 +29,7 @@
 
     @foreach($categories as $category)
     <url>
-        <loc>{{ route('category.products',$category->slug) }}</loc>
+        <loc>{{ url($category->slug) }}</loc>
         <lastmod>{{ optional($category->updated_at)->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -38,7 +38,7 @@
 
     @foreach($brands as $brand)
     <url>
-        <loc>{{ route('brand.products',$brand->slug) }}</loc>
+        <loc>{{ url($brand->slug) }}</loc>
         <lastmod>{{ optional($brand->updated_at)->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>
@@ -47,7 +47,7 @@
 
     @foreach($products as $product)
     <url>
-        <loc>{{ route('product.details',$product->slug) }}</loc>
+        <loc>{{ url($product->slug) }}</loc>
         <lastmod>{{ optional($product->updated_at)->toAtomString() }}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.9</priority>
@@ -56,7 +56,7 @@
 
     @foreach($blogs as $blog)
     <url>
-        <loc>{{ route('blog.details',$blog->slug) }}</loc>
+        <loc>{{ url($blog->slug) }}</loc>
         <lastmod>{{ optional($blog->updated_at)->toAtomString() }}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.6</priority>
@@ -65,7 +65,7 @@
 
     @foreach($pages as $page)
     <url>
-        <loc>{{ route('frontend.page',$page->slug) }}</loc>
+        <loc>{{ url($page->slug) }}</loc>
         <lastmod>{{ optional($page->updated_at)->toAtomString() }}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>

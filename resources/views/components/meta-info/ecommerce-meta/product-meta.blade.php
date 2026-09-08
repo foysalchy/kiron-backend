@@ -27,16 +27,13 @@
 @elseif ($activeCategory)
     {{-- ─── CATEGORY SPECIFIC META ─── --}}
     @php
-        if (isset($megaCategory)) {
-            $breadcrumbItems[] = ['name' => $megaCategory->name, 'url' => route('category.products', $megaCategory->slug)];
-        }
-        if (isset($subCategory)) {
-            $breadcrumbItems[] = ['name' => $subCategory->name, 'url' => route('category.products', $subCategory->slug)];
-        }
-        if (isset($miniCategory)) {
-            $breadcrumbItems[] = ['name' => $miniCategory->name, 'url' => route('category.products', $miniCategory->slug)];
-        }
-        if (!isset($megaCategory) && !isset($subCategory) && !isset($miniCategory) && isset($activeCategory->name)) {
+        if (isset($breadcrumb) && is_array($breadcrumb) && count($breadcrumb) > 0) {
+            foreach ($breadcrumb as $item) {
+                if (isset($item['name']) && isset($item['slug'])) {
+                    $breadcrumbItems[] = ['name' => $item['name'], 'url' => url($item['slug'])];
+                }
+            }
+        } elseif (isset($activeCategory->name)) {
              $breadcrumbItems[] = ['name' => $activeCategory->name, 'url' => url()->current()];
         }
 

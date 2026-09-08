@@ -26,7 +26,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <span class="text-gray-400">/</span>
-                    <a href="{{ route('category.products', $item['slug']) }}"
+                    <a href="{{ url($item['slug']) }}"
                         class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
                         {{ $item['name'] }}
                     </a>
@@ -465,7 +465,7 @@
                             Related Products
                         </h3>
                         @if ($product->mega_categories->first())
-                            <a href="{{ route('category.products', $product->mega_categories->first()->slug) }}"
+                            <a href="{{ url($product->mega_categories->first()->slug) }}"
                                 class="text-xs font-semibold text-[var(--primary-color)] hover:underline">
                                 See All
                             </a>
@@ -486,7 +486,7 @@
                                     $relRegularPrice = (float) ($priceData->regular_price ?? $rel->regular_price ?? 0);
                                     $hasDiscount = $relRegularPrice > $relSalePrice;
                                 @endphp
-                                <a href="{{ route('product.details', $rel->slug) }}"
+                                <a href="{{ url($rel->slug) }}"
                                     class="p-2.5 sm:p-3 flex items-center gap-3.5 hover:bg-gray-50/80 rounded-lg transition-all group">
                                     <!-- Thumbnail -->
                                     <div

@@ -135,7 +135,7 @@
                 <!-- Categories Scroll Area -->
                 <div id="cat-slider" class="flex items-stretch gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2">
                     @foreach ($categories as $category)
-                        <a href="{{ url('category/' . $category->slug) }}"
+                        <a href="{{ url($category->slug) }}"
                             class="flex flex-col items-center justify-between min-w-[100px] w-[100px] md:w-auto md:min-w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
 
                             <!-- Image Wrapper -->
@@ -192,7 +192,7 @@
                         <!-- Left: Product Image -->
                         <div
                             class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
-                            <a href="{{ route('product.details', $product->slug) }}" class="block w-full h-full">
+                            <a href="{{ url($product->slug) }}" class="block w-full h-full">
                                 <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
                                     class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
                             </a>
@@ -202,7 +202,7 @@
                         <div class="flex-1 pl-4 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-sm md:text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
-                                    <a href="{{ route('product.details', $product->slug) }}" class="hover:text-[#016738]">
+                                    <a href="{{ url($product->slug) }}" class="hover:text-[#016738]">
                                         {{ $product->title }}
                                     </a>
                                 </h3>
@@ -228,7 +228,7 @@
 
                             <!-- Button -->
                             <div class="mt-3">
-                                <a href="{{ route('product.details', $product->slug) }}"
+                                <a href="{{ url($product->slug) }}"
                                     class="block w-full text-center primary-bg text-primary py-2 rounded font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
                                     à¦ªà¦£à§à¦¯ à¦¦à§‡à¦–à§à¦¨
                                 </a>

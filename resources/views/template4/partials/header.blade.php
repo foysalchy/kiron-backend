@@ -53,7 +53,7 @@
                             <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Trending
                                 Products</p>
                             @foreach ($relatedProducts as $p)
-                                <a href="{{ route('product.details', $p->slug) }}"
+                                <a href="{{ url($p->slug) }}"
                                     class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <img src="{{ $p->thumbnail_url }}" height="" width="" alt="product iamge"
                                         class="w-8 h-8 rounded object-cover border border-gray-100">
@@ -223,7 +223,7 @@
                 @foreach ($headerCategories->take(5) as $mega)
 
                     <li class="group relative">
-                        <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                        <a href="{{ url($mega->slug ?? $mega->id) }}"
                             class="flex items-center gap-2 px-5 py-4 hover:text-header transition-all cursor-pointer uppercase">
                             {{ $mega->name }}
                             @if ($mega->subCategories->count() > 0)
@@ -237,7 +237,7 @@
                                     @foreach ($mega->subCategories as $sub)
                                         <li
                                             class="group/sub px-4 py-2.5 hover:bg-gray-100 flex justify-between items-center cursor-pointer">
-                                            <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                            <a href="{{ url($sub->slug ?? $sub->id) }}"
                                                 class="group-hover/sub:text-header uppercase">
                                                 {{ $sub->name }}
                                             </a>
@@ -250,7 +250,7 @@
                                                     class="absolute left-full top-0 w-64 min-h-full bg-white shadow-2xl border-l border-gray-100 py-2 hidden group-hover/sub:block">
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <li class="px-4 py-2.5 hover:bg-gray-100">
-                                                            <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                            <a href="{{ url($mini->slug ?? $mini->id) }}"
                                                                 class="block group-hover/mini:text-header uppercase">
                                                                 {{ $mini->name }}
                                                             </a>

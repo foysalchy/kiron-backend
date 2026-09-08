@@ -22,7 +22,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <span class="text-gray-400">/</span>
-                    <a href="{{ route('category.products', $item['slug']) }}"
+                    <a href="{{ url($item['slug']) }}"
                         class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
                         {{ $item['name'] }}
                     </a>
@@ -464,7 +464,7 @@
                         </div>
                         <div class="p-4 space-y-4 max-h-[800px] overflow-y-auto custom-scrollbar">
                             @foreach($relatedProducts as $related)
-                                <a href="{{ route('product.details', $related->slug) }}"
+                                <a href="{{ url($related->slug) }}"
                                     class="group flex gap-4 p-3 rounded-lg border border-transparent hover:border-[#FF6A00]/20 hover:bg-orange-50/30 transition-all">
                                     <!-- Image -->
                                     <div

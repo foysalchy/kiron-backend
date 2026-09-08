@@ -119,7 +119,7 @@
                         <img src="{{ $subCat->image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                             alt="{{ $subCat->name }}">
                     </div>
-                    <a href="{{ route('category.products', $subCat->slug) }}"
+                    <a href="{{ url($subCat->slug) }}"
                         class="absolute bottom-0 left-0 w-full primary-bg text-primary py-3 text-center font-bold uppercase text-sm tracking-wider hover:opacity-90">
                         SHOP NOW
                     </a>

@@ -28,7 +28,7 @@
     $metaImage = $product->thumbnail_url
         ?: ($product->thumbnail ? asset('storage/' . $product->thumbnail) : ($setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('storage/' . ($setup->logo ?? ''))));
 
-    $canonicalUrl = route('product.details', $product->slug);
+    $canonicalUrl = url($product->slug);
 
     $breadcrumbItems = [
         [
@@ -48,7 +48,7 @@
             if ($name) {
                 $breadcrumbItems[] = [
                     'name' => $name,
-                    'url' => $slug ? route('category.products', $slug) : url()->current(),
+                    'url' => $slug ? url($slug) : url()->current(),
                 ];
             }
         }

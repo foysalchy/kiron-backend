@@ -38,7 +38,7 @@
 
                                     <!-- Details -->
                                     <div class="flex-1">
-                                        <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
+                                        <a href="{{ url($item->options->slug ?? $item->id) }}"
                                             class="group/title">
                                             <h3
                                                 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">

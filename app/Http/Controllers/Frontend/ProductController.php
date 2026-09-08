@@ -626,7 +626,7 @@ class ProductController extends FrontendController
         $products = $query->paginate(12)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::select('id,name,logo')->get();
+        $brands = Brand::select(['id', 'name', 'logo'])->get();
         $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
             ->with('values:id,attribute_group_id,name')->where('status', Status::Active->value)->get()->unique('name');
 

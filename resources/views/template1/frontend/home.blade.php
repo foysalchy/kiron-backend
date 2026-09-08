@@ -14,7 +14,7 @@
                     Explore Categories</div>
                 @foreach ($categories as $category)
                     <div class="group border-b border-gray-200">
-                        <a href="{{ url('category/' . $category->slug) }}"
+                        <a href="{{ url($category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
                             <div class="flex items-center gap-3 ">
                                 <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
@@ -35,7 +35,7 @@
                                 @foreach ($category->subCategories as $subCategory)
                                     <!-- sub category -->
                                     <div class="group/sub">
-                                        <a href="{{ route('category.products', $subCategory->slug) }}"
+                                        <a href="{{ url($subCategory->slug) }}"
                                             class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[var(--primary-color)] transition-colors">
                                             <span>{{ $subCategory->name }}</span>
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
@@ -48,7 +48,7 @@
                                             <div
                                                 class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
                                                 @foreach ($subCategory->miniCategories as $miniCategory)
-                                                    <a href="{{ route('category.products', $miniCategory->slug) }}"
+                                                    <a href="{{ url($miniCategory->slug) }}"
                                                         class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
                                                         {{ $miniCategory->name }}
                                                     </a>
@@ -167,7 +167,7 @@
                     </button>
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($categories as $category)
-                            <a href="{{ url('category/' . $category->slug) }}"
+                            <a href="{{ url($category->slug) }}"
                                 class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
                                 <div
                                     class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
@@ -343,7 +343,7 @@
                     <div id="brand-track" class="flex items-start gap-4 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($brands as $brand)
                             @if (!empty($brand->slug))
-                                <a href="{{ route('brand.products', ['slug' => $brand->slug]) }}"
+                                <a href="{{ url($brand->slug) }}"
                                     class="flex flex-col items-center min-w-[80px] md:min-w-[105px] group">
 
                                     <!-- Circular Image Wrapper -->

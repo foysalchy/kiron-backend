@@ -15,7 +15,7 @@
             ? asset('storage/' . $blog->images[0])
             : asset('storage/' . $setup->logo),
 
-        'canonical' => route('blog.details', $blog->slug),
+        'canonical' => url($blog->slug),
 
         'breadcrumb' => [
             [
@@ -28,7 +28,7 @@
             ],
             [
                 'name' => $blog->title,
-                'url' => route('blog.details', $blog->slug),
+                'url' => url($blog->slug),
             ],
         ],
 

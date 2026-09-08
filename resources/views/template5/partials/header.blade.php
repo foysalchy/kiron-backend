@@ -144,7 +144,7 @@
           <div class="border-t border-gray-50 pt-2 pb-2">
             <p class="text-[10px] font-bold text-gray-600 uppercase px-5 py-2 tracking-wider">Trending Products</p>
             @foreach ($relatedProducts as $p)
-            <a href="{{ route('product.details', $p->slug) }}"
+            <a href="{{ url($p->slug) }}"
               class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
               <img src="{{ $p->thumbnail_url }}" alt="product image"
                 class="w-8 h-8 rounded object-cover border border-gray-100">
