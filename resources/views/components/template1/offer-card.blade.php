@@ -12,7 +12,7 @@
     $isOutOfStock = $offer->manage_stock ? ($offer->available_stock <= 0) : false;
 @endphp
 
-<a href="{{ route('product.details', $offer->slug ?? $offer->id) }}" class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-[var(--primary-color)]/40 -translate-y-1 flex flex-col h-full">
+<a href="{{ url($offer->slug ?? $offer->id) }}" class="group shadow bg-white border border-ash/10 rounded-2xl overflow-hidden hover:border-[var(--primary-color)]/40 -translate-y-1 flex flex-col h-full">
 
   <div class="h-36 sm:h-52 relative overflow-hidden">
     <img

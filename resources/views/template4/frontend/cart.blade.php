@@ -30,7 +30,7 @@
                                 <div class="cart-item grid grid-cols-12 gap-3 md:gap-4 items-center py-4 md:py-6">
                                     <div class="col-span-12 sm:col-span-6 flex gap-3 md:gap-4 items-center">
                                         <!-- Product Image Link -->
-                                        <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
+                                        <a href="{{ url($item->options->slug ?? $item->id) }}"
                                             class="shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
                                             <img src="{{ $item->options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy"
                                                 onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
@@ -39,7 +39,7 @@
 
                                         <div class="min-w-0">
                                             <!-- Product Name Link -->
-                                            <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}"
+                                            <a href="{{ url($item->options->slug ?? $item->id) }}"
                                                 class="cursor-pointer group">
                                                 <h4
                                                     class="text-base md:text-lg lg:text-xl font-bold text-gray-900 truncate  transition-colors">

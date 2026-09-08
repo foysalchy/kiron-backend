@@ -28,13 +28,13 @@
     {{-- ─── CATEGORY SPECIFIC META ─── --}}
     @php
         if (isset($megaCategory)) {
-            $breadcrumbItems[] = ['name' => $megaCategory->name, 'url' => route('category.products', $megaCategory->slug)];
+            $breadcrumbItems[] = ['name' => $megaCategory->name, 'url' => url($megaCategory->slug)];
         }
         if (isset($subCategory)) {
-            $breadcrumbItems[] = ['name' => $subCategory->name, 'url' => route('category.products', $subCategory->slug)];
+            $breadcrumbItems[] = ['name' => $subCategory->name, 'url' => url($subCategory->slug)];
         }
         if (isset($miniCategory)) {
-            $breadcrumbItems[] = ['name' => $miniCategory->name, 'url' => route('category.products', $miniCategory->slug)];
+            $breadcrumbItems[] = ['name' => $miniCategory->name, 'url' => url($miniCategory->slug)];
         }
         if (!isset($megaCategory) && !isset($subCategory) && !isset($miniCategory) && isset($activeCategory->name)) {
              $breadcrumbItems[] = ['name' => $activeCategory->name, 'url' => url()->current()];

@@ -30,7 +30,7 @@
                class="w-24 h-24 rounded-xl object-cover">
 
           <div class="flex-1 w-full">
-            <a href="{{ route('product.details', $item->options->slug ?? $item->id) }}" class="group/title">
+            <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
               <h3 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
                 {{ $item->name ?? '' }}
               </h3>

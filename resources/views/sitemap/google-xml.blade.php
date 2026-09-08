@@ -18,7 +18,7 @@
                     <g:id>{{ $mainSku }}</g:id>
                     <g:title>{{ $product->title }}</g:title>
                     <g:description>{{ strip_tags($product->short_description ?: $product->title) }}</g:description>
-                    <g:link>{{ route('product.details', $product->slug) }}</g:link>
+                    <g:link>{{ url($product->slug) }}</g:link>
                     <g:image_link>{{ $product->thumbnail_url }}</g:image_link>
 
                     {{-- অতিরিক্ত ইমেজ লিঙ্ক (Additional Images) --}}
@@ -51,7 +51,7 @@
                         <g:item_group_id>GRP-{{ $product->id }}</g:item_group_id>
                         <g:title>{{ $product->title }} - {{ $variant->display_name }}</g:title>
                         <g:description>{{ strip_tags($product->short_description ?: $product->title) }}</g:description>
-                        <g:link>{{ route('product.details', $product->slug) }}</g:link>
+                        <g:link>{{ url($product->slug) }}</g:link>
 
                         {{-- ভ্যারিয়েন্ট ইমেজ --}}
                         <g:image_link>{{ $variant->image ? asset('storage/' . $variant->image) : $product->thumbnail_url }}

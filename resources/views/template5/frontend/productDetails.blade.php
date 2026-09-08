@@ -27,14 +27,14 @@
       @php $mega = $product->mega_categories?->first(); @endphp
       @if ($mega)
         <span>/</span>
-        <a href="{{ route('category.products', $mega->slug) }}"
+        <a href="{{ url($mega->slug) }}"
           class="hover:text-[var(--primary-color)] transition-colors">{{ $mega->name }}</a>
       @endif
 
       @php $sub = $product->sub_categories?->first(); @endphp
       @if ($sub)
         <span>/</span>
-        <a href="{{ route('category.products', $sub->slug) }}"
+        <a href="{{ url($sub->slug) }}"
           class="hover:text-[var(--primary-color)] transition-colors">{{ $sub->name }}</a>
       @endif
 

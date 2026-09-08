@@ -44,7 +44,7 @@
                 class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400' }} text-sm"></i>
         </button>
 
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full "
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full "
             aria-label="product details">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
                 alt="{{ $product->title }}" width="300" height="300" loading="lazy"
@@ -59,7 +59,7 @@
             {{ $product->mega_categories?->pluck('name')->implode(', ') ?: 'General' }}
         </div> --}}
 
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block flex-grow"
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block flex-grow"
             aria-label="product details">
             <p
                 class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2  min-h-[30px] group-hover/title:text-[#BD4F00] transition-colors">

@@ -37,7 +37,7 @@
 
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden rounded-xl mb-3 shrink-0 bg-gray-50">
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block w-full h-full">
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350"
                 width="300" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 alt="{{ $product->title }}">
@@ -67,7 +67,7 @@
 
     <!-- Product Info Area -->
     <div class="flex flex-col flex-grow px-1">
-        <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block group/title">
             <h3
                 class="hind-siliguri-medium md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}

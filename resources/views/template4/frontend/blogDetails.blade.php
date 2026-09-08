@@ -200,7 +200,7 @@
                     <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">Related Posts</h3>
                     <div class="space-y-5">
                         @foreach ($relatedPosts as $rp)
-                            <a href="{{ route('blog.details', ['slug' => $rp->slug]) }}" class="flex gap-4 group">
+                            <a href="{{ url($rp->slug) }}" class="flex gap-4 group">
                                 <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                                     <img src="{{ $rp->thumbnail_url ?? '' }}"
                                         alt="blog image" loading="lazy" height="" width=""

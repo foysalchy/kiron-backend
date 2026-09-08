@@ -22,7 +22,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <span class="text-gray-400">/</span>
-                    <a href="{{ route('category.products', $item['slug']) }}"
+                    <a href="{{ url($item['slug']) }}"
                         class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
                         {{ $item['name'] }}
                     </a>
@@ -454,7 +454,7 @@
                         Related Products
                     </h2>
                     @if ($product->mega_categories->first())
-                        <a href="{{ route('category.products', $product->mega_categories->first()->slug) }}"
+                        <a href="{{ url($product->mega_categories->first()->slug) }}"
                             class="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1">
                             View More <i class="fas fa-chevron-right text-[10px]"></i>
                         </a>

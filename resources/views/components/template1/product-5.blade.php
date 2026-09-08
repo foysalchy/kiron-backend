@@ -18,7 +18,7 @@
     $avgRating = $product->reviews_avg_rating ?? 0;
     $totalReviews = $product->reviews_count ?? 0;
 
-    $productUrl = route('product.details', $product->slug ?? $product->id);
+    $productUrl = url($product->slug ?? $product->id);
 @endphp
 
 <article
