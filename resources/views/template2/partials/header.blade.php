@@ -305,7 +305,7 @@
                             $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
                         @endphp
                         <li class="nav-dropdown-item group relative flex-shrink-0">
-                            <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                            <a href="{{ url($mega->slug ?? $mega->id) }}"
                                 class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
                                 <span>{{ $mega->name }}</span>
                                 @if ($hasSub)
@@ -324,7 +324,7 @@
                                             @endphp
                                             <li
                                                 class="nav-sub-item group/sub px-4 py-2.5 hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
-                                                <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                                <a href="{{ url($sub->slug ?? $sub->id) }}"
                                                     class="group-hover/sub:text-[var(--primary-color,#016738)] text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
                                                     {{ $sub->name }}
                                                 </a>
@@ -338,7 +338,7 @@
                                                         class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-60 min-h-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
                                                         @foreach ($sub->miniCategories as $mini)
                                                             <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
-                                                                <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                                <a href="{{ url($mini->slug ?? $mini->id) }}"
                                                                     class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-xs font-medium transition-colors">
                                                                     {{ $mini->name }}
                                                                 </a>
@@ -454,7 +454,7 @@
                         @endphp
                         <div class="border-b border-gray-100 last:border-0">
                             <div class="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg">
-                                <a href="{{ route('category.products', $mega->slug ?? $mega->id) }}"
+                                <a href="{{ url($mega->slug ?? $mega->id) }}"
                                     class="text-sm font-semibold uppercase text-black flex-1">
                                     {{ $mega->name }}
                                 </a>
@@ -474,7 +474,7 @@
                                         @endphp
                                         <div class="border-b border-gray-200/60 last:border-0">
                                             <div class="flex items-center justify-between pl-6 pr-3 py-2">
-                                                <a href="{{ route('category.products', $sub->slug ?? $sub->id) }}"
+                                                <a href="{{ url($sub->slug ?? $sub->id) }}"
                                                     class="text-xs font-medium text-black flex-1">
                                                     {{ $sub->name }}
                                                 </a>
@@ -489,7 +489,7 @@
                                             @if ($hasMini)
                                                 <div id="m2-sub-{{ $sub->id }}" class="hidden bg-white pl-8 pr-3 py-1">
                                                     @foreach ($sub->miniCategories as $mini)
-                                                        <a href="{{ route('category.products', $mini->slug ?? $mini->id) }}"
+                                                        <a href="{{ url($mini->slug ?? $mini->id) }}"
                                                             class="block py-1.5 text-[11px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
                                                             {{ $mini->name }}
                                                         </a>

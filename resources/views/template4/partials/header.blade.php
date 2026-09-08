@@ -338,7 +338,7 @@
             <div class="border-b border-gray-100">
                 <!-- মেগা ক্যাটাগরি রো -->
                 <div class="flex items-center justify-between px-5 py-4 group hover:bg-gray-50">
-                    <a href="{{ route('category.products', $mega->slug) }}"
+                    <a href="{{ url($mega->slug) }}"
                         class="text-[#0f172a] font-bold uppercase text-sm flex-1">
                         {{ $mega->name }}
                     </a>
@@ -357,7 +357,7 @@
                         @foreach ($mega->subCategories as $sub)
                             <div class="border-b border-gray-200 last:border-0">
                                 <div class="flex items-center justify-between pl-8 pr-5 py-3">
-                                    <a href="{{ route('category.products', $sub->slug) }}"
+                                    <a href="{{ url($sub->slug) }}"
                                         class="text-sm font-semibold text-gray-700 flex-1">
                                         {{ $sub->name }}
                                     </a>
@@ -373,7 +373,7 @@
                                 @if ($sub->miniCategories->count() > 0)
                                     <div id="m-sub-{{ $sub->id }}" class="hidden bg-white">
                                         @foreach ($sub->miniCategories as $mini)
-                                            <a href="{{ route('category.products', $mini->slug) }}"
+                                            <a href="{{ url($mini->slug) }}"
                                                 class="block pl-12 pr-5 py-2.5 text-xs font-medium text-gray-500 border-b border-gray-50 last:border-0">
                                                 {{ $mini->name }}
                                             </a>

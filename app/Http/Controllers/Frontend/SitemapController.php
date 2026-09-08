@@ -231,7 +231,7 @@ ROBOTS;
                         'new',
                         number_format($product->regular_price, 2, '.', '') . ' ' . $currency,
                         $product->discount > 0 ? number_format($product->sale_price, 2, '.', '') . ' ' . $currency : '',
-                        route('product.details', $product->slug),
+                        url($product->slug),
                         $product->thumbnail_url,
                         $product->galleries->pluck('image_url')->implode(','),
                         $product->brand->name ?? $setup->shop_name,
@@ -253,7 +253,7 @@ ROBOTS;
                             'new',
                             number_format($variant->regular_price, 2, '.', '') . ' ' . $currency,
                             $variant->discount > 0 ? number_format($variant->final_price, 2, '.', '') . ' ' . $currency : '',
-                            route('product.details', $product->slug),
+                            url($product->slug),
                             $variant->image ? asset('storage/' . $variant->image) : $product->thumbnail_url,
                             $vGallery->pluck('image_url')->implode(','),
                             $product->brand->name ?? $setup->shop_name,
@@ -315,7 +315,7 @@ ROBOTS;
 
             foreach ($products as $product) {
                 $commonDescription = strip_tags($product->short_description ?: $product->title);
-                $productUrl = route('product.details', $product->slug);
+                $productUrl = url($product->slug);
 
                 if ($product->type === 'single') {
                     // ─── Single Product ───
