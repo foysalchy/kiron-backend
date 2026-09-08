@@ -81,7 +81,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
 
 
 
-Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
+// Route::get('/sale/{slug}', [LandingController::class, 'index'])->name('landing');
 Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/reservation', [App\Http\Controllers\Frontend\ReservationController::class, 'index'])->name('reservation.index');
@@ -90,7 +90,7 @@ Route::post('/reservation/store', [App\Http\Controllers\Frontend\ReservationCont
 Route::post('/reservation/status', [App\Http\Controllers\Frontend\ReservationController::class, 'checkStatus'])->name('reservation.status')->middleware('throttle:10,1');
 Route::get('/categories', [HomeController::class, 'allCategories'])->name('categories.all');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
+// Route::get('/blog/{slug}', [BlogController::class, 'blogDetails'])->name('blog.details');
 
 Route::get('/contact', [ContctController::class, 'index'])->name('contact.index');
 Route::post('/contact/send', [ContctController::class, 'send'])->name('contact.send');
@@ -99,7 +99,7 @@ Route::get('/faq', [SupportController::class, 'index'])->name('faq.index');
 
 
 Route::get('/brands', [BrandController::class, 'index'])->name('brand.index');
-Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
+// Route::get('/brand/{slug}', [ProductController::class, 'brandProducts'])->name('brand.products');
 
 Route::get('/register', [AuthController::class, 'register'])->name('user.register');
 Route::post('/register', [AuthController::class, 'storeRegister'])->name('user.register.store');
@@ -121,8 +121,8 @@ Route::middleware(['auth:customer'])->group(function () {
     Route::get('/dashboard/reservations', [App\Http\Controllers\Frontend\ReservationDashboardController::class, 'myReservations'])->name('dashboard.reservations');
     });
 Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
-Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
-Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
+// Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
+// Route::get('/product/{slug}', [ProductController::class, 'productDetails'])->name('product.details');
 Route::get('/shop', [ProductController::class, 'index'])->name('shop.index');
 Route::get('/menu/filter', [ProductController::class, 'filterMenu'])->name('menu.filter');
 Route::get('/product-variation/{id}', [ProductController::class, 'getVariationModal']);
@@ -146,19 +146,30 @@ Route::get('/thank-you/{id}', [OrderController::class, 'thankyou'])->name('order
 Route::get('/invoice/download/{id}', [OrderController::class, 'invoice'])->name('invoice.download');
 Route::get('/product-track', [OrderController::class, 'trackOrder'])->name('order.track');
 Route::get('/order/reviews/{id}', [OrderController::class, 'getReviews'])->name('order.reviews');
-Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
+// Route::get('/page/{slug}', [AboutController::class, 'showPage'])->name('frontend.page');
 Route::post('/order/payment/submit', [OrderController::class, 'submitPayment'])->name('order.payment.submit');
 Route::post('/newsletter-subscribe', [HomeController::class, 'subscribe'])->name('newsletter.subscribe');
 
-Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
-Route::get('/subcategory/{mega_slug}/{sub_slug}', [ProductController::class, 'subcategoryProducts'])->name('subcategory.products');
-Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductController::class, 'minicategoryProducts'])->name('minicategory.products');
+// Route::get('/category/{slug}', [ProductController::class, 'categoryProducts'])->name('category.products');
+// Route::get('/subcategory/{mega_slug}/{sub_slug}', [ProductController::class, 'subcategoryProducts'])->name('subcategory.products');
+// Route::get('/minicategory/{mega_slug}/{sub_slug}/{mini_slug}', [ProductController::class, 'minicategoryProducts'])->name('minicategory.products');
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
 Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms.txt');
 Route::get('/feeds/google/products.xml', [SitemapController::class, 'googleXml'])->name('google.xml');
 Route::get('/feeds/facebook/products.csv', [SitemapController::class, 'facebookCatalogCsv'])->name('facebook.catalog.csv');
 Route::get('/feeds/tiktok/products.csv', [SitemapController::class, 'tiktokCatalogCsv'])->name('tiktok.catalog.csv');
+
+    // Dynamic Route Resolver for root-level slugs
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('dynamic.slug');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('product.details');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('category.products');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('subcategory.products');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('minicategory.products');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('frontend.page');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('landing');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('blog.details');
+    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('brand.products');
 
     // Route::get('/kiron', [SaasIndexController::class, 'home'])->name('kiron.index');
 });
