@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\KnowledgeBase;
 use App\Models\MegaCategory;
+use App\Models\MenuSetting;
 use App\Models\Product;
 use App\Models\ProductGroup;
 use App\Models\ProductReview;
@@ -45,7 +46,22 @@ class HomeController extends FrontendController
                 ->select('id', 'name', 'company_id', 'slug', 'image')
                 ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
         });
+        $featureCategory = Cache::remember("active_feature_category_{$companyId}", $ttl, function () use ($companyId) {
+            $menuSetting = MenuSetting::where('company_id', $companyId)
+                ->where('type', MenuSetting::TYPE_FEATURE_CATEGORY)
+                ->where('status', Status::Active->value)
+                ->latest()
+                ->first();
+            if (! $menuSetting) {
+                return null;
+            }
 
+            return [
+                'id'    => $menuSetting->id,
+                'name'  => $menuSetting->name,
+                'items' => $menuSetting->resolvedItems(), // fresh name/slug/image/link per item
+            ];
+        });
         // ৪. লেটেস্ট অফার
         $latestOffers = Cache::remember("home_latest_offers_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
@@ -80,7 +96,7 @@ class HomeController extends FrontendController
                 ->take(12)
                 ->get();
         });
-      
+
 
         $newArrivals = Cache::remember("home_new_arrivals_{$companyId}", $ttl, function () use ($companyId) {
             return Product::where('company_id', $companyId)
@@ -199,6 +215,7 @@ class HomeController extends FrontendController
         // ভিউতে ডেটা পাঠানো
         return $this->view('frontend.home', compact(
             'categories',
+            'featureCategory',
             'newArrivals',
             'brands',
             'popularProducts',

@@ -55,6 +55,7 @@ use App\Http\Controllers\Api\EmailSettingController;
 use App\Http\Controllers\Api\EmailTemplateController;
 use App\Http\Controllers\Api\EmployeeSalaryController;
 use App\Http\Controllers\Api\ExtraCategoryController;
+use App\Http\Controllers\Api\FeatureCategoryController;
 use App\Http\Controllers\Api\FirebaseSettingController;
 use App\Http\Controllers\Api\FooterCodeController;
 use App\Http\Controllers\Api\HolidayController;
@@ -278,7 +279,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/payment-collection/parties', [PaymentCollectionController::class, 'getDueParties']);
         Route::get('/payment-collection/parties/{partyId}/invoices', [PaymentCollectionController::class, 'getPartyDueInvoices']);
         Route::post('/payment-collection/parties/{partyId}/settle', [PaymentCollectionController::class, 'settlePayments']);
-        Route::get('/payment-collection/transactions', [PaymentCollectionController::class, 'transactions']); 
+        Route::get('/payment-collection/transactions', [PaymentCollectionController::class, 'transactions']);
         Route::get('/site-basic-data', [SiteSettingController::class, 'basicData']);
         Route::get('/company/package-usage', [PackageUsageController::class, 'index']);
         Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, 'addpayment']);
@@ -302,7 +303,7 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/subscriptions/{id}/discount', [SubscriptionController::class, 'applyDiscount']);
                 Route::get('/billing/companies', [SubscriptionController::class, 'billing']);
                 Route::get('/billing/entries', [SubscriptionController::class, 'unifiedBillingList']);
-                
+
                 // SaaS Dashboard
                 Route::get('/saas-dashboard/stats', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getStats']);
                 Route::get('/saas-dashboard/charts', [\App\Http\Controllers\Api\SaasDashboardController::class, 'getCharts']);
@@ -315,7 +316,8 @@ Route::prefix('v1')->group(function () {
             Route::put('/menu-settings/{menuSetting}', [MenuSettingController::class, 'update']);
             Route::patch('/menu-settings/{menuSetting}/status', [MenuSettingController::class, 'toggleStatus']);
             Route::delete('/menu-settings/{menuSetting}', [MenuSettingController::class, 'destroy']);
-            //site settings routes
+
+
 
 
             Route::post('/settings/update-invoice-template', [SiteSettingController::class, 'updateInvoiceTemplate']);
@@ -561,7 +563,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}/force', [AreaController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [AreaController::class, 'toggleStatus']);
                 });
-                
+
                 // Table Routes
                 Route::prefix('tables')->group(function () {
                     Route::get('/', [TableController::class, 'index']);
@@ -1953,10 +1955,10 @@ Route::prefix('v1')->group(function () {
                 });
                 Route::get('/package-upgrades', [PackageUpgradeController::class, 'index']);
                 Route::post('/package-upgrades/{id}/status-update', [PackageUpgradeController::class, 'updateStatus']);
-                
+
                 Route::get('/subscription-refunds', [SubscriptionRefundController::class, 'index']);
                 Route::put('/subscription-refunds/{id}/status', [SubscriptionRefundController::class, 'updateStatus']);
-                
+
                 Route::post('/registration/register-seller', [CompanyRegistrationController::class, 'register']);
 
                 // Referral & Partner Program Management
