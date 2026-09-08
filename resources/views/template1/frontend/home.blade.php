@@ -14,7 +14,7 @@
                     Explore Categories</div>
                 @foreach ($categories as $category)
                     <div class="group border-b border-gray-200">
-                        <a href="{{ url('category/' . $category->slug) }}"
+                        <a href="{{ url($category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
                             <div class="flex items-center gap-3 ">
                                 <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
@@ -140,7 +140,7 @@
                     <!-- Categories Scroll Area (Dynamic) -->
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($categories as $category)
-                            <a href="{{ url('category/' . $category->slug) }}"
+                            <a href="{{ url($category->slug) }}"
                                 class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
                                 <div
                                     class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
