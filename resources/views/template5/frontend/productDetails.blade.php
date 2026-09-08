@@ -254,43 +254,9 @@
       }
       document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
     }
-    function updatePriceDisplay(salePrice, regularPrice) {
-      const saleEl = document.getElementById('main-sale-price');
-      const regularEl = document.getElementById('main-regular-price');
-      const currency = "{{ $setup->currency }}";
-
-      if (saleEl) {
-        saleEl.innerText = currency + ' ' + Math.round(salePrice).toLocaleString();
-      }
-
-      if (regularEl) {
-        if (regularPrice && regularPrice > salePrice) {
-          regularEl.innerText = currency + ' ' + Math.round(regularPrice).toLocaleString();
-          regularEl.classList.remove('hidden');
-        } else {
-          regularEl.classList.add('hidden');
-        }
-      }
+          }
     }
-    function recalculateSelectedPrice() {
-      if (finalSelectedVariationIds.length === 0) {
-        updatePriceDisplay(
-              {{ $product->display_price_data->sale_price }},
-          {{ $product->display_price_data->regular_price }}
-        );
-        return;
-      }
-
-      let totalSale = 0;
-      let totalRegular = 0;
-
-      finalSelectedVariationIds.forEach(id => {
-        const v = allVariations.find(v => v.id === id);
-        if (v) {
-          totalSale += parseFloat(v.price);
-          totalRegular += parseFloat(v.regular_price || v.price); // regular_price না থাকলে price-ই ধরা হবে (fallback)
-        }
-      });
+          });
 
       updatePriceDisplay(totalSale, totalRegular);
     }
@@ -321,46 +287,144 @@
       container.classList.toggle('md:px-10', showArrows);
     }
 
-    function handleSelection(group, valId, isLastGroup) {
-      if (!isLastGroup) {
-        activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
-        let idx = attributeGroups.indexOf(group);
-        for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-        if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-      } else {
-        activeFilters[group] = valId;
-        let matched = allVariations.find(v => attributeGroups.every(g => v.attributes[g].id == activeFilters[g]));
-
-        if (matched) {
-          let isSingleChoice = false;
-          for (let gName in matched.attributes) {
-            if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
           }
-
-          if (isSingleChoice) {
-            finalSelectedVariationIds = [matched.id];
-            let combined = [...(matched.galleries || []), ...defaultGalleries];
-            updateGalleryThumbnails([...new Set(combined)]);
-            if (matched.main_image) changeImage(matched.main_image);
-          } else {
-            const index = finalSelectedVariationIds.indexOf(matched.id);
-            if (index > -1) {
-              finalSelectedVariationIds.splice(index, 1);
-              if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
-            } else {
-              finalSelectedVariationIds.push(matched.id);
-              let combined = [...(matched.galleries || []), ...defaultGalleries];
-              updateGalleryThumbnails([...new Set(combined)]);
-              if (matched.main_image) changeImage(matched.main_image);
-            }
-          }
-
-          recalculateSelectedPrice();
-        }
-      }
       renderAttributes();
     }
-    function checkIsSelected(groupName, valId) {
+    
+        function updatePriceDisplay(salePrice, regularPrice) {
+            const saleEl = document.getElementById('sale-price');
+            const regularEl = document.getElementById('regular-price');
+            const badgeEl = document.getElementById('discount-badge');
+            const currency = "{{ $setup->currency }}";
+            const currencyPosition = "{{ $setup->currency_position ?? 'left' }}";
+
+            const formattedSale = Math.round(salePrice).toLocaleString();
+            if (saleEl) {
+                saleEl.innerText = (currencyPosition === 'left')
+                    ? `${currency} ${formattedSale}`
+                    : `${formattedSale} ${currency}`;
+            }
+
+            if (regularEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const formattedRegular = Math.round(regularPrice).toLocaleString();
+                    regularEl.innerText = (currencyPosition === 'left')
+                        ? `${currency} ${formattedRegular}`
+                        : `${formattedRegular} ${currency}`;
+                    regularEl.classList.remove('hidden');
+                } else {
+                    if(regularEl) regularEl.classList.add('hidden');
+                }
+            }
+
+            if (badgeEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+                    badgeEl.innerText = percent + '% OFF';
+                    badgeEl.classList.remove('hidden');
+                } else {
+                    if(badgeEl) badgeEl.classList.add('hidden');
+                }
+            }
+        }
+
+        function recalculateSelectedPrice() {
+            if (finalSelectedVariationIds.length === 0) {
+                updatePriceDisplay(
+                    {{ $product->display_price_data->sale_price ?? 0 }},
+                    {{ $product->display_price_data->regular_price ?? 0 }}
+                );
+                return;
+            }
+
+            let totalSale = 0;
+            let totalRegular = 0;
+
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v) {
+                    totalSale += parseFloat(v.price);
+                    totalRegular += parseFloat(v.regular_price || v.price);
+                }
+            });
+
+            updatePriceDisplay(totalSale, totalRegular);
+        }
+
+        function updateSkuDisplay() {
+            const skuEl = document.getElementById('product-sku');
+            const tabSkuEl = document.getElementById('tab-sku');
+            
+            if (finalSelectedVariationIds.length === 0) {
+                const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
+                if (allSkus.length > 0) {
+                    const text = [...new Set(allSkus)].join(", ");
+                    if(skuEl) skuEl.innerText = text;
+                    if(tabSkuEl) tabSkuEl.innerText = text;
+                }
+                return;
+            }
+            
+            let selectedSkus = [];
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v && v.sku) selectedSkus.push(v.sku);
+            });
+            
+            if (selectedSkus.length > 0) {
+                const text = [...new Set(selectedSkus)].join(", ");
+                if(skuEl) skuEl.innerText = text;
+                if(tabSkuEl) tabSkuEl.innerText = text;
+            }
+        }
+
+        function handleSelection(group, valId, isLastGroup) {
+            if (!isLastGroup) {
+                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+                let idx = attributeGroups.indexOf(group);
+                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+                if (finalSelectedVariationIds.length === 0) {
+                    updateGalleryThumbnails(defaultGalleries);
+                    recalculateSelectedPrice();
+                }
+            } else {
+                activeFilters[group] = valId;
+                let matched = allVariations.find(v => {
+                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                });
+
+                if (matched) {
+                    let isSingleChoice = false;
+                    for (let gName in matched.attributes) {
+                        if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
+                    }
+
+                    if (isSingleChoice) {
+                        finalSelectedVariationIds = [matched.id];
+                        let combined = [...(matched.galleries || []), ...defaultGalleries];
+                        updateGalleryThumbnails([...new Set(combined)]);
+                        if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                    } else {
+                        const index = finalSelectedVariationIds.indexOf(matched.id);
+                        if (index > -1) {
+                            finalSelectedVariationIds.splice(index, 1);
+                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                        } else {
+                            finalSelectedVariationIds.push(matched.id);
+                            let combined = [...(matched.galleries || []), ...defaultGalleries];
+                            updateGalleryThumbnails([...new Set(combined)]);
+                            if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                        }
+                    }
+
+                    recalculateSelectedPrice();
+                }
+            }
+            updateSkuDisplay();
+            renderAttributes();
+        }
+
+        function checkIsSelected(groupName, valId) {
       return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
     }
 

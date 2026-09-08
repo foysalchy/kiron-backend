@@ -16,7 +16,8 @@
         <nav aria-label="Breadcrumb"
             class=" mx-auto  flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
 
-            <a href="{{ route('home') }}" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+            <a href="{{ route('home') }}"
+                class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
 
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
@@ -67,17 +68,30 @@
 
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
 
-                    <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
-                        <span class="uppercase font-bold">SKU</span>: <span class="font-mono">
-                            @if (is_array($product->sku_code))
-                                {{ implode(', ', $product->sku_code) }}
-                            @else
-                                {{ $product->sku_code ?? 'N/A' }}
+                    @php
+                        $skus = [];
+                        if ($product->type === 'variation') {
+                            $skus = $product->variations->pluck('sku')->filter()->toArray();
+                        } else {
+                            $skus = is_array($product->sku_code) ? $product->sku_code : [$product->sku_code];
+                        }
+                        $skus = array_unique(array_filter($skus));
+                    @endphp
+                    @if(!empty($skus) || !empty($product->brand))
+                        <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
+                            @if(!empty($skus))
+                                <span class="uppercase font-bold">SKU</span>: <span id="product-sku" class="font-mono">
+                                    {{ implode(', ', $skus) }}
+                                </span>
                             @endif
-                        </span>
-                        <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
-                    </div>
-                    <div class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
+                            @if(!empty($product->brand))
+                                <span class="@if(!empty($skus)) ml-4 @endif font-bold">Brand:</span>
+                                <span>{{ $product->brand->name }}</span>
+                            @endif
+                        </div>
+                    @endif
+                    <div
+                        class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
                     </div>
 
@@ -117,7 +131,8 @@
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         {{-- এই অংশটুকু রিপ্লেস করুন --}}
-                        <span class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                        <span
+                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
@@ -128,15 +143,13 @@
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- ১. Add To Cart -->
-                        <button id="btn-cart" onclick="handleAddToCart()"
-                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-cart" onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
                         <!-- ২. Order Now Button -->
-                        <button id="btn-order" onclick="handleAddToCart(true)"
-                            {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                        <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
@@ -144,9 +157,10 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                        {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
-                            <i id="wish-icon-main" class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
+                            <i id="wish-icon-main"
+                                class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
                             <span id="wish-text-main">{{ $isWishlisted ? 'Wishlisted' : 'Wishlist' }}</span>
                         </button>
                     </div>
@@ -158,8 +172,7 @@
                                 style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
                                 <div class="shrink-0">
                                     @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) }}"
-                                            class="h-5 w-5 object-contain">
+                                        <img src="{{ asset('storage/' . $item->icon_file) }}" class="h-5 w-5 object-contain">
                                     @else
                                         <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
                                     @endif
@@ -172,264 +185,328 @@
                     </div>
 
                     <!-- Dynamic 3-Column Grid -->
-                     @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-                        @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
-                            <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
-                                <div class="text-orange-500 shrink-0">
-                                    @if ($card->icon_file)
-                                        <img src="{{ asset('storage/' . $card->icon_file) }}"
-                                            class="h-5 w-5 object-contain">
-                                    @else
-                                        <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
-                                    @endif
+                    @if($trustBadges->where('page_type', 'product_page_sub')->count() > 0)
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                            @foreach ($trustBadges->where('page_type', 'product_page_sub') as $card)
+                                <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
+                                    <div class="text-orange-500 shrink-0">
+                                        @if ($card->icon_file)
+                                            <img src="{{ asset('storage/' . $card->icon_file) }}" class="h-5 w-5 object-contain">
+                                        @else
+                                            <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
+                                        @endif
+                                    </div>
+                                    <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
                                 </div>
-                                <div class="text-[12px] md:text-sm font-medium text-gray-800">{{ $card->title }}</div>
-                            </div>
-                        @endforeach
-                    </div>
+                            @endforeach
+                        </div>
                     @endif
 
                     <div class="bg-gray-100 py-3 px-3 rounded">
-                    <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
+                        <div class="text-center mb-4 text-gray-700">Call or WhatsApp to order directly</div>
 
-                    <div class="grid grid-cols-2 gap-2 md:gap-3">
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
 
-                        <a href="tel:{{ $setup->phone }}"
-                            class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
-                                <path
-                                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                </path>
-                            </svg>
-                            Call Now
-                        </a>
+                            <a href="tel:{{ $setup->phone }}"
+                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
+                                    <path
+                                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                    </path>
+                                </svg>
+                                Call Now
+                            </a>
 
-                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
-                            target="_blank"
-                            class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
-                                <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
-                            </svg>
-                            WhatsApp
-                        </a>
-                    </div></div>
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
+                                target="_blank"
+                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
+                                    <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+                                </svg>
+                                WhatsApp
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. TABS SECTION -->
-        <div class="bg-white rounded-lg shadow-xs   relative overflow-hidden mb-12">
-            <!-- Tab Buttons -->
-            <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
-                id="tabs-nav">
-                <button onclick="switchTab('description')" id="tab-btn-description"
-                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
+        <!-- 3. TABS & RELATED PRODUCTS SECTION -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-start">
 
-                <button onclick="switchTab('specification')" id="tab-btn-specification"
-                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
+            <!-- Left Column: Tabs Section -->
+            <div class="md:col-span-7 lg:col-span-8 bg-white rounded-lg shadow-xs relative overflow-hidden">
+                <!-- Tab Buttons -->
+                <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
+                    id="tabs-nav">
+                    <button onclick="switchTab('description')" id="tab-btn-description"
+                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
 
-                <button onclick="switchTab('review')" id="tab-btn-review"
-                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
-                    Reviews ({{ $product->reviews->count() }})
-                </button>
-            </div>
+                    <button onclick="switchTab('specification')" id="tab-btn-specification"
+                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
 
-            <!-- Tab Content Area -->
-            <div class="p-6 md:p-10">
-
-                <!-- Section: Description  -->
-                <div id="tab-content-description" class="tab-content block">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
-                    <div class="text-[18px] prose prose-orange max-w-none">
-                        {!! $product->full_description ?? 'No detailed description available for this product.' !!}
-                    </div>
+                    <button onclick="switchTab('review')" id="tab-btn-review"
+                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
+                        Reviews ({{ $product->reviews->count() }})
+                    </button>
                 </div>
 
-                <!-- Section: Specification  -->
-                <div id="tab-content-specification" class="tab-content hidden">
-                    <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
+                <!-- Tab Content Area -->
+                <div class="p-6 md:p-10">
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">Brand:</span>
-                            <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                    <!-- Section: Description  -->
+                    <div id="tab-content-description" class="tab-content block">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
+                        <div class="text-[18px] prose prose-orange max-w-none">
+                            {!! $product->full_description ?? 'No detailed description available for this product.' !!}
                         </div>
+                    </div>
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">SKU:</span>
-                            <span class="font-mono font-bold">
-                                @if (is_array($product->sku_code))
-                                    {{ implode(', ', $product->sku_code) }}
-                                @else
-                                    {{ $product->sku_code ?? 'N/A' }}
-                                @endif
-                            </span>
-                        </div>
+                    <!-- Section: Specification  -->
+                    <div id="tab-content-specification" class="tab-content hidden">
+                        <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">Availability:</span>
-                            <span
-                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
-                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
-                            </span>
-                        </div>
+                            @if(!empty($product->brand))
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <span class="font-medium text-gray-500">Brand:</span>
+                                <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                            </div>
+                        @endif
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">Category:</span>
-                            <span class="font-bold">{{ $product->mega_categories->first()->name ?? 'N/A' }}</span>
-                        </div>
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <span class="font-medium text-gray-500">SKU:</span>
+                                <span id="tab-sku" class="font-mono font-bold">
+                                    @if(!empty($skus))
+                                        {{ implode(', ', $skus) }}
+                                    @else
+                                        N/A
+                                    @endif
+                                </span>
+                            </div>
 
-                        @php
-                            $grouped = [];
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <span class="font-medium text-gray-500">Availability:</span>
+                                <span
+                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                                    {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                </span>
+                            </div>
 
-                            if ($product->type === 'variation') {
-                                foreach ($product->variations as $variation) {
-                                    foreach ($variation->attributes as $attr) {
-                                        $name = $attr->attributeGroup->name ?? '';
-                                        $val = $attr->attributeValue->name ?? '';
-                                        if (!isset($grouped[$name])) {
-                                            $grouped[$name] = [];
-                                        }
-                                        if (!in_array($val, $grouped[$name])) {
-                                            $grouped[$name][] = $val;
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <span class="font-medium text-gray-500">Category:</span>
+                                <span class="font-bold">{{ $product->mega_categories->first()->name ?? 'N/A' }}</span>
+                            </div>
+
+                            @php
+                                $grouped = [];
+
+                                if ($product->type === 'variation') {
+                                    foreach ($product->variations as $variation) {
+                                        foreach ($variation->attributes as $attr) {
+                                            $name = $attr->attributeGroup->name ?? '';
+                                            $val = $attr->attributeValue->name ?? '';
+                                            if (!isset($grouped[$name])) {
+                                                $grouped[$name] = [];
+                                            }
+                                            if (!in_array($val, $grouped[$name])) {
+                                                $grouped[$name][] = $val;
+                                            }
                                         }
                                     }
                                 }
-                            }
+                            @endphp
+
+                            @foreach ($grouped as $groupName => $values)
+                                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                    <span class="font-medium text-gray-500">{{ $groupName }}:</span>
+                                    <span class="font-bold">{{ implode(', ', $values) }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+
+                    <!-- Section: Review -->
+                    <div id="tab-content-review" class="tab-content hidden px-2">
+                        <h3 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h3>
+
+                        @php
+                            $reviews = $product->reviews;
+                            $avgRating = $reviews->avg('rating') ?? 0;
+                            $totalReviews = $reviews->count();
+                            $avatarColors = ['bg-orange-600', 'bg-blue-600', 'bg-purple-600', 'bg-indigo-600'];
                         @endphp
 
-                        @foreach ($grouped as $groupName => $values)
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-medium text-gray-500">{{ $groupName }}:</span>
-                                <span class="font-bold">{{ implode(', ', $values) }}</span>
+                        <!-- Review Summary Card -->
+                        <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
+                            <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
+                            <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <i
+                                        class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-300' }}"></i>
+                                @endfor
                             </div>
-                        @endforeach
-                    </div>
-                </div>
-
-
-                <!-- Section: Review -->
-                <div id="tab-content-review" class="tab-content hidden px-2">
-                    <h3 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h3>
-
-                    @php
-                        $reviews = $product->reviews;
-                        $avgRating = $reviews->avg('rating') ?? 0;
-                        $totalReviews = $reviews->count();
-                        $avatarColors = ['bg-orange-600', 'bg-blue-600', 'bg-purple-600', 'bg-indigo-600'];
-                    @endphp
-
-                    <!-- Review Summary Card -->
-                    <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
-                        <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
-                        <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <i
-                                    class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-300' }}"></i>
-                            @endfor
+                            <div class="text-sm text-gray-900 font-bold">{{ $totalReviews }} Reviews</div>
                         </div>
-                        <div class="text-sm text-gray-900 font-bold">{{ $totalReviews }} Reviews</div>
-                    </div>
 
-                    <!-- Individual Reviews List -->
-                    <div class="space-y-0">
-                        @forelse($reviews as $index => $review)
-                            <div class="py-8 border-b border-gray-100 last:border-0">
-                                <div class="flex items-start gap-5">
+                        <!-- Individual Reviews List -->
+                        <div class="space-y-0">
+                            @forelse($reviews as $index => $review)
+                                <div class="py-8 border-b border-gray-100 last:border-0">
+                                    <div class="flex items-start gap-5">
 
-                                    <!-- Initials Avatar (Like "RH" or "F") -->
-                                    @php
-                                        $nameParts = explode(' ', $review->customer->name ?? 'User');
-                                        $initials = '';
-                                        foreach ($nameParts as $part) {
-                                            $initials .= substr($part, 0, 1);
-                                        }
-                                        $initials = strtoupper(substr($initials, 0, 2));
-                                    @endphp
+                                        <!-- Initials Avatar (Like "RH" or "F") -->
+                                        @php
+                                            $nameParts = explode(' ', $review->customer->name ?? 'User');
+                                            $initials = '';
+                                            foreach ($nameParts as $part) {
+                                                $initials .= substr($part, 0, 1);
+                                            }
+                                            $initials = strtoupper(substr($initials, 0, 2));
+                                        @endphp
 
-                                    <div
-                                        class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-primary rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
-                                        {{ $initials }}
-                                    </div>
-
-                                    <div class="flex-1">
-                                        <!-- Header Line: Name, Stars, Date -->
-                                        <div class="flex items-center gap-3 mb-2">
-                                            <h4 class="text-md font-bold text-gray-900">
-                                                {{ $review->customer->name ?? 'Customer' }}</h4>
-
-                                            <div class="flex text-yellow-400 text-[10px] gap-0.5">
-                                                @for ($i = 1; $i <= 5; $i++)
-                                                    <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
-                                                @endfor
-                                            </div>
-
-                                            <span class="text-sm text-gray-400 font-medium ml-1">
-                                                {{ $review->created_at->diffForHumans() }}
-                                            </span>
+                                        <div
+                                            class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-primary rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
+                                            {{ $initials }}
                                         </div>
 
-                                        <!-- Review Content inside the loop -->
-                                        <p class="text-md text-gray-700 leading-relaxed mb-4">
-                                            {{ $review->comment }}
-                                        </p>
+                                        <div class="flex-1">
+                                            <!-- Header Line: Name, Stars, Date -->
+                                            <div class="flex items-center gap-3 mb-2">
+                                                <h4 class="text-md font-bold text-gray-900">
+                                                    {{ $review->customer->name ?? 'Customer' }}
+                                                </h4>
 
-                                        @if ($review->images && count($review->images) > 0)
-                                            <!-- Thumbnails -->
-                                            <div class="flex flex-wrap gap-3 mb-4">
-                                                @foreach ($review->images as $img)
-                                                    <div
-                                                        class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
-                                                        <img src="{{ asset('storage/' . $img) }}"
-                                                            onclick="expandReviewImage(this.src, '{{ $review->id }}')"
-                                                            class="w-full h-full object-cover" alt="Review Image">
-                                                    </div>
-                                                @endforeach
-                                            </div>
-
-                                            <!-- Expanded Image Container (Hidden by default) -->
-                                            <div id="expanded-container-{{ $review->id }}"
-                                                class="hidden mb-6 transition-all duration-500">
-                                                <div class="relative inline-block group">
-                                                    <img id="large-view-{{ $review->id }}" src=""
-                                                        class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
-
-                                                    <!-- Close Button -->
-                                                    <button onclick="closeReviewImage('{{ $review->id }}')"
-                                                        class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-primary w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
-                                                        <i class="fas fa-times text-xs"></i>
-                                                    </button>
+                                                <div class="flex text-yellow-400 text-[10px] gap-0.5">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
+                                                    @endfor
                                                 </div>
-                                            </div>
-                                        @endif
 
-                                        <!-- Variant Tag -->
-                                        <div
-                                            class="inline-block bg-[#F3F4F6] text-gray-500 text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">
-                                            @if ($review->variation)
-                                                {{ $review->variation->display_name }}
-                                            @else
-                                                Single Product
+                                                <span class="text-sm text-gray-400 font-medium ml-1">
+                                                    {{ $review->created_at->diffForHumans() }}
+                                                </span>
+                                            </div>
+
+                                            <!-- Review Content inside the loop -->
+                                            <p class="text-md text-gray-700 leading-relaxed mb-4">
+                                                {{ $review->comment }}
+                                            </p>
+
+                                            @if ($review->images && count($review->images) > 0)
+                                                <!-- Thumbnails -->
+                                                <div class="flex flex-wrap gap-3 mb-4">
+                                                    @foreach ($review->images as $img)
+                                                        <div
+                                                            class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
+                                                            <img src="{{ asset('storage/' . $img) }}"
+                                                                onclick="expandReviewImage(this.src, '{{ $review->id }}')"
+                                                                class="w-full h-full object-cover" alt="Review Image">
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+
+                                                <!-- Expanded Image Container (Hidden by default) -->
+                                                <div id="expanded-container-{{ $review->id }}"
+                                                    class="hidden mb-6 transition-all duration-500">
+                                                    <div class="relative inline-block group">
+                                                        <img id="large-view-{{ $review->id }}" src=""
+                                                            class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
+
+                                                        <!-- Close Button -->
+                                                        <button onclick="closeReviewImage('{{ $review->id }}')"
+                                                            class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-primary w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                                                            <i class="fas fa-times text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             @endif
+
+                                            <!-- Variant Tag -->
+                                            <div
+                                                class="inline-block bg-[#F3F4F6] text-gray-500 text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">
+                                                @if ($review->variation)
+                                                    {{ $review->variation->display_name }}
+                                                @else
+                                                    Single Product
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-20 bg-white">
-                                <p class="text-gray-400 font-medium italic">No reviews yet. Be the first to share your
-                                    experience!</p>
-                            </div>
-                        @endforelse
+                            @empty
+                                <div class="text-center py-20 bg-white">
+                                    <p class="text-gray-400 font-medium italic">No reviews yet. Be the first to share your
+                                        experience!</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                </div>
+            </div> <!-- Close Left Column: Tabs Section -->
+
+            <!-- Right Column: Related Products sidebar -->
+            @if(isset($relatedProducts) && $relatedProducts->count() > 0)
+                <div class="md:col-span-5 lg:col-span-4 sticky top-4">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <i class="fas fa-layer-group text-[#FF6A00]"></i> Related Products
+                            </h3>
+                            <span
+                                class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full">{{ $relatedProducts->count() }}</span>
+                        </div>
+                        <div class="p-4 space-y-4 max-h-[800px] overflow-y-auto custom-scrollbar">
+                            @foreach($relatedProducts as $related)
+                                <a href="{{ route('product.details', $related->slug) }}"
+                                    class="group flex gap-4 p-3 rounded-lg border border-transparent hover:border-[#FF6A00]/20 hover:bg-orange-50/30 transition-all">
+                                    <!-- Image -->
+                                    <div
+                                        class="w-20 h-20 shrink-0 rounded-md overflow-hidden bg-gray-100 border border-gray-200 relative">
+                                        <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
+                                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
+                                    </div>
+                                    <!-- Info -->
+                                    <div class="flex flex-col justify-center">
+                                        <h4
+                                            class="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-[#FF6A00] transition-colors mb-1">
+                                            {{ $related->title }}
+                                        </h4>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-md font-black text-[#FF6A00]">
+                                                @if(($setup->currency_position ?? 'left') == 'left')
+                                                    {{ $setup->currency }}
+                                                    {{ number_format($related->display_price_data->sale_price) }}
+                                                @else
+                                                    {{ number_format($related->display_price_data->sale_price) }}
+                                                    {{ $setup->currency }}
+                                                @endif
+                                            </span>
+                                            @if($related->display_price_data->regular_price > $related->display_price_data->sale_price)
+                                                <span class="text-xs text-gray-400 line-through">
+                                                    @if(($setup->currency_position ?? 'left') == 'left')
+                                                        {{ $setup->currency }}
+                                                        {{ number_format($related->display_price_data->regular_price) }}
+                                                    @else
+                                                        {{ number_format($related->display_price_data->regular_price) }}
+                                                        {{ $setup->currency }}
+                                                    @endif
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
-
-            </div>
+            @endif
         </div>
 
     </section>
@@ -514,10 +591,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                            onclick="changeImage('${imgUrl}', this)">
-                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
-                        </button>`;
+                                    <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                        onclick="changeImage('${imgUrl}', this)">
+                                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                    </button>`;
             });
         }
 
@@ -563,110 +640,143 @@
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
-   function updatePriceDisplay(salePrice, regularPrice) {
-    const saleEl = document.getElementById('sale-price');
-    const regularEl = document.getElementById('regular-price');
-    const badgeEl = document.getElementById('discount-badge');
-    const currency = "{{ $setup->currency }}";
-    const currencyPosition = "{{ $setup->currency_position ?? 'left' }}";
+        
+        
+        
+        
+        
+        function updatePriceDisplay(salePrice, regularPrice) {
+            const saleEl = document.getElementById('sale-price');
+            const regularEl = document.getElementById('regular-price');
+            const badgeEl = document.getElementById('discount-badge');
+            const currency = "{{ $setup->currency }}";
+            const currencyPosition = "{{ $setup->currency_position ?? 'left' }}";
 
-    const formattedSale = Math.round(salePrice).toLocaleString();
-    if (saleEl) {
-        saleEl.innerText = (currencyPosition === 'left')
-            ? `${currency} ${formattedSale}`
-            : `${formattedSale} ${currency}`;
-    }
-
-    if (regularEl) {
-        if (regularPrice && regularPrice > salePrice) {
-            const formattedRegular = Math.round(regularPrice).toLocaleString();
-            regularEl.innerText = (currencyPosition === 'left')
-                ? `${currency} ${formattedRegular}`
-                : `${formattedRegular} ${currency}`;
-            regularEl.classList.remove('hidden');
-        } else {
-            regularEl.classList.add('hidden');
-        }
-    }
-
-    if (badgeEl) {
-        if (regularPrice && regularPrice > salePrice) {
-            const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
-            badgeEl.innerText = percent + '% OFF';
-            badgeEl.classList.remove('hidden');
-        } else {
-            badgeEl.classList.add('hidden');
-        }
-    }
-}
-
-function recalculateSelectedPrice() {
-    if (finalSelectedVariationIds.length === 0) {
-        updatePriceDisplay(
-            {{ $product->display_price_data->sale_price }},
-            {{ $product->display_price_data->regular_price }}
-        );
-        return;
-    }
-
-    let totalSale = 0;
-    let totalRegular = 0;
-
-    finalSelectedVariationIds.forEach(id => {
-        const v = allVariations.find(v => v.id === id);
-        if (v) {
-            totalSale += parseFloat(v.price);
-            totalRegular += parseFloat(v.regular_price || v.price);
-        }
-    });
-
-    updatePriceDisplay(totalSale, totalRegular);
-}
-
-function handleSelection(group, valId, isLastGroup) {
-    if (!isLastGroup) {
-        activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
-        let idx = attributeGroups.indexOf(group);
-        for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-        if (finalSelectedVariationIds.length === 0) {
-            updateGalleryThumbnails(defaultGalleries);
-            recalculateSelectedPrice();
-        }
-    } else {
-        activeFilters[group] = valId;
-        let matched = allVariations.find(v => {
-            return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
-        });
-
-        if (matched) {
-            let isSingleChoice = false;
-            for (let gName in matched.attributes) {
-                if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
+            const formattedSale = Math.round(salePrice).toLocaleString();
+            if (saleEl) {
+                saleEl.innerText = (currencyPosition === 'left')
+                    ? `${currency} ${formattedSale}`
+                    : `${formattedSale} ${currency}`;
             }
 
-            if (isSingleChoice) {
-                finalSelectedVariationIds = [matched.id];
-                let combined = [...(matched.galleries || []), ...defaultGalleries];
-                updateGalleryThumbnails([...new Set(combined)]);
-                if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
-            } else {
-                const index = finalSelectedVariationIds.indexOf(matched.id);
-                if (index > -1) {
-                    finalSelectedVariationIds.splice(index, 1);
-                    if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+            if (regularEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const formattedRegular = Math.round(regularPrice).toLocaleString();
+                    regularEl.innerText = (currencyPosition === 'left')
+                        ? `${currency} ${formattedRegular}`
+                        : `${formattedRegular} ${currency}`;
+                    regularEl.classList.remove('hidden');
                 } else {
-                    finalSelectedVariationIds.push(matched.id);
-                    let combined = [...(matched.galleries || []), ...defaultGalleries];
-                    updateGalleryThumbnails([...new Set(combined)]);
-                    if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                    if(regularEl) regularEl.classList.add('hidden');
                 }
             }
 
-            recalculateSelectedPrice();
+            if (badgeEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+                    badgeEl.innerText = percent + '% OFF';
+                    badgeEl.classList.remove('hidden');
+                } else {
+                    if(badgeEl) badgeEl.classList.add('hidden');
+                }
+            }
         }
-    }
-    renderAttributes();
-}
+
+        function recalculateSelectedPrice() {
+            if (finalSelectedVariationIds.length === 0) {
+                updatePriceDisplay(
+                    {{ $product->display_price_data->sale_price ?? 0 }},
+                    {{ $product->display_price_data->regular_price ?? 0 }}
+                );
+                return;
+            }
+
+            let totalSale = 0;
+            let totalRegular = 0;
+
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v) {
+                    totalSale += parseFloat(v.price);
+                    totalRegular += parseFloat(v.regular_price || v.price);
+                }
+            });
+
+            updatePriceDisplay(totalSale, totalRegular);
+        }
+
+        function updateSkuDisplay() {
+            const skuEl = document.getElementById('product-sku');
+            const tabSkuEl = document.getElementById('tab-sku');
+            
+            if (finalSelectedVariationIds.length === 0) {
+                const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
+                if (allSkus.length > 0) {
+                    const text = [...new Set(allSkus)].join(", ");
+                    if(skuEl) skuEl.innerText = text;
+                    if(tabSkuEl) tabSkuEl.innerText = text;
+                }
+                return;
+            }
+            
+            let selectedSkus = [];
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v && v.sku) selectedSkus.push(v.sku);
+            });
+            
+            if (selectedSkus.length > 0) {
+                const text = [...new Set(selectedSkus)].join(", ");
+                if(skuEl) skuEl.innerText = text;
+                if(tabSkuEl) tabSkuEl.innerText = text;
+            }
+        }
+
+        function handleSelection(group, valId, isLastGroup) {
+            if (!isLastGroup) {
+                activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
+                let idx = attributeGroups.indexOf(group);
+                for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
+                if (finalSelectedVariationIds.length === 0) {
+                    updateGalleryThumbnails(defaultGalleries);
+                    recalculateSelectedPrice();
+                }
+            } else {
+                activeFilters[group] = valId;
+                let matched = allVariations.find(v => {
+                    return attributeGroups.every(g => v.attributes[g].id == activeFilters[g]);
+                });
+
+                if (matched) {
+                    let isSingleChoice = false;
+                    for (let gName in matched.attributes) {
+                        if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
+                    }
+
+                    if (isSingleChoice) {
+                        finalSelectedVariationIds = [matched.id];
+                        let combined = [...(matched.galleries || []), ...defaultGalleries];
+                        updateGalleryThumbnails([...new Set(combined)]);
+                        if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                    } else {
+                        const index = finalSelectedVariationIds.indexOf(matched.id);
+                        if (index > -1) {
+                            finalSelectedVariationIds.splice(index, 1);
+                            if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                        } else {
+                            finalSelectedVariationIds.push(matched.id);
+                            let combined = [...(matched.galleries || []), ...defaultGalleries];
+                            updateGalleryThumbnails([...new Set(combined)]);
+                            if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
+                        }
+                    }
+
+                    recalculateSelectedPrice();
+                }
+            }
+            updateSkuDisplay();
+            renderAttributes();
+        }
 
         function checkIsSelected(groupName, valId) {
             return allVariations.some(v => finalSelectedVariationIds.includes(v.id) && v.attributes[groupName].id == valId);
@@ -745,15 +855,15 @@ function handleSelection(group, valId, isLastGroup) {
             const wishText = document.getElementById('wish-text-main');
 
             fetch("{{ route('wishlist.toggle') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token
-                    },
-                    body: JSON.stringify({
-                        product_id: productId
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token
+                },
+                body: JSON.stringify({
+                    product_id: productId
                 })
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'unauthorized') {

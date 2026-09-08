@@ -67,17 +67,29 @@
                     @endif
 
                     <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-3 leading-tight">{{ $product->title }}</h1>
-
-                    <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
-                        <span class="uppercase font-bold">SKU</span>: <span class="font-mono">
-                            @if (is_array($product->sku_code))
-                                {{ implode(', ', $product->sku_code) }}
-                            @else
-                                {{ $product->sku_code ?? 'N/A' }}
+                    @php
+                        $skus = [];
+                        if ($product->type === 'variation') {
+                            $skus = $product->variations->pluck('sku')->filter()->toArray();
+                        } else {
+                            $skus = is_array($product->sku_code) ? $product->sku_code : [$product->sku_code];
+                        }
+                        $skus = array_unique(array_filter($skus));
+                    @endphp
+                    @if(!empty($skus) || !empty($product->brand))
+                        <div class="flex items-center gap-2 mb-2 text-sm text-gray-600">
+                            @if(!empty($skus))
+                                <span class="uppercase font-bold">SKU</span>: <span id="product-sku" class="font-mono">
+                                    {{ implode(', ', $skus) }}
+                                </span>
                             @endif
-                        </span>
-                        <span class="ml-4 font-bold">Brand:</span> <span>{{ $product->brand->name ?? 'No Brand' }}</span>
-                    </div>
+                            @if(!empty($product->brand))
+                                <span class="@if(!empty($skus)) ml-4 @endif font-bold">Brand:</span>
+                                <span>{{ $product->brand->name }}</span>
+                            @endif
+                        </div>
+                    @endif
+
                     <div
                         class="prose prose-slate max-w-none mb-4 text-[18px] leading-relaxed font-medium overflow-visible relative">
                         {!! $product->short_description !!}
@@ -145,7 +157,7 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -255,18 +267,20 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
-                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                            <span class="font-medium text-gray-500">Brand:</span>
-                            <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
-                        </div>
+                        @if(!empty($product->brand))
+                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                <span class="font-medium text-gray-500">Brand:</span>
+                                <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                            </div>
+                        @endif
 
                         <div class="flex items-center justify-between py-3 border-b border-gray-100">
                             <span class="font-medium text-gray-500">SKU:</span>
-                            <span class="font-mono font-bold">
-                                @if (is_array($product->sku_code))
-                                    {{ implode(', ', $product->sku_code) }}
+                            <span id="tab-sku" class="font-mono font-bold">
+                                @if(!empty($skus))
+                                    {{ implode(', ', $skus) }}
                                 @else
-                                    {{ $product->sku_code ?? 'N/A' }}
+                                    N/A
                                 @endif
                             </span>
                         </div>
@@ -432,6 +446,29 @@
             </div>
         </div>
 
+        @if (isset($relatedProducts) && $relatedProducts->count() > 0)
+            <!-- Related Products -->
+            <div class="mt-10 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3">
+                        Related Products
+                    </h2>
+                    @if ($product->mega_categories->first())
+                        <a href="{{ route('category.products', $product->mega_categories->first()->slug) }}"
+                            class="text-sm font-semibold text-[var(--primary-color)] hover:underline flex items-center gap-1">
+                            View More <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    @endif
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
+                    @foreach ($relatedProducts->take(10) as $rel)
+                        <x-template1.product-card :product="$rel" />
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
     </section>
 @endsection
 
@@ -515,10 +552,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                onclick="changeImage('${imgUrl}', this)">
-                                <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
-                            </button>`;
+                                <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                    onclick="changeImage('${imgUrl}', this)">
+                                    <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                </button>`;
             });
         }
 
@@ -564,12 +601,104 @@
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
+
+
+        function updatePriceDisplay(salePrice, regularPrice) {
+            const saleEl = document.getElementById('sale-price');
+            const regularEl = document.getElementById('regular-price');
+            const badgeEl = document.getElementById('discount-badge');
+            const currency = "{{ $setup->currency }}";
+            const currencyPosition = "{{ $setup->currency_position ?? 'left' }}";
+
+            const formattedSale = Math.round(salePrice).toLocaleString();
+            if (saleEl) {
+                saleEl.innerText = (currencyPosition === 'left')
+                    ? `${currency} ${formattedSale}`
+                    : `${formattedSale} ${currency}`;
+            }
+
+            if (regularEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const formattedRegular = Math.round(regularPrice).toLocaleString();
+                    regularEl.innerText = (currencyPosition === 'left')
+                        ? `${currency} ${formattedRegular}`
+                        : `${formattedRegular} ${currency}`;
+                    regularEl.classList.remove('hidden');
+                } else {
+                    if (regularEl) regularEl.classList.add('hidden');
+                }
+            }
+
+            if (badgeEl) {
+                if (regularPrice && regularPrice > salePrice) {
+                    const percent = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
+                    badgeEl.innerText = percent + '% OFF';
+                    badgeEl.classList.remove('hidden');
+                } else {
+                    if (badgeEl) badgeEl.classList.add('hidden');
+                }
+            }
+        }
+
+        function recalculateSelectedPrice() {
+            if (finalSelectedVariationIds.length === 0) {
+                updatePriceDisplay(
+                        {{ $product->display_price_data->sale_price ?? 0 }},
+                    {{ $product->display_price_data->regular_price ?? 0 }}
+                );
+                return;
+            }
+
+            let totalSale = 0;
+            let totalRegular = 0;
+
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v) {
+                    totalSale += parseFloat(v.price);
+                    totalRegular += parseFloat(v.regular_price || v.price);
+                }
+            });
+
+            updatePriceDisplay(totalSale, totalRegular);
+        }
+
+        function updateSkuDisplay() {
+            const skuEl = document.getElementById('product-sku');
+            const tabSkuEl = document.getElementById('tab-sku');
+
+            if (finalSelectedVariationIds.length === 0) {
+                const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
+                if (allSkus.length > 0) {
+                    const text = [...new Set(allSkus)].join(", ");
+                    if (skuEl) skuEl.innerText = text;
+                    if (tabSkuEl) tabSkuEl.innerText = text;
+                }
+                return;
+            }
+
+            let selectedSkus = [];
+            finalSelectedVariationIds.forEach(id => {
+                const v = allVariations.find(v => v.id === id);
+                if (v && v.sku) selectedSkus.push(v.sku);
+            });
+
+            if (selectedSkus.length > 0) {
+                const text = [...new Set(selectedSkus)].join(", ");
+                if (skuEl) skuEl.innerText = text;
+                if (tabSkuEl) tabSkuEl.innerText = text;
+            }
+        }
+
         function handleSelection(group, valId, isLastGroup) {
             if (!isLastGroup) {
                 activeFilters[group] = (activeFilters[group] == valId) ? null : valId;
                 let idx = attributeGroups.indexOf(group);
                 for (let i = idx + 1; i < attributeGroups.length; i++) activeFilters[attributeGroups[i]] = null;
-                if (finalSelectedVariationIds.length === 0) updateGalleryThumbnails(defaultGalleries);
+                if (finalSelectedVariationIds.length === 0) {
+                    updateGalleryThumbnails(defaultGalleries);
+                    recalculateSelectedPrice();
+                }
             } else {
                 activeFilters[group] = valId;
                 let matched = allVariations.find(v => {
@@ -587,7 +716,6 @@
                         let combined = [...(matched.galleries || []), ...defaultGalleries];
                         updateGalleryThumbnails([...new Set(combined)]);
                         if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
-                        document.getElementById('sale-price').innerText = '{{ $setup->currency }} ' + matched.price.toLocaleString();
                     } else {
                         const index = finalSelectedVariationIds.indexOf(matched.id);
                         if (index > -1) {
@@ -600,8 +728,11 @@
                             if (matched.main_image) document.getElementById('mainImage').src = matched.main_image;
                         }
                     }
+
+                    recalculateSelectedPrice();
                 }
             }
+            updateSkuDisplay();
             renderAttributes();
         }
 

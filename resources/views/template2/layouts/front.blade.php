@@ -2,21 +2,22 @@
 <html lang="en">
 
 <head>
-   @yield('meta')
+    @yield('meta')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
 
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? asset('images/template1/frontend/sell.png') }}">
+    <link rel="icon" type="image/x-icon"
+        href="{{ $setup->favicon_url ?? asset('images/template1/frontend/sell.png') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <!-- Outfit Font -->
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-    media="print" onload="this.media='all'" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        media="print" onload="this.media='all'" rel="stylesheet" />
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         media="print" onload="this.media='all'">
@@ -26,22 +27,42 @@
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
         :root {
-            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#016738' }};
+            --primary-color:
+                {{ $themeColor->theme_template['primary_color'] ?? '#016738' }}
+            ;
 
-            --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
+            --primary-text:
+                {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }}
+            ;
 
-            --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }};
-            --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }};
+            --primary-hover-text:
+                {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }}
+            ;
+            --primary-hover-color:
+                {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }}
+            ;
 
-            --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
-            --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
+            --secondary-color:
+                {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }}
+            ;
+            --secondary-text:
+                {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }}
+            ;
 
 
-            --header-bg: {{ $themeColor->theme_template['header_color'] ?? ($themeColor->theme_template['primary_color'] ?? '#66267b') }};
-            --header-text: {{ $themeColor->theme_template['header_text_color'] ?? '#ffffff' }};
+            --header-bg:
+                {{ $themeColor->theme_template['header_color'] ?? ($themeColor->theme_template['primary_color'] ?? '#66267b') }}
+            ;
+            --header-text:
+                {{ $themeColor->theme_template['header_text_color'] ?? '#ffffff' }}
+            ;
 
-            --footer-bg: {{ $themeColor->theme_template['footer_color'] ?? '#0a061e' }};
-            --footer-text: {{ $themeColor->theme_template['footer_text_color'] ?? '#ffffff' }};
+            --footer-bg:
+                {{ $themeColor->theme_template['footer_color'] ?? '#0a061e' }}
+            ;
+            --footer-text:
+                {{ $themeColor->theme_template['footer_text_color'] ?? '#ffffff' }}
+            ;
         }
 
         .header-custom-bg {
@@ -53,12 +74,15 @@
             background-color: var(--footer-bg) !important;
             color: var(--footer-text) !important;
         }
+
         .text-header {
             color: var(--header-text) !important;
         }
+
         .text-footer {
             color: var(--footer-text) !important;
         }
+
         .primary-bg {
             background-color: var(--primary-color) !important;
             color: var(--primary-text) !important;
@@ -97,7 +121,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-
     </style>
     @stack('styles')
 </head>
@@ -128,7 +151,7 @@
 
     @stack('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,
