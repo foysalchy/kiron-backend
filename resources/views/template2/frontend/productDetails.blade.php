@@ -44,7 +44,7 @@
                 <!-- Left: Image Gallery -->
                 <div class="  lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
-                        class="  mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
+                        class="  mb-4 overflow-hidden rounded-xl bg-white border border-gray-100 relative group">
                         <img id="mainImage" src="{{ $product->thumbnail_url }}"
                             class="m-auto  object-contain transition-transform duration-500">
                     </div>
