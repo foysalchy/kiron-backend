@@ -161,11 +161,11 @@
         </div>
 
         <!-- 3. Bottom Bar -->
-        <div class="border-t border-white/40 py-5">
+        <div class="border-t border-white/40 py-5 credit-bottom">
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div
                     class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm opacity-90 text-center">
-                    <p>Â© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
+                    <p>© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-xs md:text-sm opacity-90">We Accept:</span>
