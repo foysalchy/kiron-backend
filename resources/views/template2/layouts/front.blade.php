@@ -100,6 +100,11 @@
 
     </style>
     @stack('styles')
+    @if(isset($footerCodes))
+        @foreach($footerCodes as $footerCode)
+            {!! $footerCode->code !!}
+        @endforeach
+    @endif
 </head>
 
 <body class="font-['Poppins',_sans-serif]">

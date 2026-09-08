@@ -25,7 +25,7 @@
 @endphp
 
 <div
-    class="group relative flex flex-col p-4 bg-white border border-gray-200 rounded-lg hover:shadow-xs transition-all duration-300 h-full">
+    class="group relative flex flex-col   bg-white border border-gray-200 rounded-lg hover:shadow-xs transition-all duration-300 h-full">
 
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">
@@ -58,7 +58,7 @@
     </div>
 
     <!-- Info Area -->
-    <div class="flex flex-col flex-grow">
+    <div class="flex flex-col flex-grow px-4">
         <a href="{{ route('product.details', $product->slug ?? $product->id) }}" class="block group/title">
             <p
                 class="hind-siliguri-medium md:text-[17px] text-[15px]  text-gray-800 line-clamp-2 mb-2 min-h-[40px] group-hover/title:text-[#BD4F00] transition-colors">
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Price & Button -->
-    <div class="mt-auto pt-3 flex items-center justify-between gap-1">
+    <div class="mt-auto px-4 pb-4 pt-3 flex items-center justify-between gap-1">
         <div class="flex flex-col min-w-0">
             <span class="text-lg font-bold text-brand text-primary">
                 @if(($setup->currency_position ?? 'left') == 'left')

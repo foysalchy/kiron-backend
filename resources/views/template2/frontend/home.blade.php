@@ -219,7 +219,7 @@
         <section class="w-full  px-4 font-manrope">
             <div class="p-0 container mx-auto    ">
                 <div
-                    class=" bg-gray-100  border border-gray-200 rounded-lg px-6 py-6
+                    class=" bg-gray-50  border border-gray-100 rounded-lg px-6 py-6
                     prose prose-slate max-w-none
                     prose-headings:text-[#041533] prose-headings:font-bold
                     prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
