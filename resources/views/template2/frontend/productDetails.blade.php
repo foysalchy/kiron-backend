@@ -14,7 +14,7 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="container mx-auto px-4 flex flex-wrap items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
+            class="container mx-auto px-4 flex   items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
 
             <a href="{{ route('home') }}"
                 class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
