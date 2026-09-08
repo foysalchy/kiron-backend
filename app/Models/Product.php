@@ -86,6 +86,22 @@ class Product extends Model
         return $this->thumbnail_url;
     }
 
+    public function getMetaTitleAttribute($value): ?string
+    {
+        if (empty($value) || in_array(strtolower(trim($value)), ['null', 'undefined'])) {
+            return null;
+        }
+        return $value;
+    }
+
+    public function getMetaDescriptionAttribute($value): ?string
+    {
+        if (empty($value) || in_array(strtolower(trim($value)), ['null', 'undefined'])) {
+            return null;
+        }
+        return $value;
+    }
+
     public static function homepageCacheKeys(): array
     {
         return [

@@ -13,9 +13,11 @@
 ])
 
 <?php
-$titlex = $title ?: $setup->title ?? $setup->shop_name;
-$title = $titlex;
-$description = $description ?: $setup->description ?? '';
+$rawTitle = trim((string) $title);
+$title = (!empty($rawTitle) && !in_array(strtolower($rawTitle), ['null', 'undefined'])) ? $rawTitle : ($setup->title ?? $setup->shop_name ?? '');
+
+$rawDesc = trim((string) $description);
+$description = (!empty($rawDesc) && !in_array(strtolower($rawDesc), ['null', 'undefined'])) ? $rawDesc : ($setup->description ?? '');
 $keywords = is_array($keywords) ? implode(',', $keywords) : ($keywords ?: $setup->tags ?? '');
 $canonical = $canonical ?: url()->current();
 if (!$image) {
@@ -38,11 +40,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="title" content="{{ $title }}">
-@if (!($setup->allow_search_engine_index ?? false))
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-    @else
-        <meta name="robots" content="index, follow, archive, snippet">
-    @endif
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="description" content="{{ $description }}">
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
@@ -118,7 +116,7 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {{-- Breadcrumb --}}
 @if (count($breadcrumb))
     <script type="application/ld+json">
-    {!! json_encode([
+        {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',
             'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
@@ -132,14 +130,14 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 
             })->toArray()
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
+        </script>
 @endif
 
 
 {{-- BlogPosting --}}
 @if ($type == 'BlogPosting')
     <script type="application/ld+json">
-    {!! json_encode([
+        {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
             'headline' => $schema['headline'] ?? $title,
@@ -171,26 +169,26 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
                 ? \Carbon\Carbon::parse($schema['updated'])->toIso8601String()
                 : now()->toIso8601String()
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
+        </script>
 @endif
 
 
 @if ($type == 'ContactPage')
     <script type="application/ld+json">
-    {!! json_encode([
+        {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'ContactPage',
             'name' => $title,
             'description' => $description,
             'url' => $canonical
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
+        </script>
 @endif
 
 
 @if ($type == 'FAQPage' && count($faq))
     <script type="application/ld+json">
-    {!! json_encode([
+        {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'FAQPage',
 
@@ -216,13 +214,13 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
             })->toArray()
 
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
+        </script>
 @endif
 
 {{-- Product --}}
 @if ($type == 'Product')
     <script type="application/ld+json">
-    {!! json_encode([
+        {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'Product',
 
@@ -252,5 +250,5 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
             ]
 
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
+        </script>
 @endif

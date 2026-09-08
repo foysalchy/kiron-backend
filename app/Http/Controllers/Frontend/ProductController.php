@@ -409,16 +409,44 @@ class ProductController extends FrontendController
                     'attributes' => $attrs,
                     'main_image' => $variation->image_url ?? $product->thumbnail_url,
                     'galleries' => $varGalleries,
-                    'stock' => $variation->available_stock
+                    'stock' => $variation->available_stock,
+                    'sku' => $variation->sku
                 ];
             }
         }
 
         $defaultGalleries = $product->galleries->map(fn($g) => $g->image_url)->toArray();
         array_unshift($defaultGalleries, $product->thumbnail_url);
-        //  \Log::info($formattedVariations);
-        $relatedProducts = Product::where('status', Status::Active->value)
-            ->where('id', '!=', $product->id)->latest()->take(8)->get();
+        // Filter related products by product's category
+        $subCategoryIds = (array) ($product->sub_category_ids ?? []);
+        $megaCategoryIds = (array) ($product->mega_category_ids ?? []);
+
+        $relatedProducts = collect();
+
+        if (!empty($subCategoryIds) || !empty($megaCategoryIds)) {
+            $relatedQuery = Product::where('status', Status::Active->value)
+                ->where('id', '!=', $product->id);
+
+            $relatedQuery->where(function ($q) use ($subCategoryIds, $megaCategoryIds) {
+                if (!empty($subCategoryIds)) {
+                    $q->where(function ($subQ) use ($subCategoryIds) {
+                        foreach ($subCategoryIds as $id) {
+                            $subQ->orWhereJsonContains('sub_category_ids', (int) $id);
+                        }
+                    });
+                }
+
+                if (!empty($megaCategoryIds)) {
+                    $q->orWhere(function ($megaQ) use ($megaCategoryIds) {
+                        foreach ($megaCategoryIds as $id) {
+                            $megaQ->orWhereJsonContains('mega_category_ids', (int) $id);
+                        }
+                    });
+                }
+            });
+
+            $relatedProducts = $relatedQuery->with(['brand', 'variations'])->latest()->take(8)->get();
+        }
 
         $trustBadges = ContentSetting::where('status', Status::Active->value)
             ->whereIn('page_type', [
