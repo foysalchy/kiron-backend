@@ -69,33 +69,36 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {{-- Organization --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'Organization',
+    '@'.'context' => 'https://schema.org',
+    '@'.'type' => 'OnlineStore',
     'name' => $setup->shop_name ?? '',
     'url' => url('/'),
     'logo' => $organizationLogo,
     'email' => $setup->email ?? '',
+    'legalName' => $setup->legal_name ?? ($setup->shop_name ?? ''),
+    'alternateName' => !empty($setup->alternate_name) ? array_map('trim', explode(',', $setup->alternate_name)) : [],
     'telephone' => $setup->phone ?? '',
     'foundingDate' => $setup->established ?? '',
     'sameAs' => $socialLinks,
     'founder' => [
-        '@type' => 'Person',
+        '@'.'type' => 'Person',
         'name' => $setup->founder_name ?? '',
         'jobTitle' => $setup->founder_designation ?? ''
     ],
     'address' => [
-        '@type' => 'PostalAddress',
+        '@'.'type' => 'PostalAddress',
         'streetAddress' => ($setup?->store_address ?: $setup?->corporate_address) ?? '',
         'addressCountry' => 'BD'
     ]
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+ 
 </script>
 
 {{-- Website --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'WebSite',
+    '@'.'context' => 'https://schema.org',
+    '@'.'type' => 'WebSite',
     'name' => $setup->shop_name ?? '',
     'url' => url('/')
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
@@ -104,8 +107,8 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 {{-- WebPage --}}
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
-    '@type' => 'WebPage',
+    '@'.'context' => 'https://schema.org',
+    '@'.'type' => 'WebPage',
     'name' => $title,
     'description' => $description,
     'url' => $canonical,
@@ -117,12 +120,12 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 @if (count($breadcrumb))
     <script type="application/ld+json">
         {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'BreadcrumbList',
+            '@'.'context' => 'https://schema.org',
+            '@'.'type' => 'BreadcrumbList',
             'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
 
                 return [
-                    '@type' => 'ListItem',
+                    '@'.'type' => 'ListItem',
                     'position' => $index + 1,
                     'name' => $item['name'],
                     'item' => $item['url']
@@ -138,27 +141,27 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 @if ($type == 'BlogPosting')
     <script type="application/ld+json">
         {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'BlogPosting',
+            '@'.'context' => 'https://schema.org',
+            '@'.'type' => 'BlogPosting',
             'headline' => $schema['headline'] ?? $title,
             'description' => $description,
             'image' => [
-                '@type' => 'ImageObject',
+                '@'.'type' => 'ImageObject',
                 'url' => $image
             ],
             'mainEntityOfPage' => [
-                '@type' => 'WebPage',
-                '@id' => $canonical
+                '@'.'type' => 'WebPage',
+                '@'.'id' => $canonical
             ],
             'author' => [
-                '@type' => 'Person',
+                '@'.'type' => 'Person',
                 'name' => $schema['author'] ?? ($setup->founder_name ?? '')
             ],
             'publisher' => [
-                '@type' => 'Organization',
+                '@'.'type' => 'Organization',
                 'name' => $setup->shop_name,
                 'logo' => [
-                    '@type' => 'ImageObject',
+                    '@'.'type' => 'ImageObject',
                     'url' => $organizationLogo
                 ]
             ],
@@ -176,8 +179,8 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 @if ($type == 'ContactPage')
     <script type="application/ld+json">
         {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'ContactPage',
+            '@'.'context' => 'https://schema.org',
+            '@'.'type' => 'ContactPage',
             'name' => $title,
             'description' => $description,
             'url' => $canonical
@@ -189,19 +192,19 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 @if ($type == 'FAQPage' && count($faq))
     <script type="application/ld+json">
         {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'FAQPage',
+            '@'.'context' => 'https://schema.org',
+            '@'.'type' => 'FAQPage',
 
             'mainEntity' => collect($faq)->map(function ($item) {
 
                 return [
-                    '@type' => 'Question',
+                    '@'.'type' => 'Question',
 
                     'name' => data_get($item, 'question')
                         ?? data_get($item, 'title'),
 
                     'acceptedAnswer' => [
-                        '@type' => 'Answer',
+                        '@'.'type' => 'Answer',
 
                         'text' => strip_tags(
                             data_get($item, 'answer')
@@ -221,8 +224,8 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 @if ($type == 'Product')
     <script type="application/ld+json">
         {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
+            '@'.'context' => 'https://schema.org',
+            '@'.'type' => 'Product',
 
             'name' => $schema['name'] ?? $title,
 
@@ -233,12 +236,12 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
             'sku' => $schema['sku'] ?? null,
 
             'brand' => [
-                '@type' => 'Brand',
+                '@'.'type' => 'Brand',
                 'name' => $setup->shop_name
             ],
 
             'offers' => [
-                '@type' => 'Offer',
+                '@'.'type' => 'Offer',
 
                 'url' => $canonical,
 
