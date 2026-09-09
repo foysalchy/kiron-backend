@@ -66,11 +66,11 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta name="twitter:description" content="{{ $description }}">
 <meta name="twitter:image" content="{{ $image }}">
 
-<?php
+@php
 $graph = [];
 
 $graph[] = [
-    '@type' => 'OnlineStore',
+    '@'.'type' => 'OnlineStore',
     'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => url('/'),
     'logo' => $organizationLogo,
@@ -81,25 +81,25 @@ $graph[] = [
     'foundingDate' => $setup->established ?? '',
     'sameAs' => $socialLinks,
     'founder' => [
-        '@type' => 'Person',
+        '@'.'type' => 'Person',
         'name' => html_entity_decode($setup->founder_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'jobTitle' => html_entity_decode($setup->founder_designation ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8')
     ],
     'address' => [
-        '@type' => 'PostalAddress',
+        '@'.'type' => 'PostalAddress',
         'streetAddress' => html_entity_decode(($setup?->store_address ?: $setup?->corporate_address) ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'addressCountry' => 'BD'
     ]
 ];
 
 $graph[] = [
-    '@type' => 'WebSite',
+    '@'.'type' => 'WebSite',
     'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => url('/')
 ];
 
 $graph[] = [
-    '@type' => 'WebPage',
+    '@'.'type' => 'WebPage',
     'name' => html_entity_decode($title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => $canonical,
@@ -108,10 +108,10 @@ $graph[] = [
 
 if (count($breadcrumb)) {
     $graph[] = [
-        '@type' => 'BreadcrumbList',
+        '@'.'type' => 'BreadcrumbList',
         'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
             return [
-                '@type' => 'ListItem',
+                '@'.'type' => 'ListItem',
                 'position' => $index + 1,
                 'name' => html_entity_decode($item['name'], ENT_QUOTES | ENT_XML1, 'UTF-8'),
                 'item' => $item['url']
@@ -122,26 +122,26 @@ if (count($breadcrumb)) {
 
 if ($type == 'BlogPosting') {
     $graph[] = [
-        '@type' => 'BlogPosting',
+        '@'.'type' => 'BlogPosting',
         'headline' => html_entity_decode($schema['headline'] ?? $title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'image' => [
-            '@type' => 'ImageObject',
+            '@'.'type' => 'ImageObject',
             'url' => $image
         ],
         'mainEntityOfPage' => [
-            '@type' => 'WebPage',
-            '@id' => $canonical
+            '@'.'type' => 'WebPage',
+            '@'.'id' => $canonical
         ],
         'author' => [
-            '@type' => 'Person',
+            '@'.'type' => 'Person',
             'name' => html_entity_decode($schema['author'] ?? ($setup->founder_name ?? ''), ENT_QUOTES | ENT_XML1, 'UTF-8')
         ],
         'publisher' => [
-            '@type' => 'Organization',
+            '@'.'type' => 'Organization',
             'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
             'logo' => [
-                '@type' => 'ImageObject',
+                '@'.'type' => 'ImageObject',
                 'url' => $organizationLogo
             ]
         ],
@@ -156,7 +156,7 @@ if ($type == 'BlogPosting') {
 
 if ($type == 'ContactPage') {
     $graph[] = [
-        '@type' => 'ContactPage',
+        '@'.'type' => 'ContactPage',
         'name' => html_entity_decode($title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'url' => $canonical
@@ -165,13 +165,13 @@ if ($type == 'ContactPage') {
 
 if ($type == 'FAQPage' && count($faq)) {
     $graph[] = [
-        '@type' => 'FAQPage',
+        '@'.'type' => 'FAQPage',
         'mainEntity' => collect($faq)->map(function ($item) {
             return [
-                '@type' => 'Question',
+                '@'.'type' => 'Question',
                 'name' => html_entity_decode(data_get($item, 'question') ?? data_get($item, 'title'), ENT_QUOTES | ENT_XML1, 'UTF-8'),
                 'acceptedAnswer' => [
-                    '@type' => 'Answer',
+                    '@'.'type' => 'Answer',
                     'text' => html_entity_decode(strip_tags(data_get($item, 'answer') ?? data_get($item, 'content')), ENT_QUOTES | ENT_XML1, 'UTF-8')
                 ]
             ];
@@ -181,25 +181,26 @@ if ($type == 'FAQPage' && count($faq)) {
 
 if ($type == 'Product') {
     $productSchema = [
-        '@type' => 'Product',
+        '@'.'type' => 'Product',
+        '@'.'id' => $canonical . '#product',
         'name' => html_entity_decode($schema['name'] ?? $title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
-        'image' => $image,
+        'image' => [$image],
         'sku' => $schema['sku'] ?? null,
         'mpn' => $schema['mpn'] ?? $schema['sku'] ?? null,
         'brand' => [
-            '@type' => 'Brand',
+            '@'.'type' => 'Brand',
             'name' => html_entity_decode($schema['brand_name'] ?? $setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8')
         ],
         'offers' => [
-            '@type' => 'Offer',
+            '@'.'type' => 'Offer',
             'url' => $canonical,
             'priceCurrency' => $schema['currency'] ?? 'BDT',
             'price' => $schema['price'] ?? 0,
             'availability' => $schema['availability'] ?? 'https://schema.org/InStock',
             'priceValidUntil' => now()->addYear()->format('Y-m-d'),
             'hasMerchantReturnPolicy' => [
-                '@type' => 'MerchantReturnPolicy',
+                '@'.'type' => 'MerchantReturnPolicy',
                 'applicableCountry' => 'BD',
                 'returnPolicyCategory' => 'https://schema.org/MerchantReturnFiniteReturnWindow',
                 'merchantReturnDays' => 7,
@@ -207,27 +208,27 @@ if ($type == 'Product') {
                 'returnFees' => 'https://schema.org/FreeReturn'
             ],
             'shippingDetails' => [
-                '@type' => 'OfferShippingDetails',
+                '@'.'type' => 'OfferShippingDetails',
                 'shippingRate' => [
-                    '@type' => 'MonetaryAmount',
-                    'value' => 0,
+                    '@'.'type' => 'MonetaryAmount',
+                    'value' => $setup->inside_charge ?? 0,
                     'currency' => $schema['currency'] ?? 'BDT'
                 ],
                 'shippingDestination' => [
-                    '@type' => 'DefinedRegion',
+                    '@'.'type' => 'DefinedRegion',
                     'addressCountry' => 'BD'
                 ],
                 'deliveryTime' => [
-                    '@type' => 'ShippingDeliveryTime',
+                    '@'.'type' => 'ShippingDeliveryTime',
                     'handlingTime' => [
-                        '@type' => 'QuantitativeValue',
+                        '@'.'type' => 'QuantitativeValue',
                         'minValue' => 0,
                         'maxValue' => 1,
                         'unitCode' => 'd'
                     ],
                     'transitTime' => [
-                        '@type' => 'QuantitativeValue',
-                        'minValue' => 1,
+                        '@'.'type' => 'QuantitativeValue',
+                        'minValue' => 3,
                         'maxValue' => 5,
                         'unitCode' => 'd'
                     ]
@@ -238,7 +239,7 @@ if ($type == 'Product') {
     
     if (isset($schema['review_count']) && $schema['review_count'] > 0 && isset($schema['rating_value'])) {
         $productSchema['aggregateRating'] = [
-            '@type' => 'AggregateRating',
+            '@'.'type' => 'AggregateRating',
             'ratingValue' => $schema['rating_value'],
             'reviewCount' => $schema['review_count'],
             'bestRating' => 5,
@@ -248,11 +249,11 @@ if ($type == 'Product') {
     
     $graph[] = $productSchema;
 }
-?>
+@endphp
 
 <script type="application/ld+json">
 {!! json_encode([
-    '@context' => 'https://schema.org',
-    '@graph' => $graph
+    '@'.'context' => 'https://schema.org',
+    '@'.'graph' => $graph
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
