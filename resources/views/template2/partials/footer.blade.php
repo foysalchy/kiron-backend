@@ -53,6 +53,54 @@
                     <p class="opacity-90 text-[16px] leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
                     </p>
+                    <form id="newsletter-form">
+                        @csrf
+                        <div class="flex mb-5">
+                            <input type="email" name="email" id="subscriber-email" placeholder="Enter your email"
+                                required
+                                class="  border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm outline-none focus:border-[#BD4F00]">
+                            <button type="submit" id="subscribe-btn"
+                                class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap text-white">
+                                Subscribe
+                            </button>
+                        </div>
+                    </form>
+                    
+                </div>
+
+                <!-- Column 2: Quick Links -->
+                <div class=" ">
+                    <h4 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="{{ route('contact.index') }}"
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Contact Us</a></li>
+                        <li><a href="{{ route('order.track') }}"
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Track Order</a></li>
+                        <li><a href="{{ route('faq.index') }}"
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Help & Support</a></li>
+                        <li><a href="{{ route('blog.index') }}"
+                                class="text-[16px] opacity-90 hover:underline transition-colors">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Pages -->
+                <div>
+                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        @foreach ($footerPages as $page)
+                            <li>
+                                <a href="{{ url($page->slug) }}"
+                                    class="text-[16px] opacity-90 hover:underline transition-colors">
+                                    {{ $page->title }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter -->
+                <div>
+                    <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Contact Us</h4>
                     <ul class="space-y-3 text-[16px]">
                         <li class="flex items-start gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
@@ -89,56 +137,7 @@
                             </a>
                         </li>
                     </ul>
-                </div>
-
-                <!-- Column 2: Quick Links -->
-                <div class=" ">
-                    <h4 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h4>
-                    <ul class="space-y-2.5 text-sm">
-                        <li><a href="{{ route('contact.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Contact Us</a></li>
-                        <li><a href="{{ route('order.track') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Track Order</a></li>
-                        <li><a href="{{ route('faq.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Help & Support</a></li>
-                        <li><a href="{{ route('blog.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Blog</a></li>
-                    </ul>
-                </div>
-
-                <!-- Column 3: Pages -->
-                <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h4>
-                    <ul class="space-y-2.5 text-sm">
-                        @foreach ($footerPages as $page)
-                            <li>
-                                <a href="{{ url($page->slug) }}"
-                                    class="text-[16px] opacity-90 hover:underline transition-colors">
-                                    {{ $page->title }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-
-                <!-- Column 4: Newsletter -->
-                <div>
-                    <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
-                    <p class="opacity-90 text-[16px] mb-4">Subscribe to get updates on new products and exclusive
-                        offers.
-                    </p>
-                    <form id="newsletter-form">
-                        @csrf
-                        <div class="flex mb-5">
-                            <input type="email" name="email" id="subscriber-email" placeholder="Enter your email"
-                                required
-                                class="  border border-gray-700 text-footer px-3 py-2.5 rounded-l-md w-full text-sm outline-none focus:border-[#BD4F00]">
-                            <button type="submit" id="subscribe-btn"
-                                class="primary-bg hover:bg-[#a34400] px-4 py-2.5 rounded-r-md font-semibold text-sm transition-colors whitespace-nowrap text-white">
-                                Subscribe
-                            </button>
-                        </div>
-                    </form>
+                    
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
                             <a href="{{ $social->link }}" target="_blank"
@@ -148,7 +147,7 @@
                                 onmouseout="this.style.color='#9CA3AF'">
                                 @if ($social->icon_image)
                                     <img src="{{ $social->icon_image ?? '' }}" alt="social icon"
-                                        class="h-5 w-5 object-contain">
+                                        class="h-8 w-8 object-contain">
                                 @else
                                     <i class="{{ $social->icon_class ?? 'fab fa-share' }}" aria-hidden="true"></i>
                                 @endif
