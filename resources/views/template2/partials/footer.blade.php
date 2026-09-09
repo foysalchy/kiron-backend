@@ -112,7 +112,7 @@
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
                             <li>
-                                <a href="{{ url('page', ['slug' => $page->slug]) }}"
+                                <a href="{{ url($page->slug) }}"
                                     class="text-[16px] opacity-90 hover:underline transition-colors">
                                     {{ $page->title }}
                                 </a>
