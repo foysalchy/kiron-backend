@@ -117,8 +117,7 @@
                                     onchange="updateCheckoutShipping(this.value)"
                                     {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                 <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                    Regular Delivery({{ $setup->currency }}
-                                    {{ number_format($setup->inside_charge, 0) }})
+                                    Regular Delivery(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }}@else{{ number_format($setup->inside_charge, 0) }} {{ $setup->currency }}@endif)
                                 </span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
@@ -126,8 +125,7 @@
                                     onchange="updateCheckoutShipping(this.value)"
                                     {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                 <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                    Quick Bite({{ $setup->currency }}
-                                    {{ ($setup->outside_charge) }})
+                                    Quick Bite(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }}@else{{ number_format($setup->outside_charge, 0) }} {{ $setup->currency }}@endif)
                                 </span>
                             </label>
                         </div>
@@ -165,11 +163,10 @@
                                 @endif
 
                                 <p class="text-[var(--primary-color)] font-semibold text-sm">
-                                    {{ $setup->currency }}{{ number_format($item->price) }}
+                                    @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }}{{ number_format($item->price) }}@else{{ number_format($item->price) }}{{ $setup->currency }}@endif
                                 </p>
                             </div>
 
-                            <!-- Quantity Display -->
                         <!-- Quantity Controls -->
 <div class="flex flex-col items-end gap-2">
     <div class="flex items-center border border-gray-200 rounded-full h-8 w-20">
@@ -214,29 +211,38 @@
                     <div class="space-y-4 border-t border-gray-100 pt-6">
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-md font-medium">Subtotal:</span>
-                            <span class="text-md font-bold text-gray-900">{{ $setup->currency }}
-                                {{ number_format($subtotal) }}</span>
+                            <span class="text-md font-bold text-gray-900">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($subtotal) }}@else{{ number_format($subtotal) }} {{ $setup->currency }}@endif</span>
                         </div>
 
                         @if ($discount > 0)
                         <div class="flex justify-between items-center text-green-600">
                             <span class="text-md font-medium">Discount
                                 {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}:</span>
-                            <span class="text-md font-bold">- {{ $setup->currency }}
-                                <span id="discount-display">{{ number_format($discount) }}</span>
+                            <span class="text-md font-bold">- @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }}@endif
+                                <span id="discount-display">{{ number_format($discount) }}</span>@if(($setup->currency_position ?? 'left') == 'right') {{ $setup->currency }}@endif
                             </span>
                         </div>
                         @endif
 
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-md font-medium">Delivery Charge:</span>
-                            <span class="text-md font-bold text-gray-900"> {{ $setup->currency }} <span
-                                    id="shipping-display">{{ number_format($shipping) }}</span></span>
+                            <span class="text-md font-bold text-gray-900">
+                                @if(($setup->currency_position ?? 'left') == 'left')
+                                    {{ $setup->currency }} <span id="shipping-display">{{ number_format($shipping) }}</span>
+                                @else
+                                    <span id="shipping-display">{{ number_format($shipping) }}</span> {{ $setup->currency }}
+                                @endif
+                            </span>
                         </div>
                         <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                             <span class="text-lg font-black text-gray-900">Total to Pay:</span>
-                            <span class="text-xl font-bold text-[var(--secondary-color)]">{{ $setup->currency }} <span
-                                    id="total-display">{{ number_format($total) }}</span></span>
+                            <span class="text-xl font-bold text-[var(--secondary-color)]">
+                                @if(($setup->currency_position ?? 'left') == 'left')
+                                    {{ $setup->currency }} <span id="total-display">{{ number_format($total) }}</span>
+                                @else
+                                    <span id="total-display">{{ number_format($total) }}</span> {{ $setup->currency }}
+                                @endif
+                            </span>
                         </div>
                     </div>
 
