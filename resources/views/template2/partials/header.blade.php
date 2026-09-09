@@ -428,7 +428,7 @@
                                             <div class="border-b border-gray-200/60 last:border-0">
                                                 <div class="flex items-center justify-between pl-6 pr-3 py-2">
                                                     <a href="{{ $childUrl }}"
-                                                        class="text-xs font-medium text-black flex-1 hover:text-[var(--primary-color)] transition-colors">
+                                                        class="text-[14px] font-medium text-black flex-1 hover:text-[var(--primary-color)] transition-colors">
                                                         {{ $child['label'] }}
                                                     </a>
                                                 </div>
@@ -490,7 +490,7 @@
                                                 <div id="m2-sub-{{ $sub->id }}" class="hidden bg-white pl-8 pr-3 py-1">
                                                     @foreach ($sub->miniCategories as $mini)
                                                         <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                            class="block py-1.5 text-[11px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
+                                                            class="block py-1.5 text-[14px] font-normal text-black hover:text-black border-b border-gray-50 last:border-0">
                                                             {{ $mini->name }}
                                                         </a>
                                                     @endforeach
