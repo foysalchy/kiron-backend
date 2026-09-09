@@ -335,11 +335,11 @@
 
                                                 @if ($hasMini)
                                                     <ul
-                                                        class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-60 min-h-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
+                                                        class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
                                                         @foreach ($sub->miniCategories as $mini)
                                                             <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                                    class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-xs font-medium transition-colors">
+                                                                    class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-lg font-medium transition-colors">
                                                                     {{ $mini->name }}
                                                                 </a>
                                                             </li>
