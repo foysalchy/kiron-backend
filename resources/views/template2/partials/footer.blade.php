@@ -101,7 +101,7 @@
                 <!-- Column 4: Newsletter -->
                 <div>
                     <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Contact Us</h4>
-                    <ul class="space-y-3 text-[16px]">
+                    <ul class="  text-[16px]">
                         <li class="flex items-start gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
