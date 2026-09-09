@@ -66,192 +66,193 @@ $organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $i
 <meta name="twitter:description" content="{{ $description }}">
 <meta name="twitter:image" content="{{ $image }}">
 
-{{-- Organization --}}
-<script type="application/ld+json">
-{!! json_encode([
-    '@'.'context' => 'https://schema.org',
-    '@'.'type' => 'OnlineStore',
-    'name' => $setup->shop_name ?? '',
+<?php
+$graph = [];
+
+$graph[] = [
+    '@type' => 'OnlineStore',
+    'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => url('/'),
     'logo' => $organizationLogo,
     'email' => $setup->email ?? '',
-    'legalName' => $setup->legal_name ?? ($setup->shop_name ?? ''),
-    'alternateName' => !empty($setup->alternate_name) ? array_map('trim', explode(',', $setup->alternate_name)) : [],
+    'legalName' => html_entity_decode($setup->legal_name ?? ($setup->shop_name ?? ''), ENT_QUOTES | ENT_XML1, 'UTF-8'),
+    'alternateName' => !empty($setup->alternate_name) ? array_map(fn($v) => html_entity_decode(trim($v), ENT_QUOTES | ENT_XML1, 'UTF-8'), explode(',', $setup->alternate_name)) : [],
     'telephone' => $setup->phone ?? '',
     'foundingDate' => $setup->established ?? '',
     'sameAs' => $socialLinks,
     'founder' => [
-        '@'.'type' => 'Person',
-        'name' => $setup->founder_name ?? '',
-        'jobTitle' => $setup->founder_designation ?? ''
+        '@type' => 'Person',
+        'name' => html_entity_decode($setup->founder_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'jobTitle' => html_entity_decode($setup->founder_designation ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8')
     ],
     'address' => [
-        '@'.'type' => 'PostalAddress',
-        'streetAddress' => ($setup?->store_address ?: $setup?->corporate_address) ?? '',
+        '@type' => 'PostalAddress',
+        'streetAddress' => html_entity_decode(($setup?->store_address ?: $setup?->corporate_address) ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
         'addressCountry' => 'BD'
     ]
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
- 
-</script>
+];
 
-{{-- Website --}}
-<script type="application/ld+json">
-{!! json_encode([
-    '@'.'context' => 'https://schema.org',
-    '@'.'type' => 'WebSite',
-    'name' => $setup->shop_name ?? '',
+$graph[] = [
+    '@type' => 'WebSite',
+    'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => url('/')
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
-</script>
+];
 
-{{-- WebPage --}}
-<script type="application/ld+json">
-{!! json_encode([
-    '@'.'context' => 'https://schema.org',
-    '@'.'type' => 'WebPage',
-    'name' => $title,
-    'description' => $description,
+$graph[] = [
+    '@type' => 'WebPage',
+    'name' => html_entity_decode($title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+    'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
     'url' => $canonical,
     'primaryImageOfPage' => $image
+];
+
+if (count($breadcrumb)) {
+    $graph[] = [
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
+            return [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'name' => html_entity_decode($item['name'], ENT_QUOTES | ENT_XML1, 'UTF-8'),
+                'item' => $item['url']
+            ];
+        })->toArray()
+    ];
+}
+
+if ($type == 'BlogPosting') {
+    $graph[] = [
+        '@type' => 'BlogPosting',
+        'headline' => html_entity_decode($schema['headline'] ?? $title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'image' => [
+            '@type' => 'ImageObject',
+            'url' => $image
+        ],
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            '@id' => $canonical
+        ],
+        'author' => [
+            '@type' => 'Person',
+            'name' => html_entity_decode($schema['author'] ?? ($setup->founder_name ?? ''), ENT_QUOTES | ENT_XML1, 'UTF-8')
+        ],
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => html_entity_decode($setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8'),
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => $organizationLogo
+            ]
+        ],
+        'datePublished' => isset($schema['published'])
+            ? \Carbon\Carbon::parse($schema['published'])->toIso8601String()
+            : now()->toIso8601String(),
+        'dateModified' => isset($schema['updated'])
+            ? \Carbon\Carbon::parse($schema['updated'])->toIso8601String()
+            : now()->toIso8601String()
+    ];
+}
+
+if ($type == 'ContactPage') {
+    $graph[] = [
+        '@type' => 'ContactPage',
+        'name' => html_entity_decode($title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'url' => $canonical
+    ];
+}
+
+if ($type == 'FAQPage' && count($faq)) {
+    $graph[] = [
+        '@type' => 'FAQPage',
+        'mainEntity' => collect($faq)->map(function ($item) {
+            return [
+                '@type' => 'Question',
+                'name' => html_entity_decode(data_get($item, 'question') ?? data_get($item, 'title'), ENT_QUOTES | ENT_XML1, 'UTF-8'),
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => html_entity_decode(strip_tags(data_get($item, 'answer') ?? data_get($item, 'content')), ENT_QUOTES | ENT_XML1, 'UTF-8')
+                ]
+            ];
+        })->toArray()
+    ];
+}
+
+if ($type == 'Product') {
+    $productSchema = [
+        '@type' => 'Product',
+        'name' => html_entity_decode($schema['name'] ?? $title, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'description' => html_entity_decode($description, ENT_QUOTES | ENT_XML1, 'UTF-8'),
+        'image' => $image,
+        'sku' => $schema['sku'] ?? null,
+        'mpn' => $schema['mpn'] ?? $schema['sku'] ?? null,
+        'brand' => [
+            '@type' => 'Brand',
+            'name' => html_entity_decode($schema['brand_name'] ?? $setup->shop_name ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8')
+        ],
+        'offers' => [
+            '@type' => 'Offer',
+            'url' => $canonical,
+            'priceCurrency' => $schema['currency'] ?? 'BDT',
+            'price' => $schema['price'] ?? 0,
+            'availability' => $schema['availability'] ?? 'https://schema.org/InStock',
+            'priceValidUntil' => now()->addYear()->format('Y-m-d'),
+            'hasMerchantReturnPolicy' => [
+                '@type' => 'MerchantReturnPolicy',
+                'applicableCountry' => 'BD',
+                'returnPolicyCategory' => 'https://schema.org/MerchantReturnFiniteReturnWindow',
+                'merchantReturnDays' => 7,
+                'returnMethod' => 'https://schema.org/ReturnByMail',
+                'returnFees' => 'https://schema.org/FreeReturn'
+            ],
+            'shippingDetails' => [
+                '@type' => 'OfferShippingDetails',
+                'shippingRate' => [
+                    '@type' => 'MonetaryAmount',
+                    'value' => 0,
+                    'currency' => $schema['currency'] ?? 'BDT'
+                ],
+                'shippingDestination' => [
+                    '@type' => 'DefinedRegion',
+                    'addressCountry' => 'BD'
+                ],
+                'deliveryTime' => [
+                    '@type' => 'ShippingDeliveryTime',
+                    'handlingTime' => [
+                        '@type' => 'QuantitativeValue',
+                        'minValue' => 0,
+                        'maxValue' => 1,
+                        'unitCode' => 'd'
+                    ],
+                    'transitTime' => [
+                        '@type' => 'QuantitativeValue',
+                        'minValue' => 1,
+                        'maxValue' => 5,
+                        'unitCode' => 'd'
+                    ]
+                ]
+            ]
+        ]
+    ];
+    
+    if (isset($schema['review_count']) && $schema['review_count'] > 0 && isset($schema['rating_value'])) {
+        $productSchema['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => $schema['rating_value'],
+            'reviewCount' => $schema['review_count'],
+            'bestRating' => 5,
+            'worstRating' => 1
+        ];
+    }
+    
+    $graph[] = $productSchema;
+}
+?>
+
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@graph' => $graph
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
-
-{{-- Breadcrumb --}}
-@if (count($breadcrumb))
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@'.'context' => 'https://schema.org',
-            '@'.'type' => 'BreadcrumbList',
-            'itemListElement' => collect($breadcrumb)->values()->map(function ($item, $index) {
-
-                return [
-                    '@'.'type' => 'ListItem',
-                    'position' => $index + 1,
-                    'name' => $item['name'],
-                    'item' => $item['url']
-                ];
-
-            })->toArray()
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-        </script>
-@endif
-
-
-{{-- BlogPosting --}}
-@if ($type == 'BlogPosting')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@'.'context' => 'https://schema.org',
-            '@'.'type' => 'BlogPosting',
-            'headline' => $schema['headline'] ?? $title,
-            'description' => $description,
-            'image' => [
-                '@'.'type' => 'ImageObject',
-                'url' => $image
-            ],
-            'mainEntityOfPage' => [
-                '@'.'type' => 'WebPage',
-                '@'.'id' => $canonical
-            ],
-            'author' => [
-                '@'.'type' => 'Person',
-                'name' => $schema['author'] ?? ($setup->founder_name ?? '')
-            ],
-            'publisher' => [
-                '@'.'type' => 'Organization',
-                'name' => $setup->shop_name,
-                'logo' => [
-                    '@'.'type' => 'ImageObject',
-                    'url' => $organizationLogo
-                ]
-            ],
-            'datePublished' => isset($schema['published'])
-                ? \Carbon\Carbon::parse($schema['published'])->toIso8601String()
-                : now()->toIso8601String(),
-            'dateModified' => isset($schema['updated'])
-                ? \Carbon\Carbon::parse($schema['updated'])->toIso8601String()
-                : now()->toIso8601String()
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-        </script>
-@endif
-
-
-@if ($type == 'ContactPage')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@'.'context' => 'https://schema.org',
-            '@'.'type' => 'ContactPage',
-            'name' => $title,
-            'description' => $description,
-            'url' => $canonical
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-        </script>
-@endif
-
-
-@if ($type == 'FAQPage' && count($faq))
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@'.'context' => 'https://schema.org',
-            '@'.'type' => 'FAQPage',
-
-            'mainEntity' => collect($faq)->map(function ($item) {
-
-                return [
-                    '@'.'type' => 'Question',
-
-                    'name' => data_get($item, 'question')
-                        ?? data_get($item, 'title'),
-
-                    'acceptedAnswer' => [
-                        '@'.'type' => 'Answer',
-
-                        'text' => strip_tags(
-                            data_get($item, 'answer')
-                            ?? data_get($item, 'content')
-                        )
-                    ]
-
-                ];
-
-            })->toArray()
-
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-        </script>
-@endif
-
-{{-- Product --}}
-@if ($type == 'Product')
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@'.'context' => 'https://schema.org',
-            '@'.'type' => 'Product',
-
-            'name' => $schema['name'] ?? $title,
-
-            'description' => $description,
-
-            'image' => $image,
-
-            'sku' => $schema['sku'] ?? null,
-
-            'brand' => [
-                '@'.'type' => 'Brand',
-                'name' => $setup->shop_name
-            ],
-
-            'offers' => [
-                '@'.'type' => 'Offer',
-
-                'url' => $canonical,
-
-                'priceCurrency' => $schema['currency'] ?? 'BDT',
-
-                'price' => $schema['price'] ?? 0,
-
-                'availability' => $schema['availability'] ?? 'https://schema.org/InStock'
-            ]
-
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-        </script>
-@endif

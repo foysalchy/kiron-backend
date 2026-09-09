@@ -61,6 +61,11 @@
 
     $price = $product->sale_price ?? $product->regular_price ?? 0;
     $isInStock = !isset($product->available_stock) || $product->available_stock > 0;
+
+    $brandName = $product->brand->name ?? $setup->shop_name ?? 'Generic';
+    $reviewCount = $product->reviews ? $product->reviews->count() : 0;
+    $ratingValue = $reviewCount > 0 ? $product->reviews->avg('rating') : 0;
+    $mpn = is_array($product->sku_code) ? implode(', ', $product->sku_code) : ($product->sku_code ?? null);
 @endphp
 
 @include('components.meta-info.meta', [
@@ -74,9 +79,13 @@
     'breadcrumb' => $breadcrumbItems,
     'schema' => [
         'name' => $product->title,
-        'sku' => is_array($product->sku_code) ? implode(', ', $product->sku_code) : ($product->sku_code ?? null),
+        'sku' => $mpn,
+        'mpn' => $mpn,
         'price' => $price,
         'currency' => 'BDT',
         'availability' => $isInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        'brand_name' => $brandName,
+        'rating_value' => $ratingValue,
+        'review_count' => $reviewCount,
     ],
 ])
