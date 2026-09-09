@@ -145,11 +145,16 @@
                                 class="opacity-90 text-lg transition-all duration-300"
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
+                                
+
                                 @if ($social->icon_image)
-                                    <img src="{{ $social->icon_image ?? '' }}" alt="social icon"
-                                        class="h-8 w-8 object-contain">
+                                    <img src="{{ $social->icon_image ?? '' }}"
+                                        alt="social icon"
+                                        class="social-icon">
                                 @else
-                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }}" aria-hidden="true"></i>
+                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }}"
+                                    aria-hidden="true"
+                                    class="social-icon"></i>
                                 @endif
                             </a>
                         @endforeach
@@ -187,6 +192,20 @@
     </div>
 
 </footer>
+<style>
+                                    .social-icon {
+                                        font-size: 25px;
+                                        margin-top: 10px;
+                                        border: 1px solid gainsboro;
+                                        border-radius: 5px;
+                                        width: 40px;
+                                        height: 40px;
+                                        text-align: center;
+                                        line-height: 40px;
+                                        display: inline-block;
+                                        object-fit: contain;
+                                    }
+                                </style>
 <script>
     document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
         e.preventDefault();
