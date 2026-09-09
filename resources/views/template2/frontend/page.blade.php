@@ -30,7 +30,7 @@
                         <img src="{{ asset('storage/' . $page->image) }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif
 
-                    <div class="page-description text-gray-600 leading-relaxed text-[16px]">
+                    <div class="prose  text-gray-600 leading-relaxed text-[16px]">
                         {!! $page->description !!}
                     </div>
                 </div>
