@@ -475,7 +475,7 @@
                                         <div class="border-b border-gray-200/60 last:border-0">
                                             <div class="flex items-center justify-between pl-6 pr-3 py-2">
                                                 <a href="{{ url($sub->slug ?? $sub->id) }}"
-                                                    class="text-xs font-medium text-black flex-1">
+                                                    class="text-[14px] font-medium text-black flex-1">
                                                     {{ $sub->name }}
                                                 </a>
                                                 @if ($hasMini)
