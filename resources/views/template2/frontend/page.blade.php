@@ -18,9 +18,9 @@
 
                 <!-- Header -->
                 <div class="p-8 md:p-12 pb-0 md:pb-0">
-                    <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+                    <!-- <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
                         {{ $page->title }}
-                    </h1>
+                    </h1> -->
                     <div class="w-16 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
                 </div>
 
@@ -51,7 +51,7 @@
         }
 
         .page-description p {
-            margin-bottom: 1.2rem;
+            margin-bottom: 0px;
         }
 
         .page-description ul {
