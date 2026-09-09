@@ -21,7 +21,7 @@
                     <!-- <h1 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">
                         {{ $page->title }}
                     </h1> -->
-                    <div class="w-16 h-1.5 bg-[var(--primary-color)] rounded-full"></div>
+                  
                 </div>
 
                 <!-- Body -->
