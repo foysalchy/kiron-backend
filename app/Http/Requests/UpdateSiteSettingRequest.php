@@ -28,6 +28,8 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
             $this->companyRules(),
             [
                 'shop_name'         => ['sometimes', 'required', 'string', 'max:255'],
+                'legal_name'        => ['nullable', 'string', 'max:255'],
+                'alternate_name'    => ['nullable', 'string', 'max:255'],
                 'title'             => ['sometimes', 'required', 'string', 'max:255'],
                 'description'       => ['nullable', 'string'],
                 'logo'              => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],

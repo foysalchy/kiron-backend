@@ -28,6 +28,8 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'shop_name'         => ['required', 'string', 'max:255'],
+                'legal_name'        => ['nullable', 'string', 'max:255'],
+                'alternate_name'    => ['nullable', 'string', 'max:255'],
                 'title'             => ['required', 'string', 'max:255'],
                 'description'       => ['nullable', 'string'],
                 'logo'              => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
