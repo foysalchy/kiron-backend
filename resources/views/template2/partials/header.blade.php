@@ -339,7 +339,7 @@
                                                         @foreach ($sub->miniCategories as $mini)
                                                             <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                                    class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-base  font-medium transition-colors">
+                                                                    class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-[14px] font-medium transition-colors">
                                                                     {{ $mini->name }}
                                                                 </a>
                                                             </li>
