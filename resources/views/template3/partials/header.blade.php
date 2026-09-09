@@ -509,7 +509,7 @@
 
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
-        <h2 class="text-lg font-bold text-gray-800">Shopping Cart</h2>
+        <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
         <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
