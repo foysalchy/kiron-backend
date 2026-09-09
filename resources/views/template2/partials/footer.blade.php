@@ -152,9 +152,9 @@
                                         alt="social icon"
                                         class="social-icon">
                                 @else
-                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }}"
+                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }} social-icon"
                                     aria-hidden="true"
-                                    class="social-icon"></i>
+                                   ></i>
                                 @endif
                             </a>
                         @endforeach
