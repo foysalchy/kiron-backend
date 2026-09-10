@@ -25,7 +25,7 @@
     $rawKeywords = $product->meta_keywords;
     $metaKeywords = (is_array($rawKeywords) ? implode(',', array_filter($rawKeywords, fn($k) => !in_array(strtolower(trim($k)), ['null', 'undefined']))) : ((!empty($rawKeywords) && !in_array(strtolower(trim($rawKeywords)), ['null', 'undefined'])) ? $rawKeywords : ($setup->tags ?? '')));
 
-    $metaImage = $product->thumbnail_url
+   $metaImage = $product->thumbnail_url
         ?: ($product->thumbnail ? asset('storage/' . $product->thumbnail) : ($setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('storage/' . ($setup->logo ?? ''))));
 
     $canonicalUrl = url($product->slug);

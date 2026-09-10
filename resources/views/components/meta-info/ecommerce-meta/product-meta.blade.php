@@ -19,7 +19,7 @@
         'title'       => 'Flash Sale - Best Deals | ' . ($setup->shop_name ?? 'Shop'),
         'description' => 'Get amazing discounts on our flash sale items. Limited time offers!',
         'keywords'    => 'flash sale, discount, deals, offers',
-        'image'       => $setup->meta_image ? asset('storage/' . $setup->meta_image) : asset('images/default-share.jpg'),
+        'image'       => $setup->meta_image_url ?: asset('images/default-share.jpg'),
         'canonical'   => url()->current(),
         'breadcrumb'  => $breadcrumbItems,
     ])
@@ -46,7 +46,7 @@
         'title'       => ($activeCategory->meta_title ?? $activeCategory->name ?? 'Category') . ' | ' . ($setup->shop_name ?? ''),
         'description' => ($activeCategory->meta_description ?? 'Browse our latest collection of ' . ($activeCategory->name ?? 'products')),
         'keywords'    => is_array($activeCategory->meta_keywords ?? null) ? implode(',', $activeCategory->meta_keywords) : ($activeCategory->meta_keywords ?? ''),
-        'image'       => ($activeCategory->image ?? null) ? asset('storage/' . $activeCategory->image) : asset('images/default-share.jpg'),
+        'image'       => ($activeCategory->image_url ?? null) ?: (($activeCategory->image ?? null) ? \Illuminate\Support\Facades\Storage::disk('r2')->url($activeCategory->image) : asset('images/default-share.jpg')),
         'canonical'   => $canonicalUrl,
         'breadcrumb'  => $breadcrumbItems,
     ])
@@ -68,7 +68,7 @@
         'keywords'    => ($pageData && $pageData->meta_keywords)
                          ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
                          : ($setup->tags ?? 'products, online shop'),
-        'image'       => ($setup->meta_image ?? null) ? asset('storage/' . $setup->meta_image) : asset('storage/' . ($setup->logo ?? '')),
+        'image'       => $setup->meta_image_url ?: $setup->logo_url,
         'canonical'   => route('shop.index'),
         'breadcrumb'  => [
             ['name' => 'Home', 'url' => url('/')],

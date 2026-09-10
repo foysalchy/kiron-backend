@@ -11,9 +11,9 @@
             ? implode(',', $blog->meta_keywords)
             : $blog->meta_keywords,
 
-        'image' => count($blog->images)
-            ? asset('storage/' . $blog->images[0])
-            : asset('storage/' . $setup->logo),
+        'image' => !empty($blog->images) && isset($blog->images[0])
+            ? \Illuminate\Support\Facades\Storage::disk('r2')->url($blog->images[0])
+            : $setup->logo_url,
 
         'canonical' => url($blog->slug),
 

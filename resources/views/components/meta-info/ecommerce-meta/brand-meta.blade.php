@@ -15,7 +15,7 @@
         'title'       => ($brand->meta_title ?: $brand->name . ' Products') . ' | ' . ($setup->shop_name ?? ''),
         'description' => $brand->meta_description ?: 'Shop the latest collection of authentic ' . $brand->name . ' products.',
         'keywords'    => $brand->meta_keywords ?: $brand->name . ', brand shop',
-        'image'       => $brand->image ? asset('storage/' . $brand->image) : $setup->logo_url,
+        'image'       => $brand->image_url ?? (($brand->image ?? null) ? \Illuminate\Support\Facades\Storage::disk('r2')->url($brand->image) : $setup->logo_url),
         'canonical'   => url()->current(),
         'breadcrumb'  => [
             ['name' => 'Home', 'url' => url('/')],
@@ -37,7 +37,7 @@
                          ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
                          : ($setup->tags ?? 'brands, online shopping'),
 
-        'image'       => $setup->meta_image ? asset('storage/' . $setup->meta_image) : $setup->logo_url,
+        'image'       => $setup->meta_image_url ?: $setup->logo_url,
         'canonical'   => route('brand.index'),
         'breadcrumb'  => [
             ['name' => 'Home', 'url' => url('/')],

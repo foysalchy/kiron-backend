@@ -17,9 +17,7 @@
         ? implode(',', $pageData->meta_keywords)
         : 'contact, support, sales, customer service, business software',
 
-    'image' => $setup->meta_image
-        ? asset('storage/' . $setup->meta_image)
-        : asset('storage/' . $setup->logo),
+    'image' => $setup->meta_image_url ?: $setup->logo_url,
 
     'canonical' => route('contact.index'),
 

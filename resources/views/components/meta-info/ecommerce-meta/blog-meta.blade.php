@@ -16,7 +16,7 @@
     'title' => ($pageData->meta_title ?? 'Our Blog') . ' | ' . ($setup->shop_name ?? 'Bhaiya Digital'),
     'description' => $pageData->meta_description ?? 'Read the latest insights, styles, and shopping tips on our blog.',
     'keywords' => $keywords,
-    'image' => $setup->meta_image ? asset('storage/' . $setup->meta_image) : $setup->logo_url,
+    'image' => $setup->meta_image_url ?: $setup->logo_url,
     'canonical' => route('blog.index'),
     'breadcrumb' => [
         ['name' => 'Home', 'url' => url('/')],
