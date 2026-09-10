@@ -40,6 +40,7 @@ class SiteSetting extends Model
         'allow_search_engine_index',
         'status',
         'meta_image',
+        'dark_logo',
         'founder_name',
         'founder_designation',
         'established',
@@ -52,7 +53,7 @@ class SiteSetting extends Model
     ];
 
 
-    protected $appends = ['logo_url', 'favicon_url'];
+    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url'];
     public static function homepageCacheKeys(): array
     {
         return ['site_settings_cart'];
@@ -93,6 +94,20 @@ class SiteSetting extends Model
     {
         return $this->favicon
             ? Storage::disk('r2')->url($this->favicon)
+            : null;
+    }
+    
+    public function getMetaImageUrlAttribute(): ?string
+    {
+        return $this->meta_image
+            ? Storage::disk('r2')->url($this->meta_image)
+            : null;
+    }
+
+    public function getDarkLogoUrlAttribute(): ?string
+    {
+        return $this->dark_logo
+            ? Storage::disk('r2')->url($this->dark_logo)
             : null;
     }
 }

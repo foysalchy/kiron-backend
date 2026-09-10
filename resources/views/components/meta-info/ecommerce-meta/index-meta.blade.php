@@ -14,9 +14,9 @@ $setup->company_id ?? null
         ? implode(',', $pageData->meta_keywords)
         : ($setup?->tags ?? ''),
 
-     'image' => ($setup && $setup->meta_image)
-        ? asset('storage/'.$setup->meta_image)
-        : (($setup && $setup->logo) ? asset('storage/'.$setup->logo) : ''),
+     'image' => ($setup && $setup->meta_image_url) 
+        ? $setup->meta_image_url 
+        : (($setup && $setup->logo_url) ? $setup->logo_url : ''),
 
     'canonical' => url()->current(),
 

@@ -64,10 +64,10 @@
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="relative">
             <!-- Section Heading -->
-            <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-0">
+            <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
               {{ $featureCategory['name'] ?? 'Featured Category' }}
             </h2>
-            <p class="text-center text-xl text-black mb-4 mt-0">Buy Your Desired Products from Featured Categories</p>
+            <p class="text-center lg:text-xl text-base text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
 
             <!-- Carousel Wrapper -->
             <div class="relative px-2 md:px-6">
@@ -99,7 +99,7 @@
                                 </div>
 
                                 <!-- Category Name -->
-                                <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[11px] md:text-[16px]">
+                                <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[12px] md:text-[16px]">
                                     {{ $tItem['label'] }}
                                 </span>
                             </a>
@@ -244,9 +244,9 @@
         <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
             <!-- Header -->
-            <div class="mb-6">
-                <h2 class="text-md md:text-lg font-bold mb-4 md:mb-6 uppercase tracking-tight">All Products</h2>
-            </div>
+             
+                <h2 class="text-md md:text-lg font-bold lg:mb-4 mb-2 uppercase tracking-tight">All Products</h2>
+            
 
             <!-- Product Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">

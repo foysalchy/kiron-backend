@@ -18,13 +18,20 @@ $title = (!empty($rawTitle) && !in_array(strtolower($rawTitle), ['null', 'undefi
 
 $rawDesc = trim((string) $description);
 $description = (!empty($rawDesc) && !in_array(strtolower($rawDesc), ['null', 'undefined'])) ? $rawDesc : ($setup->description ?? '');
-$keywords = is_array($keywords) ? implode(',', $keywords) : ($keywords ?: $setup->tags ?? '');
+$rawKeywords = $keywords ?: $setup->tags ?? '';
+if (is_string($rawKeywords) && str_starts_with(trim($rawKeywords), '[')) {
+    $decoded = json_decode($rawKeywords, true);
+    if (is_array($decoded)) {
+        $rawKeywords = $decoded;
+    }
+}
+$keywords = is_array($rawKeywords) ? implode(',', $rawKeywords) : $rawKeywords;
 $canonical = $canonical ?: url()->current();
 if (!$image) {
-    if (!empty($setup->meta_image)) {
-        $image = asset('storage/' . $setup->meta_image);
-    } elseif (!empty($setup->logo)) {
-        $image = asset('storage/' . $setup->logo);
+    if (!empty($setup->meta_image_url)) {
+        $image = $setup->meta_image_url;
+    } elseif (!empty($setup->logo_url)) {
+        $image = $setup->logo_url;
     } else {
         $image = asset('images/header/logo.svg');
     }
@@ -32,7 +39,7 @@ if (!$image) {
 if ($socialLinks instanceof \Illuminate\Support\Collection) {
     $socialLinks = $socialLinks->pluck('url')->filter()->values()->toArray();
 }
-$organizationLogo = !empty($setup->logo) ? asset('storage/' . $setup->logo) : $image;
+$organizationLogo = !empty($setup->logo_url) ? $setup->logo_url : $image;
 ?>
 
 <title>{{ $title }}</title>

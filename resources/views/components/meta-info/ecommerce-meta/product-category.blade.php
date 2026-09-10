@@ -31,7 +31,7 @@
 
     'keywords' => $category->meta_keywords ?: $category->name . ', online shop, ' . ($setup->shop_name ?? ''),
 
-    'image' => $category->image ? asset('storage/' . $category->image) : asset('images/default-share.jpg'),
+    'image' => $category->image_url ?: ($category->image ? asset('storage/' . $category->image) : asset('images/default-share.jpg')),
 
     'canonical' => url()->current(),
 
