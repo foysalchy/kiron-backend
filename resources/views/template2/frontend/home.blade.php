@@ -67,7 +67,7 @@
             <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
               {{ $featureCategory['name'] ?? 'Featured Category' }}
             </h2>
-            <p class="text-center lg:text-xl text-base text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
+            <p class="text-center lg:text-xl text-[13px] text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
 
             <!-- Carousel Wrapper -->
             <div class="relative px-2 md:px-6">
@@ -116,7 +116,7 @@
             <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
               {{ $featureCategory['name'] ?? 'Featured Category' }}
             </h2>
-            <p class="text-center lg:text-xl text-base text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
+            <p class="text-center lg:text-xl text-[13px] text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
 
             <!-- Carousel Wrapper -->
             <div class="relative px-2 md:px-6">
@@ -147,7 +147,7 @@
                             </div>
 
                             <!-- Category Name -->
-                            <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[11px] md:text-[16px]">
+                            <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[12px] md:text-[16px]">
                                 {{ $category->name }}
                             </span>
                         </a>
