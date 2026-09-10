@@ -113,10 +113,10 @@
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="relative">
             <!-- Section Heading -->
-            <h2 class="text-center text-2xl md:text-3xl font-extrabold text-black mb-0">
-              Featured Category
+            <h2 class="text-md md:text-lg font-bold  uppercase tracking-tight text-center mb-0">
+              {{ $featureCategory['name'] ?? 'Featured Category' }}
             </h2>
-            <p class="text-center text-xl text-black mb-4 mt-0">Buy Your Desired Products from Featured Categories</p>
+            <p class="text-center lg:text-xl text-base text-black lg:mb-4 mb-2 mt-0">Buy Your Desired Products from Featured Categories</p>
 
             <!-- Carousel Wrapper -->
             <div class="relative px-2 md:px-6">
