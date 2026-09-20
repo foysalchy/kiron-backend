@@ -79,7 +79,7 @@
                                 {{ $isL ? $currency : '' }} {{ number_format($maxP) }} {{ !$isL ? $currency : '' }}
                             </span>,
                             depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD. -->
-                             {!! $pageData->meta_description !!}
+                             {!! $pageData->meta_description ?? '' !!}
                         @endif
                     </div>
             </div>
@@ -291,7 +291,7 @@
                     prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
                     prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
 
-                    {!! $pageData->description !!}
+                    {!! $pageData->description ?? '' !!}
 
                 </div>
                 @endif
