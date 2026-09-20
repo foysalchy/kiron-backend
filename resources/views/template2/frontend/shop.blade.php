@@ -46,7 +46,7 @@
             <div class="meta_info py-4">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
                         @if($category && $category->name)
-                            {{ $category->name }} Product Price in {{$setup->country}}
+                            {{ $category->name }} Product Price in {{ !empty($setup->country) ? $setup->country : 'Bangladesh' }}
                         @else
                             @php
                                 $pageData = \App\Services\Saas\SystemPageService::get(
