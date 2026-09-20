@@ -45,10 +45,16 @@
                 </nav>
             <div class="meta_info py-4">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
-                        @if (isset($category->meta_title) && $category->meta_title)
-                            <p>{!! $category->meta_title !!}</p>
+                        @if($category->name)
+                            {{ $category->name }} Product Price in {{$setup->country}}
                         @else
-                        {{ $category->name ?? 'Shop' }} Price in Bangladesh
+                            @php
+                                $pageData = \App\Services\Saas\SystemPageService::get(
+                                    \App\Enums\SystemPageType::SHOP,
+                                    $setup->company_id ?? null
+                                );
+                            @endphp
+                            {{ $pageData->meta_title }}
                         @endif
                     </h1>
 
@@ -56,7 +62,7 @@
                         @if (isset($category->meta_description) && $category->meta_description)
                             <p>{!! $category->meta_description ?? '' !!}</p>
                         @else
-                            @php
+                            <!-- @php
                                 $isL = ($setup->currency_position ?? 'left') == 'left';
                                 $currency = $setup->currency;
 
@@ -72,7 +78,8 @@
                             <span class="font-bold text-gray-800">
                                 {{ $isL ? $currency : '' }} {{ number_format($maxP) }} {{ !$isL ? $currency : '' }}
                             </span>,
-                            depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD.
+                            depending on size, material, design, and features. Visit <strong>{{ $setup->shop_name }}</strong> and compare options to find the best {{ strtolower($catName) }} at lowest price in BD. -->
+                             {!! $pageData->meta_description !!}
                         @endif
                     </div>
             </div>
@@ -274,6 +281,18 @@
                  @if (isset($category->description) && $category->description)
                 <div class="bg-white rounded-lg shadow-xs  mt-4 px-4 py-4 text-[16px] prose w-full min-w-full">
                     {!! $category->description !!}
+                </div>
+                @else
+                                 <div
+                    class=" bg-gray-50  border border-gray-100 rounded-lg px-6 py-6
+                    prose prose-slate max-w-none
+                    prose-headings:text-[#041533] prose-headings:font-bold
+                    prose-h2:text-[24px] md:prose-h2:text-[28px] prose-h2:tracking-tight prose-h2:mb-4
+                    prose-h3:text-[22px] md:prose-h3:text-[24px] prose-h3:mb-4
+                    prose-p:text-[#4b5563] prose-p:text-base prose-p:leading-[1.7] prose-p:text-justify md:prose-p:text-left prose-p:mb-8">
+
+                    {!! $homePageData->description !!}
+
                 </div>
                 @endif
             </main>
