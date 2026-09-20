@@ -102,6 +102,9 @@
                                 <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[12px] md:text-[16px]">
                                     {{ $tItem['label'] }}
                                 </span>
+                                <span class="text-[#0f172a9c] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[10px] md:text-[12px]">
+                                    {{ $tItem['product_count'] ?? 0 }} Items 
+                                </span>
                             </a>
                         @endif
                     @endforeach
@@ -147,8 +150,8 @@
                             </div>
 
                             <!-- Category Name -->
-                            <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[12px] md:text-[16px]">
-                                {{ $category->name }}
+                            <span class="text-[#0f172a9c] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[10px] md:text-[12px]">
+                                Count Items 
                             </span>
                         </a>
                     @endforeach

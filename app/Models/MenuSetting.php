@@ -95,6 +95,9 @@ class MenuSetting extends Model
                     'link'    => "category/{$fresh->slug}",
                     'visible' => $item['visible'] ?? true,
                     'order'   => $item['order'] ?? 0,
+                    'product_count' => \App\Models\Product::where('status', 1)
+                        ->whereJsonContains($item['level'] . '_ids', (int)$item['ref_id'])
+                        ->count(),
                 ];
             })
             ->filter()
