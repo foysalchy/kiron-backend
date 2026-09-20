@@ -46,9 +46,13 @@ class HomeController extends FrontendController
                 ->select('id', 'name', 'company_id', 'slug', 'image')
                 ->with('subCategories:id,mega_category_id,name,slug', 'subCategories.miniCategories:id,sub_category_id,name,slug')->get();
             
-            $cats->map(function ($cat) {
+            $cats->map(function ($cat) use ($companyId) {
                 $cat->product_count = \App\Models\Product::where('status', 1)
-                    ->whereJsonContains('mega_category_ids', (int)$cat->id)
+                    ->where('company_id', $companyId)
+                    ->where(function($q) use ($cat) {
+                        $q->whereJsonContains('mega_category_ids', (int) $cat->id)
+                          ->orWhereJsonContains('mega_category_ids', (string) $cat->id);
+                    })
                     ->count();
                 return $cat;
             });

@@ -96,7 +96,11 @@ class MenuSetting extends Model
                     'visible' => $item['visible'] ?? true,
                     'order'   => $item['order'] ?? 0,
                     'product_count' => \App\Models\Product::where('status', 1)
-                        ->whereJsonContains($item['level'] . '_ids', (int)$item['ref_id'])
+                        ->where('company_id', $this->company_id)
+                        ->where(function($q) use ($item) {
+                            $q->whereJsonContains($item['level'] . '_ids', (int) $item['ref_id'])
+                              ->orWhereJsonContains($item['level'] . '_ids', (string) $item['ref_id']);
+                        })
                         ->count(),
                 ];
             })
