@@ -96,6 +96,7 @@
                     @endif
                     <div
                         class="prose prose-slate max-w-none mb-4 text-lg leading-relaxed font-medium overflow-visible relative">
+                          <h3 class="text-xl font-bold text-gray-900 mb-6">Summury  </h3>
                         {!! $product->short_description !!}
                     </div>
 
@@ -148,19 +149,19 @@
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- 1. Add To Cart -->
                         <button id="btn-cart" onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                            class="flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="order-2 md:order-1 col-span-1 md:col-span-1 flex-1 primary-bg hover:bg-green-700 text-primary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Add To Cart
                         </button>
 
                         <!-- 2. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="order-1 md:order-2 col-span-2 md:col-span-1 flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
-                            class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
+                            class="order-3 md:order-3 col-span-1 md:col-span-1 flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
                                                         {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
