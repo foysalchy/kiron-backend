@@ -148,10 +148,13 @@
                                     class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                                     alt="{{ $category->name }}">
                             </div>
+                             <span class="text-[#0f172a] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[12px] md:text-[16px]">
+                                {{ $category->name }}
+                            </span>
 
                             <!-- Category Name -->
                             <span class="text-[#0f172a9c] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[10px] md:text-[12px]">
-                                Count Items 
+                                {{ $category->product_count ?? 0 }} Items 
                             </span>
                         </a>
                     @endforeach
