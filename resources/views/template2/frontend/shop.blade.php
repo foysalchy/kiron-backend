@@ -45,7 +45,11 @@
                 </nav>
             <div class="meta_info py-4">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">
+                        @if (isset($category->meta_title) && $category->meta_title)
+                            <p>{!! $category->meta_title !!}</p>
+                        @else
                         {{ $category->name ?? 'Shop' }} Price in Bangladesh
+                        @endif
                     </h1>
 
                     <div class="text-sm md:text-base text-gray-600 leading-relaxed max-w-5xl">

@@ -61,7 +61,7 @@
                 </div>
 
                 <!-- Right: Product Purchase Details -->
-                <div class="p-6 md:p-8">
+                <div class="lg:p-6 md:p-8 px-0 py-4">
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
                         <span id="discount-badge"
                             class="inline-block bg-[#FFCF00] text-black text-sm font-bold px-3 py-1 rounded-full mb-4">
