@@ -18,7 +18,7 @@
     <div class="lg:col-span-2 space-y-6">
 
       @foreach ($cartContent as $item)
-<div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">   
+<div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">
        <a href="{{ route('cart.remove', $item->rowId) }}"
    class="absolute top-4 right-4 z-20 text-smoke hover:text-red-500 transition-colors pointer-events-auto">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -43,11 +43,19 @@
             <div class="flex items-center justify-between mt-4">
               <div>
                 <span class="font-mono font-semibold text-[var(--primary-color)] text-lg">
-                  {{ $setup->currency }} {{ number_format($item->price, 0) }}
+                  @if(($setup->currency_position ?? 'left') == 'left')
+                    {{ $setup->currency }} {{ number_format($item->price, 0) }}
+                  @else
+                    {{ number_format($item->price, 0) }} {{ $setup->currency }}
+                  @endif
                 </span>
                 @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
                   <span class="text-smoke line-through text-sm ml-1.5">
-                    {{ $setup->currency }} {{ number_format($item->options['regular_price'], 0) }}
+                    @if(($setup->currency_position ?? 'left') == 'left')
+                      {{ $setup->currency }} {{ number_format($item->options['regular_price'], 0) }}
+                    @else
+                      {{ number_format($item->options['regular_price'], 0) }} {{ $setup->currency }}
+                    @endif
                   </span>
                 @endif
               </div>
@@ -61,7 +69,7 @@
 
             <div class="flex justify-end mt-2">
               <span class="font-mono font-bold text-coal text-sm">
-                Subtotal: {{ $setup->currency }} {{ number_format($item->subtotal, 0) }}
+                Subtotal: @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($item->subtotal, 0) }}@else{{ number_format($item->subtotal, 0) }} {{ $setup->currency }}@endif
               </span>
             </div>
           </div>
@@ -92,7 +100,7 @@
                      {{ $shipping_area == 'inside' ? 'checked' : '' }}
                      class="accent-[var(--primary-color)]">
               <span class="text-sm font-medium text-coal">
-                Regular Delivery ({{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }})
+                Regular Delivery (@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }}@else{{ number_format($setup->inside_charge, 0) }} {{ $setup->currency }}@endif)
               </span>
             </label>
 
@@ -101,7 +109,7 @@
                      {{ $shipping_area == 'outside' ? 'checked' : '' }}
                      class="accent-[var(--primary-color)]">
               <span class="text-sm font-medium text-coal">
-                Quick Bite ({{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }})
+                Quick Bite (@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }}@else{{ number_format($setup->outside_charge, 0) }} {{ $setup->currency }}@endif)
               </span>
             </label>
           </form>
@@ -131,19 +139,19 @@
           <div class="pt-4 mt-4 border-t border-coal/10 space-y-4">
             <div class="flex justify-between">
               <span class="text-smoke">Subtotal</span>
-              <span class="font-medium">{{ $setup->currency }} {{ number_format($subtotal, 0) }}</span>
+              <span class="font-medium">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($subtotal, 0) }}@else{{ number_format($subtotal, 0) }} {{ $setup->currency }}@endif</span>
             </div>
 
             @if ($discount > 0)
               <div class="flex justify-between text-green-600">
                 <span>Discount ({{ session('coupon')['coupon_code'] }})</span>
-                <span>- {{ $setup->currency }} {{ number_format($discount, 0) }}</span>
+                <span>- @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($discount, 0) }}@else{{ number_format($discount, 0) }} {{ $setup->currency }}@endif</span>
               </div>
             @endif
 
             <div class="flex justify-between">
               <span class="text-smoke">Delivery Fee</span>
-              <span class="font-medium">{{ $setup->currency }} {{ number_format($shipping, 0) }}</span>
+              <span class="font-medium">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($shipping, 0) }}@else{{ number_format($shipping, 0) }} {{ $setup->currency }}@endif</span>
             </div>
           </div>
         </div>
@@ -151,7 +159,7 @@
         <div class="pt-4 border-t border-coal/10 mb-6">
           <div class="flex justify-between items-center">
             <span class="font-semibold text-lg">Total</span>
-            <span class="font-mono font-bold text-2xl text-ember">{{ $setup->currency }} {{ number_format($total, 0) }}</span>
+            <span class="font-mono font-bold text-2xl text-ember">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($total, 0) }}@else{{ number_format($total, 0) }} {{ $setup->currency }}@endif</span>
           </div>
         </div>
 

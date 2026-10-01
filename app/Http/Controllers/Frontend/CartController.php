@@ -18,20 +18,19 @@ use Illuminate\Support\Facades\Log;
 
 class CartController extends FrontendController
 {
-    public function __construct(protected CouponService $couponService) {}
+    public function __construct(protected CouponService $couponService)
+    {
+        parent::__construct();
+    }
     public function index()
     {
         $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
 
         $cartContent = Cart::content();
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
-        //delivvery charge default=60
-        $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
-            return SiteSetting::where('company_id', $companyId)
-                ->where('status', Status::Active->value)->first();
-        });
+        // Delivery charge – always fetch fresh from DB (no cache)
+        $settings = SiteSetting::where('company_id', $companyId)->first();
         $defaultInside = $settings->inside_charge ?? 60;
 
         $shipping = session()->get('shipping_cost', $defaultInside);
@@ -111,12 +110,9 @@ class CartController extends FrontendController
     public function updateShipping(Request $request)
     {
         $companyId = $this->company_id;
-        $ttl = now()->addHours(6);
-        $settings = Cache::remember("site_settings_cart_{$companyId}", $ttl, function () use ($companyId) {
-            return SiteSetting::where('company_id', $companyId)
-                ->where('status', Status::Active->value)->first();
-        });
-        $inside = $settings->inside_charge ?? 60;
+        // Delivery charge – always fetch fresh from DB (no cache)
+        $settings = SiteSetting::where('company_id', $companyId)->first();
+        $inside  = $settings->inside_charge ?? 60;
         $outside = $settings->outside_charge ?? 100;
 
         $cost = ($request->area == 'outside') ? $outside : $inside;

@@ -219,7 +219,7 @@
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span id="shipping-display" class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
@@ -433,7 +433,7 @@
         function updateCheckoutShipping(value) {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            fetch("{{ route('cart.shipping') }}", {
+            fetch("{{ url('/cart/shipping') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
