@@ -39,6 +39,11 @@ class SubscriptionPayment extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function customerPaymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(CustomerPaymentMethod::class, 'payment_method');
+    }
+
     // helpers
 
     public function isSuccess(): bool

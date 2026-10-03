@@ -71,6 +71,16 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(ActionLog::class)->orderBy('id', 'desc')->limit(10);
+    }
+
+    public function history(): HasMany
+    {
+        return $this->hasMany(UserLoginHistory::class)->orderBy('id', 'desc')->limit(10);
+    }
     public function isSuperAdmin(): bool
     {
         return $this->role === 'super_admin';

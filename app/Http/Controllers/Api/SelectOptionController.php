@@ -25,6 +25,7 @@ use App\Models\Employee;
 use App\Models\ExtraCategory;
 use App\Models\MegaCategory;
 use App\Models\MiniCategory;
+use App\Models\NoteTemplate;
 use App\Models\Party;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -162,7 +163,7 @@ class SelectOptionController extends Controller
             ->when($type === 'pos', function ($q) {
                 $q->whereIn('purpose', ['pos', 'both']);
             })
-            
+
             ->orderBy('title', 'asc')
             ->get();
 
@@ -233,7 +234,7 @@ class SelectOptionController extends Controller
             ->when($type === 'pos', function ($q) {
                 $q->whereIn('purpose', ['pos', 'both']);
             })
-            ->where('manage_stock',1)
+            ->where('manage_stock', 1)
             ->orderBy('title', 'asc')
             ->get();
 
@@ -582,6 +583,10 @@ class SelectOptionController extends Controller
     public function getSmsTemplate()
     {
         return SmsTemplate::where('is_default', 0)->get();
+    }
+    public function getNoteTemplate()
+    {
+        return NoteTemplate::where('status', Status::Active->value)->get();
     }
     public function getAvailableDomains()
     {

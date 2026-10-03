@@ -39,7 +39,7 @@ class AuthController extends Controller
             $query = UserLoginHistory::with(['user:id,name,email', 'company:id,name']);
 
             if ($user->role !== 'super_admin') {
-                $query->where('user_id', $user->id);
+                $query->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id));
             } else {
                 $query->when($request->company_id, fn($q) => $q->where('company_id', $request->company_id))
                     ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id));

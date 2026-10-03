@@ -231,7 +231,7 @@ public function billing(Request $request): JsonResponse
     // ── Existing companies ──
     $companyQuery = Company::with([
         'currentSubscription.pricingPackage',
-        'subscriptions.subscriptionPayments',
+        'subscriptions.subscriptionPayments.customerPaymentMethod',
         'subscriptions' => fn($q) => $q->with(['pricingPackage'])->latest(),
         'referralAttribution.partner.group'
     ]);
@@ -276,7 +276,7 @@ public function billing(Request $request): JsonResponse
     // ── NEW: Package upgrade requests, grouped by company ──
     // Loaded without global scopes so soft-deleted / restricted companies still show their requests.
     $upgradeRequests = \App\Models\UpdgradePackageRequest::withoutGlobalScopes()
-        ->with(['pricingPackage']) // target package being requested
+        ->with(['pricingPackage', 'customerPaymentMethod']) // target package being requested
         ->get();
 
     $upgradesByCompany = $upgradeRequests->groupBy('company_id');
@@ -289,7 +289,7 @@ public function billing(Request $request): JsonResponse
     }
 
     // ── Orphan subscriptions (company force-deleted) ──
-    $orphanQuery = \App\Models\CompanySubscription::with(['pricingPackage', 'subscriptionPayments'])
+    $orphanQuery = \App\Models\CompanySubscription::with(['pricingPackage', 'subscriptionPayments.customerPaymentMethod'])
         ->whereDoesntHave('company');
 
     if ($request->status && $request->status !== 'all') {
@@ -336,6 +336,27 @@ public function billing(Request $request): JsonResponse
     foreach ($deletedCompanies as $dc) {
         $allCompanies[] = $dc;
     }
+
+    // Sort companies by the latest billing date (subscription or upgrade request)
+    usort($allCompanies, function ($a, $b) {
+        $aDate = $a['created_at'] ?? '1970-01-01';
+        if (!empty($a['subscriptions'])) {
+            $aDate = max($aDate, collect($a['subscriptions'])->max('created_at'));
+        }
+        if (!empty($a['upgrade_requests'])) {
+            $aDate = max($aDate, collect($a['upgrade_requests'])->max('created_at'));
+        }
+
+        $bDate = $b['created_at'] ?? '1970-01-01';
+        if (!empty($b['subscriptions'])) {
+            $bDate = max($bDate, collect($b['subscriptions'])->max('created_at'));
+        }
+        if (!empty($b['upgrade_requests'])) {
+            $bDate = max($bDate, collect($b['upgrade_requests'])->max('created_at'));
+        }
+
+        return strtotime($bDate) <=> strtotime($aDate);
+    });
 
     // ── Stats — full dataset ──
     $allSubs = \App\Models\CompanySubscription::query();
@@ -412,7 +433,8 @@ public function billing(Request $request): JsonResponse
         // Fetch pending upgrades
         $pendingUpgradesQuery = \App\Models\UpdgradePackageRequest::with([
             'company.pricingPackage',
-            'pricingPackage'
+            'pricingPackage',
+            'customerPaymentMethod'
         ])->where('status', Status::Pending->value);
 
         if ($search) {

@@ -8,12 +8,21 @@ class NotificationController extends Controller
 {
     public function index(Request $request)
     {
-        $notifications = $request->user()
-            ->notifications()
-            ->latest()
-            ->limit(15)
-            ->get()
-            ->map(fn($n) => [
+        $query = $request->user()->notifications();
+
+        if ($request->has('filter')) {
+            if ($request->filter === 'unread') {
+                $query->whereNull('read_at');
+            } elseif ($request->filter === 'read') {
+                $query->whereNotNull('read_at');
+            }
+        }
+
+        $perPage = $request->input('per_page', 15);
+        $paginator = $query->latest()->paginate($perPage);
+
+        $paginator->getCollection()->transform(function ($n) {
+            return [
                 'id'         => $n->id,
                 'type'       => $n->data['type'] ?? null,
                 'title'      => $n->data['title'] ?? null,
@@ -21,9 +30,10 @@ class NotificationController extends Controller
                 'action_url' => $n->data['action_url'] ?? null,
                 'is_read'    => !is_null($n->read_at),
                 'created_at' => $n->created_at,
-            ]);
+            ];
+        });
 
-        return response()->json(['data' => $notifications]);
+        return response()->json(['data' => $paginator]);
     }
 
     public function unreadCount(Request $request)

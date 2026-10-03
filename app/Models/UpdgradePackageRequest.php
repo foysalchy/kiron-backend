@@ -37,4 +37,9 @@ class UpdgradePackageRequest extends Model
     {
         return $this->belongsTo(PricingPackage::class, 'pricing_package_id');
     }
+
+    public function customerPaymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(CustomerPaymentMethod::class, 'payment_method');
+    }
 }
