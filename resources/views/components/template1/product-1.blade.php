@@ -25,7 +25,7 @@
 @endphp
 
 <div
-    class="group relative flex flex-col   bg-white border border-gray-200 rounded-lg hover:shadow-xs transition-all duration-300 h-full">
+    class="bg-white group relative flex flex-col   bg-white border border-gray-200 rounded-lg hover:shadow-xs transition-all duration-300 h-full">
 
     <!-- Image Section -->
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">

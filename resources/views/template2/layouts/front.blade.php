@@ -135,7 +135,7 @@
     @include('template2.partials.header')
 
     <!-- Page Content Area -->
-    <main class="bg-white">
+    <main class="bg-[#fcfcfc]">
         @yield('content')
     </main>
 
