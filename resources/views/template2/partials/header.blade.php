@@ -273,9 +273,9 @@
                                                         $childUrl = str_starts_with($childLink, 'http') ? $childLink : url($childLink);
                                                     @endphp
                                                     <li
-                                                        class="nav-sub-item group/sub px-4 py-2.5 hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
+                                                        class="nav-sub-item group/sub  hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
                                                         <a href="{{ $childUrl }}"
-                                                            class="group-hover/sub:text-[var(--primary-color,#016738)] text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
+                                                            class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
                                                             {{ $child['label'] }}
                                                         </a>
                                                     </li>
