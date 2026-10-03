@@ -271,6 +271,7 @@ class BabycareCategorySeeder extends Seeder
                 ]);
 
                 foreach ($subData['miniCategories'] as $miniName) {
+                    $combinedName = "{$miniName} {$subData['name']}";
                     MiniCategory::updateOrCreate([
                         'mega_category_id' => $megaCategory->id,
                         'sub_category_id' => $subCategory->id,
@@ -279,9 +280,9 @@ class BabycareCategorySeeder extends Seeder
                     ], [
                         'slug' => Str::slug($miniName),
                         'status' => 1,
-                        'meta_title' => "{$miniName} Price in Bangladesh",
-                        'meta_description' => "Shop {$miniName} products in Bangladesh at Littlebaby, including quality {$miniName} products for babies and families. Explore authentic {$miniName} products at competitive prices with convenient online shopping and delivery.",
-                        'meta_keywords' => ["{$miniName}", "Buy {$miniName}", "{$miniName} Price in BD", "{$miniName} Bangladesh"]
+                        'meta_title' => "{$combinedName} Price in Bangladesh",
+                        'meta_description' => "Shop {$combinedName} products in Bangladesh at Littlebaby, including quality {$combinedName} products for babies and families. Explore authentic {$combinedName} products at competitive prices with convenient online shopping and delivery.",
+                        'meta_keywords' => ["{$combinedName}", "Buy {$combinedName}", "{$combinedName} Price in BD", "{$combinedName} Bangladesh"]
                     ]);
                 }
             }
