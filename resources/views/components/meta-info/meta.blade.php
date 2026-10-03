@@ -47,7 +47,11 @@ $organizationLogo = !empty($setup->logo_url) ? $setup->logo_url : $image;
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="title" content="{{ $title }}">
-<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+@if($setup->allow_search_engine_index)
+    <meta name="robots" content="index, follow, noarchive, nosnippet">
+@else
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+@endif
 <meta name="description" content="{{ $description }}">
 <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 
