@@ -74,17 +74,17 @@
             }).catch(err => console.error('Cart Refresh Error:', err));
     }
 
-    // ============ সব item-এর subtotal যোগ করে overall subtotal বের করা (কোনো drift/parsing bug থাকবে না) ============
     function recalculateOverallSubtotal() {
         const subtotalValEl = document.getElementById('mini-cart-subtotal-val');
-        if (!subtotalValEl) return;
-
+        const floatingSubtotalEl = document.getElementById('floating-cart-subtotal');
+        
         let total = 0;
         document.querySelectorAll('[data-item-subtotal-raw]').forEach(el => {
             total += parseFloat(el.getAttribute('data-item-subtotal-raw')) || 0;
         });
 
-        subtotalValEl.innerText = formatMoney(total);
+        if (subtotalValEl) subtotalValEl.innerText = formatMoney(total);
+        if (floatingSubtotalEl) floatingSubtotalEl.innerText = formatMoney(total);
     }
 
     // ============ OPTIMISTIC UI UPDATE ============
