@@ -143,17 +143,17 @@
     @include('template2.partials.footer')
 
     <!-- Floating Cart Button -->
-    <button onclick="toggleCartDrawer()" class="fixed z-[90] right-0 top-1/2 -translate-y-1/2 bg-[var(--primary-color)] text-[var(--primary-text)] shadow-2xl p-3 flex flex-col items-center justify-center gap-1 rounded-l-lg hover:bg-opacity-90 transition-all border border-r-0 border-white/20 group cursor-pointer outline-none">
+    <button onclick="toggleCartDrawer()" class="fixed z-[90] right-0 top-1/2 -translate-y-1/2 primary-bg shadow-2xl p-3 flex flex-col items-center justify-center gap-1 rounded-l-lg hover:bg-opacity-90 transition-all border border-r-0 border-white/20 group cursor-pointer outline-none">
         <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
             </svg>
-            <span class="cart-count-nav absolute -top-2 -right-2 bg-black text-white text-[10px] font-bold h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center rounded-full">
+            <span class="cart-count-nav absolute -top-2 -right-2 bg-white text-[var(--primary-color)] text-[10px] font-bold h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center rounded-full">
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
             </span>
         </div>
         <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-1">Cart</span>
-        <div class="bg-black/20 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold w-full text-center mt-1">
+        <div class="bg-white/20 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold w-full text-center mt-1">
             <span id="floating-cart-subtotal">{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}</span>৳
         </div>
     </button>
