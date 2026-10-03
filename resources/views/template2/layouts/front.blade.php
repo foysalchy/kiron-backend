@@ -235,9 +235,9 @@
                 }
             }
 
-            // Observe the floating cart subtotal for changes
-            const subtotalEl = document.getElementById('floating-cart-subtotal');
-            if (subtotalEl) {
+            // Observe the cart count for changes to trigger animation, sound and price update
+            const cartCountEls = document.querySelectorAll('.cart-count-nav');
+            if (cartCountEls.length > 0) {
                 const observer = new MutationObserver((mutations) => {
                     mutations.forEach((mutation) => {
                         if (mutation.type === 'characterData' || mutation.type === 'childList') {
@@ -250,12 +250,18 @@
                                 
                                 // Play sound
                                 playCartSound();
+                                
+                                // Update cart drawer and subtotal if refreshMiniCart is available
+                                if (typeof refreshMiniCart === 'function') {
+                                    refreshMiniCart();
+                                }
                             }
                         }
                     });
                 });
                 
-                observer.observe(subtotalEl, { characterData: true, childList: true, subtree: true });
+                // Only need to observe one of them, the first one is usually in the header or floating cart
+                observer.observe(cartCountEls[0], { characterData: true, childList: true, subtree: true });
             }
         });
     </script>
