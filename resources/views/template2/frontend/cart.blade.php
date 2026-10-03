@@ -27,67 +27,66 @@
 
                         <div class="p-5 space-y-6">
                             @foreach ($cartContent as $item)
-                                <div
-                                    class="flex flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
-                                    <!-- Image -->
-                                    <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
-                                        <img src="{{ $item->options->thumbnail }}"
-                                            onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                            class="w-full h-full object-cover">
-                                    </div>
-
-                                    <!-- Details -->
-                                    <div class="flex-1">
-                                        <a href="{{ url($item->options->slug ?? $item->id) }}"
-                                            class="group/title">
-                                            <h3
-                                                class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
-                                                {{ $item->name ?? '' }}
-                                            </h3>
-                                        </a>
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span
-                                                class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
-                                                {{ $item->options->variant ?? 'Product' }}
-                                            </span>
+                                <div class="flex flex-col sm:flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
+                                    <div class="flex flex-row items-start gap-3 w-full sm:flex-1">
+                                        <!-- Image -->
+                                        <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
+                                            <img src="{{ $item->options->thumbnail }}"
+                                                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                                class="w-full h-full object-cover">
                                         </div>
-                                        <div class="flex items-baseline gap-2">
-                                            <p class="font-bold text-gray-700 text-lg">
-                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                                {{ number_format($item->price, 0) }}
-                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                            </p>
 
-                                            @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                                                <span class="text-sm text-gray-400 line-through font-normal pl-1">
-                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                                    {{ number_format($item->options['regular_price'], 0) }}
-                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                        <!-- Details -->
+                                        <div class="flex-1">
+                                            <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
+                                                <h3 class="font-bold text-gray-800 text-sm md:text-lg leading-tight mb-1 group-hover/title:text-[var(--primary-color)] transition-colors">
+                                                    {{ $item->name ?? '' }}
+                                                </h3>
+                                            </a>
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <span class=" text-[var(--primary-color)] text-xs font-bold px-2 py-0.5 rounded uppercase">
+                                                    {{ $item->options->variant ?? 'Product' }}
                                                 </span>
-                                            @endif
+                                            </div>
+                                            <div class="flex flex-wrap items-baseline gap-1 sm:gap-2">
+                                                <p class="font-bold text-gray-700 text-base sm:text-lg">
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                    {{ number_format($item->price, 0) }}
+                                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                </p>
+
+                                                @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
+                                                    <span class="text-xs sm:text-sm text-gray-400 line-through font-normal pl-1">
+                                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                        {{ number_format($item->options['regular_price'], 0) }}
+                                                        {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <!-- Qty Controls -->
-                                    <div
-                                        class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-                                        <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-                                            class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
-                                    </div>
+                                    <div class="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 mt-2 sm:mt-0">
+                                        <!-- Qty Controls -->
+                                        <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
+                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                                                class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
+                                            <span class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
+                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                                                class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
+                                        </div>
 
-                                    <!-- Price & Delete -->
-                                    <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-bold text-base md:text-xl text-[var(--primary-color)]">
-                                            {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                            {{ number_format($item->subtotal, 0) }}
-                                            {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
-                                        <a href="{{ route('cart.remove', $item->rowId) }}"
-                                            class="text-red-400 hover:text-red-600 transition-colors">
-                                            <i class="far fa-trash-alt text-lg"></i>
-                                        </a>
+                                        <!-- Price & Delete -->
+                                        <div class="flex flex-row sm:flex-col items-center sm:items-end gap-3 sm:gap-4 sm:min-w-[100px]">
+                                            <p class="font-bold text-base md:text-xl text-[var(--primary-color)]">
+                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                                {{ number_format($item->subtotal, 0) }}
+                                                {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
+                                            <a href="{{ route('cart.remove', $item->rowId) }}"
+                                                class="text-red-400 hover:text-red-600 transition-colors">
+                                                <i class="far fa-trash-alt text-base sm:text-lg"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             @endforeach
