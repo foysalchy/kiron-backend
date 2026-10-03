@@ -23,7 +23,7 @@ class PackageUpgradeService
     public function getAllUpgradeRequests(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = $query = UpdgradePackageRequest::withoutGlobalScopes()->with(['company', 'pricingPackage']);
+            $query = UpdgradePackageRequest::withoutGlobalScopes()->with(['company', 'pricingPackage', 'customerPaymentMethod']);
 
 
             if (!empty($filters['pricing_package_id'])) {

@@ -171,7 +171,7 @@ class CompanyService
             'subscriptions' => fn($q) => $q->with(['pricingPackage', 'extraOrderCharges.order']),
             'updateRequests' => fn($q) => $q->latest()->limit(3), // company update requests
 
-            'subscriptions.subscriptionPayments',
+            'subscriptions.subscriptionPayments.customerPaymentMethod',
 
             'domains',
             'loginHistories.user',

@@ -117,11 +117,20 @@ class OrderReturnService
             if (!$order) {
                 throw ApiException::notFound('Order');
             }
-            if (!$order->warehouse_id) {
+
+            $warehouseId = $order->warehouse_id;
+            if (!$warehouseId && !empty($order->warehouse_info)) {
+                $warehouseInfo = is_string($order->warehouse_info) ? json_decode($order->warehouse_info, true) : $order->warehouse_info;
+                if (is_array($warehouseInfo) && count($warehouseInfo) > 0) {
+                    $warehouseId = $warehouseInfo[0]['warehouse_id'] ?? null;
+                }
+            }
+
+            if (!$warehouseId) {
                 throw ApiException::badRequest('Order does not have a warehouse assigned');
             }
 
-            $data['warehouse_id'] = $order->warehouse_id;
+            $data['warehouse_id'] = $warehouseId;
             $data['customer_id'] = $order->customer_id;
 
             // Calculate totals
@@ -232,6 +241,23 @@ class OrderReturnService
             $items = $data['items'] ?? null;
             $payments = $data['payments'] ?? null;
             unset($data['items'], $data['payments']);
+
+            if (isset($data['order_id'])) {
+                $order = Order::find($data['order_id']);
+                if ($order) {
+                    $warehouseId = $order->warehouse_id;
+                    if (!$warehouseId && !empty($order->warehouse_info)) {
+                        $warehouseInfo = is_string($order->warehouse_info) ? json_decode($order->warehouse_info, true) : $order->warehouse_info;
+                        if (is_array($warehouseInfo) && count($warehouseInfo) > 0) {
+                            $warehouseId = $warehouseInfo[0]['warehouse_id'] ?? null;
+                        }
+                    }
+                    if ($warehouseId) {
+                        $data['warehouse_id'] = $warehouseId;
+                        $data['customer_id'] = $order->customer_id;
+                    }
+                }
+            }
 
             // If items provided, recalculate totals
             if ($items) {

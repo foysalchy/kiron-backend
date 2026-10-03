@@ -384,6 +384,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('/roles', [SelectOptionController::class, 'getRoles']);
                     Route::get('/email-templates', [SelectOptionController::class, 'getEmailTemplate']);
                     Route::get('/sms-templates', [SelectOptionController::class, 'getSmsTemplate']);
+                    Route::get('/note-templates', [SelectOptionController::class, 'getNoteTemplate']);
                 });
                 //party routes
                 Route::prefix('parties')->group(function () {

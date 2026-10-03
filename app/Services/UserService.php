@@ -70,7 +70,7 @@ class UserService
      */
     public function getUserById(int $id): User
     {
-        $user = User::with('roles')->find($id);
+        $user = User::with(['roles', 'logs', 'history'])->find($id);
         if (!$user) {
             throw ApiException::notFound('User');
         }
