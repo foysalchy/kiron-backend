@@ -8,17 +8,14 @@
             <img src="{{ $item->options->thumbnail ?? asset('images/no-image.png') }}" class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
-            <h3 class="text-xs font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
-            <p class="text-[10px] text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}</p>
+            <h3 class="text-[13px] font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
+            <p class="text-[13px] text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}</p>
 
             <div class="flex justify-between items-center mt-2">
-                <span class="text-xs font-bold text-[var(--primary-color)]" data-unit-price="{{ $item->price }}">
+                <span class="text-[13px] font-bold text-[var(--primary-color)]" data-unit-price="{{ $item->price }}">
                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                 </span>
-                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
-            </div>
-
-            <div class="flex items-center justify-between mt-2">
+                  <div class="flex items-center justify-between mt-2">
                 <div class="flex items-center border border-gray-200 rounded-full h-7 w-20">
                     <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', -1)"
                         class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">-</button>
@@ -26,12 +23,16 @@
                     <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', 1)"
                         class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">+</button>
                 </div>
-                <span class="text-[10px] font-bold text-gray-700"
+                <span class="text-[13px] font-bold text-gray-700"
                       data-item-subtotal
                       data-item-subtotal-raw="{{ $item->subtotal }}">
                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                 </span>
             </div>
+                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
+            </div>
+
+          
         </div>
     </div>
 @empty

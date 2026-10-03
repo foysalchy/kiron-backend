@@ -235,34 +235,52 @@
                 }
             }
 
-            // Observe the cart count for changes to trigger animation, sound and price update
+            // Observe the cart count for changes to trigger price update (refreshMiniCart)
             const cartCountEls = document.querySelectorAll('.cart-count-nav');
             if (cartCountEls.length > 0) {
                 const observer = new MutationObserver((mutations) => {
                     mutations.forEach((mutation) => {
                         if (mutation.type === 'characterData' || mutation.type === 'childList') {
-                            const btn = document.getElementById('floating-cart-btn');
-                            if (btn) {
-                                // Add shake class
-                                btn.classList.remove('animate-cart-shake');
-                                void btn.offsetWidth; // trigger reflow
-                                btn.classList.add('animate-cart-shake');
-                                
-                                // Play sound
-                                playCartSound();
-                                
-                                // Update cart drawer and subtotal if refreshMiniCart is available
-                                if (typeof refreshMiniCart === 'function') {
-                                    refreshMiniCart();
-                                }
+                            // Update cart drawer and subtotal if refreshMiniCart is available
+                            if (typeof refreshMiniCart === 'function') {
+                                refreshMiniCart();
                             }
                         }
                     });
                 });
                 
-                // Only need to observe one of them, the first one is usually in the header or floating cart
+                // Only need to observe one of them
                 observer.observe(cartCountEls[0], { characterData: true, childList: true, subtree: true });
             }
+
+            // Immediately trigger shake and sound on Add to Cart button clicks
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('button') || e.target.closest('a');
+                if (target) {
+                    const onclickAttr = target.getAttribute('onclick') || '';
+                    const idAttr = target.getAttribute('id') || '';
+                    
+                    // Check if it's an add to cart action
+                    if (
+                        onclickAttr.includes('addSingleToCart') || 
+                        onclickAttr.includes('processAddVariation') || 
+                        onclickAttr.includes('handleAddToCart') || 
+                        idAttr === 'btn-cart' || 
+                        idAttr === 'btn-order'
+                    ) {
+                        const btn = document.getElementById('floating-cart-btn');
+                        if (btn) {
+                            // Add shake class immediately
+                            btn.classList.remove('animate-cart-shake');
+                            void btn.offsetWidth; // trigger reflow
+                            btn.classList.add('animate-cart-shake');
+                        }
+                        
+                        // Play sound immediately
+                        playCartSound();
+                    }
+                }
+            });
         });
     </script>
 </body>
