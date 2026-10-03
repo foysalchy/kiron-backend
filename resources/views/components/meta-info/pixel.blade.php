@@ -40,7 +40,19 @@
     }
     $fbUserDataJson = !empty($fbUserData) ? json_encode($fbUserData) : '{}';
 @endphp
+@if($market && !empty($market->domain_verify))
+        {!! $market->domain_verify !!}
+@endif
+@if($market && !empty($market->google_measurement_id))
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $market->google_measurement_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
+        gtag('config', '{{ $market->google_measurement_id }}');
+    </script>
+@endif
 @if($market && !empty($market->facebook_pixel_id))
     <!-- Facebook Pixel Code -->
     <script>
@@ -61,7 +73,5 @@
     </noscript>
     <!-- End Facebook Pixel Code -->
 
-    @if($market->domain_verify)
-        {!! $market->domain_verify !!}
-    @endif
+   
 @endif
