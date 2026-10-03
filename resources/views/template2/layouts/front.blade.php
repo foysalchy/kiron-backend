@@ -121,6 +121,17 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        @keyframes cartShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
+        }
+        
+        .animate-cart-shake {
+            animation: cartShake 0.4s ease-in-out;
+        }
     </style>
     @stack('styles')
     @if(isset($footerCodes))
@@ -143,7 +154,7 @@
     @include('template2.partials.footer')
 
     <!-- Floating Cart Button -->
-    <button onclick="toggleCartDrawer()" class="fixed z-[90] right-0 bottom-24 primary-bg shadow-2xl p-3 flex flex-col items-center justify-center gap-1 rounded-l-lg hover:bg-opacity-90 transition-all border border-r-0 border-white/20 group cursor-pointer outline-none">
+    <button id="floating-cart-btn" onclick="toggleCartDrawer()" class="fixed z-[90] right-0 bottom-24 primary-bg shadow-2xl p-3 flex flex-col items-center justify-center gap-1 rounded-l-lg hover:bg-opacity-90 transition-all border border-r-0 border-white/20 group cursor-pointer outline-none">
         <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 sm:h-7 sm:w-7 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -198,6 +209,54 @@
             @if (Session::has('warning'))
                 toastr.warning("{{ Session::get('warning') }}");
             @endif
+
+            // Cart Update Animation and Sound
+            function playCartSound() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    // A pleasant short "pop/bell" sound
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioCtx.currentTime + 0.1);
+                } catch (e) {
+                    console.log("Audio not supported");
+                }
+            }
+
+            // Observe the floating cart subtotal for changes
+            const subtotalEl = document.getElementById('floating-cart-subtotal');
+            if (subtotalEl) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'characterData' || mutation.type === 'childList') {
+                            const btn = document.getElementById('floating-cart-btn');
+                            if (btn) {
+                                // Add shake class
+                                btn.classList.remove('animate-cart-shake');
+                                void btn.offsetWidth; // trigger reflow
+                                btn.classList.add('animate-cart-shake');
+                                
+                                // Play sound
+                                playCartSound();
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(subtotalEl, { characterData: true, childList: true, subtree: true });
+            }
         });
     </script>
 </body>
