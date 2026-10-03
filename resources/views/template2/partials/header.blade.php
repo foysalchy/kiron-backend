@@ -330,16 +330,16 @@
                                                 </a>
                                                 @if ($hasMini)
                                                     <i
-                                                        class="fa-solid fa-chevron-right text-xs text-gray-400 group-hover/sub:text-[var(--primary-color,#016738)] group-hover/sub:translate-x-0.5 transition-transform"></i>
+                                                        class="fa-solid fa-chevron-right text-xs text-gray-400 pr-[10px] group-hover/sub:text-[var(--primary-color,#016738)] group-hover/sub:translate-x-0.5 transition-transform"></i>
                                                 @endif
 
                                                 @if ($hasMini)
                                                     <ul
                                                         class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
                                                         @foreach ($sub->miniCategories as $mini)
-                                                            <li class="px-4 py-2 hover:bg-gray-100 border-b border-gray-50 last:border-0">
+                                                            <li class=" hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                                    class="block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-[14px] font-medium transition-colors">
+                                                                    class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-[14px] font-medium transition-colors">
                                                                     {{ $mini->name }}
                                                                 </a>
                                                             </li>
