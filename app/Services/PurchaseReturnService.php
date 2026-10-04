@@ -24,16 +24,22 @@ class PurchaseReturnService
     /**
      * Get all purchase returns with optional pagination
      */
-    public function getAllPurchaseReturns(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllPurchaseReturns(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = PurchaseReturn::with([
-                'purchase',
-                'supplier',
-                'purchaseReturnDetails.product',
-                'purchaseReturnDetails.variation.attributes.attributeGroup',
-                'purchaseReturnDetails.variation.attributes.attributeValue'
-            ]);
+            $query = PurchaseReturn::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with([
+                    'purchase',
+                    'supplier',
+                    'purchaseReturnDetails.product',
+                    'purchaseReturnDetails.variation.attributes.attributeGroup',
+                    'purchaseReturnDetails.variation.attributes.attributeValue'
+                ]);
+            }
 
             if (isset($filters['purchase_id'])) {
                 $query->where('purchase_id', $filters['purchase_id']);
@@ -64,8 +70,8 @@ class PurchaseReturnService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching purchase returns: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch purchase returns');

@@ -297,13 +297,7 @@ class ProductService
                 }
             }
 
-            return $product->load([
-                'brand',
-                'galleries',
-                'variations.attributes.attributeGroup',
-                'variations.attributes.attributeValue',
-                'variations.stocks.warehouse'
-            ]);
+            return $product;
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -758,13 +752,7 @@ class ProductService
                     }
                 }
             }
-            return $product->fresh([
-                'brand',
-                'galleries',
-                'variations.attributes.attributeGroup',
-                'variations.attributes.attributeValue',
-                'variations.stocks.warehouse'
-            ]);
+            return $product;
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
@@ -1127,7 +1115,7 @@ class ProductService
             Log::info('Product restored successfully', ['product_id' => $id]);
             LogHelper::restored('product', $id, $product->company_id);
 
-            return $product->load(['brand', 'galleries']);
+            return $product;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -1193,7 +1181,7 @@ class ProductService
             Log::info('Product status toggled', ['product_id' => $id]);
             LogHelper::statusChanged('product', $id, $product->company_id);
 
-            return $product->load(['brand', 'galleries']);
+            return $product;
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {

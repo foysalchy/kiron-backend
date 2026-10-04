@@ -19,6 +19,15 @@ class BlogService
     {
         try {
             $query = Blog::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
             //filter
             if (isset($filters['status'])) {

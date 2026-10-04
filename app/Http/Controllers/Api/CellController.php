@@ -17,6 +17,8 @@ class CellController extends Controller
     {
         $filters = [
             'rack_id' => $request->query('rack_id'),
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
@@ -72,3 +74,5 @@ class CellController extends Controller
         return ResponseHelper::success($data, 'Cell status updated successfully');
     }
 }
+
+

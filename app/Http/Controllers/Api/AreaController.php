@@ -19,6 +19,8 @@ class AreaController extends Controller
     {
         $filters = [
             'warehouse_id' => $request->query('warehouse_id'),
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
@@ -75,3 +77,5 @@ class AreaController extends Controller
         return ResponseHelper::success($data, 'Area status updated successfully');
     }
 }
+
+

@@ -43,6 +43,31 @@ class SelectOptionController extends Controller
     /**
      * Get select options for various entities
      */
+    public function productDependencies(Request $request)
+    {
+        $companyId = auth()->user()->company_id;
+        $includes = $request->query('includes');
+        
+        $data = [];
+        $includeList = $includes ? explode(',', $includes) : null;
+        
+        $wants = function($key) use ($includeList) {
+            return !$includeList || in_array($key, $includeList);
+        };
+
+        if ($wants('brands')) $data['brands'] = Brand::getCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('warehouses')) $data['warehouses'] = Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
+        if ($wants('users')) $data['users'] = auth()->user()->company->users()->select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
+        if ($wants('megaCategories')) $data['megaCategories'] = MegaCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('subCategories')) $data['subCategories'] = SubCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('miniCategories')) $data['miniCategories'] = MiniCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('extraCategories')) $data['extraCategories'] = ExtraCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('attributeGroups')) $data['attributeGroups'] = AttributeGroup::getActiveCachedOptions($companyId, ['id', 'name']);
+        if ($wants('attributeValues')) $data['attributeValues'] = AttributeValue::getActiveCachedOptions($companyId, ['id', 'name', 'attribute_group_id']);
+
+        return response()->json($data);
+    }
+
     public function warehouseOptions()
     {
         return Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
@@ -122,49 +147,115 @@ class SelectOptionController extends Controller
     }
     public function purchaseProductOptions(Request $request)
     {
-        $query = Product::with([
-            'brand',
-            'galleries',
-            'variations.attributes.attributeGroup',
-            'variations.attributes.attributeValue',
-            'variations.stocks.warehouse',
-        ]);
+        $query = Product::query();
+
+        if ($request->has('with')) {
+            $with = is_string($request->query('with')) ? explode(',', $request->query('with')) : $request->query('with');
+            $query->with($with);
+        } else {
+            $query->with([
+                'brand',
+                'galleries',
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+                'variations.stocks.warehouse',
+            ]);
+        }
 
         if ($request->has('product_type') && !empty($request->query('product_type'))) {
             $query->where('product_type', $request->query('product_type'));
         }
 
-        return $query->orderBy('title', 'asc')->get();
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        return $query->orderBy('title', 'asc')->get($columns);
     }
+
+    public function purchaseInitialData(Request $request)
+    {
+        $warehouses = Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
+        $suppliers = Party::select('id', 'name')->where('type', Party::TYPE_SUPPLIER)->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
+        $taxGroups = \App\Models\TaxGroup::where('status', Status::Active->value)->get();
+        
+        $productQuery = Product::query();
+        if ($request->has('with')) {
+            $with = is_string($request->query('with')) ? explode(',', $request->query('with')) : $request->query('with');
+            $productQuery->with($with);
+        } else {
+            $productQuery->with([
+                'brand',
+                'galleries',
+                'variations.attributes.attributeGroup',
+                'variations.attributes.attributeValue',
+                'variations.stocks.warehouse',
+            ]);
+        }
+        
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        $products = $productQuery->orderBy('title', 'asc')->get($columns);
+
+        return response()->json([
+            'warehouses' => $warehouses,
+            'suppliers' => $suppliers,
+            'tax_groups' => $taxGroups,
+            'products' => $products
+        ]);
+    }
+
+    public function purchaseReturnInitialData(Request $request)
+    {
+        $purchases = Purchase::select('id', 'reference_no', 'supplier_id', 'grand_total')->orderBy('purchase_date', 'desc')->get();
+        $suppliers = Party::select('id', 'name')->where('type', Party::TYPE_SUPPLIER)->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
+        $taxGroups = \App\Models\TaxGroup::where('status', Status::Active->value)->get();
+        
+        return response()->json([
+            'purchases' => $purchases,
+            'suppliers' => $suppliers,
+            'tax_groups' => $taxGroups,
+        ]);
+    }
+
     public function getProductByWarehouse(Request $request, $warehouseId)
     {
         $type = $request->query('type');
 
         $products = Product::with([
-            'brand',
-            'galleries',
+            'brand:id,name,logo',
+            'galleries:id,product_id,image',
             'variations.attributes.attributeGroup',
             'variations.attributes.attributeValue',
             'variations.stocks' => function ($q) use ($warehouseId) {
                 $q->where('warehouse_id', $warehouseId);
             },
-            'variations.stocks.warehouse',
+            'variations.stocks.warehouse:id,name',
         ])
+            ->leftJoin('product_variations', 'products.id', '=', 'product_variations.product_id')
+            ->leftJoin('product_variation_stocks', 'product_variations.id', '=', 'product_variation_stocks.product_variation_id')
             ->where(function ($q) use ($warehouseId) {
-                $q->where('manage_stock', false)
-                    ->orWhereJsonContains('warehouse_info', [
+                $q->where('products.manage_stock', false)
+                    ->orWhereJsonContains('products.warehouse_info', [
                         'warehouse_id' => (string) $warehouseId
                     ])
-                    ->orWhereHas('variations.stocks', function ($stockQuery) use ($warehouseId) {
-                        $stockQuery->where('warehouse_id', $warehouseId)
-                            ->where('quantity', '>', 0);
+                    ->orWhere(function ($q2) use ($warehouseId) {
+                        $q2->where('product_variation_stocks.warehouse_id', $warehouseId)
+                            ->where('product_variation_stocks.quantity', '>', 0);
                     });
             })
             ->when($type === 'pos', function ($q) {
-                $q->whereIn('purpose', ['pos', 'both']);
+                $q->whereIn('products.purpose', ['pos', 'both']);
             })
-
-            ->orderBy('title', 'asc')
+            ->select('products.*')
+            ->groupBy('products.id')
+            ->orderBy('products.title', 'asc')
             ->get();
 
         $mappedProducts = $products->map(function ($product) use ($warehouseId) {

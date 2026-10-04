@@ -13,10 +13,16 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class MiniCategoryService
 {
-    public function getAllMiniCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllMiniCategories(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = MiniCategory::with('subCategory', 'megaCategory');
+            $query = MiniCategory::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with('subCategory', 'megaCategory');
+            }
 
 
             if (isset($filters['sub_category_id'])) {
@@ -40,8 +46,8 @@ class MiniCategoryService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching mini categories: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch mini categories');

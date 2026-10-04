@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class MegaCategoryService
 {
-    public function getAllMegaCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllMegaCategories(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             
@@ -35,8 +35,8 @@ class MegaCategoryService
             $sortOrder = $filters['sort_order'] ?? 'desc';
             $query->orderBy($sortBy, $sortOrder);
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching mega categories: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch mega categories');

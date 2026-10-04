@@ -23,7 +23,7 @@ class PartyService
     /**
      * Get all parties with optional pagination
      */
-    public function getAllParties(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllParties(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             $query = Party::query();
@@ -75,9 +75,6 @@ class PartyService
                 }
             }
 
-
-
-
             // Search
             if (isset($filters['search'])) {
                 $query->where(function ($q) use ($filters) {
@@ -93,8 +90,8 @@ class PartyService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching parties: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch parties');
@@ -116,7 +113,11 @@ class PartyService
     }
     public function getProfileWithLog(int $id): Party
     {
-        $party = Party::with([
+        $party = Party::select([
+            'id', 'company_id', 'type', 'name', 'email', 'phone', 
+            'alternative_phone', 'address', 'balance', 'due_amount', 
+            'credit_limit', 'status', 'created_at'
+        ])->with([
             'logs.user:id,name',
             'orders' => fn($q) => $q->latest()->select([
                 'id',
@@ -137,7 +138,11 @@ class PartyService
     }
     public function getSupplierProfile(int $id): Party
     {
-        $party = Party::with([
+        $party = Party::select([
+            'id', 'company_id', 'type', 'name', 'email', 'phone', 
+            'alternative_phone', 'address', 'balance', 'due_amount', 
+            'credit_limit', 'status', 'created_at'
+        ])->with([
             'logs.user:id,name',
             'purchases' => fn($q) => $q->latest()
                 ->select([

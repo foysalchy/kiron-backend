@@ -21,6 +21,15 @@ class KnowledgeBaseService
     {
         try {
             $query = KnowledgeBase::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {

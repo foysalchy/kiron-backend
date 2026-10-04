@@ -19,6 +19,8 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'role'       => $request->query('role'),
@@ -67,3 +69,4 @@ class UserController extends Controller
         return ResponseHelper::success($data, 'User status updated successfully');
     }
 }
+

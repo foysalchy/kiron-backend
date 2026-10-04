@@ -20,7 +20,16 @@ class AreaService
     public function getAllAreas(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Area::with(['warehouse']);
+            $query = Area::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
 
             if (!empty($filters['warehouse_id'])) {
@@ -220,3 +229,4 @@ class AreaService
         }
     }
 }
+

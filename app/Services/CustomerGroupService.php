@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class CustomerGroupService
 {
-    public function getAllGroups(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllGroups(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             $query = CustomerGroup::query();
@@ -38,8 +38,8 @@ class CustomerGroupService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching customer groups: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch customer groups');

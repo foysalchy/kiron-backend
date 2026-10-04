@@ -43,16 +43,17 @@ class FrontendOrderService
             $query->where('orders.payment_status', $filters['payment_status']);
         }
 
+        $needsCustomerJoin = !empty($filters['customer_name']) || !empty($filters['customer_phone']) || !empty($filters['search']);
+        if ($needsCustomerJoin) {
+            $query->leftJoin('parties', 'orders.customer_id', '=', 'parties.id');
+        }
+
         if (!empty($filters['customer_name'])) {
-            $query->whereHas('customer', function ($q) use ($filters) {
-                $q->where('name', 'like', '%' . $filters['customer_name'] . '%');
-            });
+            $query->where('parties.name', 'like', '%' . $filters['customer_name'] . '%');
         }
 
         if (!empty($filters['customer_phone'])) {
-            $query->whereHas('customer', function ($q) use ($filters) {
-                $q->where('phone', 'like', '%' . $filters['customer_phone'] . '%');
-            });
+            $query->where('parties.phone', 'like', '%' . $filters['customer_phone'] . '%');
         }
 
         if (!empty($filters['order_no'])) {
@@ -60,12 +61,16 @@ class FrontendOrderService
         }
 
         if (!empty($filters['product_name']) || !empty($filters['product_sku'])) {
-            $query->whereHas('orderDetails.product', function ($q) use ($filters) {
+            $query->leftJoin('order_details', 'orders.id', '=', 'order_details.order_id')
+                  ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
+                  ->distinct();
+                  
+            $query->where(function($q) use ($filters) {
                 if (!empty($filters['product_name'])) {
-                    $q->where('title', 'like', '%' . $filters['product_name'] . '%');
+                    $q->where('products.title', 'like', '%' . $filters['product_name'] . '%');
                 }
                 if (!empty($filters['product_sku'])) {
-                    $q->where('sku_code', 'like', '%' . $filters['product_sku'] . '%');
+                    $q->where('products.sku_code', 'like', '%' . $filters['product_sku'] . '%');
                 }
             });
         }
@@ -100,10 +105,8 @@ class FrontendOrderService
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('orders.order_no', 'like', '%' . $searchTerm . '%')
                     ->orWhere('orders.reference_no', 'like', '%' . $searchTerm . '%')
-                    ->orWhereHas('customer', function ($subQ) use ($searchTerm) {
-                        $subQ->where('name', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('phone', 'like', '%' . $searchTerm . '%');
-                    });
+                    ->orWhere('parties.name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('parties.phone', 'like', '%' . $searchTerm . '%');
             });
         }
 
@@ -126,6 +129,45 @@ class FrontendOrderService
             }
         );
         $orders = $query->paginate($perPage);
+
+        // Pre-fetch customer total orders to avoid N+1
+        $customerIds = $orders->getCollection()->pluck('customer_id')->filter()->unique()->values()->toArray();
+        $customerTotalOrdersMap = [];
+        if (!empty($customerIds)) {
+            $customerTotalOrdersMap = Order::whereIn('customer_id', $customerIds)
+                ->select('customer_id', DB::raw('count(*) as total'))
+                ->groupBy('customer_id')
+                ->pluck('total', 'customer_id')
+                ->toArray();
+        }
+
+        // Collect all phones (from customer or shipping address) to avoid N+1 for fake count
+        $phonesForFake = $orders->getCollection()->map(function ($order) {
+            return $order->customer?->phone ?? ($order->shipping_address['phone'] ?? null);
+        })->filter()->unique()->values()->toArray();
+
+        $fakeOrderCountMap = [];
+        if (!empty($phonesForFake)) {
+            $fakeOrders = Order::where('status', Status::Fake->value)
+                ->where(function ($q) use ($phonesForFake) {
+                    $q->whereHas('customer', function ($cQ) use ($phonesForFake) {
+                        $cQ->whereIn('phone', $phonesForFake);
+                    });
+                    foreach ($phonesForFake as $phone) {
+                        $q->orWhere('shipping_address', 'LIKE', '%"phone":"' . $phone . '"%')
+                          ->orWhere('shipping_address', 'LIKE', '%"phone": "' . $phone . '"%');
+                    }
+                })
+                ->get();
+
+            foreach ($phonesForFake as $phone) {
+                $fakeOrderCountMap[$phone] = $fakeOrders->filter(function ($fakeOrder) use ($phone) {
+                    $fakePhone = $fakeOrder->customer?->phone ?? ($fakeOrder->shipping_address['phone'] ?? null);
+                    return $fakePhone === $phone;
+                })->count();
+            }
+        }
+
         $phones = $orders->getCollection()
             ->pluck('customer.phone')
             ->filter()
@@ -134,33 +176,29 @@ class FrontendOrderService
         $courierHistories = CourierCheckHistory::whereIn('phone', $phones)
             ->get()
             ->keyBy('phone');
+            
         // Transform the data to include calculated fields
-        $orders->getCollection()->transform(function ($order) use ($courierHistories) {
+        $orders->getCollection()->transform(function ($order) use ($courierHistories, $customerTotalOrdersMap, $fakeOrderCountMap) {
             $customerTotalOrders = 1;
             $fakeOrderCount = 0;
             
             $phone = $order->customer?->phone ?? $order->shipping_address['phone'] ?? null;
             
             if ($order->customer_id) {
-                $customerTotalOrders = Order::where('customer_id', $order->customer_id)->count();
+                $customerTotalOrders = $customerTotalOrdersMap[$order->customer_id] ?? 1;
             }
             
             if ($phone) {
-                $fakeOrderCount = Order::where(function($q) use ($phone) {
-                    $q->whereHas('customer', function($cQ) use ($phone) {
-                        $cQ->where('phone', $phone);
-                    })
-                    ->orWhere('shipping_address', 'LIKE', '%"phone":"' . $phone . '"%')
-                    ->orWhere('shipping_address', 'LIKE', '%"phone": "' . $phone . '"%');
-                })
-                ->where('status', Status::Fake->value)
-                ->where('id', '!=', $order->id)
-                ->count();
+                $baseFakeCount = $fakeOrderCountMap[$phone] ?? 0;
+                $fakeOrderCount = $baseFakeCount;
+                if ($order->status === Status::Fake->value) {
+                    $fakeOrderCount = max(0, $baseFakeCount - 1);
+                }
             }
 
             // ✅ courier history lookup
-            $phone = $order->customer?->phone;
-            $courierHistory = $phone ? ($courierHistories[$phone] ?? null) : null;
+            $courierHistoryPhone = $order->customer?->phone;
+            $courierHistory = $courierHistoryPhone ? ($courierHistories[$courierHistoryPhone] ?? null) : null;
 
             return [
                 'id' => $order->id,
@@ -264,18 +302,18 @@ class FrontendOrderService
     public function getOrderById($orderId)
     {
         $order = Order::with([
-            'customer',
-            'warehouse',
-            'company',
-            'actionLogs.user',
-            'orderDetails.product',
+            'customer:id,name,phone,address,email',
+            'warehouse:id,name',
+            'company:id,name,email,phone,logo',
+            'actionLogs.user:id,name,email',
+            'orderDetails.product:id,title,sku_code,thumbnail',
             'orderDetails.variation.attributes.attributeGroup',
             'orderDetails.variation.attributes.attributeValue',
             'orderPayments',
             'orderNotes' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             },
-            'coupon'
+            'coupon:id,code,discount_value'
         ])
             ->findOrFail($orderId);
 

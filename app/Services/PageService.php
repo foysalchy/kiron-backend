@@ -23,6 +23,15 @@ class PageService
     {
         try {
             $query = Page::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
             // Status Filter (Enum mapping)
             if (isset($filters['status']) && $filters['status'] !== 'all') {
