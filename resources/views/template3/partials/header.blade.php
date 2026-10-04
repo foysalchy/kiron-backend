@@ -11,7 +11,7 @@
     <div class="container mx-auto px-4 py-4 flex items-center justify-between gap-4 lg:gap-10">
 
         <!-- Mobile Menu Toggle -->
-        <button onclick="toggleMobileMenu()" class="md:hidden text-gray-700 text-2xl focus:outline-none">
+        <button onclick="toggleMobileMenu()" aria-label="Open menu" class="md:hidden text-gray-700 text-2xl focus:outline-none">
             <i class="fas fa-bars"></i>
         </button>
 
@@ -33,7 +33,7 @@
                 <!-- Category Dropdown -->
                 <div class="relative flex-shrink-0 border-r border-gray-200 bg-gray-50">
                     <label for="category-dropdown" class="sr-only">Select Category</label>
-                    <select name="category"
+                    <select id="category-dropdown" name="category"
                         class="h-full pl-4 pr-10 py-2 text-base text-gray-700 bg-transparent outline-none appearance-none cursor-pointer">
                         <option value="">All Categories</option>
                         @foreach ($headerCategories as $cat)
@@ -101,7 +101,7 @@
             <!-- Account -->
             <div class="relative group hidden md:block" id="desktop-account-wrapper">
                 @auth('customer')
-                    <button onclick="toggleDesktopAccount()"
+                    <button onclick="toggleDesktopAccount()" aria-label="Open account menu"
                         class="flex items-center gap-1 text-gray-800 hover:text-blue-600 transition-colors cursor-pointer">
                         <i class="fa-regular fa-user text-2xl"></i>
                     </button>
@@ -276,7 +276,7 @@
             class="flex border border-gray-300 rounded-md overflow-hidden bg-white relative z-30">
             <input type="text" name="search" id="mobile-search-input" autocomplete="off" value="{{ request('search') }}"
                 placeholder="Search Products.." class="flex-1 px-3 py-2 text-sm outline-none">
-            <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
+            <button type="submit" aria-label="Search" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
                 <i class="fas fa-search"></i>
             </button>
         </form>
@@ -510,7 +510,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
         <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
-        <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
+        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer" class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
     </div>

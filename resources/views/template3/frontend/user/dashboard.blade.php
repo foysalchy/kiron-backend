@@ -1,5 +1,9 @@
 @extends('template3.layouts.front')
 
+@section('meta')
+    <title>Dashboard - {{ $setup->shop_name ?? 'Shop' }}</title>
+@endsection
+
 @section('content')
     <section class="container py-6 mx-auto px-4 lg:px-0">
         <!-- Dashboard Header -->
@@ -23,13 +27,14 @@
                         <div
                             class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
                             @if ($user->profile)
-                                <img src="{{ $user->profile_url }}" class="w-full h-full object-cover">
+                                <img src="{{ $user->profile_url }}" alt="{{ $user->name }} profile photo"
+                                    class="w-full h-full object-cover">
                             @else
                                 <i class="fas fa-user text-3xl text-gray-300"></i>
                             @endif
                         </div>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900">{{ $user->name }}</h3>
+                    <h2 class="text-lg font-bold text-gray-900">{{ $user->name }}</h2>
                     <p class="text-sm text-gray-500 font-medium">{{ $user->email }}</p>
 
                     <!-- Sidebar Menu -->
@@ -84,7 +89,7 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Order</p>
-                                <h4 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h4>
+                                <h3 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h3>
                             </div>
                             <i class="fas fa-shopping-bag h-8 w-8 text-orange-500 text-2xl"></i>
                         </div>
@@ -92,11 +97,11 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
-                                <h4 class="text-2xl font-semibold text-gray-900">
+                                <h3 class="text-2xl font-semibold text-gray-900">
                                      {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                         {{ number_format($totalSpent ?? 0) }}
                                         {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                                </h4>
+                                </h3>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -113,8 +118,8 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Wishlist</p>
-                                <h4 class="text-2xl font-semibold text-gray-900 wishlist-count-val">
-                                    {{ $wishlistCount ?? 0 }}</h4>
+                                <h3 class="text-2xl font-semibold text-gray-900 wishlist-count-val">
+                                    {{ $wishlistCount ?? 0 }}</h3>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -176,9 +181,9 @@
                                     <div
                                         class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                                         <div>
-                                            <h4 class="font-semibold text-md text-gray-900">
+                                            <h3 class="font-semibold text-md text-gray-900">
                                                 #{{ $order->order_no ?? $order->id }}
-                                            </h4>
+                                            </h3>
                                             <p class="text-sm text-gray-700 font-medium">
                                                 Order Date: {{ $order->created_at->format('d M, Y') }}
                                             </p>
@@ -212,9 +217,11 @@
                                                     @if ($item->product && $item->product->thumbnail)
                                                         <img src="{{ $item->product->thumbnail_url }}"
                                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                                            alt="{{ $item->product->title ?? 'Product image' }}"
                                                             class="w-full h-full object-cover">
                                                     @else
                                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}"
+                                                            alt="Product image unavailable"
                                                             class="w-full h-full object-cover">
                                                     @endif
                                                 </div>
@@ -366,6 +373,7 @@
                                     <div class="shrink-0">
                                         <img id="image-preview"
                                             src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                                            alt="{{ $user->name }} profile photo preview"
                                             class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm">
                                     </div>
                                     <div class="flex-1">

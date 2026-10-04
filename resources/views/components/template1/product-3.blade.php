@@ -22,6 +22,24 @@
         }
     }
 
+    $secondaryColor = str_replace('##', '#', trim(data_get($company->theme_template, 'secondary_color', '#FFA500')));
+    $hexColor = ltrim($secondaryColor, '#');
+    if (preg_match('/^[a-f0-9]{3}$|^[a-f0-9]{6}$/i', $hexColor)) {
+        if (strlen($hexColor) === 3) {
+            $hexColor = implode('', array_map(fn ($digit) => $digit . $digit, str_split($hexColor)));
+        }
+
+        $rgb = array_map('hexdec', str_split($hexColor, 2));
+        $rgb = array_map(function ($channel) {
+            $channel /= 255;
+            return $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4;
+        }, $rgb);
+        $luminance = 0.2126 * $rgb[0] + 0.7152 * $rgb[1] + 0.0722 * $rgb[2];
+        $badgeTextColor = $luminance > 0.179 ? '#000000' : '#ffffff';
+    } else {
+        $badgeTextColor = '#000000';
+    }
+
     $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
 @endphp
 
@@ -82,8 +100,8 @@
 
            @if ($discountLabel)
             <span
-                class="secondary-bg text-[#0f172a] text-[10px] md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
-                    max-md:absolute max-md:top-1 max-md:left-1">
+                class="secondary-bg text-[10px] md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                    max-md:absolute max-md:top-1 max-md:left-1" style="color: {{ $badgeTextColor }} !important;">
                 -{{ $discountLabel }} OFF
             </span>
         @endif

@@ -138,13 +138,13 @@
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                         <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
-                                            class="w-full h-full object-cover">
+                                            alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
                                     </div>
 
                                     <div class="flex-1">
-                                        <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">
                                             {{ $item->name }}
-                                        </h4>
+                                        </h3>
 
                                         @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
                                             <div class="flex flex-wrap gap-1 mb-1">
@@ -170,6 +170,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
+                                            aria-label="Remove {{ $item->name ?? 'item' }} from cart"
                                             class="text-red-400 hover:text-red-600">
                                             <i class="far fa-trash-alt text-xs"></i>
                                         </a>
@@ -459,7 +460,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <img src="${e.target.result}" alt="Uploaded payment proof preview" class="w-full h-full object-cover">
             </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);

@@ -15,7 +15,7 @@
                     class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
                     <i class="fas fa-filter text-[var(--primary-color)]"></i> Filters
                 </button>
-                <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
+                <span class="text-xs text-gray-600">{{ $products->total() }} products</span>
             </div>
 
 
