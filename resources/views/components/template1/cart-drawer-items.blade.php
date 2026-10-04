@@ -5,7 +5,7 @@
 @forelse($cartItems as $item)
     <div class="flex gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0" data-row-id="{{ $item->rowId }}">
         <div class="w-16 h-16 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
-            <img src="{{ $item->options->thumbnail ?? asset('images/no-image.png') }}" class="w-full h-full object-contain">
+            <img src="{{ $item->options->thumbnail ?? asset('images/no-image.png') }}" alt="{{ $item->name }}" class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
             <h3 class="text-[13px] font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
@@ -29,7 +29,7 @@
                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                     </span>
                  
-                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
+                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" aria-label="Remove {{ $item->name }} from cart" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
             </div>
 
           

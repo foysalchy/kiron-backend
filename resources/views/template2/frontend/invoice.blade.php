@@ -177,7 +177,7 @@
 
         .shop-info p {
             font-size: 13px;
-            color: #6b7280;
+            color: #4b5563;
             font-weight: 500;
             line-height: 1.7;
         }
@@ -197,7 +197,7 @@
 
         .invoice-meta-info p {
             font-size: 13px;
-            color: #6b7280;
+            color: #4b5563;
             font-weight: 500;
             line-height: 1.8;
         }
@@ -312,7 +312,7 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: #4b5563;
             margin-top: 4px;
         }
 
@@ -358,7 +358,7 @@
             justify-content: space-between;
             font-size: 13px;
             font-weight: 500;
-            color: #6b7280;
+            color: #4b5563;
             padding: 6px 0;
         }
 
@@ -367,11 +367,11 @@
         }
 
         .summary-row.discount {
-            color: #16a34a;
+            color: #15803d;
         }
 
         .summary-row.discount span:last-child {
-            color: #16a34a;
+            color: #15803d;
         }
 
         .summary-divider {
@@ -396,7 +396,7 @@
         .summary-total .amount {
             font-size: 24px;
             font-weight: 700;
-            color: #FF6A00;
+            color: #CC5200;
         }
 
         /* ── Footer Info ── */
@@ -425,7 +425,7 @@
 
         .footer-row ul li {
             font-size: 12px;
-            color: #6b7280;
+            color: #4b5563;
             font-weight: 500;
             line-height: 2;
         }
@@ -436,7 +436,7 @@
 
         .footer-contact p {
             font-size: 12px;
-            color: #6b7280;
+            color: #4b5563;
             margin-bottom: 6px;
         }
 
@@ -467,7 +467,7 @@
 
         .thankyou p:last-child {
             font-size: 13px;
-            color: #9ca3af;
+            color: #4b5563;
             font-weight: 500;
             margin-top: 4px;
         }
@@ -653,7 +653,7 @@
     </div>
 
     <!-- Page -->
-    <div class="page-wrapper">
+    <main class="page-wrapper">
         <div id="invoice-content" class="invoice-card">
             <div class="invoice-inner">
 
@@ -662,7 +662,8 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="Shop Logo">
+                                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="Shop Logo"
+                                    width="160" height="48">
                             @else
                                 <div class="logo-placeholder">
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>
@@ -808,10 +809,9 @@
                         <p>Thank you for shopping with {{ $setup->shop_name }}.</p>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>

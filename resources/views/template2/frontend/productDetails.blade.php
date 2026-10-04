@@ -25,7 +25,7 @@
 
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
-                    <span class="text-gray-400">/</span>
+                    <span class="text-gray-500">/</span>
                     <a href="{{ url($item['slug']) }}"
                         class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
                         {{ $item['name'] }}
@@ -33,7 +33,7 @@
                 @endforeach
             @endif
 
-            <span class="text-gray-400">/</span>
+            <span class="text-gray-500">/</span>
             <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
 
@@ -43,9 +43,8 @@
 
                 <!-- Left: Image Gallery -->
                 <div class="  lg:border-r border-b lg:border-b-0 border-gray-100">
-                    <div
-                        class="  mb-4 overflow-hidden rounded-xl bg-white border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                    <div class="  mb-4 overflow-hidden rounded-xl bg-white border border-gray-100 relative group">
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
                             class="m-auto  object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -96,13 +95,13 @@
                     @endif
                     <div
                         class="prose prose-slate max-w-none mb-4 text-lg leading-relaxed font-medium overflow-visible relative">
-                          <h3 class="text-xl font-bold text-gray-900 mb-6">Summury  </h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Summury </h2>
                         {!! $product->short_description !!}
                     </div>
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-400 text-lg line-through">
+                            <span id="regular-price" class="text-gray-500 text-lg line-through">
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                                 @else
@@ -128,16 +127,16 @@
                     <!-- Quantity -->
                     <div class="flex items-center gap-6 mb-8 mt-4">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-10">
-                            <button onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
+                            <button onclick="changeQty(-1)" aria-label="Decrease quantity" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>
-                            <input type="number" id="main-qty" value="1" readonly
+                            <input type="number" id="main-qty" aria-label="Quantity" value="1" readonly
                                 class="w-10 text-center font-bold border-none outline-none">
-                            <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
+                            <button onclick="changeQty(1)" aria-label="Increase quantity" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         {{-- Replace this part --}}
                         <span
-                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
@@ -155,14 +154,14 @@
 
                         <!-- 2. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                            class="order-1 md:order-2 col-span-2 md:col-span-1 flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="order-1 md:order-2 col-span-2 md:col-span-1 flex-1 secondary-bg hover:bg-yellow-500 text-black h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="order-3 md:order-3 col-span-1 md:col-span-1 flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                                        {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -177,7 +176,7 @@
                                 style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
                                 <div class="shrink-0">
                                     @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) }}" class="h-5 w-5 object-contain">
+                                        <img src="{{ asset('storage/' . $item->icon_file) }}" alt="" class="h-5 w-5 object-contain">
                                     @else
                                         <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
                                     @endif
@@ -196,7 +195,7 @@
                                 <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
                                     <div class="text-orange-500 shrink-0">
                                         @if ($card->icon_file)
-                                            <img src="{{ asset('storage/' . $card->icon_file) }}" class="h-5 w-5 object-contain">
+                                            <img src="{{ asset('storage/' . $card->icon_file) }}" alt="" class="h-5 w-5 object-contain">
                                         @else
                                             <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
                                         @endif
@@ -213,7 +212,7 @@
                         <div class="grid grid-cols-2 gap-2 md:gap-3">
 
                             <a href="tel:{{ $setup->phone }}"
-                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                class="bg-[#EE4D2D] hover:bg-red-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
@@ -226,7 +225,7 @@
 
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                                 target="_blank"
-                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                class="bg-[#25D366] hover:bg-green-600 text-black h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
@@ -265,7 +264,7 @@
 
                     <!-- Section: Description  -->
                     <div id="tab-content-description" class="tab-content block">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
                         <div class="text-lg prose prose-orange max-w-none">
                             {!! $product->full_description ?? 'No detailed description available for this product.' !!}
                         </div>
@@ -273,15 +272,15 @@
 
                     <!-- Section: Specification  -->
                     <div id="tab-content-specification" class="tab-content hidden">
-                        <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
                             @if(!empty($product->brand))
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-medium text-gray-500">Brand:</span>
-                                <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
-                            </div>
-                        @endif
+                                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                    <span class="font-medium text-gray-500">Brand:</span>
+                                    <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                </div>
+                            @endif
 
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <span class="font-medium text-gray-500">SKU:</span>
@@ -297,7 +296,7 @@
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <span class="font-medium text-gray-500">Availability:</span>
                                 <span
-                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
                                     {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
                                 </span>
                             </div>
@@ -338,7 +337,7 @@
 
                     <!-- Section: Review -->
                     <div id="tab-content-review" class="tab-content hidden px-2">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h2>
 
                         @php
                             $reviews = $product->reviews;
@@ -383,9 +382,9 @@
                                         <div class="flex-1">
                                             <!-- Header Line: Name, Stars, Date -->
                                             <div class="flex items-center gap-3 mb-2">
-                                                <h4 class="text-md font-bold text-gray-900">
+                                                <h3 class="text-md font-bold text-gray-900">
                                                     {{ $review->customer->name ?? 'Customer' }}
-                                                </h4>
+                                                </h3>
 
                                                 <div class="flex text-yellow-400 text-[10px] gap-0.5">
                                                     @for ($i = 1; $i <= 5; $i++)
@@ -393,7 +392,7 @@
                                                     @endfor
                                                 </div>
 
-                                                <span class="text-sm text-gray-400 font-medium ml-1">
+                                                <span class="text-sm text-gray-500 font-medium ml-1">
                                                     {{ $review->created_at->diffForHumans() }}
                                                 </span>
                                             </div>
@@ -420,7 +419,7 @@
                                                 <div id="expanded-container-{{ $review->id }}"
                                                     class="hidden mb-6 transition-all duration-500">
                                                     <div class="relative inline-block group">
-                                                        <img id="large-view-{{ $review->id }}" src=""
+                                                        <img id="large-view-{{ $review->id }}" src="" alt="Expanded review image"
                                                             class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
 
                                                         <!-- Close Button -->
@@ -446,7 +445,7 @@
                                 </div>
                             @empty
                                 <div class="text-center py-20 bg-white">
-                                    <p class="text-gray-400 font-medium italic">No reviews yet. Be the first to share your
+                                    <p class="text-gray-500 font-medium italic">No reviews yet. Be the first to share your
                                         experience!</p>
                                 </div>
                             @endforelse
@@ -461,10 +460,10 @@
             <aside class="md:col-span-5 lg:col-span-4 flex flex-col gap-6 sticky top-24">
                 <div class="bg-white rounded-lg shadow-xs border border-gray-100 overflow-hidden">
                     <div class="px-5 py-4 bg-[#F9FAFB] border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="font-bold text-gray-900 text-base md:text-lg flex items-center gap-2">
+                        <h2 class="font-bold text-gray-900 text-base md:text-lg flex items-center gap-2">
                             <span class="w-1.5 h-5 bg-[var(--primary-color)] rounded-full inline-block"></span>
                             Related Products
-                        </h3>
+                        </h2>
                         @if ($product->mega_categories->first())
                             <a href="{{ url($product->mega_categories->first()->slug) }}"
                                 class="text-xs font-semibold text-[var(--primary-color)] hover:underline">
@@ -498,16 +497,16 @@
 
                                     <!-- Info -->
                                     <div class="min-w-0 flex-1">
-                                        <h4
+                                        <h3
                                             class="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
                                             {{ $rel->title }}
-                                        </h4>
+                                        </h3>
                                         <div class="flex items-baseline gap-2 mt-1.5">
                                             <span class="text-sm sm:text-base font-bold text-[var(--primary-color)]">
                                                 {{ $isL ? $currency : '' }}{{ number_format($relSalePrice) }}{{ !$isL ? $currency : '' }}
                                             </span>
                                             @if ($hasDiscount)
-                                                <span class="text-xs text-gray-400 line-through">
+                                                <span class="text-xs text-gray-500 line-through">
                                                     {{ $isL ? $currency : '' }}{{ number_format($relRegularPrice) }}{{ !$isL ? $currency : '' }}
                                                 </span>
                                             @endif
@@ -517,7 +516,7 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="p-8 text-center text-gray-400 text-sm">
+                        <div class="p-8 text-center text-gray-500 text-sm">
                             No related products found in this category.
                         </div>
                     @endif
@@ -585,10 +584,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                                                    <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                                        onclick="changeImage('${imgUrl}', this)">
-                                                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
-                                                    </button>`;
+                                                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                                            onclick="changeImage('${imgUrl}', this)">
+                                                            <img src="${imgUrl}" alt="Product Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                                        </button>`;
             });
         }
 
@@ -608,7 +607,7 @@
                     if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
                 });
 
-                let groupHtml = `<div class="mb-4"><h3 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+                let groupHtml = `<div class="mb-4"><h2 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h2><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const isFilterActive = (activeFilters[groupName] == valId);
@@ -620,7 +619,7 @@
 
                     // Logic to show image on variation button
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" alt="${valName}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;
@@ -634,9 +633,9 @@
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
-        
-        
-        
+
+
+
         function updatePriceDisplay(salePrice, regularPrice) {
             const saleEl = document.getElementById('sale-price');
             const regularEl = document.getElementById('regular-price');
@@ -659,7 +658,7 @@
                         : `${formattedRegular} ${currency}`;
                     regularEl.classList.remove('hidden');
                 } else {
-                    if(regularEl) regularEl.classList.add('hidden');
+                    if (regularEl) regularEl.classList.add('hidden');
                 }
             }
 
@@ -669,7 +668,7 @@
                     badgeEl.innerText = percent + '% OFF';
                     badgeEl.classList.remove('hidden');
                 } else {
-                    if(badgeEl) badgeEl.classList.add('hidden');
+                    if (badgeEl) badgeEl.classList.add('hidden');
                 }
             }
         }
@@ -677,7 +676,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                    {{ $product->display_price_data->sale_price ?? 0 }},
+                        {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;
@@ -700,27 +699,27 @@
         function updateSkuDisplay() {
             const skuEl = document.getElementById('product-sku');
             const tabSkuEl = document.getElementById('tab-sku');
-            
+
             if (finalSelectedVariationIds.length === 0) {
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
                 if (allSkus.length > 0) {
                     const text = [...new Set(allSkus)].join(", ");
-                    if(skuEl) skuEl.innerText = text;
-                    if(tabSkuEl) tabSkuEl.innerText = text;
+                    if (skuEl) skuEl.innerText = text;
+                    if (tabSkuEl) tabSkuEl.innerText = text;
                 }
                 return;
             }
-            
+
             let selectedSkus = [];
             finalSelectedVariationIds.forEach(id => {
                 const v = allVariations.find(v => v.id === id);
                 if (v && v.sku) selectedSkus.push(v.sku);
             });
-            
+
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");
-                if(skuEl) skuEl.innerText = text;
-                if(tabSkuEl) tabSkuEl.innerText = text;
+                if (skuEl) skuEl.innerText = text;
+                if (tabSkuEl) tabSkuEl.innerText = text;
             }
         }
 

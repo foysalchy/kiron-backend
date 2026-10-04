@@ -14,7 +14,7 @@
                 <h1 class="text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
-                <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
+                <span class="px-4 py-1 {{ $order->status_color }} text-md font-bold rounded-lg mb-1">
                      {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
@@ -29,7 +29,7 @@
 
                 <!-- Ordered Products Card -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h2>
 
                     <div class="space-y-4">
                         @foreach ($order->orderDetails as $item)
@@ -39,15 +39,15 @@
                                 {{-- 1. Safe Image Check --}}
                                 <div
                                     class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
-                                    <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                    <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}" alt="{{ $item->product->title ?? 'Product Image' }}"
                                         class="w-full h-full object-cover">
                                 </div>
 
                                 <div class="flex-1 text-center sm:text-left">
                                     {{-- 2. Safe Title Check --}}
-                                    <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
+                                    <h3 class="text-md font-bold text-gray-800 mb-1 leading-tight">
                                         {{ $item->product->title ?? 'Product Not Available' }}
-                                    </h4>
+                                    </h3>
 
                                     @if ($item->variation)
                                         <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
@@ -97,7 +97,7 @@
 
                 <!-- Order Tracking Section -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden p-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h3>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h2>
 
                     <!-- Vertical Timeline -->
                     {{-- The 'before' class creates the vertical line connecting the dots --}}
@@ -146,7 +146,7 @@
                                 <!-- Label -->
                                 <p
                                     class="font-bold text-md leading-none mb-1
-                    {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-400') }}">
+                    {{ $isCurrent ? 'text-orange-600' : ($isCompleted ? 'text-green-700' : 'text-gray-500') }}">
                                     {{ $status->label() }}
                                 </p>
 
@@ -230,10 +230,10 @@
 
                 <!-- Customer Information -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h2>
                     <div class="space-y-4">
                         <div class="flex items-start ">
-                            <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
+                            <div class="w-10 h-10 flex items-center justify-center text-gray-500 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-map-pin h-4 w-4 text-gray-500">
@@ -250,7 +250,7 @@
                             </div>
                         </div>
                         <div class="flex items-center ">
-                            <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
+                            <div class="w-10 h-10 flex items-center justify-center text-gray-500 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-phone h-4 w-4 text-gray-500">
@@ -266,8 +266,8 @@
 
                 <!-- Payment Summary -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
-                        Summary</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
+                        Summary</h2>
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
@@ -293,14 +293,14 @@
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                             </span>
                         </div>
-                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
+                        <p class="text-[11px] text-gray-500 font-bold uppercase mt-2">Method:
                             {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h2>
                     <div class="space-y-3">
                         <a href="{{ route('invoice.download', $order->id) }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
@@ -324,7 +324,7 @@
                         </a>
                         @if ($order->status == \App\Enums\Status::ReturnRequest->value)
                             <button disabled
-                                class="w-full py-2.5 bg-gray-100 text-gray-400 rounded-md text-sm font-bold cursor-not-allowed">
+                                class="w-full py-2.5 bg-gray-100 text-gray-500 rounded-md text-sm font-bold cursor-not-allowed">
                                 Return Requested
                             </button>
                         @else
@@ -343,7 +343,7 @@
         class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
             <button onclick="closeReturnModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl cursor-pointer">&times;</button>
+                class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl cursor-pointer">&times;</button>
             <h2 class="text-xl font-bold text-gray-800 mb-6">Request a Return</h2>
 
             <form action="{{ route('order.return', $order->id) }}" method="POST" enctype="multipart/form-data">
@@ -362,7 +362,7 @@
                             class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-red-500">
                             <input type="file" name="images[]" multiple accept="image/*" class="hidden"
                                 onchange="handleReturnPreview(this)">
-                            <i class="fas fa-camera text-gray-400"></i>
+                            <i class="fas fa-camera text-gray-500"></i>
                         </label>
                     </div>
                 </div>
@@ -378,7 +378,7 @@
         class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
             <button onclick="closeReviewModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl cursor-pointer border-none bg-transparent">&times;</button>
+                class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl cursor-pointer border-none bg-transparent">&times;</button>
 
             <h2 class="text-xl font-bold text-gray-800 mb-6">Give Product Review</h2>
 
@@ -391,10 +391,10 @@
 
                 <!-- Product Info -->
                 <div class="flex gap-4 mb-6">
-                    <img id="modal-product-img" src="" class="w-16 h-16 rounded-lg border object-cover">
+                    <img id="modal-product-img" src="" alt="Product Review Image" class="w-16 h-16 rounded-lg border object-cover">
                     <div>
-                        <h4 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h4>
-                        <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
+                        <h3 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h3>
+                        <p id="modal-product-variant" class="text-xs text-gray-500 mt-1"></p>
                     </div>
                 </div>
 
@@ -424,7 +424,7 @@
                             class="w-16 h-16 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:border-orange-500">
                             <input type="file" name="images[]" multiple accept="image/*" class="hidden"
                                 onchange="handleReviewImagePreview(this)">
-                            <i class="fas fa-camera text-gray-400"></i>
+                            <i class="fas fa-camera text-gray-500"></i>
                         </label>
                     </div>
                 </div>
@@ -466,7 +466,7 @@
                     reader.onload = (e) => {
                         const div = document.createElement('div');
                         div.className = 'w-16 h-16 rounded-xl border overflow-hidden shrink-0 relative';
-                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                        div.innerHTML = `<img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover">`;
                         container.insertBefore(div, label);
                     };
                     reader.readAsDataURL(file);
@@ -501,7 +501,7 @@
                         div.className =
                             'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                         div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover">
                     <button type="button" onclick="removeReviewImage(this, '${file.name}')"
                         class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>
