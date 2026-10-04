@@ -19,6 +19,15 @@ class CellService
     {
         try {
             $query = Cell::with(['rack', 'warehouse', 'area']);
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
             if (!empty($filters['warehouse_id'])) {
                 $query->where('warehouse_id', $filters['warehouse_id']);
@@ -212,3 +221,4 @@ class CellService
         }
     }
 }
+

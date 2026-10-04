@@ -13,10 +13,16 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class SubCategoryService
 {
-    public function getAllSubCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllSubCategories(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = SubCategory::with(['megaCategory']);
+            $query = SubCategory::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with(['megaCategory']);
+            }
 
 
 
@@ -41,8 +47,8 @@ class SubCategoryService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching sub categories: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch sub categories');

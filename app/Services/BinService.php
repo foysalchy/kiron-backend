@@ -20,7 +20,16 @@ class BinService
     public function getAllBins(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Bin::with(['warehouse', 'area', 'rack', 'cell']);
+            $query = Bin::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
             if (isset($filters['warehouse_id'])) {
                 $query->where('warehouse_id', $filters['warehouse_id']);
@@ -317,3 +326,4 @@ class BinService
         return $lastLedger && $lastLedger->quantity_after > 0;
     }
 }
+

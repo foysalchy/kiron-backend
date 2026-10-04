@@ -17,7 +17,7 @@ class BrandService
     /**
      * Get all brands with optional pagination
      */
-    public function getAllBrands(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllBrands(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             $query = Brand::query();
@@ -37,8 +37,8 @@ class BrandService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching brands: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch brands');

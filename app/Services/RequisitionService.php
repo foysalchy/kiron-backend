@@ -15,15 +15,25 @@ class RequisitionService
     /**
      * Get all requisitions with optional pagination
      */
-    public function getAllRequisitions(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllRequisitions(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = Requisition::with([
-                'user',
-                'requisitionDetails.product',
-                'requisitionDetails.variation.attributes.attributeGroup',
-                'requisitionDetails.variation.attributes.attributeValue'
-            ]);
+            $query = Requisition::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with([
+                    'user',
+                    'requisitionDetails.product',
+                    'requisitionDetails.variation.attributes.attributeGroup',
+                    'requisitionDetails.variation.attributes.attributeValue'
+                ]);
+            }
+
+            if (isset($filters['with_count'])) {
+                $query->withCount($filters['with_count']);
+            }
 
             if (isset($filters['user_id'])) {
                 $query->where('user_id', $filters['user_id']);
@@ -58,8 +68,8 @@ class RequisitionService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching requisitions: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch requisitions');

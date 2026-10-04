@@ -26,7 +26,13 @@ class MegaCategoryController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->megaCategoryService->getAllMegaCategories($filters, true);
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        $data = $this->megaCategoryService->getAllMegaCategories($filters, true, $columns);
 
         return ResponseHelper::success($data, 'Mega categories retrieved successfully');
     }

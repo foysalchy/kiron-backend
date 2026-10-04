@@ -22,6 +22,8 @@ class BlogController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),

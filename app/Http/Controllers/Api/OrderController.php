@@ -97,7 +97,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Order not found',
+                'message' => 'Error: ' . $e->getMessage() . ' Line: ' . $e->getLine() . ' File: ' . $e->getFile(),
                 'error' => $e->getMessage(),
             ], 404);
         }

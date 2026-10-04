@@ -18,7 +18,16 @@ class RackService
     public function getAllRacks(array $filters, bool $paginate = true)
     {
         try {
-            $query = Rack::with(['warehouse', 'area']);
+            $query = Rack::query();
+            if (!empty($filters['select'])) {
+                $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
+                $query->select($selectArray);
+            }
+
+            if (!empty($filters['with'])) {
+                $query->with($filters['with']);
+            }
+
 
 
             if (!empty($filters['warehouse_id'])) {
@@ -213,3 +222,4 @@ class RackService
         }
     }
 }
+

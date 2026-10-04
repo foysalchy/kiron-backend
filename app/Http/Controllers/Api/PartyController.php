@@ -30,7 +30,13 @@ class PartyController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $parties = $this->partyService->getAllParties($filters, true);
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        $parties = $this->partyService->getAllParties($filters, true, $columns);
 
         return ResponseHelper::success($parties, 'Parties retrieved successfully');
     }

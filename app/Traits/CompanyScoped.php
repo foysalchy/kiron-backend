@@ -38,17 +38,17 @@ static::addGlobalScope('company', function (Builder $builder) {
 
             if (self::isSuperAdmin($user)) {
                 // Super admin: only fetch records where company_id is null
-                $builder->whereNull('company_id');
+                $builder->whereNull($builder->getModel()->getTable() . '.company_id');
             } else {
                 // Regular user: fetch their company's records
-                $builder->where('company_id', $user->company_id);
+                $builder->where($builder->getModel()->getTable() . '.company_id', $user->company_id);
             }
             return;
         }
 
         $company = getCurrentCompany();
         if ($company && isset($company->company_id)) {
-            $builder->where('company_id', $company->company_id);
+            $builder->where($builder->getModel()->getTable() . '.company_id', $company->company_id);
         }
 
     } catch (\Exception $e) {

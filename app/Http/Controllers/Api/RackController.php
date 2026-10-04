@@ -21,6 +21,8 @@ class RackController extends Controller
     {
         $filters = [
             'area_id' => $request->query('area_id'),
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
@@ -75,3 +77,5 @@ class RackController extends Controller
         return ResponseHelper::success($data, 'Rack status updated successfully');
     }
 }
+
+

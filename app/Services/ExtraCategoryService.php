@@ -13,10 +13,16 @@ use Illuminate\Support\Facades\{DB, Log};
 
 class ExtraCategoryService
 {
-    public function getAllExtraCategories(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllExtraCategories(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = ExtraCategory::with('miniCategory', 'subCategory', 'megaCategory');
+            $query = ExtraCategory::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with('miniCategory', 'subCategory', 'megaCategory');
+            }
 
             if (isset($filters['company_id'])) {
                 $query->where('company_id', $filters['company_id']);
@@ -39,8 +45,8 @@ class ExtraCategoryService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching extra categories: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch extra categories');

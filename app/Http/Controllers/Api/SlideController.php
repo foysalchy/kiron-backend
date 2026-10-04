@@ -18,6 +18,8 @@ class SlideController extends Controller
     public function index(Request $request): JsonResponse
     {
         $filters = [
+            'select' => $request->query('select'),
+            'with' => $request->query('with'),
             'status' => $request->query('status'),
             'title' => $request->query('title'),
             'search' => $request->query('search'),
@@ -79,3 +81,4 @@ class SlideController extends Controller
         return ResponseHelper::success($data, 'Slider status updated successfully');
     }
 }
+

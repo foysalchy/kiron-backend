@@ -340,6 +340,9 @@ Route::prefix('v1')->group(function () {
                 // company routes
 
                 Route::prefix('options')->group(function () {
+                    Route::get('/purchase-return-initial-data', [SelectOptionController::class, 'purchaseReturnInitialData']);
+                    Route::get('/purchase-initial-data', [SelectOptionController::class, 'purchaseInitialData']);
+                    Route::get('/product/dependencies', [SelectOptionController::class, 'productDependencies']);
                     Route::get('/warehouses', [SelectOptionController::class, 'warehouseOptions']);
                     Route::get('/product/warehouses', [SelectOptionController::class, 'productwarehouseOptions']);
                     Route::get('/areas/{warehouseId}', [SelectOptionController::class, 'areaOptions']);

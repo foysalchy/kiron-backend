@@ -28,7 +28,19 @@ class SubCategoryController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->subCategoryService->getAllSubCategories($filters, true);
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        if ($request->has('with')) {
+            $with = is_string($request->query('with')) ? explode(',', $request->query('with')) : $request->query('with');
+            if (empty($with) || $with[0] === '') $with = [];
+            $filters['with'] = $with;
+        }
+
+        $data = $this->subCategoryService->getAllSubCategories($filters, true, $columns);
 
         return ResponseHelper::success($data, 'Sub categories retrieved successfully');
     }

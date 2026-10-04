@@ -16,10 +16,16 @@ class AttributeService
     /**
      * Get all attributes with optional pagination
      */
-    public function getAllAttributes(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllAttributes(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            $query = AttributeValue::with(['attributeGroup']);
+            $query = AttributeValue::query();
+
+            if (isset($filters['with'])) {
+                $query->with($filters['with']);
+            } else {
+                $query->with(['attributeGroup']);
+            }
 
 
             if (isset($filters['attribute_group_id'])) {
@@ -43,8 +49,8 @@ class AttributeService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching attributes: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch attributes');

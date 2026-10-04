@@ -20,6 +20,8 @@ class WarehouseController extends Controller
     {
         $filters = [
 
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status'     => $request->query('status'),
             'search'     => $request->query('search'),
             'sort_by'    => $request->query('sort_by', 'created_at'),
@@ -73,3 +75,5 @@ class WarehouseController extends Controller
         return ResponseHelper::success($data, 'Warehouse status updated successfully');
     }
 }
+
+

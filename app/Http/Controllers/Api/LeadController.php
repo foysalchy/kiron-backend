@@ -119,3 +119,4 @@ class LeadController extends Controller
         return ResponseHelper::success($data, 'Lead status updated successfully');
     }
 }
+

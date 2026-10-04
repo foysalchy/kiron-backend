@@ -35,7 +35,24 @@ class RequisitionController extends Controller
             'per_page' => $request->query('per_page', 15),
         ];
 
-        $data = $this->requisitionService->getAllRequisitions($filters);
+        $columns = ['*'];
+        if ($request->has('select')) {
+            $select = $request->query('select');
+            $columns = is_string($select) ? explode(',', $select) : $select;
+        }
+
+        if ($request->has('with')) {
+            $with = is_string($request->query('with')) ? explode(',', $request->query('with')) : $request->query('with');
+            if (empty($with) || $with[0] === '') $with = [];
+            $filters['with'] = $with;
+        }
+
+        if ($request->has('with_count')) {
+            $withCount = is_string($request->query('with_count')) ? explode(',', $request->query('with_count')) : $request->query('with_count');
+            $filters['with_count'] = $withCount;
+        }
+
+        $data = $this->requisitionService->getAllRequisitions($filters, true, $columns);
 
         return ResponseHelper::success($data, 'Requisitions retrieved successfully');
     }

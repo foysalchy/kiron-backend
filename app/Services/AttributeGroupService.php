@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 class AttributeGroupService
 {
 
-    public function getAllAttributeGroup(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllAttributeGroup(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             $query = AttributeGroup::query();
@@ -48,8 +48,8 @@ class AttributeGroupService
 
             // Return paginated or all
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching attribute group: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch attribute group');

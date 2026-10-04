@@ -24,6 +24,8 @@ class BinController extends Controller
             'area_id' => $request->query('area_id'),
             'rack_id' => $request->query('rack_id'),
             'cell_id' => $request->query('cell_id'),
+            'select'     => $request->query('select'),
+            'with'       => $request->query('with'),
             'status' => $request->query('status'),
             'search' => $request->query('search'),
             'sort_by' => $request->query('sort_by', 'created_at'),
@@ -146,3 +148,4 @@ class BinController extends Controller
 
   
 }
+

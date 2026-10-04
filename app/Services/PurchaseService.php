@@ -25,15 +25,12 @@ class PurchaseService
     /**
      * Get all purchases with optional pagination
      */
-    public function getAllPurchases(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
+    public function getAllPurchases(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
             $query = Purchase::with([
-                'warehouse',
-                'supplier',
-                'purchaseDetails.product',
-                'purchaseDetails.variation.attributes.attributeGroup',
-                'purchaseDetails.variation.attributes.attributeValue'
+                'warehouse:id,name',
+                'supplier:id,name'
             ])->withSum('payments', 'amount');
 
             if (isset($filters['warehouse_id'])) {
@@ -69,8 +66,8 @@ class PurchaseService
             $query->orderBy($sortBy, $sortOrder);
 
             return $paginate
-                ? $query->paginate($filters['per_page'] ?? 15)
-                : $query->get();
+                ? $query->paginate($filters['per_page'] ?? 15, $columns)
+                : $query->get($columns);
         } catch (\Exception $e) {
             Log::error('Error fetching purchases: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch purchases');
