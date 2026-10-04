@@ -332,6 +332,27 @@ class OrderController extends FrontendController
                     ]);
                 }
 
+                if (Session::has('coupon')) {
+                    $couponData = Session::get('coupon');
+                    $couponId = $couponData['coupon_id'] ?? null;
+                    $couponDiscount = $couponData['discount_amount'] ?? 0;
+
+                    if ($couponId) {
+                        $order->update([
+                            'coupon_id' => $couponId,
+                            'coupon_discount' => $couponDiscount,
+                            'grand_total' => max(0, $order->grand_total - $couponDiscount),
+                        ]);
+
+                        app(\App\Services\CouponService::class)->applyCoupon(
+                            $couponId,
+                            $order->id,
+                            $order->subtotal ?? $order->grand_total,
+                            $couponDiscount,
+                            $order->customer_id
+                        );
+                    }
+                }
 
                 $order->update(['payment_status' => $isCOD ? Order::PAYMENT_UNPAID : Order::PAYMENT_PENDING]);
 
