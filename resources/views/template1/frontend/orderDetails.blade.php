@@ -14,13 +14,13 @@
                 <h1 class="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
-                <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
+                <span class="px-4 py-1 {{ $order->status_color }} text-md font-bold rounded-lg mb-1">
                     {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
                 </span>
-                <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
+                <p class="text-sm text-gray-600 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
             </div>
         </div>
-        <p class="text-md text-gray-500 mb-8">Order Number: #{{ $order->order_no }}</p>
+        <p class="text-md text-gray-600 mb-8">Order Number: #{{ $order->order_no }}</p>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -29,7 +29,7 @@
 
                 <!-- Ordered Products Card -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h2>
 
                     <div class="space-y-4">
                         @foreach ($order->orderDetails as $item)
@@ -40,12 +40,12 @@
                                 <div
                                     class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
                                     <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                        class="w-full h-full object-cover">
+                                        class="w-full h-full object-cover" alt="{{ $item->product->title ?? 'Product Image' }}">
                                 </div>
 
                                 <div class="flex-1 text-center sm:text-left">
                                     {{-- 2. Safe Title Check --}}
-                                    <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
+                                    <h3 class="text-md font-bold text-gray-800 mb-1 leading-tight">
                                         {{ $item->product->title ?? 'Product Not Available' }}
                                     </h4>
 
@@ -97,7 +97,7 @@
 
                 <!-- Order Tracking Section -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden p-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h3>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h2>
 
                     <!-- Vertical Timeline -->
                     {{-- The 'before' class creates the vertical line connecting the dots --}}
@@ -203,7 +203,7 @@
                                     <i class="fas fa-truck-moving text-xl"></i>
                                 </div>
                                 <div>
-                                    <h5 class="text-blue-900 font-bold text-sm mb-0.5">Courier Tracking</h5>
+                                    <h3 class="text-blue-900 font-bold text-sm mb-0.5">Courier Tracking</h3>
                                     <p class="text-sm text-blue-700 font-semibold uppercase">
                                         {{ $order->courier_info['courier_name'] ?? 'Courier' }}
                                     </p>
@@ -230,7 +230,7 @@
 
                 <!-- Customer Information -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h2>
                     <div class="space-y-4">
                         <div class="flex items-start ">
                             <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
@@ -266,8 +266,8 @@
 
                 <!-- Payment Summary -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
-                        Summary</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
+                        Summary</h2>
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
@@ -287,14 +287,14 @@
                             <span class="text-gray-800 font-bold">Total:</span>
                             <span class="text-xl font-bold text-[var(--primary-color)]">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                         </div>
-                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
+                        <p class="text-[11px] text-gray-600 font-bold uppercase mt-2">Method:
                             {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h2>
                     <div class="space-y-3">
                         <a href="{{ route('invoice.download', $order->id) }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
@@ -385,10 +385,10 @@
 
                 <!-- Product Info -->
                 <div class="flex gap-4 mb-6">
-                    <img id="modal-product-img" src="" class="w-16 h-16 rounded-lg border object-cover">
+                    <img id="modal-product-img" src="" class="w-16 h-16 rounded-lg border object-cover" alt="Product to review">
                     <div>
-                        <h4 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h4>
-                        <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
+                        <h3 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h3>
+                        <p id="modal-product-variant" class="text-xs text-gray-600 mt-1"></p>
                     </div>
                 </div>
 
@@ -460,7 +460,7 @@
                     reader.onload = (e) => {
                         const div = document.createElement('div');
                         div.className = 'w-16 h-16 rounded-xl border overflow-hidden shrink-0 relative';
-                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                        div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover" alt="Return evidence image">`;
                         container.insertBefore(div, label);
                     };
                     reader.readAsDataURL(file);
@@ -495,7 +495,7 @@
                         div.className =
                             'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                         div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <img src="${e.target.result}" class="w-full h-full object-cover" alt="Review evidence image">
                     <button type="button" onclick="removeReviewImage(this, '${file.name}')"
                         class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>

@@ -11,7 +11,7 @@
                 Contact Us
             </h1>
             <!-- Description -->
-            <p class="text-md md:text-lg text-gray-500 max-w-3xl mx-auto leading-relaxed font-medium">
+            <p class="text-md md:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed font-medium">
                 Get in touch with us. We are available to serve you 24/7.
             </p>
 
@@ -97,7 +97,7 @@
                                 <p class="text-gray-900 font-semibold mb-1">Phone</p>
 
                                 {{-- মেইন ফোন নম্বর --}}
-                                <a href="tel:{{ str_replace(' ', '', $setup->phone) }}"
+                                <a href="tel:{{ str_replace(' ', '', $setup->phone) }}" aria-label="Call us"
                                     class="text-gray-600 hover:text-orange-500 transition-colors d-block mb-1">
                                     {{ $setup->phone }}
                                 </a>
@@ -106,7 +106,7 @@
 
                                 {{-- অল্টারনেটিভ ফোন নম্বর --}}
                                 @if ($setup->alt_phone)
-                                    <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}"
+                                    <a href="tel:{{ str_replace(' ', '', $setup->alt_phone) }}" aria-label="Call our alternate number"
                                         class="text-gray-600 hover:text-orange-500 transition-colors block">
                                         {{ $setup->alt_phone }}
                                     </a>
@@ -130,7 +130,7 @@
 
                             <div>
                                 <p class="text-gray-900 font-semibold">WhatsApp</p>
-                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-orange-500 transition-colors">
+                                <a href="https://wa.me/{{ $whatsappNumber }}" aria-label="Contact us on WhatsApp" class="hover:text-orange-500 transition-colors">
                                     {{ $whatsappNumber }}
                                 </a>
                             </div>
@@ -150,7 +150,7 @@
                             </div>
                             <div>
                                 <p class="text-gray-900 font-semibold">Email</p>
-                                <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                <a href="mailto:{{ $setup->email }}" aria-label="Email us" class="hover:text-orange-500 transition-colors">
                                     {{ $setup->email }}
                                 </a>
                             </div>
@@ -242,7 +242,7 @@
                         </div>
                     </div>
                 @empty
-                    <p class="text-center text-gray-500">No information found.</p>
+                    <p class="text-center text-gray-600">No information found.</p>
                 @endforelse
 
             </div>
@@ -260,7 +260,7 @@
 
             <!-- Map Container -->
             <div class="relative w-full rounded-lg overflow-hidden shadow-inner group">
-                <iframe
+                <iframe title="Google Maps Location"
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.1075677025856!2d90.41018317589578!3d23.779185187720234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70b22a019d3%3A0xe54331201990c74e!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1709456789012!5m2!1sen!2sbd"
                     class="w-full h-[400px] md:h-[500px] grayscale-[0.2] contrast-[1.1] transition-all group-hover:grayscale-0"
                     style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">

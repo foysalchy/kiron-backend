@@ -51,7 +51,7 @@
             <!-- Logo Section -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200" height="80"
                         class="h-8 md:h-12 w-auto object-contain">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
@@ -121,7 +121,7 @@
 
 
             <!-- Mobile Search Toggle -->
-            <button class="sm:hidden text-xl hover-text" onclick="toggleMobileSearch()">
+            <button class="sm:hidden text-xl hover-text" aria-label="Toggle Mobile Search" onclick="toggleMobileSearch()">
                 <i class="fas fa-search"></i>
             </button>
 
@@ -382,7 +382,7 @@
                 <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-orange-50">
                     <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--primary-color)]">
                         <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
-                            class="w-full h-full object-cover">
+                            class="w-full h-full object-cover" alt="User Profile">
                     </div>
                     <div>
                         <p class="text-sm font-bold text-gray-900">{{ auth('customer')->user()->name }}</p>

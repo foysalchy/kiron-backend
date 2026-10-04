@@ -18,8 +18,8 @@
                                 @endif
                             </div>
                             <div>
-                                <h4 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
-                                    {{ $feature->title }}</h4>
+                                <h2 class="font-medium text-sm md:text-base text-footer leading-tight">
+                                    {{ $feature->title }}</h2>
                                 <p class="opacity-90 text-xs md:text-sm mt-0.5">
                                     {{ $feature->subtitle ?? $feature->text_content }}</p>
                             </div>
@@ -48,12 +48,12 @@
                                     class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
                             </div>
                         @endif
-                        
+
                     </div>
-                    <p class="opacity-90 text-[16px] leading-relaxed mb-5">
+                    <p class="opacity-90 text-base leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
                     </p>
-                    <ul class="space-y-3 text-[16px]">
+                    <ul class="space-y-3 text-base">
                         <li class="flex items-start gap-3 opacity-90">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -93,27 +93,27 @@
 
                 <!-- Column 2: Quick Links -->
                 <div class=" ">
-                    <h4 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h4>
+                    <h2 class="text-lg font-bold mb-4 md:mb-4">Quick Links</h2>
                     <ul class="space-y-2.5 text-sm">
                         <li><a href="{{ route('contact.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Contact Us</a></li>
+                                class="text-base opacity-90 hover:underline transition-colors">Contact Us</a></li>
                         <li><a href="{{ route('order.track') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Track Order</a></li>
+                                class="text-base opacity-90 hover:underline transition-colors">Track Order</a></li>
                         <li><a href="{{ route('faq.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Help & Support</a></li>
+                                class="text-base opacity-90 hover:underline transition-colors">Help & Support</a></li>
                         <li><a href="{{ route('blog.index') }}"
-                                class="text-[16px] opacity-90 hover:underline transition-colors">Blog</a></li>
+                                class="text-base opacity-90 hover:underline transition-colors">Blog</a></li>
                     </ul>
                 </div>
 
                 <!-- Column 3: Pages -->
                 <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h4>
+                    <h2 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h2>
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
                             <li>
                                 <a href="{{ url('page', ['slug' => $page->slug]) }}"
-                                    class="text-[16px] opacity-90 hover:underline transition-colors">
+                                    class="text-base opacity-90 hover:underline transition-colors">
                                     {{ $page->title }}
                                 </a>
                             </li>
@@ -123,8 +123,8 @@
 
                 <!-- Column 4: Newsletter -->
                 <div>
-                    <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
-                    <p class="opacity-90 text-[16px] mb-4">Subscribe to get updates on new products and exclusive
+                    <h2 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h2>
+                    <p class="opacity-90 text-base mb-4">Subscribe to get updates on new products and exclusive
                         offers.
                     </p>
                     <form id="newsletter-form">

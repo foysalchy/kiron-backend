@@ -312,7 +312,7 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: #6b7280;
             margin-top: 4px;
         }
 
@@ -396,7 +396,7 @@
         .summary-total .amount {
             font-size: 24px;
             font-weight: 700;
-            color: #FF6A00;
+            color: #C65200;
         }
 
         /* ── Footer Info ── */
@@ -467,7 +467,7 @@
 
         .thankyou p:last-child {
             font-size: 13px;
-            color: #9ca3af;
+            color: #6b7280;
             font-weight: 500;
             margin-top: 4px;
         }
@@ -639,7 +639,7 @@
     </div>
 
     <!-- Page -->
-    <div class="page-wrapper">
+    <main class="page-wrapper">
         <div id="invoice-content" class="invoice-card">
             <div class="invoice-inner">
 
@@ -791,7 +791,7 @@
 
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>

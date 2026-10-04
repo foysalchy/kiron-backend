@@ -30,7 +30,7 @@
             @endif
 
             <span class="text-gray-400">/</span>
-            <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <span class="text-gray-600 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -41,7 +41,7 @@
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->title ?? 'Product Image' }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -97,7 +97,7 @@
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                            <span id="regular-price" class="text-gray-400 text-lg line-through">
+                            <span id="regular-price" class="text-gray-500 text-lg line-through">
                                 @if(($setup->currency_position ?? 'left') == 'left')
                                     {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                                 @else
@@ -123,16 +123,16 @@
                     <!-- Quantity -->
                     <div class="flex items-center gap-6 mb-8 mt-4">
                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden h-10">
-                            <button onclick="changeQty(-1)" class="px-3 hover:bg-gray-50"><i
+                            <button onclick="changeQty(-1)" aria-label="Decrease quantity" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-minus text-[10px]"></i></button>
-                            <input type="number" id="main-qty" value="1" readonly
+                            <input type="number" id="main-qty" aria-label="Quantity" value="1" readonly
                                 class="w-10 text-center font-bold border-none outline-none">
-                            <button onclick="changeQty(1)" class="px-3 hover:bg-gray-50"><i
+                            <button onclick="changeQty(1)" aria-label="Increase quantity" class="px-3 hover:bg-gray-50"><i
                                     class="fas fa-plus text-[10px]"></i></button>
                         </div>
                         {{-- এই অংশটুকু রিপ্লেস করুন --}}
                         <span
-                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                            class="text-sm {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </span>
                     </div>
@@ -150,7 +150,7 @@
 
                         <!-- ২. Order Now Button -->
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                            class="flex-1 secondary-bg hover:bg-yellow-500 text-secondary h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            class="flex-1 secondary-bg hover:bg-yellow-500 !text-gray-900 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
@@ -208,7 +208,7 @@
                         <div class="grid grid-cols-2 gap-2 md:gap-3">
 
                             <a href="tel:{{ $setup->phone }}"
-                                class="bg-[#EE4D2D] hover:bg-red-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
+                                class="bg-[#C62828] hover:bg-red-600 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-phone h-5 w-5 mr-2">
@@ -221,7 +221,7 @@
 
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}?text={{ urlencode("Assalamu Alaikum, I want to order this product:\n\n*" . $product->title . "*\n\nClick here for details:\n" . url()->current()) }}"
                                 target="_blank"
-                                class="bg-[#25D366] hover:bg-green-600 text-primary h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
+                                class="bg-[#075E54] hover:bg-green-700 text-white h-11 rounded-xl flex items-center justify-center gap-3 font-bold transition-colors px-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round" class="lucide lucide-message-circle h-5 w-5 mr-2">
@@ -260,7 +260,7 @@
 
                     <!-- Section: Description  -->
                     <div id="tab-content-description" class="tab-content block">
-                        <h3 class="text-xl font-bold text-gray-900 mb-6">Product Description</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
                         <div class="text-[18px] prose prose-orange max-w-none">
                             {!! $product->full_description ?? 'No detailed description available for this product.' !!}
                         </div>
@@ -268,7 +268,7 @@
 
                     <!-- Section: Specification  -->
                     <div id="tab-content-specification" class="tab-content hidden">
-                        <h3 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h3>
+                        <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
                             @if(!empty($product->brand))
@@ -292,7 +292,7 @@
                             <div class="flex items-center justify-between py-3 border-b border-gray-100">
                                 <span class="font-medium text-gray-500">Availability:</span>
                                 <span
-                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-600' : 'text-red-500' }}">
+                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
                                     {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
                                 </span>
                             </div>
@@ -456,9 +456,9 @@
                 <div class="md:col-span-5 lg:col-span-4 sticky top-4">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                                 <i class="fas fa-layer-group text-[#FF6A00]"></i> Related Products
-                            </h3>
+                            </h2>
                             <span
                                 class="bg-gray-200 text-gray-700 text-xs font-bold px-2 py-1 rounded-full">{{ $relatedProducts->count() }}</span>
                         </div>
@@ -474,12 +474,12 @@
                                     </div>
                                     <!-- Info -->
                                     <div class="flex flex-col justify-center">
-                                        <h4
+                                        <h3
                                             class="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-[#FF6A00] transition-colors mb-1">
                                             {{ $related->title }}
-                                        </h4>
+                                        </h3>
                                         <div class="flex items-center gap-2">
-                                            <span class="text-md font-black text-[#FF6A00]">
+                                            <span class="text-md font-black text-[#c2410c]">
                                                 @if(($setup->currency_position ?? 'left') == 'left')
                                                     {{ $setup->currency }}
                                                     {{ number_format($related->display_price_data->sale_price) }}
@@ -489,7 +489,7 @@
                                                 @endif
                                             </span>
                                             @if($related->display_price_data->regular_price > $related->display_price_data->sale_price)
-                                                <span class="text-xs text-gray-400 line-through">
+                                                <span class="text-xs text-gray-500 line-through">
                                                     @if(($setup->currency_position ?? 'left') == 'left')
                                                         {{ $setup->currency }}
                                                         {{ number_format($related->display_price_data->regular_price) }}
@@ -593,7 +593,7 @@
                 container.innerHTML += `
                                     <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                         onclick="changeImage('${imgUrl}', this)">
-                                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                        <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" alt="Product Thumbnail" />
                                     </button>`;
             });
         }
