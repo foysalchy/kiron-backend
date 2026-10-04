@@ -52,10 +52,10 @@
 
                     <!-- Card Content -->
                     <div class="p-6">
-                        <h3
+                        <h2
                             class="text-xl font-bold text-gray-900 mb-3 leading-tight line-clamp-2 group-hover:text-primary transition-colors">
                             {{ $blog->title }}
-                        </h3>
+                        </h2>
                         <p class="text-gray-700 text-sm mb-6 line-clamp-2">
                             {{ $blog->short ?? \Illuminate\Support\Str::limit(strip_tags($blog->body), 100) }}
                         </p>

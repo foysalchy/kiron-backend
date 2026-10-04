@@ -137,14 +137,14 @@
                                     <!-- Actual Product Image -->
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}" alt="{{ $item->name ?? 'Product Image' }}"
                                             class="w-full h-full object-cover">
                                     </div>
 
                                     <div class="flex-1">
-                                        <h4 class="text-sm font-bold text-gray-800 leading-tight mb-1">
+                                        <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">
                                             {{ $item->name }}
-                                        </h4>
+                                        </h3>
 
                                         @if ($item->options->has('attributes') && count($item->options->attributes) > 0)
                                             <div class="flex flex-wrap gap-1 mb-1">
@@ -169,9 +169,10 @@
                                     <!-- Quantity Display -->
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                        <a href="{{ route('cart.remove', $item->rowId) }}"
+                                        <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item" title="Remove item"
                                             class="text-red-400 hover:text-red-600">
-                                            <i class="far fa-trash-alt text-xs"></i>
+                                            <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
+                                            <span class="sr-only">Remove item</span>
                                         </a>
                                     </div>
                                 </div>
@@ -186,17 +187,16 @@
                                     class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
 
-                                @if (session()->has('coupon'))
-                                    <button type="button" onclick="removeCoupon()"
-                                        class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
-                                        <i class="fas fa-times text-white"></i>
-                                    </button>
-                                @else
-                                    <button type="button" onclick="applyCoupon()"
-                                        class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
-                                        Apply Now
-                                    </button>
-                                @endif
+                                <button type="button" id="remove-coupon-btn" onclick="removeCoupon()" aria-label="Remove coupon" title="Remove coupon"
+                                    class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center {{ session()->has('coupon') ? '' : 'hidden' }}">
+                                    <i class="fas fa-times text-white" aria-hidden="true"></i>
+                                    <span class="sr-only">Remove coupon</span>
+                                </button>
+
+                                <button type="button" id="apply-coupon-btn" onclick="applyCoupon()"
+                                    class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold {{ session()->has('coupon') ? 'hidden' : '' }}">
+                                    Apply Now
+                                </button>
                             </div>
                         </div>
 
@@ -209,17 +209,14 @@
                                 </span>
                             </div>
 
-                            @if ($discount > 0)
-                                <div class="flex justify-between items-center text-green-600">
-                                    <span class="text-md font-medium">Discount
-                                        {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}:</span>
-                                    <span class="text-md font-bold">- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($discount) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
-                                </div>
-                            @endif
+                            <div id="discount-row" class="flex justify-between items-center text-green-600 {{ $discount > 0 ? '' : 'hidden' }}">
+                                <span class="text-md font-medium">Discount <span id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span>:</span>
+                                <span class="text-md font-bold">- {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="discount-display">{{ number_format($discount) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                            </div>
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span id="shipping-display" class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
@@ -324,12 +321,13 @@
         }
 
         function applyCoupon() {
-            const code = document.getElementById('coupon-code-input').value;
+            const codeInput = document.getElementById('coupon-code-input');
+            const code = codeInput.value;
             if (!code) return toastr.warning('Please enter a coupon code');
 
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            const btn = event.target;
+            const btn = event.target || document.getElementById('apply-coupon-btn');
             const originalText = btn.innerText;
             btn.innerText = 'Applying...';
             btn.disabled = true;
@@ -349,7 +347,20 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        // DOM update
+                        document.getElementById('discount-display').innerText = data.discount_amount.toLocaleString();
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
+                        document.getElementById('discount-code-display').innerText = '(' + data.coupon_code + ')';
+                        document.getElementById('discount-row').classList.remove('hidden');
+
+                        codeInput.setAttribute('readonly', 'readonly');
+                        document.getElementById('apply-coupon-btn').classList.add('hidden');
+                        document.getElementById('remove-coupon-btn').classList.remove('hidden');
+
+                        toastr.success(data.message);
+
+                        btn.innerText = originalText;
+                        btn.disabled = false;
                     } else {
                         toastr.error(data.message || "Invalid coupon");
                         btn.innerText = originalText;
@@ -368,20 +379,31 @@
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
             fetch("{{ route('coupon.remove') }}", {
-                method: 'GET',
-                headers: {
-                    'X-CSRF-TOKEN': token,
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-                .then(res => {
-                    location.reload();
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
                 })
-                .catch(err => {
-                    console.error('Error:', err);
-                    location.reload();
-                });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
+                        document.getElementById('discount-row').classList.add('hidden');
+
+                        const codeInput = document.getElementById('coupon-code-input');
+                        codeInput.removeAttribute('readonly');
+                        codeInput.value = '';
+
+                        document.getElementById('apply-coupon-btn').classList.remove('hidden');
+                        document.getElementById('remove-coupon-btn').classList.add('hidden');
+
+                        toastr.success(data.message);
+                    }
+                })
+                .catch(err => console.error(err));
         }
     </script>
     <script>
@@ -472,7 +494,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <img src="${e.target.result}" alt="Uploaded Screenshot" class="w-full h-full object-cover">
             </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);

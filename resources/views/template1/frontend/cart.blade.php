@@ -33,7 +33,7 @@
                                     <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
                                         <img src="{{ $item->options->thumbnail }}"
                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                            class="w-full h-full object-cover">
+                                            class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
 
                                     <!-- Details -->
@@ -57,7 +57,7 @@
                                             </p>
 
                                             @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                                                <span class="text-sm text-gray-400 line-through font-normal pl-1">
+                                                <span class="text-sm text-gray-500 line-through font-normal pl-1">
                                                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->options['regular_price'], 0) : number_format($item->options['regular_price'], 0) . ' ' . $setup->currency }}
                                                 </span>
                                             @endif
@@ -80,6 +80,7 @@
                                             {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal, 0) : number_format($item->subtotal, 0) . ' ' . $setup->currency }}
                                         </p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
+                                            aria-label="Remove {{ $item->name }} from cart"
                                             class="text-red-400 hover:text-red-600 transition-colors">
                                             <i class="far fa-trash-alt text-lg"></i>
                                         </a>

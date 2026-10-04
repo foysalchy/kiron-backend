@@ -15,7 +15,7 @@
                 class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 shadow-xs">
                 <i class="fas fa-filter text-[var(--primary-color)]"></i> Filters
             </button>
-            <span class="text-xs text-gray-400">{{ $products->total() }} products</span>
+            <span class="text-xs text-gray-500">{{ $products->total() }} products</span>
         </div>
 
 
@@ -163,7 +163,7 @@
 
                             <!-- Brand List -->
                             <div class="px-4 pt-2 pb-3 border-b border-gray-50">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase mb-2">Brands</h3>
+                                <h3 class="text-xs font-bold text-gray-500 uppercase mb-2">Brands</h3>
                                 <div class="flex flex-col gap-0 text-gray-800 font-medium">
                                     @foreach ($brands as $brand)
                                         @php $isSelectedBrand = in_array($brand->id, (array)request('brand')); @endphp

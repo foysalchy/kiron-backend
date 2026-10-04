@@ -31,7 +31,7 @@
                                     <div class="flex flex-row items-start gap-3 w-full sm:flex-1">
                                         <!-- Image -->
                                         <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
-                                            <img src="{{ $item->options->thumbnail }}"
+                                            <img src="{{ $item->options->thumbnail }}" alt="{{ $item->name ?? 'Product Image' }}"
                                                 onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                                 class="w-full h-full object-cover">
                                         </div>
@@ -56,7 +56,7 @@
                                                 </p>
 
                                                 @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                                                    <span class="text-xs sm:text-sm text-gray-400 line-through font-normal pl-1">
+                                                    <span class="text-xs sm:text-sm text-gray-500 line-through font-normal pl-1">
                                                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                         {{ number_format($item->options['regular_price'], 0) }}
                                                         {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
@@ -69,10 +69,10 @@
                                     <div class="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 mt-2 sm:mt-0">
                                         <!-- Qty Controls -->
                                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" aria-label="Decrease quantity"
                                                 class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                             <span class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
-                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" aria-label="Increase quantity"
                                                 class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
 
@@ -82,9 +82,10 @@
                                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                 {{ number_format($item->subtotal, 0) }}
                                                 {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
-                                            <a href="{{ route('cart.remove', $item->rowId) }}"
+                                            <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item" title="Remove item"
                                                 class="text-red-400 hover:text-red-600 transition-colors">
-                                                <i class="far fa-trash-alt text-base sm:text-lg"></i>
+                                                <i class="far fa-trash-alt text-base sm:text-lg" aria-hidden="true"></i>
+                                                <span class="sr-only">Remove item</span>
                                             </a>
                                         </div>
                                     </div>
@@ -134,17 +135,18 @@
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf
-                            <label class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
+                            <label for="coupon_code" class="text-sm font-bold text-gray-600 block mb-2">Coupon Code</label>
                             <div class="flex gap-2">
-                                <input type="text" name="coupon_code" placeholder="Enter Coupon Code"
+                                <input type="text" id="coupon_code" name="coupon_code" placeholder="Enter Coupon Code"
                                     value="{{ session()->has('coupon') ? session('coupon')['coupon_code'] : '' }}"
                                     class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                     {{ session()->has('coupon') ? 'readonly' : '' }}>
 
                                 @if (session()->has('coupon'))
-                                    <a href="{{ route('coupon.remove') }}"
+                                    <a href="{{ route('coupon.remove') }}" aria-label="Remove coupon" title="Remove coupon"
                                         class="bg-red-500 text-primary rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-times" aria-hidden="true"></i>
+                                        <span class="sr-only">Remove coupon</span>
                                     </a>
                                 @else
                                     <button type="submit"

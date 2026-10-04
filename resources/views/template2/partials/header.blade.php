@@ -12,14 +12,14 @@
         <div class="flex items-center justify-between gap-4 lg:gap-8">
 
             <!-- Mobile Menu Toggle (Visible only on Mobile) -->
-            <button onclick="toggleMobileMenu()" class="md:hidden text-header text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" aria-label="Open mobile menu" class="md:hidden text-header text-2xl focus:outline-none">
                 <i class="fas fa-bars"></i>
             </button>
 
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
                         class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
@@ -33,7 +33,7 @@
                     class="flex w-full border border-[var(--primary-color)] rounded-sm overflow-hidden bg-white z-30 relative">
                     <!-- Category Dropdown -->
                     <div class="relative flex-shrink-0 border-r border-[var(--primary-color)] w-[130px] max-w-[200px]">
-                        <select name="category" id="header-category-select"
+                        <select name="category" id="header-category-select" aria-label="Select Category"
                             class="w-full h-full pl-3 pr-8 py-2 text-sm md:text-base text-header  bg-transparent outline-none appearance-none cursor-pointer">
                             <option value="">All</option>
                             @foreach ($headerCategories as $cat)
@@ -98,7 +98,7 @@
             <!-- Right Side Actions (Cart & Account) -->
             <div class="flex items-center gap-3 sm:gap-4 lg:gap-6">
                 <!-- Cart Icon -->
-                <button onclick="toggleCartDrawer()" class="relative group outline-none">
+                <button onclick="toggleCartDrawer()" aria-label="Open cart drawer" class="relative group outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 md:h-8 md:w-8 text-header" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -114,7 +114,7 @@
                 <div class="relative group hidden md:block" id="desktop-account-wrapper">
                     @auth('customer')
                         <!-- Logged In User Trigger -->
-                        <button onclick="toggleDesktopAccount()"
+                        <button onclick="toggleDesktopAccount()" aria-label="Toggle account menu"
                             class="flex items-center gap-2 text-header outline-none cursor-pointer select-none">
                             <div
                                 class="w-8 h-8 md:w-9 md:h-9 rounded-full primary-bg text-primary flex items-center justify-center font-bold border-2 border-white shadow-sm">
@@ -191,7 +191,7 @@
             <!-- Category Segment for Mobile -->
             <div
                 class="relative flex-shrink-0 border-r border-[var(--primary-color)] bg-gray-50 w-[100px] flex items-center">
-                <select name="category" id="mobile-category-select"
+                <select name="category" id="mobile-category-select" aria-label="Select Category"
                     class="w-full pl-2 pr-6 py-2 text-xs text-header font-semibold bg-transparent outline-none truncate appearance-none cursor-pointer">
                     <option value="">All</option>
                     @foreach ($headerCategories as $cat)
@@ -208,7 +208,7 @@
             <input type="text" name="search" id="mobile-search-input" autocomplete="off" value="{{ request('search') }}"
                 placeholder="Find some product ..." class="flex-1 px-3 py-2 text-sm outline-none">
 
-            <button type="submit" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
+            <button type="submit" aria-label="Search" class="primary-bg text-primary px-4 py-2 font-bold text-sm">
                 <i class="fas fa-search"></i>
             </button>
         </form>
@@ -370,12 +370,12 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}"
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
                     class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-black">{{ $setup->shop_name ?? 'Shop Name' }}</span>
             @endif
-            <button onclick="toggleMobileMenu()" class="text-black text-2xl focus:outline-none">
+            <button onclick="toggleMobileMenu()" aria-label="Close mobile menu" class="text-black text-2xl focus:outline-none">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -551,7 +551,7 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
         <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
-        <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
+        <button onclick="toggleCartDrawer()" aria-label="Close cart drawer" class="text-gray-500 hover:text-red-500 text-2xl">
             <i class="fas fa-times"></i>
         </button>
     </div>
@@ -563,27 +563,25 @@
     </div>
 
     <!-- Footer -->
-    @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
-        <div class="p-4 border-t bg-gray-50" id="mini-cart-footer">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
-                <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val">
-                    {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
-                </span>
-            </div>
-
-            <div class="space-y-3">
-                <a href="{{ route('cart.index') }}"
-                    class="block w-full text-center primary-bg text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
-                    VIEW CART
-                </a>
-                <a href="{{ route('checkout.index') }}"
-                    class="block w-full text-center bg-black text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
-                    CHECKOUT
-                </a>
-            </div>
+    <div class="p-4 border-t bg-gray-50" id="mini-cart-footer" style="{{ \Gloudemans\Shoppingcart\Facades\Cart::count() > 0 ? '' : 'display:none;' }}">
+        <div class="flex justify-between items-center mb-4">
+            <span class="text-lg font-bold text-gray-700">SUBTOTAL:</span>
+            <span class="text-lg font-bold text-gray-900" id="mini-cart-subtotal-val" data-subtotal-raw="{{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal(0, '', '') }}">
+                {{ \Gloudemans\Shoppingcart\Facades\Cart::subtotal() }}৳
+            </span>
         </div>
-    @endif
+
+        <div class="space-y-3">
+            <a href="{{ route('cart.index') }}"
+                class="block w-full text-center primary-bg text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+                VIEW CART
+            </a>
+            <a href="{{ route('checkout.index') }}"
+                class="block w-full text-center bg-black text-primary py-3 rounded font-bold uppercase hover:bg-opacity-90 transition-colors">
+                CHECKOUT
+            </a>
+        </div>
+    </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {

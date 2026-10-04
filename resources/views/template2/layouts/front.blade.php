@@ -2,7 +2,11 @@
 <html lang="en">
 
 <head>
-    @yield('meta')
+    @hasSection('meta')
+        @yield('meta')
+    @else
+        <title>{{ $setup->shop_name ?? 'Shop' }}</title>
+    @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 

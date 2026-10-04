@@ -58,9 +58,9 @@
 
         @if ($discountLabel)
             <div
-                class="absolute top-1 right-1 secondary-bg text-secondary w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
+                class="absolute top-1 right-1 secondary-bg text-white w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
                 <span class="text-xs font-bold leading-none">{{ $discountLabel }}</span>
-                <span class="text-[10px] font-medium leading-none mt-0.5 uppercase">Off</span>
+                <span class="text-[10px] font-bold leading-none mt-0.5 uppercase">Off</span>
             </div>
         @endif
     </div>

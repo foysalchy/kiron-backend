@@ -19,17 +19,17 @@
                 <form action="{{ route('user.login.store') }}" method="POST" class="space-y-4">
                     @csrf
 
-                    <!-- Email Field -->
+                    <!-- Email or Phone Field -->
                     <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-700 ml-1">Email Address</label>
+                        <label class="text-sm font-medium text-gray-700 ml-1">Email or Phone Number</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                <i class="far fa-envelope text-sm"></i>
+                                <i class="far fa-user text-sm"></i>
                             </span>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="user@example.com" required
-                                class="w-full pl-11 pr-4 py-3 rounded-lg border @error('email') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
+                            <input type="text" name="login" value="{{ old('login') }}" placeholder="Email or Phone Number" required
+                                class="w-full pl-11 pr-4 py-3 rounded-lg border @error('login') border-red-500 @else border-gray-200 @enderror outline-none focus:border-[var(--primary-color)] focus:ring-4 focus:ring-green-50 transition-all text-sm">
                         </div>
-                        @error('email')
+                        @error('login')
                             <p class="text-red-500 text-xs mt-1 ml-1">{{ $message }}</p>
                         @enderror
                     </div>

@@ -93,7 +93,7 @@
 
                 <!-- Column 2: Quick Links -->
                 <div class=" ">
-                    <h4 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h4>
+                    <h3 class="text-[18px] font-bold mb-4 md:mb-4">Quick Links</h3>
                     <ul class="space-y-2.5 text-sm">
                         <li><a href="{{ route('contact.index') }}"
                                 class="text-[16px] opacity-90 hover:underline transition-colors">Contact Us</a></li>
@@ -108,7 +108,7 @@
 
                 <!-- Column 3: Pages -->
                 <div>
-                    <h4 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h4>
+                    <h3 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h3>
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
                             <li>
@@ -123,7 +123,7 @@
 
                 <!-- Column 4: Newsletter -->
                 <div>
-                    <h4 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h4>
+                    <h3 class="text-base text-footer md:text-lg font-bold mb-4 md:mb-4">Newsletter</h3>
                     <p class="opacity-90 text-[16px] mb-4">Subscribe to get updates on new products and exclusive offers.
                     </p>
                     <div class="flex mb-5">
@@ -183,5 +183,4 @@
     </div>
 
 </footer>
-
 

@@ -130,7 +130,8 @@
 
                             <div>
                                 <p class="text-gray-900 font-semibold">WhatsApp</p>
-                                <a href="https://wa.me/{{ $whatsappNumber }}" class="hover:text-orange-500 transition-colors">
+                                <a href="https://wa.me/{{ $whatsappNumber }}" aria-label="Contact us on WhatsApp"
+                                    class="hover:text-orange-500 transition-colors">
                                     {{ $whatsappNumber }}
                                 </a>
                             </div>
@@ -150,7 +151,8 @@
                             </div>
                             <div>
                                 <p class="text-gray-900 font-semibold">Email</p>
-                                <a href="mailto:{{ $setup->email }}" class="hover:text-orange-500 transition-colors">
+                                <a href="mailto:{{ $setup->email }}" aria-label="Email us"
+                                    class="hover:text-orange-500 transition-colors">
                                     {{ $setup->email }}
                                 </a>
                             </div>
@@ -262,6 +264,7 @@
             <div class="relative w-full rounded-lg overflow-hidden shadow-inner group">
                 <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.1075677025856!2d90.41018317589578!3d23.779185187720234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755c70b22a019d3%3A0xe54331201990c74e!2sGulshan%202%2C%20Dhaka%201212!5e0!3m2!1sen!2sbd!4v1709456789012!5m2!1sen!2sbd"
+                    title="Store location on Google Maps"
                     class="w-full h-[400px] md:h-[500px] grayscale-[0.2] contrast-[1.1] transition-all group-hover:grayscale-0"
                     style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
                 </iframe>

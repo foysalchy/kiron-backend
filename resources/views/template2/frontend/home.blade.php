@@ -29,11 +29,11 @@
                     </div>
 
                     <!-- Navigation Arrows (Click logic added) -->
-                    <button onclick="prevSlide()"
+                    <button onclick="prevSlide()" aria-label="Previous slide"
                         class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-white/50 flex items-center justify-center text-primary bg-black/20 hover:bg-black/40 transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <button onclick="nextSlide()"
+                    <button onclick="nextSlide()" aria-label="Next slide"
                         class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-white/50 flex items-center justify-center text-primary bg-black/20 hover:bg-black/40 transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer">
                         <i class="fas fa-chevron-right"></i>
                     </button>
@@ -223,7 +223,7 @@
                                         {{-- à¦¸à¦¿à¦™à§à¦—à§‡à¦²: Discount à¦¥à¦¾à¦•à¦²à§‡ à¦•à¦¾à¦Ÿà¦¾ à¦¦à¦¾à¦®à¦¸à¦¹ à¦¦à§‡à¦–à¦¾à¦¬à§‡ --}}
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
                                             <span
-                                                class="line-through text-gray-400 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
+                                                class="line-through text-gray-500 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
                                             <span>{{ number_format($salePrice, 0) }}{{ $currency }}</span>
                                         @elseif($regularPrice > 0)
                                             <span>{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
