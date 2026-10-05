@@ -15,10 +15,14 @@
                     <div id="main-slider" class="flex transition-transform duration-700 ease-in-out h-full w-full">
                         @forelse($mainSliders as $slider)
                             <div class="min-w-full h-full">
-                                <a href="{{ $slider->url ?? '#' }}">
-                                    <img src="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}"
-                                        class="w-full h-full object-cover" alt="{{ $slider->title }}"
-                                        @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                                <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
+                                    <picture class="block w-full h-full">
+                                        <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}">
+                                        <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}">
+                                        <img src="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}"
+                                            class="w-full h-full object-cover" alt="{{ $slider->title }}"
+                                            @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                                    </picture>
                                 </a>
                             </div>
                         @empty
