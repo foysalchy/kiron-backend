@@ -3,8 +3,8 @@
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
     @if(isset($mainSliders) && $mainSliders->isNotEmpty())
         @php $firstSlider = $mainSliders->first(); @endphp
-        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)">
-        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)">
+        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)" fetchpriority="high">
     @endif
 @endsection
 @push('styles')
