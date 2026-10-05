@@ -20,8 +20,8 @@
 
         'image' =>
             $setup?->meta_image ?? null
-                ? asset('storage/' . $setup->meta_image)
-                : asset('storage/' . ($setup?->logo ?? '')),
+            ? asset('storage/' . $setup->meta_image)
+            : asset('storage/' . ($setup?->logo ?? '')),
         'canonical' => url()->current(),
         'breadcrumb' => [
             [
@@ -91,17 +91,17 @@
         }
 
         /* .animated-text {
-                background: linear-gradient(90deg,
-                        #00555c,
-                        #4fd1c5,
-                        #7c3aed,
-                        #00555c);
-                background-size: 300% 100%;
-                -webkit-background-clip: text;
-                background-clip: text;
-                color: transparent;
-                animation: textGradient 4s linear infinite;
-            } */
+                                background: linear-gradient(90deg,
+                                        #00555c,
+                                        #4fd1c5,
+                                        #7c3aed,
+                                        #00555c);
+                                background-size: 300% 100%;
+                                -webkit-background-clip: text;
+                                background-clip: text;
+                                color: transparent;
+                                animation: textGradient 4s linear infinite;
+                            } */
 
         @keyframes textGradient {
             0% {
@@ -477,8 +477,7 @@
             <div class="swiper-wrapper">
                 @foreach ($sliders as $key => $slider)
                     <div class="swiper-slide min-h-screen flex items-center pt-12 pb-32 lg:pt-20 relative overflow-hidden">
-                        <div
-                            class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
+                        <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 lg:gap-12 gap-4 lg:gap-16 items-center">
 
                             <div class="scroll-wrapper text-center lg:text-left order-2 lg:order-1 lg:pt-14 pt-5 md:pt-0">
                                 @if ($key == 0)
@@ -525,9 +524,15 @@
                                 </div>
 
                                 <div class="relative z-10 px-6 md:px-10   float-anim">
-                                    <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
-                                        class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
-                                        alt="Core Platform" />
+                                    <picture class="block w-full h-full">
+                                        <source media="(max-width: 767px)"
+                                            srcset="{{ $slider->mobile_image_url ?? asset('./images/saas/hero.png') }}">
+                                        <source media="(min-width: 768px)"
+                                            srcset="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}">
+                                        <img src="{{ $slider->image_url ?? asset('./images/saas/hero.png') }}"
+                                            class=" lg:w-[90%] lg:max-w-[90%] w-[60%] max-w-[60%] block m-auto"
+                                            alt="Core Platform" />
+                                    </picture>
                                 </div>
 
                             </div>
@@ -585,7 +590,7 @@
                     @foreach ($solutions as $key => $sol)
                         <button onclick="switchSolution('{{ $key }}', this)"
                             class="sol-tab-btn whitespace-nowrap flex-1  mt-2 px-2 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all
-                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c] hover:text-white' }}">
+                                                        {{ $loop->first ? 'bg-[#00555c] text-white' : 'bg-[#00555c30] text-gray-900 hover:bg-[#00555c] hover:text-white' }}">
                             {{ $sol['title'] }}
                         </button>
                     @endforeach
@@ -650,7 +655,7 @@
             </div>
 
             <!-- <div class="integration-section pt-10">
-                    <div class="pin-wrap"> -->
+                                    <div class="pin-wrap"> -->
             <div class="  pt-10">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
 
@@ -676,8 +681,8 @@
                                     style="animation-delay:1.2s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#00555c" stroke-width="1.5" />
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
+                                    stroke-width="1.5" />
 
                                 <!-- Output Path -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -736,8 +741,8 @@
                                     style="animation-delay:1.2s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#00555c" stroke-width="1.5" />
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
+                                    stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -793,8 +798,8 @@
                                     style="animation-delay:1.2s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#00555c" stroke-width="1.5" />
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
+                                    stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -853,8 +858,8 @@
                                     style="animation-delay:1.2s" />
 
                                 <!-- সেন্ট্রাল পালস রিং -->
-                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none"
-                                    stroke="#00555c" stroke-width="1.5" />
+                                <circle class="ring-pulse" cx="225" cy="150" r="45" fill="none" stroke="#00555c"
+                                    stroke-width="1.5" />
 
                                 <!-- আউটপুট পাথ -->
                                 <path class="flow-line" d="M255 150 C 320 150, 340 150, 400 150" />
@@ -953,11 +958,10 @@
                             <div
                                 class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
                                 <img src="{{ asset('./images/saas/nagad.png') }}" class="h-8 md:h-10 object-contain"
-                                    alt="Nagad"
-                                    onerror="
-                        this.src =
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png'
-                      " />
+                                    alt="Nagad" onerror="
+                                        this.src =
+                                          'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nagad_Logo.svg/1200px-Nagad_Logo.svg.png'
+                                      " />
                             </div>
                             <div
                                 class="border-2 border-[#00555c] rounded-2xl p-4 flex items-center justify-center bg-white h-20 md:h-24 hover:shadow-md transition cursor-pointer">
@@ -1076,7 +1080,7 @@
 
                         <div
                             class="px-8 py-3 border-2 border-[#00555c] rounded-2xl text-gray-900 font-bold text-base bg-white z-10">
-                           Order Source
+                            Order Source
                         </div>
 
                         <div class="w-full relative flex flex-col items-center">
@@ -1136,16 +1140,14 @@
 
                             <!-- Left Icon -->
                             <div class="flex-shrink-0">
-                                <div
-                                    class="w-16 h-16    rounded
-                   border border-white/20
-                   flex items-center justify-center">
+                                <div class="w-16 h-16    rounded
+                                                                   border border-white/20
+                                                                   flex items-center justify-center">
                                     @if ($feature->image_url)
-                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}"
-                                            class="w-16" alt=" {{ $feature->title }}" />
+                                        <img src="{{ $feature->image_url ?? asset('images/saas/live1.png') }}" class="w-16"
+                                            alt=" {{ $feature->title }}" />
                                     @else
-                                        <i
-                                            class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
+                                        <i class="{{ $feature->icon ?? 'fa-solid fa-file-lines' }} text-2xl text-[#00555c]"></i>
                                     @endif
                                 </div>
                             </div>
@@ -1160,8 +1162,7 @@
 
                                 <span class="inline-flex items-center gap-2 font-semibold text-[#00555c]">
                                     Read More
-                                    <i
-                                        class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
                                 </span>
                             </div>
 
@@ -1286,7 +1287,8 @@
                         class="inline-block px-5 py-2 rounded-full border border-indigo-100 bg-indigo-50 text-[#00555c] font-semibold text-sm md:text-lg mb-6">
                         Demo & Template
                     </span>
-                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10" data-speed="0.05">
+                    <h2 class="move-up text-2xl md:text-4xl animated-text  font-extrabold text-gray-900  mb-10"
+                        data-speed="0.05">
                         Get a complete system live experience on one platform
                     </h2>
 
@@ -1524,7 +1526,8 @@
                         <button type="button" id="home-yearly-btn" onclick="switchHomePricingCycle('yearly')"
                             class="home-cycle-btn px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 text-gray-600 hover:text-gray-900 flex items-center gap-2 cursor-pointer">
                             <span>Yearly Billing</span>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm animate-pulse">
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-sm animate-pulse">
                                 Save 20%
                             </span>
                         </button>
@@ -1579,8 +1582,7 @@
                                     <div
                                         class="relative bg-[#0073ea] text-white text-[10px] font-black uppercase px-2.5 py-1.5 rounded-sm flex items-center shadow-sm tracking-tighter">
                                         <span>Most Popular</span>
-                                        <div
-                                            class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
+                                        <div class="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 bg-[#0073ea] rotate-45">
                                         </div>
                                     </div>
                                 @endif
@@ -1595,8 +1597,7 @@
                                             style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
                                             {{ $setup->currency ?? '৳' }} {{ number_format($monthlyFinal, 0) }}
                                             @if ($monthlyReg > $monthlyFinal)
-                                                <span
-                                                    class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
+                                                <span class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
                                                     <del>{{ number_format($monthlyReg, 0) }}</del>
                                                 </span>
                                             @endif
@@ -1615,8 +1616,7 @@
                                             style="color: {{ $isSpecialMode ? $themeColor : '#111' }};">
                                             {{ $setup->currency ?? '৳' }} {{ number_format($effectiveMonthlyFromYearly, 0) }}
                                             @if ($monthlyFinal > $effectiveMonthlyFromYearly)
-                                                <span
-                                                    class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
+                                                <span class="inline-block text-gray-400 text-lg font-semibold line-through ml-1">
                                                     <del>{{ number_format($monthlyFinal, 0) }}</del>
                                                 </span>
                                             @endif
@@ -1630,7 +1630,8 @@
                                             {{ $setup->currency ?? '৳' }}{{ number_format($yearlyFinal, 0) }} / year
                                         </span>
                                         @if ($yearlySaving > 0)
-                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">
+                                            <span
+                                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">
                                                 Save {{ $setup->currency ?? '৳' }}{{ number_format($yearlySaving, 0) }}
                                             </span>
                                         @endif
@@ -1652,12 +1653,12 @@
                             <div class="mb-4">
                                 <p class="text-gray-600 text-sm leading-relaxed">
                                     {{ strtolower($plan->name) == 'starter'
-                                        ? 'Start your business with confidence.'
-                                        : (strtolower($plan->name) == 'growth'
-                                            ? 'Scale faster with smarter tools.'
-                                            : (strtolower($plan->name) == 'business'
-                                                ? 'Powerful tools for growing teams.'
-                                                : 'Enterprise-grade performance & support.')) }}
+                        ? 'Start your business with confidence.'
+                        : (strtolower($plan->name) == 'growth'
+                            ? 'Scale faster with smarter tools.'
+                            : (strtolower($plan->name) == 'business'
+                                ? 'Powerful tools for growing teams.'
+                                : 'Enterprise-grade performance & support.')) }}
                                 </p>
                             </div>
 
@@ -1672,8 +1673,7 @@
                                         @foreach ([['User Limit', $plan->user_limit], ['Product Limit', $plan->product_limit], ['Order Limit', $plan->order_limit], ['Extra Order', $plan->extra_order_charge]] as [$label, $value])
                                             <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                                 <div class="flex items-center gap-3">
-                                                    <div
-                                                        class="w-5 h-5 rounded-full bg-[#7e22ce17] flex items-center justify-center">
+                                                    <div class="w-5 h-5 rounded-full bg-[#7e22ce17] flex items-center justify-center">
                                                         <i class="fa-solid fa-check text-[10px] text-[#7e22ce]"></i>
                                                     </div>
 
@@ -1696,8 +1696,7 @@
                                         @foreach ($plan->multiple_input as $extraDetail)
                                             <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                                 <div class="flex items-center gap-3">
-                                                    <div
-                                                        class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
+                                                    <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
                                                         <i class="fa-solid fa-check text-[10px] text-emerald-600"></i>
                                                     </div>
 
@@ -1733,7 +1732,8 @@
                         Why Businesses Choose Dorja.io
                     </span>
 
-                    <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" data-speed="0.05">
+                    <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
+                        data-speed="0.05">
                         From Operations to Growth — Everything in One System
                     </h2>
                 </div>
@@ -1743,7 +1743,8 @@
                         <div
                             class="bg-white   border-black-100 rounded-2xl p-8 md:p-14 flex flex-col-reverse {{ $loop->even ? 'lg:flex-row-reverse' : 'lg:flex-row' }} items-center gap-12 lg:gap-20">
                             <div class="w-full lg:w-1/2 text-center lg:text-left">
-                                <h3 class="move-up text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2" data-speed="0.05">
+                                <h3 class="move-up text-[#00555c] md:text-3xl text-xl md:text-4xl font-extrabold lg:mb-6 mb-2"
+                                    data-speed="0.05">
                                     {{ $benefit->title }}
                                 </h3>
                                 <div class="text-gray-800 lg:text-lg text-sm leading-relaxed   max-w-xl">
@@ -1800,13 +1801,13 @@
                                         {{ 'Admin' }}
                                     </span>
                                     <!-- <div class="flex items-center gap-2 text-gray-600 text-sm font-bold">
-                                            <i class="fa-regular fa-clock"></i>
-                                            <span>{{ $blog->reading_time ?? '' }} minutes</span>
-                                        </div> -->
+                                                                                            <i class="fa-regular fa-clock"></i>
+                                                                                            <span>{{ $blog->reading_time ?? '' }} minutes</span>
+                                                                                        </div> -->
                                 </div>
 
-                                <h3
-                                    class="move-up text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight line-clamp-2" data-speed="0.05">
+                                <h3 class="move-up text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight line-clamp-2"
+                                    data-speed="0.05">
                                     {{ $blog->title ?? '' }}
                                 </h3>
 
@@ -1889,7 +1890,8 @@
                     Frequently Asked Questions
                 </span>
 
-                <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10" data-speed="0.05">
+                <h2 class="move-up text-2xl animated-text  md:text-4xl font-extrabold text-gray-900 mb-10"
+                    data-speed="0.05">
                     Better Understanding of Dorja.io and its Features
                 </h2>
 
@@ -1981,7 +1983,7 @@
         });
 
         // Search Filter
-        document.getElementById('faqSearch').addEventListener('input', function() {
+        document.getElementById('faqSearch').addEventListener('input', function () {
             let value = this.value.toLowerCase();
             let items = document.querySelectorAll('.faq-item');
 
@@ -1997,7 +1999,7 @@
         });
     </script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (document.querySelector('.heroSwiper')) {
                 new Swiper('.heroSwiper', {
                     loop: true,
@@ -2031,13 +2033,13 @@
             let featureHtml = '';
             data.features.forEach(f => {
                 featureHtml += `
-            <div class="flex items-center gap-4">
-                <div class="w-8 h-8 bg-[#00555c] rounded-lg flex items-center justify-center text-white">
-                    <i class="fa-solid ${f.icon} text-sm"></i>
-                </div>
-                <span class="font-bold text-gray-900 text-lg">${f.text}</span>
-            </div>
-        `;
+                            <div class="flex items-center gap-4">
+                                <div class="w-8 h-8 bg-[#00555c] rounded-lg flex items-center justify-center text-white">
+                                    <i class="fa-solid ${f.icon} text-sm"></i>
+                                </div>
+                                <span class="font-bold text-gray-900 text-lg">${f.text}</span>
+                            </div>
+                        `;
             });
 
             document.getElementById('sol-features').innerHTML = featureHtml;
@@ -2052,18 +2054,18 @@
         }
 
         // default load
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             document.querySelector(".sol-tab-btn").click();
         });
     </script>
     <script>
         //review
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const loadMoreBtn = document.getElementById('load-more-reviews');
             const itemsToShow = 6;
 
             if (loadMoreBtn) {
-                loadMoreBtn.addEventListener('click', function() {
+                loadMoreBtn.addEventListener('click', function () {
                     const hiddenCards = document.querySelectorAll('.review-card.hidden');
 
                     for (let i = 0; i < itemsToShow && i < hiddenCards.length; i++) {
@@ -2097,7 +2099,7 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const firstTab = document.querySelector('.tab-btn');
             if (firstTab) filterDemos(1, firstTab);
         });

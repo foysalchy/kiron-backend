@@ -13,9 +13,13 @@
                 <div id="main-slider" class="flex transition-transform duration-700 ease-in-out h-full w-full">
                     @forelse($mainSliders as $slider)
                         <div class="min-w-full h-full">
-                            <a href="{{ $slider->url ?? '#' }}">
-                                <img src="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
-                                 height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                            <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
+                                <picture class="block w-full h-full">
+                                    <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
+                                    <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
+                                    <img src="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
+                                     height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                                </picture>
                             </a>
                         </div>
                     @empty
@@ -271,9 +275,13 @@
                         <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
                             <div
                                 class="aspect-[641/320] rounded-md w-full border border-[var(--primary-color)] overflow-hidden bg-gray-100">
-                                <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
-                                    alt="{{ $slider->title }}" loading="lazy" width="641" height="320"
-                                    class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
+                                <picture class="block w-full h-full">
+                                    <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                    <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                    <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                        alt="{{ $slider->title }}" loading="lazy" width="641" height="320"
+                                        class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
+                                </picture>
                             </div>
                         </a>
                     </div>

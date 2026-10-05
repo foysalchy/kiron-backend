@@ -145,11 +145,15 @@
                     <div class="swiper-wrapper">
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
-                                <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
-                                    <img src="{{ $slider->image_url ?? ''}}"
-                                        alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
-                                        class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
-                                        loading="eager" @else loading="lazy" @endif />
+                                <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}" class="block w-full h-full">
+                                    <picture class="block w-full h-full">
+                                        <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? $slider->image_url ?? ''}}">
+                                        <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? ''}}">
+                                        <img src="{{ $slider->image_url ?? ''}}"
+                                            alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
+                                            class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
+                                            loading="eager" @else loading="lazy" @endif />
+                                    </picture>
                                 </a>
                             </div>
                         @empty
