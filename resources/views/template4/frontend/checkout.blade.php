@@ -135,6 +135,7 @@
                                 <!-- Actual Product Image -->
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
                                     <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                        alt="{{ $item->name }}"
                                         class="w-full h-full object-cover">
                                 </div>
 
@@ -166,8 +167,10 @@
                                 <!-- Quantity Display -->
                                 <div class="flex items-center gap-2">
                                     <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                    <a href="{{ route('cart.remove', $item->rowId) }}" class="text-red-400 hover:text-red-600">
-                                        <i class="far fa-trash-alt text-xs"></i>
+                                    <a href="{{ route('cart.remove', $item->rowId) }}"
+                                        aria-label="Remove {{ $item->name }} from cart"
+                                        class="text-red-400 hover:text-red-600">
+                                        <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
                                     </a>
                                 </div>
                             </div>
@@ -183,17 +186,16 @@
                                 class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                 {{ session()->has('coupon') ? 'readonly' : '' }}>
 
-                            @if (session()->has('coupon'))
-                                <button type="button" onclick="removeCoupon()"
-                                    class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center">
-                                    <i class="fas fa-times text-white"></i>
-                                </button>
-                            @else
-                                <button type="button" onclick="applyCoupon()"
-                                    class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold">
-                                    Apply Now
-                                </button>
-                            @endif
+                            <button type="button" id="remove-coupon-btn" onclick="removeCoupon()" aria-label="Remove coupon" title="Remove coupon"
+                                class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center {{ session()->has('coupon') ? '' : 'hidden' }}">
+                                <i class="fas fa-times text-white" aria-hidden="true"></i>
+                                <span class="sr-only">Remove coupon</span>
+                            </button>
+
+                            <button type="button" id="apply-coupon-btn" onclick="applyCoupon()"
+                                class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold {{ session()->has('coupon') ? 'hidden' : '' }}">
+                                Apply Now
+                            </button>
                         </div>
                     </div>
 
@@ -235,12 +237,10 @@
                         </div>
 
                         <!-- ৩. ডিসকাউন্ট (যদি থাকে) -->
-                        @if ($discount > 0)
-                            <div class="flex justify-between items-center text-green-600 font-bold">
-                                <span>Discount {{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span>
-                                <span>- {{ $isL ? $setup->currency : '' }} {{ number_format($discount) }} {{ !$isL ? $setup->currency : '' }}</span>
-                            </div>
-                        @endif
+                        <div id="discount-row" class="flex justify-between items-center text-green-700 font-bold {{ $discount > 0 ? '' : 'hidden' }}">
+                            <span>Discount <span id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span></span>
+                            <span>- {{ $isL ? $setup->currency : '' }} <span id="discount-display">{{ number_format($discount) }}</span> {{ !$isL ? $setup->currency : '' }}</span>
+                        </div>
 
                         <!-- ৪. সর্বমোট (Total) -->
                         <div class="flex justify-between items-center py-4 border-t border-gray-100 mt-2">
@@ -339,14 +339,15 @@
             }
         }
         function applyCoupon() {
-            const code = document.getElementById('coupon-code-input').value;
+            const codeInput = document.getElementById('coupon-code-input');
+            const code = codeInput.value;
             if (!code) return toastr.warning('Please enter a coupon code');
 
             const token = document.querySelector('meta[name="csrf-token"]').content;
 
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = 'Applying...';
+            const btn = event.target.tagName === 'BUTTON' ? event.target : event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerText = '...';
             btn.disabled = true;
 
             fetch("{{ route('coupon.apply') }}", {
@@ -364,17 +365,29 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        location.reload();
+                        document.getElementById('discount-display').innerText = data.discount_amount.toLocaleString();
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
+                        document.getElementById('discount-code-display').innerText = '(' + data.coupon_code + ')';
+                        document.getElementById('discount-row').classList.remove('hidden');
+
+                        codeInput.setAttribute('readonly', 'readonly');
+                        document.getElementById('apply-coupon-btn').classList.add('hidden');
+                        document.getElementById('remove-coupon-btn').classList.remove('hidden');
+
+                        toastr.success(data.message);
+                        
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     } else {
                         toastr.error(data.message || "Invalid coupon");
-                        btn.innerText = originalText;
+                        btn.innerHTML = originalText;
                         btn.disabled = false;
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     toastr.error("Server error occurred. Please try again.");
-                    btn.innerText = originalText;
+                    btn.innerHTML = originalText;
                     btn.disabled = false;
                 });
         }
@@ -390,12 +403,24 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-                .then(res => {
-                    location.reload();
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
+                        document.getElementById('discount-row').classList.add('hidden');
+
+                        const codeInput = document.getElementById('coupon-code-input');
+                        codeInput.removeAttribute('readonly');
+                        codeInput.value = '';
+
+                        document.getElementById('apply-coupon-btn').classList.remove('hidden');
+                        document.getElementById('remove-coupon-btn').classList.add('hidden');
+
+                        toastr.success(data.message);
+                    }
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    location.reload();
                 });
         }
 

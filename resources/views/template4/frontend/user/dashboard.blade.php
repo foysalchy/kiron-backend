@@ -1,5 +1,9 @@
 @extends('template4.layouts.front')
 
+@section('meta')
+    <title>Account Dashboard - {{ $setup->shop_name ?? config('app.name') }}</title>
+@endsection
+
 @section('content')
     <section class="container py-6 mx-auto px-4 lg:px-0">
         <!-- Dashboard Header -->
@@ -29,7 +33,7 @@
                             @endif
                         </div>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900">{{ $user->name }}</h3>
+                    <h2 class="text-lg font-bold text-gray-900">{{ $user->name }}</h2>
                     <p class="text-sm text-gray-500 font-medium">{{ $user->email }}</p>
 
                     <!-- Sidebar Menu -->
@@ -84,7 +88,7 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Order</p>
-                                <h4 class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</h4>
+                                <p class="text-2xl font-semibold text-gray-900">{{ $totalOrders ?? 0 }}</p>
                             </div>
                             <i class="fas fa-shopping-bag h-8 w-8 text-orange-500 text-2xl"></i>
                         </div>
@@ -92,9 +96,9 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Total Cost</p>
-                                <h4 class="text-2xl font-semibold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
+                                <p class="text-2xl font-semibold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                     {{ number_format($totalSpent ?? 0) }}
-                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</h4>
+                                    {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -111,8 +115,8 @@
                             class="bg-white p-4 md:p-6 rounded-lg border border-gray-200 shadow-xs flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-gray-700 mb-1">Wishlist</p>
-                                <h4 class="text-2xl font-semibold text-gray-900 wishlist-count-val">
-                                    {{ $wishlistCount ?? 0 }}</h4>
+                                <p class="text-2xl font-semibold text-gray-900 wishlist-count-val">
+                                    {{ $wishlistCount ?? 0 }}</p>
                             </div>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

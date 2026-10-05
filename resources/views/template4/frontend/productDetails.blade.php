@@ -66,11 +66,16 @@
                             alt="main image" class=" m-auto object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
-                        <button onclick="toggleWishlist({{ $product->id }})" type="button" class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
+                        <button onclick="toggleWishlist({{ $product->id }})" type="button"
+                            aria-label="{{ $isWishlisted ? 'Remove ' . $product->title . ' from wishlist' : 'Add ' . $product->title . ' to wishlist' }}"
+                            data-wishlist-add-label="Add {{ $product->title }} to wishlist"
+                            data-wishlist-remove-label="Remove {{ $product->title }} from wishlist"
+                            class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
                                 {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
 
                             <i
-                                class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"></i>
+                                class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"
+                                aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
@@ -153,7 +158,7 @@
                                 </button>
                             </div>
                         </div>
-                        <p class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                        <p class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
                             <i class="fas {{ (!$product->manage_stock || $product->available_stock > 0) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </p>
@@ -664,14 +669,24 @@
                             icon.classList.add('text-white');
 
                             const btn = icon.closest('button');
-                            if (btn) btn.classList.replace('primary-bg', 'bg-red-500');
+                            if (btn) {
+                                btn.classList.replace('primary-bg', 'bg-red-500');
+                                if (btn.dataset.wishlistRemoveLabel) {
+                                    btn.setAttribute('aria-label', btn.dataset.wishlistRemoveLabel);
+                                }
+                            }
                         } else {
                             icon.setAttribute('fill', 'none');
                             icon.setAttribute('stroke', 'currentColor');
                             icon.classList.replace('fa-solid', 'fa-regular');
 
                             const btn = icon.closest('button');
-                            if (btn) btn.classList.replace('bg-red-500', 'primary-bg');
+                            if (btn) {
+                                btn.classList.replace('bg-red-500', 'primary-bg');
+                                if (btn.dataset.wishlistAddLabel) {
+                                    btn.setAttribute('aria-label', btn.dataset.wishlistAddLabel);
+                                }
+                            }
                         }
                     });
 
