@@ -1,6 +1,11 @@
 @extends('template2.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
+    @if(isset($mainSliders) && $mainSliders->isNotEmpty())
+        @php $firstSlider = $mainSliders->first(); @endphp
+        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)">
+        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)">
+    @endif
 @endsection
 @section('content')
     <!-- HERO SECTION (Updated to 2-Column Layout) -->

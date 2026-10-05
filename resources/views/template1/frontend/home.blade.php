@@ -1,6 +1,11 @@
 @extends('template1.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
+    @if(isset($mainSliders) && $mainSliders->isNotEmpty())
+        @php $firstSlider = $mainSliders->first(); @endphp
+        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)">
+        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)">
+    @endif
 @endsection
 @section('content')
     <!-- HERO SECTION -->
@@ -298,8 +303,7 @@
             <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
                 @foreach ($middleSliders as $slider)
-                    {{-- à¦à¦–à¦¾à¦¨à§‡ h-40 (à¦®à§‹à¦¬à¦¾à¦‡à¦²à§‡) à¦à¦¬à¦‚ md:h-64 (à¦¡à§‡à¦¸à§à¦•à¦Ÿà¦ªà§‡) à¦¬à¦¾
-                    à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à¦®à¦¤à§‹ à¦¹à¦¾à¦‡à¦Ÿ à¦¦à¦¿à¦¨ --}}
+              
                     <div
                         class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
                         <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
