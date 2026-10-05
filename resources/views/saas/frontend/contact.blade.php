@@ -16,7 +16,7 @@
     'description' => $pageData?->meta_description ?? ('Contact ' . $setup->shop_name . ' for sales, support, product demos, or any business inquiries. We are here to help you grow your business.'),
 
     'keywords' => $pageData?->meta_keywords
-        ? implode(',', $pageData->meta_keywords)
+        ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
         : 'contact, support, sales, customer service, business software',
 
     'image' => $setup->meta_image

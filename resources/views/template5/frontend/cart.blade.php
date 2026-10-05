@@ -18,24 +18,24 @@
     <div class="lg:col-span-2 space-y-6">
 
       @foreach ($cartContent as $item)
-<div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">
-       <a href="{{ route('cart.remove', $item->rowId) }}"
-   aria-label="Remove {{ $item->name }} from cart"
-   class="absolute top-4 right-4 z-20 text-gray-700 hover:text-red-700 transition-colors pointer-events-auto">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
-</a>
+        <div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">
+            <a href="{{ route('cart.remove', $item->rowId) }}"
+            aria-label="Remove {{ $item->name }} from cart"
+            class="absolute top-4 right-4 z-20 text-gray-700 hover:text-red-700 transition-colors pointer-events-auto">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </a>
 
           <img src="{{ $item->options->thumbnail }}"
                onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                alt="{{ $item->name }}"
                class="w-24 h-24 rounded-xl object-cover">
 
-          <div class="flex-1 w-full">
-            <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
-              <h2 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
-                {{ $item->name ?? '' }}
-              </h2>
-            </a>
+            <div class="flex-1 w-full">
+                <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
+                <h2 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
+                    {{ $item->name ?? '' }}
+                </h2>
+                </a>
 
             @if (!empty($item->options->variant))
               <p class="text-gray-700 text-sm mt-1">{{ $item->options->variant }}</p>
@@ -211,10 +211,37 @@
 @push('scripts')
 <script>
   function updateCartQty(rowId, newQty) {
-    if (newQty < 1) return;
-    document.getElementById('update-row-id').value = rowId;
-    document.getElementById('update-qty').value = newQty;
-    document.getElementById('update-cart-form').submit();
-  }
+            if (newQty < 1) return;
+            const form = document.getElementById('update-cart-form');
+            document.getElementById('update-row-id').value = rowId;
+            document.getElementById('update-qty').value = newQty;
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    fetch(window.location.href)
+                    .then(r => r.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newMain = doc.querySelector('main');
+                        const currentMain = document.querySelector('main');
+                        if(newMain && currentMain) {
+                            currentMain.innerHTML = newMain.innerHTML;
+                        } else {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    if (typeof toastr !== 'undefined') toastr.error(data.message);
+                }
+            });
+        }
 </script>
 @endpush

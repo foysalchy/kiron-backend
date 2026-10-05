@@ -169,19 +169,19 @@
                             </div>
 
                         <!-- Quantity Controls -->
-<div class="flex flex-col items-end gap-2">
-    <div class="flex items-center border border-gray-200 rounded-full h-8 w-20">
-        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
-            class="w-7 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)]">-</button>
-        <span class="flex-1 text-center text-xs font-bold">{{ $item->qty }}</span>
-        <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
-            class="w-7 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)]">+</button>
-    </div>
-    <a href="{{ route('cart.remove', $item->rowId) }}"
-        class="text-red-700 hover:text-red-800 text-xs">
-        <i class="far fa-trash-alt"></i> Remove
-    </a>
-</div>
+                            <div class="flex flex-col items-end gap-2">
+                                <div class="flex items-center border border-gray-200 rounded-full h-8 w-24 px-1">
+                                    <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', -1, this)"
+                                        class="w-7 h-6 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] font-bold text-lg leading-none rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">-</button>
+                                    <span id="qty-{{ $item->rowId }}" class="flex-1 text-center text-xs font-bold">{{ $item->qty }}</span>
+                                    <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
+                                        class="w-7 h-6 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] font-bold text-lg leading-none rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">+</button>
+                                </div>
+                                <a href="{{ route('cart.remove', $item->rowId) }}"
+                                    class="text-red-700 hover:text-red-800 text-xs">
+                                    <i class="far fa-trash-alt"></i> Remove
+                                </a>
+                            </div>
                         </div>
                         @endforeach
                     </div>
@@ -211,7 +211,7 @@
                     <div class="space-y-4 border-t border-gray-100 pt-6">
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-md font-medium">Subtotal:</span>
-                            <span class="text-md font-bold text-gray-900">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($subtotal) }}@else{{ number_format($subtotal) }} {{ $setup->currency }}@endif</span>
+                            <span class="text-md font-bold text-gray-900">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} <span id="subtotal-display">{{ number_format($subtotal) }}</span>@else<span id="subtotal-display">{{ number_format($subtotal) }}</span> {{ $setup->currency }}@endif</span>
                         </div>
 
                         <div id="discount-row" class="flex justify-between items-center text-green-600 {{ $discount > 0 ? '' : 'hidden' }}">
@@ -373,7 +373,7 @@
                     document.getElementById('remove-coupon-btn').classList.remove('hidden');
 
                     toastr.success(data.message);
-                    
+
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                 } else {
@@ -539,9 +539,17 @@
         });
 </script>
 <script>
-    function updateCheckoutQty(rowId, newQty) {
+    function updateCheckoutQty(rowId, change, btnEl) {
+        const qtySpan = document.getElementById('qty-' + rowId);
+        if(!qtySpan) return;
+        
+        const currentQty = parseInt(qtySpan.innerText);
+        const newQty = currentQty + change;
+        
         if (newQty < 1) return;
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        if(btnEl) btnEl.disabled = true;
 
         fetch("{{ route('cart.update') }}", {
                 method: 'POST',
@@ -557,13 +565,35 @@
             })
             .then(res => res.json())
             .then(data => {
-                // qty change করলে subtotal/shipping/total সব রিক্যালকুলেট হবে,
-                // তাই সহজ ও নির্ভরযোগ্য উপায় হলো পেজ রিলোড
-                location.reload();
+                if(data.status === 'success') {
+                    qtySpan.innerText = newQty;
+                    
+                    // Update totals
+                    const subtotalDisplay = document.getElementById('subtotal-display');
+                    const totalDisplay = document.getElementById('total-display');
+                    const shippingDisplay = document.getElementById('shipping-display');
+                    const discountDisplay = document.getElementById('discount-display');
+                    
+                    if(subtotalDisplay) subtotalDisplay.innerText = data.subtotal;
+                    if(totalDisplay) totalDisplay.innerText = data.total;
+                    if(shippingDisplay) shippingDisplay.innerText = data.shipping;
+                    if(discountDisplay) discountDisplay.innerText = data.discount;
+                    
+                    // Trigger draft save if needed to sync immediately
+                    if(typeof saveDraft === 'function') {
+                        const phoneInput = document.querySelector('input[name="phone"]');
+                        if (phoneInput && phoneInput.value && phoneInput.value.length >= 11) {
+                            saveDraft();
+                        }
+                    }
+                }
             })
             .catch(err => {
                 console.error(err);
                 toastr.error("Quantity update failed. Please try again.");
+            })
+            .finally(() => {
+                if(btnEl) btnEl.disabled = false;
             });
     }
 </script>

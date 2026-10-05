@@ -563,11 +563,36 @@ class CartController extends FrontendController
 
         // AJAX request হলে JSON response
         if ($request->ajax() || $request->wantsJson()) {
+            $subtotalFloat = (float) str_replace(',', '', Cart::subtotal());
+            
+            $discount = 0;
+            if (session()->has('coupon')) {
+                // Re-validate coupon against new subtotal
+                $couponResult = (new \App\Services\CouponService())->validateCoupon(
+                    session('coupon')['coupon_code'], 
+                    $subtotalFloat, 
+                    auth('customer')->id() ?? null
+                );
+                if ($couponResult['success']) {
+                    session()->put('coupon', $couponResult);
+                    $discount = $couponResult['discount_amount'];
+                } else {
+                    session()->forget('coupon');
+                }
+            }
+            
+            $settings = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
+            $shipping = session()->get('shipping_cost', $settings->inside_charge ?? 60);
+            $total = ($subtotalFloat - $discount) + $shipping;
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Cart has been updated.',
                 'cart_count' => Cart::count(),
                 'subtotal' => Cart::subtotal(),
+                'discount' => number_format($discount),
+                'shipping' => number_format($shipping),
+                'total' => number_format($total)
             ]);
         }
 

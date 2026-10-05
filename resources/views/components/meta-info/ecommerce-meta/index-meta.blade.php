@@ -10,8 +10,8 @@ $setup->company_id ?? null
     'type' => 'WebPage',
     'title' => $pageData->meta_title ?? $setup->title ?? $setup->shop_name ?? 'Dorja',
     'description' => $pageData->meta_description ?? $setup->description ?? '',
-    'keywords' => (isset($pageData->meta_keywords) && is_array($pageData->meta_keywords))
-        ? implode(',', $pageData->meta_keywords)
+    'keywords' => isset($pageData->meta_keywords) && !empty($pageData->meta_keywords)
+        ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
         : ($setup?->tags ?? ''),
 
      'image' => ($setup && $setup->meta_image_url) 
