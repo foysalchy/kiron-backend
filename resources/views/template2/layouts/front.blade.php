@@ -8,7 +8,7 @@
         <title>{{ $setup->shop_name ?? 'Shop' }}</title>
     @endif
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+ 
 
 
 

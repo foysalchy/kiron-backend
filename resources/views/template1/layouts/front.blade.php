@@ -3,7 +3,7 @@
 
    @yield('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
