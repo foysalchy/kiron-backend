@@ -424,28 +424,36 @@ class ProductController extends FrontendController
         $relatedProducts = collect();
 
         if (!empty($subCategoryIds) || !empty($megaCategoryIds)) {
-            $relatedQuery = Product::where('status', Status::Active->value)
-                ->where('id', '!=', $product->id);
+            $relatedProducts = \Illuminate\Support\Facades\Cache::remember(
+                "related_products_v2_{$product->id}",
+                now()->addHours(6),
+                function () use ($product, $subCategoryIds, $megaCategoryIds) {
+                    $relatedQuery = Product::where('status', Status::Active->value)
+                        ->where('id', '!=', $product->id);
 
-            $relatedQuery->where(function ($q) use ($subCategoryIds, $megaCategoryIds) {
-                if (!empty($subCategoryIds)) {
-                    $q->where(function ($subQ) use ($subCategoryIds) {
-                        foreach ($subCategoryIds as $id) {
-                            $subQ->orWhereJsonContains('sub_category_ids', (int) $id);
+                    $relatedQuery->where(function ($q) use ($subCategoryIds, $megaCategoryIds) {
+                        if (!empty($subCategoryIds)) {
+                            $q->where(function ($subQ) use ($subCategoryIds) {
+                                foreach ($subCategoryIds as $id) {
+                                    $subQ->orWhereJsonContains('sub_category_ids', (string) $id);
+                                    $subQ->orWhereJsonContains('sub_category_ids', (int) $id);
+                                }
+                            });
+                        }
+
+                        if (!empty($megaCategoryIds)) {
+                            $q->orWhere(function ($megaQ) use ($megaCategoryIds) {
+                                foreach ($megaCategoryIds as $id) {
+                                    $megaQ->orWhereJsonContains('mega_category_ids', (string) $id);
+                                    $megaQ->orWhereJsonContains('mega_category_ids', (int) $id);
+                                }
+                            });
                         }
                     });
-                }
 
-                if (!empty($megaCategoryIds)) {
-                    $q->orWhere(function ($megaQ) use ($megaCategoryIds) {
-                        foreach ($megaCategoryIds as $id) {
-                            $megaQ->orWhereJsonContains('mega_category_ids', (int) $id);
-                        }
-                    });
+                    return $relatedQuery->with(['brand:id,company_id,name,slug,logo', 'variations'])->latest()->take(8)->get();
                 }
-            });
-
-            $relatedProducts = $relatedQuery->with(['brand', 'variations'])->latest()->take(8)->get();
+            );
         }
 
         $trustBadges = ContentSetting::where('status', Status::Active->value)

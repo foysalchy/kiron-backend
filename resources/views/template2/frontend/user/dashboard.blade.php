@@ -26,7 +26,7 @@
                         <div
                             class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
                             @if ($user->profile)
-                                <img src="{{ $user->profile_url }}" alt="{{ $user->name ?? 'User Profile' }}" class="w-full h-full object-cover">
+                                <img src="{{ $user- loading="lazy" width="800" height="800">profile_url }}" alt="{{ $user->name ?? 'User Profile' }}" class="w-full h-full object-cover">
                             @else
                                 <i class="fas fa-user text-3xl text-gray-300"></i>
                             @endif
@@ -213,11 +213,11 @@
                                                 <div
                                                     class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
                                                     @if ($item->product && $item->product->thumbnail)
-                                                        <img src="{{ $item->product->thumbnail_url }}" alt="{{ $item->product->title ?? 'Product Image' }}"
+                                                        <img src="{{ $item- loading="lazy" width="800" height="800">product->thumbnail_url }}" alt="{{ $item->product->title ?? 'Product Image' }}"
                                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                                             class="w-full h-full object-cover">
                                                     @else
-                                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $item->product->title ?? 'Product Image' }}"
+                                                        <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $item- loading="lazy" width="800" height="800">product->title ?? 'Product Image' }}"
                                                             class="w-full h-full object-cover">
                                                     @endif
                                                 </div>
@@ -367,7 +367,7 @@
 
                                 <div class="md:col-span-2 flex items-center gap-6">
                                     <div class="shrink-0">
-                                        <img id="image-preview" alt="{{ $user->name ?? 'User Profile' }}"
+                                        <img id="image-preview" alt="{{ $user- loading="lazy" width="800" height="800">name ?? 'User Profile' }}"
                                             src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                                             class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm">
                                     </div>

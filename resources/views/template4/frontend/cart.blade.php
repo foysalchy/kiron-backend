@@ -32,7 +32,7 @@
                                         <!-- Product Image Link -->
                                         <a href="{{ url($item->options->slug ?? $item->id) }}"
                                             class="shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
-                                            <img src="{{ $item->options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy"
+                                            <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy"
                                                 onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                                 class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl border border-gray-100" />
                                         </a>

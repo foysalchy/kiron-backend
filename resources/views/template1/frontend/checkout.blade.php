@@ -138,7 +138,7 @@
                                     <!-- Actual Product Image -->
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                        <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>
 
@@ -495,7 +495,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
             </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);

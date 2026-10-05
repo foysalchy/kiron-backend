@@ -65,7 +65,7 @@
             <div class="space-y-4 min-w-0">
                 <div
                     class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
-                    <img id="mainImage" src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
+                    <img id="mainImage" src="{{ $product- loading="lazy" width="800" height="800">display_image_url ?? $product->thumbnail_url }}"
                         alt="{{ $product->title }}" class="w-full h-full object-cover">
 
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
@@ -95,7 +95,7 @@
                                 onclick="changeImage('{{ $imgUrl }}')"
                                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
                                 <img src="{{ $imgUrl }}"
-                                    alt="{{ $product->title }} image {{ $index + 1 }}"
+                                    alt="{{ $product- loading="lazy" width="800" height="800">title }} image {{ $index + 1 }}"
                                     onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                                     class="w-full h-full object-cover pointer-events-none">
                             </button>
@@ -276,7 +276,7 @@
                         : 'border border-coal/15 text-coal hover:border-[var(--primary-color)]';
 
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-6 h-6 rounded-full object-cover mr-2 inline-block"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" class="w-6 h-6 rounded-full object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${activeClass}">${btnContent}</button>`;
@@ -306,7 +306,7 @@
                 container.innerHTML += `
               <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
-                <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
+                <img src="${img}" alt="{{ addslashes($product- loading="lazy" width="800" height="800">title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
               </button>`;
             });
 

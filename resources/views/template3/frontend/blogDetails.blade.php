@@ -19,12 +19,12 @@
                     <!-- Featured Image: Dynamic -->
                     <div class="relative">
                         @if (!empty($blog->images) && isset($blog->images[0]))
-                            <img src="{{ asset('storage/' . $blog->images[0]) }}" alt="{{ $blog->title }}"
+                            <img src="{{ asset('storage/' . $blog- loading="lazy" width="800" height="800">images[0]) }}" alt="{{ $blog->title }}"
                                 class="w-full h-64 md:h-[450px] object-cover">
                         @else
                             <div
                                 class="w-full h-64 md:h-[450px] bg-gray-100 flex items-center justify-center text-gray-300">
-                                <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $blog->title }}"
+                                <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $blog- loading="lazy" width="800" height="800">title }}"
                                 class="w-full h-64 md:h-[450px] object-cover">
                             </div>
                         @endif
@@ -96,7 +96,7 @@
                        <div class="flex items-center gap-3 md:gap-5 p-4 md:p-6 bg-blue-50/50 rounded-lg mb-8 md:mb-12">
                             <div
                                 class="h-16 w-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 shadow-sm border-2 border-white">
-                                <img src="{{ $blog->user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"
+                                <img src="{{ $blog- loading="lazy" width="800" height="800">user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"
                                     alt="{{ $blog->user->name ?? 'Author' }}" class="w-full h-full object-cover">
                             </div>
                             <div>
@@ -190,12 +190,12 @@
                             <a href="{{ url($rp->slug) }}" class="flex gap-4 group">
                                 <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
                                     @if ($rp->thumbnail_url)
-                                        <img src="{{ $rp->thumbnail_url }}" alt="blog image"
+                                        <img src="{{ $rp- loading="lazy" width="800" height="800">thumbnail_url }}" alt="blog image"
                                             onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                     @else
                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="blog image"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" width="800" height="800">
                                     @endif
                                 </div>
                                 <div>

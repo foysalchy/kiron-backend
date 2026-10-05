@@ -11,7 +11,7 @@
                             <div
                                 class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
                                 @if ($feature->icon_file)
-                                    <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
+                                    <img src="{{ asset('storage/' . $feature- loading="lazy" width="800" height="800">icon_file) }}" alt="{{ $feature->title }}"
                                         class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
                                 @else
                                     <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-footer text-lg"></i>
@@ -39,7 +39,7 @@
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-5">
                         @if ($setup && $setup->logo)
-                            <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                            <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                             alt="{{ $setup->shop_name ?? '' }} Logo"
                             class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
                         @else
@@ -148,7 +148,7 @@
                                 
 
                                 @if ($social->icon_image)
-                                    <img src="{{ $social->icon_image ?? '' }}"
+                                    <img src="{{ $social- loading="lazy" width="800" height="800">icon_image ?? '' }}"
                                         alt="social icon"
                                         class="social-icon">
                                 @else
@@ -177,7 +177,7 @@
                         @foreach ($footerBottomRight as $item)
                             <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
                                 @if ($item->icon_file)
-                                    <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
+                                    <img src="{{ asset('storage/' . $item- loading="lazy" width="800" height="800">icon_file) ?? './images/template1/frontend/default.webp' }}"
                                         height="16" width="120" loading="lazy" alt="{{ $item->title }}"
                                         class="h-4">
                                 @else

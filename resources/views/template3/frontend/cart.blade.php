@@ -33,7 +33,7 @@
     <div class="flex flex-row items-start gap-3 md:gap-6 flex-1 w-full">
         <!-- Image -->
         <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0">
-            <img src="{{ $item->options->thumbnail }}"
+            <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail }}"
                 onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                 alt="{{ $item->name ?? 'Product Image' }}" class="w-full h-full object-cover">
         </div>

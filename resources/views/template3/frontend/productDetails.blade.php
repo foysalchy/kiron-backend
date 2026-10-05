@@ -41,7 +41,7 @@
                 <div class="p-4 lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}"
+                        <img id="mainImage" src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -50,7 +50,7 @@
                                 class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
                                 <img src="{{ $imgUrl }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                    class="w-full h-full object-contain" alt="Product Image">
+                                    class="w-full h-full object-contain" alt="Product Image" loading="lazy" width="800" height="800">
                             </button>
                         @endforeach
                     </div>
@@ -172,7 +172,7 @@
                                 style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
                                 <div class="shrink-0">
                                     @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) }}" class="h-5 w-5 object-contain">
+                                        <img src="{{ asset('storage/' . $item- loading="lazy" width="800" height="800">icon_file) }}" class="h-5 w-5 object-contain">
                                     @else
                                         <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
                                     @endif
@@ -191,7 +191,7 @@
                                 <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
                                     <div class="text-orange-500 shrink-0">
                                         @if ($card->icon_file)
-                                            <img src="{{ asset('storage/' . $card->icon_file) }}" class="h-5 w-5 object-contain">
+                                            <img src="{{ asset('storage/' . $card- loading="lazy" width="800" height="800">icon_file) }}" class="h-5 w-5 object-contain">
                                         @else
                                             <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
                                         @endif
@@ -400,7 +400,7 @@
                                                     <div
                                                         class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
                                                         <img src="{{ asset('storage/' . $img) }}"
-                                                            onclick="expandReviewImage(this.src, '{{ $review->id }}')"
+                                                            onclick="expandReviewImage(this.src, '{{ $review- loading="lazy" width="800" height="800">id }}')"
                                                             class="w-full h-full object-cover" alt="Review Image">
                                                     </div>
                                                 @endforeach
@@ -410,7 +410,7 @@
                                             <div id="expanded-container-{{ $review->id }}"
                                                 class="hidden mb-6 transition-all duration-500">
                                                 <div class="relative inline-block group">
-                                                    <img id="large-view-{{ $review->id }}" src=""
+                                                    <img id="large-view-{{ $review- loading="lazy" width="800" height="800">id }}" src=""
                                                         class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
 
                                                     <!-- Close Button -->
@@ -554,7 +554,7 @@
                 container.innerHTML += `
                                 <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                     onclick="changeImage('${imgUrl}', this)">
-                                    <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                                    <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
                                 </button>`;
             });
         }
@@ -587,7 +587,7 @@
 
                     // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;

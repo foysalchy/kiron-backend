@@ -8,7 +8,7 @@
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
 
     <style>
         * {
@@ -662,7 +662,7 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="Shop Logo"
+                                <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" alt="Shop Logo"
                                     width="160" height="48">
                             @else
                                 <div class="logo-placeholder">

@@ -26,7 +26,7 @@
                         <div
                             class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
                             @if ($user->profile)
-                                <img src="{{ $user->profile_url }}" class="w-full h-full object-cover" alt="User Profile">
+                                <img src="{{ $user- loading="lazy" width="800" height="800">profile_url }}" class="w-full h-full object-cover" alt="User Profile">
                             @else
                                 <i class="fas fa-user text-3xl text-gray-300"></i>
                             @endif
@@ -210,12 +210,12 @@
                                                 <div
                                                     class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
                                                     @if ($item->product && $item->product->thumbnail)
-                                                        <img src="{{ $item->product->thumbnail_url }}"
+                                                        <img src="{{ $item- loading="lazy" width="800" height="800">product->thumbnail_url }}"
                                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                                             class="w-full h-full object-cover" alt="{{ $item->product->title ?? 'Product' }}">
                                                     @else
                                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                                            class="w-full h-full object-cover" alt="Product Image">
+                                                            class="w-full h-full object-cover" alt="Product Image" loading="lazy" width="800" height="800">
                                                     @endif
                                                 </div>
                                                 <div class="text-sm">
@@ -364,7 +364,7 @@
                                 <div class="md:col-span-2 flex items-center gap-6">
                                     <div class="shrink-0">
                                         <img id="image-preview"
-                                            src="{{ $user->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                                            src="{{ $user- loading="lazy" width="800" height="800">profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                                             class="h-16 w-16 object-cover rounded-full border-2 border-orange-100 shadow-sm" alt="Profile Preview">
                                     </div>
                                     <div class="flex-1">
