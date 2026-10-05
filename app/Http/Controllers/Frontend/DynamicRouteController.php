@@ -19,22 +19,22 @@ class DynamicRouteController extends Controller
 {
     public function resolve(Request $request, $slug)
     {
-        // One single optimized DB query checking all possible tables using UNION ALL
-        $slugTypeQuery = DB::query()
-            ->selectRaw("'product' as type")
-            ->from((new Product)->getTable())
-            ->where('slug', $slug)
-            ->unionAll(DB::query()->selectRaw("'mega_category'")->from((new MegaCategory)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'sub_category'")->from((new SubCategory)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'mini_category'")->from((new MiniCategory)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'extra_category'")->from((new ExtraCategory)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'page'")->from((new Page)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'brand'")->from((new Brand)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'landing_page'")->from((new LandingPage)->getTable())->where('slug', $slug))
-            ->unionAll(DB::query()->selectRaw("'blog'")->from((new Blog)->getTable())->where('slug', $slug));
+        $resolvedType = \Illuminate\Support\Facades\Cache::remember("slug_type_{$slug}", now()->addHours(24), function () use ($slug) {
+            $slugTypeQuery = DB::query()
+                ->selectRaw("'product' as type")
+                ->from((new Product)->getTable())
+                ->where('slug', $slug)
+                ->unionAll(DB::query()->selectRaw("'mega_category'")->from((new MegaCategory)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'sub_category'")->from((new SubCategory)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'mini_category'")->from((new MiniCategory)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'extra_category'")->from((new ExtraCategory)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'page'")->from((new Page)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'brand'")->from((new Brand)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'landing_page'")->from((new LandingPage)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'blog'")->from((new Blog)->getTable())->where('slug', $slug));
 
-        $result = clone $slugTypeQuery;
-        $resolvedType = $result->first()->type ?? 'not_found';
+            return $slugTypeQuery->first()->type ?? 'not_found';
+        });
 
         // Delegate to the appropriate controller based on the resolved type
         switch ($resolvedType) {
