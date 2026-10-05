@@ -337,7 +337,7 @@ class AuthController extends Controller
 
             // Handle profile image upload
             if ($request->hasFile('profile')) {
-                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? 'user') . '_' . time();
+                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? 'user') . '-' . time();
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $request->file('profile'),
                     'users/profiles',
@@ -426,7 +426,7 @@ class AuthController extends Controller
 
             // Handle profile image upload
             if ($request->hasFile('profile')) {
-                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? $user->name ?? 'user') . '_' . time();
+                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? $user->name ?? 'user') . '-' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $request->file('profile'),
                     $user->profile,
@@ -623,7 +623,7 @@ class AuthController extends Controller
     // POST /api/v1/auth/reset-password
     // ──────────────────────────────────────────────────────────────────────────
 
- public function verifyOtp(Request $request)
+    public function verifyOtp(Request $request)
     {
         $request->validate([
             'method'       => ['required', 'in:email,sms'],

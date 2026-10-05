@@ -234,7 +234,7 @@ class ProductService
         try {
             // Handle thumbnail upload
             if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
-                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'product') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'product') . '-' . time();
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'products/thumbnails',
@@ -574,7 +574,7 @@ class ProductService
             unset($variationData['gallery_images']);
 
             if (!empty($variationData['image'])) {
-                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '_' . time();
+                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '-' . time();
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
@@ -676,7 +676,7 @@ class ProductService
             $previousAssignedTo = $product->assigned_to;
             // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
-                $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '-' . time();
                 $data['thumbnail'] = FileUploadHelper::replace(
                     $data['thumbnail'],
                     $product->thumbnail,
@@ -868,7 +868,7 @@ class ProductService
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
 
             if (!empty($variationData['image'])) {
-                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '_' . time();
+                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '-' . time();
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
@@ -965,7 +965,7 @@ class ProductService
                     $this->createVariationWarehouseStocks(
                         $product,
                         $newVariation,
-                        $warehouseInfo   
+                        $warehouseInfo
                     );
                 }
 
@@ -1086,7 +1086,7 @@ class ProductService
             $product = $this->getProductById($id);
 
             // Check if used in active BOM
-            $isUsedInBom = \App\Models\BomItem::where('product_id', $id)->exists() 
+            $isUsedInBom = \App\Models\BomItem::where('product_id', $id)->exists()
                 || \App\Models\BillOfMaterial::where('product_id', $id)->exists();
             if ($isUsedInBom) {
                 throw ApiException::badRequest('Cannot delete this item because it is referenced in a Bill of Materials (BOM) recipe.');
@@ -1265,7 +1265,7 @@ class ProductService
         $slug = $product ? $product->slug : 'gallery';
 
         foreach ($images as $index => $image) {
-            $customFileName = Str::slug($slug) . '_gallery' . ($index + 1) . '_' . time();
+            $customFileName = Str::slug($slug) . '_gallery' . ($index + 1) . '-' . time();
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
@@ -1286,7 +1286,7 @@ class ProductService
         $slug = $variation && $variation->product ? $variation->product->slug : 'variation';
 
         foreach ($images as $index => $image) {
-            $customFileName = Str::slug($slug) . '_vgallery' . ($index + 1) . '_' . time();
+            $customFileName = Str::slug($slug) . '_vgallery' . ($index + 1) . '-' . time();
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
@@ -2584,4 +2584,3 @@ class ProductService
         ];
     }
 }
-

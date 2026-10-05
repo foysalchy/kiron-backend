@@ -74,7 +74,7 @@ class SubCategoryService
 
         try {
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '-' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/sub',
@@ -112,7 +112,7 @@ class SubCategoryService
             $category = $this->getSubCategoryById($id);
 
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '-' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $category->image,

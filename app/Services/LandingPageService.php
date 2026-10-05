@@ -129,12 +129,12 @@ class LandingPageService
                 );
             }
 
-        
+
             $request = request();
             if ($request->hasFile('img_paths')) {
                 $newPaths = [];
                 foreach ($request->file('img_paths') as $index => $file) {
-                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_img_' . ($index + 1) . '_' . time();
+                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_img_' . ($index + 1) . '-' . time();
                     $newPaths[] = FileUploadHelper::uploadImage(
                         $file,
                         'landing-pages/images',
@@ -185,8 +185,8 @@ class LandingPageService
 
                     if ($request->hasFile($fileKey)) {
                         $oldImage = $existingExtras[$fieldName][$i]['image'] ?? null;
-                        
-                        $customFileName = $baseSlug . '_extra_' . $fieldName . '_' . ($i + 1) . '_' . time();
+
+                        $customFileName = $baseSlug . '_extra_' . $fieldName . '_' . ($i + 1) . '-' . time();
 
                         $card['image'] = $oldImage
                             ? FileUploadHelper::replace(
@@ -260,7 +260,7 @@ class LandingPageService
                 // নতুন upload
                 $newPaths = [];
                 foreach ($request->file('img_paths') as $index => $file) {
-                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_img_' . ($index + 1) . '_' . time();
+                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_img_' . ($index + 1) . '-' . time();
                     $newPaths[] = FileUploadHelper::uploadImage(
                         $file,
                         'landing-pages/images',

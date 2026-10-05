@@ -71,7 +71,7 @@ class ResignationService
         try {
             // Handle Letter Upload (Image or PDF)
             if (isset($data['letter'])) {
-                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? 'emp') . '_' . time();
+                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? 'emp') . '-' . time();
                 $data['letter'] = FileUploadHelper::upload(
                     $data['letter'],
                     'resignations/letters',
@@ -118,9 +118,9 @@ class ResignationService
                 if ($resignation->letter) {
                     FileUploadHelper::delete($resignation->letter);
                 }
-                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? $resignation->employee_id ?? 'emp') . '_' . time();
+                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? $resignation->employee_id ?? 'emp') . '-' . time();
                 $data['letter'] = FileUploadHelper::upload(
-                    $data['letter'], 
+                    $data['letter'],
                     'resignations',
                     'r2',
                     false,
