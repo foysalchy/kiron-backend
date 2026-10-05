@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 
 class RenameLegacyImagesCommand extends Command
 {
-    protected $signature = 'kiron:rename-images';
+    protected $signature = 'dorja:rename-images';
     protected $description = 'Rename legacy images to SEO friendly names on R2 storage';
 
     public function handle()
@@ -21,7 +21,7 @@ class RenameLegacyImagesCommand extends Command
         $products = DB::table('products')->whereNotNull('thumbnail')->get();
         foreach ($products as $product) {
             $this->renameFile('products', 'thumbnail', $product->id, $product->thumbnail, $product->slug ?? $product->name ?? 'product', 'products/images');
-            
+
             // Handle galleries (JSON array)
             if (!empty($product->galleries)) {
                 $galleries = json_decode($product->galleries, true);
@@ -125,7 +125,7 @@ class RenameLegacyImagesCommand extends Command
             // Get S3 Client to perform a server-side copy with Cache-Control
             $client = $disk->getClient();
             $bucket = config('filesystems.disks.r2.bucket');
-            
+
             $client->copyObject([
                 'Bucket' => $bucket,
                 'Key' => $newPath,

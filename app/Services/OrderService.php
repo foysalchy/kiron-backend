@@ -1282,10 +1282,47 @@ class OrderService
      */
     private function restoreOrderStock(Order $order): void
     {
+        $warehouseInfo = is_string($order->warehouse_info) ? json_decode($order->warehouse_info, true) : $order->warehouse_info;
+
+        if (is_array($warehouseInfo) && !empty($warehouseInfo)) {
+            foreach ($warehouseInfo as $info) {
+                if (empty($info['warehouse_id'])) continue;
+                
+                $product = Product::find($info['product_id']);
+                if (!$product || !$product->manage_stock) continue;
+
+                $stockData = [
+                    'warehouse_id' => $info['warehouse_id'],
+                    'bin_id' => $info['bin_id'] ?? null,
+                    'quantity' => $info['quantity'],
+                    'batch_number' => null,
+                    'serial_numbers' => null,
+                    'transaction_type' => 'return',
+                    'reference_type' => 'OrderCancellation',
+                    'reference_id' => $order->id,
+                    'notes' => "Stock restored from cancelled/held order: {$order->order_no}"
+                ];
+
+                if (!empty($info['variation_id'])) {
+                    $stockData['variation_id'] = $info['variation_id'];
+                }
+
+                $this->productService->addStockToWarehouse($info['product_id'], $stockData);
+            }
+            return;
+        }
+
+        // Fallback for POS orders or older orders without warehouse_info
         foreach ($order->orderDetails as $detail) {
             if (!$detail->product || !$detail->product->manage_stock) {
                 continue;
             }
+
+            if (!$order->warehouse_id) {
+                Log::warning("Skipping stock restore: Warehouse ID is missing for Order #{$order->id}");
+                continue;
+            }
+
             $stockData = [
                 'warehouse_id' => $order->warehouse_id,
                 'bin_id' => null,
