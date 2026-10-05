@@ -51,7 +51,7 @@ class SocialSettingService
         try {
 
             if (isset($data['icon_image'])) {
-                $customFileName = Str::slug($data['icon_name'] ?? 'social-icon') . '_' . time();
+                $customFileName = Str::slug($data['icon_name'] ?? 'social-icon') . '-' . time();
                 $data['icon_image'] = FileUploadHelper::uploadImage(
                     $data['icon_image'],
                     'social-settings/icons',
@@ -92,7 +92,7 @@ class SocialSettingService
             $social = $this->getById($id);
 
             if (isset($data['icon_image'])) {
-                $customFileName = Str::slug($data['icon_name'] ?? $social->icon_name ?? 'social-icon') . '_' . time();
+                $customFileName = Str::slug($data['icon_name'] ?? $social->icon_name ?? 'social-icon') . '-' . time();
                 $data['icon_image'] = FileUploadHelper::replace(
                     $data['icon_image'],
                     $social->icon_image,

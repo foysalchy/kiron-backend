@@ -17,7 +17,7 @@ use Illuminate\Support\Str;
 
 class PageService
 {
-   /**
+    /**
      *  Get All Pages (With Pagination & Filters)
      */
     public function getAllPages(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
@@ -53,7 +53,6 @@ class PageService
             return $paginate
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
-
         } catch (\Exception $e) {
             Log::error('Error fetching pages: ' . $e->getMessage());
             throw ApiException::serverError('Failed to fetch pages');
@@ -79,13 +78,13 @@ class PageService
      */
     public function createPage(array $data): Page
     {
-  
+
         DB::beginTransaction();
         try {
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'page') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'page') . '-' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
-                    $data['image'], 
+                    $data['image'],
                     'pages',
                     'r2',
                     2048,
@@ -118,10 +117,10 @@ class PageService
             $page = $this->getPageById($id);
 
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? $page->slug ?? 'page') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? $page->slug ?? 'page') . '-' . time();
                 $data['image'] = FileUploadHelper::replace(
-                    $data['image'], 
-                    $page->image, 
+                    $data['image'],
+                    $page->image,
                     'pages',
                     'r2',
                     $customFileName
@@ -220,7 +219,7 @@ class PageService
 
             $page->update(['status' => $newStatus->value]);
 
-            LogHelper::statusChanged('page',$page->id,$page->company_id,$page->title . ' status changed to ' . $newStatus->label());
+            LogHelper::statusChanged('page', $page->id, $page->company_id, $page->title . ' status changed to ' . $newStatus->label());
             DB::commit();
             return $page;
         } catch (\Exception $e) {

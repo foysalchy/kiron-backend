@@ -33,7 +33,7 @@ class UserService
     {
         try {
             $query = User::query();
-            
+
             if (!empty($filters['select'])) {
                 $selectArray = is_string($filters['select']) ? explode(',', $filters['select']) : $filters['select'];
                 $query->select($selectArray);
@@ -102,8 +102,8 @@ class UserService
             }
             if (isset($data['profile'])) {
                 $name = $data['name'] ?? 'user';
-                $customFileName = Str::slug($name) . '_' . time();
-                
+                $customFileName = Str::slug($name) . '-' . time();
+
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
@@ -151,8 +151,8 @@ class UserService
             }
             if (isset($data['profile'])) {
                 $name = $data['name'] ?? $user->name ?? 'user';
-                $customFileName = Str::slug($name) . '_' . time();
-                
+                $customFileName = Str::slug($name) . '-' . time();
+
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
@@ -243,4 +243,3 @@ class UserService
         }
     }
 }
-

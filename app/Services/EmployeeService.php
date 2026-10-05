@@ -91,7 +91,7 @@ class EmployeeService
         try {
             // Handle image upload
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['first_name'] ?? 'employee') . '_' . time();
+                $customFileName = Str::slug($data['first_name'] ?? 'employee') . '-' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'employees/images',
@@ -132,7 +132,7 @@ class EmployeeService
 
             // Handle image replacement
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['first_name'] ?? $employee->first_name ?? 'employee') . '_' . time();
+                $customFileName = Str::slug($data['first_name'] ?? $employee->first_name ?? 'employee') . '-' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $employee->image,

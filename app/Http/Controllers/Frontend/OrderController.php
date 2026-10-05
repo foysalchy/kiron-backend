@@ -296,9 +296,9 @@ class OrderController extends FrontendController
                 $screenshotPaths = [];
                 if ($request->hasFile('screenshots')) {
                     foreach ($request->file('screenshots') as $index => $image) {
-                        $customFileName = 'order_screenshot_' . ($orderData['order_no'] ?? 'order') . '_' . ($index + 1) . '_' . time();
+                        $customFileName = 'order-screenshot-' . ($orderData['order_no'] ?? 'order') . '-' . ($index + 1) . '-' . time();
                         $screenshotPaths[] = FileUploadHelper::uploadImage(
-                            $image, 
+                            $image,
                             'payments/screenshots',
                             'r2',
                             2048,
@@ -613,7 +613,7 @@ class OrderController extends FrontendController
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
-                    $customFileName = 'order_review_' . ($productId ?? 'product') . '_' . ($index + 1) . '_' . time();
+                    $customFileName = 'order_review_' . ($productId ?? 'product') . '_' . ($index + 1) . '-' . time();
                     $path = FileUploadHelper::uploadImage(
                         $image,
                         'reviews',
@@ -670,9 +670,9 @@ class OrderController extends FrontendController
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $index => $image) {
-                $customFileName = 'order_return_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '_' . time();
+                $customFileName = 'order_return_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '-' . time();
                 $imagePaths[] = FileUploadHelper::uploadImage(
-                    $image, 
+                    $image,
                     'returns',
                     'r2',
                     2048,
@@ -749,9 +749,9 @@ class OrderController extends FrontendController
             $screenshotPaths = [];
             if ($request->hasFile('screenshots')) {
                 foreach ($request->file('screenshots') as $index => $image) {
-                    $customFileName = 'order_payment_screenshot_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '_' . time();
+                    $customFileName = 'order_payment_screenshot_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '-' . time();
                     $path = FileUploadHelper::uploadImage(
-                        $image, 
+                        $image,
                         'payments/screenshots',
                         'r2',
                         2048,

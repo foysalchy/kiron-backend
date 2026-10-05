@@ -118,7 +118,7 @@ class AuthController extends FrontendController
             $data = $request->only('name', 'email', 'phone', 'address');
 
             if ($request->hasFile('profile')) {
-                $customFileName = 'customer_profile_' . Str::slug($data['name'] ?? $user->name ?? 'customer') . '_' . time();
+                $customFileName = 'customer_profile_' . Str::slug($data['name'] ?? $user->name ?? 'customer') . '-' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $request->file('profile'),
                     $user->profile,
