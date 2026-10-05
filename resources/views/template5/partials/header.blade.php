@@ -15,7 +15,7 @@
       </button>
       <a href="{{ $homeUrl }}" class="relative flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
         @if($setup->logo_url ?? false)
-        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}"
+        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}" width="200" height="80"
           class="w-[100px] max-w-full z-10">
         <span class="absolute -bottom-1 left-0 h-[2.5px] w-full bg-gradient-to-r from-ember via-ember/60 to-transparent scale-x-0 origin-left group-hover/logo:scale-x-100 transition-transform duration-500"></span>
         @else
@@ -272,8 +272,8 @@
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b">
       <div class="text-lg font-bold text-gray-800">Shopping Cart</div>
-      <button onclick="toggleCartDrawer()" class="text-gray-500 hover:text-red-500 text-2xl">
-        <i class="fas fa-times"></i>
+      <button onclick="toggleCartDrawer()" aria-label="Close cart drawer" class="text-gray-500 hover:text-red-500 text-2xl">
+        <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
 

@@ -17,10 +17,10 @@
             <span class="px-4 py-1 {{ $order->status_color }} text-dark text-md font-bold rounded-lg mb-1">
                 {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
             </span>
-            <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
+            <p class="text-sm text-gray-700 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
         </div>
     </div>
-    <p class="text-md text-gray-500 mb-8">Order Number: #{{ $order->order_no }}</p>
+    <p class="text-md text-gray-700 mb-8">Order Number: #{{ $order->order_no }}</p>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -29,7 +29,7 @@
 
             <!-- Ordered Products Card -->
             <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h2>
 
                 <div class="space-y-4">
                     @foreach ($order->orderDetails as $item)
@@ -40,14 +40,15 @@
                         <div
                             class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
                             <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                alt="{{ $item->product->title ?? 'Product image' }}"
                                 class="w-full h-full object-cover">
                         </div>
 
                         <div class="flex-1 text-center sm:text-left">
                             {{-- 2. Safe Title Check --}}
-                            <h4 class="text-md font-bold text-gray-800 mb-1 leading-tight">
+                            <p class="text-md font-bold text-gray-800 mb-1 leading-tight">
                                 {{ $item->product->title ?? 'Product Not Available' }}
-                            </h4>
+                            </p>
 
                             @if ($item->variation)
                             <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
@@ -297,7 +298,7 @@
                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($order->grand_total) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                     </span>
                 </div>
-                <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
+                <p class="text-[11px] text-gray-700 font-bold uppercase mt-2">Method:
                     {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}
                 </p>
             </div>
@@ -362,6 +363,7 @@
                         <input type="checkbox" name="order_detail_ids[]" value="{{ $item->id }}"
                             class="w-4 h-4 accent-red-500 shrink-0">
                         <img src="{{ $item->product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                            alt="{{ $item->product->title ?? 'Product image' }}"
                             class="w-12 h-12 rounded-lg object-cover border shrink-0">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-800 truncate">{{ $item->product->title ?? 'Product Not Available' }}</p>
@@ -422,7 +424,7 @@
 
             <!-- Product Info -->
             <div class="flex gap-4 mb-6">
-                <img id="modal-product-img" src="" class="w-16 h-16 rounded-lg border object-cover">
+                <img id="modal-product-img" src="" alt="Product image" class="w-16 h-16 rounded-lg border object-cover">
                 <div>
                     <h4 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h4>
                     <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
@@ -534,7 +536,7 @@ function handleReturnPreview(input) {
                 const div = document.createElement('div');
                 div.className = 'return-preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                 div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <img src="${e.target.result}" alt="Return proof image preview" class="w-full h-full object-cover">
                     <button type="button" onclick="removeReturnImage(this, '${file.name}')"
                         class="absolute top-0 right-0 bg-red-500 text-white p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>
@@ -593,7 +595,7 @@ function removeReturnImage(element, fileName) {
                     div.className =
                         'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                     div.innerHTML = `
-                    <img src="${e.target.result}" class="w-full h-full object-cover">
+                    <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover">
                     <button type="button" onclick="removeReviewImage(this, '${file.name}')"
                         class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>
@@ -647,7 +649,9 @@ function removeReturnImage(element, fileName) {
     function openReviewModal(id, name, img, variant, variationId) {
         document.getElementById('modal-product-id').value = id;
         document.getElementById('modal-product-name').innerText = name;
-        document.getElementById('modal-product-img').src = img;
+        const productImage = document.getElementById('modal-product-img');
+        productImage.src = img;
+        productImage.alt = name ? `${name} image` : 'Product image';
         document.getElementById('modal-product-variant').innerText = variant ? '(' + variant + ')' : '';
         document.getElementById('modal-variation-id').value = variationId || '';
 

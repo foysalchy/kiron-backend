@@ -49,7 +49,7 @@
         $homeUrl = Route::has('home') ? route('home') : url('/');
       @endphp
       <div>
-        <h4 class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Explore</h4>
+        <p class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Explore</p>
         <ul class="space-y-2.5 text-sm text-footer/70">
           <li><a href="{{ $homeUrl }}" class="hover:text-brand transition-colors">Home</a></li>
           <li><a href="{{ $homeUrl }}#menu" class="hover:text-brand transition-colors">Menu</a></li>
@@ -60,7 +60,7 @@
 
       <!-- Legal -->
       <div>
-        <h4 class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Legal</h4>
+        <p class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Legal</p>
         <ul class="space-y-2.5 text-sm text-footer/70">
           <li><a href="{{ Route::has('privacy-policy') ? route('privacy-policy') : '#' }}" class="hover:text-brand transition-colors">Privacy Policy</a></li>
           <li><a href="{{ Route::has('terms') ? route('terms') : '#' }}" class="hover:text-brand transition-colors">Terms of Service</a></li>
@@ -70,7 +70,7 @@
 
       <!-- Newsletter -->
       <div>
-        <h4 class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Newsletter</h4>
+        <p class="text-[11px] tracking-[0.2em] uppercase text-footer/90 mb-4">Newsletter</p>
         <p class="text-footer/70 text-sm mb-4">Subscribe to receive exclusive offers and updates.</p>
 <form id="newsletter-form-2" class="relative">
   @csrf

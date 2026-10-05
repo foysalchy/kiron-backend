@@ -175,7 +175,7 @@
         </svg>
       </div>
       <div>
-        <h3 class="font-display font-semibold text-lg">Order Online</h3>
+        <p class="font-display font-semibold text-lg">Order Online</p>
         <p class="text-smoke text-sm mt-0.5">Gourmet cuisine delivered straight to your door.</p>
         <a href="#menu" class="inline-flex items-center gap-1.5 text-[var(--primary-color)] font-medium text-sm mt-2">Start Order
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
@@ -194,7 +194,7 @@
         </svg>
       </div>
       <div>
-        <h3 class="font-display font-semibold text-lg">Book a Table</h3>
+        <p class="font-display font-semibold text-lg">Book a Table</p>
         <p class="text-smoke text-sm mt-0.5">Reserve your spot for an unforgettable evening.</p>
         <a href="#" class="inline-flex items-center gap-1.5 text-[var(--primary-color)] font-medium text-sm mt-2">Reservations
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">

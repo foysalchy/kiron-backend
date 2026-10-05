@@ -8,7 +8,7 @@
 <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 lg:py-20">
   <div class="flex items-center justify-between mb-8">
     <h1 class="font-display font-semibold text-3xl sm:text-4xl text-coal">Your Cart</h1>
-    <span class="text-smoke bg-white px-4 py-2 rounded-full border border-coal/10 text-sm">
+    <span class="text-gray-700 bg-white px-4 py-2 rounded-full border border-coal/10 text-sm">
       {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }} Items
     </span>
   </div>
@@ -20,8 +20,9 @@
       @foreach ($cartContent as $item)
 <div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">
        <a href="{{ route('cart.remove', $item->rowId) }}"
-   class="absolute top-4 right-4 z-20 text-smoke hover:text-red-500 transition-colors pointer-events-auto">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+   aria-label="Remove {{ $item->name }} from cart"
+   class="absolute top-4 right-4 z-20 text-gray-700 hover:text-red-700 transition-colors pointer-events-auto">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
 </a>
 
           <img src="{{ $item->options->thumbnail }}"
@@ -31,13 +32,13 @@
 
           <div class="flex-1 w-full">
             <a href="{{ url($item->options->slug ?? $item->id) }}" class="group/title">
-              <h3 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
+              <h2 class="font-display font-semibold text-lg group-hover/title:text-[var(--primary-color)] transition-colors">
                 {{ $item->name ?? '' }}
-              </h3>
+              </h2>
             </a>
 
             @if (!empty($item->options->variant))
-              <p class="text-smoke text-sm mt-1">{{ $item->options->variant }}</p>
+              <p class="text-gray-700 text-sm mt-1">{{ $item->options->variant }}</p>
             @endif
 
             <div class="flex items-center justify-between mt-4">
@@ -50,7 +51,7 @@
                   @endif
                 </span>
                 @if (isset($item->options['regular_price']) && (float) $item->options['regular_price'] > (float) $item->price)
-                  <span class="text-smoke line-through text-sm ml-1.5">
+                  <span class="text-gray-600 line-through text-sm ml-1.5">
                     @if(($setup->currency_position ?? 'left') == 'left')
                       {{ $setup->currency }} {{ number_format($item->options['regular_price'], 0) }}
                     @else
@@ -87,7 +88,7 @@
     <!-- Order Summary -->
     <div>
       <div class="bg-white p-6 rounded-2xl border border-coal/10 shadow-sm sticky top-28">
-        <h3 class="font-display font-semibold text-xl mb-6">Order Summary</h3>
+        <h2 class="font-display font-semibold text-xl mb-6">Order Summary</h2>
 
         <!-- Shipping Area -->
         <div class="mb-6">
@@ -138,19 +139,19 @@
 
           <div class="pt-4 mt-4 border-t border-coal/10 space-y-4">
             <div class="flex justify-between">
-              <span class="text-smoke">Subtotal</span>
+              <span class="text-gray-700">Subtotal</span>
               <span class="font-medium">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($subtotal, 0) }}@else{{ number_format($subtotal, 0) }} {{ $setup->currency }}@endif</span>
             </div>
 
             @if ($discount > 0)
-              <div class="flex justify-between text-green-600">
+              <div class="flex justify-between text-green-700">
                 <span>Discount ({{ session('coupon')['coupon_code'] }})</span>
                 <span>- @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($discount, 0) }}@else{{ number_format($discount, 0) }} {{ $setup->currency }}@endif</span>
               </div>
             @endif
 
             <div class="flex justify-between">
-              <span class="text-smoke">Delivery Fee</span>
+              <span class="text-gray-700">Delivery Fee</span>
               <span class="font-medium">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($shipping, 0) }}@else{{ number_format($shipping, 0) }} {{ $setup->currency }}@endif</span>
             </div>
           </div>
@@ -168,7 +169,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
 
-        <p class="text-center text-smoke text-sm font-medium flex items-center justify-center gap-2 mt-4">
+        <p class="text-center text-gray-700 text-sm font-medium flex items-center justify-center gap-2 mt-4">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
             <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
             <path d="M15 18H9"></path>

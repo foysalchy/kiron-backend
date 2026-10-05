@@ -29,6 +29,10 @@
     <img
       src="{{ $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
       alt="{{ $product->title }}"
+      width="400"
+      height="320"
+      loading="lazy"
+      decoding="async"
       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
     >
 
