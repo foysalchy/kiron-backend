@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         media="print" onload="this.media='all'">
     <!-- Local CSS -->
-    @vite(['resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
    
     @include('components.meta-info.pixel', ['setup' => $setup])
     <style>
