@@ -54,7 +54,7 @@
                         @foreach ($sidebarSliders as $slider)
                             <div class="min-h-full w-full">
                                 <a href="{{ $slider->url ?? '#' }}">
-                                    <img src="{{ $slider->image_url ?? asset('images/template1/frontend/hero-right1.jpg') }}"
+                                    <img src="{{ $slider- loading="lazy">image_url ?? asset('images/template1/frontend/hero-right1.jpg') }}"
                                         class="w-full h-full object-cover rounded-lg" alt="{{ $slider->title }}">
                                 </a>
                             </div>
@@ -148,7 +148,7 @@
 
                             <!-- Image Wrapper -->
                             <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
-                                <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
+                                <img src="{{ $category- loading="lazy">image_url ?? asset('images/template1/frontend/default.webp') }}"
                                     onerror="this.onerror=null;this.src='{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}';"
                                     class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                                     alt="{{ $category->name }}">
@@ -204,7 +204,7 @@
                         <div
                             class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
+                                <img src="{{ $product- loading="lazy">thumbnail_url }}" alt="{{ $product->title }}" loading="lazy"
                                     class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
                             </a>
                         </div>

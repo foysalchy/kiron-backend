@@ -120,7 +120,7 @@
                         </h3>
                     </div>
                     <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $subCat->image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                        <img src="{{ $subCat- loading="lazy">image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                             alt="{{ $subCat->name }}">
                     </div>
                     <a href="{{ url($subCat->slug) }}"
@@ -347,7 +347,7 @@
                                 <div class="flex-shrink-0">
                                     @if ($review->customer && $review->customer->image)
                                         <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm"
-                                            src="{{ asset('storage/' . $review->customer->image) ?? asset('images/template1/frontend/default.webp') }}"
+                                            src="{{ asset('storage/' . $review- loading="lazy">customer->image) ?? asset('images/template1/frontend/default.webp') }}"
                                             alt="{{ $review->customer->name }}">
                                     @else
                                         <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" height="" width=""

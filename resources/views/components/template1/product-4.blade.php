@@ -47,7 +47,7 @@
         <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full "
             aria-label="product details">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
-                alt="{{ $product->title }}" width="300" height="300" loading="lazy"
+                alt="{{ $product- loading="lazy">title }}" width="300" height="300" loading="lazy"
                 class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110">
         </a>
     </div>

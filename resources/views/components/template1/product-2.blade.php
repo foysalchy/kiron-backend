@@ -40,7 +40,7 @@
         <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" height="350"
                 width="300" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                alt="{{ $product->title }}">
+                alt="{{ $product- loading="lazy">title }}">
         </a>
 
         <!-- Wishlist Button -->

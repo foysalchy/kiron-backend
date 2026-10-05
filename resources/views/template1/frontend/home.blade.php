@@ -17,7 +17,7 @@
                         <a href="{{ url($category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
                             <div class="flex items-center gap-3 ">
-                                <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
+                                <img src="{{ !empty($category- loading="lazy">image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
                                     class="w-8 h-8 rounded-full object-cover border border-gray-100"
                                     alt="{{ $category->name }}">
                                 <span class="text-lg text-gray-800">{{ $category->name }}</span>
@@ -103,7 +103,7 @@
                         @foreach ($sidebarSliders as $slider)
                             <div class="min-h-full w-full">
                                 <a href="{{ $slider->url ?? '#' }}">
-                                    <img src="{{ $slider->image_url }}" class="w-full h-full object-cover rounded-lg"
+                                    <img src="{{ $slider- loading="lazy">image_url }}" class="w-full h-full object-cover rounded-lg"
                                         alt="{{ $slider->title }}">
                                 </a>
                             </div>
@@ -175,7 +175,7 @@
                                 class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
                                 <div
                                     class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
-                                    <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
+                                    <img src="{{ $category- loading="lazy">image_url ?? asset('images/template1/frontend/default.webp') }}"
                                         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         alt="{{ $category->name }}"
                                         onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
@@ -357,7 +357,7 @@
                                     <!-- Circular Image Wrapper -->
                                     <div
                                         class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden mb-3 border border-gray-100 bg-white flex items-center justify-center p-2">
-                                        <img src="{{ $brand->logo_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                        <img src="{{ $brand- loading="lazy">logo_url ?? asset('./images/template1/frontend/default.webp') }}"
                                             class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                                             alt="{{ $brand->name }}">
                                     </div>

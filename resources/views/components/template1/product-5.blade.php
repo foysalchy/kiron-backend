@@ -28,7 +28,7 @@
   <div class="h-40 relative overflow-hidden">
     <img
       src="{{ $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
-      alt="{{ $product->title }}"
+      alt="{{ $product- loading="lazy">title }}"
       width="400"
       height="320"
       loading="lazy"
