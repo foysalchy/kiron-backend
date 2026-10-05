@@ -149,7 +149,7 @@
                                     <picture class="block w-full h-full">
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? $slider->image_url ?? ''}}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? ''}}">
-                                        <img src="{{ $slider->image_url ?? ''}}"
+                                        <img src="{{ $slider- loading="lazy">image_url ?? ''}}"
                                             alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
                                             class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
                                             loading="eager" @else loading="lazy" @endif />

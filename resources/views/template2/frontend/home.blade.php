@@ -19,7 +19,7 @@
                                     <picture class="block w-full h-full">
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}">
-                                        <img src="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}"
+                                        <img src="{{ $slider- loading="lazy">image_url ?? asset('images/template1/frontend/cover.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $slider->title }}"
                                             @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                     </picture>
