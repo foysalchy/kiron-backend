@@ -146,7 +146,7 @@
                         @forelse($mainSliders as $slider)
                             <div class="swiper-slide">
                                 <a href="{{ $slider->url ?? '#' }}" aria-label="{{ $slider->title ?? 'Slider Image' }}">
-                                    <img src="{{ $slider- loading="lazy" width="800" height="800">image_url ?? ''}}"
+                                    <img src="{{ $slider->image_url ?? ''}}"
                                         alt="{{ $slider->title ?: 'Promotion Slider Image' }}"
                                         class="w-full h-full object-cover rounded-2xl" @if ($loop->first) fetchpriority="high"
                                         loading="eager" @else loading="lazy" @endif />
@@ -166,7 +166,7 @@
                 @php $sideBanner = $sidebarSliders->first(); @endphp
                 @if ($sideBanner)
                     <a href="{{ $sideBanner->url ?? '#' }}" aria-label="{{ $sideBanner->title ?? 'banner Image' }}">
-                        <img src="{{ $sideBanner- loading="lazy" width="800" height="800">image_url ?? '' }}" alt="{{ $sideBanner->title }}" height="450" width="300"
+                        <img src="{{ $sideBanner->image_url ?? '' }}" alt="{{ $sideBanner->title }}" height="450" width="300"
                             loading="lazy"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
                     </a>
@@ -280,7 +280,7 @@
                     <!-- Icon / Image -->
                     <div class="  mb-2 flex items-center justify-center overflow-hidden">
                         @if($category->image_url)
-                            <img src="{{ $category- loading="lazy" width="800" height="800">image_url }}"
+                            <img src="{{ $category->image_url }}"
                                 alt="{{ $category->name }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
@@ -346,7 +346,7 @@
                         <div
                             class="w-[110px] md:w-[75px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                              <img src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url }}"
+                              <img src="{{ $product->thumbnail_url }}"
                                     alt="{{ $product->title }}"
                                     class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500  "
                                 >
@@ -419,7 +419,7 @@
                             <!-- Left Part: Product Image -->
                             <div
                                 class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-2 md:p-4 bg-white relative">
-                                <img src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url ?? '' }}" height="150" width="150" alt="{{ $product->title }}"
+                                <img src="{{ $product->thumbnail_url ?? '' }}" height="150" width="150" alt="{{ $product->title }}"
                                     loading="lazy"
                                     class="max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
                             </div>
@@ -494,7 +494,7 @@
                         <!-- Left side: Product Image -->
                         <div
                             class="w-[35%] h-full flex items-center justify-center border-r border-[#F0E9F2] p-1 md:p-4 bg-white relative overflow-hidden">
-                            <img src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url ?? '' }}" height="140" width="100" alt="{{ $product->title }}"
+                            <img src="{{ $product->thumbnail_url ?? '' }}" height="140" width="100" alt="{{ $product->title }}"
                                 loading="lazy"
                                 class="max-h-full object-contain transition-transform duration-500 group-hover:scale-110" />
                         </div>

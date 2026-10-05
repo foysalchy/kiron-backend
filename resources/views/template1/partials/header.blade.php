@@ -51,7 +51,7 @@
             <!-- Logo Section -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200" height="80"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200" height="80"
                         class="h-8 md:h-12 w-auto object-contain">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
@@ -103,7 +103,7 @@
                         @foreach ($relatedProducts as $p)
                             <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}"
+                                <img src="{{ $p->thumbnail_url }}"
                                     class="w-6 h-6 rounded object-cover border border-gray-100">
                                 <span class="truncate">{{ $p->title }}</span>
                             </a>
@@ -150,7 +150,7 @@
                     class="flex items-center gap-1.5 hover-text transition-colors select-none">
                     @auth('customer')
                         <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-                            <img src="{{ auth('customer')- loading="lazy" width="800" height="800">user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                            <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                                 alt="User" class="w-full h-full object-cover">
                         </div>
                     @else
@@ -263,7 +263,7 @@
                         @foreach ($relatedProducts as $p)
                             <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-                                <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}"
+                                <img src="{{ $p->thumbnail_url }}"
                                     class="w-6 h-6 rounded object-cover border border-gray-100"
                                     onerror="this.src='{{ asset('images/no-image.png') }}'">
                                 <span class="truncate">{{ $p->title }}</span>
@@ -381,7 +381,7 @@
             @auth('customer')
                 <div class="flex items-center gap-3 px-5 py-4 border-b border-gray-100 bg-orange-50">
                     <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--primary-color)]">
-                        <img src="{{ auth('customer')- loading="lazy" width="800" height="800">user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                        <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                             class="w-full h-full object-cover" alt="User Profile">
                     </div>
                     <div>
@@ -538,7 +538,7 @@
         <a href="{{ route('user.dashboard') }}" class="flex flex-col items-center gap-1 text-gray-700">
             @auth('customer')
                 <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-                    <img src="{{ auth('customer')- loading="lazy" width="800" height="800">user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+                    <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
                         alt="User" class="w-full h-full object-cover">
                 </div>
                 <div>

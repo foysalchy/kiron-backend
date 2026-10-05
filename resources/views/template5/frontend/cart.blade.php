@@ -25,7 +25,7 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </a>
 
-          <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail }}"
+          <img src="{{ $item->options->thumbnail }}"
                onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                alt="{{ $item->name }}"
                class="w-24 h-24 rounded-xl object-cover">

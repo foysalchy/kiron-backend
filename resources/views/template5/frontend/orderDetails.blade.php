@@ -39,7 +39,7 @@
                         {{-- 1. Safe Image Check --}}
                         <div
                             class="w-16 h-16 md:w-20 md:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-50 shrink-0 overflow-hidden">
-                            <img src="{{ $item- loading="lazy" width="800" height="800">product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
+                            <img src="{{ $item->product->thumbnail_url ?? asset('./images/template1/frontend/default.webp') }}"
                                 alt="{{ $item->product->title ?? 'Product image' }}"
                                 class="w-full h-full object-cover">
                         </div>
@@ -362,7 +362,7 @@
                     <label class="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:border-red-300 transition-colors has-[:checked]:border-red-400 has-[:checked]:bg-red-50">
                         <input type="checkbox" name="order_detail_ids[]" value="{{ $item->id }}"
                             class="w-4 h-4 accent-red-500 shrink-0">
-                        <img src="{{ $item- loading="lazy" width="800" height="800">product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                        <img src="{{ $item->product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
                             alt="{{ $item->product->title ?? 'Product image' }}"
                             class="w-12 h-12 rounded-lg object-cover border shrink-0">
                         <div class="flex-1 min-w-0">

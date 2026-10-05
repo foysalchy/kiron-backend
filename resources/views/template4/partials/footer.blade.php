@@ -7,7 +7,7 @@
             <div class="lg:col-span-2 space-y-8">
                 <div>
                     <a href="{{ route('home') }}" aria-label="Little Joy Home">
-                        <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                        <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                             alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
                             class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
                     </a>

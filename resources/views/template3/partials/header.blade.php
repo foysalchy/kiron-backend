@@ -18,7 +18,7 @@
         <!-- Logo -->
         <a href="{{ route('home') }}" class="flex-shrink-0">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                     alt="{{ $setup->shop_name ?? 'Shop' }} Logo" class="h-12 md:h-16 w-auto object-contain" />
             @else
                 <span class="text-2xl font-black italic text-gray-900 tracking-tighter">KICK<span
@@ -84,7 +84,7 @@
                         @foreach ($relatedProducts ?? [] as $p)
                             <a href="{{ url($p->slug) }}"
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}" height="" width=""
+                                <img src="{{ $p->thumbnail_url }}" height="" width=""
                                     class="w-6 h-6 rounded object-cover border border-gray-100">
                                 <span class="truncate">{{ $p->title }}</span>
                             </a>
@@ -307,7 +307,7 @@
                     @foreach ($relatedProducts ?? [] as $p)
                         <a href="{{ url($p->slug) }}"
                             class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                            <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}" height="" width=""
+                            <img src="{{ $p->thumbnail_url }}" height="" width=""
                                 class="w-6 h-6 rounded object-cover border border-gray-100">
                             <span class="truncate">{{ $p->title }}</span>
                         </a>
@@ -330,7 +330,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" height="" width=""
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="" width=""
                     alt="{{ $setup->shop_name }}" class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold [var(--primary-color)]">খাঁটি ভাই</span>

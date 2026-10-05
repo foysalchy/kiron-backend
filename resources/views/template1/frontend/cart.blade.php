@@ -31,7 +31,7 @@
                                     class="flex flex-row items-start gap-3 md:gap-6 p-3 md:p-4 border border-gray-200 rounded-lg relative group">
                                     <!-- Image -->
                                     <div class="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
-                                        <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail }}"
+                                        <img src="{{ $item->options->thumbnail }}"
                                             onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
                                             class="w-full h-full object-cover" alt="{{ $item->name ?? 'Product Image' }}">
                                     </div>

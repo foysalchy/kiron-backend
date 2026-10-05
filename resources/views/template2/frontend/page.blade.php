@@ -27,7 +27,7 @@
                 <!-- Body -->
                 <div class="p-8 md:p-12 mt-0 md:pt-0 pt-0">
                     @if ($page->image)
-                        <img src="{{ asset('storage/' . $page- loading="lazy" width="800" height="800">image) }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
+                        <img src="{{ asset('storage/' . $page->image) }}" class="w-full h-auto rounded-xl mb-8 shadow-sm">
                     @endif
 
                     <div class="prose  text-gray-600 leading-relaxed text-[16px]">

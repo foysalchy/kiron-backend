@@ -39,7 +39,7 @@
 
                     <!-- Featured Image: Dynamic -->
                     <div class="relative">
-                        <img src="{{ $blog- loading="lazy" width="800" height="800">thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                        <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
                             alt="{{ $blog->title }}" class="w-full h-auto max-h-[550px] object-cover"
                             onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';">
 
@@ -110,7 +110,7 @@
                         <div class="flex items-center gap-3 md:gap-5 p-4 md:p-6 bg-blue-50/50 rounded-lg mb-8 md:mb-12">
                             <div
                                 class="h-16 w-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 shadow-sm border-2 border-white">
-                                <img src="{{ $blog- loading="lazy" width="800" height="800">user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"
+                                <img src="{{ $blog->user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"
                                     alt="{{ $blog->user->name ?? 'Author' }}" class="w-full h-full object-cover">
                             </div>
                             <div>
@@ -203,7 +203,7 @@
                         @foreach ($relatedPosts as $rp)
                             <a href="{{ url($rp->slug) }}" class="flex gap-4 group">
                                 <div class="h-16 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                                    <img src="{{ $rp- loading="lazy" width="800" height="800">thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+                                    <img src="{{ $rp->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
                                         alt="blog image"
                                         onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform">

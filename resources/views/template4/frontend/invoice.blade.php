@@ -638,7 +638,7 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url }}" alt="{{ $setup->shop_name }} logo"
+                                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }} logo"
                                     width="200" height="48">
                             @else
                                 <div class="logo-placeholder">

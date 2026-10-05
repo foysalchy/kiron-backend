@@ -15,7 +15,7 @@
       </button>
       <a href="{{ $homeUrl }}" class="relative flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
         @if($setup->logo_url ?? false)
-        <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}" width="200" height="80"
+        <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}" width="200" height="80"
           class="w-[100px] max-w-full z-10">
         <span class="absolute -bottom-1 left-0 h-[2.5px] w-full bg-gradient-to-r from-ember via-ember/60 to-transparent scale-x-0 origin-left group-hover/logo:scale-x-100 transition-transform duration-500"></span>
         @else
@@ -54,7 +54,7 @@
     class="flex items-center gap-1.5 text-gray-700 hover:text-[var(--primary-color)] transition-colors select-none">
     @auth('customer')
     <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
-        <img src="{{ auth('customer')- loading="lazy" width="800" height="800">user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+        <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
             alt="User" class="w-full h-full object-cover">
     </div>
     @else
@@ -146,7 +146,7 @@
             @foreach ($relatedProducts as $p)
             <a href="{{ url($p->slug) }}"
               class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-              <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}" alt="product image"
+              <img src="{{ $p->thumbnail_url }}" alt="product image"
                 class="w-8 h-8 rounded object-cover border border-gray-100">
               <span class="truncate">{{ $p->title }}</span>
             </a>
@@ -175,7 +175,7 @@
       @auth('customer')
       <div class="flex items-center gap-3 px-5 py-4 border-b border-coal/10 bg-white">
         <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-ember">
-          <img src="{{ auth('customer')- loading="lazy" width="800" height="800">user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
+          <img src="{{ auth('customer')->user()->profile_url ?? asset('./images/template1/frontend/user.avif') }}"
             class="w-full h-full object-cover">
         </div>
         <div>

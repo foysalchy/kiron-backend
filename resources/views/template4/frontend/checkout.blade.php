@@ -107,7 +107,7 @@
                                         </div>
 
                                         @if ($method->icon)
-                                            <img src="{{ $method- loading="lazy" width="800" height="800">icon_url ?? '' }}" alt="icon" loading="lazy" height="" width=""
+                                            <img src="{{ $method->icon_url ?? '' }}" alt="icon" loading="lazy" height="" width=""
                                                 class="w-6 h-6 md:w-8 md:h-8 object-contain rounded shrink-0" />
                                         @endif
                                     </label>
@@ -134,7 +134,7 @@
                             <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
                                 <!-- Actual Product Image -->
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                    <img src="{{ $item- loading="lazy" width="800" height="800">options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
+                                    <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
                                         alt="{{ $item->name }}"
                                         class="w-full h-full object-cover">
                                 </div>

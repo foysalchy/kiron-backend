@@ -44,7 +44,7 @@
                 <!-- Left: Image Gallery -->
                 <div class="  lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div class="  mb-4 overflow-hidden rounded-xl bg-white border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url }}" alt="{{ $product->title }}"
+                        <img id="mainImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
                             class="m-auto  object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -176,7 +176,7 @@
                                 style="color: {{ $item->sort_order == 1 ? '#00A651' : ($item->sort_order == 2 ? '#3B82F6' : ($item->sort_order == 3 ? '#9333EA' : '#F15A24')) }};">
                                 <div class="shrink-0">
                                     @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item- loading="lazy" width="800" height="800">icon_file) }}" alt="" class="h-5 w-5 object-contain">
+                                        <img src="{{ asset('storage/' . $item->icon_file) }}" alt="" class="h-5 w-5 object-contain">
                                     @else
                                         <i class="{{ $item->icon_url ?? 'fas fa-check-circle' }} h-5 w-5"></i>
                                     @endif
@@ -195,7 +195,7 @@
                                 <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg text-center justify-center">
                                     <div class="text-orange-500 shrink-0">
                                         @if ($card->icon_file)
-                                            <img src="{{ asset('storage/' . $card- loading="lazy" width="800" height="800">icon_file) }}" alt="" class="h-5 w-5 object-contain">
+                                            <img src="{{ asset('storage/' . $card->icon_file) }}" alt="" class="h-5 w-5 object-contain">
                                         @else
                                             <i class="{{ $card->icon_url ?? 'fas fa-star' }} h-5 w-5"></i>
                                         @endif
@@ -409,7 +409,7 @@
                                                         <div
                                                             class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
                                                             <img src="{{ asset('storage/' . $img) }}"
-                                                                onclick="expandReviewImage(this.src, '{{ $review- loading="lazy" width="800" height="800">id }}')"
+                                                                onclick="expandReviewImage(this.src, '{{ $review->id }}')"
                                                                 class="w-full h-full object-cover" alt="Review Image">
                                                         </div>
                                                     @endforeach
@@ -419,7 +419,7 @@
                                                 <div id="expanded-container-{{ $review->id }}"
                                                     class="hidden mb-6 transition-all duration-500">
                                                     <div class="relative inline-block group">
-                                                        <img id="large-view-{{ $review- loading="lazy" width="800" height="800">id }}" src="" alt="Expanded review image"
+                                                        <img id="large-view-{{ $review->id }}" src="" alt="Expanded review image"
                                                             class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
 
                                                         <!-- Close Button -->
@@ -491,7 +491,7 @@
                                     <!-- Thumbnail -->
                                     <div
                                         class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-md overflow-hidden shrink-0 border border-gray-100 p-1 flex items-center justify-center">
-                                        <img src="{{ $rel- loading="lazy" width="800" height="800">thumbnail_url }}" alt="{{ $rel->title }}" loading="lazy"
+                                        <img src="{{ $rel->thumbnail_url }}" alt="{{ $rel->title }}" loading="lazy"
                                             class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                                     </div>
 

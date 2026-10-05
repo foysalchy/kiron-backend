@@ -62,7 +62,7 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2  ">
-                        <img id="mainImage" src="{{ $product- loading="lazy" width="800" height="800">thumbnail_url ?? '' }}" loading="lazy" height="" width=""
+                        <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                             alt="main image" class=" m-auto object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
@@ -313,7 +313,7 @@
             @foreach ($relatedProducts->take(5) as $rel)
                 <a href="{{ url($rel->slug) }}"
                     class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                    <img src="{{ $rel- loading="lazy" width="800" height="800">thumbnail_url ?? '' }}" loading="lazy" height="" width=""
+                    <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
                         alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
                     <div class="min-w-0 flex-1">
                         <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>

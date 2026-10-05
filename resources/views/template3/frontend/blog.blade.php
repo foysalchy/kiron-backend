@@ -32,7 +32,7 @@
 
                     <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
                         @if ($blog->thumbnail_url)
-                            <img src="{{ $blog- loading="lazy" width="800" height="800">thumbnail_url }}" alt="{{ $blog->title }}"
+                            <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         @else
                             <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="Default Image"

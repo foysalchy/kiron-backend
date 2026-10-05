@@ -19,7 +19,7 @@
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex-shrink-0">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
                         class="h-8 sm:h-10 md:h-14 w-auto">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-header">{{ $setup->shop_name ?? 'Shop Name' }}</span>
@@ -82,7 +82,7 @@
                             @foreach ($relatedProducts ?? [] as $p)
                                 <a href="{{ route('shop.index', ['search' => $p->title]) }}"
                                     class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}"
+                                    <img src="{{ $p->thumbnail_url }}"
                                         class="w-6 h-6 rounded object-cover border border-gray-100">
                                     <span class="truncate">{{ $p->title }}</span>
                                 </a>
@@ -370,7 +370,7 @@
         <!-- Drawer Header -->
         <div class="flex items-center justify-between p-5 bg-white border-b border-gray-50">
             @if ($setup && $setup->logo)
-                <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
+                <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="160" height="56"
                     class="h-8 w-auto">
             @else
                 <span class="text-xl font-bold text-black">{{ $setup->shop_name ?? 'Shop Name' }}</span>

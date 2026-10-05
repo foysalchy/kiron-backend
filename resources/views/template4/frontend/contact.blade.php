@@ -189,7 +189,7 @@
                                 onmouseout="this.style.borderColor='#e5e7eb'; this.style.color='inherit'">
 
                                 @if ($social->icon_image)
-                                    <img src="{{ asset('storage/' . $social- loading="lazy" width="800" height="800">icon_image)  ?? '' }}"
+                                    <img src="{{ asset('storage/' . $social->icon_image)  ?? '' }}"
                                         alt="{{ $social->icon_name }}" height="" width="" loading="lazy"
                                         class="h-5 w-5 object-contain group-hover:primary-bg transition-transform">
                                 @else

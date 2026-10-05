@@ -13,7 +13,7 @@
         <div class="container mx-auto flex items-center justify-between gap-4">
             <div class="flex-shrink-0">
                 <a href="{{ route('home') }}" aria-label="Little Joy Baby Shop Home">
-                    <img src="{{ $setup- loading="lazy" width="800" height="800">logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
                         alt="{{ $setup->shop_name ?? 'Little Joy Baby Shop' }} Logo"
                         class="h-12 md:h-16 w-auto object-contain" />
                 </a>
@@ -56,7 +56,7 @@
                             @foreach ($relatedProducts as $p)
                                 <a href="{{ url($p->slug) }}"
                                     class="flex items-center gap-3 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <img src="{{ $p- loading="lazy" width="800" height="800">thumbnail_url }}" height="" width="" alt="product iamge"
+                                    <img src="{{ $p->thumbnail_url }}" height="" width="" alt="product iamge"
                                         class="w-8 h-8 rounded object-cover border border-gray-100">
                                     <span class="truncate">{{ $p->title }}</span>
                                 </a>
