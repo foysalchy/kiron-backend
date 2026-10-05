@@ -162,7 +162,7 @@
                         </div>
                     @else
                         <!-- Guest User Icon -->
-                        <a href="{{ route('user.login') }}" class="flex items-center gap-2 text-header group/login">
+                        <a href="{{ route('user.login') }}" aria-label="Login" class="flex items-center gap-2 text-header group/login">
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-8 w-8 group-hover/login:scale-110 transition-transform" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
