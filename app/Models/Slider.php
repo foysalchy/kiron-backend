@@ -29,6 +29,8 @@ class Slider extends Model
 
 
     protected $hidden = ['deleted_at'];
+    protected $appends = ['image_url', 'mobile_image_url'];
+    
     public static function homepageCacheKeys(): array
     {
         return ['home_sliders'];

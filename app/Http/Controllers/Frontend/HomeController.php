@@ -208,7 +208,7 @@ class HomeController extends FrontendController
         $allSliders = Cache::remember("home_sliders_{$companyId}", $ttl, function () use ($companyId) {
             return Slider::where('company_id', $companyId)
                 ->where('status', Status::Active->value)
-                ->select('id', 'company_id', 'title', 'image', 'url', 'placement')
+                ->select('id', 'company_id', 'title', 'image', 'mobile_image', 'url', 'placement')
                 ->get();
         });
 
