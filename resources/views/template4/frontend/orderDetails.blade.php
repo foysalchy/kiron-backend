@@ -14,7 +14,7 @@
                 <h1 class="text-xl md:text-2xl font-bold text-gray-800">Order Details</h1>
             </div>
             <div class="flex flex-col items-start md:items-end">
-                <span class="px-4 py-1 {{ $order->status_color }} text-white text-md font-bold rounded-lg mb-1">
+                <span class="px-4 py-1 {{ $order->status_color }} text-md font-bold rounded-lg mb-1">
                      {{ \App\Enums\Status::tryFrom($order->status)?->label() ?? 'Draft' }}
                 </span>
                 <p class="text-sm text-gray-500 font-medium">Order Date: {{ $order->created_at->format('d/m/Y') }}</p>
@@ -29,7 +29,7 @@
 
                 <!-- Ordered Products Card -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h3>
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Ordered Items</h2>
 
                     <div class="space-y-4">
                         @foreach ($order->orderDetails as $item)
@@ -45,9 +45,9 @@
 
                                 <div class="flex-1 text-center sm:text-left">
                                     {{-- 2. Safe Title Check --}}
-                                    <h4 class="text-base font-bold text-gray-800 mb-1 leading-tight">
+                                    <p class="text-base font-bold text-gray-800 mb-1 leading-tight">
                                         {{ $item->product->title ?? 'Product Not Available' }}
-                                    </h4>
+                                    </p>
 
                                     @if ($item->variation)
                                         <div class="flex flex-wrap justify-center sm:justify-start gap-2 mb-2">
@@ -97,7 +97,7 @@
 
                 <!-- Order Tracking Section -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs overflow-hidden p-6">
-                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h3>
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-8">Order Tracking</h2>
 
                     <!-- Vertical Timeline -->
                     {{-- The 'before' class creates the vertical line connecting the dots --}}
@@ -203,7 +203,7 @@
                                     <i class="fas fa-truck-moving text-xl"></i>
                                 </div>
                                 <div>
-                                    <h5 class="text-blue-900 font-bold text-sm mb-0.5">Courier Tracking</h5>
+                                    <p class="text-blue-900 font-bold text-sm mb-0.5">Courier Tracking</p>
                                     <p class="text-sm text-blue-700 font-semibold uppercase">
                                         {{ $order->courier_info['courier_name'] ?? 'Courier' }}
                                     </p>
@@ -230,7 +230,7 @@
 
                 <!-- Customer Information -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Customer Information</h2>
                     <div class="space-y-4">
                         <div class="flex items-start ">
                             <div class="w-10 h-10 flex items-center justify-center text-gray-400 shrink-0">
@@ -266,8 +266,8 @@
 
                 <!-- Payment Summary -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
-                        Summary</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-800 mb-6 border-b border-gray-50 pb-3">Payment
+                        Summary</h2>
                     <div class="space-y-4">
                         <div class="flex justify-between text-md text-gray-600 font-medium">
                             <span>Subtotal:</span>
@@ -300,14 +300,14 @@
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($order->grand_total) : number_format($order->grand_total) . ' ' . $setup->currency }}
                             </span>
                         </div>
-                        <p class="text-[11px] text-gray-400 font-bold uppercase mt-2">Method:
+                        <p class="text-[11px] text-gray-600 font-bold uppercase mt-2">Method:
                             {{ str_replace('_', ' ', $order->payment_method ?? 'COD') }}</p>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="bg-white rounded-lg border border-gray-200 shadow-xs p-6">
-                    <h3 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h3>
+                    <h2 class="text-lg md:text-2xl font-bold text-gray-900 mb-6">Action</h2>
                     <div class="space-y-3">
                         <a href="{{ route('invoice.download', $order->id) }}"
                             class="w-full py-2.5 bg-white border border-gray-200 rounded-md text-sm text-gray-800 hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-all flex items-center justify-center gap-3">
@@ -590,4 +590,3 @@
         });
     </script>
 @endpush
-

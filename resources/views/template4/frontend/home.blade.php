@@ -82,26 +82,25 @@
                         black 46px);
             }
             .mainHeroSwiper .swiper-pagination-bullet {
-                width: 8px !important;
-                height: 8px !important;
-                margin: 0 6px !important;
+                width: 48px !important;
+                height: 48px !important;
+                margin: 0 !important;
             }
         }
     </style>
     <style>
         .mainHeroSwiper .swiper-pagination-bullet {
-            width: 12px !important;
-            height: 12px !important;
-            background: #ffffff !important;
+            width: 48px !important;
+            height: 48px !important;
+            background: transparent !important;
             opacity: 1 !important;
-            margin: 0 12px !important;
+            margin: 0 24px !important;
             position: relative !important;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             transition: all 0.3s ease;
         }
 
         .mainHeroSwiper .swiper-pagination-bullet-active {
-            background: #66267b !important;
+            background: transparent !important;
             transform: scale(1.2);
         }
 
@@ -111,10 +110,27 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 48px;
-            height: 48px;
-            background: transparent;
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             cursor: pointer;
+        }
+
+        .mainHeroSwiper .swiper-pagination-bullet-active::before {
+            background: #66267b;
+        }
+
+        @media (max-width: 640px) {
+            .mainHeroSwiper .swiper-pagination-bullet {
+                margin: 0 !important;
+            }
+
+            .mainHeroSwiper .swiper-pagination-bullet::before {
+                width: 8px;
+                height: 8px;
+            }
         }
     </style>
 @endpush
@@ -362,7 +378,7 @@
                                     @else
                                         {{-- সিঙ্গেল: Discount থাকলে কাটা দামসহ দেখাবে --}}
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
-                                            <span class="line-through text-gray-400 text-xs md:text-sm font-bold">
+                                            <span class="line-through text-gray-600 text-xs md:text-sm font-bold">
                                                 {{ $isLeft ? $currency : '' }}{{ number_format($regularPrice, 0) }}{{ !$isLeft ? $currency : '' }}
                                             </span>
                                             <span>

@@ -148,8 +148,9 @@
 
         .shop-logo-row img {
             height: 48px;
-            width: auto;
+            width: 200px;
             object-fit: contain;
+            object-position: left center;
         }
 
         .logo-placeholder {
@@ -312,7 +313,7 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            color: #9ca3af;
+            color: #6b7280;
             margin-top: 4px;
         }
 
@@ -367,11 +368,11 @@
         }
 
         .summary-row.discount {
-            color: #16a34a;
+            color: #15803d;
         }
 
         .summary-row.discount span:last-child {
-            color: #16a34a;
+            color: #15803d;
         }
 
         .summary-divider {
@@ -396,7 +397,7 @@
         .summary-total .amount {
             font-size: 24px;
             font-weight: 700;
-            color: #FF6A00;
+            color: #C2410C;
         }
 
         /* ── Footer Info ── */
@@ -467,7 +468,7 @@
 
         .thankyou p:last-child {
             font-size: 13px;
-            color: #9ca3af;
+            color: #6b7280;
             font-weight: 500;
             margin-top: 4px;
         }
@@ -628,7 +629,7 @@
     </div>
 
     <!-- Page -->
-    <div class="page-wrapper">
+    <main class="page-wrapper">
         <div id="invoice-content" class="invoice-card">
             <div class="invoice-inner">
 
@@ -637,7 +638,8 @@
                     <div>
                         <div class="shop-logo-row">
                             @if ($setup->logo)
-                                <img src="{{ $setup->logo_url }}">
+                                <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name }} logo"
+                                    width="200" height="48">
                             @else
                                 <div class="logo-placeholder">
                                     <span>{{ substr($setup->shop_name, 0, 1) }}</span>
@@ -777,10 +779,9 @@
                         <p>Thank you for shopping with {{ $setup->shop_name }}.</p>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>

@@ -41,16 +41,16 @@
                                             <!-- Product Name Link -->
                                             <a href="{{ url($item->options->slug ?? $item->id) }}"
                                                 class="cursor-pointer group">
-                                                <h4
+                                                <h3
                                                     class="text-base md:text-lg lg:text-xl font-bold text-gray-900 truncate  transition-colors">
                                                     {{ $item->name }}
-                                                </h4>
+                                                </h3>
                                             </a>
                                             <p class="text-xs md:text-sm text-gray-500 mt-0.5">{{ $item->options->variant ?? '' }}
                                             </p>
 
                                             <a href="{{ route('cart.remove', $item->rowId) }}"
-                                                class="remove-btn text-xs md:text-sm text-red-500 hover:text-red-700 flex items-center gap-1 mt-1.5 md:mt-2 transition font-medium focus:outline-none">
+                                                class="remove-btn text-xs md:text-sm text-red-700 hover:text-red-800 flex items-center gap-1 mt-1.5 md:mt-2 transition font-medium focus:outline-none">
                                                 <svg class="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor"
                                                     stroke-width="2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -131,7 +131,7 @@
                         <!-- Tax & Discount -->
                         <div class="space-y-2 py-3 border-b border-gray-100">
                             @if ($discount > 0)
-                                <div class="flex justify-between items-center text-green-600">
+                                <div class="flex justify-between items-center text-green-700">
                                     <span class="text-sm md:text-base">Discount ({{ session('coupon')['coupon_code'] }})</span>
                                     <span class="text-sm md:text-base font-bold">-
                                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($discount) : number_format($discount) . ' ' . $setup->currency }}

@@ -15,13 +15,33 @@
         $reviews = $product->reviews;
         $avgRating = $reviews->avg('rating') ?? 0;
         $totalReviews = $reviews->count();
-      @endphp
+
+        $secondaryColor = str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#000000');
+        $secondaryHex = ltrim($secondaryColor, '#');
+        if (preg_match('/^[0-9a-fA-F]{3}$/', $secondaryHex)) {
+            $secondaryHex = implode('', array_map(fn ($digit) => $digit . $digit, str_split($secondaryHex)));
+        }
+
+        $orderButtonTextColor = trim($themeColor->theme_template['secondary_text_color'] ?? '#18130F');
+        if (preg_match('/^[0-9a-fA-F]{6}$/', $secondaryHex)) {
+            $rgb = array_map(
+                fn ($channel) => hexdec($channel) / 255,
+                str_split($secondaryHex, 2)
+            );
+            $linearRgb = array_map(
+                fn ($channel) => $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4,
+                $rgb
+            );
+            $luminance = 0.2126 * $linearRgb[0] + 0.7152 * $linearRgb[1] + 0.0722 * $linearRgb[2];
+            $orderButtonTextColor = $luminance > 0.179 ? '#18130F' : '#FFFFFF';
+        }
+    @endphp
 
     <!-- ============ FOOD DETAILS ============ -->
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 lg:py-20">
 
         <!-- Dynamic Breadcrumb -->
-        <div class="mb-6 flex items-center gap-2 text-sm text-smoke overflow-x-auto whitespace-nowrap no-scrollbar">
+        <div class="mb-6 flex items-center gap-2 text-sm text-gray-700 overflow-x-auto whitespace-nowrap no-scrollbar">
             <a href="{{ url('/') }}" class="hover:text-[var(--primary-color)] transition-colors">Home</a>
 
             @php $mega = $product->mega_categories?->first(); @endphp
@@ -71,9 +91,11 @@
                     <div id="thumbnail-container"
                         class="flex gap-3 md:gap-4 overflow-x-auto no-scrollbar pb-1 w-full min-w-0 scroll-smooth cursor-grab active:cursor-grabbing {{ count($allProductImages) > 3 ? 'px-8 md:px-10' : '' }}">
                         @foreach ($allProductImages as $index => $imgUrl)
-                            <button onclick="changeImage('{{ $imgUrl }}')"
+                            <button type="button" aria-label="View product image {{ $index + 1 }}"
+                                onclick="changeImage('{{ $imgUrl }}')"
                                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
                                 <img src="{{ $imgUrl }}"
+                                    alt="{{ $product->title }} image {{ $index + 1 }}"
                                     onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
                                     class="w-full h-full object-cover pointer-events-none">
                             </button>
@@ -104,7 +126,7 @@
                         @endfor
                     </div>
                     <span class="text-sm font-medium">{{ number_format($avgRating, 1) }}</span>
-                    <span class="text-sm text-smoke">({{ $totalReviews }} Reviews)</span>
+                    <span class="text-sm text-gray-700">({{ $totalReviews }} Reviews)</span>
                 </div>
 
                 <h1 class="font-display font-semibold text-4xl sm:text-5xl text-coal leading-tight mb-2">
@@ -119,7 +141,7 @@
                         @endif
                     </span>
                     <span id="main-regular-price"
-                        class="text-smoke line-through ml-1.5 text-base {{ $product->display_price_data->regular_price > $product->display_price_data->sale_price ? '' : 'hidden' }}">
+                        class="text-gray-600 line-through ml-1.5 text-base {{ $product->display_price_data->regular_price > $product->display_price_data->sale_price ? '' : 'hidden' }}">
                         @if(($setup->currency_position ?? 'left') == 'left')
                             {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                         @else
@@ -128,7 +150,7 @@
                     </span>
                 </p>
 
-                <div class="text-smoke leading-relaxed mb-8">
+                <div class="text-gray-700 leading-relaxed mb-8">
                     {!! $product->short_description ?? 'No detailed description available for this product.' !!}
                 </div>
 
@@ -156,6 +178,7 @@
 
                         <!-- Wishlist Button -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
+                            aria-label="{{ $isWishlisted ? 'Remove ' . $product->title . ' from wishlist' : 'Add ' . $product->title . ' to wishlist' }}"
                             class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
             {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
                             <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
@@ -171,7 +194,8 @@
                     <div class="flex items-center gap-3 sm:contents">
 
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                            class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 text-secondary rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                            style="color: {{ $orderButtonTextColor }} !important;"
+                            class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                             Order Now
                         </button>
 
@@ -280,9 +304,9 @@
             container.innerHTML = '';
             images.forEach((img, i) => {
                 container.innerHTML += `
-              <button onclick="changeImage('${img}')"
+              <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
-                <img src="${img}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
+                <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
               </button>`;
             });
 
@@ -579,11 +603,13 @@
                     if (data.status === 'unauthorized') {
                         toastr.warning(data.message);
                     } else if (data.status === 'added') {
+                        btnWish.setAttribute('aria-label', 'Remove ' + @json($product->title) + ' from wishlist');
                         btnWish.classList.add('border-[var(--primary-color)]', 'text-[var(--primary-color)]', 'bg-[var(--primary-color)]/5');
                         btnWish.classList.remove('border-coal/15', 'text-coal');
                         wishIcon.setAttribute('fill', '#D6431F');
                         toastr.success(data.message);
                     } else {
+                        btnWish.setAttribute('aria-label', 'Add ' + @json($product->title) + ' to wishlist');
                         btnWish.classList.remove('border-[var(--primary-color)]', 'text-[var(--primary-color)]', 'bg-[var(--primary-color)]/5');
                         btnWish.classList.add('border-coal/15', 'text-coal');
                         wishIcon.setAttribute('fill', 'none');

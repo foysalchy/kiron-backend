@@ -21,12 +21,12 @@
 
             {{-- Current Blog Title --}}
             <i class="fas fa-chevron-right text-[8px] opacity-40"></i>
-            <span class="text-secondary font-bold truncate max-w-[200px] md:max-w-none" title="{{ $blog->title }}">
+            <span class="text-gray-900 font-bold truncate max-w-[200px] md:max-w-none" title="{{ $blog->title }}">
                 {{ $blog->title }}
             </span>
         </nav>
 
-        <a class="inline-flex items-center text-secondary hover:text-primary mb-6 font-medium" href="{{ route('blog.index') }}">
+        <a class="inline-flex items-center text-gray-900 hover:text-primary mb-6 font-medium" href="{{ route('blog.index') }}">
             <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
         </a>
 
@@ -38,7 +38,7 @@
 
                     <!-- Featured Image: Dynamic -->
                     <div class="relative">
-                        <img src="{{ $blog->thumbnail_url ?? '' }}" loading="lazy" height="" width=""
+                        <img src="{{ $blog->thumbnail_url ?? '' }}" loading="lazy" width="1200" height="550"
                             alt="{{ $blog->title }}" class="w-full h-auto max-h-[550px] object-cover"
                             onerror="this.onerror=null;this.src='{{ $blog->thumbnail_url ?? '' }}';">
 

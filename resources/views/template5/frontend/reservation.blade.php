@@ -15,7 +15,7 @@
         <h1 class="font-display font-semibold text-4xl sm:text-5xl mt-3 mb-4 text-black">
             Book a Table
         </h1>
-        <p class="text-[var(--lumina-smoke)] max-w-lg mx-auto text-sm leading-relaxed">
+        <p class="text-gray-700 max-w-lg mx-auto text-sm leading-relaxed">
             Reserve your spot for an unforgettable dining experience. Choose your date, time, and table preferences below.
         </p>
     </div>
@@ -26,7 +26,7 @@
     
     <div class="flex border-b border-gray-200 mb-8 max-w-xs mx-auto md:max-w-none md:mx-0">
         <button type="button" id="tabBook" class="flex-1 md:flex-none px-6 py-3 border-b-2 border-[var(--primary-color)] text-[var(--primary-color)] font-medium text-sm md:text-base">Book a Table</button>
-        <button type="button" id="tabStatus" class="flex-1 md:flex-none px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm md:text-base transition-colors">Check Status</button>
+        <button type="button" id="tabStatus" class="flex-1 md:flex-none px-6 py-3 border-b-2 border-transparent text-gray-700 hover:text-gray-900 font-medium text-sm md:text-base transition-colors">Check Status</button>
     </div>
 
     <div id="bookingContainer" class="bg-gray-50/50 rounded-2xl border border-gray-200 p-4 md:p-8">
@@ -39,14 +39,14 @@
                 
                 <!-- Card 1: Slot Selection -->
                 <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                    <h3 class="font-semibold text-lg border-b border-gray-100 pb-3 mb-5 flex items-center gap-2">
+                    <h2 class="font-semibold text-lg border-b border-gray-100 pb-3 mb-5 flex items-center gap-2">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Select a Slot
-                    </h3>
+                    </h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                            <label for="res_date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
                             <input type="date" name="reservation_date" id="res_date" required min="{{ date('Y-m-d') }}"
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-colors text-sm">
                         </div>
@@ -56,12 +56,12 @@
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-colors text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
+                            <label for="res_time" class="block text-sm font-medium text-gray-700 mb-2">Start Time</label>
                             <input type="time" name="start_time" id="res_time" required
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-colors text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
+                            <label for="res_end_time" class="block text-sm font-medium text-gray-700 mb-2">End Time</label>
                             <input type="time" name="end_time" id="res_end_time" required
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] transition-colors text-sm">
                         </div>
@@ -471,16 +471,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function switchTab(activeTab) {
         if (activeTab === 'book') {
             tabBook.classList.add('border-[var(--primary-color)]', 'text-[var(--primary-color)]');
-            tabBook.classList.remove('border-transparent', 'text-gray-500');
+            tabBook.classList.remove('border-transparent', 'text-gray-700');
             tabStatus.classList.remove('border-[var(--primary-color)]', 'text-[var(--primary-color)]');
-            tabStatus.classList.add('border-transparent', 'text-gray-500');
+            tabStatus.classList.add('border-transparent', 'text-gray-700');
             bookingContainer.classList.remove('hidden');
             statusContainer.classList.add('hidden');
         } else {
             tabStatus.classList.add('border-[var(--primary-color)]', 'text-[var(--primary-color)]');
-            tabStatus.classList.remove('border-transparent', 'text-gray-500');
+            tabStatus.classList.remove('border-transparent', 'text-gray-700');
             tabBook.classList.remove('border-[var(--primary-color)]', 'text-[var(--primary-color)]');
-            tabBook.classList.add('border-transparent', 'text-gray-500');
+            tabBook.classList.add('border-transparent', 'text-gray-700');
             statusContainer.classList.remove('hidden');
             bookingContainer.classList.add('hidden');
         }
@@ -581,4 +581,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endpush
-

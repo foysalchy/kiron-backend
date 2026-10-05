@@ -25,9 +25,10 @@
                 <div class="relative z-30">
                     <input type="text" name="search" id="header-search-input" autocomplete="off"
                         placeholder="Search by product name"
-                        class="w-full py-3 px-6 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100 shadow-sm" />
+                        class="w-full py-3 pl-6 pr-16 rounded-full text-gray-700 focus:outline-none bg-white border border-gray-100 shadow-sm" />
                     <button type="submit"
-                        class="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-header">
+                        aria-label="Submit product search"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-gray-600 hover:text-header">
                         <i class="fa-solid fa-magnifying-glass text-lg"></i>
                     </button>
                 </div>
@@ -69,6 +70,7 @@
 
             <div class="flex items-center gap-3 md:gap-5">
                 <button id="mobile-search-btn"
+                    aria-label="Search"
                     class="lg:hidden w-10 h-10 flex items-center justify-center text-[var(--primary-color)] text-xl bg-white rounded-full">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
@@ -345,7 +347,8 @@
 
                     {{-- যদি সাব-ক্যাটাগরি থাকে তবেই প্লাস আইকন দেখাবে --}}
                     @if ($mega->subCategories->count() > 0)
-                        <button class="accordion-btn p-2 text-gray-900 focus:outline-none" data-target="m-cat-{{ $mega->id }}">
+                        <button class="accordion-btn p-2 text-gray-900 focus:outline-none" data-target="m-cat-{{ $mega->id }}"
+                            aria-label="Toggle {{ $mega->name }} subcategories">
                             <i class="fa-solid fa-plus text-sm font-black"></i>
                         </button>
                     @endif
@@ -363,7 +366,8 @@
                                     </a>
 
                                     @if ($sub->miniCategories->count() > 0)
-                                        <button class="accordion-btn p-2 text-gray-900" data-target="m-sub-{{ $sub->id }}">
+                                        <button class="accordion-btn p-2 text-gray-900" data-target="m-sub-{{ $sub->id }}"
+                                            aria-label="Toggle {{ $sub->name }} categories">
                                             <i class="fa-solid fa-plus text-[10px] font-black"></i>
                                         </button>
                                     @endif
