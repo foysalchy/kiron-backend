@@ -84,7 +84,7 @@
         </h1>
 
         <!-- Supporting text -->
-        <p class="hero-fade-up hero-delay-3 text-white/80 font-body text-base md:text-lg mb-8 max-w-lg leading-relaxed">
+        <p class="hero-fade-up hero-delay-3 text-white font-body text-base md:text-lg mb-8 max-w-lg leading-relaxed">
           Fresh flavors, warm ambience, and a seat always waiting for you. Experience dining redefined.
         </p>
 
@@ -359,7 +359,7 @@
 
       @foreach ($categories->take(8) as $category)
       <button type="button" data-slug="{{ $category->slug }}"
-        class="pill-btn shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-transparent text-smoke border border-coal/15 hover:border-coal/40 whitespace-nowrap">
+        class="pill-btn shrink-0 text-sm font-medium px-4 py-2 rounded-full transition-colors bg-transparent text-gray-700 border border-coal/15 hover:border-coal/40 whitespace-nowrap">
         {{ $category->name }}
       </button>
       @endforeach
@@ -521,7 +521,7 @@
         p.classList.toggle('bg-[var(--primary-color)]', isActive);
         p.classList.toggle('text-white', isActive);
         p.classList.toggle('bg-transparent', !isActive);
-        p.classList.toggle('text-smoke', !isActive);
+        p.classList.toggle('text-gray-700', !isActive);
         p.classList.toggle('border', !isActive);
         p.classList.toggle('border-coal/15', !isActive);
       });
