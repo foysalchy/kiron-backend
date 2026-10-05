@@ -456,14 +456,16 @@ class ProductController extends FrontendController
             );
         }
 
-        $trustBadges = ContentSetting::where('status', Status::Active->value)
-            ->whereIn('page_type', [
-                ContentSetting::PAGE_PRODUCT,
-                ContentSetting::PAGE_ALL,
-                ContentSetting::PAGE_PRODUCT_SUB,
-            ])
-            ->ordered()
-            ->get();
+        $trustBadges = \Illuminate\Support\Facades\Cache::remember('trust_badges_product', now()->addHours(24), function () {
+            return ContentSetting::where('status', Status::Active->value)
+                ->whereIn('page_type', [
+                    ContentSetting::PAGE_PRODUCT,
+                    ContentSetting::PAGE_ALL,
+                    ContentSetting::PAGE_PRODUCT_SUB,
+                ])
+                ->ordered()
+                ->get();
+        });
 
 
         $allProductImages = [];

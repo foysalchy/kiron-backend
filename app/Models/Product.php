@@ -112,6 +112,17 @@ class Product extends Model
             'home_all_products',
         ];
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($product) {
+            \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$product->slug}");
+        });
+
+        static::deleted(function ($product) {
+            \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$product->slug}");
+        });
+    }
     public static function globalLayoutSections(): array
     {
         return ['related_products', 'all_header_products'];
