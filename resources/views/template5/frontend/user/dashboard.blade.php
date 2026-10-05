@@ -218,8 +218,7 @@
                                                             class="w-full h-full object-cover">
                                                     @else
                                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                                            alt="{{ $item->product->title ?? 'Product image' }}"
-                                                            class="w-full h-full object-cover">
+                                                            class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                                                     @endif
                                                 </div>
                                                 <div class="text-sm">

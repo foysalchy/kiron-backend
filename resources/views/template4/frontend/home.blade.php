@@ -237,13 +237,12 @@
                     <!-- Icon / Image -->
                     <div class="  mb-2 flex items-center justify-center overflow-hidden">
                         @if(!empty($tItem['image']))
-                            <img
-                                src="{{ $tItem['image'] }}"
+                            <img src="{{ $tItem['image'] }}"
                                 alt="{{ $tItem['label'] }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
                                 class="w-full h-[100px] lg:h-[160px] md:h-[160px] object-cover transition-transform duration-300 group-hover:scale-110"
-                            >
+                             width="800" height="800">
                         @else
                             <i class="fas fa-layer-group text-2xl text-gray-400"></i>
                         @endif
@@ -281,8 +280,7 @@
                     <!-- Icon / Image -->
                     <div class="  mb-2 flex items-center justify-center overflow-hidden">
                         @if($category->image_url)
-                            <img
-                                src="{{ $category->image_url }}"
+                            <img src="{{ $category->image_url }}"
                                 alt="{{ $category->name }}"
                                 loading="lazy"
                                 onerror="this.style.display='none'"
@@ -348,8 +346,7 @@
                         <div
                             class="w-[110px] md:w-[75px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                              <img
-                                    src="{{ $product->thumbnail_url }}"
+                              <img src="{{ $product->thumbnail_url }}"
                                     alt="{{ $product->title }}"
                                     class="w-full aspect-square object-cover transform group-hover:scale-110 transition-transform duration-500  "
                                 >

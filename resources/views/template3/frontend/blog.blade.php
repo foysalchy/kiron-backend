@@ -36,7 +36,7 @@
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                         @else
                             <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="Default Image"
-                                class="w-full h-full object-cover">
+                                class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                         @endif
 
                         @php
@@ -104,7 +104,7 @@
             @empty
                 <div class="col-span-full text-center py-20 bg-white rounded-lg border border-dashed">
                     <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png"
-                        class="w-24 h-24 mx-auto opacity-10 mb-4">
+                        class="w-24 h-24 mx-auto opacity-10 mb-4" loading="lazy" width="800" height="800">
                     <h2 class="text-xl font-bold text-gray-400">No blogs found in this category.</h2>
                 </div>
             @endforelse

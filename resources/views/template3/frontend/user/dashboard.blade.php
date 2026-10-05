@@ -222,7 +222,7 @@
                                                     @else
                                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}"
                                                             alt="Product image unavailable"
-                                                            class="w-full h-full object-cover">
+                                                            class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                                                     @endif
                                                 </div>
                                                 <div class="text-sm">

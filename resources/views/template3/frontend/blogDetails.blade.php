@@ -195,7 +195,7 @@
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                     @else
                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="blog image"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform">
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" width="800" height="800">
                                     @endif
                                 </div>
                                 <div>

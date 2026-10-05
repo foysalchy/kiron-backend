@@ -44,26 +44,21 @@
         {!! $market->domain_verify !!}
 @endif
 @if($market && !empty($market->google_measurement_id))
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $market->google_measurement_id }}"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', '{{ $market->google_measurement_id }}');
     </script>
 @endif
 @if($market && !empty($market->facebook_pixel_id))
-    <!-- Facebook Pixel Code -->
     <script>
         !function(f,b,e,v,n,t,s)
         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
         n.callMethod.apply(n,arguments):n.queue.push(arguments)};
         if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
+        n.queue=[];}(window, document,'script');
+        
         fbq('init', '{{ $market->facebook_pixel_id }}', {!! $fbUserDataJson !!});
         fbq('track', 'PageView');
     </script>
@@ -71,7 +66,35 @@
         <img height="1" width="1" style="display:none"
              src="https://www.facebook.com/tr?id={{ $market->facebook_pixel_id }}&ev=PageView&noscript=1"/>
     </noscript>
-    <!-- End Facebook Pixel Code -->
-
-   
 @endif
+
+<script>
+    let _pixelsLoaded = false;
+    function loadTrackingScripts() {
+        if(_pixelsLoaded) return;
+        _pixelsLoaded = true;
+
+        @if($market && !empty($market->google_measurement_id))
+        var g = document.createElement('script');
+        g.async = true;
+        g.src = 'https://www.googletagmanager.com/gtag/js?id={{ $market->google_measurement_id }}';
+        document.head.appendChild(g);
+        @endif
+
+        @if($market && !empty($market->facebook_pixel_id))
+        var t = document.createElement('script');
+        t.async = true;
+        t.src = 'https://connect.facebook.net/en_US/fbevents.js';
+        var s = document.getElementsByTagName('script')[0];
+        if(s && s.parentNode){ s.parentNode.insertBefore(t,s); } else { document.head.appendChild(t); }
+        @endif
+    }
+
+    // Load scripts as soon as the user interacts with the page (scroll, click, mousemove, touch)
+    window.addEventListener('scroll', loadTrackingScripts, {once: true, passive: true});
+    window.addEventListener('mousemove', loadTrackingScripts, {once: true, passive: true});
+    window.addEventListener('touchstart', loadTrackingScripts, {once: true, passive: true});
+    
+    // Fallback: If user does nothing, load them automatically after 4 seconds
+    setTimeout(loadTrackingScripts, 4000);
+</script>

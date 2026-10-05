@@ -49,7 +49,7 @@ class PartyService
                         // Customer Due to Receive
                         $query->where(function ($q) {
                             $q->where('due_amount', '>', 0)
-                              ->orWhereRaw('(balance + 0) < 0');
+                                ->orWhereRaw('(balance + 0) < 0');
                         });
                     } elseif ($filters['balance'] === 'pay') {
                         // Customer Advance / Store Credit
@@ -60,7 +60,7 @@ class PartyService
                         // Supplier Due to Pay
                         $query->where(function ($q) {
                             $q->where('due_amount', '>', 0)
-                              ->orWhereRaw('(balance + 0) < 0');
+                                ->orWhereRaw('(balance + 0) < 0');
                         });
                     } elseif ($filters['balance'] === 'receive') {
                         // Supplier Advance Given
@@ -70,7 +70,7 @@ class PartyService
                     if ($filters['balance'] === 'receive' || $filters['balance'] === 'pay') {
                         $query->where(function ($q) {
                             $q->where('due_amount', '>', 0)
-                              ->orWhereRaw('(balance + 0) != 0');
+                                ->orWhereRaw('(balance + 0) != 0');
                         });
                     }
                 }
@@ -115,9 +115,19 @@ class PartyService
     public function getProfileWithLog(int $id): Party
     {
         $party = Party::select([
-            'id', 'company_id', 'type', 'name', 'email', 'phone', 
-            'alternative_phone', 'address', 'balance', 'due_amount', 
-            'credit_limit', 'status', 'created_at'
+            'id',
+            'company_id',
+            'type',
+            'name',
+            'email',
+            'phone',
+            'alternative_phone',
+            'address',
+            'balance',
+            'due_amount',
+            'credit_limit',
+            'status',
+            'created_at'
         ])->with([
             'logs.user:id,name',
             'orders' => fn($q) => $q->latest()->select([
@@ -140,9 +150,19 @@ class PartyService
     public function getSupplierProfile(int $id): Party
     {
         $party = Party::select([
-            'id', 'company_id', 'type', 'name', 'email', 'phone', 
-            'alternative_phone', 'address', 'balance', 'due_amount', 
-            'credit_limit', 'status', 'created_at'
+            'id',
+            'company_id',
+            'type',
+            'name',
+            'email',
+            'phone',
+            'alternative_phone',
+            'address',
+            'balance',
+            'due_amount',
+            'credit_limit',
+            'status',
+            'created_at'
         ])->with([
             'logs.user:id,name',
             'purchases' => fn($q) => $q->latest()
@@ -174,7 +194,7 @@ class PartyService
         try {
             // Handle profile upload
             if (isset($data['profile'])) {
-                $customFileName = Str::slug($data['name'] ?? 'party') . '_' . time();
+                $customFileName = Str::slug($data['name'] ?? 'party') . '-' . time();
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'parties/profiles',
@@ -221,7 +241,7 @@ class PartyService
 
             // Handle profile upload
             if (isset($data['profile'])) {
-                $customFileName = Str::slug($data['name'] ?? $party->name ?? 'party') . '_' . time();
+                $customFileName = Str::slug($data['name'] ?? $party->name ?? 'party') . '-' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $data['profile'],
                     $party->profile,

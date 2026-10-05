@@ -154,9 +154,9 @@ class LeaveApplicationService
             if (isset($data['documents']) && is_array($data['documents'])) {
                 $uploadedDocs = [];
                 foreach ($data['documents'] as $index => $doc) {
-                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? 'emp') . '_' . ($index + 1) . '_' . time();
+                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? 'emp') . '_' . ($index + 1) . '-' . time();
                     $uploadedDocs[] = FileUploadHelper::upload(
-                        $doc, 
+                        $doc,
                         'leaves/documents',
                         'r2',
                         false,
@@ -245,9 +245,9 @@ class LeaveApplicationService
 
                 $uploadedDocs = [];
                 foreach ($data['documents'] as $index => $doc) {
-                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? $application->employee_id ?? 'emp') . '_' . ($index + 1) . '_' . time();
+                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? $application->employee_id ?? 'emp') . '_' . ($index + 1) . '-' . time();
                     $uploadedDocs[] = FileUploadHelper::upload(
-                        $doc, 
+                        $doc,
                         'leaves/documents',
                         'r2',
                         false,
@@ -319,81 +319,81 @@ class LeaveApplicationService
             throw ApiException::serverError('Failed to change status');
         }
     }
-public function getLeaveBalances(array $filters = []): LengthAwarePaginator
-{
-    try {
-        $user = auth()->user();
-        $isSuperAdmin = $user->is_super_admin==1;
-        $companyId = $user->company_id;
+    public function getLeaveBalances(array $filters = []): LengthAwarePaginator
+    {
+        try {
+            $user = auth()->user();
+            $isSuperAdmin = $user->is_super_admin == 1;
+            $companyId = $user->company_id;
 
-        $query = Employee::query()
-            ->withoutGlobalScopes()
-            ->whereNull('employees.deleted_at')
-            ->join('departments', 'employees.department_id', '=', 'departments.id')
-            ->join('assign_leave_types', 'employees.position_id', '=', 'assign_leave_types.position_id')
-            ->join('leave_types', 'assign_leave_types.leave_type_id', '=', 'leave_types.id')
-            ->select(
-                'employees.id as employee_id',
-                DB::raw("CONCAT(employees.first_name, ' ', COALESCE(employees.last_name, '')) as employee_name"),
-                'departments.name as department_name',
-                'leave_types.name as leave_type_name',
-                'leave_types.id as leave_type_id',
-                'assign_leave_types.leave_count as total'
-            );
-
-        if ($isSuperAdmin) {
-            $query->whereNull('employees.company_id');
-        } else {
-            $query->where('employees.company_id', $companyId);
-        }
-
-        if (!empty($filters['employee_id'])) {
-            $query->where('employees.id', $filters['employee_id']);
-        }
-
-        if (!empty($filters['department_id'])) {
-            $query->where('employees.department_id', $filters['department_id']);
-        }
-
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
-            $query->where(function ($q) use ($search) {
-                $q->where('employees.first_name', 'like', "%{$search}%")
-                    ->orWhere('employees.last_name', 'like', "%{$search}%");
-            });
-        }
-
-        $query->orderBy('employees.first_name', 'asc');
-
-        $balances = $query->paginate($filters['per_page'] ?? 15);
-
-        $activeStatuses = [Status::Pending->value, Status::Approved->value];
-
-        foreach ($balances as $balance) {
-            $leaveQuery = LeaveApplication::withoutGlobalScopes()
-                ->where('employee_id', $balance->employee_id)
-                ->where('leave_type_id', $balance->leave_type_id)
-                ->whereIn('status', $activeStatuses)
-                ->whereNull('deleted_at');
+            $query = Employee::query()
+                ->withoutGlobalScopes()
+                ->whereNull('employees.deleted_at')
+                ->join('departments', 'employees.department_id', '=', 'departments.id')
+                ->join('assign_leave_types', 'employees.position_id', '=', 'assign_leave_types.position_id')
+                ->join('leave_types', 'assign_leave_types.leave_type_id', '=', 'leave_types.id')
+                ->select(
+                    'employees.id as employee_id',
+                    DB::raw("CONCAT(employees.first_name, ' ', COALESCE(employees.last_name, '')) as employee_name"),
+                    'departments.name as department_name',
+                    'leave_types.name as leave_type_name',
+                    'leave_types.id as leave_type_id',
+                    'assign_leave_types.leave_count as total'
+                );
 
             if ($isSuperAdmin) {
-                $leaveQuery->whereNull('company_id');
+                $query->whereNull('employees.company_id');
             } else {
-                $leaveQuery->where('company_id', $companyId);
+                $query->where('employees.company_id', $companyId);
             }
 
-            $used = $leaveQuery->sum('duration');
+            if (!empty($filters['employee_id'])) {
+                $query->where('employees.id', $filters['employee_id']);
+            }
 
-            $balance->used = (float) $used;
-            $balance->remaining = (float) max(0, $balance->total - $used);
+            if (!empty($filters['department_id'])) {
+                $query->where('employees.department_id', $filters['department_id']);
+            }
+
+            if (!empty($filters['search'])) {
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('employees.first_name', 'like', "%{$search}%")
+                        ->orWhere('employees.last_name', 'like', "%{$search}%");
+                });
+            }
+
+            $query->orderBy('employees.first_name', 'asc');
+
+            $balances = $query->paginate($filters['per_page'] ?? 15);
+
+            $activeStatuses = [Status::Pending->value, Status::Approved->value];
+
+            foreach ($balances as $balance) {
+                $leaveQuery = LeaveApplication::withoutGlobalScopes()
+                    ->where('employee_id', $balance->employee_id)
+                    ->where('leave_type_id', $balance->leave_type_id)
+                    ->whereIn('status', $activeStatuses)
+                    ->whereNull('deleted_at');
+
+                if ($isSuperAdmin) {
+                    $leaveQuery->whereNull('company_id');
+                } else {
+                    $leaveQuery->where('company_id', $companyId);
+                }
+
+                $used = $leaveQuery->sum('duration');
+
+                $balance->used = (float) $used;
+                $balance->remaining = (float) max(0, $balance->total - $used);
+            }
+
+            return $balances;
+        } catch (\Exception $e) {
+            Log::error('Error fetching leave balances: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to calculate leave balances.');
         }
-
-        return $balances;
-    } catch (\Exception $e) {
-        Log::error('Error fetching leave balances: ' . $e->getMessage());
-        throw ApiException::serverError('Failed to calculate leave balances.');
     }
-}
     public function deleteApplication(int $id): bool
     {
         DB::beginTransaction();

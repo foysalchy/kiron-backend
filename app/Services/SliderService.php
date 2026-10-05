@@ -80,7 +80,7 @@ class SliderService
         try {
             // Handle image upload
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['title'] ?? 'slider') . '_' . time();
+                $customFileName = Str::slug($data['title'] ?? 'slider') . '-' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'sliders/images',
@@ -122,7 +122,7 @@ class SliderService
 
             // Handle image upload
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '_' . time();
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $slider->image,

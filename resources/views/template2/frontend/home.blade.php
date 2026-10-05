@@ -17,13 +17,14 @@
                             <div class="min-w-full h-full">
                                 <a href="{{ $slider->url ?? '#' }}">
                                     <img src="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}"
-                                        class="w-full h-full object-cover" alt="{{ $slider->title }}">
+                                        class="w-full h-full object-cover" alt="{{ $slider->title }}"
+                                        @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                 </a>
                             </div>
                         @empty
                             <div class="min-w-full h-full">
                                 <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
-                                    class="w-full h-full object-cover">
+                                    class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                             </div>
                         @endforelse
                     </div>
@@ -95,7 +96,7 @@
                                     <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/default.webp') }}"
                                         onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
                                         class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
-                                        alt="{{ $tItem['label'] }}">
+                                        alt="{{ $tItem['label'] }}" loading="lazy" width="800" height="800">
                                 </div>
 
                                 <!-- Category Name -->

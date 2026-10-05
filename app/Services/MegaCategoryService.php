@@ -17,7 +17,7 @@ class MegaCategoryService
     public function getAllMegaCategories(array $filters = [], bool $paginate = true, array $columns = ['*']): Collection|LengthAwarePaginator
     {
         try {
-            
+
             $query = MegaCategory::query();
 
             if (isset($filters['status'])) {
@@ -62,7 +62,7 @@ class MegaCategoryService
 
         try {
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '-' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mega',
@@ -100,7 +100,7 @@ class MegaCategoryService
             $category = $this->getMegaCategoryById($id);
 
             if (isset($data['image'])) {
-                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '_' . time();
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '-' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $category->image,

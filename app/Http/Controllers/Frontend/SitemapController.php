@@ -129,7 +129,7 @@ ROBOTS;
 
         $companyId = $currentStore->company_id;
 
-        $llmsContent = Cache::remember("llms_txt_{$companyId}", now()->addHours(6), function () use ($currentStore) {
+        $llmsContent = Cache::remember("llms_txt_{$companyId}", now()->addHours(6), function () use ($currentStore, $companyId) {
             $metaTitle = $currentStore->title ?? $currentStore->shop_name ?? 'Our Shop';
             $metaDescription = $currentStore->description ?? 'Discover our premium products.';
             $shopName = $currentStore->shop_name ?? 'Our Shop';
@@ -139,29 +139,43 @@ ROBOTS;
             $content .= "Description: {$metaDescription}\n";
             $content .= "--- \n\n"; // একটি সেপারেটর লাইন
 
-            $content .= "# LLMS.txt for {$shopName}\n\n";
+            $content .= "# {$shopName}\n\n";
             $content .= "This file provides guidance for Large Language Models (LLMs) and AI crawlers.\n\n";
 
             $content .= "## Site Information\n";
-            $content .= "- **Base URL:** {$url}\n";
-            $content .= "- **Sitemap:** {$url}/sitemap.xml\n";
+            $content .= "- **Base URL:** [{$url}]({$url})\n";
+            $content .= "- **Sitemap:** [Sitemap.xml]({$url}/sitemap.xml)\n";
             $content .= "- **Meta Title:** {$metaTitle}\n";
             $content .= "- **Meta Description:** {$metaDescription}\n\n";
 
             $content .= "## Key Directories\n";
-            $content .= "- **Products:** {$url}/shop\n";
-            $content .= "- **Blogs:** {$url}/blog\n";
-            $content .= "- **Brands:** {$url}/brands\n\n";
+            $content .= "- [Home]({$url})\n";
+            $content .= "- [Shop]({$url}/shop)\n";
+            $content .= "- [Blogs]({$url}/blog)\n";
+            $content .= "- [Brands]({$url}/brands)\n";
+            $content .= "- [Login]({$url}/login)\n";
+            $content .= "- [Contact Us]({$url}/contact)\n\n";
+
+            $content .= "## Product Categories\n";
+            $categories = MegaCategory::where(function ($q) use ($companyId) {
+                $q->where('company_id', $companyId)
+                  ->orWhereNull('company_id');
+            })->where('status', Status::Active->value)->select('name', 'slug')->get();
+
+            foreach ($categories as $category) {
+                $content .= "- [{$category->name}]({$url}/{$category->slug})\n";
+            }
+            $content .= "\n";
 
             $content .= "## Guidelines\n";
-            $content .= "- Crawlers must respect the instructions in {$url}/robots.txt.\n";
+            $content .= "- Crawlers must respect the instructions in [robots.txt]({$url}/robots.txt).\n";
             $content .= "- Avoid indexing private user dashboards or checkout pages.\n";
             $content .= "- Attribution is required for content used in training sets.";
 
             return $content;
         });
 
-        return response($llmsContent, 200)->header('Content-Type', 'text/plain');
+        return response($llmsContent, 200)->header('Content-Type', 'text/markdown');
     }
     public function googleXml()
     {

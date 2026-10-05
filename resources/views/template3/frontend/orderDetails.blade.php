@@ -392,7 +392,7 @@
 
                 <!-- Product Info -->
                 <div class="flex gap-4 mb-6">
-                    <img id="modal-product-img" src="" alt="Product image" class="w-16 h-16 rounded-lg border object-cover">
+                    <img id="modal-product-img" src="" alt="Product image" class="w-16 h-16 rounded-lg border object-cover" loading="lazy" width="800" height="800">
                     <div>
                         <h3 id="modal-product-name" class="font-bold text-gray-800 text-sm leading-tight"></h3>
                         <p id="modal-product-variant" class="text-xs text-gray-400 mt-1"></p>
@@ -467,7 +467,7 @@
                     reader.onload = (e) => {
                         const div = document.createElement('div');
                         div.className = 'w-16 h-16 rounded-xl border overflow-hidden shrink-0 relative';
-                        div.innerHTML = `<img src="${e.target.result}" alt="Return item image preview" class="w-full h-full object-cover">`;
+                        div.innerHTML = `<img src="${e.target.result}" alt="Return item image preview" class="w-full h-full object-cover" loading="lazy" width="800" height="800">`;
                         container.insertBefore(div, label);
                     };
                     reader.readAsDataURL(file);
@@ -502,7 +502,7 @@
                         div.className =
                             'preview-item w-16 h-16 rounded-xl border border-gray-200 overflow-hidden shrink-0 relative group';
                         div.innerHTML = `
-                    <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover">
+                    <img src="${e.target.result}" alt="Review image preview" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                     <button type="button" onclick="removeReviewImage(this, '${file.name}')"
                         class="absolute top-0 right-0 bg-red-500 text-primary p-1 cursor-pointer">
                         <i class="fas fa-times text-[10px]"></i>

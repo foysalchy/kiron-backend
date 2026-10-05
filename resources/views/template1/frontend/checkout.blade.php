@@ -495,7 +495,7 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     grid.innerHTML = `<div class="relative w-16 h-16 border rounded overflow-hidden">
-                <img src="${e.target.result}" class="w-full h-full object-cover">
+                <img src="${e.target.result}" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
             </div>`;
                 };
                 reader.readAsDataURL(input.files[0]);

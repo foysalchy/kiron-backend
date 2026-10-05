@@ -13,6 +13,21 @@ class ProductVariation extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::saved(function ($variation) {
+            if ($variation->product) {
+                \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$variation->product->slug}");
+            }
+        });
+
+        static::deleted(function ($variation) {
+            if ($variation->product) {
+                \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$variation->product->slug}");
+            }
+        });
+    }
+
     protected $fillable = [
         'product_id',
         'sku',

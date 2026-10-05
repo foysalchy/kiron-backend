@@ -46,20 +46,38 @@ public static function upload(
 
         if ($customFileName) {
             $extension = $file->getClientOriginalExtension();
-            return $file->storeAs($fullFolder, $customFileName . '.' . $extension, $options);
-        }
-
-        if ($preserveName) {
+            $fileName = $customFileName . '.' . $extension;
+        } elseif ($preserveName) {
             $fileName = $file->getClientOriginalName();
-
-            return $file->storeAs(
-                $fullFolder,
-                $fileName,
-                $options
-            );
+        } else {
+            $fileName = $file->hashName();
         }
 
-        return $file->store($fullFolder, $options);
+        $isImage = str_starts_with($file->getMimeType(), 'image/');
+        $isSvg = strtolower($file->getClientOriginalExtension()) === 'svg';
+        $isWebp = strtolower($file->getClientOriginalExtension()) === 'webp';
+
+        // Convert image to WebP if it's not SVG and not already WebP
+        if ($isImage && !$isSvg && class_exists('\Intervention\Image\ImageManager')) {
+            try {
+                // Use Intervention Image v4 syntax
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->decodePath($file->getRealPath());
+                $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
+
+                $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+                $fileName = $fileNameWithoutExt . '.webp';
+                $fullPath = "{$fullFolder}/{$fileName}";
+
+                Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
+                return $fullPath;
+            } catch (\Exception $e) {
+                Log::error('WebP conversion failed, falling back to original', ['error' => $e->getMessage()]);
+                return $file->storeAs($fullFolder, $fileName, $options);
+            }
+        }
+
+        return $file->storeAs($fullFolder, $fileName, $options);
 
     } catch (\Exception $e) {
         Log::error('File upload failed', [

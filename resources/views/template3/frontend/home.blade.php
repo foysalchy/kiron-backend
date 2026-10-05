@@ -15,13 +15,13 @@
                         <div class="min-w-full h-full">
                             <a href="{{ $slider->url ?? '#' }}">
                                 <img src="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
-                                 height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}">
+                                 height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                             </a>
                         </div>
                     @empty
                         <div class="min-w-full h-full">
                             <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="default image"
-                              height="" width=""   class="w-full h-full object-cover">
+                              height="" width=""   class="w-full h-full object-cover" loading="lazy">
                         </div>
                     @endforelse
                 </div>
@@ -343,7 +343,7 @@
                                             alt="{{ $review->customer->name }}">
                                     @else
                                         <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" height="" width=""
-                                            src="https://ui-avatars.com/api/?name={{ urlencode($review->customer->name ?? 'User') }}&background=random"
+                                            src="https://ui-avatars.com/api/?name={{ urlencode($review- loading="lazy">customer->name ?? 'User') }}&background=random"
                                             alt="User">
                                     @endif
                                 </div>

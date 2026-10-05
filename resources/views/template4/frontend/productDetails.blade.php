@@ -53,7 +53,7 @@
                                 <button aria-label="View product image"
                                     class="thumb-btn border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                     onclick="changeImage('{{ $imgUrl }}', this)">
-                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover" alt="Product thumbnail" />
+                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover" alt="Product thumbnail" / loading="lazy" width="800" height="800">
                                 </button>
                             @endforeach
                         </div>
@@ -383,7 +383,7 @@
                 container.innerHTML += `
                         <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('${imgUrl}', this)">
-                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" />
+                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
                         </button>`;
             });
         }
@@ -416,7 +416,7 @@
 
                     // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;

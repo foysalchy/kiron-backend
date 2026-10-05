@@ -10,6 +10,21 @@ class ProductVariationStock extends Model
 {
     use HasFactory;
 
+    protected static function booted()
+    {
+        static::saved(function ($stock) {
+            if ($stock->variation && $stock->variation->product) {
+                \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$stock->variation->product->slug}");
+            }
+        });
+
+        static::deleted(function ($stock) {
+            if ($stock->variation && $stock->variation->product) {
+                \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$stock->variation->product->slug}");
+            }
+        });
+    }
+
     protected $fillable = [
         'product_variation_id',
         'warehouse_id',

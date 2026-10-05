@@ -476,7 +476,7 @@
                     link.className =
                       "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
                     link.innerHTML = `
-                                        <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='${item.thumbnail_url}'">
+                                        <img src="${item.thumbnail_url}" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='${item.thumbnail_url}'" loading="lazy" width="800" height="800">
                                         <span class="truncate">${item.title}</span>
                                     `;
                     config.results.appendChild(link);

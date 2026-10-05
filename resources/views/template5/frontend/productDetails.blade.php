@@ -276,7 +276,7 @@
                         : 'border border-coal/15 text-coal hover:border-[var(--primary-color)]';
 
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-6 h-6 rounded-full object-cover mr-2 inline-block"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" class="w-6 h-6 rounded-full object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${activeClass}">${btnContent}</button>`;
