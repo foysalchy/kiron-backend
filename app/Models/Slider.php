@@ -21,6 +21,7 @@ class Slider extends Model
         'subtitle',
         'description',
         'image',
+        'mobile_image',
         'url',
         'placement',
         'status',
@@ -59,5 +60,14 @@ class Slider extends Model
         return $this->image
             ? Storage::disk('r2')->url($this->image)
             : null;
+    }
+
+    public function getMobileImageUrlAttribute(): ?string
+    {
+        if ($this->mobile_image) {
+            return Storage::disk('r2')->url($this->mobile_image);
+        }
+        
+        return $this->image ? Storage::disk('r2')->url($this->image) : null;
     }
 }

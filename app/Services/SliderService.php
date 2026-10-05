@@ -81,13 +81,40 @@ class SliderService
             // Handle image upload
             if (isset($data['image'])) {
                 $customFileName = Str::slug($data['title'] ?? 'slider') . '-' . time();
+                
+                // 1. Upload Main Image
+                $imageFile = $data['image'];
                 $data['image'] = FileUploadHelper::uploadImage(
-                    $data['image'],
+                    $imageFile,
                     'sliders/images',
                     'r2',
                     2048,
                     $customFileName
                 );
+
+                // 2. Handle Mobile Image
+                if (isset($data['mobile_image'])) {
+                    // Upload user-provided mobile image
+                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $data['mobile_image'] = FileUploadHelper::uploadImage(
+                        $data['mobile_image'],
+                        'sliders/images',
+                        'r2',
+                        2048,
+                        $mobileCustomFileName
+                    );
+                } else {
+                    // Generate mobile image (522x220) from main image
+                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $data['mobile_image'] = FileUploadHelper::uploadResizedWebpImage(
+                        $imageFile,
+                        'sliders/images',
+                        522,
+                        220,
+                        'r2',
+                        $mobileCustomFileName
+                    );
+                }
             }
 
             $slider = Slider::create($data);
@@ -123,10 +150,61 @@ class SliderService
             // Handle image upload
             if (isset($data['image'])) {
                 $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-' . time();
+                
+                $imageFile = $data['image'];
                 $data['image'] = FileUploadHelper::replace(
-                    $data['image'],
+                    $imageFile,
                     $slider->image,
                     'sliders/images',
+                    'r2',
+                    $customFileName
+                );
+
+                // Handle Mobile Image
+                if (isset($data['mobile_image'])) {
+                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $data['mobile_image'] = FileUploadHelper::replace(
+                        $data['mobile_image'],
+                        $slider->mobile_image,
+                        'sliders/images',
+                        'r2',
+                        $mobileCustomFileName
+                    );
+                } else {
+                    // Generate mobile image from new main image
+                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    
+                    if ($slider->mobile_image) {
+                        FileUploadHelper::delete($slider->mobile_image);
+                    }
+
+                    $data['mobile_image'] = FileUploadHelper::uploadResizedWebpImage(
+                        $imageFile,
+                        'sliders/images',
+                        522,
+                        220,
+                        'r2',
+                        $mobileCustomFileName
+                    );
+                }
+            } elseif (isset($data['mobile_image'])) {
+                // If only mobile image is updated
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-' . time();
+                $data['mobile_image'] = FileUploadHelper::replace(
+                    $data['mobile_image'],
+                    $slider->mobile_image,
+                    'sliders/images',
+                    'r2',
+                    $customFileName
+                );
+            } elseif (empty($slider->mobile_image) && !empty($slider->image)) {
+                // If NO image/mobile_image provided, but mobile_image is empty, generate from existing
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-' . time();
+                $data['mobile_image'] = FileUploadHelper::generateResizedFromExisting(
+                    $slider->image,
+                    'sliders/images',
+                    522,
+                    220,
                     'r2',
                     $customFileName
                 );
@@ -226,6 +304,9 @@ class SliderService
 
             // Delete logo
             FileUploadHelper::delete($slider->image);
+            if ($slider->mobile_image) {
+                FileUploadHelper::delete($slider->mobile_image);
+            }
 
             $slider->forceDelete();
             LogHelper::forceDeleted('slider', $slider->id, $slider->company_id);

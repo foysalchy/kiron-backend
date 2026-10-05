@@ -36,6 +36,7 @@ class UpdateSliderRequest extends UpdateBaseCompanyRequest
                 ],
                 'placement' => ['required', 'string'],
                 'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+                'mobile_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status'      => ['sometimes', 'integer', 'in:0,1'],
             ]
         );
