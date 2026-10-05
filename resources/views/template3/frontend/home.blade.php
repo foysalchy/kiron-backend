@@ -17,7 +17,7 @@
                                 <picture class="block w-full h-full">
                                     <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
                                     <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}">
-                                    <img src="{{ $slider- loading="lazy">image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
+                                    <img src="{{ $slider->image_url ?? asset('images/template1/frontend/1-3-scaled.jpg') }}"
                                      height="" width=""   class="w-full h-full object-cover" alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                 </picture>
                             </a>
@@ -120,7 +120,7 @@
                         </h3>
                     </div>
                     <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $subCat- loading="lazy">image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                        <img src="{{ $subCat->image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                             alt="{{ $subCat->name }}">
                     </div>
                     <a href="{{ url($subCat->slug) }}"
@@ -278,7 +278,7 @@
                                 <picture class="block w-full h-full">
                                     <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
                                     <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
-                                    <img src="{{ $slider- loading="lazy">image_url ?? asset('./images/template1/frontend/default.webp') }}"
+                                    <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
                                         alt="{{ $slider->title }}" loading="lazy" width="641" height="320"
                                         class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
                                 </picture>
@@ -347,11 +347,11 @@
                                 <div class="flex-shrink-0">
                                     @if ($review->customer && $review->customer->image)
                                         <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm"
-                                            src="{{ asset('storage/' . $review- loading="lazy">customer->image) ?? asset('images/template1/frontend/default.webp') }}"
+                                            src="{{ asset('storage/' . $review->customer->image) ?? asset('images/template1/frontend/default.webp') }}"
                                             alt="{{ $review->customer->name }}">
                                     @else
                                         <img class="h-12 w-12 rounded-full object-cover border-2 border-white shadow-sm" height="" width=""
-                                            src="https://ui-avatars.com/api/?name={{ urlencode($review- loading="lazy">customer->name ?? 'User') }}&background=random"
+                                            src="https://ui-avatars.com/api/?name={{ urlencode($review->customer->name ?? 'User') }}&background=random"
                                             alt="User">
                                     @endif
                                 </div>

@@ -272,7 +272,7 @@
     @foreach ($categories->take(8) as $category)
     <a href="{{ url($category->slug) }}" class="bg-white p-3 rounded shadow-[0_-12px_40px_rgba(214,67,31,0.12)] flex flex-col items-center text-center gap-3 group cursor-pointer">
       <div class="w-full h-17 rounded flex items-center justify-center group-hover:ring-1 group-hover:ring-[var(--primary-color)] group-hover:-translate-y-1 transition-all overflow-hidden">
-        <img src="{{ !empty($category- loading="lazy">image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
+        <img src="{{ !empty($category->image) ? $category->image_url : asset('images/template1/frontend/default.webp') }}"
           alt="{{ $category->name }}" class="w-full h-full object-cover">
       </div>
       <div>
