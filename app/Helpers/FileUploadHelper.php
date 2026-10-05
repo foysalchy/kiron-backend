@@ -125,6 +125,107 @@ public static function upload(
         }
     }
 
+    /**
+     * Upload and resize image to specific dimensions as WebP
+     */
+    public static function uploadResizedWebpImage(
+        \Illuminate\Http\UploadedFile $file,
+        string $folder,
+        int $width,
+        int $height,
+        string $disk = 'r2',
+        ?string $customFileName = null
+    ): string {
+        try {
+            $user = auth()->user();
+            $companyId = $user?->company_id;
+            $companyFolder = $companyId === null ? 'admin' : self::getCompanyPrefix((int) $companyId) . "_{$companyId}";
+            $fullFolder = "{$companyFolder}/{$folder}";
+
+            $fileName = $customFileName ? $customFileName . '.webp' : Str::random(40) . '.webp';
+            $fullPath = "{$fullFolder}/{$fileName}";
+
+            $options = ['disk' => $disk];
+            if (in_array($disk, ['r2', 's3', 'public'])) {
+                $options['CacheControl'] = 'public, max-age=31536000, immutable';
+            }
+
+            if (class_exists('\Intervention\Image\ImageManager')) {
+                // v4 syntax
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->decodePath($file->getRealPath());
+                
+                // Crop to exact dimension or scale down
+                $image->cover($width, $height);
+                $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
+                
+                Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
+                return $fullPath;
+            }
+
+            // Fallback if Intervention is somehow missing
+            return self::upload($file, $folder, $disk, false, $customFileName);
+
+        } catch (\Exception $e) {
+            Log::error('Resized image upload failed', [
+                'folder' => $folder,
+                'error' => $e->getMessage()
+            ]);
+            throw ApiException::serverError('Failed to upload resized image');
+        }
+    }
+
+    /**
+     * Generate and upload resized image from an existing path
+     */
+    public static function generateResizedFromExisting(
+        string $existingPath,
+        string $folder,
+        int $width,
+        int $height,
+        string $disk = 'r2',
+        ?string $customFileName = null
+    ): string {
+        try {
+            $user = auth()->user();
+            $companyId = $user?->company_id;
+            $companyFolder = $companyId === null ? 'admin' : self::getCompanyPrefix((int) $companyId) . "_{$companyId}";
+            $fullFolder = "{$companyFolder}/{$folder}";
+
+            $fileName = $customFileName ? $customFileName . '.webp' : Str::random(40) . '.webp';
+            $fullPath = "{$fullFolder}/{$fileName}";
+
+            $options = ['disk' => $disk];
+            if (in_array($disk, ['r2', 's3', 'public'])) {
+                $options['CacheControl'] = 'public, max-age=31536000, immutable';
+            }
+
+            if (class_exists('\Intervention\Image\ImageManager')) {
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $imageContent = Storage::disk($disk)->get($existingPath);
+                
+                if (!$imageContent) {
+                    throw new \Exception("Existing file not found on disk: " . $existingPath);
+                }
+
+                $image = $manager->decode($imageContent);
+                $image->cover($width, $height);
+                $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
+                
+                Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
+                return $fullPath;
+            }
+
+            throw new \Exception("Intervention Image is not installed or available.");
+        } catch (\Exception $e) {
+            Log::error('Generate resized image failed', [
+                'existingPath' => $existingPath,
+                'error' => $e->getMessage()
+            ]);
+            throw ApiException::serverError('Failed to generate resized image');
+        }
+    }
+
     public static function copyFile(string $sourcePath, string $destinationFolder, string $disk = 'r2'): string
     {
         try {

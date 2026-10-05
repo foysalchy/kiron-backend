@@ -36,6 +36,7 @@ class StoreSliderRequest extends BaseCompanyRequest
                 ],
                 'placement' => ['required', 'string'],
                 'image' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+                'mobile_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]
         );
