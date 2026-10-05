@@ -72,7 +72,7 @@
                             <div class="min-w-full h-full">
                                 <a href="{{ $slider->url ?? '#' }}">
                                     <img src="{{ $slider->image_url }}" class="w-full h-full object-cover"
-                                        alt="{{ $slider->title }}">
+                                        alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                 </a>
                             </div>
                         @empty
