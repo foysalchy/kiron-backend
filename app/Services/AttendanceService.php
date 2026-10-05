@@ -54,16 +54,23 @@ class AttendanceService
                 });
             }
 
-            $statsQuery  = clone $query;
-            $allRecords  = $statsQuery->get();
+            $aggregate = (clone $query)->toBase()->select(
+                DB::raw('SUM(CASE WHEN status = ' . Attendance::STATUS_PRESENT . ' THEN 1 ELSE 0 END) as present_count'),
+                DB::raw('SUM(CASE WHEN is_late = 1 THEN 1 ELSE 0 END) as late_count'),
+                DB::raw('SUM(CASE WHEN is_early_out = 1 THEN 1 ELSE 0 END) as early_out_count'),
+                DB::raw('SUM(CASE WHEN status = ' . Attendance::STATUS_ABSENT . ' THEN 1 ELSE 0 END) as absent_count'),
+                DB::raw('SUM(CASE WHEN status = ' . Attendance::STATUS_WEEKEND . ' THEN 1 ELSE 0 END) as weekend_count'),
+                DB::raw('SUM(CASE WHEN status = ' . Attendance::STATUS_LEAVE . ' THEN 1 ELSE 0 END) as leave_count')
+            )->first();
 
             $stats = [
                 'total_employees' => Employee::count(),
-                'present'         => $allRecords->where('status', Attendance::STATUS_PRESENT)->count(),
-                'late'            => $allRecords->where('is_late', true)->count(),
-                'early_out'       => $allRecords->where('is_early_out', true)->count(),
-                'absent'          => $allRecords->where('status', Attendance::STATUS_ABSENT)->count(),
-                'weekend'         => $allRecords->where('status', Attendance::STATUS_WEEKEND)->count(),
+                'present'         => $aggregate->present_count ?? 0,
+                'late'            => $aggregate->late_count ?? 0,
+                'early_out'       => $aggregate->early_out_count ?? 0,
+                'absent'          => $aggregate->absent_count ?? 0,
+                'weekend'         => $aggregate->weekend_count ?? 0,
+                'leave'           => $aggregate->leave_count ?? 0,
             ];
 
             $sortBy    = $filters['sort_by']    ?? 'created_at';
@@ -144,10 +151,22 @@ class AttendanceService
         $failed = 0;
         $errors = [];
 
+        $employeeIds = array_unique(array_column($records, 'employee_id'));
+        $employees = Employee::whereIn('id', $employeeIds)->get()->keyBy('id');
+
+        // Optional: Bulk force delete if all records share the same date (common case)
+        $dates = array_unique(array_column($records, 'date'));
+        if (count($dates) === 1) {
+            Attendance::withTrashed()
+                ->whereIn('employee_id', $employeeIds)
+                ->whereDate('date', $dates[0])
+                ->forceDelete();
+        }
+
         foreach ($records as $index => $data) {
             DB::beginTransaction();
             try {
-                $employee = Employee::find($data['employee_id']);
+                $employee = $employees->get($data['employee_id']);
 
                 if (!$employee) {
                     $failed++;
@@ -156,11 +175,13 @@ class AttendanceService
                     continue;
                 }
 
-                // Remove any existing record (including soft-deleted) for same employee+date
-                Attendance::withTrashed()
-                    ->where('employee_id', $data['employee_id'])
-                    ->whereDate('date', $data['date'])
-                    ->forceDelete();
+                if (count($dates) > 1) {
+                    // Remove any existing record (including soft-deleted) for same employee+date
+                    Attendance::withTrashed()
+                        ->where('employee_id', $data['employee_id'])
+                        ->whereDate('date', $data['date'])
+                        ->forceDelete();
+                }
 
                 $data       = $this->calculateAttendanceMetrics($data, $employee);
                 $attendance = Attendance::create($data);

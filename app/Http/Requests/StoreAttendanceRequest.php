@@ -47,7 +47,8 @@ class StoreAttendanceRequest extends BaseCompanyRequest
                         Attendance::STATUS_WEEKEND,
                         Attendance::STATUS_LATE,
                         Attendance::STATUS_EARLY_OUT,
-                        Attendance::STATUS_HOLIDAY
+                        Attendance::STATUS_HOLIDAY,
+                        Attendance::STATUS_LEAVE
                     ])
                 ],
                 'is_late'      => ['boolean'],

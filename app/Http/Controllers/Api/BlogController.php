@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Helpers\FileUploadHelper;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class BlogController extends Controller
 {
     public function __construct(
@@ -110,13 +111,16 @@ public function uploadImage(Request $request)
         'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
     ]);
 
+    $customFileName = 'blog_image_' . time();
     $path = FileUploadHelper::upload(
         file: $request->file('image'),
         folder: 'blogs/content',
-        disk: 'public'
+        disk: 'r2',
+        compress: false,
+        customFileName: $customFileName
     );
 
-    $url = asset('storage/' . $path);
+    $url = FileUploadHelper::getUrl($path, 'r2');
 
     return response()->json([
         'url' => $url,

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -173,10 +174,13 @@ class PartyService
         try {
             // Handle profile upload
             if (isset($data['profile'])) {
+                $customFileName = Str::slug($data['name'] ?? 'party') . '_' . time();
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'parties/profiles',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
             $data['password'] = Hash::make($data['password']);
@@ -217,10 +221,13 @@ class PartyService
 
             // Handle profile upload
             if (isset($data['profile'])) {
+                $customFileName = Str::slug($data['name'] ?? $party->name ?? 'party') . '_' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $data['profile'],
                     $party->profile,
-                    'parties/profiles'
+                    'parties/profiles',
+                    'r2',
+                    $customFileName
                 );
             }
 

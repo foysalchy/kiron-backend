@@ -14,6 +14,7 @@ use App\Models\CompanySubscription;
 use App\Models\CompanyUpdateRequest;
 use App\Models\ExtraOrderCharge;
 use App\Models\PricingPackage;
+use Illuminate\Support\Str;
 use App\Services\CompanyDeletionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -247,9 +248,13 @@ class CompanyController extends Controller
             // document upload
             $documentPath = null;
             if ($request->hasFile('document')) {
+                $customFileName = 'company_payment_doc_' . time();
                 $documentPath = FileUploadHelper::uploadImage(
                     $request->file('document'),
-                    'payment_documents'
+                    'payment_documents',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 

@@ -10,6 +10,7 @@ use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Str;
 
 class MegaCategoryService
 {
@@ -61,10 +62,13 @@ class MegaCategoryService
 
         try {
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mega',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -96,10 +100,13 @@ class MegaCategoryService
             $category = $this->getMegaCategoryById($id);
 
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $category->image,
-                    'categories/mega'
+                    'categories/mega',
+                    'r2',
+                    $customFileName
                 );
             }
 

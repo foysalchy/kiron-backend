@@ -52,7 +52,7 @@ class AttendanceController extends Controller
             'records.*.in_time'     => ['nullable', 'date_format:H:i'],
             'records.*.out_time'    => ['nullable', 'date_format:H:i', 'after:records.*.in_time'],
             'records.*.grace_time'  => ['nullable', 'integer', 'min:0'],
-            'records.*.status'      => ['required', 'integer', 'in:0,1,2,3,4,5'],
+            'records.*.status'      => ['required', 'integer', 'in:0,1,2,3,4,5,6'],
             'records.*.is_late'     => ['nullable', 'boolean'],
             'records.*.is_early_out' => ['nullable', 'boolean'],
         ]);
@@ -101,7 +101,7 @@ class AttendanceController extends Controller
     public function changeStatus(Request $request, int $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|integer|in:0,1,2,3,4,5',
+            'status' => 'required|integer|in:0,1,2,3,4,5,6',
         ]);
 
         $data = $this->attendanceService->changeAttendanceStatus($id, (int) $request->input('status'));

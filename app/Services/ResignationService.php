@@ -10,6 +10,7 @@ use App\Models\Resignation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Str;
 
 class ResignationService
 {
@@ -70,10 +71,13 @@ class ResignationService
         try {
             // Handle Letter Upload (Image or PDF)
             if (isset($data['letter'])) {
+                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? 'emp') . '_' . time();
                 $data['letter'] = FileUploadHelper::upload(
                     $data['letter'],
                     'resignations/letters',
-
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -114,7 +118,14 @@ class ResignationService
                 if ($resignation->letter) {
                     FileUploadHelper::delete($resignation->letter);
                 }
-                $data['letter'] = FileUploadHelper::upload($data['letter'], 'resignations');
+                $customFileName = 'resign_letter_' . ($data['employee_id'] ?? $resignation->employee_id ?? 'emp') . '_' . time();
+                $data['letter'] = FileUploadHelper::upload(
+                    $data['letter'], 
+                    'resignations',
+                    'r2',
+                    false,
+                    $customFileName
+                );
             }
 
             // 3. Update core data

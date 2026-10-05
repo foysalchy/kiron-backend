@@ -63,9 +63,13 @@ class SubscriptionController extends Controller
 
             $documentPath = null;
             if ($request->hasFile('document')) {
+                $customFileName = 'subscription_doc_' . time();
                 $documentPath = FileUploadHelper::uploadImage(
                     $request->file('document'),
-                    'payment_documents'
+                    'payment_documents',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -124,9 +128,13 @@ class SubscriptionController extends Controller
 
             $documentPath = null;
             if ($request->hasFile('document')) {
+                $customFileName = 'subscription_doc_' . time();
                 $documentPath = FileUploadHelper::uploadImage(
                     $request->file('document'),
-                    'payment_documents'
+                    'payment_documents',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 

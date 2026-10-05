@@ -11,6 +11,7 @@ use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{DB, Log};
 
 class LeaveApplicationService
@@ -152,8 +153,15 @@ class LeaveApplicationService
             // 6. Handle Documents
             if (isset($data['documents']) && is_array($data['documents'])) {
                 $uploadedDocs = [];
-                foreach ($data['documents'] as $doc) {
-                    $uploadedDocs[] = FileUploadHelper::upload($doc, 'leaves/documents');
+                foreach ($data['documents'] as $index => $doc) {
+                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? 'emp') . '_' . ($index + 1) . '_' . time();
+                    $uploadedDocs[] = FileUploadHelper::upload(
+                        $doc, 
+                        'leaves/documents',
+                        'r2',
+                        false,
+                        $customFileName
+                    );
                 }
                 $data['documents'] = $uploadedDocs;
             }
@@ -236,8 +244,15 @@ class LeaveApplicationService
                 }
 
                 $uploadedDocs = [];
-                foreach ($data['documents'] as $doc) {
-                    $uploadedDocs[] = FileUploadHelper::upload($doc, 'leaves/documents');
+                foreach ($data['documents'] as $index => $doc) {
+                    $customFileName = 'leave_doc_' . ($data['employee_id'] ?? $application->employee_id ?? 'emp') . '_' . ($index + 1) . '_' . time();
+                    $uploadedDocs[] = FileUploadHelper::upload(
+                        $doc, 
+                        'leaves/documents',
+                        'r2',
+                        false,
+                        $customFileName
+                    );
                 }
                 $data['documents'] = $uploadedDocs;
             }

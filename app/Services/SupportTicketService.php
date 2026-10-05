@@ -10,6 +10,7 @@ use App\Models\SupportTicket;
 use App\Models\SupportTicketReply;
 use App\Models\User;
 use App\Notifications\TicketAssignedNotification;
+use Illuminate\Support\Str;
 use App\Notifications\TicketCreatedNotification;
 use App\Services\Notification\NotificationRecipientResolver;
 use App\Services\Notification\NotificationService;
@@ -139,10 +140,13 @@ class SupportTicketService
 
         try {
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['subject'] ?? 'ticket') . '_attach_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/attachments',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
             $data['user_id'] = auth()->id();
@@ -184,10 +188,13 @@ class SupportTicketService
             $ticket = $this->getTicketById($id);
 
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['subject'] ?? $ticket->subject ?? 'ticket') . '_attach_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $ticket->image,
-                    'tickets/attachments'
+                    'tickets/attachments',
+                    'r2',
+                    $customFileName
                 );
             }
 
@@ -336,9 +343,13 @@ class SupportTicketService
             }
 
             if (isset($data['image'])) {
+                $customFileName = Str::slug($ticket->subject ?? 'ticket') . '_reply_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'tickets/replies',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 

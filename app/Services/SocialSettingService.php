@@ -10,6 +10,7 @@ use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SocialSettingService
 {
@@ -50,10 +51,13 @@ class SocialSettingService
         try {
 
             if (isset($data['icon_image'])) {
+                $customFileName = Str::slug($data['icon_name'] ?? 'social-icon') . '_' . time();
                 $data['icon_image'] = FileUploadHelper::uploadImage(
                     $data['icon_image'],
                     'social-settings/icons',
-                   
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -88,10 +92,13 @@ class SocialSettingService
             $social = $this->getById($id);
 
             if (isset($data['icon_image'])) {
+                $customFileName = Str::slug($data['icon_name'] ?? $social->icon_name ?? 'social-icon') . '_' . time();
                 $data['icon_image'] = FileUploadHelper::replace(
                     $data['icon_image'],
                     $social->icon_image,
-                    'social-settings/icons'
+                    'social-settings/icons',
+                    'r2',
+                    $customFileName
                 );
             }
 
