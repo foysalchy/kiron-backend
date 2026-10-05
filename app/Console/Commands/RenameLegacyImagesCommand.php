@@ -117,7 +117,7 @@ class RenameLegacyImagesCommand extends Command
         if (!$disk->exists($oldPath)) return $oldPath;
 
         $extension = pathinfo($oldPath, PATHINFO_EXTENSION) ?: 'jpg';
-        $suffix = $index ? "_{$index}_" : '_';
+        $suffix = $index ? "-{$index}-" : '-';
         $newFileName = Str::slug($baseName) . $suffix . time() . '.' . $extension;
         $newPath = $folder . '/' . $newFileName;
 
