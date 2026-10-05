@@ -81,7 +81,7 @@ class SliderService
             // Handle image upload
             if (isset($data['image'])) {
                 $customFileName = Str::slug($data['title'] ?? 'slider') . '-' . time();
-                
+
                 // 1. Upload Main Image
                 $imageFile = $data['image'];
                 $data['image'] = FileUploadHelper::uploadImage(
@@ -95,7 +95,7 @@ class SliderService
                 // 2. Handle Mobile Image
                 if (isset($data['mobile_image'])) {
                     // Upload user-provided mobile image (force resize)
-                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $mobileCustomFileName = Str::slug($data['title'] ?? 'slider') . '-mobile-522x220px-' . time();
                     $data['mobile_image'] = FileUploadHelper::uploadResizedWebpImage(
                         $data['mobile_image'],
                         'sliders/images',
@@ -106,7 +106,7 @@ class SliderService
                     );
                 } else {
                     // Generate mobile image (522x220) from main image
-                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $mobileCustomFileName = Str::slug($data['title'] ?? 'slider') . '-mobile-522x220px-' . time();
                     $data['mobile_image'] = FileUploadHelper::uploadResizedWebpImage(
                         $imageFile,
                         'sliders/images',
@@ -151,7 +151,7 @@ class SliderService
             // Handle image upload
             if (isset($data['image'])) {
                 $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-' . time();
-                
+
                 $imageFile = $data['image'];
                 $data['image'] = FileUploadHelper::replace(
                     $imageFile,
@@ -163,7 +163,7 @@ class SliderService
 
                 // Handle Mobile Image
                 if (isset($data['mobile_image'])) {
-                    $mobileCustomFileName = 'mobile-' . $customFileName;
+                    $mobileCustomFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-522x220px-' . time();
                     $data['mobile_image'] = FileUploadHelper::replaceResizedWebpImage(
                         $data['mobile_image'],
                         $slider->mobile_image,
@@ -175,8 +175,8 @@ class SliderService
                     );
                 } else {
                     // Generate mobile image from new main image
-                    $mobileCustomFileName = 'mobile-' . $customFileName;
-                    
+                    $mobileCustomFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-522x220px-' . time();
+
                     if ($slider->mobile_image) {
                         FileUploadHelper::delete($slider->mobile_image);
                     }
@@ -192,7 +192,7 @@ class SliderService
                 }
             } elseif (isset($data['mobile_image'])) {
                 // If only mobile image is updated (force resize)
-                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-' . time();
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-522x220px-' . time();
                 $data['mobile_image'] = FileUploadHelper::replaceResizedWebpImage(
                     $data['mobile_image'],
                     $slider->mobile_image,
@@ -204,7 +204,7 @@ class SliderService
                 );
             } elseif (empty($slider->mobile_image) && !empty($slider->image)) {
                 // If NO image/mobile_image provided, but mobile_image is empty, generate from existing
-                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-' . time();
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-522x220px-' . time();
                 $data['mobile_image'] = FileUploadHelper::generateResizedFromExisting(
                     $slider->image,
                     'sliders/images',
