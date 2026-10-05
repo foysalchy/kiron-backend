@@ -9,6 +9,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class CustomerPaymentMethod extends Model
 {
     use SoftDeletes;
+    
+    protected static function booted()
+    {
+        static::saved(function ($method) {
+            \Illuminate\Support\Facades\Cache::forget("payment_methods_{$method->company_id}");
+        });
+
+        static::deleted(function ($method) {
+            \Illuminate\Support\Facades\Cache::forget("payment_methods_{$method->company_id}");
+        });
+    }
+
     protected $fillable = [
         'company_id',
         'name',

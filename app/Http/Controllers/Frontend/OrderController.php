@@ -26,8 +26,12 @@ class OrderController extends FrontendController
         if (Cart::count() == 0) {
             return redirect()->route('cart.index')->with('error', 'Your cart is empty!');
         }
-        $paymentMethods = CustomerPaymentMethod::where('company_id', $this->company_id)->where('status', Status::Active->value)
-            ->select(['id', 'company_id', 'name', 'account_number', 'method_details', 'status'])->get();
+        $paymentMethods = \Illuminate\Support\Facades\Cache::remember("payment_methods_{$this->company_id}", 86400, function () {
+            return CustomerPaymentMethod::where('company_id', $this->company_id)
+                ->where('status', Status::Active->value)
+                ->select(['id', 'company_id', 'name', 'account_number', 'method_details', 'status'])
+                ->get();
+        });
 
         $existingDraftId = Session::get('current_draft_order_id');
         $existingDraft   = $existingDraftId
@@ -44,7 +48,12 @@ class OrderController extends FrontendController
             ]);
         }
 
-        $settings = SiteSetting::where('company_id', $this->company_id)->select(['id', 'company_id', 'inside_charge', 'outside_charge'])->first();
+        $settings = \Illuminate\Support\Facades\Cache::remember("site_settings_{$this->company_id}", 86400, function () {
+            return SiteSetting::where('company_id', $this->company_id)
+                ->select(['id', 'company_id', 'inside_charge', 'outside_charge'])
+                ->first();
+        });
+        
         $defaultInside = $settings->inside_charge ?? 60;
         $cartContent = Cart::content();
 

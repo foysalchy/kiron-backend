@@ -12,6 +12,17 @@ use Illuminate\Support\Facades\Storage;
 class SiteSetting extends Model
 {
     use SoftDeletes, CompanyScoped, HasHomepageCache, HasGlobalLayoutCache;
+
+    protected static function booted()
+    {
+        static::saved(function ($setting) {
+            \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
+        });
+
+        static::deleted(function ($setting) {
+            \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
+        });
+    }
     protected $fillable = [
         'company_id',
         'shop_name',

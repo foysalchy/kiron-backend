@@ -29,8 +29,10 @@ class CartController extends FrontendController
         $cartContent = Cart::content();
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
 
-        // Delivery charge – always fetch fresh from DB (no cache)
-        $settings = SiteSetting::where('company_id', $companyId)->first();
+        // Delivery charge – fetched from cache
+        $settings = \Illuminate\Support\Facades\Cache::remember("site_settings_{$companyId}", 86400, function () use ($companyId) {
+            return SiteSetting::where('company_id', $companyId)->first();
+        });
         $defaultInside = $settings->inside_charge ?? 60;
 
         $shipping = session()->get('shipping_cost', $defaultInside);
@@ -66,38 +68,39 @@ class CartController extends FrontendController
 
         $productIds = [];
         foreach ($cartContent as $item) {
-            // ভ্যারিয়েশন আইডি থাকলে মেইন প্রোডাক্ট আইডি বের করা
             $productIds[] = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
         }
 
-        $megaCategoryIds = [];
-        if (!empty($productIds)) {
-            $productsInCart = Product::whereIn('id', $productIds)->get();
-            foreach ($productsInCart as $p) {
-                if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
-                    $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
+        $cacheKey = "cart_related_" . md5(implode('_', $productIds));
+        $relatedProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($productIds) {
+            $megaCategoryIds = [];
+            if (!empty($productIds)) {
+                $productsInCart = Product::whereIn('id', $productIds)->select('id', 'mega_category_ids')->get();
+                foreach ($productsInCart as $p) {
+                    if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
+                        $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
+                    }
                 }
             }
-        }
-        $megaCategoryIds = array_unique($megaCategoryIds);
+            $megaCategoryIds = array_unique($megaCategoryIds);
 
-        // কোয়েরি তৈরি করা
-        $relatedQuery = Product::where('status', Status::Active->value)
-            ->whereNotIn('id', $productIds);
+            $relatedQuery = Product::where('status', Status::Active->value)
+                ->whereNotIn('id', $productIds);
 
-        if (!empty($megaCategoryIds)) {
-            $relatedQuery->where(function ($q) use ($megaCategoryIds) {
-                foreach ($megaCategoryIds as $catId) {
-                    $q->orWhereJsonContains('mega_category_ids', $catId);
-                }
-            });
-        }
+            if (!empty($megaCategoryIds)) {
+                $relatedQuery->where(function ($q) use ($megaCategoryIds) {
+                    foreach ($megaCategoryIds as $catId) {
+                        $q->orWhereJsonContains('mega_category_ids', $catId);
+                    }
+                });
+            }
 
-        // যদি কার্ট খালি থাকে বা রিলেটেড কিছু না পায় তবে লেটেস্ট প্রোডাক্ট দেখাবে
-        $relatedProducts = $relatedQuery->inRandomOrder()->limit(8)->get();
-        if ($relatedProducts->isEmpty()) {
-            $relatedProducts = Product::where('status', Status::Active->value)->latest()->limit(8)->get();
-        }
+            $products = $relatedQuery->inRandomOrder()->limit(8)->get();
+            if ($products->isEmpty()) {
+                $products = Product::where('status', Status::Active->value)->latest()->limit(8)->get();
+            }
+            return $products;
+        });
 
 
         return $this->view(
