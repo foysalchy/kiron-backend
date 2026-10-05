@@ -21,4 +21,3 @@ class ReservationDashboardController extends Controller
         return view('template5.frontend.user.my_reservations', compact('reservations'));
     }
 }
-

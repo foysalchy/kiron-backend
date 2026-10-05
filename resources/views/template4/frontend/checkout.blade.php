@@ -205,13 +205,13 @@
                         <div class="space-y-3">
                             <label class="flex items-center justify-between cursor-pointer text-sm">
                                 <span>Inside Dhaka
-                                    ({{ $setup->currency }}{{ number_format($setup->inside_charge) }})</span>
+                                    ({{ $setup->currency }}{{ number_format($setup->inside_charge, 2) }})</span>
                                 <input type="radio" name="delivery_area" value="inside"
                                     onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
                             <label class="flex items-center justify-between cursor-pointer text-sm">
                                 <span>Outside Dhaka
-                                    ({{ $setup->currency }}{{ number_format($setup->outside_charge) }})</span>
+                                    ({{ $setup->currency }}{{ number_format($setup->outside_charge, 2) }})</span>
                                 <input type="radio" name="delivery_area" value="outside"
                                     onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
                             </label>
@@ -232,7 +232,7 @@
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-sm md:text-base font-medium">Shipping Charge</span>
                             <span class="text-sm md:text-base font-bold text-gray-900">
-                                {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping) }}</span> {{ !$isL ? $setup->currency : '' }}
+                                {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ !$isL ? $setup->currency : '' }}
                             </span>
                         </div>
 
@@ -441,7 +441,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('shipping-display').innerText = data.shipping_cost;
+                        document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toFixed(2);
                         document.getElementById('total-display').innerText = data.grand_total;
 
                         _checkoutTotal = data.grand_total_raw ? data.grand_total_raw : parseFloat(data.grand_total

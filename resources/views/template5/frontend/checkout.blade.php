@@ -117,7 +117,7 @@
                                     onchange="updateCheckoutShipping(this.value)"
                                     {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                 <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                    Regular Delivery(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->inside_charge, 0) }}@else{{ number_format($setup->inside_charge, 0) }} {{ $setup->currency }}@endif)
+                                    Regular Delivery(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->inside_charge, 2) }}@else{{ number_format($setup->inside_charge, 2) }} {{ $setup->currency }}@endif)
                                 </span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
@@ -125,7 +125,7 @@
                                     onchange="updateCheckoutShipping(this.value)"
                                     {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                 <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                    Quick Bite(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->outside_charge, 0) }}@else{{ number_format($setup->outside_charge, 0) }} {{ $setup->currency }}@endif)
+                                    Quick Bite(@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($setup->outside_charge, 2) }}@else{{ number_format($setup->outside_charge, 2) }} {{ $setup->currency }}@endif)
                                 </span>
                             </label>
                         </div>
@@ -225,9 +225,9 @@
                             <span class="text-md font-medium">Delivery Charge:</span>
                             <span class="text-md font-bold text-gray-900">
                                 @if(($setup->currency_position ?? 'left') == 'left')
-                                    {{ $setup->currency }} <span id="shipping-display">{{ number_format($shipping) }}</span>
+                                    {{ $setup->currency }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span>
                                 @else
-                                    <span id="shipping-display">{{ number_format($shipping) }}</span> {{ $setup->currency }}
+                                    <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ $setup->currency }}
                                 @endif
                             </span>
                         </div>
@@ -485,7 +485,7 @@
             .then(data => {
                 if (data.success) {
                     // Update DOM with formatted numbers so the view matches PHP's number_format()
-                    document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toLocaleString();
+                    document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toFixed(2);
                     document.getElementById('total-display').innerText = data.grand_total;
 
                     toastr.success(data.message);
@@ -576,7 +576,7 @@
                     
                     if(subtotalDisplay) subtotalDisplay.innerText = data.subtotal;
                     if(totalDisplay) totalDisplay.innerText = data.total;
-                    if(shippingDisplay) shippingDisplay.innerText = data.shipping;
+                    if(shippingDisplay) shippingDisplay.innerText = Number(data.shipping).toFixed(2);
                     if(discountDisplay) discountDisplay.innerText = data.discount;
                     
                     // Trigger draft save if needed to sync immediately
