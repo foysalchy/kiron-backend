@@ -16,7 +16,7 @@
     'description' => $pageData?->meta_description ?? ('Explore flexible pricing plans for ' . $setup->shop_name . '. Choose the perfect plan for your business with powerful ERP, POS, Inventory, CRM, Accounting, and HRM features.'),
 
     'keywords' => $pageData?->meta_keywords
-        ? implode(',', $pageData->meta_keywords)
+        ? (is_array($pageData->meta_keywords) ? implode(',', $pageData->meta_keywords) : $pageData->meta_keywords)
         : 'pricing, ERP pricing, POS pricing, inventory software pricing, business software',
 
     'image' => $setup->meta_image

@@ -67,16 +67,16 @@
                                     <!-- Qty Controls -->
                                     <div
                                         class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }}, {{ $item->price }})"
                                             class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
-                                        <span class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
-                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+                                        <span id="qty-{{ $item->rowId }}" class="w-10 text-center font-bold text-gray-800">{{ $item->qty }}</span>
+                                        <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }}, {{ $item->price }})"
                                             class="px-3 py-2 text-gray-600 text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                     </div>
 
                                     <!-- Price & Delete -->
                                     <div class="flex flex-col items-end gap-2 md:gap-4 min-w-[70px] md:min-w-[100px]">
-                                        <p class="font-black text-base md:text-xl text-[var(--primary-color)]">
+                                        <p id="item-subtotal-{{ $item->rowId }}" class="font-black text-base md:text-xl text-[var(--primary-color)]">
                                             {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($item->subtotal, 0) : number_format($item->subtotal, 0) . ' ' . $setup->currency }}
                                         </p>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
@@ -226,11 +226,51 @@
 
 @push('scripts')
     <script>
-        function updateCartQty(rowId, newQty) {
+        function updateCartQty(rowId, newQty, price) {
             if (newQty < 1) return;
+            const form = document.getElementById('update-cart-form');
             document.getElementById('update-row-id').value = rowId;
             document.getElementById('update-qty').value = newQty;
-            document.getElementById('update-cart-form').submit();
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    // Update qty display
+                    const qtySpan = document.getElementById('qty-' + rowId);
+                    if(qtySpan) qtySpan.innerText = newQty;
+                    
+                    // Update item subtotal
+                    const itemSubSpan = document.getElementById('item-subtotal-' + rowId);
+                    if(itemSubSpan && price) {
+                        const newSub = (newQty * price).toLocaleString();
+                        itemSubSpan.innerText = '{{ $setup->currency_position ?? "left" == "left" ? $setup->currency." " : "" }}' + newSub + '{{ $setup->currency_position ?? "left" == "right" ? " ".$setup->currency : "" }}';
+                    }
+                    
+                    // Fetch current page to silently update all global totals without manual math
+                    fetch(window.location.href)
+                    .then(r => r.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        // Just swap the calculation section if we want, or easier:
+                        // Just reload but without visual refresh by replacing the body
+                        // Actually, replacing innerHTML of a specific container is safest.
+                        // For cart.blade.php, we can just replace the whole main container!
+                        const newMain = doc.querySelector('main') || doc.body;
+                        const currentMain = document.querySelector('main') || document.body;
+                        if(newMain && currentMain) {
+                            currentMain.innerHTML = newMain.innerHTML;
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endpush

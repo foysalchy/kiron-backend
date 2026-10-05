@@ -197,9 +197,36 @@
     <script>
         function updateCartQty(rowId, newQty) {
             if (newQty < 1) return;
+            const form = document.getElementById('update-cart-form');
             document.getElementById('update-row-id').value = rowId;
             document.getElementById('update-qty').value = newQty;
-            document.getElementById('update-cart-form').submit();
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    fetch(window.location.href)
+                    .then(r => r.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newMain = doc.querySelector('main');
+                        const currentMain = document.querySelector('main');
+                        if(newMain && currentMain) {
+                            currentMain.innerHTML = newMain.innerHTML;
+                        } else {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    if (typeof toastr !== 'undefined') toastr.error(data.message);
+                }
+            });
         }
     </script>
 @endpush

@@ -164,15 +164,9 @@ class OrderController extends FrontendController
                 : null;
 
             if ($oldOrder) {
-                $oldOrder->update([
-                    'customer_id'      => $customer->id,
-                    'shipping_address' => $shippingAddress,
-                    'other_charges'    => session()->get('shipping_cost', 60),
-                    'warehouse_info'   => $warehouseInfo,
-                    'items'            => $items,
-                ]);
-                DB::commit();
-                return ['success' => true, 'order_id' => $oldOrder->id, 'logged_in' => true];
+                // Delete old details and the order itself so it can be cleanly recreated with accurate totals and relations
+                $oldOrder->orderDetails()->delete();
+                $oldOrder->delete();
             }
 
             $orderData = [
@@ -222,23 +216,18 @@ class OrderController extends FrontendController
             'screenshots.*'  => 'image|max:2048',
         ]);
 
-        // 1. Draft order find
+        // 1. Draft order find & ALWAYS Sync with latest Cart Content
+        $draftResult = $this->createDraftOrder($request->all());
+        if (!isset($draftResult['success']) || !$draftResult['success']) {
+            return back()->with('error', 'Order failed: ' . ($draftResult['error'] ?? 'Unknown error'));
+        }
+
         $orderId = Session::get('current_draft_order_id');
         $order = Order::where('company_id', $this->company_id)
             ->where('status', Status::Draft->value)
             ->find($orderId);
 
-        Log::info('Draft order search', ['session_order_id' => $orderId, 'found' => $order ? $order->id : null]);
-
-        // 2. Fallback — draft না থাকলে create করো
-        if (!$order) {
-            $draftResult = $this->createDraftOrder($request->all());
-            if ($draftResult['success']) {
-                $order = Order::find(Session::get('current_draft_order_id'));
-            } else {
-                return back()->with('error', 'Order failed: ' . $draftResult['error']);
-            }
-        }
+        Log::info('Draft order synced', ['session_order_id' => $orderId, 'found' => $order ? $order->id : null]);
 
         // 3. Status check
         $currentStatus = $order->status instanceof Status ? $order->status->value : (int)$order->status;
