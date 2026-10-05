@@ -31,9 +31,13 @@ class SmsWalletService
 
             $screenshotPath = null;
             if (isset($data['screenshot'])) {
+                $customFileName = 'recharge_screenshot_' . time();
                 $screenshotPath = FileUploadHelper::uploadImage(
                     $data['screenshot'],
-                    'sms_recharges/screenshots'
+                    'sms_recharges/screenshots',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 

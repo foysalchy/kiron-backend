@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\OfficeLocation;
 use App\Exceptions\ApiException;
 use App\Helpers\LogHelper;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -90,10 +91,13 @@ class EmployeeService
         try {
             // Handle image upload
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['first_name'] ?? 'employee') . '_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'employees/images',
-                   
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -128,10 +132,13 @@ class EmployeeService
 
             // Handle image replacement
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['first_name'] ?? $employee->first_name ?? 'employee') . '_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $employee->image,
-                    'employees/images'
+                    'employees/images',
+                    'r2',
+                    $customFileName
                 );
             }
 

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class SliderService
 {
@@ -79,10 +80,13 @@ class SliderService
         try {
             // Handle image upload
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['title'] ?? 'slider') . '_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'sliders/images',
-                   
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -118,10 +122,13 @@ class SliderService
 
             // Handle image upload
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $slider->image,
-                    'sliders/images'
+                    'sliders/images',
+                    'r2',
+                    $customFileName
                 );
             }
 

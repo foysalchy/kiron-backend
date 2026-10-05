@@ -10,6 +10,7 @@ use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Str;
 
 class SubCategoryService
 {
@@ -73,10 +74,13 @@ class SubCategoryService
 
         try {
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/sub',
-                   
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -108,10 +112,13 @@ class SubCategoryService
             $category = $this->getSubCategoryById($id);
 
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $category->image,
-                    'categories/sub'
+                    'categories/sub',
+                    'r2',
+                    $customFileName
                 );
             }
 

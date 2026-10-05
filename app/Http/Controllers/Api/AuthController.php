@@ -337,10 +337,13 @@ class AuthController extends Controller
 
             // Handle profile image upload
             if ($request->hasFile('profile')) {
+                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? 'user') . '_' . time();
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $request->file('profile'),
                     'users/profiles',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -423,10 +426,13 @@ class AuthController extends Controller
 
             // Handle profile image upload
             if ($request->hasFile('profile')) {
+                $customFileName = 'user_profile_' . Str::slug($data['name'] ?? $user->name ?? 'user') . '_' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $request->file('profile'),
                     $user->profile,
-                    'users/profiles'
+                    'users/profiles',
+                    'r2',
+                    $customFileName
                 );
             }
 

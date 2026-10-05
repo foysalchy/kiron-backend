@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
@@ -72,26 +73,35 @@ class SiteSettingService
         try {
             // Handle logo upload
             if (isset($data['logo'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? 'site-logo') . '_logo_' . time();
                 $data['logo'] = FileUploadHelper::uploadImage(
                     $data['logo'],
                     'settings/logos',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
             // Handle favicon upload
             if (isset($data['favicon'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? 'site-favicon') . '_favicon_' . time();
                 $data['favicon'] = FileUploadHelper::uploadImage(
                     $data['favicon'],
                     'settings/favicons',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
             if (isset($data['meta_image'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? 'site-meta') . '_meta_' . time();
                 $data['meta_image'] = FileUploadHelper::uploadImage(
                     $data['meta_image'],
                     'settings/meta_image',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -123,26 +133,35 @@ class SiteSettingService
 
             // Handle logo replace
             if (isset($data['logo'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-logo') . '_logo_' . time();
                 $data['logo'] = FileUploadHelper::replace(
                     $data['logo'],
                     $setting->logo,
-                    'settings/logos'
+                    'settings/logos',
+                    'r2',
+                    $customFileName
                 );
             }
 
             // Handle favicon replace
             if (isset($data['favicon'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-favicon') . '_favicon_' . time();
                 $data['favicon'] = FileUploadHelper::replace(
                     $data['favicon'],
                     $setting->favicon,
-                    'settings/favicons'
+                    'settings/favicons',
+                    'r2',
+                    $customFileName
                 );
             }
             if (isset($data['meta_image'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-meta') . '_meta_' . time();
                 $data['meta_image'] = FileUploadHelper::replace(
                     $data['meta_image'],
                     $setting->meta_image,
-                    'settings/meta_image'
+                    'settings/meta_image',
+                    'r2',
+                    $customFileName
                 );
             }
 

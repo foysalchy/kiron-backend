@@ -9,6 +9,7 @@ use App\Models\{Cart as CartTrack, CustomerPaymentMethod, Order, OrderPayment, P
 use App\Services\OrderService;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{Cache, DB, Hash, Log, Session};
 
 class OrderController extends FrontendController
@@ -305,8 +306,15 @@ class OrderController extends FrontendController
 
                 $screenshotPaths = [];
                 if ($request->hasFile('screenshots')) {
-                    foreach ($request->file('screenshots') as $image) {
-                        $screenshotPaths[] = FileUploadHelper::uploadImage($image, 'payments/screenshots');
+                    foreach ($request->file('screenshots') as $index => $image) {
+                        $customFileName = 'order_screenshot_' . ($orderData['order_no'] ?? 'order') . '_' . ($index + 1) . '_' . time();
+                        $screenshotPaths[] = FileUploadHelper::uploadImage(
+                            $image, 
+                            'payments/screenshots',
+                            'r2',
+                            2048,
+                            $customFileName
+                        );
                     }
                 }
 
@@ -615,11 +623,14 @@ class OrderController extends FrontendController
             $imagePaths = [];
 
             if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
+                foreach ($request->file('images') as $index => $image) {
+                    $customFileName = 'order_review_' . ($productId ?? 'product') . '_' . ($index + 1) . '_' . time();
                     $path = FileUploadHelper::uploadImage(
                         $image,
                         'reviews',
-
+                        'r2',
+                        2048,
+                        $customFileName
                     );
                     $imagePaths[] = $path;
                 }
@@ -669,8 +680,15 @@ class OrderController extends FrontendController
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $imagePaths[] = FileUploadHelper::uploadImage($image, 'returns');
+            foreach ($request->file('images') as $index => $image) {
+                $customFileName = 'order_return_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '_' . time();
+                $imagePaths[] = FileUploadHelper::uploadImage(
+                    $image, 
+                    'returns',
+                    'r2',
+                    2048,
+                    $customFileName
+                );
             }
         }
 
@@ -741,8 +759,15 @@ class OrderController extends FrontendController
             }
             $screenshotPaths = [];
             if ($request->hasFile('screenshots')) {
-                foreach ($request->file('screenshots') as $image) {
-                    $path = FileUploadHelper::uploadImage($image, 'payments/screenshots');
+                foreach ($request->file('screenshots') as $index => $image) {
+                    $customFileName = 'order_payment_screenshot_' . ($order->order_no ?? 'order') . '_' . ($index + 1) . '_' . time();
+                    $path = FileUploadHelper::uploadImage(
+                        $image, 
+                        'payments/screenshots',
+                        'r2',
+                        2048,
+                        $customFileName
+                    );
                     $screenshotPaths[] = $path;
                 }
             }

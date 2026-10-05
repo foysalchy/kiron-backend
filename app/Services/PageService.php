@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class PageService
 {
@@ -82,7 +83,14 @@ class PageService
         DB::beginTransaction();
         try {
             if (isset($data['image'])) {
-                $data['image'] = FileUploadHelper::uploadImage($data['image'], 'pages');
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'page') . '_' . time();
+                $data['image'] = FileUploadHelper::uploadImage(
+                    $data['image'], 
+                    'pages',
+                    'r2',
+                    2048,
+                    $customFileName
+                );
             }
 
             $page = Page::create($data);
@@ -110,7 +118,14 @@ class PageService
             $page = $this->getPageById($id);
 
             if (isset($data['image'])) {
-                $data['image'] = FileUploadHelper::replace($data['image'], $page->image, 'pages');
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? $page->slug ?? 'page') . '_' . time();
+                $data['image'] = FileUploadHelper::replace(
+                    $data['image'], 
+                    $page->image, 
+                    'pages',
+                    'r2',
+                    $customFileName
+                );
             }
 
             $page->update($data);

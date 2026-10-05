@@ -17,7 +17,8 @@ public static function upload(
     UploadedFile $file,
     string $folder = 'uploads',
     string $disk = 'r2',
-    bool $preserveName = false
+    bool $preserveName = false,
+    ?string $customFileName = null
 ): string {
     try {
         $user = auth()->user();
@@ -33,6 +34,20 @@ public static function upload(
         }
 
         $fullFolder = "{$companyFolder}/{$folder}";
+        
+        $options = [
+            'disk' => $disk,
+        ];
+        
+        // Add cache control headers for public disks
+        if ($disk === 'r2' || $disk === 's3' || $disk === 'public') {
+            $options['CacheControl'] = 'public, max-age=31536000, immutable';
+        }
+
+        if ($customFileName) {
+            $extension = $file->getClientOriginalExtension();
+            return $file->storeAs($fullFolder, $customFileName . '.' . $extension, $options);
+        }
 
         if ($preserveName) {
             $fileName = $file->getClientOriginalName();
@@ -40,11 +55,11 @@ public static function upload(
             return $file->storeAs(
                 $fullFolder,
                 $fileName,
-                $disk
+                $options
             );
         }
 
-        return $file->store($fullFolder, $disk);
+        return $file->store($fullFolder, $options);
 
     } catch (\Exception $e) {
         Log::error('File upload failed', [
@@ -64,7 +79,8 @@ public static function upload(
         UploadedFile $file,
         string $folder = 'images',
         string $disk = 'r2',
-        int $maxSize = 2048
+        int $maxSize = 2048,
+        ?string $customFileName = null
     ): string {
         try {
             // Validate image
@@ -79,7 +95,7 @@ public static function upload(
                 throw ApiException::badRequest("Image size cannot exceed {$maxSize}KB");
             }
 
-            return self::upload($file, $folder, $disk);
+            return self::upload($file, $folder, $disk, false, $customFileName);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -121,13 +137,21 @@ public static function upload(
         UploadedFile $file,
         string $folder,
         string $customName,
-        string $disk = 'public'
+        string $disk = 'r2'
     ): string {
         try {
             $extension = $file->getClientOriginalExtension();
             $fileName = $customName . '.' . $extension;
 
-            return $file->storeAs($folder, $fileName, $disk);
+            $options = [
+                'disk' => $disk,
+            ];
+            
+            if ($disk === 'r2' || $disk === 's3' || $disk === 'public') {
+                $options['CacheControl'] = 'public, max-age=31536000, immutable';
+            }
+
+            return $file->storeAs($folder, $fileName, $options);
         } catch (\Exception $e) {
             Log::error('File upload with custom name failed', [
                 'folder' => $folder,
@@ -140,7 +164,7 @@ public static function upload(
 
 
 
-    public static function delete(?string $filePath, string $disk = 'public'): bool
+    public static function delete(?string $filePath, string $disk = 'r2'): bool
     {
         try {
             if (!$filePath || !Storage::disk($disk)->exists($filePath)) {
@@ -162,11 +186,12 @@ public static function upload(
         UploadedFile $newFile,
         ?string $oldFilePath,
         string $folder,
-        string $disk = 'r2'
+        string $disk = 'r2',
+        ?string $customFileName = null
     ): string {
         try {
             // Upload new file
-            $newFilePath = self::upload($newFile, $folder, $disk);
+            $newFilePath = self::upload($newFile, $folder, $disk, false, $customFileName);
 
             // Delete old file
             if ($oldFilePath) {
@@ -185,7 +210,7 @@ public static function upload(
     }
 
 
-    public static function getUrl(?string $filePath, string $disk = 'public'): ?string
+    public static function getUrl(?string $filePath, string $disk = 'r2'): ?string
     {
         if (!$filePath) {
             return null;
@@ -203,7 +228,7 @@ public static function upload(
     }
 
 
-    public static function exists(?string $filePath, string $disk = 'public'): bool
+    public static function exists(?string $filePath, string $disk = 'r2'): bool
     {
         if (!$filePath) {
             return false;
@@ -212,7 +237,7 @@ public static function upload(
         return Storage::disk($disk)->exists($filePath);
     }
 
-    public static function getSize(string $filePath, string $disk = 'public'): ?float
+    public static function getSize(string $filePath, string $disk = 'r2'): ?float
     {
         try {
             if (!self::exists($filePath, $disk)) {
@@ -231,7 +256,7 @@ public static function upload(
     public static function uploadMultiple(
         array $files,
         string $folder = 'uploads',
-        string $disk = 'public'
+        string $disk = 'r2'
     ): array {
         $uploadedPaths = [];
 
@@ -258,7 +283,7 @@ public static function upload(
     }
 
 
-    public static function deleteMultiple(array $filePaths, string $disk = 'public'): bool
+    public static function deleteMultiple(array $filePaths, string $disk = 'r2'): bool
     {
         try {
             foreach ($filePaths as $filePath) {

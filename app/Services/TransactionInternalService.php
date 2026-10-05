@@ -143,10 +143,13 @@ class TransactionInternalService
         try {
             $data['created_by'] = Auth::id();
             if (isset($data['file'])) {
+                $customFileName = 'internal_voucher_' . time();
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],
                     'transfers/attachments',
-                    'public'
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -197,10 +200,13 @@ class TransactionInternalService
             // dd($transfer);
             // Handle File Replacement
             if (isset($data['file'])) {
+                $customFileName = 'internal_voucher_' . time();
                 $data['file'] = FileUploadHelper::replace(
                     $data['file'],
                     $transfer->file,
-                    'transfers/attachments'
+                    'transfers/attachments',
+                    'r2',
+                    $customFileName
                 );
             }
 

@@ -10,6 +10,7 @@ use App\Helpers\LogHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Str;
 
 class MiniCategoryService
 {
@@ -72,10 +73,13 @@ class MiniCategoryService
 
         try {
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::uploadImage(
                     $data['image'],
                     'categories/mini',
-                   
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -107,10 +111,13 @@ class MiniCategoryService
             $category = $this->getMiniCategoryById($id);
 
             if (isset($data['image'])) {
+                $customFileName = Str::slug($data['slug'] ?? $data['name'] ?? $category->slug ?? 'category') . '_' . time();
                 $data['image'] = FileUploadHelper::replace(
                     $data['image'],
                     $category->image,
-                    'categories/mini'
+                    'categories/mini',
+                    'r2',
+                    $customFileName
                 );
             }
 

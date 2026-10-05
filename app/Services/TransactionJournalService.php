@@ -144,10 +144,13 @@ class TransactionJournalService
             }
 
             if (isset($data['file'])) {
+                $customFileName = 'journal_voucher_' . time();
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],
                     'journals/attachments',
-                    'public'
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -194,10 +197,13 @@ class TransactionJournalService
             $journal = $this->getJournalById($id);
 
             if (isset($data['file'])) {
+                $customFileName = 'journal_voucher_' . time();
                 $data['file'] = FileUploadHelper::replace(
                     $data['file'],
                     $journal->file,
-                    'journals/attachments'
+                    'journals/attachments',
+                    'r2',
+                    $customFileName
                 );
             }
 

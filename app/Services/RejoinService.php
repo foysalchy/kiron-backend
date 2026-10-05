@@ -10,6 +10,7 @@ use App\Models\Rejoin;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\{DB, Log};
+use Illuminate\Support\Str;
 
 class RejoinService
 {
@@ -72,9 +73,13 @@ class RejoinService
         try {
             // Handle appointment letter upload
             if (isset($data['appointment_letter']) && $data['appointment_letter']->isValid()) {
+                $customFileName = 'rejoin_letter_' . ($data['employee_id'] ?? 'emp') . '_' . time();
                 $data['appointment_letter'] = FileUploadHelper::upload(
                     $data['appointment_letter'],
-                    'rejoins/letters'
+                    'rejoins/letters',
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -111,9 +116,13 @@ class RejoinService
                     FileUploadHelper::delete($rejoin->appointment_letter);
                 }
                 // Upload new letter
+                $customFileName = 'rejoin_letter_' . ($data['employee_id'] ?? $rejoin->employee_id ?? 'emp') . '_' . time();
                 $data['appointment_letter'] = FileUploadHelper::upload(
                     $data['appointment_letter'],
-                    'rejoins/appointment_letters'
+                    'rejoins/appointment_letters',
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 

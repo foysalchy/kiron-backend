@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -100,9 +101,15 @@ class UserService
                 $data['password'] = Hash::make($data['password']);
             }
             if (isset($data['profile'])) {
+                $name = $data['name'] ?? 'user';
+                $customFileName = Str::slug($name) . '_' . time();
+                
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
             $data['status'] = Status::Active->value;
@@ -143,9 +150,15 @@ class UserService
                 unset($data['password']);
             }
             if (isset($data['profile'])) {
+                $name = $data['name'] ?? $user->name ?? 'user';
+                $customFileName = Str::slug($name) . '_' . time();
+                
                 $data['profile'] = FileUploadHelper::uploadImage(
                     $data['profile'],
                     'users/profile',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 

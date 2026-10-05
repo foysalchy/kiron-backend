@@ -16,6 +16,7 @@ class Attendance extends Model
     const STATUS_LATE      = 3;
     const STATUS_EARLY_OUT = 4;
     const STATUS_HOLIDAY   = 5;
+    const STATUS_LEAVE     = 6;
     protected $fillable    = [
         'company_id',
         'employee_id',
@@ -80,6 +81,7 @@ class Attendance extends Model
             self::STATUS_LATE => 'Late',
             self::STATUS_EARLY_OUT => 'Early Out',
             self::STATUS_HOLIDAY => 'Holiday',
+            self::STATUS_LEAVE => 'Leave',
             default => 'Unknown',
         };
     }

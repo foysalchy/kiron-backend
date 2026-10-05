@@ -120,10 +120,13 @@ class TransactionIncomeService
             $data['created_by'] = Auth::id();
 
             if (isset($data['file'])) {
+                $customFileName = 'income_voucher_' . time();
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],
                     'incomes/attachments',
-                    'public'
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -173,10 +176,13 @@ class TransactionIncomeService
             $income = $this->getIncomeById($id);
 
             if (isset($data['file'])) {
+                $customFileName = 'income_voucher_' . time();
                 $data['file'] = FileUploadHelper::replace(
                     $data['file'],
                     $income->file,
-                    'incomes/attachments'
+                    'incomes/attachments',
+                    'r2',
+                    $customFileName
                 );
             }
 

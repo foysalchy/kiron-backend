@@ -13,6 +13,7 @@ use App\Services\Notification\NotificationService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\{Auth, DB, Log};
+use Illuminate\Support\Str;
 
 class ProductService
 {
@@ -233,9 +234,13 @@ class ProductService
         try {
             // Handle thumbnail upload
             if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
+                $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'product') . '_' . time();
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'products/thumbnails',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             } else {
                 $data['thumbnail'] = $data['thumbnail'] ?? null;
@@ -569,10 +574,13 @@ class ProductService
             unset($variationData['gallery_images']);
 
             if (!empty($variationData['image'])) {
+                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '_' . time();
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
@@ -668,10 +676,13 @@ class ProductService
             $previousAssignedTo = $product->assigned_to;
             // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
+                $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '_' . time();
                 $data['thumbnail'] = FileUploadHelper::replace(
                     $data['thumbnail'],
                     $product->thumbnail,
-                    'products/thumbnails'
+                    'products/thumbnails',
+                    'r2',
+                    $customFileName
                 );
             }
 
@@ -857,10 +868,13 @@ class ProductService
             $combinationHash = $this->generateCombinationHash($product->id, $attributes);
 
             if (!empty($variationData['image'])) {
+                $customFileName = Str::slug($product->slug) . '_variation_' . uniqid() . '_' . time();
                 $variationData['image'] = FileUploadHelper::uploadImage(
                     $variationData['image'],
                     'products/variation',
-
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
             $warehouseInfo = $variationData['warehouse_info'] ?? [];
@@ -1247,11 +1261,17 @@ class ProductService
      */
     private function createGalleries(int $productId, array $images, array $titles = []): void
     {
+        $product = Product::find($productId);
+        $slug = $product ? $product->slug : 'gallery';
+
         foreach ($images as $index => $image) {
+            $customFileName = Str::slug($slug) . '_gallery' . ($index + 1) . '_' . time();
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-
+                'r2',
+                2048,
+                $customFileName
             );
 
             Gallery::create([
@@ -1262,11 +1282,17 @@ class ProductService
     }
     private function createVariationGalleries(int $variationId, array $images, array $titles = []): void
     {
+        $variation = ProductVariation::with('product')->find($variationId);
+        $slug = $variation && $variation->product ? $variation->product->slug : 'variation';
+
         foreach ($images as $index => $image) {
+            $customFileName = Str::slug($slug) . '_vgallery' . ($index + 1) . '_' . time();
             $imagePath = FileUploadHelper::uploadImage(
                 $image,
                 'products/galleries',
-
+                'r2',
+                2048,
+                $customFileName
             );
 
             VariationGallery::create([

@@ -124,10 +124,13 @@ class TransactionExpenseService
         try {
             $data['created_by'] = Auth::id();
             if (isset($data['file'])) {
+                $customFileName = 'expense_voucher_' . time();
                 $data['file'] = FileUploadHelper::upload(
                     $data['file'],
                     'expenses/attachments',
-                    'public'
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
             //Calculate Total Amount from items array
@@ -186,10 +189,13 @@ class TransactionExpenseService
 
             // Handle File Replacement
             if (isset($data['file'])) {
+                $customFileName = 'expense_voucher_' . time();
                 $data['file'] = FileUploadHelper::replace(
                     $data['file'],
                     $expense->file,
-                    'expenses/attachments'
+                    'expenses/attachments',
+                    'r2',
+                    $customFileName
                 );
             }
 

@@ -10,6 +10,7 @@ use App\Models\LandingPage;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class LandingPageService
 {
@@ -107,16 +108,24 @@ class LandingPageService
         DB::beginTransaction();
         try {
             if (isset($data['thumbnail'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_thumb_' . time();
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
                     'landing-pages/thumbnails',
+                    'r2',
+                    2048,
+                    $customFileName
                 );
             }
 
             if (isset($data['video'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_video_' . time();
                 $data['video'] = FileUploadHelper::upload(
                     $data['video'],
                     'landing-pages/videos',
+                    'r2',
+                    false,
+                    $customFileName
                 );
             }
 
@@ -124,10 +133,14 @@ class LandingPageService
             $request = request();
             if ($request->hasFile('img_paths')) {
                 $newPaths = [];
-                foreach ($request->file('img_paths') as $file) {
+                foreach ($request->file('img_paths') as $index => $file) {
+                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_img_' . ($index + 1) . '_' . time();
                     $newPaths[] = FileUploadHelper::uploadImage(
                         $file,
                         'landing-pages/images',
+                        'r2',
+                        2048,
+                        $customFileName
                     );
                 }
                 $data['img_paths'] = $newPaths;
@@ -142,7 +155,8 @@ class LandingPageService
                 $data['extras'] = $this->handleExtrasImages(
                     $data['extras'],
                     [],
-                    $request
+                    $request,
+                    Str::slug($data['title'] ?? $data['name'] ?? 'landing-page')
                 );
             }
 
@@ -162,7 +176,7 @@ class LandingPageService
     }
 
     // Card extras image upload helper
-    private function handleExtrasImages(array $extras, array $existingExtras = [], $request): array
+    private function handleExtrasImages(array $extras, array $existingExtras = [], $request, string $baseSlug = 'landing-page'): array
     {
         foreach ($extras as $fieldName => &$fieldValue) {
             if (is_array($fieldValue) && !empty($fieldValue) && isset($fieldValue[0]['title'])) {
@@ -171,17 +185,23 @@ class LandingPageService
 
                     if ($request->hasFile($fileKey)) {
                         $oldImage = $existingExtras[$fieldName][$i]['image'] ?? null;
+                        
+                        $customFileName = $baseSlug . '_extra_' . $fieldName . '_' . ($i + 1) . '_' . time();
 
                         $card['image'] = $oldImage
                             ? FileUploadHelper::replace(
                                 $request->file($fileKey),
                                 $oldImage,
-                                'landing-pages/extras'
+                                'landing-pages/extras',
+                                'r2',
+                                $customFileName
                             )
                             : FileUploadHelper::uploadImage(
                                 $request->file($fileKey),
                                 'landing-pages/extras',
-
+                                'r2',
+                                2048,
+                                $customFileName
                             );
                     } elseif (isset($card['image']) && str_starts_with((string)$card['image'], '__file__')) {
                         $card['image'] = null;
@@ -205,18 +225,24 @@ class LandingPageService
             $landingPage = $this->getLandingPageById($id);
 
             if (isset($data['thumbnail']) && !is_string($data['thumbnail'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_thumb_' . time();
                 $data['thumbnail'] = FileUploadHelper::replace(
                     $data['thumbnail'],
                     $landingPage->thumbnail,
-                    'landing-pages/thumbnails'
+                    'landing-pages/thumbnails',
+                    'r2',
+                    $customFileName
                 );
             }
 
             if (isset($data['video'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_video_' . time();
                 $data['video'] = FileUploadHelper::replace(
                     $data['video'],
                     $landingPage->video,
-                    'landing-pages/videos'
+                    'landing-pages/videos',
+                    'r2',
+                    $customFileName
                 );
             }
 
@@ -233,10 +259,14 @@ class LandingPageService
 
                 // নতুন upload
                 $newPaths = [];
-                foreach ($request->file('img_paths') as $file) {
+                foreach ($request->file('img_paths') as $index => $file) {
+                    $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_img_' . ($index + 1) . '_' . time();
                     $newPaths[] = FileUploadHelper::uploadImage(
                         $file,
                         'landing-pages/images',
+                        'r2',
+                        2048,
+                        $customFileName
                     );
                 }
 
@@ -256,7 +286,8 @@ class LandingPageService
                 $data['extras'] = $this->handleExtrasImages(
                     $data['extras'],
                     $existingExtras,
-                    $request
+                    $request,
+                    Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page')
                 );
             }
 

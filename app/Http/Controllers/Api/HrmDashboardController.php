@@ -25,13 +25,19 @@ class HrmDashboardController extends Controller
         $activeDepartments = Department::active()->count();
         $pendingLeavesCount = LeaveApplication::where('status', 'pending')->count();
 
-        $attendances = Attendance::whereBetween('date', [$dateFrom, $dateTo])->get();
-        $todaysPresent = $attendances->whereIn('status', [1, 3])->count();
-        $lateToday = $attendances->where('status', 3)->count();
-        $absentToday = $attendances->where('status', 0)->count();
-        $onLeaveToday = $attendances->where('status', 5)->count(); // Assuming 5 is holiday/leave for now
+        $attendanceCounts = Attendance::whereBetween('date', [$dateFrom, $dateTo])
+            ->select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $todaysPresent = ($attendanceCounts[1] ?? 0) + ($attendanceCounts[3] ?? 0) + ($attendanceCounts[4] ?? 0);
+        $lateToday = $attendanceCounts[3] ?? 0;
+        $absentToday = $attendanceCounts[0] ?? 0;
+        $onLeaveToday = ($attendanceCounts[5] ?? 0) + ($attendanceCounts[6] ?? 0); // Holiday + Leave
         
-        $attendanceRate = $activeEmployees > 0 ? round(($todaysPresent / $activeEmployees) * 100, 2) : 0;
+        $days = Carbon::parse($dateFrom)->diffInDays(Carbon::parse($dateTo)) + 1;
+        $totalExpected = $activeEmployees * $days;
+        $attendanceRate = $totalExpected > 0 ? round(($todaysPresent / $totalExpected) * 100, 2) : 0;
 
         $currentMonthPayslips = Payslip::whereMonth('created_at', Carbon::now()->month)->sum('net_payable');
 
@@ -50,43 +56,43 @@ class HrmDashboardController extends Controller
 
         // 3. Payroll Trends (Last 6 months)
         $sixMonthsAgo = Carbon::now()->subMonths(5)->startOfMonth();
-        $payslipsData = Payslip::with('items')
-            ->select('payslips.*', 'periods.period_name', 'periods.start_date')
+        
+        $payslipsBase = DB::table('payslips')
             ->join('periods', 'payslips.period_id', '=', 'periods.id')
             ->where('periods.start_date', '>=', $sixMonthsAgo)
+            ->select(
+                'periods.period_name as month',
+                'periods.start_date',
+                DB::raw('SUM(payslips.net_payable) as net_salary'),
+                DB::raw('SUM(payslips.gross_salary) as gross_salary')
+            )
+            ->groupBy('periods.id', 'periods.period_name', 'periods.start_date')
             ->get();
-        
-        $trendsMap = [];
-        foreach ($payslipsData as $ps) {
-            $month = $ps->period_name;
-            if (!isset($trendsMap[$month])) {
-                $trendsMap[$month] = [
-                    'month' => $month,
-                    'net_salary' => 0,
-                    'gross_salary' => 0,
-                    'overtime' => 0,
-                    'bonus' => 0,
-                    'start_date' => $ps->start_date
-                ];
-            }
-            $trendsMap[$month]['net_salary'] += $ps->net_payable;
-            $trendsMap[$month]['gross_salary'] += $ps->gross_salary;
             
-            foreach ($ps->items as $item) {
-                if (stripos($item->name, 'overtime') !== false || stripos($item->type, 'overtime') !== false) {
-                    $trendsMap[$month]['overtime'] += $item->amount;
-                }
-                if (stripos($item->name, 'bonus') !== false || stripos($item->type, 'bonus') !== false) {
-                    $trendsMap[$month]['bonus'] += $item->amount;
-                }
-            }
-        }
-        
-        usort($trendsMap, function($a, $b) {
-            return strtotime($a['start_date']) <=> strtotime($b['start_date']);
-        });
-        
-        $payrollTrends = array_values($trendsMap);
+        $payslipsItems = DB::table('payslip_items')
+            ->join('payslips', 'payslip_items.payslip_id', '=', 'payslips.id')
+            ->join('periods', 'payslips.period_id', '=', 'periods.id')
+            ->where('periods.start_date', '>=', $sixMonthsAgo)
+            ->select(
+                'periods.period_name as month',
+                DB::raw("SUM(CASE WHEN payslip_items.name LIKE '%overtime%' OR payslip_items.type LIKE '%overtime%' THEN payslip_items.amount ELSE 0 END) as overtime"),
+                DB::raw("SUM(CASE WHEN payslip_items.name LIKE '%bonus%' OR payslip_items.type LIKE '%bonus%' THEN payslip_items.amount ELSE 0 END) as bonus")
+            )
+            ->groupBy('periods.id', 'periods.period_name')
+            ->get()
+            ->keyBy('month');
+            
+        $payrollTrends = $payslipsBase->map(function ($item) use ($payslipsItems) {
+            $monthItems = $payslipsItems->get($item->month);
+            return [
+                'month' => $item->month,
+                'net_salary' => $item->net_salary ?? 0,
+                'gross_salary' => $item->gross_salary ?? 0,
+                'overtime' => $monthItems->overtime ?? 0,
+                'bonus' => $monthItems->bonus ?? 0,
+                'start_date' => $item->start_date
+            ];
+        })->sortBy('start_date')->values()->toArray();
 
         // 4. Pending Leave Requests
         $pendingLeavesList = LeaveApplication::with(['employee.department', 'leaveType'])
@@ -111,26 +117,39 @@ class HrmDashboardController extends Controller
             });
 
         // 5. Department Attendance Overview
-        $deptAttendance = [];
-        $departments = Department::with(['employees' => function($q) { $q->where('status', 1); }])->get();
-        foreach ($departments as $dept) {
-            $empIds = $dept->employees->pluck('id')->toArray();
-            $deptAtts = $attendances->whereIn('employee_id', $empIds);
-            $presentCount = $deptAtts->whereIn('status', [1, 3])->count();
-            $absentCount = $deptAtts->where('status', 0)->count();
-            $leaveCount = $deptAtts->where('status', 5)->count();
-            $empCount = count($empIds);
+        $deptAttendanceQuery = DB::table('departments')
+            ->leftJoin('employees', function($join) {
+                $join->on('departments.id', '=', 'employees.department_id')
+                     ->where('employees.status', 1);
+            })
+            ->leftJoin('attendances', function($join) use ($dateFrom, $dateTo) {
+                $join->on('employees.id', '=', 'attendances.employee_id')
+                     ->whereBetween('attendances.date', [$dateFrom, $dateTo]);
+            })
+            ->select(
+                'departments.id', 
+                'departments.name as department',
+                DB::raw('COUNT(DISTINCT employees.id) as employees_count'),
+                DB::raw('SUM(CASE WHEN attendances.status IN (1, 3) THEN 1 ELSE 0 END) as present_count'),
+                DB::raw('SUM(CASE WHEN attendances.status = 0 THEN 1 ELSE 0 END) as absent_count'),
+                DB::raw('SUM(CASE WHEN attendances.status = 5 THEN 1 ELSE 0 END) as leave_count')
+            )
+            ->groupBy('departments.id', 'departments.name')
+            ->get();
             
-            $deptAttendance[] = [
+        $deptAttendance = $deptAttendanceQuery->map(function ($dept) {
+            $empCount = $dept->employees_count;
+            $presentCount = $dept->present_count ?? 0;
+            return [
                 'id' => $dept->id,
-                'department' => $dept->name,
+                'department' => $dept->department,
                 'employees' => $empCount,
                 'present' => $presentCount,
-                'absent' => $absentCount,
-                'leave' => $leaveCount,
+                'absent' => $dept->absent_count ?? 0,
+                'leave' => $dept->leave_count ?? 0,
                 'attendance_percent' => $empCount > 0 ? round(($presentCount / $empCount) * 100, 1) : 0,
             ];
-        }
+        })->toArray();
 
         // 6. HR Alerts
         $probationEnding = Employee::where('status', 1)

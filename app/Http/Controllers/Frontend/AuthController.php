@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 class AuthController extends FrontendController
 {
@@ -117,10 +118,13 @@ class AuthController extends FrontendController
             $data = $request->only('name', 'email', 'phone', 'address');
 
             if ($request->hasFile('profile')) {
+                $customFileName = 'customer_profile_' . Str::slug($data['name'] ?? $user->name ?? 'customer') . '_' . time();
                 $data['profile'] = FileUploadHelper::replace(
                     $request->file('profile'),
                     $user->profile,
-                    'customers/profiles'
+                    'customers/profiles',
+                    'r2',
+                    $customFileName
                 );
             }
 
