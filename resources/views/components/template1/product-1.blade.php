@@ -31,7 +31,7 @@
     <div class="relative w-full aspect-square overflow-hidden bg-gray-50 rounded-lg mb-3 shrink-0">
         <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full">
             <img src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
-                alt="{{ $product->title }}" height="350" width="300"
+                alt="{{ $product->title }}" height="350" width="300" loading="lazy"
                 class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
         </a>
 

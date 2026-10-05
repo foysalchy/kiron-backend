@@ -23,4 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(raf);
 
     window.lenis = lenis; // এটি টেস্ট করার জন্য জরুরি
+
+    // Image Skeleton Loader
+    const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+    lazyImages.forEach(img => {
+        if (!img.complete) {
+            const wrapper = img.closest('.aspect-square, picture') || img.parentElement;
+            if (wrapper) {
+                wrapper.classList.add('animate-pulse', 'bg-gray-200');
+                img.style.opacity = '0';
+                
+                img.addEventListener('load', function() {
+                    wrapper.classList.remove('animate-pulse', 'bg-gray-200');
+                    img.style.transition = 'opacity 0.3s ease-in-out';
+                    img.style.opacity = '1';
+                });
+            }
+        }
+    });
 });
