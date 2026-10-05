@@ -13,16 +13,7 @@ class SiteSetting extends Model
 {
     use SoftDeletes, CompanyScoped, HasHomepageCache, HasGlobalLayoutCache;
 
-    protected static function booted()
-    {
-        static::saved(function ($setting) {
-            \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
-        });
 
-        static::deleted(function ($setting) {
-            \Illuminate\Support\Facades\Cache::forget("site_settings_{$setting->company_id}");
-        });
-    }
     protected $fillable = [
         'company_id',
         'shop_name',
@@ -67,7 +58,7 @@ class SiteSetting extends Model
     protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url'];
     public static function homepageCacheKeys(): array
     {
-        return ['site_settings_cart'];
+        return ['site_settings_cart', 'site_settings'];
     }
     public static function globalLayoutSections(): array
     {
@@ -107,7 +98,7 @@ class SiteSetting extends Model
             ? Storage::disk('r2')->url($this->favicon)
             : null;
     }
-    
+
     public function getMetaImageUrlAttribute(): ?string
     {
         return $this->meta_image

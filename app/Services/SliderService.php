@@ -94,13 +94,14 @@ class SliderService
 
                 // 2. Handle Mobile Image
                 if (isset($data['mobile_image'])) {
-                    // Upload user-provided mobile image
+                    // Upload user-provided mobile image (force resize)
                     $mobileCustomFileName = 'mobile-' . $customFileName;
-                    $data['mobile_image'] = FileUploadHelper::uploadImage(
+                    $data['mobile_image'] = FileUploadHelper::uploadResizedWebpImage(
                         $data['mobile_image'],
                         'sliders/images',
+                        522,
+                        220,
                         'r2',
-                        2048,
                         $mobileCustomFileName
                     );
                 } else {
@@ -163,10 +164,12 @@ class SliderService
                 // Handle Mobile Image
                 if (isset($data['mobile_image'])) {
                     $mobileCustomFileName = 'mobile-' . $customFileName;
-                    $data['mobile_image'] = FileUploadHelper::replace(
+                    $data['mobile_image'] = FileUploadHelper::replaceResizedWebpImage(
                         $data['mobile_image'],
                         $slider->mobile_image,
                         'sliders/images',
+                        522,
+                        220,
                         'r2',
                         $mobileCustomFileName
                     );
@@ -188,12 +191,14 @@ class SliderService
                     );
                 }
             } elseif (isset($data['mobile_image'])) {
-                // If only mobile image is updated
+                // If only mobile image is updated (force resize)
                 $customFileName = Str::slug($data['title'] ?? $slider->title ?? 'slider') . '-mobile-' . time();
-                $data['mobile_image'] = FileUploadHelper::replace(
+                $data['mobile_image'] = FileUploadHelper::replaceResizedWebpImage(
                     $data['mobile_image'],
                     $slider->mobile_image,
                     'sliders/images',
+                    522,
+                    220,
                     'r2',
                     $customFileName
                 );

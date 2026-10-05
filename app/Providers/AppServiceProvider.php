@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Enums\Status;
 use App\Models\Company;
 use App\Models\ContentSetting;
-use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue, Blog, CustomerReview, DomainSetup, FooterCode, KnowledgeBase, LandingPage, MasterBrand, MasterDemo, MasterFeature, PricingPackage, ProductGroup, ProductReview, Reservation, Slider, SystemPage, Table};
+use App\Models\{MegaCategory, SubCategory, MiniCategory, ExtraCategory, Brand, AttributeGroup, AttributeValue, Blog, CustomerPaymentMethod, CustomerReview, DomainSetup, FooterCode, KnowledgeBase, LandingPage, MasterBrand, MasterDemo, MasterFeature, PricingPackage, ProductGroup, ProductReview, Reservation, Slider, SystemPage, Table};
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\SearchProduct;
@@ -273,10 +273,11 @@ class AppServiceProvider extends ServiceProvider
             CustomerReview::class,
             MasterDemo::class,
             PricingPackage::class,
-            DomainSetup::class, 
+            DomainSetup::class,
             Table::class,
             Reservation::class,
             FooterCode::class,
+            CustomerPaymentMethod::class,
         ];
 
         foreach ($models as $model) {

@@ -328,6 +328,36 @@ public static function upload(
         }
     }
 
+    /**
+     * Replace an existing image with a new resized WebP image
+     */
+    public static function replaceResizedWebpImage(
+        \Illuminate\Http\UploadedFile $newFile,
+        ?string $oldFilePath,
+        string $folder,
+        int $width,
+        int $height,
+        string $disk = 'r2',
+        ?string $customFileName = null
+    ): string {
+        try {
+            $newFilePath = self::uploadResizedWebpImage($newFile, $folder, $width, $height, $disk, $customFileName);
+
+            if ($oldFilePath) {
+                self::delete($oldFilePath, $disk);
+            }
+
+            return $newFilePath;
+        } catch (\Exception $e) {
+            Log::error('Resized file replacement failed', [
+                'old_file' => $oldFilePath,
+                'folder' => $folder,
+                'error' => $e->getMessage()
+            ]);
+            throw ApiException::serverError('Failed to replace resized file');
+        }
+    }
+
 
     public static function getUrl(?string $filePath, string $disk = 'r2'): ?string
     {

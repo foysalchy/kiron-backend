@@ -3,23 +3,14 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CustomerPaymentMethod extends Model
 {
-    use SoftDeletes;
-    
-    protected static function booted()
-    {
-        static::saved(function ($method) {
-            \Illuminate\Support\Facades\Cache::forget("payment_methods_{$method->company_id}");
-        });
+    use SoftDeletes, HasHomepageCache;
 
-        static::deleted(function ($method) {
-            \Illuminate\Support\Facades\Cache::forget("payment_methods_{$method->company_id}");
-        });
-    }
 
     protected $fillable = [
         'company_id',
@@ -35,6 +26,10 @@ class CustomerPaymentMethod extends Model
     protected $casts = [
         'method_details' => 'array',
     ];
+    public static function homepageCacheKeys(): array
+    {
+        return ['payment_methods'];
+    }
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = strtolower($value);
