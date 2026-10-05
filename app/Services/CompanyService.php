@@ -36,7 +36,9 @@ class CompanyService
 
                     'domains as domain_used' => fn($q) => $q->withoutGlobalScopes(),
 
-                ]);
+                ])
+                ->where('id', '!=', 1) // Exclude master/admin company if it's ID 1
+                ->whereRaw("LOWER(REPLACE(name, ' ', '')) NOT LIKE ?", ['%littlebaby%']);
 
             // Existing filters
             if (isset($filters['status'])) {
