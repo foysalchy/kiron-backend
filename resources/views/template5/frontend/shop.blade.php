@@ -24,7 +24,7 @@
 
             <!-- Breadcrumb -->
             <nav class="hidden md:flex items-center gap-2 mb-2 text-sm font-medium text-gray-500">
-                <a href="/" class="hover:text-gray-500 transition-colors">Home</a>
+                <a href="/" class="inline-flex min-h-11 items-center px-2 hover:text-gray-500 transition-colors">Home</a>
 
                 <!-- Chevron Icon -->
                 <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" class="w-4 h-4 text-gray-500"

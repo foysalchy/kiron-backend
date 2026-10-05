@@ -80,7 +80,7 @@
                 <!-- Thumbnail Gallery with Arrows -->
                 <div class="relative group/gallery">
                     <!-- Left Arrow -->
-                    <button type="button" id="thumb-arrow-left" onclick="scrollThumbnails(-1)"
+                    <button type="button" id="thumb-arrow-left" aria-label="Scroll product images left" onclick="scrollThumbnails(-1)"
                         class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
                         <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.4">
@@ -103,7 +103,7 @@
                     </div>
 
                     <!-- Right Arrow -->
-                    <button type="button" id="thumb-arrow-right" onclick="scrollThumbnails(1)"
+                    <button type="button" id="thumb-arrow-right" aria-label="Scroll product images right" onclick="scrollThumbnails(1)"
                         class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
                         <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.4">

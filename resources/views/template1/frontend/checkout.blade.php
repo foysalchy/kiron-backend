@@ -117,7 +117,7 @@
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'inside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 0) : number_format($setup->inside_charge, 0) . ' ' . $setup->currency }})
+                                        Inside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge, 2) : number_format($setup->inside_charge, 2) . ' ' . $setup->currency }})
                                     </span>
                                 </label>
                                 <label class="flex items-center gap-3 cursor-pointer group">
@@ -125,7 +125,7 @@
                                         onchange="updateCheckoutShipping(this.value)"
                                         {{ $shipping_area == 'outside' ? 'checked' : '' }} class="w-4 h-4 accent-black">
                                     <span class="text-sm font-medium text-gray-700 group-hover:text-black">
-                                        Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 0) : number_format($setup->outside_charge, 0) . ' ' . $setup->currency }})
+                                        Outside Dhaka ({{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge, 2) : number_format($setup->outside_charge, 2) . ' ' . $setup->currency }})
                                     </span>
                                 </label>
                             </div>
@@ -222,7 +222,7 @@
                                 <span class="text-md font-medium">Delivery Charge:</span>
                                 <span class="text-md font-bold text-gray-900">
                                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
-                                    <span id="shipping-display">{{ number_format($shipping) }}</span>
+                                    <span id="shipping-display">{{ number_format($shipping, 2) }}</span>
                                     {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                                 </span>
                             </div>
@@ -472,7 +472,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                         document.getElementById('shipping-display').innerText = data.shipping_cost.toLocaleString();
+                         document.getElementById('shipping-display').innerText = Number(data.shipping_cost).toFixed(2);
                         document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
                         toastr.success(data.message);
                     }

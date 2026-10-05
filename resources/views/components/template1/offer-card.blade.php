@@ -45,7 +45,7 @@
           <polygon points="12 2 15 9 22 9 16.5 13.5 18.5 21 12 17 5.5 21 7.5 13.5 2 9 9 9"/>
         </svg>
         <span class="text-[10px] sm:text-xs font-medium">{{ number_format($avgRating, 1) }}</span>
-        <span class="text-[10px] sm:text-xs text-smoke">({{ $totalReviews }})</span>
+        <span class="text-[10px] sm:text-xs text-gray-700">({{ $totalReviews }})</span>
       </div>
 
     <div class="flex items-center justify-between gap-3 mt-auto">
@@ -59,7 +59,7 @@
         </span>
 
         @if ($regularPrice > $salePrice)
-          <span class="text-smoke line-through ml-1 sm:ml-1.5 text-xs sm:text-sm">
+          <span class="text-gray-600 line-through ml-1 sm:ml-1.5 text-xs sm:text-sm">
             @if(($setup->currency_position ?? 'left') == 'left')
               {{ $setup->currency }} {{ number_format($regularPrice) }}
             @else

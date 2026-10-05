@@ -13,7 +13,7 @@
       <button type="button" class="lg:hidden text-2xl text-coal focus:outline-none shrink-0" onclick="toggleMobileMenu()" aria-label="Toggle Menu">
         <i class="fas fa-bars"></i>
       </button>
-      <a href="{{ $homeUrl }}" class="relative flex items-baseline gap-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
+      <a href="{{ $homeUrl }}" class="relative flex min-h-11 items-center gap-2 px-2 shrink-0 max-w-[45vw] lg:max-w-none group/logo py-2">
         @if($setup->logo_url ?? false)
         <img src="{{ $setup->logo_url }}" alt="{{ $setup->shop_name ?? 'Shop' }}" width="200" height="80"
           class="w-[100px] max-w-full z-10">
