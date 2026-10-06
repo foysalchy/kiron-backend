@@ -7,8 +7,7 @@
     <title>Invoice - #{{ $order->order_no }}</title>
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @vite('resources/css/app.css')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.onload=null; this.media='all'">
+    @include('components.fontawesome')
 
     <style>
         * {
@@ -18,7 +17,7 @@
         }
 
         body {
-            font-family: "Poppins", "Hind Siliguri", sans-serif;
+            font-family: "Geist Sans", "Hind Siliguri", sans-serif;
             background-color: #F8FAFC;
             color: #1E293B;
             font-size: 14px;

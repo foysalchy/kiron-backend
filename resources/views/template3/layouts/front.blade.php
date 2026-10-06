@@ -9,8 +9,7 @@
     <link rel="icon" type="image/x-icon"
         href="{{ $setup->favicon_url ?? asset('images/template1/frontend/sell.png') }}">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.onload=null; this.media='all'">
+    @include('components.fontawesome')
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
    

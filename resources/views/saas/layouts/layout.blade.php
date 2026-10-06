@@ -17,8 +17,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.onload=null; this.media='all'">
+    @include('components.fontawesome')
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('components.meta-info.pixel', ['setup' => $setup])

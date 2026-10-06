@@ -7,6 +7,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/fontawesome.css',
                 'resources/css/landing2.css',
                 'resources/css/landing3.css',
                 'resources/js/app.js',

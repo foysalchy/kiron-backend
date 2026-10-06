@@ -32,8 +32,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.onload=null; this.media='all'">
+    @include('components.fontawesome')
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
     </style>
