@@ -44,7 +44,7 @@ class CartController extends FrontendController
             try {
                 $couponSession = session()->get('coupon');
                 $customerId = auth('customer')->id();
-                
+
                 if (!$customerId && session()->has('current_draft_order_id')) {
                     $draftOrder = \App\Models\Order::find(session()->get('current_draft_order_id'));
                     if ($draftOrder && $draftOrder->customer_id) {
@@ -287,7 +287,7 @@ class CartController extends FrontendController
                         'options' => [
                             'slug'          => $variation->product->slug,
                             'variation_id'  => $variation->id,
-                            'thumbnail'     => $variation->image_url ?? $variation->product->thumbnail_url,
+                            'thumbnail'     => $variation->image_url ?? $variation->product->thumbnail_95_url ?? $variation->product->thumbnail_url,
                             'variant'       => $variation->display_name,
                             'regular_price' => $variation->regular_price,
                             'warehouse_id'  => $warehouseId,
@@ -336,7 +336,7 @@ class CartController extends FrontendController
                         'weight'  => 0,
                         'options' => [
                             'slug'          => $product->slug,
-                            'thumbnail'     => $product->thumbnail_url,
+                            'thumbnail'     => $product->thumbnail_95_url ?? $product->thumbnail_url,
                             'regular_price' => $product->regular_price,
                             'warehouse_id'  => $warehouseId,
                             'bin_id'        => $binId ?? null,
@@ -567,13 +567,13 @@ class CartController extends FrontendController
         // AJAX request হলে JSON response
         if ($request->ajax() || $request->wantsJson()) {
             $subtotalFloat = (float) str_replace(',', '', Cart::subtotal());
-            
+
             $discount = 0;
             if (session()->has('coupon')) {
                 // Re-validate coupon against new subtotal
                 $couponResult = (new \App\Services\CouponService())->validateCoupon(
-                    session('coupon')['coupon_code'], 
-                    $subtotalFloat, 
+                    session('coupon')['coupon_code'],
+                    $subtotalFloat,
                     auth('customer')->id() ?? null
                 );
                 if ($couponResult['success']) {
@@ -583,7 +583,7 @@ class CartController extends FrontendController
                     session()->forget('coupon');
                 }
             }
-            
+
             $settings = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
             $shipping = session()->get('shipping_cost', $settings->inside_charge ?? 60);
             $total = ($subtotalFloat - $discount) + $shipping;
