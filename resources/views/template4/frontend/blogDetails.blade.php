@@ -39,25 +39,15 @@
                     <!-- Featured Image: Dynamic -->
                     <div class="relative">
                         <img src="{{ $blog->thumbnail_url ?? '' }}" loading="lazy" width="1200" height="550"
-                            alt="{{ $blog->title }}" class="w-full h-auto max-h-[550px] object-cover"
+                            alt="{{ $blog->title }}" class="w-full h-auto"
                             onerror="this.onerror=null;this.src='{{ $blog->thumbnail_url ?? '' }}';">
 
-                        @php
-                            $keywords = is_array($blog->meta_keywords)
-                                ? $blog->meta_keywords
-                                : explode(',', $blog->meta_keywords);
-                        @endphp
-                        <div
-                            class="absolute top-4 left-4 primary-bg text-primary px-4 py-1 rounded-full text-sm shadow-xs font-semibold">
-                            {{ $keywords[0] ?? 'Blog' }}
-                        </div>
+                        
                     </div>
 
                     <div class="p-4 md:p-10">
 
-                        <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
-                            {{ $blog->title }}
-                        </h1>
+                       
 
                         <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8 pb-6">
                             <div class="flex items-center gap-2">
@@ -73,24 +63,45 @@
                             </span>
                         </div>
 
-                        <div class="flex flex-wrap gap-2 mb-8">
-                            @foreach ($keywords as $tag)
-                                @if (trim($tag))
-                                    <a href="{{ url('/blogs?tag=' . urlencode(trim($tag))) }}"
-                                        class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-tag h-3 w-3 mr-1">
-                                            <path
-                                                d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                                            </path>
-                                            <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                                        </svg> {{ trim($tag) }}
-                                    </a>
-                                @endif
-                            @endforeach
-                        </div>
+                       @php
+    $keywordTags = is_string($keywords) ? json_decode($keywords, true) : $keywords;
+@endphp
+
+<div class="flex flex-wrap gap-2 mb-8">
+    @foreach ($keywordTags ?? [] as $tag)
+        @php
+            $tag = trim($tag);
+        @endphp
+
+        @if ($tag)
+            <a href="{{ url('/blogs?tag=' . urlencode($tag)) }}"
+                class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-tag h-3 w-3 mr-1">
+
+                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
+                    </path>
+
+                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                </svg>
+
+                {{ $tag }}
+            </a>
+        @endif
+    @endforeach
+</div>
+                         <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
+                            {{ $blog->title }}
+                        </h1>
 
                         <div class="prose prose-orange max-w-none"> {{-- Customize the prose style to match your theme: prose-orange or prose-slate --}}
                             {!! $blog->body !!}
@@ -104,19 +115,7 @@
                             @endif
                         </div>
 
-                        <div class="h-[1px] w-full bg-gray-200 my-10"></div>
-
-                        <div class="flex items-center gap-3 md:gap-5 p-4 md:p-6 bg-blue-50/50 rounded-lg mb-8 md:mb-12">
-                            <div
-                                class="h-16 w-16 rounded-full bg-gray-200 overflow-hidden flex-shrink-0 shadow-sm border-2 border-white">
-                                <img src="{{ $blog->user && $blog->user->profile ? asset('storage/' . $blog->user->profile) : asset('./images/template1/frontend/default.webp') }}"
-                                    alt="{{ $blog->user->name ?? 'Author' }}" class="w-full h-full object-cover" loading="lazy" height="" width="">
-                            </div>
-                            <div>
-                                <h2 class="font-bold text-lg text-gray-900">{{ $blog->user->name ?? 'Admin' }}</h2>
-                                {{-- <p class="text-gray-600 text-sm">Professional content writer and fashion expert. Regularly works with us.</p> --}}
-                            </div>
-                        </div>
+                      
                         {{-- <!-- Comments Section -->
                         <div class=\"mt-12\">
                             <h3 class=\"text-xl font-bold text-gray-900 mb-8\">Comments (2)</h3>
@@ -233,17 +232,7 @@
                     </div>
                 </div>
 
-                <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs">
-                    <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">Popular Tags</h3>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach ($popularTags as $tag)
-                            <a href="{{ url('/blogs?tag=' . urlencode($tag)) }}"
-                                class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1.5 text-xs font-bold text-gray-900 hover:bg-blue-600 hover:text-primary hover:border-blue-600 transition-all">
-                                {{ $tag }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
+             
 
             </div>
         </div>

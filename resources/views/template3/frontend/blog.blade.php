@@ -30,7 +30,7 @@
                 <div
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
-                    <div class="relative aspect-square bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <div class="relative bg-gray-50 flex items-center justify-center overflow-hidden">
                         @if ($blog->thumbnail_url)
                             <img src="{{ $blog->thumbnail_url }}" alt="{{ $blog->title }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
