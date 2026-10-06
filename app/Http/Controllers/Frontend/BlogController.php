@@ -1,12 +1,12 @@
 <?php
 
-namespace AppHttpControllersFrontend;
+namespace App\Http\Controllers\Frontend;
 
-use AppEnumsStatus;
-use AppHttpControllersController;
-use AppModelsBlog;
-use IlluminateHttpRequest;
-use IlluminateSupportFacadesCache;
+use App\Enums\Status;
+use App\Http\Controllers\Controller;
+use App\Models\Blog;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends FrontendController
 {
@@ -74,3 +74,4 @@ class BlogController extends FrontendController
         return  $this->view('frontend.blogDetails', compact('blog', 'relatedPosts', 'popularTags'));
     }
 }
+
