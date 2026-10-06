@@ -51,7 +51,7 @@
 
                         <div class="flex  items-center gap-6 text-sm text-gray-500  mb-4 justify-between">
                             <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-user text-secondary text-black"></i> Author:
+                                <i class="fa-regular fa-user   text-black"></i> Author:
                                 <span>{{ $blog->user->name ?? 'Admin' }}</span>
                             </div>
                             <div class="flex items-center gap-2">
