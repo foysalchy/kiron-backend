@@ -31,9 +31,12 @@ class ResignationService
             }
 
             if (isset($filters['search'])) {
-                $query->whereHas('employee', function ($q) use ($filters) {
-                    $q->where('name', 'like', "%{$filters['search']}%");
-                })->orWhere('reason', 'like', "%{$filters['search']}%");
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('employee', function ($q2) use ($search) {
+                        $q2->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+                    })->orWhere('reason', 'like', "%{$search}%");
+                });
             }
 
             $sortBy = $filters['sort_by'] ?? 'created_at';

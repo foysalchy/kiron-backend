@@ -84,6 +84,7 @@ use App\Http\Controllers\Api\MetaDirectProxyController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\OfficeLocationController;
 use App\Http\Controllers\Api\OmniSettingsController;
 use App\Http\Controllers\Api\OrderController;
@@ -1240,6 +1241,13 @@ Route::prefix('v1')->group(function () {
                     Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
                     Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
                     Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+                });
+                Route::prefix('contact-messages')->group(function () {
+                    Route::get('/', [ContactMessageController::class, 'index']);
+                    Route::get('/unread-count', [ContactMessageController::class, 'unreadCount']);
+                    Route::post('/{id}/read', [ContactMessageController::class, 'markAsRead']);
+                    Route::post('/read-all', [ContactMessageController::class, 'markAllAsRead']);
+                    Route::delete('/{id}', [ContactMessageController::class, 'destroy']);
                 });
                 //support-departments routes
                 Route::prefix('support-departments')->group(function () {
