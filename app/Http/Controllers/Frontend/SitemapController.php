@@ -31,15 +31,13 @@ class SitemapController extends Controller
         $allowIndex = $setup ? (bool)($setup->allow_search_engine_index ?? false) : false;
         
         $robotsContent = Cache::remember(
-            "robots_{$companyId}_" . ($allowIndex ? 'index' : 'noindex'),
+            "robots_v2_{$companyId}_" . ($allowIndex ? 'index' : 'noindex'),
             now()->addHours(6),
             function () use ($allowIndex) {
                 if (!$allowIndex) {
                     return <<<ROBOTS
 User-agent: *
 Disallow: /
-Noindex: /
-Nofollow: /
 ROBOTS;
                 }
 

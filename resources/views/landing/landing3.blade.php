@@ -5,13 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $landing->title }}</title>
+    <meta name="description"
+        content="{{ \Illuminate\Support\Str::limit(strip_tags($landing->short_description ?: $landing->description ?: $landing->title), 160) }}">
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/landing3.css', 'resources/js/landing3.js'])
 
     <style>
         body {
@@ -111,6 +108,7 @@
 
 <body class="text-gray-800 bg-white overflow-x-hidden">
 
+    <main>
     {{-- ══ SECTION 1: HERO (Dynamic Version) ══ --}}
     <section class="relative bg-[#0D2601] text-white pt-12 pb-24 md:pb-48 px-4 text-center overflow-hidden">
         <div class="container mx-auto relative z-10">
@@ -119,7 +117,7 @@
             <div class="mb-8 md:mb-12">
                 @if ($setup->logo)
                     <img src="{{ $setup->logo_url }}" alt="Logo"
-                        class="mx-auto w-16 sm:w-18 md:w-24 object-contain">
+                        width="96" height="96" class="mx-auto w-16 sm:w-18 md:w-24 object-contain">
                 @else
                     <span class="text-xl md:text-3xl font-black uppercase tracking-widest text-[#FFD700]">
                         {{ $setup->shop_name }}
@@ -139,7 +137,13 @@
                 <a href="#order"
                     class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-10 md:px-16 py-3 md:py-5 rounded-full font-black text-lg sm:text-xl md:text-3xl transition-all active:translate-y-1 md:active:translate-y-2 active:shadow-none uppercase shadow-lg shadow-green-900/20">
                     অর্ডার করতে ক্লিক করুন
-                    <i class="fas fa-shopping-cart text-lg md:text-3xl ml-1"></i>
+                    <svg aria-hidden="true" class="w-5 h-5 md:w-8 md:h-8 ml-1" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -184,7 +188,13 @@
             <a href="#order"
                 class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase">
                 অর্ডার করতে ক্লিক করুন
-                <i class="fas fa-shopping-cart text-xl md:text-3xl ml-1"></i>
+                <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none"
+                    stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+                </svg>
             </a>
         </div>
     </section>
@@ -213,7 +223,8 @@
                 @foreach ($dynamicBenefits as $benefit)
                     <div
                         class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <i class="fas fa-check text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0"></i>
+                        <span aria-hidden="true"
+                            class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
 
                         <p class="text-lg md:text-3xl text-gray-700 font-medium">
                             {{ $benefit }}
@@ -226,7 +237,13 @@
                 <a href="#order"
                     class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase">
                     অর্ডার করতে ক্লিক করুন
-                    <i class="fas fa-shopping-cart text-xl md:text-3xl ml-1"></i>
+                    <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -272,7 +289,13 @@
                 <a href="#order"
                     class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 md:px-14 py-3 md:py-5 rounded-full font-black text-lg md:text-3xl transition-all uppercase">
                     অর্ডার করতে ক্লিক করুন
-                    <i class="fas fa-shopping-cart text-xl md:text-3xl ml-1"></i>
+                    <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none"
+                        stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+                    </svg>
                 </a>
             </div>
         </div>
@@ -311,10 +334,10 @@
                 </p>
             </div>
 
-            <h3
+            <p
                 class="text-4xl md:text-4xl font-black text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter">
                 {{ $landing->discount_price }}
-            </h3>
+            </p>
 
         </div>
     </section>
@@ -324,7 +347,7 @@
 
         <div class="inline-block bg-[#dcfce7] px-8 md:px-20 py-4 rounded-full mb-16 border border-[#c1e9cd]">
             <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight">
-                আমাদের কাছ থেকে <span class="text-[#00B22C]">কেন কিনবেন?</span>
+                আমাদের কাছ থেকে <span class="text-[#145a32]">কেন কিনবেন?</span>
             </h2>
         </div>
 
@@ -399,6 +422,7 @@
         <x-landing.order-form :landing="$landing" />
     </section>
 
+    </main>
     {{-- ══ FOOTER (Exact Image Match) ══ --}}
     <footer class="bg-[#F8F9FA] pt-12 pb-8 px-4 border-t border-gray-200">
         <div class="max-w-7xl mx-auto">
@@ -406,7 +430,11 @@
             <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
 
                 <div class="flex items-center gap-3 text-gray-800">
-                    <i class="fa-solid fa-location-dot text-xl text-gray-700"></i>
+                    <svg aria-hidden="true" class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path>
+                        <circle cx="12" cy="10" r="2.5"></circle>
+                    </svg>
                     <span class="text-sm md:text-base font-medium">
                         {{ $setup->corporate_address ?? 'Kuril, Vatara, Dhaka-1229, Bangladesh' }}
                     </span>
@@ -429,40 +457,6 @@
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof Swiper !== 'undefined') {
-                new Swiper('.rv-swiper', {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    loop: true,
-                    centeredSlides: false,
-                    autoplay: {
-                        delay: 3000,
-                        disableOnInteraction: false,
-                    },
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                    breakpoints: {
-                        768: {
-                            slidesPerView: 2,
-                            spaceBetween: 30,
-                        },
-                        1024: {
-                            slidesPerView: 3,
-                            spaceBetween: 30,
-                        }
-                    }
-                });
-            }
-        });
-    </script>
 </body>
 
 </html>
