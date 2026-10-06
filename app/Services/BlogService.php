@@ -27,8 +27,6 @@ class BlogService
             if (!empty($filters['with'])) {
                 $query->with($filters['with']);
             }
-
-
             //filter
             if (isset($filters['status'])) {
                 if ($filters['status'] == Status::Trashed->value) {
@@ -105,7 +103,13 @@ class BlogService
             }
 
             Log::error('Blog creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create blog');
+            
+            $errorMessage = $e->getMessage();
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                $errorMessage = 'Database error: ' . $e->errorInfo[2] ?? 'Failed to execute query';
+            }
+            
+            throw ApiException::serverError('Failed to create blog: ' . $errorMessage);
         }
     }
     /**
@@ -156,7 +160,13 @@ class BlogService
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Blog update failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to update blog');
+
+            $errorMessage = $e->getMessage();
+            if ($e instanceof \Illuminate\Database\QueryException) {
+                $errorMessage = 'Database error: ' . $e->errorInfo[2] ?? 'Failed to execute query';
+            }
+
+            throw ApiException::serverError('Failed to update blog: ' . $errorMessage);
         }
     }
 

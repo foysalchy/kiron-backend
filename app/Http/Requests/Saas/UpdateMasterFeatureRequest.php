@@ -29,9 +29,9 @@ class UpdateMasterFeatureRequest extends FormRequest
             'image'       => 'nullable|image|max:2048',
             'icon'        => 'nullable|string|max:100',
             'description' => 'nullable|string',
-            'meta_title' => 'nullable| string',
-            'meta_description' => 'nullable|string',
-            'meta_keywords' => 'nullable',
+            'meta_title' => 'nullable| string|max:255',
+            'meta_description' => 'nullable|string|max:255',
+            'meta_keywords' => 'nullable|string|max:255',
             'placement'   => 'sometimes|required|in:1,2',
             'status'      => 'sometimes|required|integer',
         ];

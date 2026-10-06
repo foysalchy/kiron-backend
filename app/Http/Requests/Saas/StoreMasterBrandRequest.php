@@ -27,11 +27,11 @@ class StoreMasterBrandRequest extends FormRequest
             'name' => 'required|string|max:255',
             'logo' => 'nullable|image|max:2048',
             'link' => 'nullable|url',
-            'meta_title' => 'nullable| string',
+            'meta_title' => 'nullable| string|max:255',
             'description' => 'nullable|string',
             'slug' => 'required|string',
-            'meta_description' => 'nullable|string',
-            'meta_keywords' => 'nullable',
+            'meta_description' => 'nullable|string|max:255',
+            'meta_keywords' => 'nullable|string|max:255',
         ];
     }
     /**

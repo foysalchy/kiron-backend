@@ -19,7 +19,9 @@ class NotificationController extends Controller
         }
 
         $perPage = $request->input('per_page', 15);
-        $paginator = $query->latest()->paginate($perPage);
+        $paginator = $query->orderByRaw('read_at IS NOT NULL')
+                           ->latest()
+                           ->paginate($perPage);
 
         $paginator->getCollection()->transform(function ($n) {
             return [

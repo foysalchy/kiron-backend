@@ -17,10 +17,10 @@ class StoreProductRequest extends BaseCompanyRequest
     protected function prepareForValidation(): void
     {
         $merge = [];
-        if (!$this->has('slug') || empty($this->slug)) {
+        if (!$this->has('slug') | empty($this->slug)) {
             $merge['slug'] = \Illuminate\Support\Str::slug($this->title) . '-' . time();
         }
-        if (!$this->has('manage_stock') || $this->manage_stock === null) {
+        if (!$this->has('manage_stock') | $this->manage_stock === null) {
             $merge['manage_stock'] = 1;
         }
         if (is_array($this->sku_code)) {
@@ -110,8 +110,8 @@ class StoreProductRequest extends BaseCompanyRequest
                 // Purpose & Meta
                 'purpose'          => ['required', 'string', 'max:255'],
                 'meta_title'       => ['nullable', 'string', 'max:255'],
-                'meta_description' => ['nullable', 'string'],
-                'meta_keywords'    => ['nullable'],
+                'meta_description' => ['nullable', 'string', 'max:255'],
+                'meta_keywords'    => ['nullable','string', 'max:255'],
                 'meta_keywords.*'  => ['nullable', 'string'],
             ]
         );
