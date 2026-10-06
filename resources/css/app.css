@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 @import "toastr/build/toastr.min.css";
 @plugin "@tailwindcss/typography";
@@ -70,13 +69,12 @@
     font-family: "Manrope", "Hind Siliguri", sans-serif;
 }
 
-.font-template2 {
+.body,
+.group\/title p {
     font-family: "Geist Sans", "Hind Siliguri", sans-serif;
 }
 
-.font-template2 :is(h1, h2, h3, h4, h5, h6) {
-    font-family: "Geist Sans", "Hind Siliguri", sans-serif;
-}
+
 
 @font-face {
     font-family: "Geist Sans";
@@ -146,12 +144,14 @@
 
     --color-char-green: #4c6444;
 }
+
 a,
 button,
 .cursor-pointer,
 input[type="submit"] {
     cursor: pointer !important;
 }
+
 h1,
 h2,
 h3,
@@ -166,22 +166,24 @@ h6 {
     top: 100px !important;
     right: 20px !important;
 }
-#toast-container > .toast-success {
+
+#toast-container>.toast-success {
     background-color: #ff6a00 !important;
     opacity: 1;
 }
 
-#toast-container > .toast-error {
+#toast-container>.toast-error {
     background-color: #e11d48 !important;
     opacity: 1;
 }
-#toast-container > .toast-warning,
-#toast-container > .toast-info {
+
+#toast-container>.toast-warning,
+#toast-container>.toast-info {
     background-color: #f59e0b !important;
     opacity: 1 !important;
 }
 
-#toast-container > .toast .toast-progress {
+#toast-container>.toast .toast-progress {
     background-color: #ffffff;
     opacity: 0.3;
 }
@@ -195,6 +197,7 @@ h6 {
     font-weight: 700;
     font-size: 14px;
 }
+
 button:hover {
     cursor: pointer;
 }
@@ -202,6 +205,7 @@ button:hover {
 #cat-slider a:hover img {
     transform: scale(1.1);
 }
+
 .hind-siliguri-light {
     font-family: "Hind Siliguri", sans-serif;
     font-weight: 300;
@@ -239,27 +243,34 @@ button:hover {
     margin-left: auto;
     margin-right: auto;
 }
+
 .prose li p {
     margin: 0px !important;
 }
+
 .prose li {
     margin: 0px !important;
 }
+
 .prose p {
     margin-top: 5px !important;
     margin-bottom: 0;
 }
+
 .prose ul {
     margin-top: 0 !important;
 }
+
 .prose a {
     color: rgb(50, 50, 230);
 }
+
 .prose h2,
 .prose h3 {
     margin-top: 15px;
     margin-bottom: 0px;
 }
+
 /* Small devices (phones) */
 @media (min-width: 576px) {
     .container {
@@ -294,11 +305,13 @@ button:hover {
         max-width: 1320px;
     }
 }
+
 @media (min-width: 1536px) {
     .container {
         max-width: 1440px;
     }
 }
+
 html.lenis {
     height: auto;
 }
@@ -346,9 +359,11 @@ html.lenis {
     line-height: 20px;
     font-weight: 600;
 }
+
 .prose hr {
     margin: 10px 0px !important;
 }
+
 .prose h5 {
     margin-top: 0;
     margin-bottom: 5px;
@@ -372,11 +387,11 @@ html.lenis {
     line-height: 1.6;
 }
 
-.prose h1 + p,
-.prose h2 + p,
-.prose h3 + p,
-.prose h4 + p,
-.prose h5 + p,
-.prose h6 + p {
+.prose h1+p,
+.prose h2+p,
+.prose h3+p,
+.prose h4+p,
+.prose h5+p,
+.prose h6+p {
     margin-top: 0;
 }
