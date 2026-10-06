@@ -1,97 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 
-   @yield('meta')
+@yield('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.onload=null; this.media='all'">
-    <!-- Local CSS -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-  
-    @include('components.meta-info.pixel', ['setup' => $setup])
-    <style>
-        :root {
-            --primary-color: {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }};
+@include('components.fontawesome')
+<!-- Local CSS -->
+@vite(['resources/css/app.css', 'resources/js/app.js'])
 
-            --primary-text: {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }};
+@include('components.meta-info.pixel', ['setup' => $setup])
+<style>
+    :root {
+        --primary-color:
+            {{ $themeColor->theme_template['primary_color'] ?? '#BD4F00' }}
+        ;
 
-            --primary-hover-text: {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }};
-            --primary-hover-color: {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }};
+        --primary-text:
+            {{ $themeColor->theme_template['primary_text_color'] ?? '#ffffff' }}
+        ;
 
-            --secondary-color: {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }};
-            --secondary-text: {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }};
+        --primary-hover-text:
+            {{ $themeColor->theme_template['primary_hover_text'] ?? '#a34400' }}
+        ;
+        --primary-hover-color:
+            {{ $themeColor->theme_template['primary_hover_color'] ?? '#a34400' }}
+        ;
 
-            --header-bg: {{ $themeColor->theme_template['header_color'] ?? ($themeColor->theme_template['primary_color'] ?? '#66267b') }};
-            --header-text: {{ $themeColor->theme_template['header_text_color'] ?? '#ffffff' }};
+        --secondary-color:
+            {{ str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#FFA500') }}
+        ;
+        --secondary-text:
+            {{ trim($themeColor->theme_template['secondary_text_color'] ?? '#000000') }}
+        ;
 
-            --footer-bg: {{ $themeColor->theme_template['footer_color'] ?? '#0a061e' }};
-            --footer-text: {{ $themeColor->theme_template['footer_text_color'] ?? '#ffffff' }};
-        }
+        --header-bg:
+            {{ $themeColor->theme_template['header_color'] ?? ($themeColor->theme_template['primary_color'] ?? '#66267b') }}
+        ;
+        --header-text:
+            {{ $themeColor->theme_template['header_text_color'] ?? '#ffffff' }}
+        ;
 
-        .header-custom-bg {
-            background-color: var(--header-bg) !important;
-            color: var(--header-text) !important;
-        }
+        --footer-bg:
+            {{ $themeColor->theme_template['footer_color'] ?? '#0a061e' }}
+        ;
+        --footer-text:
+            {{ $themeColor->theme_template['footer_text_color'] ?? '#ffffff' }}
+        ;
+    }
 
-        .footer-custom-bg {
-            background-color: var(--footer-bg) !important;
-            color: var(--footer-text) !important;
-        }
-        .text-header {
-            color: var(--header-text) !important;
-        }
-        .text-footer {
-            color: var(--footer-text) !important;
-        }
-        .primary-bg {
-            background-color: var(--primary-color) !important;
-            color: var(--primary-text) !important;
-        }
+    .header-custom-bg {
+        background-color: var(--header-bg) !important;
+        color: var(--header-text) !important;
+    }
 
-        .text-primary {
-            color: var(--primary-text) !important;
-        }
+    .footer-custom-bg {
+        background-color: var(--footer-bg) !important;
+        color: var(--footer-text) !important;
+    }
 
-        .text-brand {
-            color: var(--primary-color) !important;
-        }
+    .text-header {
+        color: var(--header-text) !important;
+    }
 
-        .secondary-bg {
-            background-color: var(--secondary-color) !important;
-            color: var(--secondary-text) !important;
-        }
+    .text-footer {
+        color: var(--footer-text) !important;
+    }
 
-        .text-secondary {
-            color: var(--secondary-text) !important;
-        }
+    .primary-bg {
+        background-color: var(--primary-color) !important;
+        color: var(--primary-text) !important;
+    }
 
-        .hover-text:hover {
-            color: var(--primary-hover-text) !important;
-        }
+    .text-primary {
+        color: var(--primary-text) !important;
+    }
 
-        .primary-bg-hover:hover {
-            background-color: var(--primary-hover-color) !important;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
+    .text-brand {
+        color: var(--primary-color) !important;
+    }
 
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-    </style>
-    @stack('styles')
-    @if(isset($footerCodes))
-        @foreach($footerCodes as $footerCode)
-            {!! $footerCode->code !!}
-        @endforeach
-    @endif
+    .secondary-bg {
+        background-color: var(--secondary-color) !important;
+        color: var(--secondary-text) !important;
+    }
+
+    .text-secondary {
+        color: var(--secondary-text) !important;
+    }
+
+    .hover-text:hover {
+        color: var(--primary-hover-text) !important;
+    }
+
+    .primary-bg-hover:hover {
+        background-color: var(--primary-hover-color) !important;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+@stack('styles')
+@if(isset($footerCodes))
+    @foreach($footerCodes as $footerCode)
+        {!! $footerCode->code !!}
+    @endforeach
+@endif
 </head>
 
 <body class="font-storefront">
@@ -120,7 +143,7 @@
 
     @stack('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             toastr.options = {
                 "closeButton": true,
                 "progressBar": true,
