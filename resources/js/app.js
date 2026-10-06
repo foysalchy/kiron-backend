@@ -1,4 +1,9 @@
 import './bootstrap';
+import $ from 'jquery';
+import toastr from 'toastr';
+
+window.$ = window.jQuery = $;
+window.toastr = toastr;
 
 window.SwiperPromise = document.querySelector('.rv-swiper, .mainHeroSwiper, .heroSwiper')
     ? Promise.all([
@@ -45,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 wrapper.classList.add('animate-pulse', 'bg-gray-200');
                 img.style.opacity = '0';
 
-                img.addEventListener('load', function() {
+                img.addEventListener('load', function () {
                     wrapper.classList.remove('animate-pulse', 'bg-gray-200');
                     img.style.transition = 'opacity 0.3s ease-in-out';
                     img.style.opacity = '1';
