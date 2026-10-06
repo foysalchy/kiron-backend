@@ -235,12 +235,34 @@ class ProductService
             // Handle thumbnail upload
             if (isset($data['thumbnail']) && $data['thumbnail'] instanceof \Illuminate\Http\UploadedFile) {
                 $customFileName = Str::slug($data['slug'] ?? $data['title'] ?? 'product') . '-' . time();
+                
+                $imageFile = $data['thumbnail'];
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
-                    $data['thumbnail'],
+                    $imageFile,
                     'products/thumbnails',
                     'r2',
                     2048,
                     $customFileName
+                );
+
+                $thumbnail310FileName = $customFileName . '-310x310';
+                $data['thumbnail_310'] = FileUploadHelper::uploadResizedWebpImage(
+                    $imageFile,
+                    'products/thumbnails',
+                    310,
+                    310,
+                    'r2',
+                    $thumbnail310FileName
+                );
+
+                $thumbnail95FileName = $customFileName . '-95x95';
+                $data['thumbnail_95'] = FileUploadHelper::uploadResizedWebpImage(
+                    $imageFile,
+                    'products/thumbnails',
+                    95,
+                    95,
+                    'r2',
+                    $thumbnail95FileName
                 );
             } else {
                 $data['thumbnail'] = $data['thumbnail'] ?? null;
@@ -309,6 +331,12 @@ class ProductService
             if (isset($data['thumbnail'])) {
                 FileUploadHelper::delete($data['thumbnail']);
             }
+            if (isset($data['thumbnail_310'])) {
+                FileUploadHelper::delete($data['thumbnail_310']);
+            }
+            if (isset($data['thumbnail_95'])) {
+                FileUploadHelper::delete($data['thumbnail_95']);
+            }
 
             Log::error('Product creation failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to create product: ' . $e->getMessage());
@@ -351,6 +379,18 @@ class ProductService
             if ($originalProduct->thumbnail) {
                 $newProductData['thumbnail'] = FileUploadHelper::copyFile(
                     $originalProduct->thumbnail,
+                    'products/thumbnails'
+                );
+            }
+            if ($originalProduct->thumbnail_310) {
+                $newProductData['thumbnail_310'] = FileUploadHelper::copyFile(
+                    $originalProduct->thumbnail_310,
+                    'products/thumbnails'
+                );
+            }
+            if ($originalProduct->thumbnail_95) {
+                $newProductData['thumbnail_95'] = FileUploadHelper::copyFile(
+                    $originalProduct->thumbnail_95,
                     'products/thumbnails'
                 );
             }
@@ -677,13 +717,63 @@ class ProductService
             // Handle thumbnail upload
             if (isset($data['thumbnail'])) {
                 $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '-' . time();
+                
+                $imageFile = $data['thumbnail'];
                 $data['thumbnail'] = FileUploadHelper::replace(
-                    $data['thumbnail'],
+                    $imageFile,
                     $product->thumbnail,
                     'products/thumbnails',
                     'r2',
                     $customFileName
                 );
+
+                $thumbnail310FileName = $customFileName . '-310x310';
+                $data['thumbnail_310'] = FileUploadHelper::replaceResizedWebpImage(
+                    $imageFile,
+                    $product->thumbnail_310,
+                    'products/thumbnails',
+                    310,
+                    310,
+                    'r2',
+                    $thumbnail310FileName
+                );
+
+                $thumbnail95FileName = $customFileName . '-95x95';
+                $data['thumbnail_95'] = FileUploadHelper::replaceResizedWebpImage(
+                    $imageFile,
+                    $product->thumbnail_95,
+                    'products/thumbnails',
+                    95,
+                    95,
+                    'r2',
+                    $thumbnail95FileName
+                );
+            } elseif (!empty($product->thumbnail)) {
+                $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '-' . time();
+
+                if (empty($product->thumbnail_310)) {
+                    $thumbnail310FileName = $customFileName . '-310x310';
+                    $data['thumbnail_310'] = FileUploadHelper::generateResizedFromExisting(
+                        $product->thumbnail,
+                        'products/thumbnails',
+                        310,
+                        310,
+                        'r2',
+                        $thumbnail310FileName
+                    );
+                }
+
+                if (empty($product->thumbnail_95)) {
+                    $thumbnail95FileName = $customFileName . '-95x95';
+                    $data['thumbnail_95'] = FileUploadHelper::generateResizedFromExisting(
+                        $product->thumbnail,
+                        'products/thumbnails',
+                        95,
+                        95,
+                        'r2',
+                        $thumbnail95FileName
+                    );
+                }
             }
 
             // Extract gallery data
@@ -772,6 +862,12 @@ class ProductService
 
             if (isset($data['thumbnail'])) {
                 FileUploadHelper::delete($data['thumbnail']);
+            }
+            if (isset($data['thumbnail_310'])) {
+                FileUploadHelper::delete($data['thumbnail_310']);
+            }
+            if (isset($data['thumbnail_95'])) {
+                FileUploadHelper::delete($data['thumbnail_95']);
             }
 
             Log::error('Product update failed: ' . $e->getMessage());
@@ -1154,6 +1250,12 @@ class ProductService
 
             // Delete thumbnail
             FileUploadHelper::delete($product->thumbnail);
+            if ($product->thumbnail_310) {
+                FileUploadHelper::delete($product->thumbnail_310);
+            }
+            if ($product->thumbnail_95) {
+                FileUploadHelper::delete($product->thumbnail_95);
+            }
 
             // Delete all gallery images
             foreach ($product->galleries as $gallery) {

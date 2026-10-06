@@ -42,7 +42,9 @@ class ProductController extends FrontendController
         $breadcrumb = [['name' => 'All Products', 'slug' => 'shop']];
         $query = Product::with('variations')
             ->withCount('reviews')
-            ->withAvg('reviews', 'rating');
+            ->withAvg('reviews', 'rating')
+            ->where('status', Status::Active->value);
+
 
         if ($request->filled('search')) {
             SearchProduct::create([
@@ -590,7 +592,7 @@ class ProductController extends FrontendController
             }
         }
 
-        $products = $productQuery->select('id', 'title', 'slug', 'thumbnail')
+        $products = $productQuery->select('id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95')
             ->take(10)
             ->get();
 

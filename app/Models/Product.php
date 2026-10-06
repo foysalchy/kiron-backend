@@ -26,6 +26,8 @@ class Product extends Model
         'title',
         'slug',
         'thumbnail',
+        'thumbnail_310',
+        'thumbnail_95',
         'video_link',
         'mega_category_ids',
         'sub_category_ids',
@@ -72,7 +74,7 @@ class Product extends Model
     ];
 
     protected $hidden = ['deleted_at'];
-    protected $appends = ['thumbnail_url', 'display_image_url'];
+    protected $appends = ['thumbnail_url', 'thumbnail_310_url', 'thumbnail_95_url', 'display_image_url'];
 
     public function getDisplayImageUrlAttribute(): ?string
     {
@@ -221,6 +223,20 @@ class Product extends Model
 
         return $this->thumbnail
             ? Storage::disk('r2')->url($this->thumbnail)
+            : null;
+    }
+
+    public function getThumbnail310UrlAttribute(): ?string
+    {
+        return $this->thumbnail_310
+            ? Storage::disk('r2')->url($this->thumbnail_310)
+            : null;
+    }
+
+    public function getThumbnail95UrlAttribute(): ?string
+    {
+        return $this->thumbnail_95
+            ? Storage::disk('r2')->url($this->thumbnail_95)
             : null;
     }
 
