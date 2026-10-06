@@ -4,7 +4,7 @@
 @endsection
 @section('content')
     <!-- CONTACT HEADER SECTION -->
-    <section class="container py-6 mx-auto font-['Outfit'] px-4">
+    <section class="container py-6 mx-auto font-storefront px-4">
         <div class="text-center">
             <!-- Main Heading -->
             <h1 class="text-2xl md:text-4xl font-black text-gray-900 mb-4">
@@ -216,7 +216,7 @@
     </section>
     <!-- FAQ SECTION -->
      @if($faqs->count() > 0)
-    <section class="container py-6 mx-auto pb-0 font-['Outfit']">
+    <section class="container py-6 mx-auto pb-0 font-storefront">
         <div class="bg-white rounded-lg shadow-xs">
 
             <!-- Title -->

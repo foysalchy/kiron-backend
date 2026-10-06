@@ -555,7 +555,9 @@
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            if (document.querySelector('.mainHeroSwiper')) {
+            window.SwiperPromise.then((Swiper) => {
+                if (!Swiper) return;
+
                 new Swiper('.mainHeroSwiper', {
                     loop: true,
                     effect: 'fade',
@@ -569,7 +571,7 @@
                         clickable: true,
                     },
                 });
-            }
+            });
         });
     </script>
 @endpush

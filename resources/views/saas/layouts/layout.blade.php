@@ -17,9 +17,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.media='all'">
+        media="print" onload="this.onload=null; this.media='all'">
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('components.meta-info.pixel', ['setup' => $setup])
@@ -89,9 +88,9 @@
         menuClose.addEventListener("click", toggleMenu);
         menuOverlay.addEventListener("click", toggleMenu);
 
-        function initLenisAnimation() {
-            if (window.lenis) {
-                window.lenis.on('scroll', () => {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.lenisReady.then((lenis) => {
+                lenis.on('scroll', () => {
                     const vh = window.innerHeight;
 
                     document.querySelectorAll('.move-up').forEach(el => {
@@ -111,11 +110,8 @@
                         }
                     });
                 });
-            } else {
-                setTimeout(initLenisAnimation, 100);
-            }
-        }
-        initLenisAnimation();
+            });
+        });
     </script>
 
 </body>

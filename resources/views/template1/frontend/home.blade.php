@@ -14,10 +14,11 @@
         <div class="flex flex-col lg:flex-row gap-4 items-stretch h-[200px] sm:h-[280px] md:h-[380px] lg:h-[480px]">
 
             <!-- 1. LEFT SIDEBAR: Cascading Multi-Level Menu (260px wide) -->
-            <div class="relative w-[250px] bg-white shadow-xs rounded-lg pb-2 hidden  lg:block">
-                <div class="primary-bg text-primary py-3 text-lg text-center font-semibold position-sticky sticky top-0">
+            <div class="relative flex h-full min-h-0 w-[250px] flex-col rounded-lg bg-white pb-2 shadow-xs hidden lg:flex">
+                <div class="primary-bg text-primary shrink-0 py-3 text-lg text-center font-semibold">
                     Explore Categories</div>
-                @foreach ($categories as $category)
+                <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                    @foreach ($categories as $category)
                     <div class="group border-b border-gray-200">
                         <a href="{{ url($category->slug) }}"
                             class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
@@ -65,7 +66,8 @@
                             </div>
                         @endif
                     </div>
-                @endforeach
+                    @endforeach
+                </div>
 
             </div>
 
