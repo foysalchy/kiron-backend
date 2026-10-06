@@ -63,47 +63,55 @@
                                 {{ $blog->reading_time ?? 5 }} minutes
                             </span>
                         </div>
-@php
-                            $keywords = is_array($blog->meta_keywords)
-                                ? $blog->meta_keywords
-                                : explode(',', $blog->meta_keywords);
-                        @endphp
                         @php
-    $keywordTags = is_string($keywords) ? json_decode($keywords, true) : $keywords;
-@endphp
+                            $keywords = $blog->meta_keywords;
 
-<div class="flex flex-wrap gap-2 mb-8">
-    @foreach ($keywordTags ?? [] as $tag)
-        @php
-            $tag = trim($tag);
-        @endphp
+                            if (is_string($keywords)) {
+                                $decoded = json_decode($keywords, true);
 
-        @if ($tag)
-            <a href="{{ url('/blogs?tag=' . urlencode($tag)) }}"
-                class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200">
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $keywords = $decoded;
+                                } else {
+                                    $keywords = explode(',', $keywords);
+                                }
+                            }
 
-                <svg xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="lucide lucide-tag h-3 w-3 mr-1">
+                            $keywords = is_array($keywords) ? $keywords : [];
+                        @endphp
 
-                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
-                    </path>
+                        <div class="flex flex-wrap gap-2 mb-8">
+                            @foreach ($keywords as $tag)
+                                @php
+                                    $tag = trim($tag);
+                                @endphp
 
-                    <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                </svg>
+                                @if ($tag)
+                                    <a href="{{ url('/blogs?tag=' . urlencode($tag)) }}"
+                                        class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-200">
 
-                {{ $tag }}
-            </a>
-        @endif
-    @endforeach
-</div>
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            class="lucide lucide-tag h-3 w-3 mr-1">
+
+                                            <path
+                                                d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
+                                            </path>
+
+                                            <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                                        </svg>
+
+                                        {{ $tag }}
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
                           <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
                             {{ $blog->title }}
                         </h1>

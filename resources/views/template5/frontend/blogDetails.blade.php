@@ -63,16 +63,23 @@
                             </span>
                         </div>
 @php
-                            $keywords = is_array($blog->meta_keywords)
-                                ? $blog->meta_keywords
-                                : explode(',', $blog->meta_keywords);
-                        @endphp
-                        @php
-    $keywordTags = is_string($keywords) ? json_decode($keywords, true) : $keywords;
+    $keywords = $blog->meta_keywords;
+
+    if (is_string($keywords)) {
+        $decoded = json_decode($keywords, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $keywords = $decoded;
+        } else {
+            $keywords = explode(',', $keywords);
+        }
+    }
+
+    $keywords = is_array($keywords) ? $keywords : [];
 @endphp
 
 <div class="flex flex-wrap gap-2 mb-8">
-    @foreach ($keywordTags ?? [] as $tag)
+    @foreach ($keywords as $tag)
         @php
             $tag = trim($tag);
         @endphp
@@ -92,7 +99,8 @@
                     stroke-linejoin="round"
                     class="lucide lucide-tag h-3 w-3 mr-1">
 
-                    <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
+                    <path
+                        d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z">
                     </path>
 
                     <circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle>
