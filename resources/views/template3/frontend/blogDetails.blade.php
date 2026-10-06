@@ -35,20 +35,34 @@
 
                       
 
-                        <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8 pb-6">
+                        <div class="flex  items-center gap-6 text-sm text-gray-500  mb-4 justify-between">
                             <div class="flex items-center gap-2">
-                                <i class="fa-regular fa-user text-secondary"></i>
+                                <i class="fa-regular fa-user text-secondary text-black"></i> Author:
                                 <span>{{ $blog->user->name ?? 'Admin' }}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="fa-regular fa-calendar text-secondary"></i>
                                 <span>{{ $blog->created_at->format('Y-m-d') }}</span>
                             </div>
-                            <span class="primary-bg text-primary px-2 py-0.5 rounded-full text-xs font-medium">
-                                {{ $blog->reading_time ?? 5 }} minutes
-                            </span>
+                           
                         </div>
-                        @php
+                   
+                          <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
+                            {{ $blog->title }}
+                        </h1>
+
+                        <div class="prose prose-orange max-w-none"> {{-- Customize the prose style to match your theme: prose-orange or prose-slate --}}
+                            {!! $blog->body !!}
+
+                            @if ($blog->body_2)
+                                <div class="mt-6">{!! $blog->body_2 !!}</div>
+                            @endif
+
+                            @if ($blog->body_3)
+                                <div class="mt-6">{!! $blog->body_3 !!}</div>
+                            @endif
+                        </div>
+     @php
     $keywords = $blog->meta_keywords;
 
     if (is_string($keywords)) {
@@ -64,7 +78,7 @@
     $keywords = is_array($keywords) ? $keywords : [];
 @endphp
 
-<div class="flex flex-wrap gap-2 mb-8">
+<div class="flex flex-wrap gap-2 mb-6">
     @foreach ($keywords as $tag)
         @php
             $tag = trim($tag);
@@ -97,22 +111,6 @@
         @endif
     @endforeach
 </div>
-                          <h1 class="text-xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 leading-tight">
-                            {{ $blog->title }}
-                        </h1>
-
-                        <div class="prose prose-orange max-w-none"> {{-- Customize the prose style to match your theme: prose-orange or prose-slate --}}
-                            {!! $blog->body !!}
-
-                            @if ($blog->body_2)
-                                <div class="mt-6">{!! $blog->body_2 !!}</div>
-                            @endif
-
-                            @if ($blog->body_3)
-                                <div class="mt-6">{!! $blog->body_3 !!}</div>
-                            @endif
-                        </div>
-
                      
                         {{-- <!-- Comments Section -->
                         <div class=\"mt-12\">
