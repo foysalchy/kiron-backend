@@ -130,7 +130,7 @@
         }
         body , 
 .group\/title p{
-font-family: "Geist", sans-serif ;
+font-family: "Geist Sans", sans-serif ;
   font-optical-sizing: auto;
   font-weight: <weight>;
   font-style: normal;
