@@ -211,9 +211,9 @@
                                             <div class="flex items-center gap-3">
                                                 <div
                                                     class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shrink-0 border border-gray-100 overflow-hidden">
-                                                    @if ($item->product && $item->product->thumbnail)
-                                                        <img src="{{ $item->product->thumbnail_url }}"
-                                                            onerror="this.src='{{ $item->product->thumbnail_url }}'"
+                                                    @if($item->product && $item->product->thumbnail_95)
+                                                        <img src="{{ $item->product->thumbnail_95_url }}"
+                                                            onerror="this.src='{{ $item->product->thumbnail_95_url }}'"
                                                             class="w-full h-full object-cover">
                                                     @endif
                                                 </div>

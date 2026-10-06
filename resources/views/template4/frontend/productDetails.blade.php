@@ -313,7 +313,7 @@
             @foreach ($relatedProducts->take(5) as $rel)
                 <a href="{{ url($rel->slug) }}"
                     class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                    <img src="{{ $rel->thumbnail_url ?? '' }}" loading="lazy" width="64" height="64"
+                    <img src="{{ $rel->thumbnail_95_url ?? '' }}" loading="lazy" width="64" height="64"
                         alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
                     <div class="min-w-0 flex-1">
                         <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
