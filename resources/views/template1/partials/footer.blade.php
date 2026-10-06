@@ -165,24 +165,27 @@
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div
                     class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm opacity-90 text-center">
-                    <p>Â© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
+                    <p> {{ $setup->copy_right ?? ''}}</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-xs md:text-sm opacity-90">We Accept:</span>
-                    <div class="flex gap-2">
-                        @foreach ($footerBottomRight as $item)
-                            <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
-                                @if ($item->icon_file)
-                                    <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
-                                        height="16" width="120" loading="lazy" alt="{{ $item->title }}"
-                                        class="h-4">
-                                @else
-                                    {{ $item->title }}
-                                @endif
-                            </div>
-                        @endforeach
+                @if ($footerBottomRight->isNotEmpty())
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs md:text-sm opacity-90">We Accept:</span>
+                        <div class="flex gap-2">
+                            @foreach ($footerBottomRight as $item)
+                                <div
+                                    class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
+                                    @if ($item->icon_file)
+                                        <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
+                                            height="16" width="120" loading="lazy" alt="{{ $item->title }}"
+                                            class="h-4">
+                                    @else
+                                        {{ $item->title }}
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -229,5 +232,4 @@
             });
     });
 </script>
-
 

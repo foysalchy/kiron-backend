@@ -98,7 +98,7 @@
 
     <!-- Bottom -->
     <div class="border-t border-white/10 mt-12 pt-6 flex flex-col sm:flex-row justify-between gap-3 text-xs text-footer/50">
-      <p>&copy; {{ date('Y') }} {{ $setup->shop_name ?? 'Dorja.io' }}. All rights reserved.</p>
+      <p>{{ $setup->copy_right ?? ''}}</p>
       <p>Design & Developed by <a href="https://bhaiya.digital">Bhaiya Digital</a> </p>
     </div>
   </div>

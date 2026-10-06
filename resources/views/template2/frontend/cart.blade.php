@@ -247,6 +247,10 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                        badge.innerText = data.cart_count;
+                    });
+
                     fetch(window.location.href)
                     .then(r => r.text())
                     .then(html => {
@@ -262,6 +266,11 @@
                     });
                 } else {
                     if (typeof toastr !== 'undefined') toastr.error(data.message);
+                }
+            })
+            .catch(() => {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Unable to update cart. Please try again.');
                 }
             });
         }

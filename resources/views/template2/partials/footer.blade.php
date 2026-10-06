@@ -19,9 +19,11 @@
                             </div>
                             <div>
                                 <h3 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
-                                    {{ $feature->title }}</h3>
+                                    {{ $feature->title }}
+                                </h3>
                                 <p class="opacity-90 text-xs md:text-sm mt-0.5">
-                                    {{ $feature->subtitle ?? $feature->text_content }}</p>
+                                    {{ $feature->subtitle ?? $feature->text_content }}
+                                </p>
                             </div>
                         </div>
                     @endforeach
@@ -40,15 +42,15 @@
                     <div class="flex items-center gap-3 mb-5">
                         @if ($setup && $setup->logo)
                             <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
-                            alt="{{ $setup->shop_name ?? '' }} Logo"
-                            class="h-12 md:h-16 w-auto object-contain" loading="lazy" />
+                                alt="{{ $setup->shop_name ?? '' }} Logo" class="h-12 md:h-16 w-auto object-contain"
+                                loading="lazy" />
                         @else
                             <div class="w-10 h-10 flex items-center justify-center rounded-lg">
                                 <span
                                     class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
                             </div>
                         @endif
-                        
+
                     </div>
                     <p class="opacity-90 text-[16px] leading-relaxed mb-5">
                         {{ $setup->description ?? 'Your trusted partner for automotive accessories and car care products.' }}
@@ -65,7 +67,7 @@
                             </button>
                         </div>
                     </form>
-                    
+
                 </div>
 
                 <!-- Column 2: Quick Links -->
@@ -121,7 +123,8 @@
                                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                                 </path>
                             </svg>
-                            <a href="tel:{{ $setup->phone }}" class="hover:text-[var(--primary-color)] transition-colors">
+                            <a href="tel:{{ $setup->phone }}"
+                                class="hover:text-[var(--primary-color)] transition-colors">
                                 {{ $setup->phone }}
                             </a>
                         </li>
@@ -132,29 +135,25 @@
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
-                            <a href="mailto:{{ $setup->email }}" class="hover:text-[var(--primary-color)] transition-colors">
+                            <a href="mailto:{{ $setup->email }}"
+                                class="hover:text-[var(--primary-color)] transition-colors">
                                 {{ $setup->email }}
                             </a>
                         </li>
                     </ul>
-                    
+
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
-                            <a href="{{ $social->link }}" target="_blank"
-                                aria-label="Follow us on {{ $social->name }}"
+                            <a href="{{ $social->link }}" target="_blank" aria-label="Follow us on {{ $social->name }}"
                                 class="opacity-90 text-lg transition-all duration-300"
                                 onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
                                 onmouseout="this.style.color='#9CA3AF'">
-                                
+
 
                                 @if ($social->icon_image)
-                                    <img src="{{ $social->icon_image ?? '' }}"
-                                        alt="social icon"
-                                        class="social-icon">
+                                    <img src="{{ $social->icon_image ?? '' }}" alt="social icon" class="social-icon">
                                 @else
-                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }} social-icon"
-                                    aria-hidden="true"
-                                   ></i>
+                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }} social-icon" aria-hidden="true"></i>
                                 @endif
                             </a>
                         @endforeach
@@ -169,45 +168,46 @@
             <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div
                     class="flex flex-wrap justify-center md:justify-start gap-4 text-xs md:text-sm opacity-90 text-center">
-                    <p>© {{ date('Y') }} {{ $setup->shop_name ?? 'OrenMart' }}. All rights reserved.</p>
+                    <p>{{ $setup->copy_right ?? ''}}</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-xs md:text-sm opacity-90">We Accept:</span>
-                    <div class="flex gap-2">
-                        @foreach ($footerBottomRight as $item)
-                            <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
-                                @if ($item->icon_file)
-                                    <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
-                                        height="16" width="120" loading="lazy" alt="{{ $item->title }}"
-                                        class="h-4">
-                                @else
-                                    {{ $item->title }}
-                                @endif
-                            </div>
-                        @endforeach
+                @if ($footerBottomRight->isNotEmpty())
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs md:text-sm opacity-90">We Accept:</span>
+                        <div class="flex gap-2">
+                            @foreach ($footerBottomRight as $item)
+                                <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
+                                    @if ($item->icon_file)
+                                        <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
+                                            height="16" width="120" loading="lazy" alt="{{ $item->title }}" class="h-4">
+                                    @else
+                                        {{ $item->title }}
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </div>
     </div>
 
 </footer>
 <style>
-                                    .social-icon {
-                                        font-size: 25px;
-                                        margin-top: 10px;
-                                        border: 1px solid gainsboro;
-                                        border-radius: 5px;
-                                        width: 40px;
-                                        height: 40px;
-                                        text-align: center;
-                                        line-height: 40px;
-                                        display: inline-block;
-                                        object-fit: contain;
-                                    }
-                                </style>
+    .social-icon {
+        font-size: 25px;
+        margin-top: 10px;
+        border: 1px solid gainsboro;
+        border-radius: 5px;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        display: inline-block;
+        object-fit: contain;
+    }
+</style>
 <script>
-    document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
+    document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const email = document.getElementById('subscriber-email').value;
@@ -219,16 +219,16 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         fetch("{{ route('newsletter.subscribe') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    email: email
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                email: email
             })
+        })
             .then(async response => {
                 const data = await response.json();
                 if (response.ok) {
@@ -247,5 +247,3 @@
             });
     });
 </script>
-
-

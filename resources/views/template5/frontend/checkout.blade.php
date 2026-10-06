@@ -178,7 +178,7 @@
                                         class="w-7 h-6 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] font-bold text-lg leading-none rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">+</button>
                                 </div>
                                 <a href="{{ route('cart.remove', $item->rowId) }}"
-                                    class="text-red-700 hover:text-red-800 text-xs">
+                                    class="text-red-700 hover:text-red-800 text-xs checkout-cart-remove">
                                     <i class="far fa-trash-alt"></i> Remove
                                 </a>
                             </div>
@@ -578,6 +578,20 @@
                     if(totalDisplay) totalDisplay.innerText = data.total;
                     if(shippingDisplay) shippingDisplay.innerText = Number(data.shipping).toFixed(2);
                     if(discountDisplay) discountDisplay.innerText = data.discount;
+
+                    _checkoutTotal = data.grand_total_raw ? data.grand_total_raw : parseFloat(String(data.total).replace(/[^0-9.]/g, ''));
+                    const activePaymentForm = document.querySelector('.payment-form:not(.hidden)');
+                    if (activePaymentForm) {
+                        const amountInput = activePaymentForm.querySelector('[name="amount"]');
+                        if (amountInput) amountInput.value = Math.round(_checkoutTotal);
+                    }
+
+                    // Update header cart count
+                    const cartCountNav = document.querySelector('.cart-count-nav');
+                    if (cartCountNav && data.cart_count !== undefined) {
+                        cartCountNav.innerText = data.cart_count;
+                        cartCountNav.parentElement.classList.remove('hidden');
+                    }
                     
                     // Trigger draft save if needed to sync immediately
                     if(typeof saveDraft === 'function') {
@@ -600,4 +614,36 @@
 @endpush
 @push('scripts')
 @include('components.meta-info.pixel-events', ['event' => 'InitiateCheckout', 'data' => ['total' => $total]])
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const removeLinks = document.querySelectorAll('.checkout-cart-remove');
+        const formFields = document.querySelectorAll('input[name="name"], input[name="phone"], input[name="email"], input[name="district"], textarea[name="address"]');
+
+        removeLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                formFields.forEach(field => {
+                    if (field.value) {
+                        sessionStorage.setItem('checkout_form_' + field.name, field.value);
+                    }
+                });
+            });
+        });
+
+        formFields.forEach(field => {
+            const savedValue = sessionStorage.getItem('checkout_form_' + field.name);
+            if (savedValue && !field.value) {
+                field.value = savedValue;
+            }
+        });
+
+        const confirmBtn = document.querySelector('button[type="submit"]');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                formFields.forEach(field => {
+                    sessionStorage.removeItem('checkout_form_' + field.name);
+                });
+            });
+        }
+    });
+</script>
 @endpush

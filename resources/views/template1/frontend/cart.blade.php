@@ -241,6 +241,10 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                        badge.innerText = data.cart_count;
+                    });
+
                     // Update qty display
                     const qtySpan = document.getElementById('qty-' + rowId);
                     if(qtySpan) qtySpan.innerText = newQty;
@@ -269,6 +273,13 @@
                             currentMain.innerHTML = newMain.innerHTML;
                         }
                     });
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.error(data.message || 'Unable to update cart.');
+                }
+            })
+            .catch(() => {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Unable to update cart. Please try again.');
                 }
             });
         }
