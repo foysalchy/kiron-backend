@@ -71,11 +71,11 @@ class CartController extends FrontendController
             $productIds[] = is_numeric($item->id) ? $item->id : str_replace('var_', '', $item->id);
         }
 
-        $cacheKey = "cart_related_" . md5(implode('_', $productIds));
-        $relatedProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($productIds) {
+        $cacheKey = "cart_related_{$companyId}_" . md5(implode('_', $productIds));
+        $relatedProducts = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($productIds, $companyId) {
             $megaCategoryIds = [];
             if (!empty($productIds)) {
-                $productsInCart = Product::whereIn('id', $productIds)->select('id', 'mega_category_ids')->get();
+                $productsInCart = Product::whereIn('id', $productIds)->where('company_id', $companyId)->select('id', 'mega_category_ids')->get();
                 foreach ($productsInCart as $p) {
                     if ($p->mega_category_ids && is_array($p->mega_category_ids)) {
                         $megaCategoryIds = array_merge($megaCategoryIds, $p->mega_category_ids);
@@ -84,7 +84,8 @@ class CartController extends FrontendController
             }
             $megaCategoryIds = array_unique($megaCategoryIds);
 
-            $relatedQuery = Product::where('status', Status::Active->value)
+            $relatedQuery = Product::where('company_id', $companyId)
+                ->where('status', Status::Active->value)
                 ->whereNotIn('id', $productIds);
 
             if (!empty($megaCategoryIds)) {
@@ -97,7 +98,7 @@ class CartController extends FrontendController
 
             $products = $relatedQuery->inRandomOrder()->limit(8)->get();
             if ($products->isEmpty()) {
-                $products = Product::where('status', Status::Active->value)->latest()->limit(8)->get();
+                $products = Product::where('company_id', $companyId)->where('status', Status::Active->value)->latest()->limit(8)->get();
             }
             return $products;
         });

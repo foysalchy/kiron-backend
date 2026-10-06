@@ -47,7 +47,7 @@ class StoreAttributeRequest extends BaseCompanyRequest
             $names   = $this->input('names', []);
             $groupId = $this->input('attribute_group_id');
 
-            if (empty($names) || !$groupId) {
+            if (empty($names) | !$groupId) {
                 return;
             }
 

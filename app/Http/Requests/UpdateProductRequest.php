@@ -101,8 +101,8 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 // Purpose
                 'purpose' => ['sometimes', 'required', 'string', 'max:255'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
-                'meta_description' => ['nullable', 'string'],
-                'meta_keywords' => ['nullable'],
+                'meta_description' => ['nullable', 'string', 'max:255'],
+                'meta_keywords' => ['nullable', 'string', 'max:255'],
                 'meta_keywords.*' => ['nullable', 'string',],
             ]
         );
