@@ -128,6 +128,25 @@
         .animate-cart-shake {
             animation: cartShake 0.4s ease-in-out;
         }
+        body , 
+.group\/title p{
+font-family: "Geist", sans-serif ;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+}
+.group\/title p{
+margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+  height: auto;
+}
     </style>
     @stack('styles')
     @if(isset($footerCodes))
