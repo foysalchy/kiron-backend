@@ -17,6 +17,12 @@
         href="{{ $setup->favicon_url ?? asset('images/template1/frontend/sell.png') }}">
 
     @include('components.fontawesome')
+    
+    <!-- jQuery & Toastr via CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <!-- Local CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

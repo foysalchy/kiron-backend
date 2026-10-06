@@ -1,9 +1,4 @@
 import './bootstrap';
-import $ from 'jquery';
-import toastr from 'toastr';
-
-window.$ = window.jQuery = $;
-window.toastr = toastr;
 
 window.SwiperPromise = document.querySelector('.rv-swiper, .mainHeroSwiper, .heroSwiper')
     ? Promise.all([
