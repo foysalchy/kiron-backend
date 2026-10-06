@@ -30,7 +30,14 @@ class PayRollPayHeadService
             }
 
             if (!empty($filters['search'])) {
-                $query->where('name', 'like', "%{$filters['search']}%");
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('payRoll', function ($q2) use ($search) {
+                        $q2->where('name', 'like', "%{$search}%");
+                    })->orWhereHas('payHead', function ($q3) use ($search) {
+                        $q3->where('name', 'like', "%{$search}%");
+                    });
+                });
             }
 
             $sortBy = $filters['sort_by'] ?? 'created_at';

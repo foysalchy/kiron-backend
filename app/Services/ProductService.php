@@ -23,24 +23,29 @@ class ProductService
     public function getAllProducts(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Product::with([
-                'brand',
-                'galleries',
-                'barcode',
-                'variations' => function ($query) {
-                    $query->orderBy('regular_price', 'asc');
-                },
-                'variations.barcode',
+            $query = Product::query();
+            
+            if (!isset($filters['with_relations']) || $filters['with_relations'] !== 'false') {
+                $query->with([
+                    'brand',
+                    'galleries',
+                    'barcode',
+                    'variations' => function ($query) {
+                        $query->orderBy('regular_price', 'asc');
+                    },
+                    'variations.barcode',
+                    'variations.attributes.attributeGroup',
+                    'variations.attributes.attributeValue',
+                    'variations.stocks.warehouse',
+                    'variations.stocks.bin.area',
+                    'variations.stocks.bin.rack',
+                    'variations.stocks.bin.cell',
+                ]);
+            }
 
-                'variations.attributes.attributeGroup',
-                'variations.attributes.attributeValue',
-                'variations.stocks.warehouse',
-                'variations.stocks.warehouse',
-                'variations.stocks.bin.area',
-                'variations.stocks.bin.rack',
-                'variations.stocks.bin.cell',
-
-            ]);
+            if (!empty($filters['select'])) {
+                $query->select(explode(',', $filters['select']));
+            }
 
             if (isset($filters['brand_id'])) {
                 $query->where('brand_id', $filters['brand_id']);

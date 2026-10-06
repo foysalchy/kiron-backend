@@ -32,6 +32,8 @@ class ProductController extends Controller
             'sort_by' => $request->query('sort_by', 'created_at'),
             'sort_order' => $request->query('sort_order', 'desc'),
             'per_page' => $request->query('per_page', 15),
+            'select' => $request->query('select'),
+            'with_relations' => $request->query('with_relations'),
         ];
         $data = $this->productService->getAllProducts($filters, true);
 
