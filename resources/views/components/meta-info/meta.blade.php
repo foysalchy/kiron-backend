@@ -47,7 +47,11 @@ $organizationLogo = !empty($setup->logo_url) ? $setup->logo_url : $image;
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="title" content="{{ $title }}">
-@if($setup->allow_search_engine_index)
+@php
+    $isNoIndexRoute = request()->is('cart*', 'checkout*');
+@endphp
+
+@if($setup->allow_search_engine_index && !$isNoIndexRoute)
    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 @else
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">

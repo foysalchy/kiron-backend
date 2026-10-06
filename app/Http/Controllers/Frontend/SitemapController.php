@@ -47,6 +47,8 @@ ROBOTS;
                 return <<<ROBOTS
 User-agent: *
 Allow: /
+Disallow: /cart/
+Disallow: /checkout/
 Sitemap: {$url}/sitemap.xml
 ROBOTS;
             }
