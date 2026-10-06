@@ -469,7 +469,7 @@
                                     <!-- Image -->
                                     <div
                                         class="w-20 h-20 shrink-0 rounded-md overflow-hidden bg-gray-100 border border-gray-200 relative">
-                                        <img src="{{ $related->thumbnail_url }}" alt="{{ $related->title }}"
+                                        <img src="{{ $related->thumbnail_95_url }}" alt="{{ $related->title }}"
                                             class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
                                     </div>
                                     <!-- Info -->

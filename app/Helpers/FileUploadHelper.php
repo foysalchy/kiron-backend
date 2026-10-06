@@ -222,7 +222,7 @@ public static function upload(
                 'existingPath' => $existingPath,
                 'error' => $e->getMessage()
             ]);
-            throw ApiException::serverError('Failed to generate resized image');
+            throw ApiException::serverError('Failed to generate resized image: ' . $e->getMessage());
         }
     }
 

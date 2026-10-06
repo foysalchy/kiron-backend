@@ -491,7 +491,7 @@
                                     <!-- Thumbnail -->
                                     <div
                                         class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-md overflow-hidden shrink-0 border border-gray-100 p-1 flex items-center justify-center">
-                                        <img src="{{ $rel->thumbnail_url }}" alt="{{ $rel->title }}" loading="lazy"
+                                        <img src="{{ $rel->thumbnail_95_url }}" alt="{{ $rel->title }}" loading="lazy"
                                             class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
                                     </div>
 

@@ -14,13 +14,15 @@ class BlogController extends FrontendController
     {
         $companyId = $this->company_id;
         $ttl = now()->addHours(6);
-        $query = Blog::with('user')->active();
+        $query = Blog::with('user:id,name')
+            ->select('id', 'user_id', 'company_id', 'title', 'slug', 'short', 'images', 'created_at')
+            ->active();
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('body', 'like', "%{$search}%");
+                    ->orWhere('short', 'like', "%{$search}%");
             });
         }
 
@@ -72,3 +74,4 @@ class BlogController extends FrontendController
         return  $this->view('frontend.blogDetails', compact('blog', 'relatedPosts', 'popularTags'));
     }
 }
+

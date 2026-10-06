@@ -1,4 +1,4 @@
-@extends('template1.layouts.front')
+﻿@extends('template1.layouts.front')
 @section('meta')
     @include('components.meta-info.ecommerce-meta.blog-meta', ['setup' => $setup])
 @endsection
@@ -33,19 +33,9 @@
                 <div
                     class="relative bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm hover:shadow-xs transition-all duration-300 group">
 
-                    <div class="relative h-48 md:h-64 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <div class="relative bg-gray-50 flex items-center justify-center overflow-hidden">
                         <img src="{{ $blog->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
                             alt="{{ $blog->title }}" class="w-full h-full object-cover">
-
-                        @php
-                            $badgeText = is_array($blog->meta_keywords)
-                                ? $blog->meta_keywords[0] ?? 'Blog'
-                                : $blog->meta_keywords ?? 'Blog';
-                        @endphp
-                        <span
-                            class="absolute top-4 left-4 primary-bg text-primary text-sm font-bold px-3 py-1 rounded-full shadow-md z-20">
-                            {{ $badgeText }}
-                        </span>
                     </div>
 
                     <!-- Card Content -->
@@ -70,26 +60,6 @@
                             <span class="text-secondary font-bold">
                                 {{ $blog->reading_time }} Minute
                             </span>
-                        </div>
-
-                        <!-- Tags Section -->
-                        <div class="flex flex-wrap gap-3 mb-6 relative z-20"> <!-- এখানে z-20 দেওয়া হয়েছে -->
-                            @php
-                                $keywords = is_array($blog->meta_keywords)
-                                    ? $blog->meta_keywords
-                                    : explode(',', $blog->meta_keywords);
-                            @endphp
-                            @if (!empty($keywords))
-                                @foreach (array_slice($keywords, 0, 3) as $keyword)
-                                    @if (trim($keyword))
-                                        <span
-                                            class="text-xs text-gray-700 font-semibold flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-full">
-                                            <i class="fas fa-tag h-3 w-3 mr-1"></i>
-                                            {{ trim($keyword) }}
-                                        </span>
-                                    @endif
-                                @endforeach
-                            @endif
                         </div>
 
                         <!-- Read More Button (Main Link) -->

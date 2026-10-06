@@ -16,7 +16,7 @@
 
   <div class="h-36 sm:h-52 relative overflow-hidden">
     <img
-      src="{{ $offer->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
+      src="{{ $offer->thumbnail_310_url ?? $offer->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}"
       alt="{{ $offer->title ?? 'Offer' }}"
       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
     >
