@@ -15,7 +15,10 @@ window.SwiperPromise = document.querySelector('.rv-swiper, .mainHeroSwiper, .her
     })
     : Promise.resolve(null);
 
-window.lenisReady = new Promise((resolve, reject) => {
+window.lenisReady = Promise.resolve(null);
+/* 
+// Temporarily disabled Lenis
+new Promise((resolve, reject) => {
     const initializeLenis = () => {
         import('lenis').then(({ default: Lenis }) => {
             const lenis = new Lenis({
@@ -40,6 +43,7 @@ window.lenisReady = new Promise((resolve, reject) => {
         initializeLenis();
     }
 });
+*/
 
 document.addEventListener('DOMContentLoaded', () => {
     const lazyImages = document.querySelectorAll('img[loading="lazy"]');
