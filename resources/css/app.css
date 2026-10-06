@@ -40,6 +40,36 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: "Hind Siliguri";
+    src: url("../fonts/hind-siliguri/HindSiliguri-Regular-Bengali.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0980-09FF;
+}
+
+@font-face {
+    font-family: "Hind Siliguri";
+    src: url("../fonts/hind-siliguri/HindSiliguri-Bold-Bengali.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0980-09FF;
+}
+
+.font-storefront {
+    font-family: "Poppins", "Hind Siliguri", sans-serif;
+}
+
+.font-storefront :is(h1, h2, h3, h4, h5, h6) {
+    font-family: "Poppins", "Hind Siliguri", sans-serif;
+}
+
+.font-manrope-bengali {
+    font-family: "Manrope", "Hind Siliguri", sans-serif;
+}
+
 @theme {
     --font-sans:
         "Instrument Sans", ui-sans-serif, system-ui, sans-serif,

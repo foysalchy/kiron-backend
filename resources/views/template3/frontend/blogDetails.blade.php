@@ -5,7 +5,27 @@
 @section('content')
     <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
 
-        <!-- Back Button: Dynamic URL -->
+        <nav
+            class="flex items-center space-x-2 text-sm text-gray-500 mb-6 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
+            {{-- Home Link --}}
+            <a href="/" class="hover:text-primary transition-colors flex items-center gap-1">
+                <i class="fas fa-home text-xs"></i> Home
+            </a>
+
+            {{-- Blogs Index Link --}}
+            <i class="fas fa-chevron-right text-[8px] opacity-40"></i>
+            <a href="{{ url('/blogs') }}" class="hover:text-primary transition-colors">
+                Blogs
+            </a>
+
+            {{-- Current Blog Title --}}
+            <i class="fas fa-chevron-right text-[8px] opacity-40"></i>
+            <span class="text-secondary font-bold truncate max-w-[200px] md:max-w-none" title="{{ $blog->title }}">
+                {{ $blog->title }}
+            </span>
+        </nav>
+
+        <!-- আপনার বিদ্যমান Back Button -->
         <a class="inline-flex items-center text-secondary hover:text-primary mb-6 font-medium" href="{{ url('/blogs') }}">
             <i class="fas fa-arrow-left mr-2 text-sm"></i> Back to blogs
         </a>
@@ -22,10 +42,9 @@
                             <img src="{{ asset('storage/' . $blog->images[0]) }}" alt="{{ $blog->title }}"
                                 class="w-full h-64 md:h-[450px] object-cover">
                         @else
-                            <div
-                                class="w-full h-64 md:h-[450px] bg-gray-100 flex items-center justify-center text-gray-300">
+                            <div class="w-full h-64 md:h-[450px] bg-gray-100 flex items-center justify-center text-gray-300">
                                 <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="{{ $blog->title }}"
-                                class="w-full h-64 md:h-[450px] object-cover">
+                                    class="w-full h-64 md:h-[450px] object-cover">
                             </div>
                         @endif
  
@@ -51,7 +70,8 @@
                             {{ $blog->title }}
                         </h1>
 
-                        <div class="prose prose-orange max-w-none"> {{-- Customize the prose style to match your theme: prose-orange or prose-slate --}}
+                        <div class="prose prose-orange max-w-none"> {{-- Customize the prose style to match your theme:
+                            prose-orange or prose-slate --}}
                             {!! $blog->body !!}
 
                             @if ($blog->body_2)
@@ -149,7 +169,8 @@
                                                 <span class="font-bold text-gray-900">Rina Akter</span>
                                                 <span class="text-xs text-gray-500">2024-01-16</span>
                                             </div>
-                                            <p class="text-gray-700 text-sm mb-3">Very beautiful and informative post! Especially the sustainable fashion part was great.</p>
+                                            <p class="text-gray-700 text-sm mb-3">Very beautiful and informative post!
+                                                Especially the sustainable fashion part was great.</p>
                                             <div class="flex items-center gap-4">
                                                 <button class="text-xs text-gray-500 hover:text-blue-600 transition-all">
                                                     <i class="fa-regular fa-thumbs-up mr-1"></i> 12
@@ -171,7 +192,8 @@
                                                 <span class="font-bold text-gray-900">Karim Ahmed</span>
                                                 <span class="text-xs text-gray-500">2024-01-17</span>
                                             </div>
-                                            <p class="text-gray-700 text-sm mb-3">Would have liked more details on retro style. Overall though, the post is very good.</p>
+                                            <p class="text-gray-700 text-sm mb-3">Would have liked more details on retro
+                                                style. Overall though, the post is very good.</p>
                                             <div class="flex items-center gap-4">
                                                 <button class="text-xs text-gray-500 hover:text-blue-600 transition-all">
                                                     <i class="fa-regular fa-thumbs-up mr-1"></i> 12
@@ -203,7 +225,8 @@
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform">
                                     @else
                                         <img src="{{ asset('./images/template1/frontend/default.webp') }}" alt="blog image"
-                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform" loading="lazy" width="800" height="800">
+                                            class="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                                            loading="lazy" width="800" height="800">
                                     @endif
                                 </div>
                                 <div>

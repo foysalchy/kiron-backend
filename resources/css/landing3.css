@@ -1,0 +1,104 @@
+@import "tailwindcss" source(none);
+@import "./landing3-fonts.css";
+
+@source "../views/landing/landing3.blade.php";
+@source "../views/components/landing/order-form.blade.php";
+
+html {
+    scroll-behavior: smooth;
+}
+
+.container {
+    width: 100%;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1440px;
+    }
+}
+
+.swiper {
+    position: relative;
+    overflow: hidden;
+}
+
+.swiper-horizontal {
+    touch-action: pan-y;
+}
+
+.swiper-wrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    box-sizing: content-box;
+    transition-property: transform;
+    transition-timing-function: var(--swiper-wrapper-transition-timing-function, initial);
+}
+
+.swiper-slide {
+    position: relative;
+    display: block;
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.swiper-pagination {
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    transition: opacity 300ms;
+}
+
+.swiper-horizontal > .swiper-pagination-bullets,
+.swiper-pagination-bullets.swiper-pagination-horizontal {
+    top: var(--swiper-pagination-top, auto);
+    bottom: var(--swiper-pagination-bottom, 8px);
+    left: 0;
+    width: 100%;
+}
+
+.swiper-pagination-bullet {
+    display: inline-block;
+    margin: 0 var(--swiper-pagination-bullet-horizontal-gap, 4px);
+}
+
+.swiper-pagination-clickable .swiper-pagination-bullet {
+    cursor: pointer;
+}

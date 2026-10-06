@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        media="print" onload="this.onload=null; this.media='all'">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         * {
@@ -59,11 +60,12 @@
 
 <body class="text-gray-800 bg-gray-100 overflow-x-hidden">
 
+    <main>
     {{-- ══ SECTION 1: HERO ══ --}}
     <section class="bg-[#0D2601] text-white pt-10 pb-16 px-4 text-center">
         <div class="max-w-7xl mx-auto">
 
-            <img src={{ $setup->logo_url }} alt="Moringa Logo"
+            <img src={{ $setup->logo_url }} alt="Moringa Logo" width="80" height="80"
                 class="mx-auto mb-6 w-20">
 
             <div class="border border-[#2e8c03] p-4 md:p-6 rounded mb-6">
@@ -77,10 +79,10 @@
             </p> --}}
 
             <a href="#order"
-                class="inline-flex items-center gap-2 bg-[#f5a623] mb-6 text-white px-6 md:px-10 py-3 md:py-4 border-2 border-[#ad7419] rounded-xl font-bold text-lg sm:text-xl md:text-3xl shadow-lg hover:scale-105 transition-transform">
+                class="inline-flex items-center gap-2 bg-[#f5a623] mb-6 text-[#0D2601] px-6 md:px-10 py-3 md:py-4 border-2 border-[#ad7419] rounded-xl font-bold text-lg sm:text-xl md:text-3xl shadow-lg hover:scale-105 transition-transform">
                 Click to order.
                 <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/hand.png"
-                    class="w-8 md:w-12" alt="">
+                    width="32" height="32" class="w-8 md:w-12" alt="">
             </a>
 
             {{-- Video --}}
@@ -121,7 +123,7 @@
 
                 <!-- Red Header Banner -->
                 <div
-                    class="bg-[#FF0034] text-white py-6 text-xl md:text-4xl font-medium rounded-xl mb-12 shadow-lg w-full leading-tight">
+                    class="bg-[#C00000] text-white py-6 text-xl md:text-4xl font-medium rounded-xl mb-12 shadow-lg w-full leading-tight">
                     Limited Time Offer: Get {{ $landing->discount_percentage ?? '' }}% Off on
                     {{ $landing->title ?? '' }}
                 </div>
@@ -150,10 +152,10 @@
             <!-- Overlapping 3D CTA Button -->
             <div class="absolute left-1/2 -translate-x-1/2 -bottom-10 w-full flex justify-center">
                 <a href="#order"
-                    class="inline-flex items-center gap-4 bg-[#f1a32a] text-white px-10 md:px-20 py-4 rounded-xl font-bold text-2xl md:text-4xl border-3 border-[#b87d21] whitespace-nowrap">
+                    class="inline-flex items-center gap-4 bg-[#f1a32a] text-[#0D2601] px-10 md:px-20 py-4 rounded-xl font-bold text-2xl md:text-4xl border-3 border-[#b87d21] whitespace-nowrap">
                     Order Now
                     <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/hand.png"
-                        class="w-12 md:w-16" alt="hand icon">
+                        width="48" height="48" class="w-12 md:w-16" alt="hand icon">
                 </a>
             </div>
         </div>
@@ -184,10 +186,10 @@
 
         <div class="text-center mt-12">
             <a href="#order"
-                class="inline-flex items-center gap-3 bg-[#f1a32a] text-white px-6 sm:px-10 md:px-16 py-3 md:py-5 rounded-xl font-bold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
+                class="inline-flex items-center gap-3 bg-[#f1a32a] text-[#0D2601] px-6 sm:px-10 md:px-16 py-3 md:py-5 rounded-xl font-bold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
                 Order Now
                 <img src="https://landing-page-images-1.s3.ap-south-1.amazonaws.com/landing-34/hand.png"
-                    class="w-8 md:w-14" alt="">
+                    width="32" height="32" class="w-8 md:w-14" alt="">
             </a>
         </div>
     </section>
@@ -235,9 +237,10 @@
 
             <div class="mt-10">
                 <a href="#order"
-                    class="inline-flex items-center gap-2 bg-[#f5a623] text-white px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
+                    class="inline-flex items-center gap-2 bg-[#f5a623] text-[#0D2601] px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
                     Click to order.
-                    <img src="{{ asset('./images/landing/img/hand.png') }}" class="w-8 md:w-14" alt="">
+                    <img src="{{ asset('./images/landing/img/hand.png') }}" width="32" height="32"
+                        class="w-8 md:w-14" alt="">
                 </a>
             </div>
         </div>
@@ -276,9 +279,10 @@
 
             <div class="mt-10">
                 <a href="#order"
-                    class="inline-flex items-center gap-2 bg-[#f5a623] text-white px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21] hover:scale-105 transition-transform">
+                    class="inline-flex items-center gap-2 bg-[#f5a623] text-[#0D2601] px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21] hover:scale-105 transition-transform">
                     Click to order.
-                    <img src="{{ asset('./images/landing/img/hand.png') }}" class="w-8 md:w-14" alt="">
+                    <img src="{{ asset('./images/landing/img/hand.png') }}" width="32" height="32"
+                        class="w-8 md:w-14" alt="">
                 </a>
             </div>
         </div>
@@ -287,13 +291,13 @@
     {{-- ══ SECTION 7: PRICING ══ --}}
     <section class="py-14 px-4">
         <div
-            class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#2e8c03] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
-            <h2 class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#2e8c03] mb-2">
+            class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#1f5e00] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
+            <h2 class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] mb-2">
                 {{ $landing->title ?? '' }} Price
             </h2>
-            <p class="text-base md:text-2xl text-[#2e8c03]/70 mb-8">Affordable Price for the Best Product</p>
-            <div class="bg-[#FF0000] text-white p-6 md:p-10 rounded-xl shadow-lg">
-                <p class="text-base md:text-2xl font-medium mb-3 opacity-95">
+            <p class="text-base md:text-2xl text-[#1f5e00] mb-8">Affordable Price for the Best Product</p>
+            <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">
+                <p class="text-base md:text-2xl font-medium mb-3">
                     Original Price: {{ $landing->regular_price ?? '' }} {{ $setup->currency }}
                 </p>
                 <h3 class="text-xl sm:text-2xl md:text-4xl font-semibold leading-snug">
@@ -348,6 +352,7 @@
     </section>
 
 
+    </main>
     {{-- ══ FOOTER ══ --}}
     <footer class="bg-gray-50 pt-12 pb-8 px-4 border-t border-gray-100">
         <div class="max-w-5xl mx-auto">

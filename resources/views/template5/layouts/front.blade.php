@@ -8,17 +8,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? ''}}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-    <!-- Manrope Font (Lumina design system) -->
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap"
-        media="print" onload="this.media='all'" rel="stylesheet" />
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        media="print" onload="this.media='all'">
+        media="print" onload="this.onload=null; this.media='all'">
     <!-- Local CSS -->
-    @vite(['resources/css/app.css', 'resources/js/app.js']) 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
    
     @include('components.meta-info.pixel', ['setup' => $setup])
 
@@ -56,7 +49,6 @@
 }
 
         body {
-            font-family: 'Manrope', sans-serif;
             background: #F6F1E6;
         }
 
@@ -197,7 +189,7 @@
     @endif
 </head>
 
-<body>
+<body class="font-manrope-bengali">
     <!-- HEADER -->
     @include('template5.partials.header')
 

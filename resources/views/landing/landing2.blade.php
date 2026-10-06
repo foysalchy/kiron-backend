@@ -5,13 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $landing->title }}</title>
+    <meta name="description"
+        content="{{ \Illuminate\Support\Str::limit(strip_tags($landing->short_description ?: $landing->description ?: $landing->title), 160) }}">
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800;900&family=Noto+Sans+Bengali:wght@400;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite('resources/css/landing2.css')
 
     <style>
         body {
@@ -135,13 +132,14 @@
 
 <body class="bg-grid-blue text-gray-800">
 
+    <main>
     <section class="main-hero">
         <div class="h-6 md:h-12"></div>
 
         <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
             <div class="px-8 py-6">
 
-                <img src={{ $setup->logo_url ?? '' }} alt="KidzFun Logo" class="w-20">
+                <img src={{ $setup->logo_url ?? '' }} alt="KidzFun Logo" width="80" height="80" class="w-20">
             </div>
         </div>
         <div class="main-container bg-[#ebf0fa]/60 p-10">
@@ -174,7 +172,8 @@
                             </video>
                         @else
                             <img src="{{ $landing->thumbnail_url ?? asset('./images/default-thumbnail.jpg') }}"
-                                class="w-full" alt="{{ $landing->name }}">
+                                width="800" height="800" class="w-full aspect-square object-contain"
+                                alt="{{ $landing->name }}">
                         @endif
                     </div>
 
@@ -222,7 +221,8 @@
                             $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
                         @endphp
                         <img src="{{ $categoryMap ? asset('storage/' . $categoryMap) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp' }}"
-                            alt="Categories" class="w-full object-contain">
+                            alt="Categories" width="800" height="800"
+                            class="w-full aspect-square object-contain">
                     </div>
 
                     <div class="container mx-auto space-y-6 mb-16">
@@ -268,7 +268,8 @@
                     class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl bg-white/5">
 
                     <img src="{{ $promoImage ? asset('storage/' . $promoImage) : $landing->thumbnail_url }}"
-                        alt="Offer Product" class="w-full object-contain">
+                        alt="Offer Product" width="800" height="800"
+                        class="w-full aspect-square object-contain">
                 </div>
 
                 <!-- Price Section -->
@@ -289,7 +290,11 @@
             <div class="mt-14 text-center">
                 <a href="#order"
                     class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
-                    <i class="fa-solid fa-circle-down text-2xl md:text-3xl"></i>
+                    <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor"
+                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 7v10m-5-5 5 5 5-5"></path>
+                    </svg>
                     আপনারটি নিন এখনই 😍
                 </a>
             </div>
@@ -302,6 +307,7 @@
         <x-landing.order-form :landing="$landing" />
     </section>
 
+    </main>
 
     {{-- ══ FOOTER ══ --}}
     <footer class="bg-grid-dark py-16 px-4 text-center text-white bg-dark-grid border-gray-800">
@@ -318,7 +324,8 @@
                 </span>
                 পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
-            <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" class="w-20 mx-auto mb-6 brightness-200">
+            <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" width="80" height="80"
+                class="w-20 mx-auto mb-6 brightness-200">
             <p>© {{ date('Y') }} {{ $setup->title ?? '' }}. All rights reserved.</p>
         </div>
     </footer>

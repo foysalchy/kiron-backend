@@ -31,6 +31,7 @@ class LandingController extends FrontendController
                 ->where('slug', $slug)->firstOrFail();
         });
         $product = $landing->product;
+        abort_if($product === null, 404);
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
     }

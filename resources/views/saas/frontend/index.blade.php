@@ -2000,7 +2000,9 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            if (document.querySelector('.heroSwiper')) {
+            window.SwiperPromise.then((Swiper) => {
+                if (!Swiper) return;
+
                 new Swiper('.heroSwiper', {
                     loop: true,
                     effect: 'fade',
@@ -2017,7 +2019,7 @@
                         clickable: true,
                     },
                 });
-            }
+            });
         });
 
         const solutions = @json($solutions);

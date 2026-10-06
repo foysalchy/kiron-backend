@@ -10,7 +10,11 @@
         {{-- Success & Error Messages --}}
 @if(session('success'))
     <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-r-lg shadow-sm flex items-center gap-3">
-        <i class="fas fa-check-circle text-xl"></i>
+        <svg aria-hidden="true" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" d="m8 12 2.5 2.5L16 9"></path>
+        </svg>
         <div>
             <p class="font-bold">সফল হয়েছে!</p>
             <p class="text-sm">{{ session('success') }}</p>
@@ -20,7 +24,10 @@
 
 @if(session('error'))
     <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-lg shadow-sm flex items-center gap-3">
-        <i class="fas fa-exclamation-triangle text-xl"></i>
+        <svg aria-hidden="true" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path>
+        </svg>
         <div>
             <p class="font-bold">দুঃখিত!</p>
             <p class="text-sm">{{ session('error') }}</p>
@@ -61,7 +68,8 @@
                         <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-[#1f8a54] peer-checked:bg-green-50 bg-white hover:border-gray-300">
                             <div class="flex items-center gap-4 w-full">
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                                    <img src="{{ $vImage }}" class="w-full h-full object-contain" alt="PTOFUVT">
+                                    <img src="{{ $vImage }}" width="64" height="64"
+                                        class="w-full h-full object-contain" alt="PTOFUVT">
                                 </div>
                                 <div class="flex-grow text-left">
                                     <p class="text-sm md:text-md font-bold text-gray-800">{{ $mainProduct->title }}</p>
@@ -78,7 +86,8 @@
                 <div class="border-2 border-[#1f8a54] bg-green-50 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4 w-full">
                         <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" class="w-full h-full object-contain" alt="THUMBNAIL">
+                            <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}"
+                                width="64" height="64" class="w-full h-full object-contain" alt="THUMBNAIL">
                         </div>
                         <div class="text-left">
                             <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
@@ -121,7 +130,9 @@
                     <div class="flex justify-between items-start gap-4 pb-5 mb-5 border-b border-dashed border-gray-200">
                         <div class="flex items-start gap-3">
                             <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
-                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" alt="{{ $landing->product->title ?? 'Product Image' }}" class="w-full h-full object-contain">
+                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" width="56" height="56"
+                                    alt="{{ $landing->product->title ?? 'Product Image' }}"
+                                    class="w-full h-full object-contain">
                             </div>
                             <div class="max-w-[150px]">
                                 <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
