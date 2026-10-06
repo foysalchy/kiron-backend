@@ -170,7 +170,7 @@
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
                                         <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item" title="Remove item"
-                                            class="text-red-400 hover:text-red-600">
+                                            class="checkout-cart-remove text-red-400 hover:text-red-600">
                                             <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
                                             <span class="sr-only">Remove item</span>
                                         </a>
@@ -405,6 +405,40 @@
                 })
                 .catch(err => console.error(err));
         }
+    </script>
+    <script>
+        const checkoutCustomerFields = ['name', 'phone', 'email', 'district', 'address'];
+        const checkoutFormStateKey = 'template2-checkout-customer-form';
+        const checkoutForm = document.querySelector('form[enctype="multipart/form-data"]');
+
+        document.querySelectorAll('.checkout-cart-remove').forEach(link => {
+            link.addEventListener('click', () => {
+                const formState = {};
+                checkoutCustomerFields.forEach(name => {
+                    const field = checkoutForm?.elements.namedItem(name);
+                    if (field) formState[name] = field.value;
+                });
+                const createAccountField = checkoutForm?.elements.namedItem('create_account');
+                if (createAccountField) formState.create_account = createAccountField.checked;
+                sessionStorage.setItem(checkoutFormStateKey, JSON.stringify(formState));
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedFormState = sessionStorage.getItem(checkoutFormStateKey);
+            if (!savedFormState || !checkoutForm) return;
+
+            const formState = JSON.parse(savedFormState);
+            checkoutCustomerFields.forEach(name => {
+                const field = checkoutForm.elements.namedItem(name);
+                if (field && formState[name] !== undefined) field.value = formState[name];
+            });
+            const createAccountField = checkoutForm.elements.namedItem('create_account');
+            if (createAccountField && formState.create_account !== undefined) {
+                createAccountField.checked = formState.create_account;
+            }
+            sessionStorage.removeItem(checkoutFormStateKey);
+        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

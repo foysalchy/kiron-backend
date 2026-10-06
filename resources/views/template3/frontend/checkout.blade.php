@@ -171,7 +171,7 @@
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
                                         <a href="{{ route('cart.remove', $item->rowId) }}"
                                             aria-label="Remove {{ $item->name ?? 'item' }} from cart"
-                                            class="text-red-400 hover:text-red-600">
+                                            class="checkout-cart-remove text-red-400 hover:text-red-600">
                                             <i class="far fa-trash-alt text-xs"></i>
                                         </a>
                                     </div>
@@ -216,7 +216,7 @@
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 2) }} {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
@@ -404,6 +404,40 @@
                 })
                 .catch(err => console.error(err));
         }
+    </script>
+    <script>
+        const checkoutCustomerFields = ['name', 'phone', 'email', 'district', 'address'];
+        const checkoutFormStateKey = 'template3-checkout-customer-form';
+        const checkoutForm = document.querySelector('form[enctype="multipart/form-data"]');
+
+        document.querySelectorAll('.checkout-cart-remove').forEach(link => {
+            link.addEventListener('click', () => {
+                const formState = {};
+                checkoutCustomerFields.forEach(name => {
+                    const field = checkoutForm?.elements.namedItem(name);
+                    if (field) formState[name] = field.value;
+                });
+                const createAccountField = checkoutForm?.elements.namedItem('create_account');
+                if (createAccountField) formState.create_account = createAccountField.checked;
+                sessionStorage.setItem(checkoutFormStateKey, JSON.stringify(formState));
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedFormState = sessionStorage.getItem(checkoutFormStateKey);
+            if (!savedFormState || !checkoutForm) return;
+
+            const formState = JSON.parse(savedFormState);
+            checkoutCustomerFields.forEach(name => {
+                const field = checkoutForm.elements.namedItem(name);
+                if (field && formState[name] !== undefined) field.value = formState[name];
+            });
+            const createAccountField = checkoutForm.elements.namedItem('create_account');
+            if (createAccountField && formState.create_account !== undefined) {
+                createAccountField.checked = formState.create_account;
+            }
+            sessionStorage.removeItem(checkoutFormStateKey);
+        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -78,7 +78,7 @@
         <!-- Bottom Part: Divider & Copyright -->
         <div class="border-t border-white/40 pt-8 mt-10">
             <p class="text-center text-footer/90 text-base tracking-wide">
-                @ {{ $setup->shop_name ?? ''}} 2025. All Rights Reserved
+                {{ $setup->copy_right ?? ''}}
             </p>
         </div>
     </div>

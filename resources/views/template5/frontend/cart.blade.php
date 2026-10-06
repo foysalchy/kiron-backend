@@ -225,6 +225,12 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
+                    const cartCountNav = document.querySelector('.cart-count-nav');
+                    if (cartCountNav && data.cart_count !== undefined) {
+                        cartCountNav.innerText = data.cart_count;
+                        cartCountNav.parentElement.classList.remove('hidden');
+                    }
+                    
                     fetch(window.location.href)
                     .then(r => r.text())
                     .then(html => {
@@ -239,8 +245,11 @@
                         }
                     });
                 } else {
-                    if (typeof toastr !== 'undefined') toastr.error(data.message);
+                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Unable to update cart.');
                 }
+            })
+            .catch(err => {
+                if (typeof toastr !== 'undefined') toastr.error('An error occurred. Please try again.');
             });
         }
 </script>

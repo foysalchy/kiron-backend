@@ -210,6 +210,10 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                        badge.innerText = data.cart_count;
+                    });
+                    
                     fetch(window.location.href)
                     .then(r => r.text())
                     .then(html => {
@@ -223,8 +227,13 @@
                             location.reload();
                         }
                     });
-                } else {
-                    if (typeof toastr !== 'undefined') toastr.error(data.message);
+                } else if (typeof toastr !== 'undefined') {
+                    toastr.error(data.message || 'Unable to update cart.');
+                }
+            })
+            .catch(() => {
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Unable to update cart. Please try again.');
                 }
             });
         }
