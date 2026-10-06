@@ -69,44 +69,6 @@
     font-family: "Manrope", "Hind Siliguri", sans-serif;
 }
 
-.body,
-.group\/title p {
-    font-family: "Geist Sans", "Hind Siliguri", sans-serif;
-}
-
-
-
-@font-face {
-    font-family: "Geist Sans";
-    src: url("../fonts/geist/Geist-Regular.woff2") format("woff2");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Geist Sans";
-    src: url("../fonts/geist/Geist-Medium.woff2") format("woff2");
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Geist Sans";
-    src: url("../fonts/geist/Geist-SemiBold.woff2") format("woff2");
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Geist Sans";
-    src: url("../fonts/geist/Geist-Bold.woff2") format("woff2");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
 
 @theme {
     --font-sans:
