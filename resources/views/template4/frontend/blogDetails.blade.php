@@ -62,7 +62,11 @@
                                 {{ $blog->reading_time ?? 5 }} minutes
                             </span>
                         </div>
-
+@php
+                            $keywords = is_array($blog->meta_keywords)
+                                ? $blog->meta_keywords
+                                : explode(',', $blog->meta_keywords);
+                        @endphp
                        @php
     $keywordTags = is_string($keywords) ? json_decode($keywords, true) : $keywords;
 @endphp
