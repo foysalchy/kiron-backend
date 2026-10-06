@@ -188,12 +188,12 @@ class HomeController extends FrontendController
                 ->select(
                     'id',
                     'company_id',
-                    'brand_id',
+                  
                     'title',
                     'slug',
-                    'thumbnail',
+                  
                     'thumbnail_310',
-                    'thumbnail_95',
+                 
                     'regular_price',
                     'purchase_price',
                     'discount',
