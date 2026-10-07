@@ -40,7 +40,8 @@ class ProductController extends FrontendController
     public function index(Request $request)
     {
         $breadcrumb = [['name' => 'All Products', 'slug' => 'shop']];
-        $query = Product::with('variations')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
             ->withCount('reviews')
             ->withAvg('reviews', 'rating')
             ->where('status', Status::Active->value);
@@ -102,15 +103,39 @@ class ProductController extends FrontendController
         $products = $query->paginate(15);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands          = Brand::get();
-        $categories = MegaCategory::where('status', Status::Active->value)
-            ->select('id', 'name', 'company_id', 'slug', 'image')
-            ->with('subCategories:id,mega_category_id,name,slug')->get();
-        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values')
-            ->where('status', Status::Active->value)
-            ->get()
-            ->unique('name');
+        $template = $this->template ?? 'template1';
+        
+        $requirements = [
+            'template1' => ['brands', 'attributeGroups'],
+            'template2' => ['brands', 'attributeGroups'],
+            'template3' => ['brands', 'attributeGroups'],
+            'template4' => ['brands', 'attributeGroups'],
+            'template5' => ['categories', 'attributeGroups'],
+        ];
+
+        $reqs = $requirements[$template] ?? $requirements['template1'];
+
+        $brands = collect();
+        if (in_array('brands', $reqs)) {
+            $brands = Brand::select('id', 'name', 'slug')->get();
+        }
+
+        $categories = collect();
+        if (in_array('categories', $reqs)) {
+            $categories = MegaCategory::where('status', Status::Active->value)
+                ->select('id', 'name', 'slug')
+                ->with('subCategories:id,mega_category_id,name,slug')
+                ->get();
+        }
+
+        $attributeGroups = collect();
+        if (in_array('attributeGroups', $reqs)) {
+            $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+                ->with('values')
+                ->where('status', Status::Active->value)
+                ->get()
+                ->unique('name');
+        }
 
         return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'maxPriceLimit', 'breadcrumb'))->with([
             'category'    => null,
@@ -223,7 +248,9 @@ class ProductController extends FrontendController
 
         if (!$category) abort(401);
 
-        $query = Product::where('status', Status::Active->value)
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
+            ->where('status', Status::Active->value)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
 
@@ -238,16 +265,39 @@ class ProductController extends FrontendController
         $products = $query->paginate(12)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::get();
-        $categories = MegaCategory::where('status', Status::Active->value)
-            ->select('id', 'name', 'company_id', 'slug', 'image')
-            ->with('subCategories:id,mega_category_id,name,slug')->get();
+        $template = $this->template ?? 'template1';
+        
+        $requirements = [
+            'template1' => ['brands', 'attributeGroups'],
+            'template2' => ['brands', 'attributeGroups'],
+            'template3' => ['brands', 'attributeGroups'],
+            'template4' => ['brands', 'attributeGroups'],
+            'template5' => ['categories', 'attributeGroups'],
+        ];
 
-        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values')
-            ->where('status', Status::Active->value)
-            ->get()
-            ->unique('name');
+        $reqs = $requirements[$template] ?? $requirements['template1'];
+
+        $brands = collect();
+        if (in_array('brands', $reqs)) {
+            $brands = Brand::select('id', 'name', 'slug')->get();
+        }
+
+        $categories = collect();
+        if (in_array('categories', $reqs)) {
+            $categories = MegaCategory::where('status', Status::Active->value)
+                ->select('id', 'name', 'slug')
+                ->with('subCategories:id,mega_category_id,name,slug')
+                ->get();
+        }
+
+        $attributeGroups = collect();
+        if (in_array('attributeGroups', $reqs)) {
+            $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+                ->with('values')
+                ->where('status', Status::Active->value)
+                ->get()
+                ->unique('name');
+        }
 
         return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit', 'breadcrumb'))->with([
             'allProducts' => $products
@@ -518,10 +568,12 @@ class ProductController extends FrontendController
     }
     public function flashSale(Request $request)
     { // Filter products that have a discount > 0
-        $query = Product::where('discount', '>', 0)
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
+            ->where('discount', '>', 0)
             ->where('status', Status::Active->value)
             ->withCount('reviews')
-            ->withAvg('reviews', 'rating');;
+            ->withAvg('reviews', 'rating');
 
         $maxPriceLimit = $this->getMaxPriceLimit();
 
@@ -530,12 +582,39 @@ class ProductController extends FrontendController
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::get();
+        $template = $this->template ?? 'template1';
+        
+        $requirements = [
+            'template1' => ['brands', 'attributeGroups'],
+            'template2' => ['brands', 'attributeGroups'],
+            'template3' => ['brands', 'attributeGroups'],
+            'template4' => ['brands', 'attributeGroups'],
+            'template5' => ['categories', 'attributeGroups'],
+        ];
 
-        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values')
-            ->where('status', Status::Active->value)
-            ->get();
+        $reqs = $requirements[$template] ?? $requirements['template1'];
+
+        $brands = collect();
+        if (in_array('brands', $reqs)) {
+            $brands = Brand::select('id', 'name', 'slug')->get();
+        }
+
+        $categories = collect();
+        if (in_array('categories', $reqs)) {
+            $categories = MegaCategory::where('status', Status::Active->value)
+                ->select('id', 'name', 'slug')
+                ->with('subCategories:id,mega_category_id,name,slug')
+                ->get();
+        }
+
+        $attributeGroups = collect();
+        if (in_array('attributeGroups', $reqs)) {
+            $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+                ->with('values')
+                ->where('status', Status::Active->value)
+                ->get()
+                ->unique('name');
+        }
 
         // Pass a virtual category object for the title
         $category = (object) ['name' => 'Flash Sale Items'];
@@ -548,7 +627,8 @@ class ProductController extends FrontendController
     {
         $brand = Brand::where('slug', $slug)->firstOrFail();
 
-        $query = Product::with('variations')
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
             ->where('status', Status::Active->value)
             ->where('brand_id', $brand->id)
             ->withCount('reviews')
@@ -560,15 +640,43 @@ class ProductController extends FrontendController
         $products = $query->paginate(12);
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::get();
+        $template = $this->template ?? 'template1';
+        
+        $requirements = [
+            'template1' => ['brands', 'attributeGroups'],
+            'template2' => ['brands', 'attributeGroups'],
+            'template3' => ['brands', 'attributeGroups'],
+            'template4' => ['brands', 'attributeGroups'],
+            'template5' => ['categories', 'attributeGroups'],
+        ];
 
-        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values')
-            ->get();
+        $reqs = $requirements[$template] ?? $requirements['template1'];
+
+        $brands = collect();
+        if (in_array('brands', $reqs)) {
+            $brands = Brand::select('id', 'name', 'slug')->get();
+        }
+
+        $categories = collect();
+        if (in_array('categories', $reqs)) {
+            $categories = MegaCategory::where('status', Status::Active->value)
+                ->select('id', 'name', 'slug')
+                ->with('subCategories:id,mega_category_id,name,slug')
+                ->get();
+        }
+
+        $attributeGroups = collect();
+        if (in_array('attributeGroups', $reqs)) {
+            $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+                ->with('values')
+                ->where('status', Status::Active->value)
+                ->get()
+                ->unique('name');
+        }
 
         $category = $brand;
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
     }
@@ -592,7 +700,7 @@ class ProductController extends FrontendController
             }
         }
 
-        $products = $productQuery->select('id', 'title', 'slug', 'thumbnail', 'thumbnail_310', 'thumbnail_95')
+        $products = $productQuery->select('id', 'title', 'slug', 'thumbnail_95')
             ->take(10)
             ->get();
 
@@ -600,7 +708,7 @@ class ProductController extends FrontendController
             return [
                 'title' => $product->title,
                 'slug'  => $product->slug,
-                'thumbnail_url' => $product->thumbnail_url
+                'thumbnail_95_url' => $product->thumbnail_95_url
             ];
         });
 
@@ -610,7 +718,9 @@ class ProductController extends FrontendController
     {
         $category = SubCategory::where('slug', $sub_slug)->firstOrFail();
 
-        $query = Product::where('status', Status::Active->value)
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
+            ->where('status', Status::Active->value)
             ->whereJsonContains('sub_category_ids', (int)$category->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
@@ -622,7 +732,9 @@ class ProductController extends FrontendController
     {
         $category = MiniCategory::where('slug', $mini_slug)->firstOrFail();
 
-        $query = Product::where('status', Status::Active->value)
+        $query = Product::with('variations:id,product_id,regular_price,discount,discount_type')
+            ->select($this->getOptimizedProductSelects())
+            ->where('status', Status::Active->value)
             ->whereJsonContains('mini_category_ids', (int)$category->id)
             ->withCount('reviews')
             ->withAvg('reviews', 'rating');
@@ -638,12 +750,69 @@ class ProductController extends FrontendController
         $products = $query->paginate(12)->appends($request->query());
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
-        $brands = Brand::select(['id', 'name', 'logo'])->get();
-        $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
-            ->with('values:id,attribute_group_id,name')->where('status', Status::Active->value)->get()->unique('name');
+        $template = $this->template ?? 'template1';
+        
+        $requirements = [
+            'template1' => ['brands', 'attributeGroups'],
+            'template2' => ['brands', 'attributeGroups'],
+            'template3' => ['brands', 'attributeGroups'],
+            'template4' => ['brands', 'attributeGroups'],
+            'template5' => ['categories', 'attributeGroups'],
+        ];
 
-        return $this->view('frontend.shop', compact('products', 'brands', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
+        $reqs = $requirements[$template] ?? $requirements['template1'];
+
+        $brands = collect();
+        if (in_array('brands', $reqs)) {
+            $brands = Brand::select('id', 'name', 'slug')->get();
+        }
+
+        $categories = collect();
+        if (in_array('categories', $reqs)) {
+            $categories = MegaCategory::where('status', Status::Active->value)
+                ->select('id', 'name', 'slug')
+                ->with('subCategories:id,mega_category_id,name,slug')
+                ->get();
+        }
+
+        $attributeGroups = collect();
+        if (in_array('attributeGroups', $reqs)) {
+            $attributeGroups = AttributeGroup::whereIn('name', ['Size', 'Color', 'Style'])
+                ->with('values')
+                ->where('status', Status::Active->value)
+                ->get()
+                ->unique('name');
+        }
+
+        return $this->view('frontend.shop', compact('products', 'brands', 'categories', 'attributeGroups', 'category', 'maxPriceLimit'))->with([
             'allProducts' => $products
         ]);
+    }
+
+    private function getOptimizedProductSelects()
+    {
+        $selects = [
+            'products.id',
+            'products.company_id',
+            'products.brand_id',
+            'products.title',
+            'products.slug',
+            'products.regular_price',
+            'products.discount',
+            'products.discount_type',
+            'products.type',
+            'products.status',
+            'products.created_at',
+        ];
+
+        $template = $this->template ?? 'template1';
+        if ($template === 'template4') {
+            $selects[] = 'products.thumbnail_310';
+            $selects[] = 'products.thumbnail_95';
+        } else {
+            $selects[] = 'products.thumbnail_310';
+        }
+
+        return $selects;
     }
 }

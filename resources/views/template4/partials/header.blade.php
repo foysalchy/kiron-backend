@@ -1,8 +1,14 @@
 @php
-    $customMenu = \App\Models\MenuSetting::where('company_id', $setup->company_id ?? null)
-        ->where('status', \App\Enums\Status::Active->value)
-        ->where('type', 'menu')
-        ->first();
+    $suffix = $setup->company_id ?? 'global';
+    $customMenu = \Illuminate\Support\Facades\Cache::remember(
+        "layout_custom_menu_{$suffix}",
+        600,
+        fn() =>
+        \App\Models\MenuSetting::where('company_id', $setup->company_id ?? null)
+            ->where('status', \App\Enums\Status::Active->value)
+            ->where('type', 'menu')
+            ->first()
+    );
 
     $menuItems = $customMenu ? $customMenu->items : null;
 @endphp
@@ -508,12 +514,12 @@
                                         const link = document.createElement(
                                             'a');
                                         link.href =
-                                            "{{ url('product') }}/" + item
+                                            "{{ url('') }}/" + item
                                                 .slug;
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0";
                                         link.innerHTML = `
-                                        <img src="${item.thumbnail_url}" height="" width="" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='{item.thumbnail_url}'" loading="lazy">
+                                        <img src="${item.thumbnail_95_url}" height="" width="" class="w-8 h-8 rounded object-cover border border-gray-100" onerror="this.src='${item.thumbnail_95_url}'" loading="lazy">
                                         <span class="truncate">${item.title}</span>
                                     `;
                                         config.results.appendChild(link);

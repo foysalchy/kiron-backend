@@ -14,15 +14,38 @@ class FrontendController extends Controller
     public function __construct()
     {
         $this->company  = getCurrentCompany();
-        $this->template = $this->company->template_name;
+        
+        if (request()->has('preview_theme')) {
+            $this->template = 'template' . request('preview_theme');
+        } else {
+            $this->template = $this->company->template_name;
+        }
+
         $this->company_id = $this->company->company_id;
     }
 
     protected function view(string $view, array $data = [])
     {
         $company = getCurrentCompany();
-        $templateName = $company->template_name ?? '';
+        
+        if (request()->has('preview_theme')) {
+            $templateName = 'template' . request('preview_theme');
+        } else {
+            $templateName = $company->template_name ?? '';
+        }
 
         return view($templateName . '.' . $view, $data);
+    }
+
+    public function previewCard()
+    {
+        $dummyProduct = \App\Models\Product::where('status',1)->first();
+        if (!$dummyProduct) {
+            return response('No products available for preview', 200);
+        }
+        
+        // Render a minimal view with Tailwind injected (if not already included in layout)
+        // Since we want exactly the card styles, we can wrap it in a div that loads app.css
+        return view('preview-card', ['product' => $dummyProduct, 'template' => $this->template]);
     }
 }
