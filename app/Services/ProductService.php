@@ -23,7 +23,7 @@ class ProductService
     public function getAllProducts(array $filters = [], bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = Product::query();
+            $query = Product::withoutGlobalScope(\App\Models\Scopes\FinishedProductScope::class);
             
             if (!isset($filters['with_relations']) || $filters['with_relations'] !== 'false') {
                 $query->with([

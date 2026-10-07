@@ -9,6 +9,7 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url ?? ''}}">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     @include('components.fontawesome')
     <!-- Local CSS -->

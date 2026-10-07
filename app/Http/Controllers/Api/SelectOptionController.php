@@ -59,9 +59,9 @@ class SelectOptionController extends Controller
         if ($wants('warehouses')) $data['warehouses'] = Warehouse::select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
         if ($wants('users')) $data['users'] = auth()->user()->company->users()->select('id', 'name')->where('status', Status::Active->value)->orderBy('name', 'asc')->get();
         if ($wants('megaCategories')) $data['megaCategories'] = MegaCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
-        if ($wants('subCategories')) $data['subCategories'] = SubCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
-        if ($wants('miniCategories')) $data['miniCategories'] = MiniCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
-        if ($wants('extraCategories')) $data['extraCategories'] = ExtraCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug']);
+        if ($wants('subCategories')) $data['subCategories'] = SubCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'mega_category_id']);
+        if ($wants('miniCategories')) $data['miniCategories'] = MiniCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'sub_category_id']);
+        if ($wants('extraCategories')) $data['extraCategories'] = ExtraCategory::getActiveCachedOptions($companyId, ['id', 'name', 'slug', 'mini_category_id']);
         if ($wants('attributeGroups')) $data['attributeGroups'] = AttributeGroup::getActiveCachedOptions($companyId, ['id', 'name']);
         if ($wants('attributeValues')) $data['attributeValues'] = AttributeValue::getActiveCachedOptions($companyId, ['id', 'name', 'attribute_group_id']);
 
