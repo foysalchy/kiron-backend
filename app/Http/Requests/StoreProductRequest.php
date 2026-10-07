@@ -94,10 +94,10 @@ class StoreProductRequest extends BaseCompanyRequest
                 'variations.*.purchase_price'  => ['nullable'],
                 'variations.*.discount_type'  => ['nullable', Rule::in(['flat', 'percent'])],
                 'variations.*.discount'       => ['nullable', 'numeric', 'min:0'],
-                'variations.*.warehouse_info'                    => ['required', 'array', 'min:1'],
-                'variations.*.warehouse_info.*.warehouse_id'     => ['required', 'integer', 'exists:warehouses,id'],
+                'variations.*.warehouse_info'                    => ['nullable', 'array'],
+                'variations.*.warehouse_info.*.warehouse_id'     => ['nullable', 'integer', 'exists:warehouses,id'],
                 'variations.*.warehouse_info.*.bin_id'           => ['nullable', 'integer', 'exists:bins,id'],
-                'variations.*.warehouse_info.*.quantity'         => ['required', 'integer', 'min:0'],
+                'variations.*.warehouse_info.*.quantity'         => ['nullable', 'numeric', 'min:0'],
 
                 // Gallery Images
                 'gallery_images'   => ['nullable', 'array'],
