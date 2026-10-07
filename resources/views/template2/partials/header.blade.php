@@ -325,7 +325,7 @@
                                             <li
                                                 class="nav-sub-item group/sub hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
                                                 <a href="{{ url($sub->slug ?? $sub->id) }}"
-                                                    class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5  text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
+                                                    class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5  text-gray-700 uppercase flex-1 text-xs md:text-sm font-medium transition-colors">
                                                     {{ $sub->name }}
                                                 </a>
                                                 @if ($hasMini)

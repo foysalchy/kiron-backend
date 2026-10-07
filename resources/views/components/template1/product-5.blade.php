@@ -71,9 +71,9 @@
       <div class="flex items-center gap-1.5 flex-wrap">
         <span class="font-mono font-semibold">
           @if(($setup->currency_position ?? 'left') == 'left')
-            {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+            {{ $setup->currency }} {{ number_format($salePrice) }}
           @else
-            {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }} {{ $setup->currency }}
+            {{ number_format($salePrice) }} {{ $setup->currency }}
           @endif
         </span>
 

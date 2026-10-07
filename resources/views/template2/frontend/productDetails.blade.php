@@ -93,11 +93,13 @@
                             @endif
                         </div>
                     @endif
+                    @if(!empty(strip_tags(trim($product->short_description))))
                     <div
                         class="prose prose-slate max-w-none mb-4 text-lg leading-relaxed font-medium overflow-visible relative">
                         <h2 class="text-xl font-bold text-gray-900 mb-6">Summury </h2>
                         {!! $product->short_description !!}
                     </div>
+                    @endif
 
                     <div class="flex items-baseline gap-4 mb-6">
                         @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
@@ -741,7 +743,10 @@
                 if (matched) {
                     let isSingleChoice = false;
                     for (let gName in matched.attributes) {
-                        if (groupCategories[gName] === 'single') { isSingleChoice = true; break; }
+                        if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') { 
+                            isSingleChoice = true; 
+                            break; 
+                        }
                     }
 
                     if (isSingleChoice) {

@@ -79,9 +79,9 @@
             <div class="flex items-center gap-2">
                 <span class="text-[#005c7a] text-lg md:text-xl font-black font-semibold">
                     @if(($setup->currency_position ?? 'left') == 'left')
-                        {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+                        {{ $setup->currency ?? '৳' }}{{ number_format($salePrice) }}
                     @else
-                        {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}{{ $setup->currency ?? '৳' }}
+                        {{ number_format($salePrice) }}{{ $setup->currency ?? '৳' }}
                     @endif
                 </span>
 

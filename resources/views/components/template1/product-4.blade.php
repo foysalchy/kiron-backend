@@ -83,9 +83,9 @@
             {{-- বর্তমান সেল প্রাইস --}}
             <span class="text-[#be123c] text-base md:text-lg font-black font-semibold">
                 @if(($setup->currency_position ?? 'left') == 'left')
-                    {{ $setup->currency }}{{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+                    {{ $setup->currency }}{{ number_format($salePrice) }}
                 @else
-                    {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}{{ $setup->currency }}
+                    {{ number_format($salePrice) }}{{ $setup->currency }}
                 @endif
             </span>
         </div>

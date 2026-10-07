@@ -52,9 +52,9 @@
       <div class="font-mono shrink-0">
         <span class="text-sm sm:text-lg font-semibold text-black">
           @if(($setup->currency_position ?? 'left') == 'left')
-            {{ $setup->currency }} {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }}
+            {{ $setup->currency }} {{ number_format($salePrice) }}
           @else
-            {{ number_format($salePrice) }}{{ $isVar ? '+' : '' }} {{ $setup->currency }}
+            {{ number_format($salePrice) }} {{ $setup->currency }}
           @endif
         </span>
 
