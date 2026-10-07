@@ -25,6 +25,8 @@ use App\Http\Middleware\SubdomainMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // Partner & Referral Web Portal Routes
+Route::get('/_preview_card', [App\Http\Controllers\Frontend\FrontendController::class, 'previewCard'])->name('preview.card');
+
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('/login', [PartnerPortalController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [PartnerPortalController::class, 'login'])->name('login.submit');

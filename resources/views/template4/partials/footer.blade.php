@@ -37,7 +37,7 @@
                 </h3>
                 <ul class="space-y-4 text-footer/90 text-base">
                     @foreach ($footerPages as $page)
-                        <li><a href="{{ url('page', ['slug' => $page->slug]) }}"
+                        <li><a href="{{ url($page->slug) }}"
                                 class="hover:underline">{{ $page->title }}</a></li>
                     @endforeach
                 </ul>

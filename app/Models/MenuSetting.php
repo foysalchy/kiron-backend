@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use App\Traits\CompanyScoped;
+use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 
 class MenuSetting extends Model
 {
-    use CompanyScoped;
+    use CompanyScoped, HasGlobalLayoutCache;
 
     public const TYPE_MENU = 'menu';
     public const TYPE_FEATURE_CATEGORY = 'feature_category';
@@ -24,6 +25,10 @@ class MenuSetting extends Model
         'items'  => 'array',
         'status' => 'boolean',
     ];
+    public static function globalLayoutSections(): array
+    {
+        return ['custom_menu'];
+    }
 
     protected static function levelModelMap(): array
     {
@@ -64,7 +69,7 @@ class MenuSetting extends Model
         $map = self::levelModelMap();
 
         $idsByLevel = $items->groupBy('level')
-            ->map(fn ($group) => $group->pluck('ref_id')->unique()->values());
+            ->map(fn($group) => $group->pluck('ref_id')->unique()->values());
 
         $freshByLevelAndId = [];
         foreach ($idsByLevel as $level => $ids) {
@@ -92,14 +97,14 @@ class MenuSetting extends Model
                     'label'   => $item['label'] ?: $fresh->name,
                     'slug'    => $fresh->slug,
                     'image'   => $fresh->image_url,
-                    'link'    => "category/{$fresh->slug}",
+                    'link'    => "{$fresh->slug}",
                     'visible' => $item['visible'] ?? true,
                     'order'   => $item['order'] ?? 0,
                     'product_count' => \App\Models\Product::where('status', 1)
                         ->where('company_id', $this->company_id)
-                        ->where(function($q) use ($item) {
+                        ->where(function ($q) use ($item) {
                             $q->whereJsonContains($item['level'] . '_ids', (int) $item['ref_id'])
-                              ->orWhereJsonContains($item['level'] . '_ids', (string) $item['ref_id']);
+                                ->orWhereJsonContains($item['level'] . '_ids', (string) $item['ref_id']);
                         })
                         ->count(),
                 ];

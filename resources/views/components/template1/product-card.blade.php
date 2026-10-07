@@ -1,7 +1,6 @@
 @php
-
     $company = getCurrentCompany();
-    $card = $company->product_card_template ?? 2;
+    $card = request()->has('preview_card') ? request()->get('preview_card') : ($company->product_card_template ?? 2);
 @endphp
 @if ($card == 1)
     @include('components.template1.product-1', ['product' => $product, 'company' => $company])

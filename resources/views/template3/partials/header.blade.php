@@ -586,12 +586,11 @@
                                 if (data.length > 0) {
                                     data.forEach(item => {
                                         const link = document.createElement('a');
-                                        link.href = "{{ url('product') }}/" + item
-                                            .slug;
+                                        link.href = "{{ url('') }}/" + item.slug;
                                         link.className =
                                             "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                         link.innerHTML = `
-                                            <img src="${item.thumbnail_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'" loading="lazy" width="800" height="800">
+                                            <img src="${item.thumbnail_95_url}" class="w-6 h-6 rounded object-cover border" onerror="this.src='{{ asset('images/no-image.png') }}'" loading="lazy" width="800" height="800">
                                             <span class="truncate">${item.title}</span>
                                         `;
                                         liveResults.appendChild(link);
