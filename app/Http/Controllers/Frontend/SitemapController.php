@@ -210,7 +210,14 @@ ROBOTS;
 
         $companyId = $currentStore->company_id;
         $setup = SiteSetting::where('company_id', $companyId)->first();
-        $currency = $setup->currency ?? 'BDT';
+        $rawCurrency = strtoupper(trim($setup->currency ?? 'BDT'));
+        $currencyMap = ['৳' => 'BDT', 'TK' => 'BDT', 'TAKA' => 'BDT', 'TAKA.' => 'BDT'];
+        $currency = $currencyMap[$rawCurrency] ?? $rawCurrency;
+        
+        // Facebook requires a 3-letter ISO 4217 currency code (e.g. BDT, USD). 
+        if (strlen($currency) !== 3) {
+            $currency = 'BDT';
+        }
 
         $products = Product::where('company_id', $companyId)
             ->where('status', Status::Active->value)
@@ -232,49 +239,137 @@ ROBOTS;
 
         $callback = function () use ($products, $columns, $setup, $currency) {
             $file = fopen('php://output', 'w');
+            
+            // Output UTF-8 BOM for proper Excel and Meta system compatibility with Bangla characters
+            fputs($file, "\xEF\xBB\xBF");
             fputcsv($file, $columns);
 
+            // Helper: Format Price
+            $formatPrice = function ($regular, $sale) use ($currency) {
+                $regular = (float) $regular;
+                $sale = (float) $sale;
+                
+                $regularStr = number_format($regular, 2, '.', '') . ' ' . $currency;
+                $saleStr = '';
+                
+                // Only output sale price if valid and strictly less than regular price
+                if ($sale > 0 && $sale < $regular) {
+                    $saleStr = number_format($sale, 2, '.', '') . ' ' . $currency;
+                }
+                
+                return [$regularStr, $saleStr];
+            };
+
+            // Helper: Format and Validate Images
+            $formatImages = function ($mainImage, $galleries) {
+                $validUrls = [];
+                
+                $validateUrl = function($url) {
+                    $url = trim($url);
+                    if (empty($url)) return null;
+                    if (filter_var($url, FILTER_VALIDATE_URL) && str_starts_with(strtolower($url), 'https://')) {
+                        return $url;
+                    }
+                    return null;
+                };
+                
+                $mainUrl = $validateUrl($mainImage);
+                
+                foreach ($galleries as $galleryImg) {
+                    $imgUrl = is_object($galleryImg) ? ($galleryImg->image_url ?? '') : $galleryImg;
+                    $img = $validateUrl($imgUrl);
+                    if ($img && $img !== $mainUrl) {
+                        $validUrls[] = $img;
+                    }
+                }
+                
+                $validUrls = array_values(array_unique($validUrls));
+                
+                return [
+                    $mainUrl ?? '', 
+                    implode(' ', $validUrls) // Space-separated URLs for Facebook/Meta
+                ];
+            };
+
+            // Helper: Basic Google Product Category mapping
+            $getGoogleCategory = function($categoryName) {
+                $lower = strtolower(trim($categoryName));
+                if (str_contains($lower, 'diaper')) {
+                    return 'Baby & Toddler > Diapering > Diapers';
+                }
+                if (str_contains($lower, 'baby')) {
+                    return 'Baby & Toddler';
+                }
+                if (str_contains($lower, 'electronics')) {
+                    return 'Electronics';
+                }
+                return $categoryName;
+            };
+
+            // Helper: Clean Description
+            $cleanDescription = function($html) {
+                $text = strip_tags($html);
+                $text = preg_replace('/\s+/', ' ', $text); // Remove excessive whitespace/newlines
+                return trim($text);
+            };
+
             foreach ($products as $product) {
+                $productTitle = trim($product->title);
+                $description = $cleanDescription($product->short_description ?: $product->title);
+                $categoryName = $product->mega_categories->first()->name ?? 'General';
+                $googleCategory = $getGoogleCategory($categoryName);
+                $brandName = $product->brand->name ?? $setup->shop_name ?? 'Generic';
+                $link = url($product->slug);
+
                 if ($product->type === 'single') {
                     // ─── Single Product Row ───
+                    [$price, $salePrice] = $formatPrice($product->regular_price, $product->sale_price);
+                    [$mainImage, $additionalImages] = $formatImages($product->thumbnail_url, $product->galleries);
+                    
                     fputcsv($file, [
                         'PRD-' . $product->id,
-                        $product->title,
-                        strip_tags($product->short_description ?: $product->title),
+                        $productTitle,
+                        $description,
                         $product->available_stock > 0 ? 'in stock' : 'out of stock',
                         'new',
-                        number_format($product->regular_price, 2, '.', '') . ' ' . $currency,
-                        $product->discount > 0 ? number_format($product->sale_price, 2, '.', '') . ' ' . $currency : '',
-                        url($product->slug),
-                        $product->thumbnail_url,
-                        $product->galleries->pluck('image_url')->implode(','),
-                        $product->brand->name ?? $setup->shop_name,
+                        $price,
+                        $salePrice,
+                        $link,
+                        $mainImage,
+                        $additionalImages,
+                        $brandName,
                         'PRD-' . $product->id,
                         '', // gtin
                         'PRD-' . $product->id, // mpn
-                        $product->mega_categories->first()->name ?? 'General'
+                        $googleCategory
                     ]);
                 } else {
-                    // ─── Variable Product Rows
+                    // ─── Variable Product Rows ───
                     foreach ($product->variations as $variant) {
                         $vGallery = $variant->galleries->count() > 0 ? $variant->galleries : $product->galleries;
+                        
+                        // Use existing image_url accessor for variation, fallback to product thumbnail
+                        $variantImage = $variant->image_url ?: $product->thumbnail_url;
+                        
+                        [$price, $salePrice] = $formatPrice($variant->regular_price, $variant->final_price);
+                        [$mainImage, $additionalImages] = $formatImages($variantImage, $vGallery);
 
                         fputcsv($file, [
                             'VAR-' . $variant->id,
-                            $product->title . ' - ' . $variant->display_name,
-                            strip_tags($product->short_description ?: $product->title),
+                            $productTitle . ' - ' . $variant->display_name,
+                            $description,
                             $variant->available_stock > 0 ? 'in stock' : 'out of stock',
                             'new',
-                            number_format($variant->regular_price, 2, '.', '') . ' ' . $currency,
-                            $variant->discount > 0 ? number_format($variant->final_price, 2, '.', '') . ' ' . $currency : '',
-                            url($product->slug),
-                            $variant->image ? asset('storage/' . $variant->image) : $product->thumbnail_url,
-                            $vGallery->pluck('image_url')->implode(','),
-                            $product->brand->name ?? $setup->shop_name,
+                            $price,
+                            $salePrice,
+                            $link,
+                            $mainImage,
+                            $additionalImages,
+                            $brandName,
                             'PRD-' . $product->id,
                             '', // gtin
-                            $variant->sku ?? 'VAR-' . $variant->id, // mpn হিসেবে ভ্যারিয়েন্ট SKU
-                            $product->mega_categories->first()->name ?? 'General'
+                            $variant->sku ?? 'VAR-' . $variant->id, // mpn
+                            $googleCategory
                         ]);
                     }
                 }
