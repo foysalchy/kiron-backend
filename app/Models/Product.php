@@ -117,6 +117,9 @@ class Product extends Model
 
     protected static function booted()
     {
+        // গ্লোবাল স্কোপ যুক্ত করা হলো যাতে সব জায়গায় ডিফল্টভাবে শুধু 'finished' প্রোডাক্ট আসে
+        static::addGlobalScope(new \App\Models\Scopes\FinishedProductScope);
+
         static::saved(function ($product) {
             \Illuminate\Support\Facades\Cache::forget("product_details_v2_{$product->slug}");
         });

@@ -7,7 +7,6 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
 
 @font-face {
     font-family: "Hind Siliguri";
@@ -101,6 +100,24 @@ h5,
 h6 {
     font-family: "Poppins", sans-serif;
     font-weight: 600;
+}
+
+.font-manrope h1,
+.font-manrope h2,
+.font-manrope h3,
+.font-manrope h4,
+.font-manrope h5,
+.font-manrope h6 {
+    font-family: "Manrope", sans-serif;
+}
+
+.font-manrope-bengali h1,
+.font-manrope-bengali h2,
+.font-manrope-bengali h3,
+.font-manrope-bengali h4,
+.font-manrope-bengali h5,
+.font-manrope-bengali h6 {
+    font-family: "Manrope", "Hind Siliguri", sans-serif;
 }
 
 #toast-container {
