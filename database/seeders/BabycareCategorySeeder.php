@@ -173,7 +173,7 @@ class BabycareCategorySeeder extends Seeder
             ],
             [
                 'name' => 'Baby Foods',
-                'slug' => 'baby-foods-in-bangladesh',
+                'slug' => 'baby-foods',
                 'subCategories' => [
                     [
                         'name' => 'Milks',
@@ -384,7 +384,7 @@ class BabycareCategorySeeder extends Seeder
             ],
             [
                 'name' => 'Grooming & Care',
-                'slug' => 'baby-accessories-in-bangladesh',
+                'slug' => 'grooming-care',
                 'subCategories' => [
                     [
                         'name' => 'Baby Bath',
@@ -534,7 +534,7 @@ class BabycareCategorySeeder extends Seeder
             ],
             [
                 'name' => 'Toys & Play',
-                'slug' => 'toys',
+                'slug' => 'toys-and-play',
                 'subCategories' => [
                     [
                         'name' => 'Baby Rattle',
@@ -623,48 +623,60 @@ class BabycareCategorySeeder extends Seeder
             }
             $allMiniBrandsForMega = array_unique($allMiniBrandsForMega);
 
-            $megaCategory = MegaCategory::updateOrCreate([
-                'name' => $megaData['name'],
-                'company_id' => $companyId
-            ], [
-                'slug' => $megaData['slug'],
-                'status' => 1,
-                'description' => $this->generateSeoDescription($megaData['name'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
-                'meta_title' => "{$megaData['name']} Price in Bangladesh",
-                'meta_description' => "Shop {$megaData['name']} products in Bangladesh at Littlebaby, including quality {$megaData['name']} products for babies and families. Explore authentic {$megaData['name']} products at competitive prices with convenient online shopping and delivery.",
-                'meta_keywords' => ["{$megaData['name']}", "Buy {$megaData['name']}", "{$megaData['name']} Price in BD", "{$megaData['name']} Bangladesh"]
-            ]);
+            $megaCategory = MegaCategory::where('name', $megaData['name'])->where('company_id', $companyId)->first();
+            if (!$megaCategory) {
+                $megaCategory = MegaCategory::create([
+                    'name' => $megaData['name'],
+                    'company_id' => $companyId,
+                    'slug' => $megaData['slug'],
+                    'status' => 1,
+                    'description' => $this->generateSeoDescription($megaData['name'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
+                    'meta_title' => "{$megaData['name']} Price in Bangladesh",
+                    'meta_description' => "Shop {$megaData['name']} products in Bangladesh at Littlebaby, including quality {$megaData['name']} products for babies and families. Explore authentic {$megaData['name']} products at competitive prices with convenient online shopping and delivery.",
+                    'meta_keywords' => ["{$megaData['name']}", "Buy {$megaData['name']}", "{$megaData['name']} Price in BD", "{$megaData['name']} Bangladesh"]
+                ]);
+            } else {
+                $megaCategory->update(['slug' => $megaData['slug']]);
+            }
 
             foreach ($megaData['subCategories'] as $subData) {
                 $miniBrandNames = array_map(function($m) { return $m['name']; }, $subData['miniCategories']);
-                $subCategory = SubCategory::updateOrCreate([
-                    'mega_category_id' => $megaCategory->id,
-                    'name' => $subData['name'],
-                    'company_id' => $companyId
-                ], [
-                    'slug' => $subData['slug'],
-                    'status' => 1,
-                    'description' => $this->generateSeoDescription($subData['name'], array_slice($miniBrandNames, 0, 10), $megaData['name']),
-                    'meta_title' => "{$subData['name']} Price in Bangladesh",
-                    'meta_description' => "Shop {$subData['name']} products in Bangladesh at Littlebaby, including quality {$subData['name']} products for babies and families. Explore authentic {$subData['name']} products at competitive prices with convenient online shopping and delivery.",
-                    'meta_keywords' => ["{$subData['name']}", "Buy {$subData['name']}", "{$subData['name']} Price in BD", "{$subData['name']} Bangladesh"]
-                ]);
+                $subCategory = SubCategory::where('name', $subData['name'])->where('mega_category_id', $megaCategory->id)->where('company_id', $companyId)->first();
+                if (!$subCategory) {
+                    $subCategory = SubCategory::create([
+                        'mega_category_id' => $megaCategory->id,
+                        'name' => $subData['name'],
+                        'company_id' => $companyId,
+                        'slug' => $subData['slug'],
+                        'status' => 1,
+                        'description' => $this->generateSeoDescription($subData['name'], array_slice($miniBrandNames, 0, 10), $megaData['name']),
+                        'meta_title' => "{$subData['name']} Price in Bangladesh",
+                        'meta_description' => "Shop {$subData['name']} products in Bangladesh at Littlebaby, including quality {$subData['name']} products for babies and families. Explore authentic {$subData['name']} products at competitive prices with convenient online shopping and delivery.",
+                        'meta_keywords' => ["{$subData['name']}", "Buy {$subData['name']}", "{$subData['name']} Price in BD", "{$subData['name']} Bangladesh"]
+                    ]);
+                } else {
+                    $subCategory->update(['slug' => $subData['slug']]);
+                }
 
                 foreach ($subData['miniCategories'] as $miniData) {
                     $combinedName = "{$miniData['name']} {$subData['name']}";
-                    MiniCategory::updateOrCreate([
-                        'mega_category_id' => $megaCategory->id,
-                        'sub_category_id' => $subCategory->id,
-                        'name' => $miniData['name'],
-                        'company_id' => $companyId
-                    ], [
-                        'slug' => $miniData['slug'],
-                        'status' => 1,
-                        'description' => $this->generateSeoDescription($combinedName, [], $megaData['name']),
-                        'meta_title' => "{$combinedName} Price in Bangladesh",
-                        'meta_description' => "Shop {$miniData['name']} products in Bangladesh at Littlebaby, including quality {$miniData['name']} products for babies and families. Explore authentic {$miniData['name']} products at competitive prices with convenient online shopping and delivery.",
-                        'meta_keywords' => ["{$miniData['name']}", "Buy {$miniData['name']}", "{$miniData['name']} Price in BD", "{$miniData['name']} Bangladesh"]
-                    ]);
+                    $miniCategory = MiniCategory::where('name', $miniData['name'])->where('sub_category_id', $subCategory->id)->where('mega_category_id', $megaCategory->id)->where('company_id', $companyId)->first();
+                    if (!$miniCategory) {
+                        MiniCategory::create([
+                            'mega_category_id' => $megaCategory->id,
+                            'sub_category_id' => $subCategory->id,
+                            'name' => $miniData['name'],
+                            'company_id' => $companyId,
+                            'slug' => $miniData['slug'],
+                            'status' => 1,
+                            'description' => $this->generateSeoDescription($combinedName, [], $megaData['name']),
+                            'meta_title' => "{$combinedName} Price in Bangladesh",
+                            'meta_description' => "Shop {$miniData['name']} products in Bangladesh at Littlebaby, including quality {$miniData['name']} products for babies and families. Explore authentic {$miniData['name']} products at competitive prices with convenient online shopping and delivery.",
+                            'meta_keywords' => ["{$miniData['name']}", "Buy {$miniData['name']}", "{$miniData['name']} Price in BD", "{$miniData['name']} Bangladesh"]
+                        ]);
+                    } else {
+                        $miniCategory->update(['slug' => $miniData['slug']]);
+                    }
                 }
             }
         }
