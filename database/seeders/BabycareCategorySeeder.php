@@ -172,8 +172,8 @@ class BabycareCategorySeeder extends Seeder
                 ]
             ],
             [
-                'name' => 'Baby Foods',
-                'slug' => 'baby-foods',
+                'name' => 'Baby Food',
+                'slug' => 'baby-food',
                 'subCategories' => [
                     [
                         'name' => 'Milks',
