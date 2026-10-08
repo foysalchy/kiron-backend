@@ -91,6 +91,7 @@
         <h2 class="font-display font-semibold text-xl mb-6">Order Summary</h2>
 
         <!-- Shipping Area -->
+        @if(!isset($is_free_delivery) || !$is_free_delivery)
         <div class="mb-6">
           <label class="text-sm font-medium text-coal block mb-3">Select Your Shipping Area</label>
           <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form" class="space-y-2">
@@ -115,6 +116,7 @@
             </label>
           </form>
         </div>
+        @endif
 
         <div class="space-y-4 text-sm mb-6">
 
@@ -152,7 +154,13 @@
 
             <div class="flex justify-between">
               <span class="text-gray-700">Delivery Fee</span>
-              <span class="font-medium">@if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($shipping, 0) }}@else{{ number_format($shipping, 0) }} {{ $setup->currency }}@endif</span>
+              <span class="font-medium">
+                @if(isset($is_free_delivery) && $is_free_delivery)
+                  Free
+                @else
+                  @if(($setup->currency_position ?? 'left') == 'left'){{ $setup->currency }} {{ number_format($shipping, 0) }}@else{{ number_format($shipping, 0) }} {{ $setup->currency }}@endif
+                @endif
+              </span>
             </div>
           </div>
         </div>

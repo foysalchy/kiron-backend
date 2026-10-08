@@ -100,6 +100,7 @@
                         </div>
 
                         <!-- Shipping Selection -->
+                        @if(!isset($is_free_delivery) || !$is_free_delivery)
                         <div class="py-4 md:py-5 border-b border-gray-100 w-full">
                             <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
                                 @csrf
@@ -127,6 +128,12 @@
                                 </div>
                             </form>
                         </div>
+                        @else
+                        <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
+                            <span class="text-sm md:text-base text-gray-600">Shipping</span>
+                            <span class="text-sm md:text-base font-bold text-gray-900">Free</span>
+                        </div>
+                        @endif
 
                         <!-- Tax & Discount -->
                         <div class="space-y-2 py-3 border-b border-gray-100">

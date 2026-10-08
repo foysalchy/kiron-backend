@@ -57,6 +57,7 @@
 
 
             <!-- Column 5: SOCIAL -->
+            @if(isset($socialLinks) && count($socialLinks) > 0)
             <div>
                 <h3 class="text-lg font-bold uppercase tracking-widest mb-8">
                     Social
@@ -73,6 +74,7 @@
                     @endforeach
                 </ul>
             </div>
+            @endif
         </div>
 
         <!-- Bottom Part: Divider & Copyright -->

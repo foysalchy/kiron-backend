@@ -177,7 +177,7 @@
         <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
             <!-- Header -->
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[#016738]">{{ $group->name }}</h2>
+                <h2 class="text-lg md:text-xl font-bold uppercase tracking-tight text-[var(--primary-color)]">{{ $group->name }}</h2>
                     <a href="{{ route('shop.index', ['group' => $group->slug]) }}">
                         <button
                             class="primary-bg primary-bg-hover text-primary text-xs md:text-sm px-4 py-1.5 md:px-5 md:py-2 rounded transition-colors shadow-sm">
@@ -209,7 +209,7 @@
                         <div
                             class="w-[110px] md:w-[140px] flex-shrink-0 relative overflow-hidden flex items-center justify-center bg-[#F9F9F9] rounded-md">
                             <a href="{{ url($product->slug) }}" class="block w-full h-full">
-                                <img src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}" loading="lazy"
+                                <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/default.webp') }}" alt="{{ $product->title }}" loading="lazy"
                                     class="w-full h-24 md:h-32 object-contain transform group-hover:scale-110 transition-transform duration-500 p-2">
                             </a>
                         </div>
@@ -218,19 +218,19 @@
                         <div class="flex-1 pl-4 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-sm md:text-base font-bold text-gray-900 leading-snug line-clamp-2 mb-2">
-                                    <a href="{{ url($product->slug) }}" class="hover:text-[#016738]">
+                                    <a href="{{ url($product->slug) }}" class="hover:text-[var(--primary-color)]">
                                         {{ $product->title }}
                                     </a>
                                 </h3>
 
                                 <!-- Price Logic (Corrected Fields) -->
-                                <div class="text-[#016738] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
+                                <div class="text-[var(--primary-color)] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
                                     @if ($isVar && $minPrice > 0)
-                                        {{-- à¦­à§à¦¯à¦¾à¦°à¦¿à§Ÿà§‡à¦¶à¦¨: Lowest - Highest Regular Price --}}
-                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} â€“
+                                        
+                                        <span>{{ number_format($minPrice, 0) }}{{ $currency }} -
                                             {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
                                     @else
-                                        {{-- à¦¸à¦¿à¦™à§à¦—à§‡à¦²: Discount à¦¥à¦¾à¦•à¦²à§‡ à¦•à¦¾à¦Ÿà¦¾ à¦¦à¦¾à¦®à¦¸à¦¹ à¦¦à§‡à¦–à¦¾à¦¬à§‡ --}}
+                                        
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
                                             <span
                                                 class="line-through text-gray-500 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
@@ -246,7 +246,7 @@
                             <div class="mt-3">
                                 <a href="{{ url($product->slug) }}"
                                     class="block w-full text-center primary-bg text-primary py-2 rounded font-bold text-xs md:text-sm hover:bg-opacity-95 transition-all shadow-sm">
-                                    à¦ªà¦£à§à¦¯ à¦¦à§‡à¦–à§à¦¨
+                                    {{ isset($setup->lang) && $setup->lang == 'bn' ? 'পণ্য দেখুন' : 'View Product' }}
                                 </a>
                             </div>
                         </div>
@@ -308,14 +308,12 @@
         const totalSlides = {{ count($mainSliders) }};
         let mainInterval;
 
-        // à¦¸à§à¦²à¦¾à¦‡à¦¡à¦¾à¦° à¦†à¦ªà¦¡à§‡à¦Ÿ à¦•à¦°à¦¾à¦° à¦«à¦¾à¦‚à¦¶à¦¨
         function updateSliderUI() {
             if (mainSlider) {
                 mainSlider.style.transform = `translateX(-${mainIdx * 100}%)`;
             }
         }
 
-        // à¦ªà¦°à¦¬à¦°à§à¦¤à§€ à¦¸à§à¦²à¦¾à¦‡à¦¡
         function nextSlide() {
             if (totalSlides > 0) {
                 mainIdx = (mainIdx + 1) % totalSlides;
@@ -324,7 +322,6 @@
             }
         }
 
-        // à¦ªà§‚à¦°à§à¦¬à¦¬à¦°à§à¦¤à§€ à¦¸à§à¦²à¦¾à¦‡à¦¡
         function prevSlide() {
             if (totalSlides > 0) {
                 mainIdx = (mainIdx - 1 + totalSlides) % totalSlides;
@@ -333,20 +330,17 @@
             }
         }
 
-        // à¦…à¦Ÿà§‹ à¦¸à§à¦²à¦¾à¦‡à¦¡ à¦Ÿà¦¾à¦‡à¦®à¦¾à¦° à¦°à¦¿à¦¸à§‡à¦Ÿ
         function resetInterval() {
             clearInterval(mainInterval);
             startInterval();
         }
 
-        // à¦…à¦Ÿà§‹ à¦¸à§à¦²à¦¾à¦‡à¦¡ à¦¶à§à¦°à§
         function startInterval() {
             if (totalSlides > 1) {
                 mainInterval = setInterval(nextSlide, 5000);
             }
         }
 
-        // à¦ªà§‡à¦œ à¦²à§‹à¦¡ à¦¹à¦²à§‡ à¦¶à§à¦°à§ à¦¹à¦¬à§‡
         document.addEventListener('DOMContentLoaded', () => {
             if (mainSlider && totalSlides > 0) {
                 startInterval();
@@ -364,7 +358,6 @@
             }
         });
 
-        // à¦…à¦¨à§à¦¯à¦¾à¦¨à§à¦¯ à¦¸à§à¦•à§à¦°à¦² à¦«à¦¾à¦‚à¦¶à¦¨
         function scrollCats(distance) {
             document.getElementById('cat-slider').scrollBy({
                 left: distance,

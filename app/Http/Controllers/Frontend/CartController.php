@@ -37,6 +37,28 @@ class CartController extends FrontendController
 
         $shipping = session()->get('shipping_cost', $defaultInside);
         $shipping_area = session()->get('shipping_area', 'inside');
+
+        $is_free_delivery = $cartContent->isNotEmpty(); // assume true if cart has items
+        foreach ($cartContent as $item) {
+            $pId = $item->id;
+            if (str_starts_with($pId, 'var_')) {
+                $varId = str_replace('var_', '', $pId);
+                $variation = ProductVariation::find($varId);
+                $pId = $variation ? $variation->product_id : null;
+            }
+            if ($pId) {
+                $product = Product::find($pId);
+                if ($product && !$product->is_free_delivery) {
+                    $is_free_delivery = false;
+                    break;
+                }
+            }
+        }
+
+        if ($is_free_delivery) {
+            $shipping = 0;
+        }
+
         //coupon discount
         $discount = 0;
 
@@ -113,7 +135,8 @@ class CartController extends FrontendController
                 'shipping',
                 'total',
                 'shipping_area',
-                'relatedProducts'
+                'relatedProducts',
+                'is_free_delivery'
             )
         );
     }
@@ -157,6 +180,28 @@ class CartController extends FrontendController
                 } catch (\Exception $e) {
                     session()->forget('coupon');
                 }
+            }
+
+            $cartContent = Cart::content();
+            $is_free_delivery = $cartContent->isNotEmpty();
+            foreach ($cartContent as $item) {
+                $pId = $item->id;
+                if (str_starts_with($pId, 'var_')) {
+                    $varId = str_replace('var_', '', $pId);
+                    $variation = \App\Models\ProductVariation::find($varId);
+                    $pId = $variation ? $variation->product_id : null;
+                }
+                if ($pId) {
+                    $product = \App\Models\Product::find($pId);
+                    if ($product && !$product->is_free_delivery) {
+                        $is_free_delivery = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($is_free_delivery) {
+                $cost = 0;
             }
 
             $total = ($subtotal - $discount) + $cost;

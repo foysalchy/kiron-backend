@@ -200,6 +200,7 @@
                     </div>
 
                     <!-- Delivery Area Selector -->
+                    @if(!isset($is_free_delivery) || !$is_free_delivery)
                     <div class="py-4 border-b border-gray-100">
                         <p class="text-xs font-bold text-gray-500 uppercase mb-3">Delivery Area</p>
                         <div class="space-y-3">
@@ -217,6 +218,7 @@
                             </label>
                         </div>
                     </div>
+                    @endif
 
                     <div class="space-y-3 border-t border-gray-100 pt-4">
 
@@ -232,7 +234,11 @@
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-sm md:text-base font-medium">Shipping Charge</span>
                             <span class="text-sm md:text-base font-bold text-gray-900">
-                                {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ !$isL ? $setup->currency : '' }}
+                                @if(isset($is_free_delivery) && $is_free_delivery)
+                                    Free
+                                @else
+                                    {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ !$isL ? $setup->currency : '' }}
+                                @endif
                             </span>
                         </div>
 

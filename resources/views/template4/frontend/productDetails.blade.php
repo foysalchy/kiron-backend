@@ -16,7 +16,7 @@
     <section class="bg-[#F9F9F9] py-2">
         <!-- Dynamic Breadcrumbs -->
         <nav aria-label="Breadcrumb"
-            class="container mx-auto px-4 flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
+            class="container mx-auto px-4 flex items-center gap-2 mb-4 text-sm font-medium text-gray-600 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
             
             <a href="{{ route('home') }}"
                 class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
@@ -26,7 +26,7 @@
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
                     <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                        class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        class="w-4 h-4 text-gray-600 shrink-0" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                     </svg>
                     <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
@@ -34,7 +34,7 @@
             @endif
 
             <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
-                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                class="w-4 h-4 text-gray-600 shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
             <span class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
@@ -68,7 +68,7 @@
                     <!-- Main Image Box -->
                     <div
                         class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2  ">
-                        <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" loading="lazy" width="800" height="800"
+                        <img id="mainImage" src="{{ $product->thumbnail_url ?? '' }}" alt="{{ $product->title ?? 'Product Image' }}" loading="lazy" width="800" height="800"
                             alt="main image" class=" m-auto object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
@@ -93,7 +93,7 @@
                             {{ $product->title }}
                         </h1>
 
-                        <p class="text-gray-500 mt-1 text-lg font-medium pt-2 ">
+                        <p class="text-gray-600 mt-1 text-lg font-medium pt-2 ">
                             Brand Name: <span
                                 class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
                         </p>
@@ -108,7 +108,7 @@
                             </span>
 
                             @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
-                                <span id="regular-price" class="text-lg md:text-xl text-gray-400 line-through">
+                                <span id="regular-price" class="text-lg md:text-xl text-gray-600 line-through">
                                     @if(($setup->currency_position ?? 'left') == 'left')
                                         {{ $setup->currency }} {{ number_format($product->display_price_data->regular_price) }}
                                     @else
@@ -165,7 +165,7 @@
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </p>
 
-                        <p class="text-sm md:text-base text-gray-500 mt-5 md:mt-6 leading-relaxed">
+                        <p class="text-sm md:text-base text-gray-600 mt-5 md:mt-6 leading-relaxed">
                             <span class="font-bold text-gray-700 text-xs md:text-sm">Categories:</span>
                             {{ $product->mega_categories->pluck('name')->implode(', ') }}
                         </p>
@@ -216,12 +216,12 @@
                         </button>
                         <button onclick="scrollToSection('section-features', this)" role="tab" aria-selected="false"
                             aria-controls="section-features"
-                            class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
+                            class="tab-nav-btn flex-1 bg-white text-gray-600 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Features
                         </button>
                         <button onclick="scrollToSection('section-specifications', this)" role="tab" aria-selected="false"
                             aria-controls="section-specifications"
-                            class="tab-nav-btn flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
+                            class="tab-nav-btn flex-1 bg-white text-gray-600 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
                             Specifications
                         </button>
                     </div>
@@ -263,11 +263,11 @@
                         </h2>
                         <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
                             <div class="flex justify-between py-2 border-b border-gray-100">
-                                <span class="text-gray-500 font-medium">Brand:</span>
+                                <span class="text-gray-600 font-medium">Brand:</span>
                                 <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
                             </div>
                             <div class="flex justify-between py-2 border-b border-gray-100">
-                                <span class="text-gray-500 font-medium">SKU:</span>
+                                <span class="text-gray-600 font-medium">SKU:</span>
                                 <span
                                     class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
                             </div>
@@ -294,7 +294,7 @@
                             @endphp
                             @foreach ($grouped as $groupName => $values)
                                 <div class="flex justify-between py-2 border-b border-gray-100">
-                                    <span class="text-gray-500 font-medium">{{ $groupName }}:</span>
+                                    <span class="text-gray-600 font-medium">{{ $groupName }}:</span>
                                     <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
                                 </div>
                             @endforeach
@@ -315,7 +315,7 @@
             @foreach ($relatedProducts->take(5) as $rel)
                 <a href="{{ url($rel->slug) }}"
                     class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                    <img src="{{ $rel->thumbnail_95_url ?? '' }}" loading="lazy" width="64" height="64"
+                    <img src="{{ $rel->thumbnail_95_url ?? '' }}" alt="{{ $rel->title ?? 'Related Product' }}" loading="lazy" width="64" height="64"
                         alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
                     <div class="min-w-0 flex-1">
                         <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
@@ -385,7 +385,7 @@
                 container.innerHTML += `
                         <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                             onclick="changeImage('${imgUrl}', this)">
-                            <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
+                            <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
                         </button>`;
             });
         }
@@ -406,7 +406,7 @@
                     if (v.attributes[groupName]) availableValues[v.attributes[groupName].id] = v.attributes[groupName].name;
                 });
 
-                let groupHtml = `<div class="mb-4"><h3 class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</h3><div class="flex flex-wrap gap-2">`;
+                let groupHtml = `<div class="mb-4"><p class="text-lg font-bold text-gray-700 mb-2">Choose ${groupName}:</p><div class="flex flex-wrap gap-2">`;
 
                 for (const [valId, valName] of Object.entries(availableValues)) {
                     const isFilterActive = (activeFilters[groupName] == valId);
@@ -418,7 +418,7 @@
 
                     // ভ্যারিয়েশন বাটনে ইমেজ দেখানোর লজিক
                     let btnContent = valueImages[valId]
-                        ? `<img src="${valueImages[valId]}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
+                        ? `<img src="${valueImages[valId]}" alt="${valName}" class="w-8 h-8 rounded object-cover mr-2 inline-block" loading="lazy" width="800" height="800"> ${valName}`
                         : valName;
 
                     groupHtml += `<button type="button" onclick="handleSelection('${groupName}', ${valId}, ${isLastGroup})" class="flex items-center px-4 py-2 rounded-lg border text-lg font-bold transition-all ${activeClass}">${btnContent}</button>`;
@@ -717,9 +717,9 @@
 
                 document.querySelectorAll('.tab-nav-btn').forEach(b => {
                     b.classList.remove('text-[var(--primary-color)]', 'border-[var(--primary-color)]');
-                    b.classList.add('text-gray-500', 'border-transparent');
+                    b.classList.add('text-gray-600', 'border-transparent');
                 });
-                btn.classList.remove('text-gray-500', 'border-transparent');
+                btn.classList.remove('text-gray-600', 'border-transparent');
                 btn.classList.add('text-[var(--primary-color)]', 'border-[var(--primary-color)]');
             }
         }

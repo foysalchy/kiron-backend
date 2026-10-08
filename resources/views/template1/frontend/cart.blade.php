@@ -96,13 +96,14 @@
                     <div class="bg-white rounded-lg   shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
+                        @if(!isset($is_free_delivery) || !$is_free_delivery)
                         <!-- selection shipping area -->
                         <div class="mb-6">
                             <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
                             <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
                                 @csrf
                                 <div class="space-y-2">
-                                    {{-- ১. Inside Charge (Dynamic) --}}
+                                    {{--   . Inside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="inside" onchange="this.form.submit()"
@@ -113,7 +114,7 @@
                                         </span>
                                     </label>
 
-                                    {{-- ২. Outside Charge (Dynamic) --}}
+                                    {{--  ". Outside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
                                         <input type="radio" name="area" value="outside" onchange="this.form.submit()"
@@ -126,6 +127,7 @@
                                 </div>
                             </form>
                         </div>
+                        @endif
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf
@@ -166,7 +168,13 @@
 
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Delivery Charge:</span>
-                                <span>{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($shipping, 0) : number_format($shipping, 0) . ' ' . $setup->currency }}</span>
+                                <span>
+                                    @if(isset($is_free_delivery) && $is_free_delivery)
+                                        Free
+                                    @else
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($shipping, 0) : number_format($shipping, 0) . ' ' . $setup->currency }}
+                                    @endif
+                                </span>
                             </div>
                         </div>
 

@@ -100,6 +100,7 @@
                     <div class="bg-white rounded-lg   shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
+                        @if(!isset($is_free_delivery) || !$is_free_delivery)
                         <!-- selection shipping area -->
                         <div class="mb-6">
                             <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
@@ -132,6 +133,7 @@
                                 </div>
                             </form>
                         </div>
+                        @endif
                         <!-- coupon section -->
                         <form action="{{ route('coupon.apply') }}" method="POST" class="mb-6">
                             @csrf
@@ -173,7 +175,13 @@
 
                             <div class="flex justify-between font-bold text-gray-600">
                                 <span>Delivery Charge:</span>
-                                <span id="shipping-display">{{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span>
+                                    @if(isset($is_free_delivery) && $is_free_delivery)
+                                        Free
+                                    @else
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} {{ number_format($shipping, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                    @endif
+                                </span>
                             </div>
                         </div>
 
