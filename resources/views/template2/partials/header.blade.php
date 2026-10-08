@@ -254,7 +254,7 @@
                             @endphp
                             <li class="nav-dropdown-item group relative flex-shrink-0">
                                 <a href="{{ $finalUrl }}"
-                                    class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                                    class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap ">
                                     <span>{{ $item['label'] }}</span>
                                     @if (!empty($item['children']))
                                         <i
@@ -275,7 +275,7 @@
                                                     <li
                                                         class="nav-sub-item group/sub  hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
                                                         <a href="{{ $childUrl }}"
-                                                            class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700 uppercase flex-1 text-xs md:text-sm font-semibold transition-colors">
+                                                            class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5 text-gray-700  flex-1 text-xs md:text-sm font-semibold transition-colors">
                                                             {{ $child['label'] }}
                                                         </a>
                                                     </li>
@@ -290,13 +290,13 @@
                 @else
                     <li class="flex-shrink-0">
                         <a href="{{ route('home') }}"
-                            class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                            class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap ">
                             Home
                         </a>
                     </li>
                     <li class="flex-shrink-0">
                         <a href="{{ route('flash.sale') }}"
-                            class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                            class="flex items-center px-4 py-3 hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap ">
                             Offers
                         </a>
                     </li>
@@ -306,7 +306,7 @@
                         @endphp
                         <li class="nav-dropdown-item group relative flex-shrink-0">
                             <a href="{{ url($mega->slug ?? $mega->id) }}"
-                                class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap uppercase">
+                                class="flex items-center gap-1.5 px-4 py-3 group-hover:bg-[var(--secondary-color,#000000)] group-hover:text-[var(--secondary-text,#ffffff)] hover:bg-[var(--secondary-color,#000000)] hover:text-[var(--secondary-text,#ffffff)] transition-colors font-medium border-r border-white/20 whitespace-nowrap ">
                                 <span>{{ $mega->name }}</span>
                                 @if ($hasSub)
                                     <i
@@ -325,7 +325,7 @@
                                             <li
                                                 class="nav-sub-item group/sub hover:bg-gray-50 flex justify-between items-center cursor-pointer relative border-b border-gray-50 last:border-0">
                                                 <a href="{{ url($sub->slug ?? $sub->id) }}"
-                                                    class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5  text-gray-700 uppercase flex-1 text-xs md:text-sm font-medium transition-colors">
+                                                    class="group-hover/sub:text-[var(--primary-color,#016738)] px-4 py-2.5  text-gray-700  flex-1 text-xs md:text-sm font-medium transition-colors">
                                                     {{ $sub->name }}
                                                 </a>
                                                 @if ($hasMini)
@@ -339,7 +339,7 @@
                                                        @foreach ($sub->miniCategories->sortBy(fn($mini) => strtolower($mini->name)) as $mini)
                                                             <li class=" hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
-                                                                    class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-[14px] font-medium transition-colors">
+                                                                    class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900  text-[14px] font-medium transition-colors">
                                                                     {{ $mini->name }}
                                                                 </a>
                                                             </li>
@@ -405,7 +405,7 @@
                         @endphp
                         <div class="border-b border-gray-100 last:border-0">
                             <div class="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg">
-                                <a href="{{ $finalUrl }}" class="text-sm font-semibold uppercase text-black flex-1">
+                                <a href="{{ $finalUrl }}" class="text-sm font-semibold  text-black flex-1">
                                     {{ $item['label'] }}
                                 </a>
                                 @if ($hasChildren)
@@ -442,12 +442,12 @@
                 @endforeach
             @else
                 <a href="{{ route('home') }}"
-                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Home</a>
+                    class="block px-3 py-2 text-sm font-semibold  text-black hover:bg-gray-50 rounded-lg transition-colors">Home</a>
                 <a href="{{ route('flash.sale') }}"
-                    class="block px-3 py-2 text-sm font-semibold uppercase text-black hover:bg-gray-50 rounded-lg transition-colors">Offers</a>
+                    class="block px-3 py-2 text-sm font-semibold  text-black hover:bg-gray-50 rounded-lg transition-colors">Offers</a>
 
                 <div class="pt-2 mt-2 border-t border-gray-100">
-                    <p class="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Categories</p>
+                    <p class="px-3 py-1.5 text-[10px] font-semibold text-gray-400  tracking-wider">Categories</p>
                     @foreach ($headerCategories as $mega)
                         @php
                             $hasSub = $mega->subCategories && $mega->subCategories->count() > 0;
@@ -455,7 +455,7 @@
                         <div class="border-b border-gray-100 last:border-0">
                             <div class="flex items-center justify-between px-3 py-2.5 hover:bg-gray-50 rounded-lg">
                                 <a href="{{ url($mega->slug ?? $mega->id) }}"
-                                    class="text-sm font-semibold uppercase text-black flex-1">
+                                    class="text-sm font-semibold  text-black flex-1">
                                     {{ $mega->name }}
                                 </a>
                                 @if ($hasSub)
