@@ -49,6 +49,8 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'copy_right'     => ['nullable', 'string'],
                 'sms_forget_password' => ['nullable'],
                 'allow_search_engine_index' => ['nullable', 'boolean'],
+                'watermark_status' => ['nullable', 'boolean'],
+                'watermark_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
                 'manage_warehouse'     => ['nullable'],
                 'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
                 'dark_logo'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],

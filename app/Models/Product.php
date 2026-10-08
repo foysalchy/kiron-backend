@@ -51,6 +51,7 @@ class Product extends Model
         'meta_description',
         'meta_keywords',
         'status',
+        'is_free_delivery',
         'manage_stock',
         'source_info'
     ];
