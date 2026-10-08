@@ -30,12 +30,21 @@
     <!-- image section -->
     <div class="relative overflow-hidden aspect-square bg-[#f9f9f9]">
         <!-- Discount Badge -->
-        @if ($discountLabel)
-            <span
-                class="absolute top-3 left-3 bg-[#be123c] text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md z-20 shadow-sm">
-                -{{ $discountLabel }}
-            </span>
-        @endif
+        <!-- Badges (Top Left) -->
+        <div class="absolute top-3 left-3 z-20 flex flex-col items-start gap-1">
+            <!-- Discount Badge -->
+            @if ($discountLabel)
+                <span class="bg-[#be123c] text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                    -{{ $discountLabel }}
+                </span>
+            @endif
+            <!-- Free Shipping Badge -->
+            @if ($product->is_free_delivery)
+                <span class="bg-green-500 text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                    Free Shipping
+                </span>
+            @endif
+        </div>
 
         <!-- Wishlist -->
         <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="wish button"

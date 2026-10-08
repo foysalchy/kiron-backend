@@ -37,6 +37,11 @@
     >
 
     <div class="absolute inset-0 bg-black/10"></div>
+    @if ($product->is_free_delivery)
+        <div class="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded shadow-sm z-20">
+            Free Shipping
+        </div>
+    @endif
 
     <button type="button"
       onclick="event.stopPropagation(); toggleWishlist({{ $product->id }})"
