@@ -12,7 +12,7 @@
 
     <style>
         body {
-            font-family: 'Hind Siliguri', sans-serif;
+            font-family: {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!};
             scroll-behavior: smooth;
         }
 

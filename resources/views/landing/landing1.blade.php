@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $landing->title }}</title>
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
     @include('components.fontawesome')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -18,6 +15,7 @@
 
         body {
             overflow-x: hidden;
+            font-family: {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!};
         }
 
         /* Fix: prevent horizontal scroll on mobile */
