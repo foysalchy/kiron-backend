@@ -32,7 +32,7 @@ class StorePageRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords' => ['nullable','string', 'max:255'],
+                'meta_keywords' => ['nullable','string'],
                 'image'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
                 'status'      => ['nullable', 'integer', 'in:0,1'],
             ]

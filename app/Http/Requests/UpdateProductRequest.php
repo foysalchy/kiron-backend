@@ -29,7 +29,14 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Basic Info
                 'title' => ['sometimes', 'required', 'string', 'max:255'],
-                'slug' => ['nullable', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($productId)],
+                'slug' => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('products', 'slug')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    })->ignore($productId)
+                ],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'video_link' => ['nullable', 'url'],
 
@@ -102,7 +109,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'purpose' => ['sometimes', 'required', 'string', 'max:255'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords' => ['nullable', 'string', 'max:255'],
+                'meta_keywords' => ['nullable', 'string'],
                 'meta_keywords.*' => ['nullable', 'string',],
                 
                 // Delivery
