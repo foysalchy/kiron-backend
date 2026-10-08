@@ -10,18 +10,19 @@ use Illuminate\Support\Str;
 
 class BabycareCategorySeeder extends Seeder
 {
-    private function generateSeoDescription($name, $brands = [], $megaCategoryName = '')
+    private function generateSeoDescription($name, $actualSlug, $brands = [], $megaCategoryName = '')
     {
         $brandsText = "";
         if (!empty($brands)) {
             $brandsList = implode(', ', array_map(function ($brand) {
-                $slug = Str::slug($brand);
-                return "<a href=\"https://www.littlebaby.com.bd/{$slug}\">{$brand}</a>";
+                $slug = $brand['slug'];
+                $brandName = $brand['name'];
+                return "<a href=\"https://www.littlebaby.com.bd/{$slug}\">{$brandName}</a>";
             }, $brands));
             $brandsText = "<h3>Trusted {$name} Brands in Bangladesh</h3>\n<p>Parents in Bangladesh rely on well-known and trusted brands such as {$brandsList} for safe and high-quality products. These internationally recognized brands follow strict quality and safety standards to ensure the best for your child.</p>\n";
         }
 
-        $slug = Str::slug($name);
+        $slug = $actualSlug;
 
         $context = [
             'intro' => "ensuring proper care during the early years is a top priority",
@@ -618,10 +619,10 @@ class BabycareCategorySeeder extends Seeder
             $allMiniBrandsForMega = [];
             foreach ($megaData['subCategories'] as $sub) {
                 foreach ($sub['miniCategories'] as $mini) {
-                    $allMiniBrandsForMega[] = $mini['name'];
+                    $allMiniBrandsForMega[$mini['slug']] = ['name' => $mini['name'], 'slug' => $mini['slug']];
                 }
             }
-            $allMiniBrandsForMega = array_unique($allMiniBrandsForMega);
+            $allMiniBrandsForMega = array_values($allMiniBrandsForMega);
 
             $megaCategory = MegaCategory::where('name', $megaData['name'])->where('company_id', $companyId)->first();
             if (!$megaCategory) {
@@ -630,7 +631,7 @@ class BabycareCategorySeeder extends Seeder
                     'company_id' => $companyId,
                     'slug' => $megaData['slug'],
                     'status' => 1,
-                    'description' => $this->generateSeoDescription($megaData['name'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
+                    'description' => $this->generateSeoDescription($megaData['name'], $megaData['slug'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
                     'meta_title' => "{$megaData['name']} Price in Bangladesh",
                     'meta_description' => "Shop {$megaData['name']} products in Bangladesh at Littlebaby, including quality {$megaData['name']} products for babies and families. Explore authentic {$megaData['name']} products at competitive prices with convenient online shopping and delivery.",
                     'meta_keywords' => ["{$megaData['name']}", "Buy {$megaData['name']}", "{$megaData['name']} Price in BD", "{$megaData['name']} Bangladesh"]
@@ -638,7 +639,7 @@ class BabycareCategorySeeder extends Seeder
             } else {
                 $megaCategory->update([
                     'slug' => $megaData['slug'],
-                    'description' => $this->generateSeoDescription($megaData['name'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
+                    'description' => $this->generateSeoDescription($megaData['name'], $megaData['slug'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
                     'meta_title' => "{$megaData['name']} Price in Bangladesh",
                     'meta_description' => "Shop {$megaData['name']} products in Bangladesh at Littlebaby, including quality {$megaData['name']} products for babies and families. Explore authentic {$megaData['name']} products at competitive prices with convenient online shopping and delivery.",
                     'meta_keywords' => ["{$megaData['name']}", "Buy {$megaData['name']}", "{$megaData['name']} Price in BD", "{$megaData['name']} Bangladesh"]
@@ -646,7 +647,7 @@ class BabycareCategorySeeder extends Seeder
             }
 
             foreach ($megaData['subCategories'] as $subData) {
-                $miniBrandNames = array_map(function($m) { return $m['name']; }, $subData['miniCategories']);
+                $miniBrandNames = array_map(function($m) { return ['name' => $m['name'], 'slug' => $m['slug']]; }, $subData['miniCategories']);
                 $subCategory = SubCategory::where('name', $subData['name'])->where('mega_category_id', $megaCategory->id)->where('company_id', $companyId)->first();
                 if (!$subCategory) {
                     $subCategory = SubCategory::create([
@@ -655,7 +656,7 @@ class BabycareCategorySeeder extends Seeder
                         'company_id' => $companyId,
                         'slug' => $subData['slug'],
                         'status' => 1,
-                        'description' => $this->generateSeoDescription($subData['name'], array_slice($miniBrandNames, 0, 10), $megaData['name']),
+                        'description' => $this->generateSeoDescription($subData['name'], $subData['slug'], array_slice($miniBrandNames, 0, 10), $megaData['name']),
                         'meta_title' => "{$subData['name']} Price in Bangladesh",
                         'meta_description' => "Shop {$subData['name']} products in Bangladesh at Littlebaby, including quality {$subData['name']} products for babies and families. Explore authentic {$subData['name']} products at competitive prices with convenient online shopping and delivery.",
                         'meta_keywords' => ["{$subData['name']}", "Buy {$subData['name']}", "{$subData['name']} Price in BD", "{$subData['name']} Bangladesh"]
@@ -663,7 +664,7 @@ class BabycareCategorySeeder extends Seeder
                 } else {
                     $updateData = ['slug' => $subData['slug']];
                     if ($subData['name'] !== 'Diapers') {
-                        $updateData['description'] = $this->generateSeoDescription($subData['name'], array_slice($miniBrandNames, 0, 10), $megaData['name']);
+                        $updateData['description'] = $this->generateSeoDescription($subData['name'], $subData['slug'], array_slice($miniBrandNames, 0, 10), $megaData['name']);
                         $updateData['meta_title'] = "{$subData['name']} Price in Bangladesh";
                         $updateData['meta_description'] = "Shop {$subData['name']} products in Bangladesh at Littlebaby, including quality {$subData['name']} products for babies and families. Explore authentic {$subData['name']} products at competitive prices with convenient online shopping and delivery.";
                         $updateData['meta_keywords'] = ["{$subData['name']}", "Buy {$subData['name']}", "{$subData['name']} Price in BD", "{$subData['name']} Bangladesh"];
@@ -682,7 +683,7 @@ class BabycareCategorySeeder extends Seeder
                             'company_id' => $companyId,
                             'slug' => $miniData['slug'],
                             'status' => 1,
-                            'description' => $this->generateSeoDescription($combinedName, [], $megaData['name']),
+                            'description' => $this->generateSeoDescription($combinedName, $miniData['slug'], [], $megaData['name']),
                             'meta_title' => "{$combinedName} Price in Bangladesh",
                             'meta_description' => "Shop {$miniData['name']} products in Bangladesh at Littlebaby, including quality {$miniData['name']} products for babies and families. Explore authentic {$miniData['name']} products at competitive prices with convenient online shopping and delivery.",
                             'meta_keywords' => ["{$miniData['name']}", "Buy {$miniData['name']}", "{$miniData['name']} Price in BD", "{$miniData['name']} Bangladesh"]
@@ -690,7 +691,7 @@ class BabycareCategorySeeder extends Seeder
                     } else {
                         $updateData = ['slug' => $miniData['slug']];
                         if ($subData['name'] !== 'Diapers') {
-                            $updateData['description'] = $this->generateSeoDescription($combinedName, [], $megaData['name']);
+                            $updateData['description'] = $this->generateSeoDescription($combinedName, $miniData['slug'], [], $megaData['name']);
                             $updateData['meta_title'] = "{$combinedName} Price in Bangladesh";
                             $updateData['meta_description'] = "Shop {$miniData['name']} products in Bangladesh at Littlebaby, including quality {$miniData['name']} products for babies and families. Explore authentic {$miniData['name']} products at competitive prices with convenient online shopping and delivery.";
                             $updateData['meta_keywords'] = ["{$miniData['name']}", "Buy {$miniData['name']}", "{$miniData['name']} Price in BD", "{$miniData['name']} Bangladesh"];
