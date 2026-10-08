@@ -31,11 +31,14 @@ class FileUploadHelper
             $watermark = $manager->decode($watermarkContent);
 
             $mainWidth = $image->width();
-            $watermarkWidth = intval($mainWidth * 0.20);
-            if ($watermarkWidth < 50) $watermarkWidth = 50;
+            $watermarkWidth = intval($mainWidth * 0.40); // 40% of image width for center watermark
+            if ($watermarkWidth < 100) $watermarkWidth = 100;
 
             $watermark->scaleDown(width: $watermarkWidth);
-            $image->insert($watermark, 10, 10, 'bottom-right');
+
+            // Place in the center with 15% opacity (0.15) or 15 depending on version. 
+            // In v4.3 it's insert($watermark, $x, $y, $alignment, $opacity)
+            $image->insert($watermark, 0, 0, 'center', 0.15);
             
             return $image;
         } catch (\Exception $e) {
@@ -96,6 +99,14 @@ public static function upload(
                 // Use Intervention Image v4 syntax
                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $image = $manager->decodePath($file->getRealPath());
+                
+                // Add background for products or if watermark is applied
+                if ($folder === 'products' || $applyWatermark) {
+                    $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
+                    $bg->insert($image, 0, 0, 'center');
+                    $image = $bg;
+                }
+                
                 if ($applyWatermark) {
                     $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
                 }
@@ -163,6 +174,60 @@ public static function upload(
     }
 
     /**
+     * Upload image from a URL string
+     */
+    public static function uploadFromUrl(
+        string $url,
+        string $folder = 'images',
+        string $disk = 'r2',
+        bool $applyWatermark = false
+    ): ?string {
+        try {
+            $contents = file_get_contents($url);
+            if (!$contents) return null;
+
+            $user = auth()->user();
+            $companyId = $user?->company_id;
+            $companyFolder = $companyId === null ? 'admin' : self::getCompanyPrefix((int) $companyId) . "_{$companyId}";
+            $fullFolder = "{$companyFolder}/{$folder}";
+            
+            $fileName = Str::random(40) . '.webp';
+            $fullPath = "{$fullFolder}/{$fileName}";
+            
+            $options = ['disk' => $disk];
+            if (in_array($disk, ['r2', 's3', 'public'])) {
+                $options['CacheControl'] = 'public, max-age=31536000, immutable';
+            }
+
+            if (class_exists('\Intervention\Image\ImageManager')) {
+                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                $image = $manager->decode($contents);
+                
+                if ($folder === 'products' || $applyWatermark) {
+                    $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
+                    $bg->insert($image, 0, 0, 'center');
+                    $image = $bg;
+                }
+                
+                if ($applyWatermark) {
+                    $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
+                }
+                
+                $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
+                Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
+                return $fullPath;
+            }
+
+            Storage::disk($disk)->put($fullPath, $contents, $options);
+            return $fullPath;
+
+        } catch (\Exception $e) {
+            Log::error('Upload from URL failed', ['url' => $url, 'error' => $e->getMessage()]);
+            return null;
+        }
+    }
+
+    /**
      * Upload and resize image to specific dimensions as WebP
      */
     public static function uploadResizedWebpImage(
@@ -195,6 +260,13 @@ public static function upload(
                 
                 // Crop to exact dimension or scale down
                 $image->cover($width, $height);
+                
+                if ($folder === 'products' || $applyWatermark) {
+                    $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
+                    $bg->insert($image, 0, 0, 'center');
+                    $image = $bg;
+                }
+                
                 if ($applyWatermark) {
                     $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
                 }

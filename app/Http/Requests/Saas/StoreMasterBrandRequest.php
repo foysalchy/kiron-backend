@@ -31,7 +31,7 @@ class StoreMasterBrandRequest extends FormRequest
             'description' => 'nullable|string',
             'slug' => 'required|string',
             'meta_description' => 'nullable|string|max:255',
-            'meta_keywords' => 'nullable|string|max:255',
+            'meta_keywords' => 'nullable|string',
         ];
     }
     /**

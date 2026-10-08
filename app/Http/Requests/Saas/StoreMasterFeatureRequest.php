@@ -32,7 +32,7 @@ class StoreMasterFeatureRequest extends FormRequest
             'description' => 'nullable|string',
             'meta_title' => 'nullable| string|max:255',
             'meta_description' => 'nullable|string|max:255',
-            'meta_keywords' => 'nullable|string|max:255',
+            'meta_keywords' => 'nullable|string',
             'placement'   => 'required|in:1,2', // 1=feature, 2=benefit
             'status'      => 'nullable|integer',
         ];

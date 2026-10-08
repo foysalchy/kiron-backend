@@ -38,7 +38,7 @@ abstract class BaseCategoryRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'meta_keywords' => ['nullable','string', 'max:255'],
+            'meta_keywords' => ['nullable','string'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'status' => ['integer'],
         ];
@@ -58,7 +58,7 @@ abstract class BaseCategoryRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'meta_keywords' => ['nullable','string', 'max:255'],
+            'meta_keywords' => ['nullable','string'],
             'status' => ['integer'],
         ];
     }

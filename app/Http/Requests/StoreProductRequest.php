@@ -45,7 +45,14 @@ class StoreProductRequest extends BaseCompanyRequest
                 'title'        => ['required', 'string', 'max:255'],
                 'manage_stock' => ['nullable'],
                 'product_type' => ['nullable', 'string', Rule::in(['raw_material', 'semi_finished', 'finished', 'service'])],
-                'slug'         => ['nullable', 'string', 'max:255', 'unique:products,slug'],
+                'slug'         => [
+                    'nullable',
+                    'string',
+                    'max:255',
+                    Rule::unique('products', 'slug')->where(function ($query) use ($companyId) {
+                        return $query->where('company_id', $companyId);
+                    })
+                ],
                 'thumbnail'    => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
                 'video_link'   => ['nullable', 'url'],
 
@@ -111,7 +118,7 @@ class StoreProductRequest extends BaseCompanyRequest
                 'purpose'          => ['required', 'string', 'max:255'],
                 'meta_title'       => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords'    => ['nullable','string', 'max:255'],
+                'meta_keywords'    => ['nullable','string'],
                 'meta_keywords.*'  => ['nullable', 'string'],
                 
                 // Delivery

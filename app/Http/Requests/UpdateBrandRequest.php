@@ -25,7 +25,7 @@ class UpdateBrandRequest extends UpdateBaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords' => ['nullable','string', 'max:255'],
+                'meta_keywords' => ['nullable','string'],
                 'status' => ['boolean'],
             ]
         );
