@@ -93,19 +93,19 @@
     <!-- Order Now Button -->
 <button
     {{ $isOutOfStock ? 'disabled' : '' }}
-    aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}"
+    aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}"
     onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
     class="flex-1 h-9 px-2 md:px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
     {{ $isOutOfStock
         ? 'bg-smoke-300 text-white cursor-not-allowed'
         : 'bg-[var(--secondary-color)] text-white hover:bg-[var(--secondary-color)]/90 cursor-pointer' }}"
 >
-    {{ $isOutOfStock ? 'Stock Out' : 'Order Now' }}
+    {{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}
 </button>
     <!-- Add to Cart Button -->
     <button
         {{ $isOutOfStock ? 'disabled' : '' }}
-        aria-label="{{ $isOutOfStock ? 'Stock Out' : 'Add to Cart' }}"
+        aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
         onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
         class="w-9 h-9 rounded-full flex items-center justify-center transition-colors shrink-0
         {{ $isOutOfStock

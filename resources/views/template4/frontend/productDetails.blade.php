@@ -152,16 +152,12 @@
                                 <!-- Add to Cart Button -->
                                 <button onclick="handleAddToCart()"
                                     {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                                    class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                                    Add to Cart
-                                </button>
+                                    class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                                 <!-- Buy Now Button -->
                                 <button onclick="handleAddToCart(true)"
                                     {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
-                                    class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
-                                    Buy Now
-                                </button>
+                                    class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
                         <p class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">

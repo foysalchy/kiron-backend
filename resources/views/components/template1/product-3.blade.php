@@ -115,7 +115,7 @@
             @if ($isOutOfStock)
                 <i class="fas fa-exclamation-circle"></i> Stock Out
             @else
-                <i class="fas fa-shopping-cart text-xs"></i> Cart
+                <i class="fas fa-shopping-cart text-xs"></i> {{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Cart' }}
             @endif
         </button>
     </div>
