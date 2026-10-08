@@ -13,12 +13,45 @@ use Illuminate\Support\Str;
 class FileUploadHelper
 {
 
+    private static function applyWatermarkIfNeeded($image, ?int $companyId, string $disk)
+    {
+        if (!$companyId) return $image;
+
+        $setting = \App\Models\SiteSetting::where('company_id', $companyId)->first();
+        if (!$setting || !$setting->watermark_status) return $image;
+
+        $watermarkPath = $setting->watermark_logo ?: $setting->logo;
+        if (!$watermarkPath || !\Illuminate\Support\Facades\Storage::disk($disk)->exists($watermarkPath)) {
+            return $image;
+        }
+
+        try {
+            $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+            $watermarkContent = \Illuminate\Support\Facades\Storage::disk($disk)->get($watermarkPath);
+            $watermark = $manager->decode($watermarkContent);
+
+            $mainWidth = $image->width();
+            $watermarkWidth = intval($mainWidth * 0.20);
+            if ($watermarkWidth < 50) $watermarkWidth = 50;
+
+            $watermark->scaleDown(width: $watermarkWidth);
+            $image->insert($watermark, 10, 10, 'bottom-right');
+            
+            return $image;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to apply watermark', ['error' => $e->getMessage()]);
+            return $image;
+        }
+    }
+
+
 public static function upload(
     UploadedFile $file,
     string $folder = 'uploads',
     string $disk = 'r2',
     bool $preserveName = false,
-    ?string $customFileName = null
+    ?string $customFileName = null,
+    bool $applyWatermark = false
 ): string {
     try {
         $user = auth()->user();
@@ -63,6 +96,9 @@ public static function upload(
                 // Use Intervention Image v4 syntax
                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $image = $manager->decodePath($file->getRealPath());
+                if ($applyWatermark) {
+                    $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
+                }
                 $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
 
                 $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
@@ -98,7 +134,8 @@ public static function upload(
         string $folder = 'images',
         string $disk = 'r2',
         int $maxSize = 2048,
-        ?string $customFileName = null
+        ?string $customFileName = null,
+        bool $applyWatermark = false
     ): string {
         try {
             // Validate image
@@ -113,7 +150,7 @@ public static function upload(
                 throw ApiException::badRequest("Image size cannot exceed {$maxSize}KB");
             }
 
-            return self::upload($file, $folder, $disk, false, $customFileName);
+            return self::upload($file, $folder, $disk, false, $customFileName, $applyWatermark);
         } catch (ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -134,7 +171,8 @@ public static function upload(
         int $width,
         int $height,
         string $disk = 'r2',
-        ?string $customFileName = null
+        ?string $customFileName = null,
+        bool $applyWatermark = false
     ): string {
         try {
             $user = auth()->user();
@@ -157,6 +195,9 @@ public static function upload(
                 
                 // Crop to exact dimension or scale down
                 $image->cover($width, $height);
+                if ($applyWatermark) {
+                    $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
+                }
                 $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
                 
                 Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
@@ -306,11 +347,12 @@ public static function upload(
         ?string $oldFilePath,
         string $folder,
         string $disk = 'r2',
-        ?string $customFileName = null
+        ?string $customFileName = null,
+        bool $applyWatermark = false
     ): string {
         try {
             // Upload new file
-            $newFilePath = self::upload($newFile, $folder, $disk, false, $customFileName);
+            $newFilePath = self::upload($newFile, $folder, $disk, false, $customFileName, $applyWatermark);
 
             // Delete old file
             if ($oldFilePath) {
@@ -338,10 +380,11 @@ public static function upload(
         int $width,
         int $height,
         string $disk = 'r2',
-        ?string $customFileName = null
+        ?string $customFileName = null,
+        bool $applyWatermark = false
     ): string {
         try {
-            $newFilePath = self::uploadResizedWebpImage($newFile, $folder, $width, $height, $disk, $customFileName);
+            $newFilePath = self::uploadResizedWebpImage($newFile, $folder, $width, $height, $disk, $customFileName, $applyWatermark);
 
             if ($oldFilePath) {
                 self::delete($oldFilePath, $disk);

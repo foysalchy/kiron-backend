@@ -247,7 +247,8 @@ class ProductService
                     'products/thumbnails',
                     'r2',
                     2048,
-                    $customFileName
+                    $customFileName,
+                    true
                 );
 
                 $thumbnail310FileName = $customFileName . '-310x310';
@@ -257,7 +258,8 @@ class ProductService
                     310,
                     310,
                     'r2',
-                    $thumbnail310FileName
+                    $thumbnail310FileName,
+                    true
                 );
 
                 $thumbnail95FileName = $customFileName . '-95x95';
@@ -267,7 +269,8 @@ class ProductService
                     95,
                     95,
                     'r2',
-                    $thumbnail95FileName
+                    $thumbnail95FileName,
+                    true
                 );
             } else {
                 $data['thumbnail'] = $data['thumbnail'] ?? null;
@@ -625,7 +628,8 @@ class ProductService
                     'products/variation',
                     'r2',
                     2048,
-                    $customFileName
+                    $customFileName,
+                    true
                 );
             }
 
@@ -725,34 +729,37 @@ class ProductService
                 
                 $imageFile = $data['thumbnail'];
                 $data['thumbnail'] = FileUploadHelper::replace(
-                    $imageFile,
-                    $product->thumbnail,
-                    'products/thumbnails',
-                    'r2',
-                    $customFileName
-                );
+                        $imageFile,
+                        $product->thumbnail,
+                        'products/thumbnails',
+                        'r2',
+                        $customFileName,
+                        true
+                    );
 
                 $thumbnail310FileName = $customFileName . '-310x310';
                 $data['thumbnail_310'] = FileUploadHelper::replaceResizedWebpImage(
-                    $imageFile,
-                    $product->thumbnail_310,
-                    'products/thumbnails',
-                    310,
-                    310,
-                    'r2',
-                    $thumbnail310FileName
-                );
+                        $imageFile,
+                        $product->thumbnail_310,
+                        'products/thumbnails',
+                        310,
+                        310,
+                        'r2',
+                        $thumbnail310FileName,
+                        true
+                    );
 
                 $thumbnail95FileName = $customFileName . '-95x95';
                 $data['thumbnail_95'] = FileUploadHelper::replaceResizedWebpImage(
-                    $imageFile,
-                    $product->thumbnail_95,
-                    'products/thumbnails',
-                    95,
-                    95,
-                    'r2',
-                    $thumbnail95FileName
-                );
+                        $imageFile,
+                        $product->thumbnail_95,
+                        'products/thumbnails',
+                        95,
+                        95,
+                        'r2',
+                        $thumbnail95FileName,
+                        true
+                    );
             } elseif (!empty($product->thumbnail)) {
                 $customFileName = Str::slug($data['slug'] ?? $product->slug ?? 'product') . '-' . time();
 
@@ -975,7 +982,8 @@ class ProductService
                     'products/variation',
                     'r2',
                     2048,
-                    $customFileName
+                    $customFileName,
+                    true
                 );
             }
             $warehouseInfo = $variationData['warehouse_info'] ?? [];
@@ -1378,7 +1386,8 @@ class ProductService
                 'products/galleries',
                 'r2',
                 2048,
-                $customFileName
+                $customFileName,
+                true
             );
 
             Gallery::create([
@@ -1399,7 +1408,8 @@ class ProductService
                 'products/galleries',
                 'r2',
                 2048,
-                $customFileName
+                $customFileName,
+                true
             );
 
             VariationGallery::create([

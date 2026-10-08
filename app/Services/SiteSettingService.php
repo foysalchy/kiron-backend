@@ -104,6 +104,16 @@ class SiteSettingService
                     $customFileName
                 );
             }
+            if (isset($data['watermark_logo'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? 'site-watermark') . '_watermark_' . time();
+                $data['watermark_logo'] = FileUploadHelper::uploadImage(
+                    $data['watermark_logo'],
+                    'settings/watermarks',
+                    'r2',
+                    2048,
+                    $customFileName
+                );
+            }
 
             $setting = SiteSetting::create($data);
             LogHelper::created('site_setting', $setting->id, $setting->company_id, $setting->shop_name);
@@ -160,6 +170,16 @@ class SiteSettingService
                     $data['meta_image'],
                     $setting->meta_image,
                     'settings/meta_image',
+                    'r2',
+                    $customFileName
+                );
+            }
+            if (isset($data['watermark_logo'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-watermark') . '_watermark_' . time();
+                $data['watermark_logo'] = FileUploadHelper::replace(
+                    $data['watermark_logo'],
+                    $setting->watermark_logo,
+                    'settings/watermarks',
                     'r2',
                     $customFileName
                 );

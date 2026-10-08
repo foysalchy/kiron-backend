@@ -614,6 +614,10 @@ Route::prefix('v1')->group(function () {
                 Route::post('clone/products/{product}', [ProductController::class, 'clone']);
                 //prouducts
                 Route::prefix('products')->group(function () {
+                    Route::get('/export-template', [App\Http\Controllers\Api\ProductImportController::class, 'downloadTemplate']);
+                    Route::get('/export', [App\Http\Controllers\Api\ProductImportController::class, 'exportData']);
+                    Route::post('/import', [App\Http\Controllers\Api\ProductImportController::class, 'importData']);
+                    
                     Route::get('/', [ProductController::class, 'index']);
                     Route::post('/', [ProductController::class, 'store']);
                     Route::get('/{id}', [ProductController::class, 'show']);

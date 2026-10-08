@@ -104,6 +104,9 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'meta_description' => ['nullable', 'string', 'max:255'],
                 'meta_keywords' => ['nullable', 'string', 'max:255'],
                 'meta_keywords.*' => ['nullable', 'string',],
+                
+                // Delivery
+                'is_free_delivery' => ['nullable', 'boolean'],
             ]
         );
     }

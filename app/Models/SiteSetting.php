@@ -23,6 +23,8 @@ class SiteSetting extends Model
         'description',
         'logo',
         'favicon',
+        'watermark_status',
+        'watermark_logo',
         'phone',
         'inside_charge',
         'outside_charge',
@@ -55,7 +57,7 @@ class SiteSetting extends Model
     ];
 
 
-    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url'];
+    protected $appends = ['logo_url', 'favicon_url', 'meta_image_url', 'dark_logo_url', 'watermark_logo_url'];
     public static function homepageCacheKeys(): array
     {
         return ['site_settings_cart', 'site_settings'];
@@ -85,6 +87,13 @@ class SiteSetting extends Model
         return $this->belongsTo(Company::class);
     }
     // Accessors
+    public function getWatermarkLogoUrlAttribute(): ?string
+    {
+        return $this->watermark_logo
+            ? Storage::disk('r2')->url($this->watermark_logo)
+            : null;
+    }
+
     public function getLogoUrlAttribute(): ?string
     {
         return $this->logo
