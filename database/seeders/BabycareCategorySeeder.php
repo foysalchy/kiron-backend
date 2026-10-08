@@ -120,236 +120,506 @@ class BabycareCategorySeeder extends Seeder
 
         $categoriesData = [
             [
-                'name' => 'Baby Food',
+                'name' => 'Diapering',
+                'slug' => 'diapering',
+                'subCategories' => [
+                    [
+                        'name' => 'Diapers',
+                        'slug' => 'diapers',
+                        'miniCategories' => [
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-diaper'],
+                            ['name' => 'Genkikun', 'slug' => 'genkikun-diaper'],
+                            ['name' => 'Huggies', 'slug' => 'huggies-diaper'],
+                            ['name' => 'MamyPoko', 'slug' => 'mamypoko-diaper'],
+                            ['name' => 'Momotaro', 'slug' => 'momotaro-diaper'],
+                            ['name' => 'Mumlove', 'slug' => 'mumlove-diapers'],
+                            ['name' => 'NeoCare', 'slug' => 'neocare-diaper'],
+                            ['name' => 'Paisoft', 'slug' => 'paisoft-diaper'],
+                            ['name' => 'Pampers', 'slug' => 'pampers-diaper'],
+                            ['name' => 'Smart Care', 'slug' => 'smart-care-diaper'],
+                            ['name' => 'Avonee', 'slug' => 'avonee-diaper'],
+                            ['name' => 'Molfix', 'slug' => 'molfix-diaper'],
+                            ['name' => 'Babyology', 'slug' => 'babyology-diaper'],
+                            ['name' => 'Happy Nappy', 'slug' => 'fresh-diaper'],
+                            ['name' => 'SafeNest', 'slug' => 'safenest-diaper'],
+                            ['name' => 'Kinder', 'slug' => 'kinder-diaper'],
+                            ['name' => 'Twinkle', 'slug' => 'twinkle-diaper'],
+                            ['name' => 'Supermom', 'slug' => 'supermom-diaper'],
+                            ['name' => 'Kidz', 'slug' => 'kidz-diapers']
+                        ]
+                    ],
+                    [
+                        'name' => 'Wipes',
+                        'slug' => 'wipes',
+                        'miniCategories' => [
+                            ['name' => 'Pozzy', 'slug' => 'pozzy-wipes'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-wipes'],
+                            ['name' => 'Neocare', 'slug' => 'neocare-wipes'],
+                            ['name' => 'Molfix', 'slug' => 'molfix-wipes'],
+                            ['name' => 'Supermom', 'slug' => 'supermom-wipes'],
+                            ['name' => 'Smart Care', 'slug' => 'smart-care-wipes'],
+                            ['name' => 'Avonee', 'slug' => 'avonee-wipes'],
+                            ['name' => 'Huggies', 'slug' => 'huggies-wipes'],
+                            ['name' => 'Happy Nappy', 'slug' => 'fresh-happy-nappy-wipes'],
+                            ['name' => 'Kidz', 'slug' => 'kidz-wipes']
+                        ]
+                    ],
+                    [
+                        'name' => 'Diaper Bag & Storages',
+                        'slug' => 'diaper-bag-and-storages',
+                        'miniCategories' => []
+                    ]
+                ]
+            ],
+            [
+                'name' => 'Baby Foods',
+                'slug' => 'baby-foods-in-bangladesh',
                 'subCategories' => [
                     [
                         'name' => 'Milks',
-                        'miniCategories' => ['Almarai', 'Aptamil', 'Cow & Gate', 'ELDOBABY', 'Similac', 'SMA', 'Lactogen', 'Nido', 'NAN', 'Cowhead', 'Ensure', 'Kendamil', 'Biomil', 'PediaSure']
+                        'slug' => 'milks',
+                        'miniCategories' => [
+                            ['name' => 'Almarai', 'slug' => 'almarai-powder-milk'],
+                            ['name' => 'Aptamil', 'slug' => 'aptamil-milk'],
+                            ['name' => 'Cow & Gate', 'slug' => 'cow-and-gate-milk'],
+                            ['name' => 'ELDOBABY', 'slug' => 'eldobaby-milk'],
+                            ['name' => 'Similac', 'slug' => 'similac-milk'],
+                            ['name' => 'SMA', 'slug' => 'sma-milk'],
+                            ['name' => 'Lactogen', 'slug' => 'lactogen-milk'],
+                            ['name' => 'Nido', 'slug' => 'nido-milk'],
+                            ['name' => 'NAN', 'slug' => 'nan-milk'],
+                            ['name' => 'Cowhead', 'slug' => 'cowhead-milk'],
+                            ['name' => 'Ensure', 'slug' => 'ensure-milk'],
+                            ['name' => 'Kendamil', 'slug' => 'kendamil-milk'],
+                            ['name' => 'Biomil', 'slug' => 'biomil-milk'],
+                            ['name' => 'PediaSure', 'slug' => 'pediasure-milk']
+                        ]
                     ],
                     [
                         'name' => 'Cereals',
-                        'miniCategories' => ['Cowhead', 'Quaker', 'ELDOBABY', 'Nestlé', 'Cow and gate', 'Aptamil', 'Heinz', 'Gerber', 'NHF', 'Kelloggs', 'Organix']
+                        'slug' => 'cereals',
+                        'miniCategories' => [
+                            ['name' => 'Cowhead', 'slug' => 'cowhead-cereals'],
+                            ['name' => 'Quaker', 'slug' => 'quaker-cereals'],
+                            ['name' => 'ELDOBABY', 'slug' => 'eldobaby-cereals'],
+                            ['name' => 'Nestlé', 'slug' => 'nestle-cereals'],
+                            ['name' => 'Cow and gate', 'slug' => 'cow-and-gate-cereal'],
+                            ['name' => 'Aptamil', 'slug' => 'aptamil-cereal'],
+                            ['name' => 'Heinz', 'slug' => 'heinz-cereal'],
+                            ['name' => 'Gerber', 'slug' => 'gerber-cereals'],
+                            ['name' => 'NHF', 'slug' => 'nhf-cereal'],
+                            ['name' => 'Kelloggs', 'slug' => 'kelloggs-cereal'],
+                            ['name' => 'Organix', 'slug' => 'organix-cereal']
+                        ]
                     ],
                     [
                         'name' => 'Nutrition',
+                        'slug' => 'nutrition',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Cheese',
+                        'slug' => 'cheese',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Noodles',
+                        'slug' => 'noodles',
                         'miniCategories' => []
                     ]
                 ]
             ],
             [
                 'name' => 'Feeding',
+                'slug' => 'feeding',
                 'subCategories' => [
                     [
                         'name' => 'Feeder Bottle',
-                        'miniCategories' => ['Philips Avent', 'Pur', 'Pigeon', 'Tommee Tippee', 'Aiwibi', 'Fisher-Price']
+                        'slug' => 'bottles',
+                        'miniCategories' => [
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-bottle'],
+                            ['name' => 'Pur', 'slug' => 'pur-feeding-bottle'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-feeder-bottle'],
+                            ['name' => 'Tommee Tippee', 'slug' => 'tommee-tippee-bottle'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-feeding-bottle'],
+                            ['name' => 'Fisher-Price', 'slug' => 'fisher-price-feeder-bottle']
+                        ]
                     ],
                     [
                         'name' => 'Feeder Nipple',
-                        'miniCategories' => ['Pur', 'Philips Avent', 'Pigeon', 'Tommee Tippee', 'Aiwibi']
+                        'slug' => 'feeder-nipple',
+                        'miniCategories' => [
+                            ['name' => 'Pur', 'slug' => 'pur-nipple'],
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-nipple'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-nipple'],
+                            ['name' => 'Tommee Tippee', 'slug' => 'tommee-tippee-teat'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-feeder-nipple']
+                        ]
                     ],
                     [
                         'name' => 'Feeder Covers',
+                        'slug' => 'feeder-covers',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Baby Bibs',
-                        'miniCategories' => ['Fisher-Price', 'Pur', 'Pigeon', 'Aiwibi', 'Others']
+                        'slug' => 'baby-bib',
+                        'miniCategories' => [
+                            ['name' => 'Fisher-Price', 'slug' => 'fisher-price-bib'],
+                            ['name' => 'Pur', 'slug' => 'pur-baby-bib'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-bib'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-bibs'],
+                            ['name' => 'Others', 'slug' => 'other-brands-baby-bibs']
+                        ]
                     ],
                     [
                         'name' => 'Soothers & Teethers',
-                        'miniCategories' => ['Pur', 'Philips Avent', 'Tommee Tippee', 'Aiwibi']
+                        'slug' => 'soothers-teethers',
+                        'miniCategories' => [
+                            ['name' => 'Pur', 'slug' => 'pur-soother-teether'],
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-soothers-teethers'],
+                            ['name' => 'Tommee Tippee', 'slug' => 'tommee-tippee-soother'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-soothers-teethers']
+                        ]
                     ],
                     [
                         'name' => 'Toddler Cups',
-                        'miniCategories' => ['Duck', 'Philips Avent', 'Pur', 'Pigeon']
+                        'slug' => 'toddler-cups',
+                        'miniCategories' => [
+                            ['name' => 'Duck', 'slug' => 'duck-toddler-cups'],
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-toddler-cups'],
+                            ['name' => 'Pur', 'slug' => 'pur-toddler-cups'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-toddler-cup']
+                        ]
                     ],
                     [
                         'name' => 'Bottle Warmer',
-                        'miniCategories' => ['Pigeon']
+                        'slug' => 'food-blenders-steamers-and-bottle-warmers',
+                        'miniCategories' => [
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-bottle-warmer']
+                        ]
                     ],
                     [
                         'name' => 'Breast Pump',
-                        'miniCategories' => ['PUR', 'Smart Care', 'Philips Avent', 'Pigeon']
+                        'slug' => 'breast-pumps',
+                        'miniCategories' => [
+                            ['name' => 'PUR', 'slug' => 'pur-breast-pump'],
+                            ['name' => 'Smart Care', 'slug' => 'smart-care-breast-pump'],
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-breast-pump'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-breast-pump']
+                        ]
                     ],
                     [
                         'name' => 'Breast Milk Storage',
-                        'miniCategories' => ['Pigeon', 'PUR']
+                        'slug' => 'breast-milk-storage',
+                        'miniCategories' => [
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-breast-milk-storage'],
+                            ['name' => 'PUR', 'slug' => 'pur-breast-milk-storage']
+                        ]
                     ],
                     [
                         'name' => 'Sterilizer & Washers',
-                        'miniCategories' => ['Philips Avent', 'Pur']
+                        'slug' => 'sterilizer-washers',
+                        'miniCategories' => [
+                            ['name' => 'Philips Avent', 'slug' => 'philips-avent-sterilizer-washers'],
+                            ['name' => 'Pur', 'slug' => 'pur-sterilizer-washers']
+                        ]
                     ],
                     [
                         'name' => 'Feeding Cleaning',
-                        'miniCategories' => ['Hercules Bear', 'Kodomo', 'Pigeon', 'Aiwibi', 'Pur']
+                        'slug' => 'feeding-cleaning',
+                        'miniCategories' => [
+                            ['name' => 'Hercules Bear', 'slug' => 'hercules-bear-feeding-cleaning-products'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-feeding-cleaning'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-feeding-cleaning'],
+                            ['name' => 'Aiwibi', 'slug' => 'aiwibi-feeding-cleaning'],
+                            ['name' => 'Pur', 'slug' => 'pur-feeding-cleaning']
+                        ]
                     ]
                 ]
             ],
             [
                 'name' => 'School & Kids',
+                'slug' => 'school',
                 'subCategories' => [
                     [
                         'name' => 'School Bag',
+                        'slug' => 'backpacks-school-bags',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Tiffin Box',
+                        'slug' => 'tiffin-box',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Water Bottles',
+                        'slug' => 'water-bottles',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Stationary',
-                        'miniCategories' => ['Pencil Box', 'Pencil', 'Eraser', 'Pencil Sharpener', 'Color Pencil', 'Geometry Box', 'Glue Stick']
+                        'slug' => 'stationary',
+                        'miniCategories' => [
+                            ['name' => 'Pencil Box', 'slug' => 'pencil-box'],
+                            ['name' => 'Pencil', 'slug' => 'pencil'],
+                            ['name' => 'Eraser', 'slug' => 'eraser'],
+                            ['name' => 'Pencil Sharpener', 'slug' => 'pencil-sharpener'],
+                            ['name' => 'Color Pencil', 'slug' => 'color-pencil'],
+                            ['name' => 'Geometry Box', 'slug' => 'geometry-box'],
+                            ['name' => 'Glue Stick', 'slug' => 'glue-stick']
+                        ]
                     ],
                     [
                         'name' => 'Kids Watch',
+                        'slug' => 'kids-watch',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Mini Fan',
+                        'slug' => 'mini-fan',
                         'miniCategories' => []
                     ]
                 ]
             ],
             [
                 'name' => 'Grooming & Care',
+                'slug' => 'baby-accessories-in-bangladesh',
                 'subCategories' => [
                     [
                         'name' => 'Baby Bath',
-                        'miniCategories' => ['Johnson\'s', 'Mothercare', 'Boots', 'Cerave', 'Aveeno', 'Smart Care', 'Kodomo', 'Babi Mild']
+                        'slug' => 'bathing',
+                        'miniCategories' => [
+                            ['name' => 'Johnson\'s', 'slug' => 'johnsons-baby-bath'],
+                            ['name' => 'Mothercare', 'slug' => 'mothercare-baby-bath'],
+                            ['name' => 'Boots', 'slug' => 'boots-baby-bath'],
+                            ['name' => 'Cerave', 'slug' => 'cerave-baby-bath'],
+                            ['name' => 'Aveeno', 'slug' => 'aveeno-baby-bath'],
+                            ['name' => 'Smart Care', 'slug' => 'smart-care-baby-bath'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-baby-bath'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-baby-bath']
+                        ]
                     ],
                     [
                         'name' => 'Baby Shampoo',
-                        'miniCategories' => ['Johnson\'s', 'Mothercare', 'Boots', 'Kodomo', 'Babi Mild']
+                        'slug' => 'baby-shampoo',
+                        'miniCategories' => [
+                            ['name' => 'Johnson\'s', 'slug' => 'johnsons-baby-shampoo'],
+                            ['name' => 'Mothercare', 'slug' => 'mothercare-shampoo'],
+                            ['name' => 'Boots', 'slug' => 'boots-shampoo'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-shampoo'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-baby-shampoo']
+                        ]
                     ],
                     [
                         'name' => 'Baby Lotion',
-                        'miniCategories' => ['Mothercare', 'Aveeno', 'Cerave', 'Boots', 'Kodomo', 'Babi Mild']
+                        'slug' => 'lotions-oils',
+                        'miniCategories' => [
+                            ['name' => 'Mothercare', 'slug' => 'mothercare-baby-lotion'],
+                            ['name' => 'Aveeno', 'slug' => 'aveeno-lotion'],
+                            ['name' => 'Cerave', 'slug' => 'cerave-lotion'],
+                            ['name' => 'Boots', 'slug' => 'boots-lotion'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-lotion'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-baby-lotion']
+                        ]
                     ],
                     [
                         'name' => 'Baby Oil',
-                        'miniCategories' => ['Johnson', 'Orkide', 'Boots', 'Kodomo']
+                        'slug' => 'baby-oil',
+                        'miniCategories' => [
+                            ['name' => 'Johnson', 'slug' => 'johnson-baby-oil'],
+                            ['name' => 'Orkide', 'slug' => 'orkide-oil'],
+                            ['name' => 'Boots', 'slug' => 'boots-oil'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-oil']
+                        ]
                     ],
                     [
                         'name' => 'Baby Cream',
-                        'miniCategories' => ['Aveeno', 'Joona Baby', 'Mothercare', 'Johnson', 'Sebamed', 'Cerave', 'Kodomo', 'Babi Mild']
+                        'slug' => 'baby-cream',
+                        'miniCategories' => [
+                            ['name' => 'Aveeno', 'slug' => 'aveeno-baby-cream'],
+                            ['name' => 'Joona Baby', 'slug' => 'joona-baby-sunscreen'],
+                            ['name' => 'Mothercare', 'slug' => 'mothercare-cream'],
+                            ['name' => 'Johnson', 'slug' => 'johnson-baby-cream'],
+                            ['name' => 'Sebamed', 'slug' => 'sebamed-baby-cream'],
+                            ['name' => 'Cerave', 'slug' => 'cerave-baby-cream'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-cream'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-baby-cream']
+                        ]
                     ],
                     [
                         'name' => 'Baby Powder',
-                        'miniCategories' => ['Johnson', 'Kodomo', 'Babi Mild']
+                        'slug' => 'baby-powder-baby-cream',
+                        'miniCategories' => [
+                            ['name' => 'Johnson', 'slug' => 'johnsons-baby-powder'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-baby-powder'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-baby-powder']
+                        ]
                     ],
                     [
                         'name' => 'Baby Face Wash',
+                        'slug' => 'baby-face-wash',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Baby Toothpaste',
-                        'miniCategories' => ['Aquafresh', 'Kodomo', 'Babi Mild']
+                        'slug' => 'toothpastes',
+                        'miniCategories' => [
+                            ['name' => 'Aquafresh', 'slug' => 'aquafresh-toothpaste'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-toothpaste'],
+                            ['name' => 'Babi Mild', 'slug' => 'babi-mild-kids-toothpaste']
+                        ]
                     ],
                     [
                         'name' => 'Baby Toothbrush',
-                        'miniCategories' => ['Fisher-Price', 'Kodomo', 'Pigeon', 'Pur']
+                        'slug' => 'toothbrushe',
+                        'miniCategories' => [
+                            ['name' => 'Fisher-Price', 'slug' => 'fisher-price-toothbrush'],
+                            ['name' => 'Kodomo', 'slug' => 'kodomo-toothbrush'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-toothbrush'],
+                            ['name' => 'Pur', 'slug' => 'pur-toothbrush']
+                        ]
                     ],
                     [
                         'name' => 'Baby Nail Clipper',
-                        'miniCategories' => ['Pur', 'Pigeon']
+                        'slug' => 'baby-nail-clipper',
+                        'miniCategories' => [
+                            ['name' => 'Pur', 'slug' => 'pur-baby-nail-clipper'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-nail-clipper']
+                        ]
                     ],
                     [
                         'name' => 'Nasal Aspirator',
-                        'miniCategories' => ['Pur', 'Pigeon']
+                        'slug' => 'nasal-aspirator',
+                        'miniCategories' => [
+                            ['name' => 'Pur', 'slug' => 'pur-nasal-aspirator'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-nasal-aspirator']
+                        ]
                     ],
                     [
                         'name' => 'Baby Robes & Mats',
-                        'miniCategories' => ['Duck', 'Pigeon']
+                        'slug' => 'baby-robes-and-mats',
+                        'miniCategories' => [
+                            ['name' => 'Duck', 'slug' => 'duck-baby-robes-and-mats'],
+                            ['name' => 'Pigeon', 'slug' => 'pigeon-table-mat']
+                        ]
                     ],
                     [
                         'name' => 'Baby Towel',
+                        'slug' => 'baby-towel',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Booster Seats & High Chairs',
-                        'miniCategories' => ['Smart Care']
+                        'slug' => 'booster-seats-and-high-chairs',
+                        'miniCategories' => [
+                            ['name' => 'Smart Care', 'slug' => 'smart-care-booster-seats-and-high-chairs']
+                        ]
                     ],
                     [
                         'name' => 'Rash Cream',
-                        'miniCategories' => ['Aveeno', 'Sebamed', 'Sudocrem']
+                        'slug' => 'rash-cream-and-ointment',
+                        'miniCategories' => [
+                            ['name' => 'Aveeno', 'slug' => 'aveeno-rash-cream'],
+                            ['name' => 'Sebamed', 'slug' => 'sebamed-rash-cream'],
+                            ['name' => 'Sudocrem', 'slug' => 'sudocrem-rash-cream']
+                        ]
                     ],
                     [
                         'name' => 'Baby Socks',
+                        'slug' => 'socks',
                         'miniCategories' => []
                     ]
                 ]
             ],
             [
                 'name' => 'Toys & Play',
+                'slug' => 'toys',
                 'subCategories' => [
                     [
                         'name' => 'Baby Rattle',
+                        'slug' => 'baby-rattle-toy',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Building Blocks',
+                        'slug' => 'building-block',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Educational Toys',
+                        'slug' => 'educational-toy',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Musical Toys',
+                        'slug' => 'musical-toys',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Soft Toys',
+                        'slug' => 'soft-toys',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Action Figure',
+                        'slug' => 'action-figure',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Doll',
+                        'slug' => 'doll',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Toy Car',
+                        'slug' => 'toy-car',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Kaleidoscope',
+                        'slug' => 'kaleidoscope-toys',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Puzzles',
+                        'slug' => 'puzzles',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Baby Swimming Pool',
+                        'slug' => 'swimming-pool',
                         'miniCategories' => []
                     ],
                     [
                         'name' => 'Card Game',
+                        'slug' => 'card-game',
                         'miniCategories' => []
                     ]
                 ]
             ]
         ];
 
+        // Sort subCategories and miniCategories alphabetically before insertion
+        foreach ($categoriesData as &$megaData) {
+            usort($megaData['subCategories'], function($a, $b) {
+                return strcmp($a['name'], $b['name']);
+            });
+
+            foreach ($megaData['subCategories'] as &$subData) {
+                usort($subData['miniCategories'], function($a, $b) {
+                    return strcmp($a['name'], $b['name']);
+                });
+            }
+        }
+        unset($megaData, $subData); // clean up references
+
         foreach ($categoriesData as $megaData) {
             $allMiniBrandsForMega = [];
             foreach ($megaData['subCategories'] as $sub) {
-                $allMiniBrandsForMega = array_merge($allMiniBrandsForMega, $sub['miniCategories']);
+                foreach ($sub['miniCategories'] as $mini) {
+                    $allMiniBrandsForMega[] = $mini['name'];
+                }
             }
             $allMiniBrandsForMega = array_unique($allMiniBrandsForMega);
 
@@ -357,7 +627,7 @@ class BabycareCategorySeeder extends Seeder
                 'name' => $megaData['name'],
                 'company_id' => $companyId
             ], [
-                'slug' => Str::slug($megaData['name']),
+                'slug' => $megaData['slug'],
                 'status' => 1,
                 'description' => $this->generateSeoDescription($megaData['name'], array_slice($allMiniBrandsForMega, 0, 10), $megaData['name']),
                 'meta_title' => "{$megaData['name']} Price in Bangladesh",
@@ -366,33 +636,34 @@ class BabycareCategorySeeder extends Seeder
             ]);
 
             foreach ($megaData['subCategories'] as $subData) {
+                $miniBrandNames = array_map(function($m) { return $m['name']; }, $subData['miniCategories']);
                 $subCategory = SubCategory::updateOrCreate([
                     'mega_category_id' => $megaCategory->id,
                     'name' => $subData['name'],
                     'company_id' => $companyId
                 ], [
-                    'slug' => Str::slug($subData['name']),
+                    'slug' => $subData['slug'],
                     'status' => 1,
-                    'description' => $this->generateSeoDescription($subData['name'], array_slice($subData['miniCategories'], 0, 10), $megaData['name']),
+                    'description' => $this->generateSeoDescription($subData['name'], array_slice($miniBrandNames, 0, 10), $megaData['name']),
                     'meta_title' => "{$subData['name']} Price in Bangladesh",
                     'meta_description' => "Shop {$subData['name']} products in Bangladesh at Littlebaby, including quality {$subData['name']} products for babies and families. Explore authentic {$subData['name']} products at competitive prices with convenient online shopping and delivery.",
                     'meta_keywords' => ["{$subData['name']}", "Buy {$subData['name']}", "{$subData['name']} Price in BD", "{$subData['name']} Bangladesh"]
                 ]);
 
-                foreach ($subData['miniCategories'] as $miniName) {
-                    $combinedName = "{$miniName} {$subData['name']}";
+                foreach ($subData['miniCategories'] as $miniData) {
+                    $combinedName = "{$miniData['name']} {$subData['name']}";
                     MiniCategory::updateOrCreate([
                         'mega_category_id' => $megaCategory->id,
                         'sub_category_id' => $subCategory->id,
-                        'name' => $miniName,
+                        'name' => $miniData['name'],
                         'company_id' => $companyId
                     ], [
-                        'slug' => Str::slug($miniName),
+                        'slug' => $miniData['slug'],
                         'status' => 1,
                         'description' => $this->generateSeoDescription($combinedName, [], $megaData['name']),
                         'meta_title' => "{$combinedName} Price in Bangladesh",
-                        'meta_description' => "Shop {$miniName} products in Bangladesh at Littlebaby, including quality {$miniName} products for babies and families. Explore authentic {$miniName} products at competitive prices with convenient online shopping and delivery.",
-                        'meta_keywords' => ["{$miniName}", "Buy {$miniName}", "{$miniName} Price in BD", "{$miniName} Bangladesh"]
+                        'meta_description' => "Shop {$miniData['name']} products in Bangladesh at Littlebaby, including quality {$miniData['name']} products for babies and families. Explore authentic {$miniData['name']} products at competitive prices with convenient online shopping and delivery.",
+                        'meta_keywords' => ["{$miniData['name']}", "Buy {$miniData['name']}", "{$miniData['name']} Price in BD", "{$miniData['name']} Bangladesh"]
                     ]);
                 }
             }
