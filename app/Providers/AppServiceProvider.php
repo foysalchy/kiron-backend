@@ -318,13 +318,13 @@ class AppServiceProvider extends ServiceProvider
                 $applyLogic(MegaCategory::class)
                     ->select('id', 'company_id', 'name', 'slug', 'image')
                     ->with([
-                        'subCategories' => fn($q) => $q->select('id', 'company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value)->orderBy('name', 'asc'),
-                        'subCategories.miniCategories' => fn($q) => $q->select('id', 'company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value)->orderBy('name', 'asc'),
+                        'subCategories' => fn($q) => $q->select('id', 'company_id', 'mega_category_id', 'name', 'slug')->where('status', Status::Active->value),
+                        'subCategories.miniCategories' => fn($q) => $q->select('id', 'company_id', 'sub_category_id', 'name', 'slug')->where('status', Status::Active->value),
                     ])
                     ->where('status', Status::Active->value)
                     ->whereNotNull('slug')
                     ->where('slug', '!=', '')
-                    ->orderBy('name', 'asc')
+                    ->latest()
                     ->get()
             ),
 
