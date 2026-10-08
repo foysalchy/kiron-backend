@@ -53,7 +53,7 @@ class OrderController extends FrontendController
                 ->select(['id', 'company_id', 'inside_charge', 'outside_charge'])
                 ->first();
         });
-        
+
         $defaultInside = $settings->inside_charge ?? 60;
         $cartContent = Cart::content();
 
@@ -61,6 +61,28 @@ class OrderController extends FrontendController
         $subtotal = (float) str_replace(',', '', Cart::subtotal());
         $shipping = session()->get('shipping_cost', $defaultInside);
         $shipping_area = session()->get('shipping_area', 'inside');
+
+        $is_free_delivery = $cartContent->isNotEmpty();
+        foreach ($cartContent as $item) {
+            $pId = $item->id;
+            if (str_starts_with($pId, 'var_')) {
+                $varId = str_replace('var_', '', $pId);
+                $variation = ProductVariation::find($varId);
+                $pId = $variation ? $variation->product_id : null;
+            }
+            if ($pId) {
+                $product = Product::find($pId);
+                if ($product && !$product->is_free_delivery) {
+                    $is_free_delivery = false;
+                    break;
+                }
+            }
+        }
+
+        if ($is_free_delivery) {
+            $shipping = 0;
+        }
+
         $discount = session()->has('coupon') ? session('coupon')['discount_amount'] : 0;
         $total = ($subtotal - $discount) + $shipping;
 
@@ -75,7 +97,8 @@ class OrderController extends FrontendController
             'total',
             'shipping_area',
             'paymentMethods',
-            'draftOrderId'
+            'draftOrderId',
+            'is_free_delivery'
         ));
     }
 
@@ -179,6 +202,28 @@ class OrderController extends FrontendController
                 $oldOrder->delete();
             }
 
+            $shipping_cost = session()->get('shipping_cost', 60);
+            $is_free_delivery = $cartContent->isNotEmpty();
+            foreach ($cartContent as $item) {
+                $pId = $item->id;
+                if (str_starts_with($pId, 'var_')) {
+                    $varId = str_replace('var_', '', $pId);
+                    $variation = ProductVariation::find($varId);
+                    $pId = $variation ? $variation->product_id : null;
+                }
+                if ($pId) {
+                    $product = Product::find($pId);
+                    if ($product && !$product->is_free_delivery) {
+                        $is_free_delivery = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($is_free_delivery) {
+                $shipping_cost = 0;
+            }
+
             $orderData = [
 
                 'warehouse_info'   => $warehouseInfo, // JSON Column Store
@@ -187,7 +232,7 @@ class OrderController extends FrontendController
                 'items'            => $items,
                 'status'           => Status::Draft->value,
                 'order_date'       => now(),
-                'other_charges'    => session()->get('shipping_cost', 60),
+                'other_charges'    => $shipping_cost,
                 'shipping_address' => $shippingAddress,
             ];
             Log::info('Order data before create', [

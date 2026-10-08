@@ -108,6 +108,7 @@
                     <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
+                        @if(!isset($is_free_delivery) || !$is_free_delivery)
                         <div class="mb-8">
                             <h2 class="text-lg md:text-xl font-semibold leading-none tracking-tight mb-4">Select Delivery Method</h2>
                             <div class="space-y-2">
@@ -129,6 +130,7 @@
                                 </label>
                             </div>
                         </div>
+                        @endif
 
                         <!-- Product Row in Summary -->
                         <div class="space-y-4 mb-8">
@@ -216,7 +218,13 @@
 
                             <div class="flex justify-between items-center text-gray-700">
                                 <span class="text-md font-medium">Delivery Charge:</span>
-                                <span class="text-md font-bold text-gray-900"> {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</span>
+                                <span class="text-md font-bold text-gray-900">
+                                    @if(isset($is_free_delivery) && $is_free_delivery)
+                                        Free
+                                    @else
+                                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                                    @endif
+                                </span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-100 pt-4">
                                 <span class="text-lg font-black text-gray-900">Total to Pay:</span>
