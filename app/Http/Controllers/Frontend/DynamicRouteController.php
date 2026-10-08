@@ -30,7 +30,6 @@ class DynamicRouteController extends Controller
                 ->unionAll(DB::query()->selectRaw("'extra_category'")->from((new ExtraCategory)->getTable())->where('slug', $slug))
                 ->unionAll(DB::query()->selectRaw("'page'")->from((new Page)->getTable())->where('slug', $slug))
                 ->unionAll(DB::query()->selectRaw("'brand'")->from((new Brand)->getTable())->where('slug', $slug))
-                ->unionAll(DB::query()->selectRaw("'landing_page'")->from((new LandingPage)->getTable())->where('slug', $slug))
                 ->unionAll(DB::query()->selectRaw("'blog'")->from((new Blog)->getTable())->where('slug', $slug));
 
             return $slugTypeQuery->first()->type ?? 'not_found';
@@ -52,9 +51,6 @@ class DynamicRouteController extends Controller
 
             case 'brand':
                 return app(ProductController::class)->brandProducts($request, $slug);
-
-            case 'landing_page':
-                return app(LandingController::class)->index($slug);
 
             case 'blog':
                 return app(BlogController::class)->blogDetails($slug);

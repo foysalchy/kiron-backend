@@ -162,6 +162,8 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/feeds/facebook/products.csv', [SitemapController::class, 'facebookCatalogCsv'])->name('facebook.catalog.csv');
     Route::get('/feeds/tiktok/products.csv', [SitemapController::class, 'tiktokCatalogCsv'])->name('tiktok.catalog.csv');
 
+    Route::get('/sale/{slug}', [App\Http\Controllers\Frontend\LandingController::class, 'index'])->name('landing');
+
     // Dynamic Route Resolver for root-level slugs
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('dynamic.slug');
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('product.details');
@@ -169,7 +171,6 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('subcategory.products');
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('minicategory.products');
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('frontend.page');
-    Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('landing');
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('blog.details');
     Route::get('/{slug}', [App\Http\Controllers\Frontend\DynamicRouteController::class, 'resolve'])->name('brand.products');
 
