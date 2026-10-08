@@ -3,7 +3,7 @@
     @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
 @endsection
 @section('content')
-    <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
+    <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0" id="cart-container">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
             <!-- Top Header -->
             <div class="flex flex-wrap items-center justify-between gap-3">
@@ -69,10 +69,10 @@
                                     <div class="flex flex-row items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 mt-2 sm:mt-0">
                                         <!-- Qty Controls -->
                                         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs">
-                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" aria-label="Decrease quantity"
+                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" aria-label="Decrease quantity"
                                                 class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
                                             <span class="w-8 sm:w-10 text-center font-bold text-gray-800 text-sm sm:text-base">{{ $item->qty }}</span>
-                                            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" aria-label="Increase quantity"
+                                            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" aria-label="Increase quantity"
                                                 class="px-3 py-1.5 sm:px-3 sm:py-2 text-gray-600 text-lg sm:text-xl hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
                                         </div>
 
@@ -82,11 +82,11 @@
                                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}
                                                 {{ number_format($item->subtotal, 0) }}
                                                 {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}</p>
-                                            <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item" title="Remove item"
-                                                class="text-red-400 hover:text-red-600 transition-colors">
+                                            <button type="button" onclick="removeCartPageItem('{{ $item->rowId }}')" aria-label="Remove item" title="Remove item"
+                                                class="text-red-400 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-0">
                                                 <i class="far fa-trash-alt text-base sm:text-lg" aria-hidden="true"></i>
                                                 <span class="sr-only">Remove item</span>
-                                            </a>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -232,13 +232,30 @@
 
 @push('scripts')
     <script>
-        function updateCartQty(rowId, newQty) {
+        function refreshCartUI() {
+            fetch(window.location.href)
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newContainer = temp.querySelector('#cart-container');
+                    const currentContainer = document.getElementById('cart-container');
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                    } else if (currentContainer && !newContainer) {
+                        location.reload();
+                    }
+                })
+                .catch(err => console.error('Cart refresh failed:', err));
+        }
+
+        function updateCartPageQty(rowId, newQty) {
             if (newQty < 1) return;
             const form = document.getElementById('update-cart-form');
             document.getElementById('update-row-id').value = rowId;
             document.getElementById('update-qty').value = newQty;
             const formData = new FormData(form);
-            
+
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -250,20 +267,8 @@
                     document.querySelectorAll('.cart-count-nav').forEach(badge => {
                         badge.innerText = data.cart_count;
                     });
-
-                    fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newMain = doc.querySelector('main');
-                        const currentMain = document.querySelector('main');
-                        if(newMain && currentMain) {
-                            currentMain.innerHTML = newMain.innerHTML;
-                        } else {
-                            location.reload();
-                        }
-                    });
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
                 } else {
                     if (typeof toastr !== 'undefined') toastr.error(data.message);
                 }
@@ -272,6 +277,30 @@
                 if (typeof toastr !== 'undefined') {
                     toastr.error('Unable to update cart. Please try again.');
                 }
+            });
+        }
+
+        function removeCartPageItem(rowId) {
+            fetch(`/cart/remove/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.cart_count !== undefined) {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+                refreshCartUI();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
             });
         }
     </script>

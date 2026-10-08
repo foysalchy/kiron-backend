@@ -137,6 +137,7 @@
                     });
                     // Server confirm করার পরও recalculate করে নেওয়া (guaranteed accuracy)
                     recalculateOverallSubtotal();
+                    if (typeof refreshCartUI === 'function') refreshCartUI();
                 }
             })
             .catch(err => {
@@ -169,6 +170,7 @@ function removeCartItem(rowId, customMessage) {
                 });
             }
 
+            if (typeof refreshCartUI === 'function') refreshCartUI();
             toastr.success((data && data.message) || customMessage || 'The item has been removed from the cart.');
         })
         .catch(err => {

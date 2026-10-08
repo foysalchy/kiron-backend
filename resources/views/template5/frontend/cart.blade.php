@@ -3,7 +3,7 @@
     @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
 @endsection
 @section('content')
-
+<div id="cart-container">
 @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
 <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 lg:py-20">
   <div class="flex items-center justify-between mb-8">
@@ -19,11 +19,11 @@
 
       @foreach ($cartContent as $item)
         <div class="bg-white p-5 rounded-2xl border border-coal/10 flex flex-col sm:flex-row gap-5 items-center relative">
-            <a href="{{ route('cart.remove', $item->rowId) }}"
+            <button type="button" onclick="removeCartPageItem('{{ $item->rowId }}')"
             aria-label="Remove {{ $item->name }} from cart"
-            class="absolute top-4 right-4 z-20 text-gray-700 hover:text-red-700 transition-colors pointer-events-auto">
+            class="absolute top-4 right-4 z-20 text-gray-700 hover:text-red-700 transition-colors pointer-events-auto bg-transparent border-0 cursor-pointer p-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </a>
+            </button>
 
           <img src="{{ $item->options->thumbnail }}"
                onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
@@ -62,9 +62,9 @@
               </div>
 
               <div class="flex items-center border border-coal/15 rounded-full bg-ash/50 h-9 w-24">
-                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">-</button>
+                <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">-</button>
                 <span class="flex-1 text-center font-medium text-sm">{{ $item->qty }}</span>
-                <button type="button" onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">+</button>
+                <button type="button" onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})" class="w-8 flex items-center justify-center text-coal hover:text-[var(--primary-color)]">+</button>
               </div>
             </div>
 
@@ -205,12 +205,29 @@
   </div>
 </section>
 @endif
-
+</div>
 @endsection
 
 @push('scripts')
 <script>
-  function updateCartQty(rowId, newQty) {
+  function refreshCartUI() {
+      fetch(window.location.href)
+          .then(res => res.text())
+          .then(html => {
+              const temp = document.createElement('div');
+              temp.innerHTML = html;
+              const newContainer = temp.querySelector('#cart-container');
+              const currentContainer = document.getElementById('cart-container');
+              if (newContainer && currentContainer) {
+                  currentContainer.innerHTML = newContainer.innerHTML;
+              } else if (currentContainer && !newContainer) {
+                  location.reload();
+              }
+          })
+          .catch(err => console.error('Cart refresh failed:', err));
+  }
+
+  function updateCartPageQty(rowId, newQty) {
             if (newQty < 1) return;
             const form = document.getElementById('update-cart-form');
             document.getElementById('update-row-id').value = rowId;
@@ -231,25 +248,44 @@
                         cartCountNav.parentElement.classList.remove('hidden');
                     }
                     
-                    fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newMain = doc.querySelector('main');
-                        const currentMain = document.querySelector('main');
-                        if(newMain && currentMain) {
-                            currentMain.innerHTML = newMain.innerHTML;
-                        } else {
-                            location.reload();
-                        }
-                    });
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
                 } else {
                     if (typeof toastr !== 'undefined') toastr.error(data.message || 'Unable to update cart.');
                 }
             })
             .catch(err => {
                 if (typeof toastr !== 'undefined') toastr.error('An error occurred. Please try again.');
+            });
+        }
+
+  function removeCartPageItem(rowId) {
+            fetch(`/cart/remove/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.cart_count !== undefined) {
+                    const cartCountNav = document.querySelector('.cart-count-nav');
+                    if (cartCountNav) {
+                        cartCountNav.innerText = data.cart_count;
+                        if (data.cart_count > 0) {
+                            cartCountNav.parentElement.classList.remove('hidden');
+                        } else {
+                            cartCountNav.parentElement.classList.add('hidden');
+                        }
+                    }
+                }
+                refreshCartUI();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
             });
         }
 </script>

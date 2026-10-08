@@ -104,7 +104,7 @@
                 </div>
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
-                <div class="lg:col-span-1 lg:order-2 space-y-6">
+                <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
                     <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
@@ -248,6 +248,33 @@
 
 @push('scripts')
     <script>
+        function refreshCartUI() {
+            const fetchUrl = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
+            fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    
+                    const newSummary = temp.querySelector('#checkout-summary-container');
+                    const currentSummary = document.getElementById('checkout-summary-container');
+                    
+                    if (newSummary && currentSummary) {
+                        currentSummary.innerHTML = newSummary.innerHTML;
+                        
+                        // Extract and update the global total variable
+                        const totalMatch = html.match(/let _checkoutTotal = ([\d.]+);/);
+                        if(totalMatch && totalMatch[1]) {
+                            _checkoutTotal = parseFloat(totalMatch[1]);
+                        }
+                    } else {
+                        // If cart is empty, checkout might redirect or structure changes
+                        location.reload();
+                    }
+                })
+                .catch(() => location.reload());
+        }
+
         let _activeDraftOrderId = @json($draftOrderId ?? null);
         let _checkoutTotal = {{ $total }};
         let _checkoutSlug = '';
