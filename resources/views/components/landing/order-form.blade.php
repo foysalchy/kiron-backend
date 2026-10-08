@@ -281,4 +281,27 @@
             confirmButtonColor: '#d33'
         });
     @endif
+
+    // Live preview scroll preservation (SessionStorage method)
+    window.addEventListener('scroll', function() {
+        sessionStorage.setItem('landing_preview_scroll', window.scrollY);
+    });
+
+    (function() {
+        const savedScroll = sessionStorage.getItem('landing_preview_scroll');
+        if (savedScroll && parseInt(savedScroll) > 0) {
+            const targetScroll = parseInt(savedScroll);
+            const restoreScroll = () => window.scrollTo({ top: targetScroll, behavior: 'instant' });
+            
+            restoreScroll();
+            document.addEventListener('DOMContentLoaded', restoreScroll);
+            window.addEventListener('load', restoreScroll);
+            
+            // Re-apply in case images push content down
+            setTimeout(restoreScroll, 100);
+            setTimeout(restoreScroll, 300);
+            setTimeout(restoreScroll, 500);
+            setTimeout(restoreScroll, 1000);
+        }
+    })();
 </script>

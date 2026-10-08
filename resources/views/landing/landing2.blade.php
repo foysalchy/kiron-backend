@@ -220,7 +220,7 @@
                         @php
                             $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
                         @endphp
-                        <img src="{{ $categoryMap ? asset('storage/' . $categoryMap) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp' }}"
+                        <img src="{{ $categoryMap ? is_array($categoryMap) ? ($categoryMap['previewUrl'] ?? '') : (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') ? $categoryMap : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap)) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp' }}"
                             alt="Categories" width="800" height="800"
                             class="w-full aspect-square object-contain">
                     </div>
@@ -267,7 +267,7 @@
                 <div
                     class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl bg-white/5">
 
-                    <img src="{{ $promoImage ? asset('storage/' . $promoImage) : $landing->thumbnail_url }}"
+                    <img src="{{ $promoImage ? is_array($promoImage) ? ($promoImage['previewUrl'] ?? '') : (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') ? $promoImage : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage)) : $landing->thumbnail_url }}"
                         alt="Offer Product" width="800" height="800"
                         class="w-full aspect-square object-contain">
                 </div>

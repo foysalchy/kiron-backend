@@ -222,7 +222,7 @@
 
                                 @if (!empty($feature['image']))
                                     <div class="rounded-lg overflow-hidden ">
-                                        <img src="{{ asset('storage/' . $feature['image']) }}"
+                                        <img src="{{ is_array($feature['image']) ? ($feature['image']['previewUrl'] ?? '') : (str_starts_with($feature['image'], 'blob:') || str_starts_with($feature['image'], 'data:') ? $feature['image'] : \Illuminate\Support\Facades\Storage::disk('r2')->url($feature['image'])) }}"
                                             alt="{{ $feature['title'] }}"
                                             class="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-500">
 
@@ -323,7 +323,7 @@
                                 <div class="swiper-slide">
                                     <div
                                         class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
-                                        <img src="{{ asset('storage/' . $img) }}" class="w-full h-auto object-cover"
+                                        <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}" class="w-full h-auto object-cover"
                                             alt="Customer Review">
                                     </div>
                                 </div>

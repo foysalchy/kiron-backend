@@ -73,21 +73,24 @@ class LandingPage extends Model
         return $query->where('slug', $slug);
     }
 
-    // Accessors
     public function getThumbnailUrlAttribute(): ?string
     {
+        if (str_starts_with($this->thumbnail ?? '', 'data:') || str_starts_with($this->thumbnail ?? '', 'blob:')) {
+            return $this->thumbnail;
+        }
         return $this->thumbnail
             ? Storage::disk('r2')->url($this->thumbnail)
             : null;
-        // return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
     }
 
     public function getVideoUrlAttribute(): ?string
     {
+        if (str_starts_with($this->video ?? '', 'data:') || str_starts_with($this->video ?? '', 'blob:')) {
+            return $this->video;
+        }
         return $this->video
             ? Storage::disk('r2')->url($this->video)
             : null;
-        // return $this->video ? asset('storage/' . $this->video) : null;
     }
 
     // Mutators
@@ -118,8 +121,8 @@ class LandingPage extends Model
     }
     public function getDiscountPercentageAttribute()
     {
-        $regular = $this->regular_price;
-        $sale = $this->discount_price;
+        $regular = (float) $this->regular_price;
+        $sale = (float) $this->discount_price;
 
         if ($regular > 0 && $regular > $sale) {
             return round((($regular - $sale) / $regular) * 100);
