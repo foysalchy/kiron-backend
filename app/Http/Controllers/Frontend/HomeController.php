@@ -54,6 +54,7 @@ class HomeController extends FrontendController
             'products.type',
             'products.status',
             'products.short_description',
+            'products.is_free_delivery',
             'products.created_at'
         ];
 

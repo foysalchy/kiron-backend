@@ -48,13 +48,22 @@
             </svg>
         </button>
 
-        <!-- Discount Badge -->
-        @if ($discountLabel)
-            <div
-                class="absolute top-2 left-2 secondary-bg text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
-                -{{ $discountLabel }}
-            </div>
-        @endif
+        <!-- Badges (Top Left) -->
+        <div class="absolute top-2 left-2 z-10 flex flex-col items-start gap-1">
+            <!-- Discount Badge -->
+            @if ($discountLabel)
+                <div class="secondary-bg text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    -{{ $discountLabel }}
+                </div>
+            @endif
+
+            <!-- Free Delivery Badge -->
+            @if ($product->is_free_delivery)
+                <div class="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    Free Shipping
+                </div>
+            @endif
+        </div>
     </div>
 
     <!-- Info Area -->

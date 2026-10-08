@@ -63,6 +63,11 @@
                 <span class="text-[10px] font-bold leading-none mt-0.5 uppercase">Off</span>
             </div>
         @endif
+        @if ($product->is_free_delivery)
+            <div class="absolute top-2 left-12 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm z-10">
+                Free Shipping
+            </div>
+        @endif
     </div>
 
     <!-- Product Info Area -->
