@@ -318,7 +318,7 @@
                                 <div class="nav-dropdown-menu absolute left-0 top-full hidden group-hover:block z-[100] pt-1">
                                     <ul
                                         class="relative w-64 bg-white shadow-2xl border border-gray-100 py-2 rounded-b-md text-gray-700 text-sm font-medium">
-                                        @foreach ($mega->subCategories as $sub)
+                                       @foreach ($mega->subCategories->sortBy(fn($sub) => strtolower($sub->name)) as $sub)
                                             @php
                                                 $hasMini = $sub->miniCategories && $sub->miniCategories->count() > 0;
                                             @endphp
@@ -336,7 +336,7 @@
                                                 @if ($hasMini)
                                                     <ul
                                                         class="nav-sub-dropdown-menu absolute {{ (isset($loop->parent) && $loop->parent->remaining < 2) ? 'right-full border-r' : 'left-full border-l' }} top-0 w-full bg-white shadow-2xl border-gray-100 py-2 hidden group-hover/sub:block rounded-md">
-                                                        @foreach ($sub->miniCategories as $mini)
+                                                       @foreach ($sub->miniCategories->sortBy(fn($mini) => strtolower($mini->name)) as $mini)
                                                             <li class=" hover:bg-gray-100 border-b border-gray-50 last:border-0">
                                                                 <a href="{{ url($mini->slug ?? $mini->id) }}"
                                                                     class="px-4 py-2 block hover:text-[var(--primary-color,#016738)] text-gray-600 hover:text-gray-900 uppercase text-[14px] font-medium transition-colors">
