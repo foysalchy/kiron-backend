@@ -18,23 +18,30 @@
     <section class="py-2   container mx-auto px-4 lg:px-0">
 
         <nav aria-label="Breadcrumb"
-            class="container mx-auto px-4 flex   items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
+            class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap md:pt-4">
 
             <a href="{{ route('home') }}"
-                class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                <i class="fas fa-home text-xs"></i> Home
+            </a>
 
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
-                    <span class="text-gray-500">/</span>
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
                     <a href="{{ url($item['slug']) }}"
-                        class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
-                        {{ $item['name'] }}
-                    </a>
+                        class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
                 @endforeach
             @endif
 
-            <span class="text-gray-500">/</span>
-            <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+            </svg>
+            <span
+                class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
 
         <!-- 2. Product Top Info Card -->
@@ -53,7 +60,8 @@
                                 class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
                                 <img src="{{ $imgUrl }}"
                                     onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
-                                    class="w-full h-full object-contain" alt="Product Image" loading="lazy" width="800" height="800">
+                                    class="w-full h-full object-contain" alt="Product Image" loading="lazy" width="800"
+                                    height="800">
                             </button>
                         @endforeach
                     </div>
@@ -94,11 +102,11 @@
                         </div>
                     @endif
                     @if(!empty(strip_tags(trim($product->short_description))))
-                    <div
-                        class="prose prose-slate max-w-none mb-4 text-lg leading-relaxed font-medium overflow-visible relative">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6">Summury </h2>
-                        {!! $product->short_description !!}
-                    </div>
+                        <div
+                            class="prose prose-slate max-w-none mb-4 text-lg leading-relaxed font-medium overflow-visible relative">
+                            <h2 class="text-xl font-bold text-gray-900 mb-6">Summury </h2>
+                            {!! $product->short_description !!}
+                        </div>
                     @endif
 
                     <div class="flex items-baseline gap-4 mb-6">
@@ -163,7 +171,7 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="order-3 md:order-3 col-span-1 md:col-span-1 flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                                            {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                                                {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -586,10 +594,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                                                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                                            onclick="changeImage('${imgUrl}', this)">
-                                                            <img src="${imgUrl}" alt="Product Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
-                                                        </button>`;
+                                                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                                                onclick="changeImage('${imgUrl}', this)">
+                                                                <img src="${imgUrl}" alt="Product Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
+                                                            </button>`;
             });
         }
 
@@ -678,7 +686,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                        {{ $product->display_price_data->sale_price ?? 0 }},
+                            {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;
@@ -743,9 +751,9 @@
                 if (matched) {
                     let isSingleChoice = false;
                     for (let gName in matched.attributes) {
-                        if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') { 
-                            isSingleChoice = true; 
-                            break; 
+                        if (groupCategories[gName] && groupCategories[gName].toString().toLowerCase() === 'single') {
+                            isSingleChoice = true;
+                            break;
                         }
                     }
 

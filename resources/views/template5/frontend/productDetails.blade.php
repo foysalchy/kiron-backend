@@ -41,23 +41,32 @@
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 lg:py-20">
 
         <!-- Dynamic Breadcrumb -->
-        <div class="mb-6 flex items-center gap-2 text-sm text-gray-700 overflow-x-auto whitespace-nowrap no-scrollbar">
-            <a href="{{ url('/') }}" class="hover:text-[var(--primary-color)] transition-colors">Home</a>
+        <div class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+            <a href="{{ url('/') }}" class="flex items-center gap-1.5 hover:text-[var(--primary-color)] transition-colors">
+                <i class="fas fa-home text-xs"></i>
+                Home
+            </a>
 
             @php $mega = $product->mega_categories?->first(); @endphp
             @if ($mega)
-                <span>/</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
                 <a href="{{ url($mega->slug) }}"
                     class="hover:text-[var(--primary-color)] transition-colors">{{ $mega->name }}</a>
             @endif
 
             @php $sub = $product->sub_categories?->first(); @endphp
             @if ($sub)
-                <span>/</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+                    <path d="M9 18l6-6-6-6" />
+                </svg>
                 <a href="{{ url($sub->slug) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $sub->name }}</a>
             @endif
 
-            <span>/</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+                <path d="M9 18l6-6-6-6" />
+            </svg>
             <span class="text-coal font-medium truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </div>
 

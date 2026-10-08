@@ -86,6 +86,7 @@
                 </div>
 
                 <!-- Column 3: Pages -->
+                @if(isset($footerPages) && count($footerPages) > 0)
                 <div>
                     <h2 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h2>
                     <ul class="space-y-2.5 text-sm">
@@ -99,6 +100,7 @@
                         @endforeach
                     </ul>
                 </div>
+                @endif
 
                 <!-- Column 4: Newsletter -->
                 <div>

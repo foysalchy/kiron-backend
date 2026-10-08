@@ -3,7 +3,7 @@
     @include('components.meta-info.ecommerce-meta.cart-meta', ['setup' => $setup])
 @endsection
 @section('content')
-    <section class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
+    <section id="cart-container" class="container mx-auto py-4 md:py-6 px-4 lg:px-0">
         @if (\Gloudemans\Shoppingcart\Facades\Cart::count() > 0)
             <!-- Top Header -->
             <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
@@ -75,10 +75,10 @@
 
         <!-- Qty Controls -->
         <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white shadow-xs h-9 md:h-11">
-            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
+            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty - 1 }})"
                 class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">-</button>
             <span class="w-8 md:w-10 text-center font-bold text-gray-800 text-sm md:text-base">{{ $item->qty }}</span>
-            <button onclick="updateCartQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
+            <button onclick="updateCartPageQty('{{ $item->rowId }}', {{ $item->qty + 1 }})"
                 class="px-3 text-gray-600 hover:text-[var(--primary-color)] hover:bg-gray-50 transition-colors">+</button>
         </div>
 
@@ -91,10 +91,10 @@
                     {{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                 </p>
             </div>
-            <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove {{ $item->name ?? 'item' }} from cart"
+            <button onclick="removeCartPageItem('{{ $item->rowId }}')" aria-label="Remove {{ $item->name ?? 'item' }} from cart"
                 class="text-red-400 hover:text-red-600 transition-colors p-1">
                 <i class="far fa-trash-alt text-lg"></i>
-            </a>
+            </button>
         </div>
     </div>
 </div>
@@ -111,13 +111,13 @@
                         <!-- selection shipping area -->
                         <div class="mb-6">
                             <label class="text-sm font-bold text-gray-600 block mb-3">Select Your Shipping Area</label>
-                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
+                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form" onsubmit="event.preventDefault();">
                                 @csrf
                                 <div class="space-y-2">
                                     {{-- ১. Inside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'inside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="inside" onchange="this.form.submit()"
+                                        <input type="radio" name="area" value="inside" onchange="updateCartShipping(this.value)"
                                             {{ $shipping_area == 'inside' ? 'checked' : '' }}
                                             class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
@@ -129,7 +129,7 @@
                                     {{-- ২. Outside Charge (Dynamic) --}}
                                     <label
                                         class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all {{ $shipping_area == 'outside' ? 'border-[var(--primary-color)] bg-orange-50' : 'border-gray-100' }}">
-                                        <input type="radio" name="area" value="outside" onchange="this.form.submit()"
+                                        <input type="radio" name="area" value="outside" onchange="updateCartShipping(this.value)"
                                             {{ $shipping_area == 'outside' ? 'checked' : '' }}
                                             class="accent-[var(--primary-color)]">
                                         <span class="text-sm font-bold text-gray-700">
@@ -239,7 +239,27 @@
 
 @push('scripts')
     <script>
-        function updateCartQty(rowId, newQty) {
+        function refreshCartUI() {
+            const fetchUrl = window.location.href.split('?')[0] + '?t=' + new Date().getTime();
+            fetch(fetchUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newCart = temp.querySelector('#cart-container');
+                    const currentCart = document.getElementById('cart-container');
+                    
+                    if (newCart && currentCart) {
+                        currentCart.innerHTML = newCart.innerHTML;
+                        // re-init events or UI components if needed
+                    } else {
+                        location.reload();
+                    }
+                })
+                .catch(() => location.reload());
+        }
+
+        function updateCartPageQty(rowId, newQty) {
             if (newQty < 1) return;
             const form = document.getElementById('update-cart-form');
             document.getElementById('update-row-id').value = rowId;
@@ -254,31 +274,58 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
-                        badge.innerText = data.cart_count;
-                    });
-
-                    fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newMain = doc.querySelector('main');
-                        const currentMain = document.querySelector('main');
-                        if(newMain && currentMain) {
-                            currentMain.innerHTML = newMain.innerHTML;
-                        } else {
-                            location.reload();
-                        }
-                    });
+                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                    refreshCartUI();
                 } else {
                     if (typeof toastr !== 'undefined') toastr.error(data.message);
                 }
             })
             .catch(() => {
-                if (typeof toastr !== 'undefined') {
-                    toastr.error('Unable to update cart. Please try again.');
+                if (typeof toastr !== 'undefined') toastr.error('Unable to update cart.');
+            });
+        }
+
+        function removeCartPageItem(rowId) {
+            fetch(`{{ url('cart/remove') }}/${rowId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    document.querySelectorAll('.cart-count-nav').forEach(b => b.innerText = data.cart_count);
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                    refreshCartUI();
+                } else {
+                    if (typeof toastr !== 'undefined') toastr.error(data.message || 'Error removing item');
                 }
+            })
+            .catch(() => {
+                if (typeof toastr !== 'undefined') toastr.error('Unable to remove item.');
+            });
+        }
+
+        function updateCartShipping(value) {
+            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch("{{ route('cart.shipping') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ area: value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    refreshCartUI();
+                    if (typeof toastr !== 'undefined') toastr.success(data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error updating shipping:', err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to update delivery charge.');
             });
         }
     </script>

@@ -16,22 +16,28 @@
     <section class="bg-[#F9F9F9] py-2">
         <!-- Dynamic Breadcrumbs -->
         <nav aria-label="Breadcrumb"
-            class="container mx-auto px-4 flex   items-center pt-2 md:pt-4 gap-1 md:gap-2 text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6">
-
-            <a href="{{ route('home') }}" class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">Home</a>
+            class="container mx-auto px-4 flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
+            
+            <a href="{{ route('home') }}"
+                class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
+                <i class="fas fa-home text-xs"></i> Home
+            </a>
 
             @if(isset($breadcrumb) && count($breadcrumb) > 0)
                 @foreach($breadcrumb as $item)
-                    <span class="text-gray-400">/</span>
-                    <a href="{{ url($item['slug']) }}"
-                        class="text-[var(--primary-color)] hover:text-[#52166d] transition font-medium">
-                        {{ $item['name'] }}
-                    </a>
+                    <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                        class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+                    </svg>
+                    <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
                 @endforeach
             @endif
 
-            <span class="text-gray-400">/</span>
-            <span class="text-gray-500 font-normal truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                class="w-4 h-4 text-gray-400 shrink-0" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
+            </svg>
+            <span class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
     </section>
 

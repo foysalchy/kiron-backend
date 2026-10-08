@@ -104,7 +104,7 @@
             </div>
 
             <!-- RIGHT COLUMN: Delivery & Summary -->
-            <div class="lg:col-span-1 lg:order-2 space-y-6">
+            <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
                 <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                     <!-- 1. Delivery Selection (Synced with Logic) -->
@@ -177,10 +177,10 @@
                                     <button type="button" onclick="updateCheckoutQty('{{ $item->rowId }}', 1, this)"
                                         class="w-7 h-6 flex items-center justify-center text-gray-600 hover:text-[var(--primary-color)] font-bold text-lg leading-none rounded-full bg-gray-50 hover:bg-gray-100 transition-colors">+</button>
                                 </div>
-                                <a href="{{ route('cart.remove', $item->rowId) }}"
+                                <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')"
                                     class="text-red-700 hover:text-red-800 text-xs checkout-cart-remove">
                                     <i class="far fa-trash-alt"></i> Remove
-                                </a>
+                                </button>
                             </div>
                         </div>
                         @endforeach
@@ -539,6 +539,54 @@
         });
 </script>
 <script>
+    function refreshCartUI() {
+        fetch(window.location.href)
+            .then(res => res.text())
+            .then(html => {
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                
+                const newContainer = temp.querySelector('#checkout-summary-container');
+                const currentContainer = document.getElementById('checkout-summary-container');
+                
+                if (newContainer && currentContainer) {
+                    currentContainer.innerHTML = newContainer.innerHTML;
+                    
+                    const match = html.match(/let _checkoutTotal = (.*?);/);
+                    if (match && match[1]) {
+                        _checkoutTotal = parseFloat(match[1]);
+                    }
+                } else if (currentContainer && !newContainer) {
+                    window.location.href = "{{ route('shop.index') }}";
+                }
+            })
+            .catch(err => console.error('Checkout refresh failed:', err));
+    }
+
+    function removeCheckoutItem(rowId) {
+        fetch(`/cart/remove/${rowId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.cart_count !== undefined) {
+                document.querySelectorAll('.cart-count-nav').forEach(el => {
+                    el.innerText = data.cart_count;
+                });
+            }
+            refreshCartUI();
+            if (typeof refreshMiniCart === 'function') refreshMiniCart();
+            if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+        })
+        .catch(err => {
+            console.error(err);
+            if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+        });
+    }
+
     function updateCheckoutQty(rowId, change, btnEl) {
         const qtySpan = document.getElementById('qty-' + rowId);
         if(!qtySpan) return;
@@ -566,34 +614,15 @@
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
-                    qtySpan.innerText = newQty;
-                    
-                    // Update totals
-                    const subtotalDisplay = document.getElementById('subtotal-display');
-                    const totalDisplay = document.getElementById('total-display');
-                    const shippingDisplay = document.getElementById('shipping-display');
-                    const discountDisplay = document.getElementById('discount-display');
-                    
-                    if(subtotalDisplay) subtotalDisplay.innerText = data.subtotal;
-                    if(totalDisplay) totalDisplay.innerText = data.total;
-                    if(shippingDisplay) shippingDisplay.innerText = Number(data.shipping).toFixed(2);
-                    if(discountDisplay) discountDisplay.innerText = data.discount;
-
-                    _checkoutTotal = data.grand_total_raw ? data.grand_total_raw : parseFloat(String(data.total).replace(/[^0-9.]/g, ''));
-                    const activePaymentForm = document.querySelector('.payment-form:not(.hidden)');
-                    if (activePaymentForm) {
-                        const amountInput = activePaymentForm.querySelector('[name="amount"]');
-                        if (amountInput) amountInput.value = Math.round(_checkoutTotal);
+                    if (data.cart_count !== undefined) {
+                        document.querySelectorAll('.cart-count-nav').forEach(el => {
+                            el.innerText = data.cart_count;
+                            el.parentElement.classList.remove('hidden');
+                        });
                     }
+                    refreshCartUI();
+                    if (typeof refreshMiniCart === 'function') refreshMiniCart();
 
-                    // Update header cart count
-                    const cartCountNav = document.querySelector('.cart-count-nav');
-                    if (cartCountNav && data.cart_count !== undefined) {
-                        cartCountNav.innerText = data.cart_count;
-                        cartCountNav.parentElement.classList.remove('hidden');
-                    }
-                    
-                    // Trigger draft save if needed to sync immediately
                     if(typeof saveDraft === 'function') {
                         const phoneInput = document.querySelector('input[name="phone"]');
                         if (phoneInput && phoneInput.value && phoneInput.value.length >= 11) {
@@ -604,7 +633,7 @@
             })
             .catch(err => {
                 console.error(err);
-                toastr.error("Quantity update failed. Please try again.");
+                if (typeof toastr !== 'undefined') toastr.error("Quantity update failed. Please try again.");
             })
             .finally(() => {
                 if(btnEl) btnEl.disabled = false;

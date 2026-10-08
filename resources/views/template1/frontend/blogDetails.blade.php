@@ -205,8 +205,9 @@
                 </div>
             </div>
 
-            <div class="space-y-8">
+            <div class="space-y-8 lg:sticky lg:top-[180px] h-max z-10">
 
+                @if(isset($relatedPosts) && $relatedPosts->count() > 0)
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs">
                     <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">Related Posts</h3>
                     <div class="space-y-5">
@@ -229,6 +230,7 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
                 <div class="rounded-lg border border-gray-200 p-8 shadow-xs text-gray-600">
                     <h3 class="text-lg font-black mb-4">Subscribe to Newsletter</h3>

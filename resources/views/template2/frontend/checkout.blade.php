@@ -104,7 +104,7 @@
                 </div>
 
                 <!-- RIGHT COLUMN: Delivery & Summary -->
-                <div class="lg:col-span-1 lg:order-2 space-y-6">
+                <div class="lg:col-span-1 lg:order-2 space-y-6" id="checkout-summary-container">
                     <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
                         <!-- 1. Delivery Selection (Synced with Logic) -->
@@ -169,11 +169,11 @@
                                     <!-- Quantity Display -->
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-gray-500">Qty: {{ $item->qty }}</span>
-                                        <a href="{{ route('cart.remove', $item->rowId) }}" aria-label="Remove item" title="Remove item"
-                                            class="checkout-cart-remove text-red-400 hover:text-red-600">
+                                        <button type="button" onclick="removeCheckoutItem('{{ $item->rowId }}')" aria-label="Remove item" title="Remove item"
+                                            class="checkout-cart-remove text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer">
                                             <i class="far fa-trash-alt text-xs" aria-hidden="true"></i>
                                             <span class="sr-only">Remove item</span>
-                                        </a>
+                                        </button>
                                     </div>
                                 </div>
                             @endforeach
@@ -247,6 +247,56 @@
 
 
 @push('scripts')
+    <script>
+        function refreshCartUI() {
+            fetch(window.location.href)
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    
+                    const newContainer = temp.querySelector('#checkout-summary-container');
+                    const currentContainer = document.getElementById('checkout-summary-container');
+                    
+                    if (newContainer && currentContainer) {
+                        currentContainer.innerHTML = newContainer.innerHTML;
+                        
+                        // Extract new checkout total from the newly rendered HTML script block
+                        const match = html.match(/let _checkoutTotal = (.*?);/);
+                        if (match && match[1]) {
+                            _checkoutTotal = parseFloat(match[1]);
+                        }
+                    } else if (currentContainer && !newContainer) {
+                        window.location.href = "{{ route('shop.index') }}";
+                    }
+                })
+                .catch(err => console.error('Checkout refresh failed:', err));
+        }
+
+        function removeCheckoutItem(rowId) {
+            fetch(`/cart/remove/${rowId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.cart_count !== undefined) {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
+                refreshCartUI();
+                if (typeof refreshMiniCart === 'function') refreshMiniCart();
+                if (typeof toastr !== 'undefined') toastr.success(data.message || 'Item removed');
+            })
+            .catch(err => {
+                console.error(err);
+                if (typeof toastr !== 'undefined') toastr.error('Failed to remove item.');
+            });
+        }
+    </script>
     <script>
         let _activeDraftOrderId = @json($draftOrderId ?? null);
         let _checkoutTotal = {{ $total }};
@@ -405,40 +455,6 @@
                 })
                 .catch(err => console.error(err));
         }
-    </script>
-    <script>
-        const checkoutCustomerFields = ['name', 'phone', 'email', 'district', 'address'];
-        const checkoutFormStateKey = 'template2-checkout-customer-form';
-        const checkoutForm = document.querySelector('form[enctype="multipart/form-data"]');
-
-        document.querySelectorAll('.checkout-cart-remove').forEach(link => {
-            link.addEventListener('click', () => {
-                const formState = {};
-                checkoutCustomerFields.forEach(name => {
-                    const field = checkoutForm?.elements.namedItem(name);
-                    if (field) formState[name] = field.value;
-                });
-                const createAccountField = checkoutForm?.elements.namedItem('create_account');
-                if (createAccountField) formState.create_account = createAccountField.checked;
-                sessionStorage.setItem(checkoutFormStateKey, JSON.stringify(formState));
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedFormState = sessionStorage.getItem(checkoutFormStateKey);
-            if (!savedFormState || !checkoutForm) return;
-
-            const formState = JSON.parse(savedFormState);
-            checkoutCustomerFields.forEach(name => {
-                const field = checkoutForm.elements.namedItem(name);
-                if (field && formState[name] !== undefined) field.value = formState[name];
-            });
-            const createAccountField = checkoutForm.elements.namedItem('create_account');
-            if (createAccountField && formState.create_account !== undefined) {
-                createAccountField.checked = formState.create_account;
-            }
-            sessionStorage.removeItem(checkoutFormStateKey);
-        });
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
