@@ -112,6 +112,7 @@ class Product extends Model
             'home_product_groups',
             'home_popular_products',
             'home_all_products',
+            'home_categories',
         ];
     }
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
 use App\Traits\HasGlobalLayoutCache;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 
 class SubCategory extends Model
 {
-    use SoftDeletes, CompanyScoped, HasCachedOptions, HasGlobalLayoutCache;
+    use SoftDeletes, CompanyScoped, HasCachedOptions, HasGlobalLayoutCache,HasHomepageCache;
     protected $fillable = [
         'company_id',
         'mega_category_id',
@@ -34,6 +35,10 @@ class SubCategory extends Model
     public static function globalLayoutSections(): array
     {
         return ['header_categories'];
+    }
+      public static function homepageCacheKeys(): array
+    {
+        return ['home_categories'];
     }
     protected $hidden = ['deleted_at'];
 
