@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CompanyScoped;
 use App\Traits\HasCachedOptions;
 use App\Traits\HasGlobalLayoutCache;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 
 class MiniCategory extends Model
 {
-    use  SoftDeletes, CompanyScoped, HasCachedOptions, HasGlobalLayoutCache;
+    use  SoftDeletes, CompanyScoped, HasCachedOptions, HasGlobalLayoutCache,HasHomepageCache;
 
     protected $fillable = [
         'company_id',
@@ -38,6 +39,10 @@ class MiniCategory extends Model
     public static function globalLayoutSections(): array
     {
         return ['header_categories'];
+    }
+    public static function homepageCacheKeys(): array
+    {
+        return ['home_categories'];
     }
 
     public function company(): BelongsTo

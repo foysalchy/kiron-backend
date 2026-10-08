@@ -71,18 +71,21 @@ class LandingPageService
 
         return $landingPage;
     }
-    public function getLandingProductById(int $id)
+    public function getLandingProductById(int $id, ?string $search = null)
     {
-        $product = Product::with([
+        $query = Product::with([
             'brand',
             'galleries',
             'variations.attributes.attributeValue.attributeGroup',
             'variations.stocks.warehouse',
             'variations.galleries',
+        ])->where('status', Status::Active->value);
 
-        ])->limit(5)->get();
+        if (!empty($search)) {
+            $query->where('title', 'like', '%' . $search . '%');
+        }
 
-        return $product;
+        return $query->get();
     }
 
     /**

@@ -36,7 +36,7 @@ class Brand extends Model
     protected $hidden = ['deleted_at'];
     public static function homepageCacheKeys(): array
     {
-        return ['home_brands', 'brand_list_page']; 
+        return ['home_brands', 'brand_list_page','shop_brands']; 
     }
     // Relationships
     public function company(): BelongsTo
