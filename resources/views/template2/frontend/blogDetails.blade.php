@@ -206,8 +206,9 @@
 
             <div class="space-y-8">
 
+                @if(isset($relatedPosts) && count($relatedPosts) > 0)
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-xs">
-                    <h3 class="text-lg font-black text-gray-900 mb-6 pb-4">Related Posts</h3>
+                    <h3 class="text-lg font-black text-gray-900 mb-6 pb-4 border-b border-gray-100">Related Posts</h3>
                     <div class="space-y-5">
                         @foreach ($relatedPosts as $rp)
                             <a href="{{ url($rp->slug) }}" class="flex gap-4 group">
@@ -228,8 +229,9 @@
                         @endforeach
                     </div>
                 </div>
+                @endif
 
-                <div class="rounded-lg border border-gray-200 p-8 shadow-xs text-gray-600">
+                <div class="rounded-lg border border-gray-200 p-8 shadow-xs text-gray-600 lg:sticky lg:top-24 bg-white">
                     <h3 class="text-lg font-black mb-4">Subscribe to Newsletter</h3>
                     <p class="text-gray-600 text-sm mb-6 leading-relaxed">Subscribe to our newsletter to get the latest
                         fashion trends and tips.</p>

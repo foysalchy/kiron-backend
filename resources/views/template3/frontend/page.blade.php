@@ -23,7 +23,9 @@
 
             <!-- Breadcrumb -->
             <nav class="flex items-center gap-2 mb-8 text-sm text-gray-400">
-                <a href="{{ route('home') }}" class="hover:text-[#FF6A00]">Home</a>
+                <a href="{{ route('home') }}" class="hover:text-[#FF6A00] transition-colors flex items-center gap-1">
+                    <i class="fas fa-home text-xs"></i> Home
+                </a>
                 <i class="fas fa-chevron-right text-[8px]"></i>
                 <span class="text-gray-800 font-medium">{{ $page->title }}</span>
             </nav>

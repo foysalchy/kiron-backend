@@ -98,7 +98,7 @@
                     @foreach ($featureCategory['items'] as $tItem)
                         @if (data_get($tItem, 'visible') === true)
                             <a href="{{ url($tItem['link'] ?? '#') }}"
-                                class="bg-white flex flex-col items-center justify-between min-w-[100px] w-[100px] md:w-auto md:min-w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
+                                class="flex flex-col items-center justify-between w-[100px] md:w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
 
                                 <!-- Image Wrapper -->
                                 <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
@@ -149,7 +149,7 @@
                 <div id="cat-slider" class="flex items-stretch gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2">
                     @foreach ($categories as $category)
                         <a href="{{ url($category->slug) }}"
-                            class="flex flex-col bg-white items-center justify-between min-w-[100px] w-[100px] md:w-auto md:min-w-[210px] flex-shrink-0 bg-white border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
+                            class="flex flex-col bg-white items-center justify-between w-[100px] md:w-[210px] flex-shrink-0 border border-gray-200 rounded-lg p-2 md:p-6 hover:shadow-lg transition-all duration-300 group">
 
                             <!-- Image Wrapper -->
                             <div class="w-full h-16 md:h-32 flex items-center justify-center mb-2 md:mb-4">
