@@ -12,7 +12,7 @@
 
     <style>
         body {
-            font-family: 'Noto Sans Bengali', 'Outfit', sans-serif;
+            font-family: {!! $setup->lang === 'bn' ? "'Noto Sans Bengali', sans-serif" : "'Outfit', sans-serif" !!};
         }
 
         .bg-grid-blue {

@@ -204,14 +204,10 @@
 
                         <button id="btn-order" onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                             style="color: {{ $orderButtonTextColor }} !important;"
-                            class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">
-                            Order Now
-                        </button>
+                            class="flex-1 sm:order-2 sm:flex-1 h-12 secondary-bg hover:bg-yellow-500 rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}</button>
 
                         <button id="btn-cart" onclick="handleAddToCart()"
-                            class="flex-1 sm:order-3 sm:flex-1 h-12 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">
-                            Add to Cart
-                        </button>
+                            class="flex-1 sm:order-3 sm:flex-1 h-12 bg-[var(--primary-color)] hover:bg-[var(--primary-color)]/90 transition-colors text-white rounded-full flex items-center justify-center gap-2 text-sm sm:text-lg font-medium">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                     </div>
 

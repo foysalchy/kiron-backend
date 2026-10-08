@@ -64,7 +64,7 @@
             <button type="button" onclick="processAddVariation()"
                 class="flex-1 bg-[var(--primary-color)] text-white py-3 rounded-xl font-bold hover:bg-[var(--secondary-color)] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer">
                 <i id="modal-btn-icon" class="fas fa-shopping-cart text-sm"></i>
-                <span id="modal-btn-text">Add to Cart</span>
+                <span id="modal-btn-text">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart' }}</span>
             </button>
         </div>
     </div>

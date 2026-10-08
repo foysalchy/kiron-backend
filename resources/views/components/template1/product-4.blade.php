@@ -117,7 +117,7 @@
             @if ($isOutOfStock)
                 STOCK OUT
             @else
-                {{ $product->type === 'single' ? 'ADD TO CART' : 'SELECT OPTIONS' }}
+                {{ $product->type === 'single' ? (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'ADD TO CART') : 'SELECT OPTIONS' }}
             @endif
         </button>
     </div>

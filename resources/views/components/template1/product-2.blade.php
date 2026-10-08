@@ -117,12 +117,12 @@
             @if ($isOutOfStock)
                 Stock Out
             @else
-                Order Now
+                {{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now' }}
             @endif
         </button>
 
         <!-- Cart Icon Button -->
-        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="Add to Cart"
+        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart' }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id, false)" : "openVariationModal($product->id, false)" }}"
             class="primary-bg text-primary p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-center
             {{ $isOutOfStock ? 'opacity-40 cursor-not-allowed' : 'hover:bg-[#BD4F00]' }}">
