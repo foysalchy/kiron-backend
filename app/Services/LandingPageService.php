@@ -73,19 +73,14 @@ class LandingPageService
     }
     public function getLandingProductById(int $id, ?string $search = null)
     {
-        $query = Product::with([
-            'brand',
-            'galleries',
-            'variations.attributes.attributeValue.attributeGroup',
-            'variations.stocks.warehouse',
-            'variations.galleries',
-        ])->where('status', Status::Active->value);
+        $query = Product::select('id', 'title', 'thumbnail_95')
+            ->where('status', Status::Active->value);
 
         if (!empty($search)) {
             $query->where('title', 'like', '%' . $search . '%');
         }
 
-        return $query->get();
+        return $query->paginate(15);
     }
 
     /**
@@ -110,7 +105,7 @@ class LandingPageService
     {
         DB::beginTransaction();
         try {
-            if (isset($data['thumbnail'])) {
+            if (isset($data['thumbnail']) && !is_string($data['thumbnail'])) {
                 $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_thumb_' . time();
                 $data['thumbnail'] = FileUploadHelper::uploadImage(
                     $data['thumbnail'],
@@ -119,6 +114,13 @@ class LandingPageService
                     2048,
                     $customFileName
                 );
+            } elseif (empty($data['thumbnail']) && isset($data['product_id'])) {
+                $product = \App\Models\Product::find($data['product_id']);
+                if ($product && $product->thumbnail) {
+                    $data['thumbnail'] = $product->thumbnail;
+                } else {
+                    unset($data['thumbnail']);
+                }
             }
 
             if (isset($data['video'])) {
@@ -236,6 +238,13 @@ class LandingPageService
                     'r2',
                     $customFileName
                 );
+            } elseif (empty($landingPage->thumbnail) && (empty($data['thumbnail']) || is_string($data['thumbnail'])) && isset($data['product_id'])) {
+                $product = \App\Models\Product::find($data['product_id']);
+                if ($product && $product->thumbnail) {
+                    $data['thumbnail'] = $product->thumbnail;
+                } else {
+                    unset($data['thumbnail']);
+                }
             }
 
             if (isset($data['video'])) {

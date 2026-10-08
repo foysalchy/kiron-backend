@@ -367,7 +367,7 @@
 
                     <div class="w-16 h-16 md:w-24 md:h-24 mb-6">
                         @if(!empty($item['image']))
-                            <img src="{{ asset('storage/' . $item['image']) }}"
+                            <img src="{{ is_array($item['image']) ? ($item['image']['previewUrl'] ?? '') : (str_starts_with($item['image'], 'blob:') || str_starts_with($item['image'], 'data:') ? $item['image'] : \Illuminate\Support\Facades\Storage::disk('r2')->url($item['image'])) }}"
                                  class="w-full h-full object-contain"
                                  alt="{{ $item['title'] ?? 'Feature' }}">
                         @else
@@ -400,7 +400,7 @@
                             @foreach ($landing->img_paths as $img)
                                 <div class="swiper-slide">
                                     <div class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
-                                        <img src="{{ asset('storage/' . $img) }}" alt="slider"
+                                        <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}" alt="slider"
                                             class="w-full h-auto object-cover" alt="Customer Review">
                                     </div>
                                 </div>

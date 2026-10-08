@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'api/*', // Disable CSRF for API routes
+            'landing-order', // Disable CSRF for landing page orders to allow iframe preview testing
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\CaptureTrackingParams::class,

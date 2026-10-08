@@ -35,6 +35,53 @@ class LandingController extends FrontendController
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
     }
+
+    public function preview(Request $request, $template_id)
+    {
+        if ($request->isMethod('get')) {
+            // When validation fails or redirects back via GET
+            return response('
+                <div style="font-family: sans-serif; text-align: center; padding: 50px; background: #fdfdfd; min-height: 100vh;">
+                    <h3 style="color: #d9534f; margin-bottom: 15px;">Order Failed or Validation Error</h3>
+                    <p style="color: #555; line-height: 1.5;">Could not process the order. Please ensure all fields are filled properly and the product is in stock.</p>
+                    <button onclick="window.parent.postMessage(\'refresh_preview\', \'*\')" style="padding: 10px 20px; background: #13565e; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-top: 20px; font-weight: bold; transition: opacity 0.2s;" onmouseover="this.style.opacity=0.9" onmouseout="this.style.opacity=1">Refresh Preview</button>
+                </div>
+            ', 400);
+        }
+
+        $payload = json_decode($request->input('payload', '{}'), true);
+        $form = $payload['form'] ?? [];
+        $productData = $payload['product'] ?? [];
+
+        $landing = new \App\Models\LandingPage($form);
+        if (isset($form['extras'])) {
+            $landing->extras = is_string($form['extras']) ? json_decode($form['extras'], true) : $form['extras'];
+        }
+        if (isset($form['thumbnail']['previewUrl'])) {
+            $landing->thumbnail = $form['thumbnail']['previewUrl'];
+        }
+
+        \Illuminate\Support\Facades\Log::info('Thumbnail inside preview: ' . print_r($landing->thumbnail, true));
+
+        $product = new \App\Models\Product($productData);
+        if (isset($productData['id'])) {
+            $product->id = $productData['id'];
+        }
+
+        $setup = \App\Models\SiteSetting::where('company_id', $this->company_id)
+            ->orWhereNull('company_id')
+            ->orderByRaw('company_id IS NULL ASC')
+            ->first() ?? new \App\Models\SiteSetting();
+            
+        \Illuminate\Support\Facades\View::share('setup', $setup);
+
+        $socialLinks = \App\Models\SocialSetting::where('status', 1)->get();
+        \Illuminate\Support\Facades\View::share('socialLinks', $socialLinks);
+        
+        $landing->setRelation('product', $product);
+
+        return view('landing.landing' . $template_id, compact('landing', 'product'));
+    }
     public function storeLandingOrder(Request $request)
     {
         $request->validate([
@@ -42,7 +89,7 @@ class LandingController extends FrontendController
             'phone'           => 'required|string|max:20',
             'address'         => 'required|string',
             'product_id'      => 'required|exists:products,id',
-            'landing_page_id' => 'required|exists:landing_pages,id',
+            'landing_page_id' => 'nullable|exists:landing_pages,id',
             'qty'             => 'required|integer|min:1',
             'variation_id'    => 'nullable',
         ]);

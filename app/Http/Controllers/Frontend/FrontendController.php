@@ -18,10 +18,10 @@ class FrontendController extends Controller
         if (request()->has('preview_theme')) {
             $this->template = 'template' . request('preview_theme');
         } else {
-            $this->template = $this->company->template_name;
+            $this->template = $this->company ? $this->company->template_name : 'template1';
         }
 
-        $this->company_id = $this->company->company_id;
+        $this->company_id = $this->company ? $this->company->company_id : null;
     }
 
     protected function view(string $view, array $data = [])
