@@ -130,10 +130,12 @@ class ProductImportController extends Controller
                 $megaCatSlug = trim($row[13] ?? $row['raw_category'] ?? '');
                 $attributesStr = trim($row[14] ?? $row['attributes'] ?? '');
                 $thumbnailUrl = trim($row[15] ?? $row['thumbnailUrl'] ?? '');
-                $shortDescription = trim($row[16] ?? $row['shortDescription'] ?? '');
-                $metaTitle = trim($row[17] ?? $row['metaTitle'] ?? '');
-                $metaDescription = trim($row[18] ?? $row['metaDescription'] ?? '');
-                $metaKeywords = trim($row[19] ?? $row['metaKeywords'] ?? '');
+                $shortDescription = trim($row[16] ?? $row['shortDescription'] ?? '') ?: null;
+                $metaTitle = trim($row[17] ?? $row['metaTitle'] ?? '') ?: null;
+                $metaDescription = trim($row[18] ?? $row['metaDescription'] ?? '') ?: null;
+                
+                $metaKeywordsStr = trim($row[19] ?? $row['metaKeywords'] ?? '');
+                $metaKeywords = $metaKeywordsStr ? array_values(array_filter(array_map('trim', explode(',', $metaKeywordsStr)))) : null;
 
                 // Validation
                 if (empty($title) || empty($sku)) {

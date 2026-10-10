@@ -3,33 +3,33 @@
 
     <!-- 1. Top Features Row -->
     @if ($footerFeatures->count() > 0)
-        <div class="p-6">
-            <div class="container mx-auto">
-                <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach ($footerFeatures as $feature)
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
-                                @if ($feature->icon_file)
-                                    <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
-                                        class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
-                                @else
-                                    <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-footer text-lg"></i>
-                                @endif
-                            </div>
-                            <div>
-                                <h3 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
-                                    {{ $feature->title }}
-                                </h3>
-                                <p class="opacity-90 text-xs md:text-sm mt-0.5">
-                                    {{ $feature->subtitle ?? $feature->text_content }}
-                                </p>
-                            </div>
-                        </div>
-                    @endforeach
+    <div class="p-6">
+        <div class="container mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                @foreach ($footerFeatures as $feature)
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 md:w-12 md:h-12 primary-bg rounded-full flex items-center justify-center shrink-0">
+                        @if ($feature->icon_file)
+                        <img src="{{ asset('storage/' . $feature->icon_file) }}" alt="{{ $feature->title }}"
+                            class="w-5 h-5 md:w-6 md:h-6 brightness-0 invert">
+                        @else
+                        <i class="{{ $feature->icon_url ?? 'fas fa-truck' }} text-footer text-lg"></i>
+                        @endif
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-sm md:text-[16px] text-footer leading-tight">
+                            {{ $feature->title }}
+                        </h3>
+                        <p class="opacity-90 text-xs md:text-sm mt-0.5">
+                            {{ $feature->subtitle ?? $feature->text_content }}
+                        </p>
+                    </div>
                 </div>
+                @endforeach
             </div>
         </div>
+    </div>
     @endif
 
     <div>
@@ -41,14 +41,14 @@
                 <div class="sm:col-span-2 lg:col-span-1">
                     <div class="flex items-center gap-3 mb-5">
                         @if ($setup && $setup->logo)
-                            <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
-                                alt="{{ $setup->shop_name ?? '' }} Logo" class="h-12 md:h-16 w-auto object-contain"
-                                loading="lazy" />
+                        <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" height="80" width="200"
+                            alt="{{ $setup->shop_name ?? '' }} Logo" class="h-12 md:h-16 w-auto object-contain"
+                            loading="lazy" />
                         @else
-                            <div class="w-10 h-10 flex items-center justify-center rounded-lg">
-                                <span
-                                    class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
-                            </div>
+                        <div class="w-10 h-10 flex items-center justify-center rounded-lg">
+                            <span
+                                class="text-footer text-xl font-semibold">{{ substr($setup->shop_name ?? 'O', 0, 1) }}</span>
+                        </div>
                         @endif
 
                     </div>
@@ -91,12 +91,12 @@
                     <h2 class="text-base md:text-lg font-bold mb-4 md:mb-4">Pages</h2>
                     <ul class="space-y-2.5 text-sm">
                         @foreach ($footerPages as $page)
-                            <li>
-                                <a href="{{ url($page->slug) }}"
-                                    class="text-[16px] opacity-90 hover:underline transition-colors">
-                                    {{ $page->title }}
-                                </a>
-                            </li>
+                        <li>
+                            <a href="{{ url($page->slug) }}"
+                                class="text-[16px] opacity-90 hover:underline transition-colors">
+                                {{ $page->title }}
+                            </a>
+                        </li>
                         @endforeach
                     </ul>
                 </div>
@@ -146,18 +146,18 @@
 
                     <div class="flex gap-4 flex-wrap">
                         @foreach ($socialLinks as $social)
-                            <a href="{{ $social->link }}" target="_blank" aria-label="Follow us on {{ $social->name }}"
-                                class="opacity-90 text-lg transition-all duration-300"
-                                onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
-                                onmouseout="this.style.color='#9CA3AF'">
+                        <a href="{{ $social->link }}" target="_blank" aria-label="Follow us on {{ $social->name }}"
+                            class="opacity-90 text-lg transition-all duration-300"
+                            onmouseover="this.style.color='{{ $social->hover_bg ?? '#BD4F00' }}'"
+                            onmouseout="this.style.color='#9CA3AF'">
 
 
-                                @if ($social->icon_image)
-                                    <img src="{{ $social->icon_image ?? '' }}" alt="social icon" class="social-icon">
-                                @else
-                                    <i class="{{ $social->icon_class ?? 'fab fa-share' }} social-icon" aria-hidden="true"></i>
-                                @endif
-                            </a>
+                            @if ($social->icon_image)
+                            <img src="{{ $social->icon_image ?? '' }}" alt="social icon" class="social-icon">
+                            @else
+                            <i class="{{ $social->icon_class ?? 'fab fa-share' }} social-icon" aria-hidden="true"></i>
+                            @endif
+                        </a>
                         @endforeach
                     </div>
                 </div>
@@ -173,21 +173,21 @@
                     <p>{{ $setup->copy_right ?? ''}}</p>
                 </div>
                 @if ($footerBottomRight->isNotEmpty())
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs md:text-sm opacity-90">We Accept:</span>
-                        <div class="flex gap-2">
-                            @foreach ($footerBottomRight as $item)
-                                <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs h-16 w-42 flex items-center">
-                                    @if ($item->icon_file)
-                                        <img src="{{ asset('storage/' . $item->icon_file) ?? './images/template1/frontend/default.webp' }}"
-                                            height="16" width="120" loading="lazy" alt="{{ $item->title }}" class="h-4">
-                                    @else
-                                        {{ $item->title }}
-                                    @endif
-                                </div>
-                            @endforeach
+                <div class="flex items-center gap-3">
+                    <span class="text-xs md:text-sm opacity-90">We Accept:</span>
+                    <div class="flex gap-2">
+                        @foreach ($footerBottomRight as $item)
+                        <div class="bg-white px-2 py-1 rounded text-gray-700 text-xs  flex items-center">
+                            @if ($item->icon_url)
+                            <img src="{{ $item->icon_url }}"
+                                height="16" width="16" loading="lazy"
+                                alt="{{ $item->title }}" class="h-4">
+                      
+                            @endif
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endif
             </div>
         </div>
@@ -209,7 +209,7 @@
     }
 </style>
 <script>
-    document.getElementById('newsletter-form')?.addEventListener('submit', function (e) {
+    document.getElementById('newsletter-form')?.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const email = document.getElementById('subscriber-email').value;
@@ -221,16 +221,16 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
         fetch("{{ route('newsletter.subscribe') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                email: email
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    email: email
+                })
             })
-        })
             .then(async response => {
                 const data = await response.json();
                 if (response.ok) {

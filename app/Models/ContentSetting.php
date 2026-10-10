@@ -7,6 +7,7 @@ use App\Traits\CompanyScoped;
 use App\Traits\HasGlobalLayoutCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class ContentSetting extends Model
 {
@@ -79,5 +80,11 @@ class ContentSetting extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order')->orderBy('id');
+    }
+    public function getIconUrlAttribute($value): ?string
+    {
+        return $this->icon_file
+            ? Storage::disk('r2')->url($this->icon_file)
+            : $value;
     }
 }
