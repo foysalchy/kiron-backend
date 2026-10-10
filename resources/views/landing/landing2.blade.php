@@ -128,6 +128,34 @@
             animation: bounce-down 1.4s ease-in-out infinite;
         }
     </style>
+    <style>
+        @if(isset($isPreview) && $isPreview)
+        .preview-badge-container {
+            position: relative;
+        }
+        .preview-badge-container:hover {
+            outline: 2px dashed #13565e;
+        }
+        .preview-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #13565e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-bottom-right-radius: 4px;
+            z-index: 50;
+            opacity: 0.5;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .preview-badge-container:hover .preview-badge {
+            opacity: 1;
+        }
+        @endif
+    </style>
 </head>
 
 <body class="bg-grid-blue text-gray-800">
@@ -150,7 +178,8 @@
 
                     {{-- Blue badge --}}
                     <div
-                        class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg ">
+                        class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; color: white;">Landing Name</span>@endif
                         {!! $landing->name !!}
                     </div>
 
@@ -158,13 +187,15 @@
                     <div
                         class="prose prose-slate max-w-none mb-4
                         prose-h1:text-6xl lg:prose-h1:text-7xl
-                        prose-p:text-3xl lg:prose-p:text-4xl
+                        prose-p:text-3xl lg:prose-p:text-4xl {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}
                         ">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Short Description</span>@endif
                         {!! $landing->short_description ?? '' !!}
                     </div>
 
                     {{-- Product image --}}
-                    <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8">
+                    <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
                         @if ($landing->video)
                             <video class="w-full h-[600px] " controls playsinline poster="{{ $landing->thumbnail_url }}">
                                 <source src="{{ $landing->video_url }}" type="video/mp4">
@@ -178,7 +209,8 @@
                     </div>
 
                     {{-- Stock status --}}
-                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center">
+                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features</span>@endif
                         <p class="mb-4">📱 {{ $landing->extras['features'][0] ?? 'অ্যাডিকশন কমাবে' }}
                         </p>
 
@@ -201,7 +233,8 @@
                         $lastPart = array_splice($words, -3); //
                         $firstPart = implode(' ', $words);
                     @endphp
-                    <div class="mb-10">
+                    <div class="mb-10 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2</span>@endif
                         <h2 class="text-xl md:text-4xl font-semibold leading-snug">
                             {{ $firstPart }}
                             <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
@@ -225,7 +258,8 @@
                             class="w-full aspect-square object-contain">
                     </div>
 
-                    <div class="container mx-auto space-y-6 mb-16">
+                    <div class="container mx-auto space-y-6 mb-16 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 3</span>@endif
                         @php
                             $features3 = $landing->extras['features3'] ?? [];
                             $paddingClasses = ['md:pl-48', 'md:pl-32', 'md:pl-16', 'md:pl-8', 'md:pl-0'];
@@ -252,7 +286,8 @@
 
 
             {{-- ══ BLACK OFFER SECTION ══ --}}
-            <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white">
+            <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Features 4</span>@endif
                 @php
                     $promoData = $landing->extras['features4'][0] ?? null;
                     $promoHeading = $promoData['title'] ?? '⚡ দেরি শেষ!';
@@ -274,12 +309,14 @@
 
                 <!-- Price Section -->
                 <div class="space-y-8 mb-12">
-                    <h4 class="text-2xl md:text-5xl font-medium leading-tight">
+                    <h4 class="text-2xl md:text-5xl font-medium leading-tight {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount Price</span>@endif
                         {{ $landing->discount_price }}
 
                     </h4>
 
-                    <h4 class="text-xl md:text-4xl font-medium text-white/90">
+                    <h4 class="text-xl md:text-4xl font-medium text-white/90 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Regular Price</span>@endif
                         {{ $landing->regular_price }}
                     </h4>
                 </div>
