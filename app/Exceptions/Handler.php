@@ -60,6 +60,7 @@ class Handler extends ExceptionHandler
 
         // Handle Validation Exception
         $this->renderable(function (ValidationException $e, $request) {
+            \Illuminate\Support\Facades\Log::info('Validation Failed', ['errors' => $e->errors()]);
             if ($request->expectsJson() || $request->is('api/*')) {
                 return ResponseHelper::validationError(
                     $e->errors(),

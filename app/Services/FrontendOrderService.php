@@ -83,16 +83,8 @@ class FrontendOrderService
             $query->whereBetween('orders.order_date', [$filters['date_from'], $filters['date_to']]);
         }
 
-        if (!empty($filters['type'])) {
-            if ($filters['type'] === 'woo') {
-                $query->where('orders.type', 'sales')
-                    ->whereJsonContains('orders.source_info->source_name', 'woo');
-            } elseif ($filters['type'] === 'sales' || $filters['type'] === 'website') {
-                $query->where('orders.type', 'sales')
-                    ->whereNull('orders.source_info');
-            } else {
-                $query->where('orders.type', $filters['type']);
-            }
+        if (!empty($filters['source'])) {
+            $query->where('orders.source', $filters['source']);
         }
 
         if (!empty($filters['warehouse_id'])) {

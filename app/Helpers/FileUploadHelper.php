@@ -31,111 +31,109 @@ class FileUploadHelper
             $watermark = $manager->decode($watermarkContent);
 
             $mainWidth = $image->width();
-            $watermarkWidth = intval($mainWidth * 0.40); // 40% of image width for center watermark
+            $watermarkWidth = intval($mainWidth * 0.50); // 50% of image width for center watermark
             if ($watermarkWidth < 100) $watermarkWidth = 100;
 
             $watermark->scaleDown(width: $watermarkWidth);
 
-            // Place in the center with 15% opacity (0.15) or 15 depending on version. 
-            // In v4.3 it's insert($watermark, $x, $y, $alignment, $opacity)
-            $image->insert($watermark, 0, 0, 'center', 0.15);
-            
+            // Place in the center with 25% opacity (0.25) so it's more visible
+            $image->insert($watermark, 0, 0, 'center', 0.25);
+
             return $image;
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to apply watermark', ['error' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            Log::error('Failed to apply watermark', ['error' => $e->getMessage()]);
             return $image;
         }
     }
 
 
-public static function upload(
-    UploadedFile $file,
-    string $folder = 'uploads',
-    string $disk = 'r2',
-    bool $preserveName = false,
-    ?string $customFileName = null,
-    bool $applyWatermark = false
-): string {
-    try {
-        $user = auth()->user();
+    public static function upload(
+        UploadedFile $file,
+        string $folder = 'uploads',
+        string $disk = 'r2',
+        bool $preserveName = false,
+        ?string $customFileName = null,
+        bool $applyWatermark = false
+    ): string {
+        try {
+            $user = auth()->user();
 
-        $companyId = $user?->company_id;
+            $companyId = $user?->company_id;
 
-        if ($companyId === null) {
-            // Super Admin / user without company
-            $companyFolder = 'admin';
-        } else {
-            $prefix = self::getCompanyPrefix((int) $companyId);
-            $companyFolder = "{$prefix}_{$companyId}";
-        }
-
-        $fullFolder = "{$companyFolder}/{$folder}";
-        
-        $options = [
-            'disk' => $disk,
-        ];
-        
-        // Add cache control headers for public disks
-        if ($disk === 'r2' || $disk === 's3' || $disk === 'public') {
-            $options['CacheControl'] = 'public, max-age=31536000, immutable';
-        }
-
-        if ($customFileName) {
-            $extension = $file->getClientOriginalExtension();
-            $fileName = $customFileName . '.' . $extension;
-        } elseif ($preserveName) {
-            $fileName = $file->getClientOriginalName();
-        } else {
-            $fileName = $file->hashName();
-        }
-
-        $isImage = str_starts_with($file->getMimeType(), 'image/');
-        $isSvg = strtolower($file->getClientOriginalExtension()) === 'svg';
-        $isWebp = strtolower($file->getClientOriginalExtension()) === 'webp';
-
-        // Convert image to WebP if it's not SVG and not already WebP
-        if ($isImage && !$isSvg && class_exists('\Intervention\Image\ImageManager')) {
-            try {
-                // Use Intervention Image v4 syntax
-                $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
-                $image = $manager->decodePath($file->getRealPath());
-                
-                // Add background for products or if watermark is applied
-                if ($folder === 'products' || $applyWatermark) {
-                    $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
-                    $bg->insert($image, 0, 0, 'center');
-                    $image = $bg;
-                }
-                
-                if ($applyWatermark) {
-                    $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
-                }
-                $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
-
-                $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
-                $fileName = $fileNameWithoutExt . '.webp';
-                $fullPath = "{$fullFolder}/{$fileName}";
-
-                Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
-                return $fullPath;
-            } catch (\Exception $e) {
-                Log::error('WebP conversion failed, falling back to original', ['error' => $e->getMessage()]);
-                return $file->storeAs($fullFolder, $fileName, $options);
+            if ($companyId === null) {
+                // Super Admin / user without company
+                $companyFolder = 'admin';
+            } else {
+                $prefix = self::getCompanyPrefix((int) $companyId);
+                $companyFolder = "{$prefix}_{$companyId}";
             }
+
+            $fullFolder = "{$companyFolder}/{$folder}";
+
+            $options = [
+                'disk' => $disk,
+            ];
+
+            // Add cache control headers for public disks
+            if ($disk === 'r2' || $disk === 's3' || $disk === 'public') {
+                $options['CacheControl'] = 'public, max-age=31536000, immutable';
+            }
+
+            if ($customFileName) {
+                $extension = $file->getClientOriginalExtension();
+                $fileName = $customFileName . '.' . $extension;
+            } elseif ($preserveName) {
+                $fileName = $file->getClientOriginalName();
+            } else {
+                $fileName = $file->hashName();
+            }
+
+            $isImage = str_starts_with($file->getMimeType(), 'image/');
+            $isSvg = strtolower($file->getClientOriginalExtension()) === 'svg';
+            $isWebp = strtolower($file->getClientOriginalExtension()) === 'webp';
+
+            // Convert image to WebP if it's not SVG and not already WebP
+            if ($isImage && !$isSvg && class_exists('\Intervention\Image\ImageManager')) {
+                try {
+                    // Use Intervention Image v4 syntax
+                    $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+                    $image = $manager->decodePath($file->getRealPath());
+
+                    // Add background for products or if watermark is applied
+                    if ($folder === 'products' || $applyWatermark) {
+                        $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
+                        $bg->insert($image, 0, 0, 'center');
+                        $image = $bg;
+                    }
+
+                    if ($applyWatermark) {
+                        $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
+                    }
+                    $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
+
+                    $fileNameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+                    $fileName = $fileNameWithoutExt . '.webp';
+                    $fullPath = "{$fullFolder}/{$fileName}";
+
+                    Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
+                    return $fullPath;
+                } catch (\Exception $e) {
+                    Log::error('WebP conversion failed, falling back to original', ['error' => $e->getMessage()]);
+                    return $file->storeAs($fullFolder, $fileName, $options);
+                }
+            }
+
+            return $file->storeAs($fullFolder, $fileName, $options);
+        } catch (\Exception $e) {
+            Log::error('File upload failed', [
+                'folder' => $folder,
+                'disk' => $disk,
+                'error' => $e->getMessage()
+            ]);
+
+            throw ApiException::serverError('Failed to upload file');
         }
-
-        return $file->storeAs($fullFolder, $fileName, $options);
-
-    } catch (\Exception $e) {
-        Log::error('File upload failed', [
-            'folder' => $folder,
-            'disk' => $disk,
-            'error' => $e->getMessage()
-        ]);
-
-        throw ApiException::serverError('Failed to upload file');
     }
-}
 
     /**
      * Upload image with validation
@@ -190,10 +188,10 @@ public static function upload(
             $companyId = $user?->company_id;
             $companyFolder = $companyId === null ? 'admin' : self::getCompanyPrefix((int) $companyId) . "_{$companyId}";
             $fullFolder = "{$companyFolder}/{$folder}";
-            
+
             $fileName = Str::random(40) . '.webp';
             $fullPath = "{$fullFolder}/{$fileName}";
-            
+
             $options = ['disk' => $disk];
             if (in_array($disk, ['r2', 's3', 'public'])) {
                 $options['CacheControl'] = 'public, max-age=31536000, immutable';
@@ -202,17 +200,17 @@ public static function upload(
             if (class_exists('\Intervention\Image\ImageManager')) {
                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $image = $manager->decode($contents);
-                
+
                 if ($folder === 'products' || $applyWatermark) {
                     $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
                     $bg->insert($image, 0, 0, 'center');
                     $image = $bg;
                 }
-                
+
                 if ($applyWatermark) {
                     $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
                 }
-                
+
                 $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
                 Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
                 return $fullPath;
@@ -220,7 +218,6 @@ public static function upload(
 
             Storage::disk($disk)->put($fullPath, $contents, $options);
             return $fullPath;
-
         } catch (\Exception $e) {
             Log::error('Upload from URL failed', ['url' => $url, 'error' => $e->getMessage()]);
             return null;
@@ -257,28 +254,27 @@ public static function upload(
                 // v4 syntax
                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $image = $manager->decodePath($file->getRealPath());
-                
+
                 // Crop to exact dimension or scale down
                 $image->cover($width, $height);
-                
+
                 if ($folder === 'products' || $applyWatermark) {
                     $bg = $manager->createImage($image->width(), $image->height())->fill('F3F4F6');
                     $bg->insert($image, 0, 0, 'center');
                     $image = $bg;
                 }
-                
+
                 if ($applyWatermark) {
                     $image = self::applyWatermarkIfNeeded($image, $companyId, $disk);
                 }
                 $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
-                
+
                 Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
                 return $fullPath;
             }
 
             // Fallback if Intervention is somehow missing
             return self::upload($file, $folder, $disk, false, $customFileName);
-
         } catch (\Exception $e) {
             Log::error('Resized image upload failed', [
                 'folder' => $folder,
@@ -316,7 +312,7 @@ public static function upload(
             if (class_exists('\Intervention\Image\ImageManager')) {
                 $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
                 $imageContent = Storage::disk($disk)->get($existingPath);
-                
+
                 if (!$imageContent) {
                     throw new \Exception("Existing file not found on disk: " . $existingPath);
                 }
@@ -324,7 +320,7 @@ public static function upload(
                 $image = $manager->decode($imageContent);
                 $image->cover($width, $height);
                 $encoded = $image->encode(new \Intervention\Image\Encoders\WebpEncoder(85));
-                
+
                 Storage::disk($disk)->put($fullPath, (string) $encoded, $options);
                 return $fullPath;
             }
@@ -378,7 +374,7 @@ public static function upload(
             $options = [
                 'disk' => $disk,
             ];
-            
+
             if ($disk === 'r2' || $disk === 's3' || $disk === 'public') {
                 $options['CacheControl'] = 'public, max-age=31536000, immutable';
             }

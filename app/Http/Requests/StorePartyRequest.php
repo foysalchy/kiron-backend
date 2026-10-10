@@ -27,7 +27,7 @@ class StorePartyRequest extends BaseCompanyRequest
                 'type' => ['required', 'integer', Rule::in([1, 2])],
                 'name' => ['required', 'string', 'max:255'],
                 'email' => [
-                    'required',
+                    'nullable',
                     'email',
                     'max:255',
                     Rule::unique('parties', 'email')

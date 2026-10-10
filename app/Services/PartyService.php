@@ -203,7 +203,11 @@ class PartyService
                     $customFileName
                 );
             }
-            $data['password'] = Hash::make($data['password']);
+            if (isset($data['password'])) {
+                $data['password'] = Hash::make($data['password']);
+            } else {
+                $data['password'] = Hash::make('password'); // Default password for POS created customers
+            }
             $party = Party::create($data);
 
             LogHelper::created('party', $party->id, $party->company_id, $party->type_text . " created");

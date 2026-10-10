@@ -508,16 +508,32 @@ class AutoAccountingService
             $inventoryAccountId = $setting->default_inventory_account_id;
             $cashAccountId = $setting->default_cash_account_id;
             $payableAccountId = $setting->default_payable_account_id;
+            $courierAccountId = $setting->default_courier_expense_account_id;
 
             $totalAmount = (float)($purchase->grand_total ?? $purchase->total_amount ?? 0);
+            $otherCharges = (float)($purchase->other_charges ?? 0);
+            
+            // If there's an explicit expense account for other charges, separate it out
+            if ($courierAccountId && $otherCharges > 0) {
+                $inventoryAmount = max(0, round($totalAmount - $otherCharges, 2));
+            } else {
+                $inventoryAmount = $totalAmount;
+                $otherCharges = 0; // Handled within inventory
+            }
+
             $paidAmount = (float)($purchase->payment_amount ?? $purchase->paid_amount ?? 0);
             $dueAmount = max(0, round($totalAmount - $paidAmount, 2));
 
             $items = [];
 
             // Debit Inventory:
-            if ($totalAmount > 0 && $inventoryAccountId) {
-                $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => $totalAmount, 'credit' => 0];
+            if ($inventoryAmount > 0 && $inventoryAccountId) {
+                $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => $inventoryAmount, 'credit' => 0];
+            }
+
+            // Debit Courier / Freight Expense:
+            if ($otherCharges > 0 && $courierAccountId) {
+                $items[] = ['chart_of_account_id' => $courierAccountId, 'debit' => $otherCharges, 'credit' => 0];
             }
 
             // Credit Cash / Bank:

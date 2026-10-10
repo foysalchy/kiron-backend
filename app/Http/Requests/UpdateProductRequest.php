@@ -80,10 +80,10 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'purchase_price' => ['nullable'],
                 'discount_type' => ['nullable', Rule::in(['flat', 'percent'])],
                 'discount' => ['nullable', 'numeric', 'min:0'],
-                'warehouse_info' => ['required_if:type,single', 'nullable', 'array'],
-                'warehouse_info.*.warehouse_id' => ['required_with:warehouse_info', 'integer', 'exists:warehouses,id'],
+                'warehouse_info' => ['nullable', 'array'],
+                'warehouse_info.*.warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
                 'warehouse_info.*.bin_id' => ['nullable', 'integer', 'exists:bins,id'],
-                'warehouse_info.*.quantity' => ['required_with:warehouse_info', 'integer', 'min:0'],
+                'warehouse_info.*.quantity' => ['nullable', 'numeric', 'min:0'],
 
                 // Variation Product Fields (only validated when type='variation')
                 'variations' => ['required_if:type,variation', 'nullable', 'array', 'min:1'],
@@ -109,8 +109,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'purpose' => ['sometimes', 'required', 'string', 'max:255'],
                 'meta_title' => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords' => ['nullable', 'string'],
-                'meta_keywords.*' => ['nullable', 'string',],
+                'meta_keywords' => ['nullable'],
                 
                 // Delivery
                 'is_free_delivery' => ['nullable', 'boolean'],

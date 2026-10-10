@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Helpers\FileUploadHelper;
 use Illuminate\Support\Str;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class ProductImportController extends Controller
 {
@@ -229,6 +230,19 @@ class ProductImportController extends Controller
                                 'quantity' => $stockQuantity,
                                 'available_quantity' => $stockQuantity,
                             ]);
+                            
+                            \App\Models\ProductVariationStockLedger::create([
+                                'product_id' => $parentId,
+                                'variation_id' => $variation->id,
+                                'warehouse_id' => $warehouseId,
+                                'transaction_type' => 'initial_stock',
+                                'reference_type' => 'ProductImport',
+                                'quantity_before' => 0,
+                                'quantity_change' => $stockQuantity,
+                                'quantity_after' => $stockQuantity,
+                                'notes' => 'Initial stock via import',
+                                'created_by' => Auth::id() ?? 1,
+                            ]);
                         }
 
                         // Basic Attribute Parsing (e.g. Size:M, Color:Red)
@@ -282,6 +296,9 @@ class ProductImportController extends Controller
                             'meta_title' => $metaTitle,
                             'meta_description' => $metaDescription,
                             'meta_keywords' => $metaKeywords,
+                            'stock_quantity' => ($manageStock && $actualType === 'single') ? $stockQuantity : 0,
+                            'available_stock' => ($manageStock && $actualType === 'single') ? $stockQuantity : 0,
+                            'warehouse_info' => ($manageStock && $warehouseId && $actualType === 'single') ? [['warehouse_id' => (string)$warehouseId, 'quantity' => (int)$stockQuantity]] : [],
                             'company_id' => auth()->user()->company_id, // ensure company boundaries
                         ]);
 
@@ -290,10 +307,16 @@ class ProductImportController extends Controller
                         }
 
                         if ($manageStock && $warehouseId && $actualType === 'single') {
-                            \App\Models\WarehouseInventory::create([
+                            \App\Models\ProductStockLedger::create([
                                 'product_id' => $product->id,
                                 'warehouse_id' => $warehouseId,
-                                'quantity' => $stockQuantity
+                                'transaction_type' => 'initial_stock',
+                                'reference_type' => 'ProductImport',
+                                'quantity_before' => 0,
+                                'quantity_change' => $stockQuantity,
+                                'quantity_after' => $stockQuantity,
+                                'notes' => 'Initial stock via import',
+                                'created_by' => Auth::id() ?? 1,
                             ]);
                         }
                     } else {

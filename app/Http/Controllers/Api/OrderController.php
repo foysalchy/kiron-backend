@@ -47,6 +47,7 @@ class OrderController extends Controller
                 'order_date' => $request->input('order_date'),
                 'date_from' => $request->input('date_from'),
                 'date_to' => $request->input('date_to'),
+                'source' => $request->input('source'),
                 'type' => $request->input('type'),
                 'warehouse_id' => $request->input('warehouse_id'),
                 'search' => $request->input('search'),
