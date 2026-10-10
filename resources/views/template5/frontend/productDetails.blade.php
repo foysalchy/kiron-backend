@@ -141,7 +141,7 @@
                 <h1 class="font-display font-semibold text-4xl sm:text-5xl text-coal leading-tight mb-2">
                     {{ $product->title }}
                 </h1>
-                <p class="text-xl font-mono font-semibold text-[var(--primary-color)] mb-6">
+                <p class="flex items-center text-xl font-mono font-semibold text-[var(--primary-color)] mb-6">
                     <span id="main-sale-price">
                         @if(($setup->currency_position ?? 'left') == 'left')
                             {{ $setup->currency }} {{ number_format($product->display_price_data->sale_price) }}
@@ -157,6 +157,7 @@
                             {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                         @endif
                     </span>
+                    @if ($product->is_free_delivery == 1) <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">Free Shipping</span> @endif
                 </p>
 
                 <div class="text-gray-700 leading-relaxed mb-8">
