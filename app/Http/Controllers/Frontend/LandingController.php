@@ -27,7 +27,7 @@ class LandingController extends FrontendController
         $ttl = now()->addHours(6);
         $landing = Cache::remember("landing_page_view_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
             return LandingPage::where('company_id', $companyId)
-                ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,short_description,warehouse_info')
+                ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,short_description,warehouse_info,is_free_delivery')
                 ->where('slug', $slug)->firstOrFail();
         });
         $product = $landing->product;
@@ -71,7 +71,14 @@ class LandingController extends FrontendController
 
         \Illuminate\Support\Facades\Log::info('Thumbnail inside preview: ' . print_r($landing->thumbnail, true));
 
-        $product = new \App\Models\Product($productData);
+        $product = null;
+        if (isset($productData['id'])) {
+            $product = \App\Models\Product::find($productData['id']);
+        }
+        if (!$product) {
+            $product = new \App\Models\Product();
+        }
+        $product->fill($productData);
         if (isset($productData['id'])) {
             $product->id = $productData['id'];
         }
@@ -164,6 +171,11 @@ class LandingController extends FrontendController
             $shippingCost = ($request->shipping_area == 'inside')
                 ? ($settings->inside_charge ?? 60)
                 : ($settings->outside_charge ?? 100);
+
+            $productForShipping = Product::find($productId);
+            if ($productForShipping && $productForShipping->is_free_delivery) {
+                $shippingCost = 0;
+            }
 
             $orderData = [
                 'type'             => Order::TYPE_LANDING,

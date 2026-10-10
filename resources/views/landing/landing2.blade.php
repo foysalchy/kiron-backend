@@ -12,7 +12,9 @@
 
     <style>
         body {
-            font-family: {!! $setup->lang === 'bn' ? "'Noto Sans Bengali', sans-serif" : "'Outfit', sans-serif" !!};
+            font-family:
+                {!! $setup->lang === 'bn' ? "'Noto Sans Bengali', sans-serif" : "'Outfit', sans-serif" !!}
+            ;
         }
 
         .bg-grid-blue {
@@ -130,30 +132,34 @@
     </style>
     <style>
         @if(isset($isPreview) && $isPreview)
-        .preview-badge-container {
-            position: relative;
-        }
-        .preview-badge-container:hover {
-            outline: 2px dashed #13565e;
-        }
-        .preview-badge {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background-color: #13565e;
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: bold;
-            padding: 2px 6px;
-            border-bottom-right-radius: 4px;
-            z-index: 50;
-            opacity: 0.5;
-            transition: opacity 0.2s ease-in-out;
-            pointer-events: none;
-        }
-        .preview-badge-container:hover .preview-badge {
-            opacity: 1;
-        }
+            .preview-badge-container {
+                position: relative;
+            }
+
+            .preview-badge-container:hover {
+                outline: 2px dashed #13565e;
+            }
+
+            .preview-badge {
+                position: absolute;
+                top: 0;
+                left: 0;
+                background-color: #13565e;
+                color: #ffffff;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 2px 6px;
+                border-bottom-right-radius: 4px;
+                z-index: 50;
+                opacity: 0.5;
+                transition: opacity 0.2s ease-in-out;
+                pointer-events: none;
+            }
+
+            .preview-badge-container:hover .preview-badge {
+                opacity: 1;
+            }
+
         @endif
     </style>
 </head>
@@ -161,188 +167,326 @@
 <body class="bg-grid-blue text-gray-800">
 
     <main>
-    <section class="main-hero">
-        <div class="h-6 md:h-12"></div>
+        <section class="main-hero">
+            <div class="h-6 md:h-12"></div>
 
-        <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
-            <div class="px-8 py-6">
+            <div class="flex justify-center relative z-10" style="margin-bottom: -42px;">
+                <div class="px-8 py-6">
 
-                <img src={{ $setup->logo_url ?? '' }} alt="KidzFun Logo" width="80" height="80" class="w-20">
+                    <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" width="96" height="96"
+                        class="mx-auto h-12 md:h-16 w-auto object-contain">
+                </div>
             </div>
-        </div>
-        <div class="main-container bg-[#ebf0fa]/60 p-10">
+            <div class="main-container bg-[#ebf0fa]/60 p-10">
 
-            {{-- ══ HERO ══ --}}
-            <section class="py-4 px-4 text-center">
-                <div class="max-w-5xl mx-auto">
+                {{-- ══ HERO ══ --}}
+                <section class="py-4 px-4 text-center">
+                    <div class="max-w-5xl mx-auto">
 
-                    {{-- Blue badge --}}
-                    <div
-                        class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; color: white;">Landing Name</span>@endif
-                        {!! $landing->name !!}
-                    </div>
+                        {{-- Blue badge --}}
+                        <div
+                            class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; color: white;">Title</span>@endif
+                            {{ $product->title ?? $landing->title }}
+                        </div>
 
-                    {{-- Main headline --}}
-                    <div
-                        class="prose prose-slate max-w-none mb-4
+                        {{-- Main headline --}}
+                        <div class="prose prose-slate max-w-none mb-4
                         prose-h1:text-6xl lg:prose-h1:text-7xl
                         prose-p:text-3xl lg:prose-p:text-4xl {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}
                         ">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Short Description</span>@endif
-                        {!! $landing->short_description ?? '' !!}
-                    </div>
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Short Description</span>@endif
+                            {!! $landing->short_description ?? $product->short_description !!}
+                        </div>
 
-                    {{-- Product image --}}
-                    <div class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
-                        @if ($landing->video)
-                            <video class="w-full h-[600px] " controls playsinline poster="{{ $landing->thumbnail_url }}">
-                                <source src="{{ $landing->video_url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        @else
-                            <img src="{{ $landing->thumbnail_url ?? asset('./images/default-thumbnail.jpg') }}"
-                                width="800" height="800" class="w-full aspect-square object-contain"
-                                alt="{{ $landing->name }}">
+                        {{-- Product image --}}
+                        <div
+                            class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
+                            @if ($landing->video)
+                                <video class="w-full h-[600px] " controls playsinline
+                                    poster="{{ $landing->thumbnail_url ?? $product->thumbnail_url ?? '' }}">
+                                    <source src="{{ $landing->video_url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            @else
+                                <img src="{{ $landing->thumbnail_url ?? $product->thumbnail_url ?? '' }}" width="800"
+                                    height="800" class="w-full aspect-square object-contain" alt="{{ $landing->name }}">
+                            @endif
+                        </div>
+
+                        {{-- Stock status --}}
+                        @if(!empty($landing->extras['features']))
+                        <div
+                            class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Features</span>@endif
+                            @php
+                                $featuresTitle = $landing->extras['features_title'] ?? 'আপনার সোনামণির জন্য সেরা কেন?';
+                                $fWords = explode(' ', $featuresTitle);
+                                $fLastPart = count($fWords) > 2 ? array_splice($fWords, -2) : array_splice($fWords, -1);
+                                $fFirstPart = implode(' ', $fWords);
+                            @endphp
+                            <div class="mb-10 text-center">
+                                <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                                    {{ $fFirstPart }}
+                                    <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
+                                        {{ implode(' ', $fLastPart) }}
+                                        <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
+                                            preserveAspectRatio="none">
+                                            <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
+                                                stroke="#fc4124" fill="transparent" stroke-width="4" />
+                                        </svg>
+                                    </span>
+                                </h2>
+                            </div>
+
+                            <p class="mb-4"> {{ $landing->extras['features'][0] ?? '📱 অ্যাডিকশন কমাবে' }}
+                            </p>
+
+                            <p>
+                                @if(empty($landing->extras['features'][1]) && empty($landing->extras['features'][2]))
+                                    💥 ⏰
+                                @else
+                                    {{ $landing->extras['features'][1] ?? '' }}
+                                @endif
+
+                                @if(!empty($landing->extras['features'][2]))
+                                    <span
+                                        class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0">
+                                        {{ $landing->extras['features'][2] }}
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+                        <div
+                            class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] px-6 md:px-8 py-3 rounded-xl font-bold text-xl md:text-3xl mb-14 shadow-lg text-black">
+                            {{ $landing->extras['features'][3] ?? 'সাথে ১ বছরের রিপ্লেসমেন্ট 😍' }}
+                        </div>
+                        @endif
+
+                        {{-- Why best section --}}
+                        @if(!empty($landing->extras['features2']))
+                        @php
+                            $feature2Title =
+                                $landing->extras['features2'][0]['title'] ?? 'এটি কেন আপনার সোনামণির জন্য সেরা?';
+                            $words = explode(' ', $feature2Title);
+                            $lastPart = array_splice($words, -3); //
+                            $firstPart = implode(' ', $words);
+                        @endphp
+                        <div class="mb-10 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Features 2</span>@endif
+                            <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                                {{ $firstPart }}
+                                <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
+                                    {{ implode(' ', $lastPart) }}
+                                    <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
+                                        preserveAspectRatio="none">
+                                        <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
+                                            stroke="#fc4124" fill="transparent" stroke-width="4" />
+                                    </svg>
+                                </span>
+                            </h2>
+                        </div>
+
+                        {{-- Category map image --}}
+                        <div class="max-w-3xl mx-auto mb-14 overflow-hidden rounded-xl">
+                            @php
+                                $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
+                                $categoryDesc = $landing->extras['features2'][0]['description'] ?? null;
+                            @endphp
+                            <img src="{{ $categoryMap ? is_array($categoryMap) ? ($categoryMap['previewUrl'] ?? '') : (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') ? $categoryMap : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap)) : ($product->display_image_url ?? $landing->thumbnail_url) }}"
+                                alt="Categories" width="800" height="800" class="w-full aspect-square object-contain">
+
+                            @if($categoryDesc)
+                                <div class="mt-6 text-lg text-gray-700 leading-relaxed text-center md:text-left">
+                                    {!! $categoryDesc !!}
+                                </div>
+                            @endif
+                        </div>
+                        @endif
+
+                        @if(!empty($landing->extras['features3']))
+                        <div
+                            class="container mx-auto space-y-6 mb-16 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Features 3</span>@endif
+                            @php
+                                $features3 = $landing->extras['features3'] ?? [];
+                                $paddingClasses = ['md:pl-48', 'md:pl-32', 'md:pl-16', 'md:pl-8', 'md:pl-0'];
+                            @endphp
+
+                            @if(empty($features3))
+                                <!-- Point 1 -->
+                                <div class="flex gap-3 text-lg font-bold items-start md:pl-48">
+                                    <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="leading-relaxed text-gray-800">
+                                        বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124]">৫১০ টি কার্ডে</span>
+                                        রয়েছে ৪২টি ক্যাটাগরির শব্দ
+                                    </p>
+                                </div>
+
+                                <!-- Point 2 -->
+                                <div class="flex gap-3 text-lg font-bold items-start md:pl-32">
+                                    <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="leading-relaxed text-gray-800">
+                                        স্মার্ট ও টেকসই ডিজাইন লেমিনেটেড কাগজ, <span class="text-[#fc4124]">সম্পূর্ণ
+                                            ওয়াটারপ্রুফ খুবই মজবুত,</span> সহজে ছিঁড়ে যায় না বা নষ্ট হয় না
+                                    </p>
+                                </div>
+
+                                <!-- Point 3 -->
+                                <div class="flex gap-3 text-lg font-bold items-start md:pl-16">
+                                    <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="leading-relaxed text-gray-800">
+                                        ভয়েস রিপিট ফিচার, <span class="text-[#fc4124]">শিশু যা বলবে, বইটি তা-ই রিপিট
+                                            করবে।</span> এতে করে শেখা হবে আরও মজাদার, বাড়বে আত্মবিশ্বাস ও পড়ার আগ্রহ.
+                                    </p>
+                                </div>
+
+                                <!-- Point 4 -->
+                                <div class="flex gap-3 text-lg font-bold items-start md:pl-8">
+                                    <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="leading-relaxed text-gray-800">
+                                        প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#fc4124]">বাংলা বর্ণমালা,
+                                            Alphabet, আরবি বর্ণমালা, বাংলা সাংখ্যা, ইংরেজি সংখ্যা</span> রয়েছে এই বইটিতে
+                                    </p>
+                                </div>
+
+                                <!-- Point 5 -->
+                                <div class="flex gap-3 text-lg font-bold items-start md:pl-0">
+                                    <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="leading-relaxed text-gray-800">
+                                        পবিত্র কোরআনের ১৫টি সুরা ১৫টি শ্রুতিমধুর ইসলামিক গজল নতুন সংযোজন হয়েছে, <span
+                                            class="text-[#fc4124]">এতে আপনার শিশু</span> ধর্মীয় শিক্ষায় সুশিক্ষা লাভ করবে
+                                    </p>
+                                </div>
+                            @else
+                                @foreach ($features3 as $index => $point)
+                                    <div
+                                        class="flex gap-3 text-lg font-bold items-start {{ $paddingClasses[$index] ?? 'md:pl-0' }}">
+                                        <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+
+                                        <div class="leading-relaxed text-gray-800">
+                                            {!! $point !!}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
                         @endif
                     </div>
+                </section>
 
-                    {{-- Stock status --}}
-                    <div class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features</span>@endif
-                        <p class="mb-4">📱 {{ $landing->extras['features'][0] ?? 'অ্যাডিকশন কমাবে' }}
-                        </p>
 
-                        <p>💥 {{ $landing->extras['features'][1] ?? '' }} ⏰
-                            <span class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0">
-                                {{ $landing->extras['features'][2] ?? '' }}
-                            </span>
-                        </p>
-                    </div>
-                    <div
-                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] px-6 md:px-8 py-3 rounded-xl font-bold text-xl md:text-3xl mb-14 shadow-lg text-black">
-                        {{ $landing->extras['features'][3] ?? 'সাথে ১ বছরের রিপ্লেসমেন্ট' }}😍
-                    </div>
-
-                    {{-- Why best section --}}
+                {{-- ══ BLACK OFFER SECTION ══ --}}
+                @if(!empty($landing->extras['features4']))
+                <section
+                    class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                    @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                    style="top: 0; z-index: 50;">Features 4</span>@endif
                     @php
-                        $feature2Title =
-                            $landing->extras['features2'][0]['title'] ?? 'এটি কেন আপনার সোনামণির জন্য সেরা?';
-                        $words = explode(' ', $feature2Title);
-                        $lastPart = array_splice($words, -3); //
-                        $firstPart = implode(' ', $words);
+                        $promoData = $landing->extras['features4'][0] ?? null;
+                        $promoHeading = $promoData['title'] ?? '⚡ দেরি শেষ!';
+                        $promoImage = $promoData['image'] ?? null;
                     @endphp
-                    <div class="mb-10 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2</span>@endif
-                        <h2 class="text-xl md:text-4xl font-semibold leading-snug">
-                            {{ $firstPart }}
-                            <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
-                                {{ implode(' ', $lastPart) }}
-                                <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
-                                    preserveAspectRatio="none">
-                                    <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
-                                        stroke="#fc4124" fill="transparent" stroke-width="4" />
-                                </svg>
-                            </span>
-                        </h2>
+                    <!-- Heading -->
+                    <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
+                        {!! $promoHeading !!}
+                    </h3>
+
+                    <!-- Product Image in Frame -->
+                    <div
+                        class="max-w-xl mx-auto rounded-xl overflow-hidden mb-8 border-2 border-white border-dashed shadow-2xl bg-white/5">
+
+                        <img src="{{ $promoImage ? is_array($promoImage) ? ($promoImage['previewUrl'] ?? '') : (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') ? $promoImage : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage)) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/Smart-set-1-800x800.jpg' }}"
+                            alt="Offer Product" width="800" height="800" class="w-full aspect-square object-contain">
                     </div>
 
-                    {{-- Category map image --}}
-                    <div class="max-w-3xl mx-auto mb-14 overflow-hidden rounded-xl">
-                        @php
-                            $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
-                        @endphp
-                        <img src="{{ $categoryMap ? is_array($categoryMap) ? ($categoryMap['previewUrl'] ?? '') : (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') ? $categoryMap : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap)) : 'https://kidzfunbd.com/wp-content/uploads/2026/04/web-ak-bg-800x800.webp' }}"
-                            alt="Categories" width="800" height="800"
-                            class="w-full aspect-square object-contain">
+                    @php
+                        $promoDesc = $promoData['description'] ?? null;
+                    @endphp
+                    @if($promoDesc)
+                        <div class="mb-12 text-lg md:text-xl text-white/90 leading-relaxed text-center">
+                            {!! $promoDesc !!}
+                        </div>
+                    @endif
+
+                    <!-- Price Section -->
+                    <div class="space-y-8 mb-12">
+                        <h4
+                            class="text-2xl md:text-5xl font-medium leading-tight {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Discount Price</span>@endif
+                            {{ $landing->discount_price }}
+
+                        </h4>
+
+                        <h4
+                            class="text-xl md:text-4xl font-medium text-white/90 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge"
+                            style="top: -20px; z-index: 50;">Regular Price</span>@endif
+                            {{ $landing->regular_price }}
+                        </h4>
                     </div>
+                    <!-- 3D Green Button -->
 
-                    <div class="container mx-auto space-y-6 mb-16 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 3</span>@endif
-                        @php
-                            $features3 = $landing->extras['features3'] ?? [];
-                            $paddingClasses = ['md:pl-48', 'md:pl-32', 'md:pl-16', 'md:pl-8', 'md:pl-0'];
-                        @endphp
 
-                        @foreach ($features3 as $index => $point)
-                            <div
-                                class="flex gap-3 text-lg font-bold items-start {{ $paddingClasses[$index] ?? 'md:pl-0' }}">
-                                <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                            d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                </div>
-
-                                <div class="leading-relaxed text-gray-800">
-                                    {!! $point !!}
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+                </section>
+                @endif
+                <div class="mt-14 text-center">
+                    <a href="#order"
+                        class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
+                        <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 7v10m-5-5 5 5 5-5"></path>
+                        </svg>
+                        আপনারটি নিন এখনই 😍
+                    </a>
                 </div>
-            </section>
-
-
-            {{-- ══ BLACK OFFER SECTION ══ --}}
-            <section class="max-w-5xl mx-auto bg-dark-grid p-8 px-4 text-center text-white {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Features 4</span>@endif
-                @php
-                    $promoData = $landing->extras['features4'][0] ?? null;
-                    $promoHeading = $promoData['title'] ?? '⚡ দেরি শেষ!';
-                    $promoImage = $promoData['image'] ?? null;
-                @endphp
-                <!-- Heading -->
-                <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
-                    {!! $promoHeading !!}
-                </h3>
-
-                <!-- Product Image in Frame -->
-                <div
-                    class="max-w-xl mx-auto rounded-xl overflow-hidden mb-12 border-2 border-white border-dashed shadow-2xl bg-white/5">
-
-                    <img src="{{ $promoImage ? is_array($promoImage) ? ($promoImage['previewUrl'] ?? '') : (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') ? $promoImage : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage)) : $landing->thumbnail_url }}"
-                        alt="Offer Product" width="800" height="800"
-                        class="w-full aspect-square object-contain">
-                </div>
-
-                <!-- Price Section -->
-                <div class="space-y-8 mb-12">
-                    <h4 class="text-2xl md:text-5xl font-medium leading-tight {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount Price</span>@endif
-                        {{ $landing->discount_price }}
-
-                    </h4>
-
-                    <h4 class="text-xl md:text-4xl font-medium text-white/90 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
-                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Regular Price</span>@endif
-                        {{ $landing->regular_price }}
-                    </h4>
-                </div>
-                <!-- 3D Green Button -->
-
-
-            </section>
-            <div class="mt-14 text-center">
-                <a href="#order"
-                    class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
-                    <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor"
-                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 7v10m-5-5 5 5 5-5"></path>
-                    </svg>
-                    আপনারটি নিন এখনই 😍
-                </a>
             </div>
-        </div>
-    </section>
+        </section>
 
 
-    {{-- ══ ORDER FORM ══ --}}
-    <section id="order" class="py-16 px-4 bg-[#f5f6ff] relative z-10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.15)]">
-        <x-landing.order-form :landing="$landing" />
-    </section>
+        {{-- ══ ORDER FORM ══ --}}
+        <section id="order" class="py-16 px-4 bg-[#f5f6ff] relative z-10 shadow-[0_-20px_50px_-12px_rgba(0,0,0,0.15)]">
+            <x-landing.order-form :landing="$landing" />
+        </section>
 
     </main>
 
@@ -355,15 +499,15 @@
                     @foreach ($socialLinks as $link)
                         <a href="{{ $link->link }}" target="_blank"
                             class="text-white hover:text-[#7DF9FF] transition-colors">
-                            Facebook
-                        </a>
+                            {{ $link->icon_name }}
+                        </a>{{ $loop->remaining == 1 ? (app()->getLocale() == 'bn' ? ' এবং ' : ' and ') : ($loop->last ? '' : ', ') }}
                     @endforeach
                 </span>
                 পেইজের সাথে যুক্ত থাকুন 🔥
             </div>
-            <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" width="80" height="80"
-                class="w-20 mx-auto mb-6 brightness-200">
-            <p>© {{ date('Y') }} {{ $setup->title ?? '' }}. All rights reserved.</p>
+            <img src="{{ $setup->logo_url ?? '' }}" alt="Logo" width="96" height="96"
+                class="mx-auto h-12 md:h-16 w-auto mb-6 object-contain brightness-200">
+            <p>© {{ date('Y') }} {{ $setup->shop_name ?? '' }}. All rights reserved.</p>
         </div>
     </footer>
 

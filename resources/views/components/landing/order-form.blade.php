@@ -1,8 +1,9 @@
 @props(['landing'])
 @php
     $mainProduct = $landing->product;
-    $insideCharge = $setup->inside_charge ?? 60;
-    $outsideCharge = $setup->outside_charge ?? 100;
+    $isFree = \App\Models\Product::where('id', $mainProduct->id)->value('is_free_delivery');
+    $insideCharge = $isFree == 1 ? 0 : ($setup->inside_charge ?? 60);
+    $outsideCharge = $isFree == 1 ? 0 : ($setup->outside_charge ?? 100);
 @endphp
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
@@ -157,7 +158,7 @@
                             <div class="max-w-[150px]">
                                 <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
                                 <p id="summary-variant-name"
-                                    class="text-[10px] text-green-600 font-bold mt-1 uppercase"></p>
+                                    class="text-[10px] text-green-800 font-bold mt-1 uppercase"></p>
                             </div>
                         </div>
                         <div class="text-right whitespace-nowrap pt-1">
@@ -174,13 +175,14 @@
                             <span class="text-sm font-bold text-gray-700">Quantity</span>
                             <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
                                 <button type="button" onclick="changeQty(-1)"
-                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 font-bold">−</button>
+                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 font-bold cursor-pointer">−</button>
                                 <span id="qty-display" class="w-10 text-center font-bold text-sm">1</span>
                                 <button type="button" onclick="changeQty(1)"
-                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-l border-gray-300 font-bold">+</button>
+                                    class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-l border-gray-300 font-bold cursor-pointer">+</button>
                             </div>
                         </div>
 
+                        @if(!$isFree)
                         <div class="space-y-2">
                             <label class="block text-sm font-bold text-gray-500 uppercase tracking-wide">Delivery
                                 Area</label>
@@ -190,17 +192,22 @@
                                         onchange="updateDeliveryCharge({{ $insideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Inside Dhaka</div>
+                                        Inside Dhaka <span class="text-xs font-bold ml-1">{{ $insideCharge == 0 ? '(Free)' : '('.$insideCharge.$setup->currency.')' }}</span>
+                                    </div>
                                 </label>
                                 <label class="cursor-pointer">
                                     <input type="radio" name="shipping_area" value="outside"
                                         onchange="updateDeliveryCharge({{ $outsideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Outside Dhaka</div>
+                                        Outside Dhaka <span class="text-xs font-bold ml-1">{{ $outsideCharge == 0 ? '(Free)' : '('.$outsideCharge.$setup->currency.')' }}</span>
+                                    </div>
                                 </label>
                             </div>
                         </div>
+                        @else
+                        <input type="hidden" name="shipping_area" value="inside">
+                        @endif
                     </div>
 
                     {{-- Calculations --}}
@@ -212,8 +219,9 @@
                         </div>
                         <div class="flex justify-between text-sm md:text-base text-gray-800">
                             <span>Shipping Charge</span>
-                            <span class="font-bold text-red-600">+<span
-                                    id="delivery-charge-display"></span>{{ $setup->currency }}</span>
+                            <span class="font-bold text-red-600" id="delivery-charge-display-wrapper">
+                                +<span id="delivery-charge-display"></span>{{ $setup->currency }}
+                            </span>
                         </div>
                         <div
                             class="flex justify-between items-center text-lg font-bold text-gray-900 pt-2 border-t border-gray-50">
@@ -223,7 +231,7 @@
                     </div>
 
                     <button type="submit"
-                        class="w-full bg-[#1f8a54] hover:bg-[#176840] text-white font-bold py-5 rounded-xl text-2xl  active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                        class="w-full bg-[#1f8a54] hover:bg-[#176840] text-white font-bold py-5 rounded-xl text-2xl cursor-pointer active:translate-y-1 transition-all flex items-center justify-center gap-2">
                         অর্ডার করুন <span id="btn-total"></span>{{ $setup->currency }}
                     </button>
                 </div>
@@ -281,7 +289,11 @@
 
         document.getElementById('summary-unit-price').innerText = unitFormatted;
         document.getElementById('summary-subtotal').innerText = subFormatted;
-        document.getElementById('delivery-charge-display').innerText = DELIVERY.toFixed(2);
+        if (DELIVERY === 0) {
+            document.getElementById('delivery-charge-display-wrapper').innerText = 'Free';
+        } else {
+            document.getElementById('delivery-charge-display-wrapper').innerHTML = '+' + DELIVERY.toFixed(2) + CURRENCY;
+        }
         document.getElementById('summary-total').innerText = totalFormatted + CURRENCY;
         document.getElementById('btn-total').innerText = totalFormatted;
     }
