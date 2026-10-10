@@ -131,6 +131,9 @@ class ProductImportController extends Controller
                 $attributesStr = trim($row[14] ?? $row['attributes'] ?? '');
                 $thumbnailUrl = trim($row[15] ?? $row['thumbnailUrl'] ?? '');
                 $shortDescription = trim($row[16] ?? $row['shortDescription'] ?? '');
+                $metaTitle = trim($row[17] ?? $row['metaTitle'] ?? '');
+                $metaDescription = trim($row[18] ?? $row['metaDescription'] ?? '');
+                $metaKeywords = trim($row[19] ?? $row['metaKeywords'] ?? '');
 
                 // Validation
                 if (empty($title) || empty($sku)) {
@@ -274,6 +277,9 @@ class ProductImportController extends Controller
                             'purpose' => $purpose,
                             'thumbnail' => $thumbnailPath,
                             'short_description' => $shortDescription,
+                            'meta_title' => $metaTitle,
+                            'meta_description' => $metaDescription,
+                            'meta_keywords' => $metaKeywords,
                             'company_id' => auth()->user()->company_id, // ensure company boundaries
                         ]);
 
@@ -320,6 +326,9 @@ class ProductImportController extends Controller
                         'raw_warehouse' => $warehouseName,
                         'attributes' => $attributesStr,
                         'thumbnailUrl' => $thumbnailUrl,
+                        'metaTitle' => $metaTitle,
+                        'metaDescription' => $metaDescription,
+                        'metaKeywords' => $metaKeywords,
                         
                         // Resolved IDs (if they were found)
                         'brand_id' => $brandId,

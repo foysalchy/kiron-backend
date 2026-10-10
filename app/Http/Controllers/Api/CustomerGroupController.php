@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCustomerGroupRequest;
+use App\Http\Requests\UpdateCustomerGroupRequest;
 use App\Services\CustomerGroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -40,6 +41,12 @@ class CustomerGroupController extends Controller
         $data = $this->groupService->createGroup($request->validated());
         return ResponseHelper::success($data, 'Customer Group created successfully', 201);
     }
+    public function update(UpdateCustomerGroupRequest $request, int $id): JsonResponse
+    {
+        $data = $this->groupService->updateGroup($id, $request->validated());
+        return ResponseHelper::success($data, 'Customer Group updated successfully');
+    }
+
     public function show(int $id): JsonResponse
     {
         $data = $this->groupService->getGroupWithCustomers($id);
@@ -61,6 +68,18 @@ class CustomerGroupController extends Controller
     {
         $this->groupService->deleteGroup($id);
         return ResponseHelper::success(null, 'Group deleted successfully');
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $this->groupService->restoreGroup($id);
+        return ResponseHelper::success(null, 'Customer Group restored successfully');
+    }
+
+    public function forceDelete(int $id): JsonResponse
+    {
+        $this->groupService->forceDeleteGroup($id);
+        return ResponseHelper::success(null, 'Customer Group permanently deleted');
     }
 
     // Special Endpoint for Dynamic Criteria

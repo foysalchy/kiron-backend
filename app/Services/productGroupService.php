@@ -61,6 +61,23 @@ class productGroupService
             throw ApiException::serverError('Failed to create customer group');
         }
     }
+
+    public function updateGroup(int $id, array $data): ProductGroup
+    {
+        DB::beginTransaction();
+        try {
+            $group = ProductGroup::findOrFail($id);
+            $group->update($data);
+            LogHelper::updated('customer_group', $group->id, $group->company_id, $group->name);
+
+            DB::commit();
+            return $group;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Customer Group update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update customer group');
+        }
+    }
     public function createGroup2(array $data): ProductGroup
     {
         DB::beginTransaction();
@@ -132,7 +149,23 @@ class productGroupService
     {
         $group = ProductGroup::findOrFail($id);
         $group->delete();
-        LogHelper::deleted('customer_group', $group->id, $group->company_id, $group->name);
+        LogHelper::deleted('product_group', $group->id, $group->company_id, $group->name);
+        return true;
+    }
+
+    public function restoreGroup(int $id): bool
+    {
+        $group = ProductGroup::withTrashed()->findOrFail($id);
+        $group->restore();
+        LogHelper::updated('product_group', $group->id, $group->company_id, 'Restored ' . $group->name);
+        return true;
+    }
+
+    public function forceDeleteGroup(int $id): bool
+    {
+        $group = ProductGroup::withTrashed()->findOrFail($id);
+        $group->forceDelete();
+        LogHelper::deleted('product_group', $group->id, $group->company_id, 'Permanently deleted ' . $group->name);
         return true;
     }
 
@@ -144,7 +177,7 @@ class productGroupService
         $group = ProductGroup::findOrFail($id);
 
         $products = Product::whereIn('id', $group->product_ids ?? [])
-            ->select('id', 'title', 'thumbnail')
+            ->select('id', 'title', 'thumbnail_95')
             ->get();
 
         $params = $group->filter_parameters ?? [];
@@ -275,7 +308,7 @@ class productGroupService
                         }
                     })
                     ->with(['product' => function ($q) {
-                        $q->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity');
+                        $q->select('id', 'title', 'thumbnail_95');
                     }])
                     ->groupBy('product_id')
                     ->orderByDesc('total_qty_sold');
@@ -292,7 +325,7 @@ class productGroupService
             }
             if ($type === 'no_sales_products') {
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail');
+                    ->select('id', 'title', 'thumbnail_95');
 
                 if (!empty($params['date_from']) || !empty($params['date_to'])) {
                     $query->whereDoesntHave('orderDetails.order', function ($q) use ($params) {
@@ -336,7 +369,7 @@ class productGroupService
                 };
 
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail')
+                    ->select('id', 'title', 'thumbnail_95')
                     ->withCount(['orderDetails as total_qty_sold' => function ($q) use ($orderConditions) {
                         $q->whereHas('order', $orderConditions);
                     }])
@@ -371,7 +404,7 @@ class productGroupService
                 };
 
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->select('id', 'title', 'thumbnail_95')
                     ->withCount(['orderDetails as total_order_count' => function ($q) use ($orderConditions) {
                         $q->whereHas('order', $orderConditions);
                     }])
@@ -406,7 +439,7 @@ class productGroupService
                     ->select([
                         'products.id',
                         'products.title',
-                        'products.thumbnail',
+                        'products.thumbnail_95',
                         'products.regular_price',
                         'products.stock_quantity',
                         'products.stock_status',
@@ -611,7 +644,7 @@ class productGroupService
                 }
 
                 $query = Product::query()
-                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->select('products.id', 'products.title', 'products.thumbnail_95')
 
                     // ✅ Cost Priority:
                     // 1. Latest completed purchase price
@@ -721,7 +754,7 @@ class productGroupService
                 }
 
                 $query = Product::query()
-                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->select('products.id', 'products.title', 'products.thumbnail_95')
                     ->selectRaw("
             COALESCE(
                 NULLIF((SELECT pd.purchase_price FROM purchase_details pd JOIN purchases p ON p.id = pd.purchase_id WHERE pd.product_id = products.id AND p.status = ? ORDER BY p.purchase_date DESC, p.id DESC LIMIT 1), 0),
@@ -779,7 +812,7 @@ class productGroupService
                 }
 
                 $query = Product::query()
-                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->select('products.id', 'products.title', 'products.thumbnail_95')
                     ->selectRaw("
             COALESCE(
                 NULLIF((SELECT pd.purchase_price FROM purchase_details pd JOIN purchases p ON p.id = pd.purchase_id WHERE pd.product_id = products.id AND p.status = ? ORDER BY p.purchase_date DESC, p.id DESC LIMIT 1), 0),
@@ -823,7 +856,7 @@ class productGroupService
             // ==========================================
             if ($type === 'high_discount_products') {
                 $query = Product::query()
-                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->select('products.id', 'products.title', 'products.thumbnail_95')
                     ->selectRaw("
             COALESCE(
                 CASE WHEN products.type = 'single' THEN
@@ -878,7 +911,7 @@ class productGroupService
                 }
 
                 $query = Product::query()
-                    ->select('products.id', 'products.title', 'products.thumbnail', 'products.regular_price')
+                    ->select('products.id', 'products.title', 'products.thumbnail_95')
                     ->selectRaw("
             COALESCE(
                 CASE WHEN products.type = 'single' THEN
@@ -925,7 +958,7 @@ class productGroupService
 
             if ($type === 'most_wishlisted') {
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->select('id', 'title', 'thumbnail_95')
                     ->withCount(['wishlists as total_wishlist_count' => function ($q) use ($params) {
                         if (!empty($params['date_from'])) {
                             $q->whereDate('created_at', '>=', $params['date_from']);
@@ -955,7 +988,7 @@ class productGroupService
             }
             if ($type === 'most_added_to_cart') {
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
+                    ->select('id', 'title', 'thumbnail_95')
                     ->withCount(['carts as total_cart_count' => function ($q) use ($params) {
                         // $q->where('status', 1); // Added to cart
                         if (!empty($params['date_from'])) {
@@ -986,8 +1019,8 @@ class productGroupService
             }
             if ($type === 'frequently_viewed') {
                 $query = Product::query()
-                    ->select('id', 'title', 'thumbnail', 'regular_price', 'stock_quantity', 'stock_status')
-                    ->withCount(['productViews as total_view_count' => function ($q) use ($params) {
+                    ->select('id', 'title', 'thumbnail_95')
+                    ->withCount(['views as total_view_count' => function ($q) use ($params) {
                         if (!empty($params['date_from'])) {
                             $q->whereDate('created_at', '>=', $params['date_from']);
                         }
@@ -1024,7 +1057,7 @@ class productGroupService
                     ->select([
                         'products.id',
                         'products.title',
-                        'products.thumbnail',
+                        'products.thumbnail_95',
                         'products.regular_price',
                         'products.stock_quantity',
                         'products.stock_status',
@@ -1097,7 +1130,7 @@ class productGroupService
                     ->select([
                         'products.id',
                         'products.title',
-                        'products.thumbnail',
+                        'products.thumbnail_95',
                         'products.regular_price',
                         'products.stock_quantity',
                         'products.stock_status',
@@ -1173,7 +1206,7 @@ class productGroupService
                     ->select([
                         'products.id',
                         'products.title',
-                        'products.thumbnail',
+                        'products.thumbnail_95',
                         'products.regular_price',
                         'products.stock_quantity',
                         'products.stock_status',
@@ -1243,3 +1276,4 @@ class productGroupService
         }
     }
 }
+
