@@ -30,21 +30,19 @@
     <!-- image section -->
     <div class="relative overflow-hidden aspect-square bg-[#f9f9f9]">
         <!-- Discount Badge -->
-        <!-- Badges (Top Left) -->
-        <div class="absolute top-3 left-3 z-20 flex flex-col items-start gap-1">
-            <!-- Discount Badge -->
-            @if ($discountLabel)
-                <span class="bg-[#be123c] text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                    -{{ $discountLabel }}
-                </span>
-            @endif
-            <!-- Free Shipping Badge -->
-            @if ($product->is_free_delivery)
-                <span class="bg-green-500 text-white text-xs md:text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-                    Free Shipping
-                </span>
-            @endif
-        </div>
+        <!-- Discount Badge (Top Left) -->
+        @if ($discountLabel)
+            <div class="absolute top-3 left-3 z-20 bg-[#be123c] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                -{{ $discountLabel }}
+            </div>
+        @endif
+
+        <!-- Free Delivery Badge (Bottom Left) -->
+        @if ($product->is_free_delivery)
+            <div class="absolute bottom-3 left-3 z-20 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                Free Shipping
+            </div>
+        @endif
 
         <!-- Wishlist -->
         <button type="button" onclick="toggleWishlist({{ $product->id }})" aria-label="wish button"
@@ -64,7 +62,7 @@
     <!-- info area -->
     <div class="p-4 flex flex-col flex-grow bg-white">
         {{-- <!-- categories/sku -->
-        <div class="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1 truncate">
+        <div class="text-xs uppercase font-bold text-gray-400 tracking-wider mb-1 truncate">
             {{ $product->mega_categories?->pluck('name')->implode(', ') ?: 'General' }}
         </div> --}}
 
@@ -110,7 +108,7 @@
                 @endphp
                 @foreach ($previewValues as $val)
                     <span
-                        class="min-w-[30px] h-7 px-2 flex items-center justify-center border border-gray-200 rounded text-xs font-bold text-gray-600 hover:border-[var(--primary-color)] transition-colors">
+                        class="min-w-[30px] h-7 px-2 flex items-center justify-center border border-gray-200 rounded-full text-xs font-bold text-gray-600 hover:border-[var(--primary-color)] transition-colors">
                         {{ $val }}
                     </span>
                 @endforeach

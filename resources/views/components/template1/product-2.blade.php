@@ -60,11 +60,11 @@
             <div
                 class="absolute top-1 right-1 secondary-bg text-white w-12 h-12 rounded-full flex flex-col items-center justify-center shadow-md transform rotate-12 group-hover:rotate-0 transition-transform duration-300 z-10">
                 <span class="text-xs font-bold leading-none">{{ $discountLabel }}</span>
-                <span class="text-[10px] font-bold leading-none mt-0.5 uppercase">Off</span>
+                <span class="text-xs font-bold leading-none mt-0.5 uppercase">Off</span>
             </div>
         @endif
         @if ($product->is_free_delivery)
-            <div class="absolute top-2 left-12 bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm shadow-sm z-10">
+            <div class="absolute bottom-2 left-2 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm z-10">
                 Free Shipping
             </div>
         @endif
@@ -87,7 +87,7 @@
                             class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-200' }}"></i>
                     @endfor
                 </div>
-                <span class="text-[10px] text-gray-400 font-medium">({{ $totalReviews }})</span>
+                <span class="text-xs text-gray-400 font-medium">({{ $totalReviews }})</span>
             </div>
         @endif
         <!-- Price Section -->
