@@ -58,6 +58,7 @@ class BulkActionController extends Controller
         'brands'        => \App\Models\Brand::class,
         'asset-purchases'        => \App\Models\AssetPurchase::class,
         'disposal-types'        => \App\Models\DisposalType::class,
+        'customer-groups'       => \App\Models\CustomerGroup::class,
         'asset-disposals'        => \App\Models\AssetDisposal::class,
         'master-brands'        => \App\Models\MasterBrand::class,
         'master-demos'        => \App\Models\MasterDemo::class,
@@ -65,6 +66,8 @@ class BulkActionController extends Controller
         'account-groups'        => \App\Models\AccountGroup::class,
         'account-expenses'        => \App\Models\TransactionExpense::class,
         'account-incomes'        => \App\Models\TransactionIncome::class,
+        'product-groups'        => \App\Models\ProductGroup::class,
+        'product-groups'        => \App\Models\ProductGroup::class,
     ];
 
     /**

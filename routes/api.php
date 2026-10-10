@@ -1735,8 +1735,11 @@ Route::prefix('v1')->group(function () {
                     Route::get('/', 'index');
                     Route::post('/', 'store');
                     Route::get('{id}', 'show');
+                    Route::put('{id}', 'update');
                     Route::delete('{id}/customers/{customerId}', 'removeCustomer');
                     Route::patch('{id}/toggle-status', 'toggleStatus');
+                    Route::patch('{id}/restore', 'restore');
+                    Route::delete('{id}/force', 'forceDelete');
                     Route::delete('{id}', 'destroy');
                 });
                 // Product Groups Routes
@@ -1747,9 +1750,12 @@ Route::prefix('v1')->group(function () {
                     Route::get('/', 'index');
                     Route::post('/', 'store');
                     Route::get('{id}', 'show');
+                    Route::put('{id}', 'update');
                     Route::delete('{id}/products/{productId}', 'removeProduct');
                     Route::patch('{id}/toggle-status', 'toggleStatus');
                     Route::patch('{id}/toggle-frontend', 'toggleFrontend');
+                    Route::patch('{id}/restore', 'restore');
+                    Route::delete('{id}/force', 'forceDelete');
                     Route::delete('{id}', 'destroy');
                 });
                 Route::prefix('roles')->group(function () {

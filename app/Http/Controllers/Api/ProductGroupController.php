@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductGroupRequest;
+use App\Http\Requests\UpdateProductGroupRequest;
 use App\Services\productGroupService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,6 +35,13 @@ class ProductGroupController extends Controller
         $data = $this->groupService->createGroup($request->validated());
         return ResponseHelper::success($data, 'Product Group created successfully', 201);
     }
+    
+    public function update(UpdateProductGroupRequest $request, int $id): JsonResponse
+    {
+        $data = $this->groupService->updateGroup($id, $request->validated());
+        return ResponseHelper::success($data, 'Product Group updated successfully');
+    }
+
     public function show(int $id): JsonResponse
     {
         $data = $this->groupService->getGroupWithProducts($id);
@@ -60,6 +68,18 @@ class ProductGroupController extends Controller
     {
         $this->groupService->deleteGroup($id);
         return ResponseHelper::success(null, 'Group deleted successfully');
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $this->groupService->restoreGroup($id);
+        return ResponseHelper::success(null, 'Product Group restored successfully');
+    }
+
+    public function forceDelete(int $id): JsonResponse
+    {
+        $this->groupService->forceDeleteGroup($id);
+        return ResponseHelper::success(null, 'Product Group permanently deleted');
     }
 
     // Special Endpoint for Dynamic Criteria

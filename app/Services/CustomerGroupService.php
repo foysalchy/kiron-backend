@@ -63,6 +63,23 @@ class CustomerGroupService
         }
     }
 
+    public function updateGroup(int $id, array $data): CustomerGroup
+    {
+        DB::beginTransaction();
+        try {
+            $group = CustomerGroup::findOrFail($id);
+            $group->update($data);
+            LogHelper::updated('customer_group', $group->id, $group->company_id, $group->name);
+
+            DB::commit();
+            return $group;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Customer Group update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update customer group');
+        }
+    }
+
 
     /**
      * Remove a single customer from the group
@@ -104,6 +121,22 @@ class CustomerGroupService
         $group = CustomerGroup::findOrFail($id);
         $group->delete();
         LogHelper::deleted('customer_group', $group->id, $group->company_id, $group->name);
+        return true;
+    }
+
+    public function restoreGroup(int $id): bool
+    {
+        $group = CustomerGroup::withTrashed()->findOrFail($id);
+        $group->restore();
+        LogHelper::updated('customer_group', $group->id, $group->company_id, 'Restored ' . $group->name);
+        return true;
+    }
+
+    public function forceDeleteGroup(int $id): bool
+    {
+        $group = CustomerGroup::withTrashed()->findOrFail($id);
+        $group->forceDelete();
+        LogHelper::deleted('customer_group', $group->id, $group->company_id, 'Permanently deleted ' . $group->name);
         return true;
     }
 

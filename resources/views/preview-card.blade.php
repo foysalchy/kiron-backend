@@ -28,7 +28,19 @@
 </head>
 <body>
     <div class="card-container">
-        <x-template1.product-card :product="$product" />
+        @php
+            if (!isset($themeColor) || is_null($themeColor)) {
+                $themeColor = new \stdClass();
+                $themeColor->theme_template = [];
+            }
+            if (!isset($storeSettings) || is_null($storeSettings)) {
+                $storeSettings = new \stdClass();
+                $storeSettings->is_review = false;
+            }
+            $templateName = request('preview_card') ? 'template' . request('preview_card') : ($template ?? 'template1');
+            $componentName = $templateName . '.product-card';
+        @endphp
+        <x-dynamic-component :component="$componentName" :product="$product" />
     </div>
 </body>
 </html>

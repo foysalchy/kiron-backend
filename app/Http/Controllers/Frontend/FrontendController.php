@@ -43,6 +43,18 @@ class FrontendController extends Controller
         if (!$dummyProduct) {
             return response('No products available for preview', 200);
         }
+
+        if (!view()->shared('themeColor')) {
+            $themeColor = new \stdClass();
+            $themeColor->theme_template = [];
+            \Illuminate\Support\Facades\View::share('themeColor', $themeColor);
+        }
+
+        if (!view()->shared('storeSettings')) {
+            $storeSettings = new \stdClass();
+            $storeSettings->is_review = false;
+            \Illuminate\Support\Facades\View::share('storeSettings', $storeSettings);
+        }
         
         // Render a minimal view with Tailwind injected (if not already included in layout)
         // Since we want exactly the card styles, we can wrap it in a div that loads app.css
