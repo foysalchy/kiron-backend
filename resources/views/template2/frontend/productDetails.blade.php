@@ -127,6 +127,12 @@
                                 {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
                             @endif
                         </span>
+                        
+                        @if ($product->is_free_delivery == 1)
+                            <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
+                                Free Shipping
+                            </span>
+                        @endif
                     </div>
 
                     <!-- Dynamic Variations Container -->
