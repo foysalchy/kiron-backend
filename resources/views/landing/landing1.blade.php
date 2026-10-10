@@ -108,9 +108,9 @@
 
                 <a href="#order"
                     class="inline-flex items-center gap-2 bg-[#f5a623] mb-6 text-[#0D2601] px-6 md:px-10 py-3 md:py-4 border-2 border-[#ad7419] rounded-xl font-bold text-lg sm:text-xl md:text-3xl shadow-lg hover:scale-105 transition-transform">
-                    Click to order.
                     <img src="{{asset('./images/pointing-right.png')}}" width="30" height="28" class="w-8 md:w-12"
                         alt="">
+                    Click to order.
                 </a>
 
                 {{-- Video --}}
@@ -140,6 +140,7 @@
         </section>
 
 
+        @if($landing->regular_price || $landing->discount_price)
         {{-- ══ SECTION 2: PROMO PRICE ══ --}}
         <section class="py-16 md:py-24 px-4">
             <div class="max-w-7xl mx-auto relative">
@@ -179,15 +180,17 @@
                 <div class="absolute left-1/2 -translate-x-1/2 -bottom-10 w-full flex justify-center">
                     <a href="#order"
                         class="inline-flex items-center gap-4 bg-[#f1a32a] text-[#0D2601] px-10 md:px-20 py-4 rounded-xl font-bold text-2xl md:text-4xl border-3 border-[#b87d21] whitespace-nowrap">
-                        Order Now
                         <img src="{{ asset('./images/pointing-right.png') }}" width="48" height="48"
                             class="w-12 md:w-16" alt="hand icon">
+                        Order Now
                     </a>
                 </div>
             </div>
         </section>
+        @endif
 
 
+        @if(!empty($landing->extras['content']) || !empty($landing->extras['content2']))
         {{-- ══ SECTION 3: BENEFITS ══ --}}
         <section class="bg-[#f1fcf1] py-16 px-4 mt-8 md:mt-10">
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
@@ -214,14 +217,16 @@
             <div class="text-center mt-12">
                 <a href="#order"
                     class="inline-flex items-center gap-3 bg-[#f1a32a] text-[#0D2601] px-6 sm:px-10 md:px-16 py-3 md:py-5 rounded-xl font-bold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
-                    Order Now
                     <img src="{{ asset('./images/pointing-right.png') }}" width="32" height="32" class="w-8 md:w-14"
                         alt="hand icon">
+                    Order Now
                 </a>
             </div>
         </section>
+        @endif
 
 
+        @if(!empty($landing->description))
         {{-- ══ SECTION 4: PRODUCT BANNER ══ --}}
         <section class="py-12 px-4">
             <div class="max-w-2xl mx-auto text-center">
@@ -230,8 +235,10 @@
                 </article>
             </div>
         </section>
+        @endif
 
 
+        @if(!empty($landing->extras['features2']) && count($landing->extras['features2']) > 0)
         {{-- ══ SECTION 5: WHY TRUST US ══ --}}
         <section class="bg-[#1a3a1a] text-white py-16 px-4">
             <div class="max-w-7xl mx-auto text-center">
@@ -266,15 +273,29 @@
                 <div class="mt-10">
                     <a href="#order"
                         class="inline-flex items-center gap-2 bg-[#f5a623] text-[#0D2601] px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21]">
-                        Click to order.
                         <img src="{{ asset('./images/pointing-right.png') }}" width="32" height="32" class="w-8 md:w-14"
                             alt="">
+                        Click to order.
                     </a>
                 </div>
             </div>
         </section>
+        @endif
 
 
+        @php
+            $grid = $landing->extras['features'] ?? [
+                'It works against serious diseases like diabetes by controlling sugar levels.',
+                'Eating sajan leaves regularly increases the taste of the mouth.',
+                'Helps keep the liver and kidneys healthy.',
+                'High blood pressure will be under control.',
+                'The body does not show signs of age easily.',
+                'Increases immunity.',
+                'It will be very helpful for weight loss.',
+                'Relieves problems caused by fever, cough and cold.',
+            ];
+        @endphp
+        @if(count($grid) > 0)
         {{-- ══ SECTION 6: 8-GRID BENEFITS ══ --}}
         <section class="py-14 px-4 bg-white">
             <div class="max-w-7xl mx-auto text-center {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
@@ -285,19 +306,6 @@
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-sm sm:text-base md:text-xl">
-                    @php
-                        $grid = $landing->extras['features'] ?? [
-                            'It works against serious diseases like diabetes by controlling sugar levels.',
-                            'Eating sajan leaves regularly increases the taste of the mouth.',
-                            'Helps keep the liver and kidneys healthy.',
-                            'High blood pressure will be under control.',
-                            'The body does not show signs of age easily.',
-                            'Increases immunity.',
-                            'It will be very helpful for weight loss.',
-                            'Relieves problems caused by fever, cough and cold.',
-                        ];
-                    @endphp
-
                     @foreach ($grid as $g)
                         <div
                             class="border-2 border-[#4caf50] p-3 md:p-4 rounded-lg flex items-center justify-center min-h-[90px] md:min-h-[120px] text-center text-[#1a3a1a] hover:bg-[#e8f5e9] transition-all duration-300">
@@ -309,14 +317,16 @@
                 <div class="mt-10">
                     <a href="#order"
                         class="inline-flex items-center gap-2 bg-[#f5a623] text-[#0D2601] px-6 sm:px-10 md:px-14 py-3 rounded-xl font-semibold text-lg sm:text-2xl md:text-4xl border-2 border-[#b87d21] hover:scale-105 transition-transform">
-                        Click to order.
                         <img src="{{ asset('./images/pointing-right.png') }}" width="32" height="32" class="w-8 md:w-14"
                             alt="">
+                        Click to order.
                     </a>
                 </div>
             </div>
         </section>
+        @endif
 
+        @if($landing->regular_price || $landing->discount_price)
         {{-- ══ SECTION 7: PRICING ══ --}}
         <section class="py-14 px-4">
             <div
@@ -335,8 +345,10 @@
                 </div>
             </div>
         </section>
+        @endif
 
 
+        @if(!empty($landing->img_paths) && count($landing->img_paths) > 0)
         {{-- ══ SECTION 8: REVIEW SLIDER ══ --}}
         <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
             <div class="container mx-auto {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
@@ -373,6 +385,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
 
         {{-- ══ SECTION 9: ORDER FORM ══ --}}
