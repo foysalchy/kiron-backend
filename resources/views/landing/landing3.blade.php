@@ -104,6 +104,34 @@
             display: inline-block;
         }
     </style>
+    <style>
+        @if(isset($isPreview) && $isPreview)
+        .preview-badge-container {
+            position: relative;
+        }
+        .preview-badge-container:hover {
+            outline: 2px dashed #13565e;
+        }
+        .preview-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #13565e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-bottom-right-radius: 4px;
+            z-index: 50;
+            opacity: 0.5;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .preview-badge-container:hover .preview-badge {
+            opacity: 1;
+        }
+        @endif
+    </style>
 </head>
 
 <body class="text-gray-800 bg-white overflow-x-hidden">
@@ -126,7 +154,8 @@
             </div>
 
             {{-- 2. Dynamic Short Description --}}
-            <div class="hero-rich-content mb-8 md:mb-12 mx-auto max-w-6xl">
+            <div class="hero-rich-content mb-8 md:mb-12 mx-auto max-w-6xl {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Short Description</span>@endif
                 <div class="prose-container">
                     {!! $landing->short_description !!}
                 </div>
@@ -160,7 +189,8 @@
     <section class="py-10 md:py-16 px-4 text-center bg-white">
         <div class="w-full max-w-7xl mx-auto mb-10">
             <div
-                class="relative border-[6px] sm:border-[10px] md:border-[15px] border-[#F1F1F1] rounded-2xl overflow-hidden bg-black shadow-2xl">
+                class="relative border-[6px] sm:border-[10px] md:border-[15px] border-[#F1F1F1] rounded-2xl overflow-hidden bg-black shadow-2xl {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
 
                 <div class="relative w-full h-[200px] sm:h-[350px] md:h-[450px] overflow-hidden bg-black">
 
@@ -210,7 +240,8 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 gap-3">
+            <div class="grid grid-cols-1 gap-3 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features</span>@endif
                 @php
                     $dynamicBenefits = data_get($landing->extras, 'features') ?? [
                         'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
@@ -265,7 +296,8 @@
                 </h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2</span>@endif
                 @php
                     $dynamicNutrition = data_get($landing->extras, 'features2') ?? [
                         'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
@@ -308,7 +340,8 @@
             <div
                 class="mb-12
             [&_h3]:text-2xl [&_h3]:md:text-5xl [&_h3]:font-bold [&_h3]:mb-10 [&_h3]:inline-block [&_h3]:pb-2 [&_h3]:uppercase
-            [&_p]:text-sm [&_p]:md:text-xl [&_p]:leading-relaxed [&_p]:opacity-90 [&_p]:max-w-7xl [&_p]:mx-auto [&_p]:text-start [&_p]:font-medium">
+            [&_p]:text-sm [&_p]:md:text-xl [&_p]:leading-relaxed [&_p]:opacity-90 [&_p]:max-w-7xl [&_p]:mx-auto [&_p]:text-start [&_p]:font-medium {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Product Details</span>@endif
 
                 {!! $landing->description !!}
             </div>
@@ -328,14 +361,16 @@
             </div>
 
             <div
-                class="inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10">
+                class="inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px;">Title</span>@endif
                 <p class="text-[#CCFF00] font-bold text-lg md:text-4xl">
                     {{ $landing->title }}
                 </p>
             </div>
 
             <p
-                class="text-4xl md:text-4xl font-black text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter">
+                class="text-4xl md:text-4xl font-black text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount Price</span>@endif
                 {{ $landing->discount_price }}
             </p>
 
@@ -360,10 +395,12 @@
             @foreach ($featureKeys as $key)
                 @php
                     $item = data_get($landing->extras, $key . '.0');
+                    $featureLabel = str_replace('features', 'Feature ', $key);
                 @endphp
 
                 @if($item)
-                <div class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-8 flex flex-col items-center justify-center transition-all hover:-translate-y-2 hover:shadow-2xl">
+                <div class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-8 flex flex-col items-center justify-center transition-all hover:-translate-y-2 hover:shadow-2xl {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                    @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">{{ $featureLabel }}</span>@endif
 
                     <div class="w-16 h-16 md:w-24 md:h-24 mb-6">
                         @if(!empty($item['image']))
@@ -387,7 +424,8 @@
 </section>
     {{-- ══ SECTION 8: REVIEW SLIDER ══ --}}
     <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
-        <div class="container mx-auto">
+        <div class="container mx-auto {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+            @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Review  Images</span>@endif
             <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
                 What our customers say about us
             </h2>

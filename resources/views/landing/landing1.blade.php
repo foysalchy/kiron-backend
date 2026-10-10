@@ -55,6 +55,34 @@
             transform: translateY(-5px);
         }
     </style>
+    <style>
+        @if(isset($isPreview) && $isPreview)
+        .preview-badge-container {
+            position: relative;
+        }
+        .preview-badge-container:hover {
+            outline: 2px dashed #13565e;
+        }
+        .preview-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #13565e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-bottom-right-radius: 4px;
+            z-index: 50;
+            opacity: 0.5;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .preview-badge-container:hover .preview-badge {
+            opacity: 1;
+        }
+        @endif
+    </style>
 </head>
 
 <body class="text-gray-800 bg-gray-100 overflow-x-hidden">
@@ -68,10 +96,12 @@
                     class="mx-auto mb-6 h-12 md:h-16 w-auto object-contain">
 
                 <div class="border border-[#2e8c03] p-4 md:p-6 rounded mb-6">
-                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge">Title</span>@endif
                         {{ $product->title ?? $landing->title }}
                     </h1>
-                    <p class="prose prose-invert prose-lg md:prose-xl mx-auto leading-snug">
+                    <p class="prose prose-invert prose-lg md:prose-xl mx-auto leading-snug {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: -20px;">Short Description</span>@endif
                         {!! $product->short_description ?? $landing->short_description !!}
                     </p>
                 </div>
@@ -86,7 +116,8 @@
                 {{-- Video --}}
                 <div class="w-full max-w-6xl mx-auto mt-6">
                     <div
-                        class="relative rounded-xl overflow-hidden bg-black shadow-2xl {{ $landing->video ? 'border-[8px] sm:border-[12px] md:border-[18px] border-[#35B11E]' : '' }}">
+                        class="relative rounded-xl overflow-hidden bg-black shadow-2xl {{ $landing->video ? 'border-[8px] sm:border-[12px] md:border-[18px] border-[#35B11E]' : '' }} {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
                         @if ($landing->video)
                             <div class="relative aspect-video rounded-2xl overflow-hidden shadow-lg bg-black">
                                 <video class="w-full h-full object-cover" controls playsinline
@@ -124,7 +155,8 @@
                     <!-- White Price Box -->
                     <div class="bg-white rounded-xl overflow-hidden shadow-inner border border-white">
                         <!-- Regular Price -->
-                        <div class="py-6 px-8">
+                        <div class="py-6 px-8 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Regular Price</span>@endif
                             <p class="text-[#2e8c03] line-through text-2xl md:text-3xl font-medium decoration-4">
                                 {{ $landing->regular_price ?? '' }}
                             </p>
@@ -134,7 +166,8 @@
                         <div class="border-t-3 border-dotted border-[#2e8c03] mx-6"></div>
 
                         <!-- Offer Price -->
-                        <div class="py-10 px-4">
+                        <div class="py-10 px-4 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                            @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Discount Price</span>@endif
                             <p class="text-[#2e8c03] font-medium text-2xl md:text-4xl">
                                 {{ $landing->discount_price ?? '' }}
                             </p>
@@ -160,7 +193,8 @@
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
 
                 <div class="bg-white rounded-xl overflow-hidden">
-                    <div class="benefits-container text-base md:text-xl p-4 md:p-6">
+                    <div class="benefits-container text-base md:text-xl p-4 md:p-6 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                        @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Content</span>@endif
                         <article class="prose prose-slate max-w-none">
                             {!! $landing->extras['content'] ?? '' !!}
                         </article>
@@ -204,7 +238,8 @@
                 <div class="space-y-10">
                     @if (isset($landing->extras['features2']) && is_array($landing->extras['features2']))
                         @foreach ($landing->extras['features2'] as $feature)
-                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Features 2</span>@endif
                                 <h3 class="text-2xl font-bold text-[#1a3a1a] mb-4">
                                     {{ $feature['title'] ?? '' }}
                                 </h3>
@@ -242,7 +277,8 @@
 
         {{-- ══ SECTION 6: 8-GRID BENEFITS ══ --}}
         <section class="py-14 px-4 bg-white">
-            <div class="max-w-7xl mx-auto text-center">
+            <div class="max-w-7xl mx-auto text-center {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Features</span>@endif
                 <div
                     class="inline-block border-4 md:border-10 border-[#4caf50] px-4 py-4 rounded-lg text-base sm:text-lg md:text-2xl font-semibold mb-10 uppercase">
                     {{ data_get($landing->extras, 'features_title', 'Why would you eat sajina leaf powder?') }}
@@ -303,7 +339,8 @@
 
         {{-- ══ SECTION 8: REVIEW SLIDER ══ --}}
         <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
-            <div class="container mx-auto">
+            <div class="container mx-auto {{ isset($isPreview) && $isPreview ? 'preview-badge-container' : '' }}">
+                @if(isset($isPreview) && $isPreview)<span class="preview-badge" style="top: 0; z-index: 50;">Review  Images</span>@endif
                 <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
                     What our customers say about us
                 </h2>

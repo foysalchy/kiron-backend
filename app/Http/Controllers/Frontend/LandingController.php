@@ -59,6 +59,7 @@ class LandingController extends FrontendController
         $payload = json_decode($request->input('payload', '{}'), true);
         $form = $payload['form'] ?? [];
         $productData = $payload['product'] ?? [];
+        $isPreview = $payload['is_preview'] ?? false;
 
         $landing = new \App\Models\LandingPage($form);
         if (isset($form['extras'])) {
@@ -87,7 +88,7 @@ class LandingController extends FrontendController
 
         $landing->setRelation('product', $product);
 
-        return view('landing.landing' . $template_id, compact('landing', 'product'));
+        return view('landing.landing' . $template_id, compact('landing', 'product', 'isPreview'));
     }
     public function storeLandingOrder(Request $request)
     {
