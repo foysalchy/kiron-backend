@@ -34,6 +34,7 @@ class Order extends Model
         'customer_id',
         'coupon_id',
         'type',
+        'source',
         'order_no',
         'reference_no',
         'order_date',

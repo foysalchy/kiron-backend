@@ -36,6 +36,7 @@ class StoreOrderRequest extends BaseCompanyRequest
                     ->where('company_id', $companyId)
                     ->where('type', 2)],
                 'is_walk_in' => ['nullable', 'boolean'],
+                'source' => ['nullable', 'string', 'max:50'],
                 'walk_in_customer'        => ['nullable', 'array'],
                 'walk_in_customer.name'   => ['nullable', 'string', 'max:255'],
                 'walk_in_customer.phone'  => ['nullable', 'string', 'max:20'],

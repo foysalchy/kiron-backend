@@ -118,9 +118,8 @@ class StoreProductRequest extends BaseCompanyRequest
                 'purpose'          => ['required', 'string', 'max:255'],
                 'meta_title'       => ['nullable', 'string', 'max:255'],
                 'meta_description' => ['nullable', 'string', 'max:255'],
-                'meta_keywords'    => ['nullable','string'],
-                'meta_keywords.*'  => ['nullable', 'string'],
-                
+                'meta_keywords'    => ['nullable'],
+
                 // Delivery
                 'is_free_delivery' => ['nullable', 'boolean'],
             ]
