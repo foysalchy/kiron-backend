@@ -27,11 +27,18 @@ class LandingController extends FrontendController
         $ttl = now()->addHours(6);
         $landing = Cache::remember("landing_page_view_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
             return LandingPage::where('company_id', $companyId)
-                ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,warehouse_info')
+                ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,short_description,warehouse_info')
                 ->where('slug', $slug)->firstOrFail();
         });
         $product = $landing->product;
         abort_if($product === null, 404);
+
+        $setup = \App\Models\SiteSetting::where('company_id', $landing->company_id)
+            ->orWhereNull('company_id')
+            ->orderByRaw('company_id IS NULL ASC')
+            ->first() ?? new \App\Models\SiteSetting();
+
+        \Illuminate\Support\Facades\View::share('setup', $setup);
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
     }
@@ -72,12 +79,12 @@ class LandingController extends FrontendController
             ->orWhereNull('company_id')
             ->orderByRaw('company_id IS NULL ASC')
             ->first() ?? new \App\Models\SiteSetting();
-            
+
         \Illuminate\Support\Facades\View::share('setup', $setup);
 
         $socialLinks = \App\Models\SocialSetting::where('status', 1)->get();
         \Illuminate\Support\Facades\View::share('socialLinks', $socialLinks);
-        
+
         $landing->setRelation('product', $product);
 
         return view('landing.landing' . $template_id, compact('landing', 'product'));
@@ -134,7 +141,7 @@ class LandingController extends FrontendController
                 $product = Product::findOrFail($productId);
                 $unitPrice = $product->sale_price;
 
-                if ($product->manage_stock) {                                    
+                if ($product->manage_stock) {
                     $pWarehouseInfo = $product->warehouse_info ?? [];
                     foreach ($pWarehouseInfo as $info) {
                         if ($info['quantity'] >= $request->qty) {

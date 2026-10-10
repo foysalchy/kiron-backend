@@ -54,6 +54,12 @@
                     alt="{{ $product->title }}" loading="lazy"
                     class="w-full aspect-square object-cover transition-transform duration-700 group-hover:scale-110" />
             </div>
+            <!-- Free Delivery Badge -->
+            @if ($product->is_free_delivery)
+                <div class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    Free Shipping
+                </div>
+            @endif
         </a>
 
         <div class="absolute -top-1 -right-1 z-20">
@@ -100,7 +106,7 @@
 
            @if ($discountLabel)
             <span
-                class="secondary-bg text-[10px] md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
+                class="secondary-bg text-xs md:text-xs font-semibold font-black px-2 py-0.5 rounded-full uppercase
                     max-md:absolute max-md:top-1 max-md:left-1" style="color: {{ $badgeTextColor }} !important;">
                 -{{ $discountLabel }} OFF
             </span>

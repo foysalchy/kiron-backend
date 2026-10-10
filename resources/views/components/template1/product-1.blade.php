@@ -48,22 +48,21 @@
             </svg>
         </button>
 
-        <!-- Badges (Top Left) -->
-        <div class="absolute top-2 left-2 z-10 flex flex-col items-start gap-1">
-            <!-- Discount Badge -->
-            @if ($discountLabel)
-                <div class="secondary-bg text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                    -{{ $discountLabel }}
-                </div>
-            @endif
+        <!-- Discount Badge (Top Left) -->
+        @if ($discountLabel)
+            <div
+                class="absolute top-2 left-2 z-10 secondary-bg text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                -{{ $discountLabel }}
+            </div>
+        @endif
 
-            <!-- Free Delivery Badge -->
-            @if ($product->is_free_delivery)
-                <div class="bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
-                    Free Shipping
-                </div>
-            @endif
-        </div>
+        <!-- Free Delivery Badge (Bottom Left) -->
+        @if ($product->is_free_delivery)
+            <div
+                class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                Free Shipping
+            </div>
+        @endif
     </div>
 
     <!-- Info Area -->
@@ -118,7 +117,8 @@
             $isOutOfStock = $product->manage_stock ? ($product->available_stock <= 0) : false;
         @endphp
 
-        <button {{ $isOutOfStock ? 'disabled' : '' }} aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
+        <button {{ $isOutOfStock ? 'disabled' : '' }}
+            aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add to Cart') }}"
             onclick="{{ $product->type === 'single' ? "addSingleToCart($product->id)" : "openVariationModal($product->id)" }}"
             class="flex-1 py-2 rounded-lg text-sm p-2 font-medium transition-all shrink-0 whitespace-nowrap
     {{ $isOutOfStock ? 'bg-[#df7070] text-white opacity-80 cursor-not-allowed' : 'w-[50px] max-w-[50px] primary-bg text-primary hover:bg-[#BD4F00] cursor-pointer' }}">

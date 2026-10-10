@@ -64,7 +64,7 @@
                 @foreach ($mainProduct->variations as $index => $variation)
                     @php
                         $vSalePrice = $variation->regular_price - $variation->discount;
-                        $vImage = $variation->image ? asset('storage/' . $variation->image) : ($mainProduct->thumbnail_url ?? asset('images/default.webp'));
+                        $vImage = $variation->image_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
                     @endphp
                     <label class="relative cursor-pointer block">
                         <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $index === 0 ? 'checked' : '' }}
