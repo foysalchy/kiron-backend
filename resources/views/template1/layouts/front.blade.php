@@ -141,6 +141,9 @@
     </div>
 
 
+    <!-- Scroll To Top Button -->
+    <x-scroll-to-top />
+
     @stack('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
