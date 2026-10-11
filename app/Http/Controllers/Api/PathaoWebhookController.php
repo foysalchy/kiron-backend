@@ -187,18 +187,29 @@ class PathaoWebhookController extends Controller
 
             // 6. Default fallback mapping if no custom StatusMapping configured
             if ($kironStatus === null) {
-                $checkStatus = strtolower(trim((string)($orderStatus ?: $pathaoEvent)));
-                $kironStatus = match ($checkStatus) {
-                    'order.delivered', 'delivered'                                => Status::Delivered->value,
-                    'order.returned', 'returned'                                  => Status::Returned->value,
-                    'order.return_received', 'return_received', 'return-received' => Status::ReturnReceived->value,
-                    'order.picked', 'picked'                                      => Status::HandovertoCourier->value,
-                    'order.assigned-for-delivery', 'in_transit', 'in-transit',
-                    'order.in_transit', 'order.in-transit'                        => Status::InTransit->value,
-                    'order.cancelled', 'cancelled', 'canceled'                    => Status::Cancelled->value,
-                    'order.partial-delivery', 'partial_delivery'                  => Status::Delivered->value,
-                    default                                                       => null,
-                };
+                $statusSlug = $payload['order_status_slug'] ?? null;
+                $candidates = array_filter([$pathaoEvent, $orderStatus, $statusSlug]);
+
+                foreach ($candidates as $cand) {
+                    $norm = strtolower(str_replace([' ', '-', '.'], '_', trim((string)$cand)));
+                    $norm = preg_replace('/^order_/', '', $norm); // normalize 'order_delivered' -> 'delivered'
+
+                    $kironStatus = match ($norm) {
+                        'delivered', 'order_delivered'                                  => Status::Delivered->value,
+                        'returned', 'order_returned'                                    => Status::Returned->value,
+                        'return_received', 'order_return_received'                      => Status::ReturnReceived->value,
+                        'picked', 'pickup_completed', 'order_picked'                    => Status::HandovertoCourier->value,
+                        'assigned_for_delivery', 'in_transit', 'order_in_transit'       => Status::InTransit->value,
+                        'cancelled', 'canceled', 'order_cancelled'                      => Status::Cancelled->value,
+                        'partial_delivery', 'order_partial_delivery'                    => Status::Delivered->value,
+                        'hold', 'on_hold', 'order_on_hold'                              => Status::Hold->value,
+                        default                                                         => null,
+                    };
+
+                    if ($kironStatus !== null) {
+                        break;
+                    }
+                }
             }
 
             $statusChanged = false;
