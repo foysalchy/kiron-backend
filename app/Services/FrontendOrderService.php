@@ -206,6 +206,7 @@ class FrontendOrderService
                 'order_status' => $order->status,
                 'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
                 'source_info' => $order->source_info,
+                'source' => $order->source,
                 'items' => $order->orderDetails->map(function ($detail) {
                     $item = [
                         'id' => $detail->id,
@@ -488,6 +489,7 @@ class FrontendOrderService
             'totalorder' => $customerTotalOrders,
             'status' => $this->getStatusLabel($order->status),
             'order_status' => $order->status,
+            'source' => $order->source,
             'paymentStatus' => $this->getPaymentStatusLabel($order->payment_status),
             'items' => $order->orderDetails->map(function ($detail) {
                 $item = [

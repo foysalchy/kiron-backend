@@ -93,13 +93,38 @@ class Order extends Model
         // Order number generation
         static::creating(function ($order) {
             if (empty($order->order_no)) {
-                // ✅ ekta application-level lock, jate ekshathe dui request 
-                // number generate korte na pare
-                $lock = Cache::lock('order-number-generation-' . $order->type, 10);
+                $companyId = $order->company_id ?? auth()->user()?->company_id;
+                $isDraft = (int) ($order->status instanceof Status ? $order->status->value : $order->status) === Status::Draft->value;
+                $lockKey = 'order-number-generation-company-' . ($companyId ?? 'default');
+                $lock = Cache::lock($lockKey, 10);
 
-                $lock->block(5, function () use ($order) {
-                    $order->order_no = self::generateOrderNumber($order->type);
+                $lock->block(5, function () use ($order, $companyId, $isDraft) {
+                    $order->order_no = $isDraft
+                        ? self::generateDraftOrderNumber($companyId)
+                        : self::generateOrderNumber($companyId);
                 });
+            }
+        });
+
+        // Promote draft order number to official invoice number when status moves away from Draft
+        static::updating(function ($order) {
+            if ($order->isDirty('status')) {
+                $oldStatus = (int) ($order->getOriginal('status') instanceof Status ? $order->getOriginal('status')->value : $order->getOriginal('status'));
+                $newStatus = (int) ($order->status instanceof Status ? $order->status->value : $order->status);
+
+                if ($oldStatus === Status::Draft->value && $newStatus !== Status::Draft->value) {
+                    // Check if current order_no is a draft number or empty
+                    $draftPrefix = self::getCompanyDraftPrefix($order->company_id);
+                    if (empty($order->order_no) || str_starts_with($order->order_no, $draftPrefix)) {
+                        $companyId = $order->company_id ?? auth()->user()?->company_id;
+                        $lockKey = 'order-number-generation-company-' . ($companyId ?? 'default');
+                        $lock = Cache::lock($lockKey, 10);
+
+                        $lock->block(5, function () use ($order, $companyId) {
+                            $order->order_no = self::generateOrderNumber($companyId);
+                        });
+                    }
+                }
             }
         });
         // Extra charge record
@@ -153,36 +178,123 @@ class Order extends Model
     }
 
     /**
-     * Generate order number based on type
+     * Generate order number based on company name initials and incremental sequence per company
+     * Format: {INITIALS}INV-{SEQUENCE} (e.g. Sonimoni Mart -> SMINV-01, Baby Shop -> BSINV-01)
      */
-    public static function generateOrderNumber(string $type): string
+    public static function generateOrderNumber(?int $companyId = null): string
     {
-        $prefix = match ($type) {
-            self::TYPE_POS => 'POS',
-            self::TYPE_LANDING => 'LAND',
-            default => 'SALE',
-        };
-        $date = now()->format('Ymd');
+        $prefix = self::getCompanyOrderPrefix($companyId);
 
-        $lastOrder = self::withoutGlobalScopes()
-            ->withTrashed()
-            ->where('type', $type)
-            ->whereDate('created_at', now())
+        $query = self::withoutGlobalScopes()->withTrashed();
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        $lastOrder = $query->where('order_no', 'like', $prefix . '%')
             ->orderBy('id', 'desc')
             ->first();
 
-        $newNumber = $lastOrder
-            ? ((int) substr($lastOrder->order_no, -4)) + 1
-            : 1;
+        $nextNumber = 1;
+        if ($lastOrder && preg_match('/' . preg_quote($prefix, '/') . '(\d+)$/', $lastOrder->order_no, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        }
 
-        $orderNo = $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        $orderNo = $prefix . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
 
         while (self::withoutGlobalScopes()->withTrashed()->where('order_no', $orderNo)->exists()) {
-            $newNumber++;
-            $orderNo = $prefix . '-' . $date . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            $nextNumber++;
+            $orderNo = $prefix . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
         }
 
         return $orderNo;
+    }
+
+    /**
+     * Get company order prefix based on company name
+     */
+    public static function getCompanyOrderPrefix(?int $companyId): string
+    {
+        $companyName = '';
+        if ($companyId) {
+            $company = Company::find($companyId);
+            $companyName = $company?->name ?? '';
+        }
+
+        if (empty($companyName)) {
+            return 'INV-';
+        }
+
+        $words = preg_split('/[\s\-_]+/', trim($companyName));
+        $initials = '';
+        foreach ($words as $word) {
+            $clean = preg_replace('/[^a-zA-Z0-9]/', '', $word);
+            if (!empty($clean)) {
+                $initials .= mb_substr($clean, 0, 1);
+            }
+        }
+
+        $code = !empty($initials) ? strtoupper($initials) : 'INV';
+        return $code . 'INV-';
+    }
+
+    /**
+     * Generate draft order number based on company name initials
+     * Format: {INITIALS}Draft-{SEQUENCE} (e.g. Online shop -> OSDraft-01, Baby Shop -> BSDraft-01)
+     */
+    public static function generateDraftOrderNumber(?int $companyId = null): string
+    {
+        $prefix = self::getCompanyDraftPrefix($companyId);
+
+        $query = self::withoutGlobalScopes()->withTrashed();
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+
+        $lastDraft = $query->where('order_no', 'like', $prefix . '%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $nextNumber = 1;
+        if ($lastDraft && preg_match('/' . preg_quote($prefix, '/') . '(\d+)$/', $lastDraft->order_no, $matches)) {
+            $nextNumber = ((int) $matches[1]) + 1;
+        }
+
+        $orderNo = $prefix . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+
+        while (self::withoutGlobalScopes()->withTrashed()->where('order_no', $orderNo)->exists()) {
+            $nextNumber++;
+            $orderNo = $prefix . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+        }
+
+        return $orderNo;
+    }
+
+    /**
+     * Get company draft prefix based on company name
+     */
+    public static function getCompanyDraftPrefix(?int $companyId): string
+    {
+        $companyName = '';
+        if ($companyId) {
+            $company = Company::find($companyId);
+            $companyName = $company?->name ?? '';
+        }
+
+        if (empty($companyName)) {
+            return 'Draft-';
+        }
+
+        $words = preg_split('/[\s\-_]+/', trim($companyName));
+        $initials = '';
+        foreach ($words as $word) {
+            $clean = preg_replace('/[^a-zA-Z0-9]/', '', $word);
+            if (!empty($clean)) {
+                $initials .= mb_substr($clean, 0, 1);
+            }
+        }
+
+        $code = !empty($initials) ? strtoupper($initials) : 'DRAFT';
+        return $code . 'Draft-';
     }
 
     /**

@@ -22,6 +22,7 @@ class ChartOfAccountController extends Controller
         $filters = [
             'status'           => $request->query('status'),
             'account_group_id' => $request->query('account_group_id'),
+            'account_type'     => $request->query('account_type'),
             'search'           => $request->query('search'),
             'sort_by'         => $request->query('sort_by', 'created_at'),
             'sort_order'      => $request->query('sort_order', 'desc'),

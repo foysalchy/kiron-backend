@@ -100,7 +100,7 @@ private function calculateSupplierDue(int $supplierId): float
         )
         ->where('purchases.supplier_id', $supplierId)
         ->where('purchases.status', '!=', Status::Cancelled->value)
-        ->selectRaw('COALESCE(SUM(GREATEST(purchases.grand_total - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0)), 0) as total')
+        ->selectRaw('COALESCE(SUM(GREATEST(purchases.grand_total - COALESCE(purchases.other_charges, 0) - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0)), 0) as total')
         ->value('total');
 }
     public function getPartyDueList(string $direction, ?string $search, int $perPage)
@@ -144,7 +144,7 @@ private function calculateSupplierDue(int $supplierId): float
                 )
                 ->where('purchases.status', '!=',  Status::Cancelled->value)
                 ->whereNotNull('purchases.supplier_id')
-                ->selectRaw('purchases.supplier_id as party_id, GREATEST(purchases.grand_total - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0) as row_due');
+                ->selectRaw('purchases.supplier_id as party_id, GREATEST(purchases.grand_total - COALESCE(purchases.other_charges, 0) - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0) as row_due');
         }
 
         $query = Party::query()
@@ -252,7 +252,7 @@ private function calculateSupplierDue(int $supplierId): float
             )
             ->where('purchases.supplier_id', $partyId)
             ->where('purchases.status', '!=',  Status::Cancelled->value)
-            ->selectRaw('purchases.id, purchases.reference_no as invoice_no, purchases.purchase_date as invoice_date, purchases.grand_total, GREATEST(purchases.grand_total - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0) as due_amount')
+            ->selectRaw('purchases.id, purchases.reference_no as invoice_no, purchases.purchase_date as invoice_date, GREATEST(purchases.grand_total - COALESCE(purchases.other_charges, 0), 0) as grand_total, purchases.other_charges, GREATEST(purchases.grand_total - COALESCE(purchases.other_charges, 0) - COALESCE(pp.paid_amount, 0) - COALESCE(ret.returned_amount, 0), 0) as due_amount')
             ->havingRaw('due_amount > 0')
             ->orderBy('purchases.purchase_date')
             ->get();
@@ -444,7 +444,8 @@ private function calculateSupplierDue(int $supplierId): float
             }
 
             $paidSoFar = PurchasePayment::where('purchase_id', $purchase->id)->sum('amount');
-            $purchaseDue = max(0, $purchase->grand_total - $paidSoFar);
+            $supplierBill = max(0, (float) $purchase->grand_total - (float) ($purchase->other_charges ?? 0));
+            $purchaseDue = max(0, $supplierBill - $paidSoFar);
             $amount = (float) $alloc['amount'];
 
             if ($amount > $purchaseDue) {
@@ -460,6 +461,8 @@ private function calculateSupplierDue(int $supplierId): float
                 'reference_no'  => null,
                 'note'          => $note,
             ]);
+
+            $purchase->updatePaymentStatus();
         }
     }
 }

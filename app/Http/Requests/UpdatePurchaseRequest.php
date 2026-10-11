@@ -63,6 +63,10 @@ class UpdatePurchaseRequest extends UpdateBaseCompanyRequest
                 'items.*.variation_id' => ['nullable'],
                 // Totals
                 'other_charges' => ['nullable', 'numeric', 'min:0'],
+                'other_charges_details' => ['nullable', 'array'],
+                'other_charges_details.*.chart_of_account_id' => ['required_with:other_charges_details', 'nullable', 'integer', 'exists:chart_of_accounts,id'],
+                'other_charges_details.*.amount' => ['required_with:other_charges_details', 'numeric', 'min:0'],
+                'other_charges_details.*.note' => ['nullable', 'string', 'max:255'],
                 'discount_on_all' => ['nullable', 'numeric', 'min:0'],
                 'round_off' => ['nullable', 'numeric'],
 

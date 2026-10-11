@@ -539,14 +539,38 @@ class AutoAccountingService
                 $items[] = ['chart_of_account_id' => $cashAccountId, 'debit' => 0, 'credit' => $paidAmount];
             }
 
-            // Pair 2: Other Charges / Courier & Freight Expense (Debit) & Cash in Hand / Bank (Credit)
-            // 4. Debit Courier / Freight Expense (Other charges):
-            if ($otherCharges > 0 && $courierAccountId) {
-                $items[] = ['chart_of_account_id' => $courierAccountId, 'debit' => $otherCharges, 'credit' => 0];
-            }
+            // Pair 2: Other Charges / Dynamic Expenses (Debit) & Cash in Hand / Bank (Credit)
+            $chargesDetails = $purchase->other_charges_details;
+            if (!empty($chargesDetails) && is_array($chargesDetails)) {
+                $totalDynamicCharges = 0;
+                foreach ($chargesDetails as $charge) {
+                    $cAmount = (float)($charge['amount'] ?? 0);
+                    $cAccId = $charge['chart_of_account_id'] ?? $courierAccountId;
+                    if ($cAmount > 0 && $cAccId) {
+                        $items[] = [
+                            'chart_of_account_id' => $cAccId,
+                            'debit' => $cAmount,
+                            'credit' => 0
+                        ];
+                        $totalDynamicCharges += $cAmount;
+                    }
+                }
 
-            // 5. Credit Cash in Hand / Bank for other charges:
-            if ($otherCharges > 0) {
+                if ($totalDynamicCharges > 0) {
+                    $otherChargesCreditAccountId = $cashAccountId ?: ($payableAccountId ?: $courierAccountId);
+                    if ($otherChargesCreditAccountId) {
+                        $items[] = [
+                            'chart_of_account_id' => $otherChargesCreditAccountId,
+                            'debit' => 0,
+                            'credit' => $totalDynamicCharges
+                        ];
+                    }
+                }
+            } elseif ($otherCharges > 0) {
+                // Backward compatibility if single other_charges exists
+                if ($courierAccountId) {
+                    $items[] = ['chart_of_account_id' => $courierAccountId, 'debit' => $otherCharges, 'credit' => 0];
+                }
                 $otherChargesCreditAccountId = $cashAccountId ?: ($payableAccountId ?: $courierAccountId);
                 if ($otherChargesCreditAccountId) {
                     $items[] = ['chart_of_account_id' => $otherChargesCreditAccountId, 'debit' => 0, 'credit' => $otherCharges];
@@ -580,6 +604,72 @@ class AutoAccountingService
         } catch (\Exception $e) {
             Log::error('Failed to auto-post purchase journal: ' . $e->getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Delete / Remove Purchase Journal when purchase is deleted
+     */
+    public static function deletePurchaseJournal(int $purchaseId, ?int $companyId = null, bool $force = false): bool
+    {
+        try {
+            $query = TransactionJournal::withoutGlobalScopes()
+                ->where('source_type', 'purchase')
+                ->where('source_id', $purchaseId);
+
+            if ($companyId) {
+                $query->where('company_id', $companyId);
+            }
+
+            $journals = $query->get();
+
+            foreach ($journals as $journal) {
+                if ($force) {
+                    $journal->accounts()->forceDelete();
+                    $journal->forceDelete();
+                } else {
+                    $journal->accounts()->delete();
+                    $journal->delete();
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to delete purchase journal for purchase #{$purchaseId}: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Delete / Remove Order Journals (Sales, Courier expense, etc.) when order is deleted
+     */
+    public static function deleteOrderJournal(int $orderId, ?int $companyId = null, bool $force = false): bool
+    {
+        try {
+            $query = TransactionJournal::withoutGlobalScopes()
+                ->whereIn('source_type', ['order', 'courier_expense'])
+                ->where('source_id', $orderId);
+
+            if ($companyId) {
+                $query->where('company_id', $companyId);
+            }
+
+            $journals = $query->get();
+
+            foreach ($journals as $journal) {
+                if ($force) {
+                    $journal->accounts()->forceDelete();
+                    $journal->forceDelete();
+                } else {
+                    $journal->accounts()->delete();
+                    $journal->delete();
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Failed to delete order journal for order #{$orderId}: " . $e->getMessage());
+            return false;
         }
     }
 

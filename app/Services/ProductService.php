@@ -993,12 +993,19 @@ class ProductService
                     return $wh;
                 })->toArray();
             }
-            $stockQty = $manageStock ? ($variationData['stock_quantity'] ?? 0) : 0;   // ← নতুন লাইন
+            $stockQty = $manageStock ? ($variationData['stock_quantity'] ?? 0) : 0;
 
-            // Check if this combination already exists (by hash, not by ID)
-            $existingVariation = ProductVariation::where('product_id', $product->id)
-                ->where('combination_hash', $combinationHash)
-                ->first();
+            // Check if variation exists by ID first, then fallback to combination hash
+            $variationId = $variationData['id'] ?? null;
+            $existingVariation = null;
+
+            if (!empty($variationId) && $existingVariations->has($variationId)) {
+                $existingVariation = $existingVariations->get($variationId);
+            } else {
+                $existingVariation = ProductVariation::where('product_id', $product->id)
+                    ->where('combination_hash', $combinationHash)
+                    ->first();
+            }
 
             if ($existingVariation) {
 
@@ -1007,7 +1014,7 @@ class ProductService
                     'sku' => $variationData['sku'] ?? null,
                     'image' => $variationData['image'] ?? $existingVariation->image,
                     'regular_price' => $variationData['regular_price'],
-                    'purchase_price' => $variationData['purchase_price'],
+                    'purchase_price' => $variationData['purchase_price'] ?? 0,
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
                     'stock_quantity' => $stockQty,
@@ -1015,7 +1022,20 @@ class ProductService
                     'stock_status' => $manageStock
                         ? $this->determineStockStatus($stockQty)
                         : 'in_stock',
+                    'combination_hash' => $combinationHash,
                 ]);
+
+                // Sync variation attributes if provided
+                if (!empty($attributes)) {
+                    $existingVariation->attributes()->delete();
+                    foreach ($attributes as $attribute) {
+                        ProductVariationAttribute::create([
+                            'product_variation_id' => $existingVariation->id,
+                            'attribute_group_id' => $attribute['attribute_group_id'],
+                            'attribute_value_id' => $attribute['attribute_value_id'],
+                        ]);
+                    }
+                }
 
                 // Update warehouse stocks if provided
                 if (isset($variationData['warehouse_info'])) {
@@ -1050,6 +1070,7 @@ class ProductService
                     'sku' => $variationData['sku'] ?? null,
                     'image' => $variationData['image'] ?? null,
                     'regular_price' => $variationData['regular_price'],
+                    'purchase_price' => $variationData['purchase_price'] ?? 0,
                     'discount_type' => $variationData['discount_type'] ?? 'flat',
                     'discount' => $variationData['discount'] ?? 0,
                     'stock_quantity' => $stockQty,
@@ -1077,7 +1098,6 @@ class ProductService
                         $warehouseInfo
                     );
                 }
-
 
                 // ✅ 3. Create galleries for the new variation
                 if (!empty($galleryImages)) {
@@ -1129,6 +1149,7 @@ class ProductService
             $variation->galleries()->delete(); // ✅ Delete galleries from database
             $variation->attributes()->delete();
             $variation->stocks()->delete();
+            $variation->update(['sku' => null]);
             $variation->delete();
 
             Log::info('Variation deleted', ['variation_id' => $variation->id]);

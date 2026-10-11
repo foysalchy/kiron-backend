@@ -294,8 +294,13 @@ class ProductImportController extends Controller
                 }
                 
                 if ($isChildVariation) {
+                    $companyId = auth()->user()->company_id ?? null;
                     // This is a child variation
-                    $parent = Product::where('sku_code', $parentSku)->where('type', 'variation')->first();
+                    $parentQuery = Product::where('sku_code', $parentSku)->where('type', 'variation');
+                    if ($companyId) {
+                        $parentQuery->where('company_id', $companyId);
+                    }
+                    $parent = $parentQuery->first();
                     $parentId = $parent ? $parent->id : ($parentProductsBySku[$parentSku]->id ?? null);
                     
                     if (!$parentId) {
@@ -309,6 +314,18 @@ class ProductImportController extends Controller
                         $skipped++;
                         $errors[] = "Row $index: Variation skipped because attribute group/value is missing (" . implode(', ', $missingAttributeDetails) . ").";
                         continue;
+                    }
+
+                    if (!$isPreview && !empty($sku)) {
+                        $skuExistsQuery = \App\Models\ProductVariation::where('sku', $sku);
+                        if ($companyId) {
+                            $skuExistsQuery->whereHas('product', fn($q) => $q->where('company_id', $companyId));
+                        }
+                        if ($skuExistsQuery->exists()) {
+                            $skipped++;
+                            $errors[] = "Row $index: Variation SKU '$sku' already exists in your store.";
+                            continue;
+                        }
                     }
 
                     if (!$isPreview) {

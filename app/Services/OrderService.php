@@ -975,14 +975,21 @@ class OrderService
                 $this->restoreOrderStock($order);
             }
 
-            // Related records delete
-            $order->orderDetails()->delete();
+            // Related records delete (Order details, payments, notes)
+            \App\Models\OrderDetail::where('order_id', $order->id)->delete();
             $order->orderPayments()->delete();
             $order->orderNotes()->delete();
+
+            // Delete associated auto-journal vouchers (sales journal, courier expense)
+            try {
+                \App\Services\AutoAccountingService::deleteOrderJournal($id, $order->company_id, false);
+            } catch (\Exception $accError) {
+                Log::warning("Order journal deletion failed: " . $accError->getMessage());
+            }
+
             $customerId = $order->customer_id;
             $order->delete();
             $this->partyDueService->recalculatePartyDue($customerId);
-
 
             DB::commit();
 
