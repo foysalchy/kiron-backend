@@ -122,6 +122,8 @@
     </div>
 
 
+    <!-- Scroll to Top Component -->
+    <x-scroll-to-top />
 
     @stack('scripts')
 

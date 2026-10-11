@@ -215,13 +215,14 @@
                 <div class="relative">
                     <!-- Left Arrow -->
                     <button onclick="scrollGroup('track-{{ $group->id }}', -280)" aria-label="Scroll left"
-                        class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        data-track="track-{{ $group->id }}"
+                        class="group-nav-btn cursor-pointer hidden absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
                     <!-- Track: ID -->
                     <div id="track-{{ $group->id }}"
-                        class="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
+                        class="group-track flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
                         style="-ms-overflow-style:none; scrollbar-width:none;">
                         @foreach ($group->products as $product)
                             <div class="flex-shrink-0 w-[165px] md:w-[350px] h-auto">
@@ -232,7 +233,8 @@
 
                     <!-- Right Arrow -->
                     <button onclick="scrollGroup('track-{{ $group->id }}', 280)" aria-label="Scroll right"
-                        class="cursor-pointer hidden md:flex absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        data-track="track-{{ $group->id }}"
+                        class="group-nav-btn cursor-pointer hidden absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -453,6 +455,39 @@
                 }, 6000);
             }
         });
+
+        function updateScrollNavButtons() {
+            function toggleBtns(trackSelector, btnSelector) {
+                const track = typeof trackSelector === 'string' ? document.querySelector(trackSelector) : trackSelector;
+                if (!track) return;
+                const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
+                if (!buttons || buttons.length === 0) return;
+                
+                // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
+                const needsScroll = track.scrollWidth > track.clientWidth + 4;
+                buttons.forEach(function(btn) {
+                    if (needsScroll) {
+                        btn.classList.remove('hidden');
+                        btn.classList.add('flex');
+                    } else {
+                        btn.classList.add('hidden');
+                        btn.classList.remove('flex');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.group-track').forEach(function(track) {
+                const trackId = track.id;
+                const buttons = document.querySelectorAll('.group-nav-btn[data-track="' + trackId + '"]');
+                toggleBtns(track, buttons);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', updateScrollNavButtons);
+        window.addEventListener('load', updateScrollNavButtons);
+        window.addEventListener('resize', updateScrollNavButtons);
+        setTimeout(updateScrollNavButtons, 300);
+        setTimeout(updateScrollNavButtons, 1000);
 
         // অন্যান্য স্ক্রল ফাংশন
         function scrollCats(distance) {
