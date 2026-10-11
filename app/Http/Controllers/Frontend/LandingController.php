@@ -39,6 +39,7 @@ class LandingController extends FrontendController
             ->first() ?? new \App\Models\SiteSetting();
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
+        \Illuminate\Support\Facades\View::share('isPreview', false);
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
     }
@@ -89,6 +90,7 @@ class LandingController extends FrontendController
             ->first() ?? new \App\Models\SiteSetting();
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
+        \Illuminate\Support\Facades\View::share('isPreview', (bool)$isPreview);
 
         $socialLinks = \App\Models\SocialSetting::where('status', 1)->get();
         \Illuminate\Support\Facades\View::share('socialLinks', $socialLinks);
