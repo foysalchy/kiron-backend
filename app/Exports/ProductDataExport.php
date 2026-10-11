@@ -47,7 +47,11 @@ class ProductDataExport implements FromCollection, WithHeadings, WithMapping, Wi
             'Mega Category Slug',// e.g. 'mens-fashion'
             'Attributes',        // For variation e.g. 'Size:XL, Color:Red'
             'Thumbnail URL',     // Public URL of the image
-            'Short Description'
+            'Short Description',
+            'Full Description',
+            'Meta Title',
+            'Meta Description',
+            'Meta Keywords'
         ];
     }
 
@@ -65,7 +69,7 @@ class ProductDataExport implements FromCollection, WithHeadings, WithMapping, Wi
         $parentSku = $product->parent ? $product->parent->sku_code : '';
 
         // Mega Category Slugs
-        $megaCategorySlugs = $product->megaCategories ? $product->megaCategories->pluck('slug')->implode(',') : '';
+        $megaCategorySlugs = $product->megaCategories ? $product->megaCategories->pluck('slug')->implode(', ') : '';
 
         // Thumbnail URL
         $thumbnailUrl = $product->thumbnail ? FileUploadHelper::getUrl($product->thumbnail, 'r2') : '';
@@ -90,7 +94,11 @@ class ProductDataExport implements FromCollection, WithHeadings, WithMapping, Wi
             $megaCategorySlugs,
             $attributesStr,
             $thumbnailUrl,
-            $product->short_description
+            $product->short_description,
+            $product->full_description,
+            $product->meta_title,
+            $product->meta_description,
+            is_array($product->meta_keywords) ? implode(', ', $product->meta_keywords) : $product->meta_keywords
         ];
     }
 
