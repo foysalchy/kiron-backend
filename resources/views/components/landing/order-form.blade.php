@@ -1,13 +1,14 @@
-@props(['landing'])
+@props(['landing', 'isPreview' => null])
 @php
     $mainProduct = $landing->product;
     $isFree = \App\Models\Product::where('id', $mainProduct->id)->value('is_free_delivery');
     $insideCharge = $isFree == 1 ? 0 : ($setup->inside_charge ?? 60);
     $outsideCharge = $isFree == 1 ? 0 : ($setup->outside_charge ?? 100);
+    $isPreviewMode = !empty($isPreview) || request()->is('*landing/preview*') || !empty($landing->is_preview);
 @endphp
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
-    <form action="{{ route('landing.order.store') }}" method="POST" id="landing-order-form">
+    <form @if($isPreviewMode) action="javascript:void(0);" onsubmit="event.preventDefault(); showPreviewAlert(); return false;" @else action="{{ route('landing.order.store') }}" method="POST" @endif id="landing-order-form">
         {{-- Success & Error Messages --}}
         @if(session('success'))
             <div
@@ -230,7 +231,8 @@
                         </div>
                     </div>
 
-                    <button type="submit"
+                    <button type="{{ $isPreviewMode ? 'button' : 'submit' }}"
+                        @if($isPreviewMode) onclick="showPreviewAlert()" @endif
                         class="w-full bg-[#1f8a54] hover:bg-[#176840] text-white font-bold py-5 rounded-xl text-2xl cursor-pointer active:translate-y-1 transition-all flex items-center justify-center gap-2">
                         অর্ডার করুন <span id="btn-total"></span>{{ $setup->currency }}
                     </button>
@@ -239,6 +241,26 @@
         </div>
     </form>
 </div>
+
+@if($isPreviewMode)
+    {{-- Preview Alert Modal --}}
+    <div id="preview-alert-modal" class="fixed inset-0 z-[999999] hidden items-center justify-center bg-black/60 p-4" onclick="if(event.target === this) closePreviewAlert()">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all border border-gray-100">
+            <div class="w-14 h-14 mx-auto mb-4 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Preview Mode</h3>
+            <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                This is a landing page preview. Order submission is disabled in preview mode.
+            </p>
+            <button type="button" onclick="closePreviewAlert()" class="w-full py-3 px-4 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold rounded-xl transition-all shadow-md cursor-pointer">
+                Got it
+            </button>
+        </div>
+    </div>
+@endif
 
 <script>
     let UNIT_PRICE = parseFloat("{{ $mainProduct->type === 'single' ? $mainProduct->sale_price : 0 }}") || 0;
@@ -298,7 +320,42 @@
         document.getElementById('btn-total').innerText = totalFormatted;
     }
 
+    const isPreview = {{ $isPreviewMode ? 'true' : 'false' }};
+
+    function showPreviewAlert() {
+        const modal = document.getElementById('preview-alert-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            return;
+        }
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Preview Mode',
+                text: 'This is a landing page preview. Order submission is disabled in preview mode.',
+                icon: 'info',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#1f8a54'
+            });
+        } else {
+            alert('This is a landing page preview. Order submission is disabled in preview mode.');
+        }
+    }
+
+    function closePreviewAlert() {
+        const modal = document.getElementById('preview-alert-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
     document.getElementById('landing-order-form').onsubmit = function (e) {
+        if (isPreview) {
+            e.preventDefault();
+            showPreviewAlert();
+            return false;
+        }
         if (isVarProduct && !document.getElementById('selected-variation-id').value) {
             e.preventDefault();
             alert('দয়া করে একটি অপশন সিলেক্ট করুন!');
