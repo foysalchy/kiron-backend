@@ -1,7 +1,13 @@
+@props(['landing' => null, 'setup' => null])
+
 @php
-    // Markets টেবিল থেকে বর্তমান কোম্পানির পিক্সেল আইডি নিয়ে আসা
-    $market = \App\Models\Market::where('company_id', $setup->company_id ?? null)->first();
+    $landingPage = $landing ?? null;
+    $companyId = $landingPage?->company_id ?? ($setup?->company_id ?? null);
+    $market = \App\Models\Market::where('company_id', $companyId)->first();
     
+    $rawLandingPixel = !empty($landingPage?->pixel) ? trim($landingPage->pixel) : null;
+    $fbPixelId = $rawLandingPixel ?: ($market?->facebook_pixel_id ?? null);
+
     // Facebook Advanced Matching Data
     $customer = auth('customer')->user();
     $fbUserData = [];
@@ -32,7 +38,7 @@
         if (!empty($customer->post_code)) {
             $fbUserData['zp'] = hash('sha256', strtolower(preg_replace('/[^a-z0-9]/i', '', $customer->post_code)));
         }
-        $country = strtolower(trim($setup->country ?? 'bd'));
+        $country = strtolower(trim($setup?->country ?? 'bd'));
         $fbUserData['country'] = hash('sha256', $country);
         if (isset($fbUserData['ph'])) {
             $fbUserData['external_id'] = $fbUserData['ph'];
@@ -40,9 +46,15 @@
     }
     $fbUserDataJson = !empty($fbUserData) ? json_encode($fbUserData) : '{}';
 @endphp
-@if($market && !empty($market->domain_verify))
-        {!! $market->domain_verify !!}
+
+@if(isset($landing) && !empty($landing?->header_code))
+    {!! $landing->header_code !!}
 @endif
+
+@if($market && !empty($market->domain_verify))
+    {!! $market->domain_verify !!}
+@endif
+
 @if($market && !empty($market->google_measurement_id))
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -51,21 +63,40 @@
         gtag('config', '{{ $market->google_measurement_id }}');
     </script>
 @endif
-@if($market && !empty($market->facebook_pixel_id))
-    <script>
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];}(window, document,'script');
-        
-        fbq('init', '{{ $market->facebook_pixel_id }}', {!! $fbUserDataJson !!});
-        fbq('track', 'PageView');
-    </script>
-    <noscript>
-        <img height="1" width="1" style="display:none"
-             src="https://www.facebook.com/tr?id={{ $market->facebook_pixel_id }}&ev=PageView&noscript=1"/>
-    </noscript>
+
+@if(!empty($fbPixelId))
+    @if(str_contains($fbPixelId, '<script'))
+        {!! $fbPixelId !!}
+    @else
+        <script>
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];}(window, document,'script');
+            
+            fbq('init', '{{ $fbPixelId }}', {!! $fbUserDataJson !!});
+            fbq('track', 'PageView');
+            @if(isset($landing) && $landing)
+                @php
+                    $lProduct = $landing->product ?? ($product ?? null);
+                @endphp
+                @if($lProduct)
+                fbq('track', 'ViewContent', {
+                    content_name: '{{ addslashes($lProduct->title ?? $landing->title) }}',
+                    content_ids: ['{{ $lProduct->id }}'],
+                    content_type: 'product',
+                    value: {{ (float) ($landing->discount_price ?? ($landing->regular_price ?? ($lProduct->sale_price ?? 0))) }},
+                    currency: 'BDT'
+                });
+                @endif
+            @endif
+        </script>
+        <noscript>
+            <img height="1" width="1" style="display:none"
+                 src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1"/>
+        </noscript>
+    @endif
 @endif
 
 <script>
@@ -81,7 +112,7 @@
         document.head.appendChild(g);
         @endif
 
-        @if($market && !empty($market->facebook_pixel_id))
+        @if(!empty($fbPixelId) && !str_contains($fbPixelId, '<script'))
         var t = document.createElement('script');
         t.async = true;
         t.src = 'https://connect.facebook.net/en_US/fbevents.js';

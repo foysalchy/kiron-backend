@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 // Partner & Referral Web Portal Routes
 Route::get('/_preview_card', [App\Http\Controllers\Frontend\FrontendController::class, 'previewCard'])->name('preview.card');
+Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('landing.direct.preview');
 
 Route::prefix('partner')->name('partner.')->group(function () {
     Route::get('/login', [PartnerPortalController::class, 'showLoginForm'])->name('login');
@@ -80,9 +81,7 @@ Route::domain('dorja.io')->group(function () {
 
 
 Route::middleware(SubdomainMiddleware::class)->group(function () {
-
-
-
+    Route::get('/landing-preview/{template_id?}', [LandingController::class, 'directPreview'])->name('landing.preview');
     Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
     Route::post('/landing-order/partial', [LandingController::class, 'partialSave'])->name('landing.order.partial');
     Route::get('/', [HomeController::class, 'index'])->name('home');
