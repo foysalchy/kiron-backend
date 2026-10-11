@@ -15,6 +15,7 @@
 
     $firstAvailableVariationIndex = null;
     $allVariationsOutOfStock = true;
+    $isMultipleAttribute = false;
     if ($mainProduct->type === 'variation') {
         foreach ($mainProduct->variations as $idx => $v) {
             $vOutOfStock = (
@@ -28,6 +29,19 @@
                 }
             }
         }
+
+        // Check if any attribute group associated with these variations is 'Multiple'
+        $variationIds = $mainProduct->variations->pluck('id')->filter()->toArray();
+        if (!empty($variationIds)) {
+            $isMultipleAttribute = \App\Models\AttributeGroup::withoutGlobalScopes()
+                ->whereIn('id', function($q) use ($variationIds) {
+                    $q->select('attribute_group_id')
+                      ->from('product_variation_attributes')
+                      ->whereIn('product_variation_id', $variationIds);
+                })
+                ->whereRaw('LOWER(category) = ?', ['multiple'])
+                ->exists();
+        }
     }
     $isEntirelyOutOfStock = $isSingleProduct ? $isSingleOutOfStock : $allVariationsOutOfStock;
 @endphp
@@ -39,6 +53,7 @@
         @csrf
         <input type="hidden" name="product_id" value="{{ $landing->product_id }}">
         <input type="hidden" name="landing_page_id" value="{{ $landing->id }}">
+        <input type="hidden" name="draft_order_id" id="draft-order-id" value="">
         <input type="hidden" name="qty" id="input-qty" value="1">
 
         @if ($mainProduct->type === 'variation')
@@ -55,8 +70,16 @@
 
         {{-- Product Selection Area --}}
         <div class="space-y-4 mb-10">
-            <label class="block text-lg font-bold mb-4 text-gray-800">পণ্যটি সিলেক্ট করুন <span
-                    class="text-red-500">*</span></label>
+            <div class="flex items-center justify-between">
+                <label class="block text-lg font-bold text-gray-800">
+                    পণ্যটি সিলেক্ট করুন <span class="text-red-500">*</span>
+                </label>
+                @if ($mainProduct->type === 'variation' && $isMultipleAttribute)
+                    <span class="text-xs font-bold text-[#14532d] bg-[#dcfce7] px-3 py-1 rounded-full border border-[#86efac]">
+                        একাধিক পণ্য সিলেক্ট করতে পারেন
+                    </span>
+                @endif
+            </div>
 
             @if ($mainProduct->type === 'variation')
                 @foreach ($mainProduct->variations as $index => $variation)
@@ -75,16 +98,38 @@
                             : 999999;
                     @endphp
                     <label class="relative {{ $vOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
-                        <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
-                            data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
-                            data-max-stock="{{ $maxStock }}"
-                            {{ $vOutOfStock ? 'disabled' : '' }}
-                            onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}', {{ $vOutOfStock ? 'true' : 'false' }}, {{ $maxStock }})"
-                            class="hidden peer">
+                        @if ($isMultipleAttribute)
+                            <input type="checkbox" name="variation_ids[]" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
+                                data-price="{{ $vSalePrice }}"
+                                data-name="{{ $variation->display_name }}"
+                                data-img="{{ $vImage }}"
+                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                data-max-stock="{{ $maxStock }}"
+                                {{ $vOutOfStock ? 'disabled' : '' }}
+                                onchange="onVariationCheckboxChange()"
+                                class="hidden peer variant-checkbox">
+                        @else
+                            <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
+                                data-price="{{ $vSalePrice }}"
+                                data-name="{{ $variation->display_name }}"
+                                data-img="{{ $vImage }}"
+                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                data-max-stock="{{ $maxStock }}"
+                                {{ $vOutOfStock ? 'disabled' : '' }}
+                                onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}', {{ $vOutOfStock ? 'true' : 'false' }}, {{ $maxStock }})"
+                                class="hidden peer">
+                        @endif
 
                         <div
                             class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all {{ !$vOutOfStock ? 'peer-checked:border-[#1f8a54] peer-checked:bg-green-50 hover:border-gray-300' : 'bg-gray-50 border-gray-200' }} bg-white">
                             <div class="flex items-center gap-4 w-full">
+                                @if ($isMultipleAttribute)
+                                    <div class="w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 peer-checked:border-[#1f8a54] peer-checked:bg-[#1f8a54] flex items-center justify-center transition-colors">
+                                        <svg class="w-3.5 h-3.5 text-white {{ $isChecked ? '' : 'hidden' }} checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
+                                    </div>
+                                @endif
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                                     <img src="{{ $vImage }}" width="64" height="64" class="w-full h-full object-contain"
                                         alt="PRODUCT">
@@ -336,42 +381,125 @@
     const CURRENCY = "{{ $setup->currency }}";
     let qty = 1;
     const isVarProduct = {{ $mainProduct->type === 'variation' ? 'true' : 'false' }};
+    const isMultipleAttribute = {{ ($mainProduct->type === 'variation' && $isMultipleAttribute) ? 'true' : 'false' }};
     const manageStockEnabled = {{ $mainProduct->manage_stock ? 'true' : 'false' }};
     let currentVariationOutOfStock = {{ $isEntirelyOutOfStock ? 'true' : 'false' }};
     let currentMaxStock = {{ ($isSingleProduct && $mainProduct->manage_stock && $mainProduct->available_stock !== null) ? $mainProduct->available_stock : 999999 }};
 
     document.addEventListener("DOMContentLoaded", function () {
         if (isVarProduct) {
-            const firstRadio = document.querySelector('input[name="variant_radio"]:checked') || document.querySelector('input[name="variant_radio"]');
-            if (firstRadio) firstRadio.dispatchEvent(new Event('change'));
+            if (isMultipleAttribute) {
+                onVariationCheckboxChange();
+            } else {
+                const firstRadio = document.querySelector('input[name="variant_radio"]:checked') || document.querySelector('input[name="variant_radio"]');
+                if (firstRadio) firstRadio.dispatchEvent(new Event('change'));
+            }
         } else {
             updateUI();
         }
     });
 
+    function onVariationCheckboxChange() {
+        const checkboxes = Array.from(document.querySelectorAll('.variant-checkbox'));
+        const checkedList = checkboxes.filter(cb => cb.checked);
+
+        // Update visual checkmark icons
+        checkboxes.forEach(cb => {
+            const label = cb.closest('label');
+            if (label) {
+                const icon = label.querySelector('.checkmark-icon');
+                if (icon) {
+                    if (cb.checked) {
+                        icon.classList.remove('hidden');
+                    } else {
+                        icon.classList.add('hidden');
+                    }
+                }
+            }
+        });
+
+        const selectedIds = checkedList.map(cb => cb.value);
+        const selectedIdInput = document.getElementById('selected-variation-id');
+        if (selectedIdInput) {
+            selectedIdInput.value = selectedIds.join(',');
+        }
+
+        if (checkedList.length === 0) {
+            UNIT_PRICE = 0;
+            const varLabel = document.getElementById('summary-variant-name');
+            if (varLabel) varLabel.innerText = "কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি";
+            currentVariationOutOfStock = false;
+            updateBtnState(false, true);
+            updateUI();
+            return;
+        }
+
+        // Sum prices of checked variations
+        let totalUnitPrice = 0;
+        let names = [];
+        let minStock = 999999;
+        let anyOutOfStock = false;
+
+        checkedList.forEach(cb => {
+            totalUnitPrice += parseFloat(cb.dataset.price) || 0;
+            names.push(cb.dataset.name);
+            const stock = parseInt(cb.dataset.maxStock) || 999999;
+            if (stock < minStock) minStock = stock;
+            if (cb.dataset.outOfStock === '1') anyOutOfStock = true;
+        });
+
+        UNIT_PRICE = totalUnitPrice;
+        currentMaxStock = minStock;
+        currentVariationOutOfStock = anyOutOfStock;
+
+        // Update image and names
+        const firstChecked = checkedList[0];
+        if (firstChecked && firstChecked.dataset.img) {
+            const summaryImg = document.getElementById('summary-img');
+            if (summaryImg) summaryImg.src = firstChecked.dataset.img;
+        }
+
+        const varLabel = document.getElementById('summary-variant-name');
+        if (varLabel) {
+            varLabel.innerText = "Option: " + names.join(', ');
+        }
+
+        updateBtnState(currentVariationOutOfStock, false);
+        updateUI();
+    }
+
+    function updateBtnState(isOutOfStock, isEmptySelection = false) {
+        const btn = document.getElementById('submit-order-btn');
+        if (!btn || isPreview) return;
+
+        if (isOutOfStock) {
+            btn.disabled = true;
+            btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
+            btn.innerHTML = '<span>স্টক আউট (পণ্যটি শেষ)</span>';
+        } else if (isEmptySelection) {
+            btn.disabled = true;
+            btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
+            btn.innerHTML = '<span>পণ্য নির্বাচন করুন</span>';
+        } else {
+            btn.disabled = false;
+            btn.className = "w-full bg-[#1f8a54] hover:bg-[#176840] cursor-pointer text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2";
+            btn.innerHTML = '<span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>' + CURRENCY;
+        }
+    }
+
     function updateVariation(id, price, name, img, isOutOfStock = false, maxStock = 999999) {
-        document.getElementById('selected-variation-id').value = id;
+        const selectedIdInput = document.getElementById('selected-variation-id');
+        if (selectedIdInput) selectedIdInput.value = id;
         UNIT_PRICE = parseFloat(price);
-        document.getElementById('summary-img').src = img;
+        const summaryImg = document.getElementById('summary-img');
+        if (summaryImg) summaryImg.src = img;
         const varLabel = document.getElementById('summary-variant-name');
         if (varLabel) varLabel.innerText = "Option: " + name;
 
         currentVariationOutOfStock = isOutOfStock;
         currentMaxStock = maxStock;
 
-        const btn = document.getElementById('submit-order-btn');
-        if (btn && !isPreview) {
-            if (isOutOfStock) {
-                btn.disabled = true;
-                btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
-                btn.innerHTML = '<span>স্টক আউট (পণ্যটি শেষ)</span>';
-            } else {
-                btn.disabled = false;
-                btn.className = "w-full bg-[#1f8a54] hover:bg-[#176840] cursor-pointer text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2";
-                btn.innerHTML = '<span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>' + CURRENCY;
-            }
-        }
-
+        updateBtnState(isOutOfStock, false);
         updateUI();
     }
 
@@ -426,6 +554,10 @@
 
         const elBtnTotal = document.getElementById('btn-total');
         if (elBtnTotal) elBtnTotal.innerText = totalFormatted;
+
+        if (typeof window.saveLandingDraft === 'function') {
+            window.saveLandingDraft();
+        }
     }
 
     const isPreview = {{ $isPreviewMode ? 'true' : 'false' }};
@@ -523,67 +655,91 @@
     }
 
     // Partial order draft save on phone number entry
+    let isSubmittingOrder = false;
+
     document.addEventListener('DOMContentLoaded', function () {
         const phoneInput = document.getElementById('phone');
         const nameInput = document.getElementById('name');
         const addressInput = document.getElementById('address');
         const form = document.getElementById('landing-order-form');
 
-        let lastSavedPhone = '';
+        let draftDebounceTimer = null;
 
-        function saveLandingDraft() {
-            if (!phoneInput || isPreview || currentVariationOutOfStock) return;
+        window.saveLandingDraft = function () {
+            if (!phoneInput || isPreview || currentVariationOutOfStock || isSubmittingOrder) return;
             const phone = phoneInput.value.trim();
-            if (phone.length >= 11 && phone !== lastSavedPhone) {
-                lastSavedPhone = phone;
+            if (phone.length < 11) return;
 
-                const tokenInput = form ? form.querySelector('input[name="_token"]') : null;
-                const token = tokenInput ? tokenInput.value : '';
+            const tokenInput = form ? form.querySelector('input[name="_token"]') : null;
+            const token = tokenInput ? tokenInput.value : '';
 
-                const productId = form.querySelector('input[name="product_id"]')?.value;
-                const landingPageId = form.querySelector('input[name="landing_page_id"]')?.value;
-                const qtyVal = document.getElementById('input-qty')?.value || 1;
-                const variationId = document.getElementById('selected-variation-id')?.value || null;
-                const shippingArea = form.querySelector('input[name="shipping_area"]:checked')?.value || form.querySelector('input[name="shipping_area"]')?.value || 'inside';
+            const productId = form ? form.querySelector('input[name="product_id"]')?.value : null;
+            const landingPageId = form ? form.querySelector('input[name="landing_page_id"]')?.value : null;
+            const draftOrderId = document.getElementById('draft-order-id')?.value || null;
+            const qtyVal = document.getElementById('input-qty')?.value || 1;
+            const variationId = document.getElementById('selected-variation-id')?.value || null;
+            const shippingArea = (form && form.querySelector('input[name="shipping_area"]:checked')?.value) 
+                || (form && form.querySelector('input[name="shipping_area"]')?.value) 
+                || 'inside';
 
-                fetch("{{ route('landing.order.partial') }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        phone: phone,
-                        name: nameInput ? nameInput.value.trim() : '',
-                        address: addressInput ? addressInput.value.trim() : '',
-                        product_id: productId,
-                        landing_page_id: landingPageId,
-                        qty: qtyVal,
-                        variation_id: variationId,
-                        shipping_area: shippingArea
-                    })
+            fetch("{{ route('landing.order.partial') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    phone: phone,
+                    name: nameInput ? nameInput.value.trim() : '',
+                    address: addressInput ? addressInput.value.trim() : '',
+                    product_id: productId,
+                    landing_page_id: landingPageId,
+                    draft_order_id: draftOrderId,
+                    qty: qtyVal,
+                    variation_id: variationId,
+                    shipping_area: shippingArea
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log("Landing draft order created. Order ID:", data.order_id);
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.order_id) {
+                    const draftInput = document.getElementById('draft-order-id');
+                    if (draftInput) {
+                        draftInput.value = data.order_id;
                     }
-                })
-                .catch(err => {
-                    console.log("Draft save failed:", err);
-                });
-            }
+                    console.log("Landing draft order synced. Order ID:", data.order_id);
+                }
+            })
+            .catch(err => {
+                console.log("Draft save failed:", err);
+            });
+        };
+
+        function scheduleDraftSave() {
+            clearTimeout(draftDebounceTimer);
+            draftDebounceTimer = setTimeout(window.saveLandingDraft, 500);
         }
 
         if (phoneInput) {
-            phoneInput.addEventListener('blur', saveLandingDraft);
-            phoneInput.addEventListener('change', saveLandingDraft);
+            phoneInput.addEventListener('blur', function () {
+                if (!isSubmittingOrder) window.saveLandingDraft();
+            });
+            phoneInput.addEventListener('change', function () {
+                if (!isSubmittingOrder) window.saveLandingDraft();
+            });
             phoneInput.addEventListener('input', function () {
                 if (this.value.trim().length >= 11) {
-                    saveLandingDraft();
+                    scheduleDraftSave();
                 }
             });
+        }
+
+        if (nameInput) {
+            nameInput.addEventListener('blur', scheduleDraftSave);
+        }
+        if (addressInput) {
+            addressInput.addEventListener('blur', scheduleDraftSave);
         }
     });
 
@@ -602,11 +758,12 @@
             }
             if (isVarProduct && !document.getElementById('selected-variation-id').value) {
                 e.preventDefault();
-                alert('দয়া করে একটি অপশন সিলেক্ট করুন!');
+                alert('দয়া করে পণ্য সিলেক্ট করুন!');
                 return false;
             }
 
             e.preventDefault();
+            isSubmittingOrder = true;
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
             if (submitBtn) {
@@ -672,6 +829,7 @@
                 showOrderErrorModal('সার্ভারে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
             })
             .finally(() => {
+                isSubmittingOrder = false;
                 if (submitBtn) {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnHtml;

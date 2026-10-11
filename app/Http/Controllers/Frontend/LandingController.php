@@ -99,6 +99,51 @@ class LandingController extends FrontendController
 
         return view('landing.landing' . $template_id, compact('landing', 'product', 'isPreview'));
     }
+
+    public function directPreview(Request $request, $template_id = 1)
+    {
+        $companyId = $this->company_id;
+
+        $product = Product::when($companyId, fn($q) => $q->where('company_id', $companyId))
+            ->where('status', Status::Active->value)
+            ->with(['variations'])
+            ->first()
+            ?? Product::with(['variations'])->first()
+            ?? new Product([
+                'title' => 'ডেমো প্রিমিয়াম প্রোডাক্ট',
+                'regular_price' => 1200,
+                'discount' => 350,
+                'type' => 'single',
+            ]);
+
+        $landing = new LandingPage([
+            'title' => $product->title ?? 'প্রিমিয়াম কোয়ালিটি অর্গানিক সজিনা পাতা গুঁড়া',
+            'template_id' => (int)$template_id,
+            'is_preview' => true,
+            'regular_price' => $product->regular_price ?? 1200,
+            'discount_price' => max(0, ($product->regular_price ?? 1200) - ($product->discount ?? 350)),
+        ]);
+
+        $setup = \App\Models\SiteSetting::when($companyId, fn($q) => $q->where('company_id', $companyId))
+            ->orWhereNull('company_id')
+            ->orderByRaw('company_id IS NULL ASC')
+            ->first() ?? new \App\Models\SiteSetting();
+
+        \Illuminate\Support\Facades\View::share('setup', $setup);
+        \Illuminate\Support\Facades\View::share('isPreview', true);
+
+        $socialLinks = \App\Models\SocialSetting::where('status', 1)->get();
+        \Illuminate\Support\Facades\View::share('socialLinks', $socialLinks);
+
+        $landing->setRelation('product', $product);
+
+        return view('landing.landing' . $template_id, [
+            'landing' => $landing,
+            'product' => $product,
+            'isPreview' => true,
+        ]);
+    }
+
     public function storeLandingOrder(Request $request)
     {
         $request->validate([
@@ -131,25 +176,30 @@ class LandingController extends FrontendController
             $unitPrice = 0;
             $warehouseId = null;
             $productId = $request->product_id;
-            $variationId = $request->variation_id;
+            $rawVariationId = $request->variation_id ?: $request->variation_ids;
+            $variationIds = [];
+            if (is_array($rawVariationId)) {
+                $variationIds = array_filter(array_map('trim', $rawVariationId));
+            } elseif (is_string($rawVariationId) || is_numeric($rawVariationId)) {
+                $variationIds = array_filter(explode(',', (string)$rawVariationId));
+            }
 
-            if ($variationId) {
-                $variation = ProductVariation::with('product')->findOrFail($variationId);
-                $product = $variation->product;
-                $unitPrice = $variation->regular_price - $variation->discount;
+            $orderItems = [];
+            $warehouseInfoList = [];
+            $primaryWarehouseId = null;
+            $totalItemAmount = 0;
+            $totalQuantity = 0;
 
-                // Manual out of stock check
-                if ($variation->stock_status === 'out_of_stock') {
-                    $stockMsg = 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।';
-                    if ($request->ajax() || $request->wantsJson()) {
-                        return response()->json(['success' => false, 'message' => $stockMsg], 422);
-                    }
-                    return back()->with('error', $stockMsg);
-                }
+            if (!empty($variationIds)) {
+                foreach ($variationIds as $vId) {
+                    $variation = ProductVariation::with('product')->findOrFail($vId);
+                    $product = $variation->product;
+                    $vUnitPrice = $variation->regular_price - $variation->discount;
+                    $itemQty = (int)$request->qty;
+                    $itemWarehouseId = null;
 
-                // If stock is managed, check quantity and warehouse stock
-                if ($product && $product->manage_stock) {
-                    if ($variation->available_stock < $request->qty) {
+                    // Manual out of stock check
+                    if ($variation->stock_status === 'out_of_stock') {
                         $stockMsg = 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।';
                         if ($request->ajax() || $request->wantsJson()) {
                             return response()->json(['success' => false, 'message' => $stockMsg], 422);
@@ -157,21 +207,62 @@ class LandingController extends FrontendController
                         return back()->with('error', $stockMsg);
                     }
 
-                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)
-                        ->where('quantity', '>=', $request->qty)
-                        ->first();
-                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
-                } else {
-                    // unmanaged: pick assigned warehouse if any, or company warehouse fallback
-                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)->first();
-                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
-                    if (!$warehouseId) {
-                        $warehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    // If stock is managed, check quantity and warehouse stock
+                    if ($product && $product->manage_stock) {
+                        if ($variation->available_stock < $itemQty) {
+                            $stockMsg = 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।';
+                            if ($request->ajax() || $request->wantsJson()) {
+                                return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                            }
+                            return back()->with('error', $stockMsg);
+                        }
+
+                        $vStock = ProductVariationStock::where('product_variation_id', $vId)
+                            ->where('quantity', '>=', $itemQty)
+                            ->first();
+                        $itemWarehouseId = $vStock ? $vStock->warehouse_id : null;
+                    } else {
+                        $vStock = ProductVariationStock::where('product_variation_id', $vId)->first();
+                        $itemWarehouseId = $vStock ? $vStock->warehouse_id : null;
+                        if (!$itemWarehouseId) {
+                            $itemWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                        }
                     }
+
+                    if (!$itemWarehouseId) {
+                        $stockMsg = 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।';
+                        if ($request->ajax() || $request->wantsJson()) {
+                            return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                        }
+                        return back()->with('error', $stockMsg);
+                    }
+
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = $itemWarehouseId;
+                    }
+
+                    $orderItems[] = [
+                        'product_id'   => $productId,
+                        'variation_id' => $vId,
+                        'quantity'     => $itemQty,
+                        'unit_price'   => $vUnitPrice,
+                    ];
+
+                    $warehouseInfoList[] = [
+                        'product_id'   => (int) $productId,
+                        'variation_id' => (int) $vId,
+                        'warehouse_id' => (int) $itemWarehouseId,
+                        'bin_id'       => null,
+                        'quantity'     => (int) $itemQty,
+                    ];
+
+                    $totalItemAmount += ($itemQty * $vUnitPrice);
+                    $totalQuantity += $itemQty;
                 }
             } else {
                 $product = Product::findOrFail($productId);
                 $unitPrice = $product->sale_price;
+                $itemQty = (int)$request->qty;
 
                 // Manual out of stock check
                 if ($product->stock_status === 'out_of_stock') {
@@ -184,7 +275,7 @@ class LandingController extends FrontendController
 
                 // If stock is managed, check quantity and warehouse stock
                 if ($product->manage_stock) {
-                    if ($product->available_stock < $request->qty) {
+                    if ($product->available_stock < $itemQty) {
                         $stockMsg = 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।';
                         if ($request->ajax() || $request->wantsJson()) {
                             return response()->json(['success' => false, 'message' => $stockMsg], 422);
@@ -194,27 +285,44 @@ class LandingController extends FrontendController
 
                     $pWarehouseInfo = $product->warehouse_info ?? [];
                     foreach ($pWarehouseInfo as $info) {
-                        if (($info['quantity'] ?? 0) >= $request->qty) {
-                            $warehouseId = $info['warehouse_id'];
+                        if (($info['quantity'] ?? 0) >= $itemQty) {
+                            $primaryWarehouseId = $info['warehouse_id'];
                             break;
                         }
                     }
                 } else {
-                    // unmanaged: pick assigned warehouse if any, or company warehouse fallback
                     $pWarehouseInfo = $product->warehouse_info ?? [];
-                    $warehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
-                    if (!$warehouseId) {
-                        $warehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    $primaryWarehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
                     }
                 }
-            }
 
-            if (!$warehouseId) {
-                $stockMsg = 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।';
-                if ($request->ajax() || $request->wantsJson()) {
-                    return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                if (!$primaryWarehouseId) {
+                    $stockMsg = 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।';
+                    if ($request->ajax() || $request->wantsJson()) {
+                        return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                    }
+                    return back()->with('error', $stockMsg);
                 }
-                return back()->with('error', $stockMsg);
+
+                $orderItems[] = [
+                    'product_id'   => $productId,
+                    'variation_id' => null,
+                    'quantity'     => $itemQty,
+                    'unit_price'   => $unitPrice,
+                ];
+
+                $warehouseInfoList[] = [
+                    'product_id'   => (int) $productId,
+                    'variation_id' => null,
+                    'warehouse_id' => (int) $primaryWarehouseId,
+                    'bin_id'       => null,
+                    'quantity'     => (int) $itemQty,
+                ];
+
+                $totalItemAmount = $itemQty * $unitPrice;
+                $totalQuantity = $itemQty;
             }
 
             $settings = DB::table('site_settings')->where('company_id', $this->company_id)->first();
@@ -230,14 +338,8 @@ class LandingController extends FrontendController
             $orderData = [
                 'type'             => Order::TYPE_LANDING,
                 'company_id'       => $this->company_id,
-                'warehouse_id'     => $warehouseId,
-                'warehouse_info'   => [[
-                    'product_id'   => (int) $productId,
-                    'variation_id' => $variationId ? (int)$variationId : null,
-                    'warehouse_id' => (int) $warehouseId,
-                    'bin_id'       => null,
-                    'quantity'     => (int) $request->qty,
-                ]],
+                'warehouse_id'     => $primaryWarehouseId,
+                'warehouse_info'   => $warehouseInfoList,
                 'customer_id'      => $customer->id,
                 'order_date'       => now(),
                 'other_charges'    => $shippingCost,
@@ -246,60 +348,56 @@ class LandingController extends FrontendController
                     'phone'   => $request->phone,
                     'address' => $request->address,
                 ],
-                'items' => [
-                    [
-                        'product_id'   => $productId,
-                        'variation_id' => $variationId,
-                        'quantity'     => $request->qty,
-                        'unit_price'   => $unitPrice,
-                    ]
-                ],
-                'status' => Status::Pending->value,
+                'items'            => $orderItems,
+                'status'           => Status::Pending->value,
             ];
 
-            $draftId = session()->get('current_landing_draft_order_id');
+            // Strict customer match: only update draft belonging to this specific customer
             $draftOrder = null;
-            if ($draftId) {
-                $draftOrder = Order::where('id', $draftId)->where('status', Status::Draft->value)->first();
-            }
-            if (!$draftOrder && $customer) {
-                $draftOrder = Order::where('company_id', $this->company_id)
-                    ->where('customer_id', $customer->id)
-                    ->where('status', Status::Draft->value)
-                    ->latest()
-                    ->first();
+            if ($customer) {
+                $draftId = $request->draft_order_id ?: session()->get('current_landing_draft_order_id');
+                if ($draftId) {
+                    $draftOrder = Order::where('id', $draftId)
+                        ->where('customer_id', $customer->id)
+                        ->where('status', Status::Draft->value)
+                        ->first();
+                }
+                if (!$draftOrder) {
+                    $draftOrder = Order::where('customer_id', $customer->id)
+                        ->where('type', Order::TYPE_LANDING)
+                        ->where('status', Status::Draft->value)
+                        ->latest()
+                        ->first();
+                }
             }
 
             if ($draftOrder) {
                 // Confirm the existing partial/draft order
-                $itemTotal = round((int)$request->qty * (float)$unitPrice, 2);
+                $itemTotal = round((float)$totalItemAmount, 2);
                 $grandTotal = round($itemTotal + (float)$shippingCost, 2);
 
                 $draftOrder->orderDetails()->delete();
-                \App\Models\OrderDetail::create([
-                    'order_id'      => $draftOrder->id,
-                    'product_id'    => $productId,
-                    'variation_id'  => $variationId,
-                    'quantity'      => (int)$request->qty,
-                    'unit_price'    => $unitPrice,
-                    'discount'      => 0,
-                    'tax_group_id'  => null,
-                    'tax'           => 0,
-                    'total'         => $itemTotal,
-                ]);
+                foreach ($orderItems as $item) {
+                    $lineTotal = round((int)$item['quantity'] * (float)$item['unit_price'], 2);
+                    \App\Models\OrderDetail::create([
+                        'order_id'      => $draftOrder->id,
+                        'product_id'    => $item['product_id'],
+                        'variation_id'  => $item['variation_id'],
+                        'quantity'      => (int)$item['quantity'],
+                        'unit_price'    => $item['unit_price'],
+                        'discount'      => 0,
+                        'tax_group_id'  => null,
+                        'tax'           => 0,
+                        'total'         => $lineTotal,
+                    ]);
+                }
 
                 $draftOrder->update([
-                    'warehouse_id'     => $warehouseId,
-                    'warehouse_info'   => [[
-                        'product_id'   => (int) $productId,
-                        'variation_id' => $variationId ? (int)$variationId : null,
-                        'warehouse_id' => (int) $warehouseId,
-                        'bin_id'       => null,
-                        'quantity'     => (int) $request->qty,
-                    ]],
+                    'warehouse_id'     => $primaryWarehouseId,
+                    'warehouse_info'   => $warehouseInfoList,
                     'customer_id'      => $customer->id,
                     'order_date'       => now(),
-                    'total_quantities' => (int) $request->qty,
+                    'total_quantities' => (int) $totalQuantity,
                     'subtotal'         => $itemTotal,
                     'other_charges'    => $shippingCost,
                     'grand_total'      => $grandTotal,
@@ -315,21 +413,23 @@ class LandingController extends FrontendController
                 $productService = app(\App\Services\ProductService::class);
                 $productObj = Product::find($productId);
                 if ($productObj && $productObj->manage_stock) {
-                    $stockData = [
-                        'warehouse_id'     => $warehouseId,
-                        'bin_id'           => null,
-                        'quantity'         => (int) $request->qty,
-                        'batch_number'     => null,
-                        'serial_numbers'   => null,
-                        'transaction_type' => 'sale',
-                        'reference_type'   => 'LandingOrder',
-                        'reference_id'     => $draftOrder->id,
-                        'notes'            => "Stock deducted for order: {$draftOrder->order_no}"
-                    ];
-                    if ($variationId) {
-                        $stockData['variation_id'] = $variationId;
+                    foreach ($warehouseInfoList as $wInfo) {
+                        $stockData = [
+                            'warehouse_id'     => $wInfo['warehouse_id'],
+                            'bin_id'           => null,
+                            'quantity'         => (int) $wInfo['quantity'],
+                            'batch_number'     => null,
+                            'serial_numbers'   => null,
+                            'transaction_type' => 'sale',
+                            'reference_type'   => 'LandingOrder',
+                            'reference_id'     => $draftOrder->id,
+                            'notes'            => "Stock deducted for order: {$draftOrder->order_no}"
+                        ];
+                        if (!empty($wInfo['variation_id'])) {
+                            $stockData['variation_id'] = $wInfo['variation_id'];
+                        }
+                        $productService->removeStockFromWarehouse($productId, $stockData);
                     }
-                    $productService->removeStockFromWarehouse($productId, $stockData);
                 }
 
                 $order = $draftOrder;
@@ -395,41 +495,79 @@ class LandingController extends FrontendController
                 ]
             );
 
-            $unitPrice = 0;
-            $warehouseId = null;
             $productId = $request->product_id;
-            $variationId = $request->variation_id;
+            $rawVariationId = $request->variation_id ?: $request->variation_ids;
+            $variationIds = [];
+            if (is_array($rawVariationId)) {
+                $variationIds = array_filter(array_map('trim', $rawVariationId));
+            } elseif (is_string($rawVariationId) || is_numeric($rawVariationId)) {
+                $variationIds = array_filter(explode(',', (string)$rawVariationId));
+            }
 
             $qty = max(1, (int) ($request->qty ?? 1));
+            $orderItems = [];
+            $warehouseInfoList = [];
+            $primaryWarehouseId = null;
+            $totalItemAmount = 0;
+            $totalQuantity = 0;
 
-            if ($variationId) {
-                $variation = ProductVariation::with('product')->find($variationId);
-                if (!$variation) {
-                    return response()->json(['success' => false, 'message' => 'Variation not found'], 404);
-                }
-                $product = $variation->product;
-                $unitPrice = $variation->regular_price - $variation->discount;
+            if (!empty($variationIds)) {
+                foreach ($variationIds as $vId) {
+                    $variation = ProductVariation::with('product')->find($vId);
+                    if (!$variation) {
+                        return response()->json(['success' => false, 'message' => 'Variation not found'], 404);
+                    }
+                    $product = $variation->product;
+                    $vUnitPrice = $variation->regular_price - $variation->discount;
+                    $itemWarehouseId = null;
 
-                // Manual out of stock check
-                if ($variation->stock_status === 'out_of_stock') {
-                    return response()->json(['success' => false, 'message' => 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।'], 422);
-                }
-
-                if ($product && $product->manage_stock) {
-                    if ($variation->available_stock < $qty) {
+                    // Manual out of stock check
+                    if ($variation->stock_status === 'out_of_stock') {
                         return response()->json(['success' => false, 'message' => 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।'], 422);
                     }
 
-                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)
-                        ->where('quantity', '>=', $qty)
-                        ->first();
-                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
-                } else {
-                    $vStock = ProductVariationStock::where('product_variation_id', $variationId)->first();
-                    $warehouseId = $vStock ? $vStock->warehouse_id : null;
-                    if (!$warehouseId) {
-                        $warehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    if ($product && $product->manage_stock) {
+                        if ($variation->available_stock < $qty) {
+                            return response()->json(['success' => false, 'message' => 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।'], 422);
+                        }
+
+                        $vStock = ProductVariationStock::where('product_variation_id', $vId)
+                            ->where('quantity', '>=', $qty)
+                            ->first();
+                        $itemWarehouseId = $vStock ? $vStock->warehouse_id : null;
+                    } else {
+                        $vStock = ProductVariationStock::where('product_variation_id', $vId)->first();
+                        $itemWarehouseId = $vStock ? $vStock->warehouse_id : null;
+                        if (!$itemWarehouseId) {
+                            $itemWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                        }
                     }
+
+                    if (!$itemWarehouseId) {
+                        return response()->json(['success' => false, 'message' => 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।'], 422);
+                    }
+
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = $itemWarehouseId;
+                    }
+
+                    $orderItems[] = [
+                        'product_id'   => $productId,
+                        'variation_id' => $vId,
+                        'quantity'     => $qty,
+                        'unit_price'   => $vUnitPrice,
+                    ];
+
+                    $warehouseInfoList[] = [
+                        'product_id'   => (int) $productId,
+                        'variation_id' => (int) $vId,
+                        'warehouse_id' => (int) $itemWarehouseId,
+                        'bin_id'       => null,
+                        'quantity'     => (int) $qty,
+                    ];
+
+                    $totalItemAmount += ($qty * $vUnitPrice);
+                    $totalQuantity += $qty;
                 }
             } else {
                 $product = Product::find($productId);
@@ -451,21 +589,39 @@ class LandingController extends FrontendController
                     $pWarehouseInfo = $product->warehouse_info ?? [];
                     foreach ($pWarehouseInfo as $info) {
                         if (($info['quantity'] ?? 0) >= $qty) {
-                            $warehouseId = $info['warehouse_id'];
+                            $primaryWarehouseId = $info['warehouse_id'];
                             break;
                         }
                     }
                 } else {
                     $pWarehouseInfo = $product->warehouse_info ?? [];
-                    $warehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
-                    if (!$warehouseId) {
-                        $warehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    $primaryWarehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
                     }
                 }
-            }
 
-            if (!$warehouseId) {
-                return response()->json(['success' => false, 'message' => 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।'], 422);
+                if (!$primaryWarehouseId) {
+                    return response()->json(['success' => false, 'message' => 'দুঃখিত! এই পণ্যটি বর্তমানে স্টকে নেই।'], 422);
+                }
+
+                $orderItems[] = [
+                    'product_id'   => $productId,
+                    'variation_id' => null,
+                    'quantity'     => (int) $qty,
+                    'unit_price'   => $unitPrice,
+                ];
+
+                $warehouseInfoList[] = [
+                    'product_id'   => (int) $productId,
+                    'variation_id' => null,
+                    'warehouse_id' => (int) $primaryWarehouseId,
+                    'bin_id'       => null,
+                    'quantity'     => (int) $qty,
+                ];
+
+                $totalItemAmount = $qty * $unitPrice;
+                $totalQuantity = $qty;
             }
 
             $settings = DB::table('site_settings')->where('company_id', $this->company_id)->first();
@@ -478,47 +634,84 @@ class LandingController extends FrontendController
                 $shippingCost = 0;
             }
 
-            // Remove previous draft if any
-            $oldDraftId = session()->get('current_landing_draft_order_id');
-            if ($oldDraftId) {
-                $oldDraft = Order::where('id', $oldDraftId)->where('status', Status::Draft->value)->first();
-                if ($oldDraft) {
-                    $oldDraft->orderDetails()->delete();
-                    $oldDraft->delete();
-                }
+            // Strict customer match: only find and update draft belonging to THIS customer
+            $draftOrder = null;
+            $draftId = $request->draft_order_id ?: session()->get('current_landing_draft_order_id');
+            if ($draftId) {
+                $draftOrder = Order::where('id', $draftId)
+                    ->where('customer_id', $customer->id)
+                    ->where('status', Status::Draft->value)
+                    ->first();
+            }
+            if (!$draftOrder) {
+                $draftOrder = Order::where('customer_id', $customer->id)
+                    ->where('type', Order::TYPE_LANDING)
+                    ->where('status', Status::Draft->value)
+                    ->latest()
+                    ->first();
             }
 
-            $orderData = [
-                'type'             => Order::TYPE_LANDING,
-                'company_id'       => $this->company_id,
-                'warehouse_id'     => $warehouseId,
-                'warehouse_info'   => [[
-                    'product_id'   => (int) $productId,
-                    'variation_id' => $variationId ? (int)$variationId : null,
-                    'warehouse_id' => (int) $warehouseId,
-                    'bin_id'       => null,
-                    'quantity'     => (int) ($request->qty ?? 1),
-                ]],
-                'customer_id'      => $customer->id,
-                'order_date'       => now(),
-                'other_charges'    => $shippingCost,
-                'shipping_address' => [
-                    'name'    => $request->name ?: $customer->name,
-                    'phone'   => $request->phone,
-                    'address' => $request->address ?: 'N/A',
-                ],
-                'items' => [
-                    [
-                        'product_id'   => $productId,
-                        'variation_id' => $variationId,
-                        'quantity'     => (int) ($request->qty ?? 1),
-                        'unit_price'   => $unitPrice,
-                    ]
-                ],
-                'status' => Status::Draft->value,
-            ];
+            $itemTotal = round((float)$totalItemAmount, 2);
+            $grandTotal = round($itemTotal + (float)$shippingCost, 2);
 
-            $order = $this->orderService->createLandingOrder($orderData);
+            if ($draftOrder) {
+                // UPDATE existing draft - NO NEW ORDER CREATED!
+                $draftOrder->orderDetails()->delete();
+                foreach ($orderItems as $item) {
+                    $lineTotal = round((int)$item['quantity'] * (float)$item['unit_price'], 2);
+                    \App\Models\OrderDetail::create([
+                        'order_id'      => $draftOrder->id,
+                        'product_id'    => $item['product_id'],
+                        'variation_id'  => $item['variation_id'],
+                        'quantity'      => (int)$item['quantity'],
+                        'unit_price'    => $item['unit_price'],
+                        'discount'      => 0,
+                        'tax_group_id'  => null,
+                        'tax'           => 0,
+                        'total'         => $lineTotal,
+                    ]);
+                }
+
+                $draftOrder->update([
+                    'warehouse_id'     => $primaryWarehouseId,
+                    'warehouse_info'   => $warehouseInfoList,
+                    'customer_id'      => $customer->id,
+                    'order_date'       => now(),
+                    'total_quantities' => (int) $totalQuantity,
+                    'subtotal'         => $itemTotal,
+                    'other_charges'    => $shippingCost,
+                    'grand_total'      => $grandTotal,
+                    'shipping_address' => [
+                        'name'    => $request->name ?: $customer->name,
+                        'phone'   => $request->phone,
+                        'address' => $request->address ?: 'N/A',
+                    ],
+                    'status'           => Status::Draft->value,
+                ]);
+
+                $order = $draftOrder;
+            } else {
+                // Only create if NO draft exists yet for this customer
+                $orderData = [
+                    'type'             => Order::TYPE_LANDING,
+                    'company_id'       => $this->company_id,
+                    'warehouse_id'     => $primaryWarehouseId,
+                    'warehouse_info'   => $warehouseInfoList,
+                    'customer_id'      => $customer->id,
+                    'order_date'       => now(),
+                    'other_charges'    => $shippingCost,
+                    'shipping_address' => [
+                        'name'    => $request->name ?: $customer->name,
+                        'phone'   => $request->phone,
+                        'address' => $request->address ?: 'N/A',
+                    ],
+                    'items'            => $orderItems,
+                    'status'           => Status::Draft->value,
+                ];
+
+                $order = $this->orderService->createLandingOrder($orderData);
+            }
+
             session()->put('current_landing_draft_order_id', $order->id);
 
             DB::commit();
