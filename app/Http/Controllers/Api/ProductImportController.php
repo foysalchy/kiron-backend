@@ -163,12 +163,19 @@ class ProductImportController extends Controller
                     }
                 }
 
-                $megaCatIds = $row['mega_category_ids'] ?? null;
+                $rawMegaCatIds = $row['mega_category_ids'] ?? null;
+                $megaCatIds = null;
+                if (!empty($rawMegaCatIds)) {
+                    $megaCatIds = is_array($rawMegaCatIds) 
+                        ? array_values(array_filter(array_map('intval', $rawMegaCatIds)))
+                        : [intval($rawMegaCatIds)];
+                }
+
                 $isCategoryMissing = false;
-                if (!$megaCatIds && $megaCatSlug) {
+                if (empty($megaCatIds) && $megaCatSlug) {
                     $megaCat = MegaCategory::where('slug', $megaCatSlug)->orWhere('name', $megaCatSlug)->first();
                     if ($megaCat) {
-                        $megaCatIds = [$megaCat->id];
+                        $megaCatIds = [(int)$megaCat->id];
                     } else {
                         $isCategoryMissing = true;
                     }
@@ -197,6 +204,64 @@ class ProductImportController extends Controller
 
                 // Determine if this is a child variation (has parent SKU) or a parent variation
                 $isChildVariation = ($type === 'variation' && !empty($parentSku));
+
+                // Attribute validation for child variation
+                $isAttributeMissing = false;
+                $missingAttributeDetails = [];
+                $missingAttributes = [];
+                $validAttributePairs = [];
+
+                if ($isChildVariation) {
+                    if (empty($attributesStr)) {
+                        $isAttributeMissing = true;
+                        $missingAttributeDetails[] = "Attributes are required for variation rows.";
+                    } else {
+                        $attrPairs = explode(',', $attributesStr);
+                        foreach ($attrPairs as $pair) {
+                            $parts = explode(':', $pair);
+                            if (count($parts) === 2) {
+                                $groupName = trim($parts[0]);
+                                $valueName = trim($parts[1]);
+
+                                $group = \App\Models\AttributeGroup::where('name', $groupName)->first();
+                                if (!$group) {
+                                    $isAttributeMissing = true;
+                                    $missingAttributeDetails[] = "Attribute group '$groupName' not found.";
+                                    $missingAttributes[] = [
+                                        'group' => $groupName,
+                                        'value' => $valueName,
+                                        'group_exists' => false,
+                                        'group_id' => null,
+                                    ];
+                                } else {
+                                    $value = \App\Models\AttributeValue::where('attribute_group_id', $group->id)
+                                        ->where('name', $valueName)
+                                        ->first();
+                                    if (!$value) {
+                                        $isAttributeMissing = true;
+                                        $missingAttributeDetails[] = "Attribute value '$valueName' not found under '$groupName'.";
+                                        $missingAttributes[] = [
+                                            'group' => $groupName,
+                                            'value' => $valueName,
+                                            'group_exists' => true,
+                                            'group_id' => $group->id,
+                                        ];
+                                    } else {
+                                        $validAttributePairs[] = [
+                                            'group_id' => $group->id,
+                                            'value_id' => $value->id,
+                                            'group_name' => $groupName,
+                                            'value_name' => $valueName,
+                                        ];
+                                    }
+                                }
+                            } else {
+                                $isAttributeMissing = true;
+                                $missingAttributeDetails[] = "Invalid attribute format: '$pair'. Expected format: 'Group:Value'.";
+                            }
+                        }
+                    }
+                }
                 
                 if ($isChildVariation) {
                     // This is a child variation
@@ -206,6 +271,13 @@ class ProductImportController extends Controller
                     if (!$parentId) {
                         $skipped++;
                         $errors[] = "Row $index: Parent SKU ($parentSku) not found for variation.";
+                        continue;
+                    }
+
+                    // If attributes are missing or invalid, skip this variation row during actual import
+                    if (!$isPreview && $isAttributeMissing) {
+                        $skipped++;
+                        $errors[] = "Row $index: Variation skipped because attribute group/value is missing (" . implode(', ', $missingAttributeDetails) . ").";
                         continue;
                     }
 
@@ -245,31 +317,13 @@ class ProductImportController extends Controller
                             ]);
                         }
 
-                        // Basic Attribute Parsing (e.g. Size:M, Color:Red)
-                        if (!empty($attributesStr)) {
-                            $attrPairs = explode(',', $attributesStr);
-                            foreach ($attrPairs as $pair) {
-                                $parts = explode(':', $pair);
-                                if (count($parts) === 2) {
-                                    $groupName = trim($parts[0]);
-                                    $valueName = trim($parts[1]);
-                                    
-                                    $group = \App\Models\AttributeGroup::where('name', $groupName)->first();
-                                    if ($group) {
-                                        $value = \App\Models\AttributeValue::where('attribute_group_id', $group->id)
-                                            ->where('name', $valueName)
-                                            ->first();
-                                            
-                                        if ($value) {
-                                            \App\Models\ProductVariationAttribute::create([
-                                                'product_variation_id' => $variation->id,
-                                                'attribute_group_id' => $group->id,
-                                                'attribute_value_id' => $value->id,
-                                            ]);
-                                        }
-                                    }
-                                }
-                            }
+                        // Attach verified attributes
+                        foreach ($validAttributePairs as $vPair) {
+                            \App\Models\ProductVariationAttribute::create([
+                                'product_variation_id' => $variation->id,
+                                'attribute_group_id' => $vPair['group_id'],
+                                'attribute_value_id' => $vPair['value_id'],
+                            ]);
                         }
                     }
                 } else {
@@ -284,7 +338,7 @@ class ProductImportController extends Controller
                             'type' => $actualType,
                             'product_type' => 'finished',
                             'brand_id' => $brandId,
-                            'mega_category_ids' => collect($megaCatIds)->toJson(),
+                            'mega_category_ids' => $megaCatIds ?: [],
                             'regular_price' => $regularPrice,
                             'discount' => $discount,
                             'discount_type' => $discountType,
@@ -335,6 +389,7 @@ class ProductImportController extends Controller
                         'sku' => $sku,
                         'type' => $type,
                         'parentSku' => $parentSku,
+                        'is_child_variation' => $isChildVariation,
                         'price' => $regularPrice,
                         'stock' => $stockQuantity,
                         'manage_stock' => $manageStock,
@@ -344,6 +399,9 @@ class ProductImportController extends Controller
                         'is_category_missing' => $isCategoryMissing,
                         'is_warehouse_missing' => $isWarehouseMissing,
                         'is_image_missing' => $isImageMissing,
+                        'is_attribute_missing' => $isAttributeMissing,
+                        'missing_attribute_details' => $missingAttributeDetails,
+                        'missing_attributes' => $missingAttributes,
                         
                         // Raw data (what the user typed)
                         'raw_brand' => $brandSlug,
