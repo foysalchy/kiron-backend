@@ -35,6 +35,10 @@
             $luminance = 0.2126 * $linearRgb[0] + 0.7152 * $linearRgb[1] + 0.0722 * $linearRgb[2];
             $orderButtonTextColor = $luminance > 0.179 ? '#18130F' : '#FFFFFF';
         }
+
+        $currencyMap = ['$' => 'USD', '৳' => 'BDT', 'tk' => 'BDT', 'TK' => 'BDT', 'Tk' => 'BDT', 'টাকা' => 'BDT', '€' => 'EUR', '£' => 'GBP'];
+        $rawCurrency = trim($setup->currency ?? '');
+        $currencyCode = $currencyMap[$rawCurrency] ?? (preg_match('/^[A-Za-z]{3}$/', $rawCurrency) ? strtoupper($rawCurrency) : 'BDT');
     @endphp
 
     <!-- ============ FOOD DETAILS ============ -->
@@ -295,12 +299,7 @@
             }
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
-              }
-        }
-              });
 
-        updatePriceDisplay(totalSale, totalRegular);
-        }
         function updateGalleryThumbnails(images) {
             const container = document.getElementById('thumbnail-container');
             const leftArrow = document.getElementById('thumb-arrow-left');
@@ -326,10 +325,6 @@
 
             container.classList.toggle('px-8', showArrows);
             container.classList.toggle('md:px-10', showArrows);
-        }
-
-              }
-        renderAttributes();
         }
 
         function updatePriceDisplay(salePrice, regularPrice) {
@@ -575,15 +570,15 @@
                                 content_ids: ['{{ $product->id }}'],
                                 content_type: 'product',
                                 value: {{ $product->sale_price ?? 0 }} * qty,
-                                currency: '{{ $setup->currency ?? "BDT" }}'
+                                currency: '{{ $currencyCode }}'
                             });
                         }
-                        if (typeof ttq === 'function') {
+                        if (typeof ttq === 'object' && typeof ttq.track === 'function') {
                             ttq.track('AddToCart', {
                                 content_id: '{{ $product->id }}',
                                 content_type: 'product',
                                 value: {{ $product->sale_price ?? 0 }} * qty,
-                                currency: '{{ $setup->currency ?? "BDT" }}'
+                                currency: '{{ $currencyCode }}'
                             });
                         }
 

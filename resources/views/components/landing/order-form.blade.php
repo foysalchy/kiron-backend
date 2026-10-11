@@ -5,41 +5,37 @@
     $insideCharge = $isFree == 1 ? 0 : ($setup->inside_charge ?? 60);
     $outsideCharge = $isFree == 1 ? 0 : ($setup->outside_charge ?? 100);
     $isPreviewMode = !empty($isPreview) || request()->is('*landing/preview*') || !empty($landing->is_preview);
+
+    $isSingleProduct = $mainProduct->type === 'single';
+    // stock check only if manage_stock is true or stock_status is out_of_stock
+    $isSingleOutOfStock = $isSingleProduct && (
+        $mainProduct->stock_status === 'out_of_stock' || 
+        ($mainProduct->manage_stock && ($mainProduct->available_stock <= 0))
+    );
+
+    $firstAvailableVariationIndex = null;
+    $allVariationsOutOfStock = true;
+    if ($mainProduct->type === 'variation') {
+        foreach ($mainProduct->variations as $idx => $v) {
+            $vOutOfStock = (
+                $v->stock_status === 'out_of_stock' ||
+                ($mainProduct->manage_stock && ($v->available_stock <= 0))
+            );
+            if (!$vOutOfStock) {
+                $allVariationsOutOfStock = false;
+                if ($firstAvailableVariationIndex === null) {
+                    $firstAvailableVariationIndex = $idx;
+                }
+            }
+        }
+    }
+    $isEntirelyOutOfStock = $isSingleProduct ? $isSingleOutOfStock : $allVariationsOutOfStock;
 @endphp
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
     <form @if($isPreviewMode) action="javascript:void(0);" onsubmit="event.preventDefault(); showPreviewAlert(); return false;" @else action="{{ route('landing.order.store') }}" method="POST" @endif id="landing-order-form">
-        {{-- Success & Error Messages --}}
-        @if(session('success'))
-            <div
-                class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-r-lg shadow-sm flex items-center gap-3">
-                <svg aria-hidden="true" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m8 12 2.5 2.5L16 9"></path>
-                </svg>
-                <div>
-                    <p class="font-bold">সফল হয়েছে!</p>
-                    <p class="text-sm">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
 
-        @if(session('error'))
-            <div
-                class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-lg shadow-sm flex items-center gap-3">
-                <svg aria-hidden="true" class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 9v4m0 4h.01M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z">
-                    </path>
-                </svg>
-                <div>
-                    <p class="font-bold">দুঃখিত!</p>
-                    <p class="text-sm">{{ session('error') }}</p>
-                </div>
-            </div>
-        @endif
+
         @csrf
         <input type="hidden" name="product_id" value="{{ $landing->product_id }}">
         <input type="hidden" name="landing_page_id" value="{{ $landing->id }}">
@@ -67,23 +63,41 @@
                     @php
                         $vSalePrice = $variation->regular_price - $variation->discount;
                         $vImage = $variation->image_url ?? $mainProduct->thumbnail_url ?? asset('images/template1/frontend/default.webp');
+                        $vOutOfStock = (
+                            $variation->stock_status === 'out_of_stock' ||
+                            ($mainProduct->manage_stock && ($variation->available_stock <= 0))
+                        );
+                        $isChecked = ($firstAvailableVariationIndex !== null)
+                            ? ($index === $firstAvailableVariationIndex)
+                            : ($index === 0);
+                        $maxStock = $mainProduct->manage_stock
+                            ? ($variation->available_stock ?? 0)
+                            : 999999;
                     @endphp
-                    <label class="relative cursor-pointer block">
-                        <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $index === 0 ? 'checked' : '' }}
-                            onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}')"
+                    <label class="relative {{ $vOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
+                        <input type="radio" name="variant_radio" value="{{ $variation->id }}" {{ $isChecked ? 'checked' : '' }}
+                            data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                            data-max-stock="{{ $maxStock }}"
+                            {{ $vOutOfStock ? 'disabled' : '' }}
+                            onchange="updateVariation('{{ $variation->id }}', {{ $vSalePrice }}, '{{ $variation->display_name }}', '{{ $vImage }}', {{ $vOutOfStock ? 'true' : 'false' }}, {{ $maxStock }})"
                             class="hidden peer">
 
                         <div
-                            class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all peer-checked:border-[#1f8a54] peer-checked:bg-green-50 bg-white hover:border-gray-300">
+                            class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all {{ !$vOutOfStock ? 'peer-checked:border-[#1f8a54] peer-checked:bg-green-50 hover:border-gray-300' : 'bg-gray-50 border-gray-200' }} bg-white">
                             <div class="flex items-center gap-4 w-full">
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                                     <img src="{{ $vImage }}" width="64" height="64" class="w-full h-full object-contain"
-                                        alt="PTOFUVT">
+                                        alt="PRODUCT">
                                 </div>
                                 <div class="flex-grow text-left">
                                     <p class="text-sm md:text-md font-bold text-gray-800">{{ $mainProduct->title }}</p>
-                                    <p class="text-xs text-[#145a32] font-bold uppercase mt-1">Option:
-                                        {{ $variation->display_name }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <p class="text-xs text-[#145a32] font-bold uppercase">Option:
+                                            {{ $variation->display_name }}</p>
+                                        @if($vOutOfStock)
+                                            <span class="bg-red-100 text-red-600 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">স্টক আউট</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                             <div class="flex items-center gap-4 flex-shrink-0">
@@ -95,7 +109,7 @@
                 @endforeach
             @else
                 <div
-                    class="border-2 border-[#1f8a54] bg-green-50 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                    class="border-2 {{ $isSingleOutOfStock ? 'border-red-300 bg-red-50/50' : 'border-[#1f8a54] bg-green-50' }} rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4 w-full">
                         <div class="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
                             <img src="{{ $landing->product->thumbnail_url ?? asset('images/default.webp') }}" width="64"
@@ -103,6 +117,9 @@
                         </div>
                         <div class="text-left">
                             <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
+                            @if($isSingleOutOfStock)
+                                <span class="inline-block mt-1 bg-red-100 text-red-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)</span>
+                            @endif
                         </div>
                     </div>
                     <span
@@ -232,14 +249,65 @@
                     </div>
 
                     <button type="{{ $isPreviewMode ? 'button' : 'submit' }}"
+                        id="submit-order-btn"
+                        {{ $isEntirelyOutOfStock ? 'disabled' : '' }}
                         @if($isPreviewMode) onclick="showPreviewAlert()" @endif
-                        class="w-full bg-[#1f8a54] hover:bg-[#176840] text-white font-bold py-5 rounded-xl text-2xl cursor-pointer active:translate-y-1 transition-all flex items-center justify-center gap-2">
-                        অর্ডার করুন <span id="btn-total"></span>{{ $setup->currency }}
+                        class="w-full {{ $isEntirelyOutOfStock ? 'bg-gray-400 cursor-not-allowed opacity-75' : 'bg-[#1f8a54] hover:bg-[#176840] cursor-pointer' }} text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2">
+                        @if($isEntirelyOutOfStock)
+                            <span>স্টক আউট (পণ্যটি শেষ)</span>
+                        @else
+                            <span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>{{ $setup->currency }}
+                        @endif
                     </button>
                 </div>
             </div>
         </div>
     </form>
+</div>
+
+{{-- Order Error Modal --}}
+<div id="order-error-modal" class="fixed inset-0 z-[999999] {{ session('error') ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-xs p-4" onclick="if(event.target === this) closeOrderErrorModal()">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
+        <!-- Icon -->
+        <div class="w-16 h-16 mx-auto mb-4 bg-red-100 text-red-600 rounded-full flex items-center justify-center shadow-inner">
+            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 7.5h.008v.008H12v-.008z" />
+            </svg>
+        </div>
+        <!-- Title -->
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">দুঃখিত! অর্ডার সম্পন্ন হয়নি</h3>
+        <!-- Error message -->
+        <div id="order-error-modal-message" class="bg-red-50 text-red-700 text-sm md:text-base font-medium rounded-xl p-3.5 mb-6 border border-red-200/60 leading-relaxed">
+            {{ session('error') ?? 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে।' }}
+        </div>
+        <!-- Action Button -->
+        <button type="button" onclick="closeOrderErrorModal()" class="w-full py-3.5 px-6 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98">
+            আবার চেষ্টা করুন
+        </button>
+    </div>
+</div>
+
+{{-- Order Success Modal --}}
+<div id="order-success-modal" class="fixed inset-0 z-[999999] {{ session('success') ? 'flex' : 'hidden' }} items-center justify-center bg-black/60 backdrop-blur-xs p-4" onclick="if(event.target === this) closeOrderSuccessModal()">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 text-center transform transition-all border border-gray-100 animate-in fade-in zoom-in duration-200">
+        <!-- Icon -->
+        <div class="w-16 h-16 mx-auto mb-4 bg-green-100 text-green-600 rounded-full flex items-center justify-center shadow-inner">
+            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+        </div>
+        <!-- Title -->
+        <h3 class="text-2xl font-bold text-gray-900 mb-1">অভিনন্দন! আপনার অর্ডার সফল হয়েছে</h3>
+        <p id="order-success-modal-code" class="text-sm font-bold text-[#1f8a54] mb-3 {{ session('order_code') ? '' : 'hidden' }}">অর্ডার আইডি: <span>{{ session('order_code') }}</span></p>
+        <!-- Success message -->
+        <div id="order-success-modal-message" class="bg-green-50 text-green-800 text-sm md:text-base font-medium rounded-xl p-3.5 mb-6 border border-green-200/60 leading-relaxed">
+            {{ session('success') ?? 'কিছুক্ষণের মধ্যে আমাদের প্রতিনিধি আপনার সাথে ফোনে যোগাযোগ করে অর্ডারটি কনফার্ম করবে।' }}
+        </div>
+        <!-- Action Button -->
+        <button type="button" onclick="closeOrderSuccessModal()" class="w-full py-3.5 px-6 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98">
+            ঠিক আছে
+        </button>
+    </div>
 </div>
 
 @if($isPreviewMode)
@@ -268,22 +336,42 @@
     const CURRENCY = "{{ $setup->currency }}";
     let qty = 1;
     const isVarProduct = {{ $mainProduct->type === 'variation' ? 'true' : 'false' }};
+    const manageStockEnabled = {{ $mainProduct->manage_stock ? 'true' : 'false' }};
+    let currentVariationOutOfStock = {{ $isEntirelyOutOfStock ? 'true' : 'false' }};
+    let currentMaxStock = {{ ($isSingleProduct && $mainProduct->manage_stock && $mainProduct->available_stock !== null) ? $mainProduct->available_stock : 999999 }};
 
     document.addEventListener("DOMContentLoaded", function () {
         if (isVarProduct) {
-            const firstRadio = document.querySelector('input[name="variant_radio"]:checked');
+            const firstRadio = document.querySelector('input[name="variant_radio"]:checked') || document.querySelector('input[name="variant_radio"]');
             if (firstRadio) firstRadio.dispatchEvent(new Event('change'));
         } else {
             updateUI();
         }
     });
 
-    function updateVariation(id, price, name, img) {
+    function updateVariation(id, price, name, img, isOutOfStock = false, maxStock = 999999) {
         document.getElementById('selected-variation-id').value = id;
         UNIT_PRICE = parseFloat(price);
         document.getElementById('summary-img').src = img;
         const varLabel = document.getElementById('summary-variant-name');
         if (varLabel) varLabel.innerText = "Option: " + name;
+
+        currentVariationOutOfStock = isOutOfStock;
+        currentMaxStock = maxStock;
+
+        const btn = document.getElementById('submit-order-btn');
+        if (btn && !isPreview) {
+            if (isOutOfStock) {
+                btn.disabled = true;
+                btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
+                btn.innerHTML = '<span>স্টক আউট (পণ্যটি শেষ)</span>';
+            } else {
+                btn.disabled = false;
+                btn.className = "w-full bg-[#1f8a54] hover:bg-[#176840] cursor-pointer text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2";
+                btn.innerHTML = '<span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>' + CURRENCY;
+            }
+        }
+
         updateUI();
     }
 
@@ -293,6 +381,10 @@
     }
 
     function changeQty(delta) {
+        if (delta > 0 && manageStockEnabled && currentMaxStock !== null && (qty + delta) > currentMaxStock) {
+            alert('দুঃখিত! স্টকে আর পণ্য নেই (সর্বোচ্চ ' + currentMaxStock + ' টি প্রযোজ্য)।');
+            return;
+        }
         qty = Math.max(1, qty + delta);
         updateUI();
     }
@@ -301,23 +393,39 @@
         const sub = qty * UNIT_PRICE;
         const total = sub + DELIVERY;
 
-        document.getElementById('qty-display').innerText = qty;
-        document.getElementById('input-qty').value = qty;
-        document.getElementById('summary-qty').innerText = qty;
+        const elQtyDisplay = document.getElementById('qty-display');
+        if (elQtyDisplay) elQtyDisplay.innerText = qty;
+
+        const elInputQty = document.getElementById('input-qty');
+        if (elInputQty) elInputQty.value = qty;
+
+        const elSummaryQty = document.getElementById('summary-qty');
+        if (elSummaryQty) elSummaryQty.innerText = qty;
 
         const unitFormatted = UNIT_PRICE.toLocaleString(undefined, { minimumFractionDigits: 2 });
         const subFormatted = sub.toLocaleString(undefined, { minimumFractionDigits: 2 });
         const totalFormatted = total.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-        document.getElementById('summary-unit-price').innerText = unitFormatted;
-        document.getElementById('summary-subtotal').innerText = subFormatted;
-        if (DELIVERY === 0) {
-            document.getElementById('delivery-charge-display-wrapper').innerText = 'Free';
-        } else {
-            document.getElementById('delivery-charge-display-wrapper').innerHTML = '+' + DELIVERY.toFixed(2) + CURRENCY;
+        const elUnitPrice = document.getElementById('summary-unit-price');
+        if (elUnitPrice) elUnitPrice.innerText = unitFormatted;
+
+        const elSubtotal = document.getElementById('summary-subtotal');
+        if (elSubtotal) elSubtotal.innerText = subFormatted;
+
+        const elDeliveryWrapper = document.getElementById('delivery-charge-display-wrapper');
+        if (elDeliveryWrapper) {
+            if (DELIVERY === 0) {
+                elDeliveryWrapper.innerText = 'Free';
+            } else {
+                elDeliveryWrapper.innerHTML = '+' + DELIVERY.toFixed(2) + CURRENCY;
+            }
         }
-        document.getElementById('summary-total').innerText = totalFormatted + CURRENCY;
-        document.getElementById('btn-total').innerText = totalFormatted;
+
+        const elSummaryTotal = document.getElementById('summary-total');
+        if (elSummaryTotal) elSummaryTotal.innerText = totalFormatted + CURRENCY;
+
+        const elBtnTotal = document.getElementById('btn-total');
+        if (elBtnTotal) elBtnTotal.innerText = totalFormatted;
     }
 
     const isPreview = {{ $isPreviewMode ? 'true' : 'false' }};
@@ -350,38 +458,231 @@
         }
     }
 
-    document.getElementById('landing-order-form').onsubmit = function (e) {
-        if (isPreview) {
-            e.preventDefault();
-            showPreviewAlert();
-            return false;
+    let latestThankyouUrl = "{{ session('order_id') ? route('order.thankyou', session('order_id')) : '' }}";
+
+    function showOrderSuccessModal(message, orderCode, thankyouUrl) {
+        if (thankyouUrl) {
+            latestThankyouUrl = thankyouUrl;
         }
-        if (isVarProduct && !document.getElementById('selected-variation-id').value) {
-            e.preventDefault();
-            alert('দয়া করে একটি অপশন সিলেক্ট করুন!');
-            return false;
+        const modal = document.getElementById('order-success-modal');
+        if (modal) {
+            const msgEl = document.getElementById('order-success-modal-message');
+            if (msgEl && message) msgEl.innerText = message;
+            const codeEl = document.getElementById('order-success-modal-code');
+            if (codeEl) {
+                if (orderCode) {
+                    const span = codeEl.querySelector('span');
+                    if (span) {
+                        span.innerText = orderCode;
+                    } else {
+                        codeEl.innerText = 'অর্ডার আইডি: ' + orderCode;
+                    }
+                    codeEl.classList.remove('hidden');
+                } else {
+                    codeEl.classList.add('hidden');
+                }
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
-        this.querySelector('button[type="submit"]').disabled = true;
-        this.querySelector('button[type="submit"]').innerText = "প্রসেসিং...";
-        return true;
-    };
-    @if(session('success'))
-        Swal.fire({
-            title: 'অর্ডার সফল হয়েছে!',
-            text: "{{ session('success') }}",
-            icon: 'success',
-            confirmButtonText: 'ঠিক আছে',
-            confirmButtonColor: '#1f8a54'
-        });
-    @endif
+    }
+
+    function showOrderErrorModal(message) {
+        const modal = document.getElementById('order-error-modal');
+        if (modal) {
+            const msgEl = document.getElementById('order-error-modal-message');
+            if (msgEl && message) msgEl.innerText = message;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeOrderErrorModal() {
+        const modal = document.getElementById('order-error-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        // স্ক্রল করে অর্ডার ফর্মে নিয়ে যাওয়া যাতে কাস্টমার তথ্য দেখে কারেকশন করতে পারে
+        const orderSection = document.getElementById('order') || document.getElementById('landing-order-form');
+        if (orderSection) {
+            orderSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    function closeOrderSuccessModal() {
+        if (latestThankyouUrl) {
+            window.location.href = latestThankyouUrl;
+            return;
+        }
+        const modal = document.getElementById('order-success-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    // Partial order draft save on phone number entry
+    document.addEventListener('DOMContentLoaded', function () {
+        const phoneInput = document.getElementById('phone');
+        const nameInput = document.getElementById('name');
+        const addressInput = document.getElementById('address');
+        const form = document.getElementById('landing-order-form');
+
+        let lastSavedPhone = '';
+
+        function saveLandingDraft() {
+            if (!phoneInput || isPreview || currentVariationOutOfStock) return;
+            const phone = phoneInput.value.trim();
+            if (phone.length >= 11 && phone !== lastSavedPhone) {
+                lastSavedPhone = phone;
+
+                const tokenInput = form ? form.querySelector('input[name="_token"]') : null;
+                const token = tokenInput ? tokenInput.value : '';
+
+                const productId = form.querySelector('input[name="product_id"]')?.value;
+                const landingPageId = form.querySelector('input[name="landing_page_id"]')?.value;
+                const qtyVal = document.getElementById('input-qty')?.value || 1;
+                const variationId = document.getElementById('selected-variation-id')?.value || null;
+                const shippingArea = form.querySelector('input[name="shipping_area"]:checked')?.value || form.querySelector('input[name="shipping_area"]')?.value || 'inside';
+
+                fetch("{{ route('landing.order.partial') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        phone: phone,
+                        name: nameInput ? nameInput.value.trim() : '',
+                        address: addressInput ? addressInput.value.trim() : '',
+                        product_id: productId,
+                        landing_page_id: landingPageId,
+                        qty: qtyVal,
+                        variation_id: variationId,
+                        shipping_area: shippingArea
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log("Landing draft order created. Order ID:", data.order_id);
+                    }
+                })
+                .catch(err => {
+                    console.log("Draft save failed:", err);
+                });
+            }
+        }
+
+        if (phoneInput) {
+            phoneInput.addEventListener('blur', saveLandingDraft);
+            phoneInput.addEventListener('change', saveLandingDraft);
+            phoneInput.addEventListener('input', function () {
+                if (this.value.trim().length >= 11) {
+                    saveLandingDraft();
+                }
+            });
+        }
+    });
+
+    const landingForm = document.getElementById('landing-order-form');
+    if (landingForm) {
+        landingForm.onsubmit = function (e) {
+            if (isPreview) {
+                e.preventDefault();
+                showPreviewAlert();
+                return false;
+            }
+            if (currentVariationOutOfStock) {
+                e.preventDefault();
+                showOrderErrorModal('দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।');
+                return false;
+            }
+            if (isVarProduct && !document.getElementById('selected-variation-id').value) {
+                e.preventDefault();
+                alert('দয়া করে একটি অপশন সিলেক্ট করুন!');
+                return false;
+            }
+
+            e.preventDefault();
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = `
+                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg> প্রসেসিং...
+                `;
+            }
+
+            const formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(async (res) => {
+                let data = {};
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    data = {};
+                }
+
+                if (res.ok && data.success) {
+                    showOrderSuccessModal(data.message, data.order_code, data.thankyou_url);
+                    try {
+                        landingForm.reset();
+                        qty = 1;
+                        if (typeof updateUI === 'function') {
+                            updateUI();
+                        }
+                    } catch (e) {
+                        console.warn("Reset error:", e);
+                    }
+                } else {
+                    let msg = data.message || 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+                    if (data.errors && typeof data.errors === 'object') {
+                        const firstKey = Object.keys(data.errors)[0];
+                        if (firstKey && data.errors[firstKey] && data.errors[firstKey][0]) {
+                            msg = data.errors[firstKey][0];
+                        }
+                    }
+                    showOrderErrorModal(msg);
+                }
+            })
+            .catch((err) => {
+                console.error("Order error:", err);
+                showOrderErrorModal('সার্ভারে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                }
+            });
+
+            return false;
+        };
+    }
 
     @if(session('error'))
-        Swal.fire({
-            title: 'দুঃখিত!',
-            text: "{{ session('error') }}",
-            icon: 'error',
-            confirmButtonText: 'আবার চেষ্টা করুন',
-            confirmButtonColor: '#d33'
+        // এরর থাকলে স্বয়ংক্রিয়ভাবে অর্ডার সেকশনে স্ক্রল করবে
+        document.addEventListener('DOMContentLoaded', function () {
+            const orderSection = document.getElementById('order') || document.getElementById('landing-order-form');
+            if (orderSection) {
+                setTimeout(function() {
+                    orderSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
         });
     @endif
 
@@ -391,6 +692,7 @@
     });
 
     (function () {
+        @if(!session('error') && !session('success'))
         const savedScroll = sessionStorage.getItem('landing_preview_scroll');
         if (savedScroll && parseInt(savedScroll) > 0) {
             const targetScroll = parseInt(savedScroll);
@@ -406,5 +708,6 @@
             setTimeout(restoreScroll, 500);
             setTimeout(restoreScroll, 1000);
         }
+        @endif
     })();
 </script>
