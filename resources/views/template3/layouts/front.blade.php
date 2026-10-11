@@ -118,6 +118,8 @@
         </div>
     </div>
 
+    <!-- Scroll to Top Component -->
+    <x-scroll-to-top bottom="bottom-6 md:bottom-8" />
 
     @stack('scripts')
     <script>

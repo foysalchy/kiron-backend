@@ -20,23 +20,23 @@
         <circle
             cx="50"
             cy="50"
-            r="44"
+            r="43"
             fill="none"
             stroke="#e5e7eb"
-            stroke-width="5"
+            stroke-width="7"
         />
         <!-- Progress Circle -->
         <circle
             id="scroll-progress-circle"
             cx="50"
             cy="50"
-            r="44"
+            r="43"
             fill="none"
             stroke="var(--primary-color, #BD4F00)"
-            stroke-width="5"
+            stroke-width="7"
             stroke-linecap="round"
-            stroke-dasharray="276.46"
-            stroke-dashoffset="276.46"
+            stroke-dasharray="270.18"
+            stroke-dashoffset="270.18"
             style="transition: stroke-dashoffset 0.1s linear;"
         />
     </svg>
@@ -48,7 +48,7 @@
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
-        stroke-width="2.5"
+        stroke-width="3.5"
     >
         <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
     </svg>
@@ -61,7 +61,7 @@
         if (!btn || !circle) return;
 
         const threshold = {{ (int) $threshold }};
-        const circumference = 276.46; // 2 * Math.PI * 44
+        const circumference = 270.18; // 2 * Math.PI * 43
 
         function updateProgress() {
             const scrollY = window.scrollY || document.documentElement.scrollTop;

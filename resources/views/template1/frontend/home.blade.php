@@ -466,18 +466,16 @@
         }
 
         function updateScrollNavButtons() {
-            const isDesktop = window.innerWidth >= 768;
-
             function toggleBtns(trackSelector, btnSelector) {
                 const track = typeof trackSelector === 'string' ? document.querySelector(trackSelector) : trackSelector;
                 if (!track) return;
                 const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
                 if (!buttons || buttons.length === 0) return;
-                const needsScroll = track.scrollWidth > track.clientWidth + 2;
+                
+                // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
+                const needsScroll = track.scrollWidth > track.clientWidth + 4;
                 buttons.forEach(function(btn) {
-                    // ডেস্কটপে শুধুমাত্র স্ক্রল প্রয়োজন হলেই বাটন দেখাবে, কিন্তু ফোনে/মোবাইলে বাটন হাইড হবে না
-                    const shouldShow = isDesktop ? needsScroll : true;
-                    if (shouldShow) {
+                    if (needsScroll) {
                         btn.classList.remove('hidden');
                         btn.classList.add('flex');
                     } else {

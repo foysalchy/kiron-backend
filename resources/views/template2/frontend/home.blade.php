@@ -84,12 +84,12 @@
 
                 <!-- Navigation Buttons (Green as per Image) -->
                 <button onclick="scrollCats(-240)" aria-label="Scroll left"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    class="cat-nav-btn absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden">
                     <i class="fas fa-chevron-left text-xs"></i>
                 </button>
 
                 <button onclick="scrollCats(240)" aria-label="Scroll right"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    class="cat-nav-btn absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden">
                     <i class="fas fa-chevron-right text-xs"></i>
                 </button>
 
@@ -136,12 +136,12 @@
 
                 <!-- Navigation Buttons (Green as per Image) -->
                 <button onclick="scrollCats(-240)" aria-label="Scroll left"
-                    class="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    class="cat-nav-btn absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden">
                     <i class="fas fa-chevron-left text-xs"></i>
                 </button>
 
                 <button onclick="scrollCats(240)" aria-label="Scroll right"
-                    class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden md:flex">
+                    class="cat-nav-btn absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 md:w-8 md:h-8 primary-bg text-primary rounded-full items-center justify-center shadow-lg z-20 hover:scale-110 transition-all cursor-pointer hidden">
                     <i class="fas fa-chevron-right text-xs"></i>
                 </button>
 
@@ -357,6 +357,35 @@
                 }, 6000);
             }
         });
+
+        function updateScrollNavButtons() {
+            function toggleBtns(trackSelector, btnSelector) {
+                const track = typeof trackSelector === 'string' ? document.querySelector(trackSelector) : trackSelector;
+                if (!track) return;
+                const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
+                if (!buttons || buttons.length === 0) return;
+                
+                // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
+                const needsScroll = track.scrollWidth > track.clientWidth + 4;
+                buttons.forEach(function(btn) {
+                    if (needsScroll) {
+                        btn.classList.remove('hidden');
+                        btn.classList.add('flex');
+                    } else {
+                        btn.classList.add('hidden');
+                        btn.classList.remove('flex');
+                    }
+                });
+            }
+
+            toggleBtns('#cat-slider', '.cat-nav-btn');
+        }
+
+        document.addEventListener('DOMContentLoaded', updateScrollNavButtons);
+        window.addEventListener('load', updateScrollNavButtons);
+        window.addEventListener('resize', updateScrollNavButtons);
+        setTimeout(updateScrollNavButtons, 300);
+        setTimeout(updateScrollNavButtons, 1000);
 
         function scrollCats(distance) {
             document.getElementById('cat-slider').scrollBy({

@@ -196,6 +196,8 @@ margin: 0;
         </div>
     </div>
 
+    <!-- Scroll to Top Component (Placed below floating cart button) -->
+    <x-scroll-to-top bottom="bottom-5 md:bottom-6" />
 
     @stack('scripts')
     <script>
