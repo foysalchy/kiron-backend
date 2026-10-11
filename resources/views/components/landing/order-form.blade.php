@@ -638,6 +638,14 @@
                 }
 
                 if (res.ok && data.success) {
+                    if (typeof fbq === 'function') {
+                        fbq('track', 'Lead', {
+                            content_name: '{{ addslashes($mainProduct->title ?? ($landing->title ?? "Order")) }}',
+                            content_ids: ['{{ $mainProduct->id ?? "" }}'],
+                            value: parseFloat(document.getElementById('summary-total')?.innerText.replace(/[^0-9.]/g, '') || 0),
+                            currency: 'BDT'
+                        });
+                    }
                     showOrderSuccessModal(data.message, data.order_code, data.thankyou_url);
                     try {
                         landingForm.reset();

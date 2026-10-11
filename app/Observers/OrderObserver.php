@@ -84,7 +84,10 @@ class OrderObserver
             $url = request()->headers->get('referer') ?? config('app.url');
 
             // Dispatch Facebook CAPI
-            if (!empty($market->facebook_pixel_id) && !empty($market->meta_access_token)) {
+            $statusValue = $order->status instanceof \App\Enums\Status ? $order->status->value : (int)$order->status;
+            [$pixelId, $accessToken] = $this->resolveFacebookCredentials($order, $market);
+
+            if ($statusValue !== \App\Enums\Status::Draft->value && !empty($pixelId) && !empty($accessToken)) {
                 $fbUserData = array_filter([
                     'client_ip_address' => $ip,
                     'client_user_agent' => $userAgent,
@@ -111,8 +114,8 @@ class OrderObserver
                 // Only send Purchase instantly if instant_purchase_event is true
                 if ($market->instant_purchase_event !== false) {
                     SendFacebookCapiEvent::dispatch(
-                        $market->facebook_pixel_id,
-                        $market->meta_access_token,
+                        $pixelId,
+                        $accessToken,
                         'Purchase',
                         ['event_time' => time()],
                         $fbUserData,
@@ -130,6 +133,7 @@ class OrderObserver
 
             // Dispatch TikTok CAPI
             if (!empty($market->tiktok_pixel_id) && !empty($market->tiktok_access_token)) {
+                $ttp = $_COOKIE['_ttp'] ?? request()->cookie('_ttp') ?? session('_ttp') ?? null;
                 $ttUserData = array_filter([
                     'ip' => $ip,
                     'user_agent' => $userAgent,
@@ -154,7 +158,7 @@ class OrderObserver
                 SendTiktokCapiEvent::dispatch(
                     $market->tiktok_pixel_id,
                     $market->tiktok_access_token,
-                    'CompletePayment', // PlaceAnOrder is also valid, but CompletePayment/Purchase is standard
+                    'CompletePayment',
                     ['event_time' => time()],
                     $ttUserData,
                     $ttCustomData,
@@ -175,15 +179,24 @@ class OrderObserver
     {
         if ($order->isDirty('status')) {
             $market = Market::where('company_id', $order->company_id)->first();
-            if (!$market || empty($market->facebook_pixel_id) || empty($market->meta_access_token)) {
+            if (!$market) {
                 return;
             }
 
-            // Current status name based on Enum
             $statusValue = $order->status instanceof \App\Enums\Status ? $order->status->value : (int)$order->status;
-            
-            // Map integer status back to string if needed for comparison, but frontend sends integer value
-            // Actually, the settings dropdown will save the integer value of the status.
+            $prevStatus = $order->getOriginal('status');
+            $prevStatusValue = $prevStatus instanceof \App\Enums\Status ? $prevStatus->value : (int)$prevStatus;
+
+            // Transition from Draft to Active/Pending with instant purchase enabled
+            if ($prevStatusValue === \App\Enums\Status::Draft->value && $statusValue !== \App\Enums\Status::Draft->value && !$order->fb_purchase_event_fired) {
+                if ($market->instant_purchase_event !== false) {
+                    $this->fireCustomEvent($order, $market, 'Purchase');
+                    Order::withoutEvents(function () use ($order) {
+                        $order->update(['fb_purchase_event_fired' => true]);
+                    });
+                }
+            }
+
             $targetStatus = $market->purchase_event_status;
             $isCancelled = $statusValue === \App\Enums\Status::Cancelled->value;
 
@@ -197,7 +210,7 @@ class OrderObserver
 
             // Fire Cancel event
             if ($market->fire_cancel_event && $isCancelled && !$order->fb_cancel_event_fired && $order->fb_purchase_event_fired) {
-                $this->fireCustomEvent($order, $market, 'Cancel'); // Standard FB event name or custom
+                $this->fireCustomEvent($order, $market, 'Cancel');
                 Order::withoutEvents(function () use ($order) {
                     $order->update(['fb_cancel_event_fired' => true]);
                 });
@@ -208,6 +221,11 @@ class OrderObserver
     private function fireCustomEvent(Order $order, Market $market, string $eventName): void
     {
         try {
+            [$pixelId, $accessToken] = $this->resolveFacebookCredentials($order, $market);
+            if (empty($pixelId) || empty($accessToken)) {
+                return;
+            }
+
             $sourceInfo = $order->pixel_source_info ?? [];
             $ip = $sourceInfo['ip'] ?? request()->ip();
             $userAgent = $sourceInfo['user_agent'] ?? request()->userAgent();
@@ -280,9 +298,9 @@ class OrderObserver
                 'content_ids' => [$order->id],
             ];
 
-            \App\Jobs\SendFacebookCapiEvent::dispatch(
-                $market->facebook_pixel_id,
-                $market->meta_access_token,
+            SendFacebookCapiEvent::dispatch(
+                $pixelId,
+                $accessToken,
                 $eventName,
                 ['event_time' => time()],
                 $fbUserData,
@@ -294,5 +312,44 @@ class OrderObserver
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('OrderObserver fireCustomEvent Error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Resolve Facebook Pixel ID and Meta Access Token (Landing page takes priority, fallback to Market).
+     */
+    private function resolveFacebookCredentials(Order $order, Market $market): array
+    {
+        $sourceInfo = $order->pixel_source_info ?? [];
+        $landingId = $sourceInfo['landing_page_id'] 
+            ?? ($order->source_info['landing_page_id'] ?? null) 
+            ?? request()->input('landing_page_id');
+
+        $landing = null;
+        if ($landingId) {
+            $landing = \App\Models\LandingPage::find($landingId);
+        } elseif ($order->type === Order::TYPE_LANDING) {
+            $firstDetail = $order->orderDetails?->first();
+            if ($firstDetail && $firstDetail->product_id) {
+                $landing = \App\Models\LandingPage::where('company_id', $order->company_id)
+                    ->where('product_id', $firstDetail->product_id)
+                    ->first();
+            }
+        }
+
+        $pixelId = null;
+        if ($landing && !empty($landing->pixel) && !str_contains($landing->pixel, '<script')) {
+            $pixelId = trim($landing->pixel);
+        } elseif (!empty($market->facebook_pixel_id)) {
+            $pixelId = trim($market->facebook_pixel_id);
+        }
+
+        $accessToken = null;
+        if ($landing && !empty($landing->meta_access_token)) {
+            $accessToken = trim($landing->meta_access_token);
+        } elseif (!empty($market->meta_access_token)) {
+            $accessToken = trim($market->meta_access_token);
+        }
+
+        return [$pixelId, $accessToken];
     }
 }

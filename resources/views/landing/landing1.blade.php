@@ -9,65 +9,7 @@
     @include('components.fontawesome')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @php
-        $fbPixelId = !empty($landing->pixel) ? trim($landing->pixel) : null;
-        $market = \App\Models\Market::where('company_id', $landing->company_id ?? ($setup->company_id ?? null))->first();
-        if (empty($fbPixelId) && $market) {
-            $fbPixelId = $market->facebook_pixel_id ?? null;
-        }
-
-        $currencyCode = 'BDT';
-        if (!empty($setup->currency)) {
-            $c = trim($setup->currency);
-            if (in_array($c, ['$', 'USD'])) $currencyCode = 'USD';
-            elseif (in_array($c, ['৳', 'tk', 'TK', 'Tk', 'টাকা', 'BDT'])) $currencyCode = 'BDT';
-            elseif ($c === '€') $currencyCode = 'EUR';
-            elseif ($c === '£') $currencyCode = 'GBP';
-            elseif (preg_match('/^[A-Za-z]{3}$/', $c)) $currencyCode = strtoupper($c);
-        }
-    @endphp
-
-    @if($market && !empty($market->domain_verify))
-        {!! $market->domain_verify !!}
-    @endif
-
-    @if(!empty($landing->header_code))
-        {!! $landing->header_code !!}
-    @endif
-
-    @if(!empty($fbPixelId))
-        @if(str_contains($fbPixelId, '<script'))
-            {!! $fbPixelId !!}
-        @else
-            <!-- Meta Pixel Code -->
-            <script>
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-                fbq('init', '{{ $fbPixelId }}');
-                fbq('track', 'PageView');
-                @if(isset($product) && $product)
-                fbq('track', 'ViewContent', {
-                    content_name: '{{ addslashes($product->title ?? $landing->title) }}',
-                    content_ids: ['{{ $product->id }}'],
-                    content_type: 'product',
-                    value: {{ (float) ($landing->discount_price ?? ($landing->regular_price ?? ($product->sale_price ?? 0))) }},
-                    currency: '{{ $currencyCode }}'
-                });
-                @endif
-            </script>
-            <noscript>
-                <img height="1" width="1" style="display:none"
-                     src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1"/>
-            </noscript>
-            <!-- End Meta Pixel Code -->
-        @endif
-    @endif
+    @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
     <style>
         * {
             box-sizing: border-box;

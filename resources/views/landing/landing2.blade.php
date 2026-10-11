@@ -10,6 +10,8 @@
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @vite('resources/css/landing2.css')
 
+    @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
+
     <style>
         body {
             font-family:
