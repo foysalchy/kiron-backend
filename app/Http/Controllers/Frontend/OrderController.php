@@ -198,8 +198,8 @@ class OrderController extends FrontendController
 
             if ($oldOrder) {
                 // Delete old details and the order itself so it can be cleanly recreated with accurate totals and relations
-                $oldOrder->orderDetails()->delete();
-                $oldOrder->delete();
+                $oldOrder->orderDetails()->forceDelete();
+                $oldOrder->forceDelete();
             }
 
             $shipping_cost = session()->get('shipping_cost', 60);

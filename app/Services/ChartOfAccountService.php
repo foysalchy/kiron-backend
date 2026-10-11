@@ -33,6 +33,13 @@ class ChartOfAccountService
                 $query->where('account_group_id', $filters['account_group_id']);
             }
 
+            // Filter by Account Type (e.g. Expense, Income, Assets, Liabilities)
+            if (!empty($filters['account_type'])) {
+                $query->whereHas('accountGroup', function ($q) use ($filters) {
+                    $q->where('account_type', $filters['account_type']);
+                });
+            }
+
             // Search by Name
             if (isset($filters['search']) && $filters['search'] !== '') {
                 $query->where('name', 'like', "%{$filters['search']}%");

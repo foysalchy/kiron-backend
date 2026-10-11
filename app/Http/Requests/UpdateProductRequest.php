@@ -87,6 +87,7 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
 
                 // Variation Product Fields (only validated when type='variation')
                 'variations' => ['required_if:type,variation', 'nullable', 'array', 'min:1'],
+                'variations.*.id'                                => ['nullable', 'integer'],
                 'variations.*.sku'                               => ['nullable'],
 
                 'variations.*.attributes' => ['required_with:variations', 'array', 'min:1'],
@@ -134,6 +135,45 @@ class UpdateProductRequest extends UpdateBaseCompanyRequest
                 'regular_price.min' => 'Price must be at least 0',
             ]
         );
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $variations = $this->input('variations', []);
+            if (!is_array($variations)) {
+                return;
+            }
+
+            $seenSkus = [];
+            foreach ($variations as $index => $var) {
+                $sku = isset($var['sku']) ? trim((string)$var['sku']) : '';
+                if ($sku === '') {
+                    continue;
+                }
+
+                $lowerSku = strtolower($sku);
+                if (in_array($lowerSku, $seenSkus)) {
+                    $validator->errors()->add("variations.{$index}.sku", "Duplicate SKU '{$sku}' in variation list.");
+                } else {
+                    $seenSkus[] = $lowerSku;
+                }
+
+                $varId = $var['id'] ?? null;
+                $companyId = $this->input('company_id') ?? $this->user()?->company_id;
+                $query = \App\Models\ProductVariation::where('sku', $sku);
+                if ($companyId) {
+                    $query->whereHas('product', fn($q) => $q->where('company_id', $companyId));
+                }
+                if (!empty($varId)) {
+                    $query->where('id', '!=', $varId);
+                }
+
+                if ($query->exists()) {
+                    $validator->errors()->add("variations.{$index}.sku", "The SKU '{$sku}' has already been taken.");
+                }
+            }
+        });
     }
 
     protected function failedValidation(Validator $validator)

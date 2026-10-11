@@ -20,3 +20,7 @@ Schedule::command('subscriptions:send-expiry-reminders')
 
 Schedule::command('referral:release-commissions')
     ->dailyAt('01:00');
+
+Schedule::command('parties:recalculate-dues')
+    ->dailyAt('02:00');
+

@@ -28,13 +28,10 @@ class Purchase extends Model
         'total_quantities',
         'subtotal',
         'other_charges',
+        'other_charges_details',
         'discount_on_all',
         'round_off',
         'grand_total',
-        'payment_amount',
-        'payment_type',
-        'account',
-        'payment_note',
         'status',
         'payment_status',
         'note',
@@ -45,10 +42,10 @@ class Purchase extends Model
         'total_quantities' => 'integer',
         'subtotal' => 'decimal:2',
         'other_charges' => 'decimal:2',
+        'other_charges_details' => 'array',
         'discount_on_all' => 'decimal:2',
         'round_off' => 'decimal:2',
         'grand_total' => 'decimal:2',
-        'payment_amount' => 'decimal:2',
         'status' => 'integer',
         'payment_status' => 'integer',
     ];
@@ -58,20 +55,38 @@ class Purchase extends Model
         parent::boot();
 
         static::creating(function ($model) {
-            $model->reference_no = self::generateReferenceNumber();
+            if (empty($model->reference_no)) {
+                $model->reference_no = self::generateReferenceNumber();
+            }
         });
     }
 
     public static function generateReferenceNumber(): string
     {
         $date = now()->format('Ymd');
-        $lastPurchase = self::whereDate('created_at', now())
-            ->latest('id')
+        $prefix = 'PUR-' . $date . '-';
+
+        // Check across all purchases including soft-deleted ones and other companies/global scopes
+        $lastPurchase = self::withoutGlobalScopes()
+            ->withTrashed()
+            ->where('reference_no', 'like', $prefix . '%')
+            ->orderBy('id', 'desc')
             ->first();
 
-        $number = $lastPurchase ? (int) substr($lastPurchase->reference_no, -4) + 1 : 1;
+        $number = 1;
+        if ($lastPurchase && preg_match('/-(\d+)$/', $lastPurchase->reference_no, $matches)) {
+            $number = (int) $matches[1] + 1;
+        }
 
-        return 'PUR-' . $date . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        $refNo = $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+        // Ensure absolute uniqueness in database
+        while (self::withoutGlobalScopes()->withTrashed()->where('reference_no', $refNo)->exists()) {
+            $number++;
+            $refNo = $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+        }
+
+        return $refNo;
     }
     public function payments()
     {
@@ -80,17 +95,20 @@ class Purchase extends Model
 
     public function updatePaymentStatus(): void
     {
-        $totalPaid = $this->payments()->sum('amount');
+        $totalPaid = (float) $this->payments()->sum('amount');
+        $supplierBill = max(0, (float) $this->grand_total - (float) ($this->other_charges ?? 0));
 
         if ($totalPaid <= 0) {
-            $status =   self::PAYMENT_UNPAID; // unpaid
-        } elseif ($totalPaid >= $this->grand_total) {
-            $status =   self::PAYMENT_PAID ; // paid
+            $status = self::PAYMENT_UNPAID; // unpaid
+        } elseif ($totalPaid >= $supplierBill) {
+            $status = self::PAYMENT_PAID; // paid
         } else {
             $status = self::PAYMENT_PARTIAL; // partial
         }
 
-        $this->update(['payment_status' => $status]);
+        $this->update([
+            'payment_status' => $status,
+        ]);
     }
 
     // Relationships
@@ -158,8 +176,9 @@ class Purchase extends Model
 
     public function getDueAmountAttribute(): float
     {
-        $paid = $this->payment_amount ?? 0;
-        return max(0, $this->grand_total - $paid);
+        $paid = (float) $this->payments()->sum('amount');
+        $supplierBill = max(0, (float) $this->grand_total - (float) ($this->other_charges ?? 0));
+        return max(0, $supplierBill - $paid);
     }
 
     // Helper Methods

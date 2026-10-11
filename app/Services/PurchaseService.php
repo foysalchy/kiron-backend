@@ -112,8 +112,9 @@ class PurchaseService
             $data = array_merge($data, $totals);
 
             // Determine payment status
+            $supplierBill = max(0, (float) $data['grand_total'] - (float) ($data['other_charges'] ?? 0));
             $data['payment_status'] = $this->determinePaymentStatus(
-                $data['grand_total'],
+                $supplierBill,
                 $data['payment_amount'] ?? 0
             );
 
@@ -209,8 +210,9 @@ class PurchaseService
                 $data = array_merge($data, $totals);
 
                 // Update payment status
+                $supplierBill = max(0, (float) $data['grand_total'] - (float) ($data['other_charges'] ?? 0));
                 $data['payment_status'] = $this->determinePaymentStatus(
-                    $data['grand_total'],
+                    $supplierBill,
                     $data['payment_amount'] ?? $purchase->payment_amount ?? 0
                 );
 
@@ -242,8 +244,9 @@ class PurchaseService
                 }
             } else if (isset($data['payment_amount'])) {
                 // Only payment updated
+                $supplierBill = max(0, (float) $purchase->grand_total - (float) ($purchase->other_charges ?? 0));
                 $data['payment_status'] = $this->determinePaymentStatus(
-                    $purchase->grand_total,
+                    $supplierBill,
                     $data['payment_amount']
                 );
             }
@@ -293,6 +296,13 @@ class PurchaseService
             }
 
             $purchase->delete();
+
+            // Delete associated auto-journal voucher in Advanced Mode
+            try {
+                \App\Services\AutoAccountingService::deletePurchaseJournal($id, $purchase->company_id, false);
+            } catch (\Exception $accError) {
+                Log::warning("Purchase journal deletion failed: " . $accError->getMessage());
+            }
 
             DB::commit();
 
@@ -417,6 +427,13 @@ class PurchaseService
 
             DB::commit();
 
+            // Re-post journal when restored
+            try {
+                \App\Services\AutoAccountingService::postPurchaseJournal($purchase);
+            } catch (\Exception $accError) {
+                Log::warning("Purchase restore auto-journal failed: " . $accError->getMessage());
+            }
+
             Log::info('Purchase restored successfully', ['purchase_id' => $id]);
             LogHelper::custom('restored', 'purchase', $id, $purchase->company_id);
 
@@ -461,6 +478,14 @@ class PurchaseService
 
             // Permanently delete the purchase
             $companyId = $purchase->company_id;
+
+            // Delete associated auto-journal voucher permanently
+            try {
+                \App\Services\AutoAccountingService::deletePurchaseJournal($id, $companyId, true);
+            } catch (\Exception $accError) {
+                Log::warning("Purchase journal force deletion failed: " . $accError->getMessage());
+            }
+
             $purchase->forceDelete();
 
             DB::commit();
@@ -587,15 +612,24 @@ class PurchaseService
             $subtotal += $this->calculateItemTotal($item);
         }
 
-        $otherCharges = $data['other_charges'] ?? 0;
-        $discountOnAll = $data['discount_on_all'] ?? 0;
-        $roundOff = $data['round_off'] ?? 0;
+        $otherChargesDetails = $data['other_charges_details'] ?? [];
+        if (!empty($otherChargesDetails) && is_array($otherChargesDetails)) {
+            $otherCharges = collect($otherChargesDetails)->sum(function ($charge) {
+                return (float)($charge['amount'] ?? 0);
+            });
+        } else {
+            $otherCharges = (float)($data['other_charges'] ?? 0);
+        }
+
+        $discountOnAll = (float)($data['discount_on_all'] ?? 0);
+        $roundOff = (float)($data['round_off'] ?? 0);
 
         $grandTotal = $subtotal + $otherCharges - $discountOnAll + $roundOff;
 
         return [
             'total_quantities' => $totalQuantities,
             'subtotal' => round($subtotal, 2),
+            'other_charges' => round($otherCharges, 2),
             'grand_total' => round($grandTotal, 2),
         ];
     }
