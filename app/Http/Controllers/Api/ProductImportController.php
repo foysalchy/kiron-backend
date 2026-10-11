@@ -132,10 +132,31 @@ class ProductImportController extends Controller
                 $attributesStr = trim($row[14] ?? $row['attributes'] ?? '');
                 $thumbnailUrl = trim($row[15] ?? $row['thumbnailUrl'] ?? '');
                 $shortDescription = trim($row[16] ?? $row['shortDescription'] ?? '') ?: null;
-                $metaTitle = trim($row[17] ?? $row['metaTitle'] ?? '') ?: null;
-                $metaDescription = trim($row[18] ?? $row['metaDescription'] ?? '') ?: null;
                 
-                $metaKeywordsStr = trim($row[19] ?? $row['metaKeywords'] ?? '');
+                // Full Description might be in column 17 (if new template) or in JSON payload
+                // If old template was used (20 cols: 0-19), Meta Title was at 17, Meta Description at 18, Meta Keywords at 19.
+                // In new template (21 cols: 0-20), Full Description is at 17, Meta Title at 18, Meta Description at 19, Meta Keywords at 20.
+                if ($request->has('rows')) {
+                    $fullDescription = trim($row['fullDescription'] ?? '') ?: null;
+                    $metaTitle = trim($row['metaTitle'] ?? '') ?: null;
+                    $metaDescription = trim($row['metaDescription'] ?? '') ?: null;
+                    $metaKeywordsStr = trim($row['metaKeywords'] ?? '');
+                } else {
+                    $numCols = count($row);
+                    if ($numCols >= 21) {
+                        $fullDescription = trim($row[17] ?? '') ?: null;
+                        $metaTitle = trim($row[18] ?? '') ?: null;
+                        $metaDescription = trim($row[19] ?? '') ?: null;
+                        $metaKeywordsStr = trim($row[20] ?? '');
+                    } else {
+                        // Backwards compatible with 20-col template without Full Description
+                        $fullDescription = null;
+                        $metaTitle = trim($row[17] ?? '') ?: null;
+                        $metaDescription = trim($row[18] ?? '') ?: null;
+                        $metaKeywordsStr = trim($row[19] ?? '');
+                    }
+                }
+                
                 $metaKeywords = $metaKeywordsStr ? array_values(array_filter(array_map('trim', explode(',', $metaKeywordsStr)))) : null;
 
                 // Validation
@@ -173,10 +194,19 @@ class ProductImportController extends Controller
 
                 $isCategoryMissing = false;
                 if (empty($megaCatIds) && $megaCatSlug) {
-                    $megaCat = MegaCategory::where('slug', $megaCatSlug)->orWhere('name', $megaCatSlug)->first();
-                    if ($megaCat) {
-                        $megaCatIds = [(int)$megaCat->id];
-                    } else {
+                    // Split by comma to support multiple categories in Excel (e.g. "Electronics, Gadgets" or "men, shoes")
+                    $catSlugsOrNames = array_values(array_filter(array_map('trim', explode(',', $megaCatSlug))));
+                    $resolvedCatIds = [];
+                    foreach ($catSlugsOrNames as $singleCat) {
+                        $megaCat = MegaCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($megaCat) {
+                            $resolvedCatIds[] = (int)$megaCat->id;
+                        }
+                    }
+                    if (!empty($resolvedCatIds)) {
+                        $megaCatIds = array_values(array_unique($resolvedCatIds));
+                    }
+                    if (empty($megaCatIds) || count($resolvedCatIds) < count($catSlugsOrNames)) {
                         $isCategoryMissing = true;
                     }
                 }
@@ -347,6 +377,7 @@ class ProductImportController extends Controller
                             'purpose' => $purpose,
                             'thumbnail' => $thumbnailPath,
                             'short_description' => $shortDescription,
+                            'full_description' => $fullDescription,
                             'meta_title' => $metaTitle,
                             'meta_description' => $metaDescription,
                             'meta_keywords' => $metaKeywords,
@@ -409,6 +440,8 @@ class ProductImportController extends Controller
                         'raw_warehouse' => $warehouseName,
                         'attributes' => $attributesStr,
                         'thumbnailUrl' => $thumbnailUrl,
+                        'shortDescription' => $shortDescription,
+                        'fullDescription' => $fullDescription,
                         'metaTitle' => $metaTitle,
                         'metaDescription' => $metaDescription,
                         'metaKeywords' => $metaKeywords,
