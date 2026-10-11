@@ -131,11 +131,11 @@
                 </h2>
                 <div class="relative group">
                     <button onclick="scrollCats(-200)" aria-label="Scroll left"
-                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="cat-nav-btn hidden absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                     </button>
                     <button onclick="scrollCats(200)" aria-label="Scroll right"
-                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="cat-nav-btn hidden absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                     </button>
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
@@ -169,11 +169,11 @@
                 </h2>
                 <div class="relative group">
                     <button onclick="scrollCats(-200)" aria-label="Scroll left"
-                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="cat-nav-btn hidden absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                     </button>
                     <button onclick="scrollCats(200)" aria-label="Scroll right"
-                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="cat-nav-btn hidden absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                     </button>
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
@@ -218,7 +218,7 @@
 
                     <!-- Left Arrow -->
                     <button onclick="scrollNA(-280)" aria-label="left arrow"
-                        class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        class="na-nav-btn cursor-pointer hidden absolute -left-2 md:-left-5 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                             stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -240,7 +240,7 @@
 
                     <!-- Right Arrow -->
                     <button onclick="scrollNA(280)" aria-label="Scroll right"
-                        class="cursor-pointer hidden md:flex absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        class="na-nav-btn cursor-pointer hidden absolute right-1 top-[35%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                             stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -274,13 +274,14 @@
                 <div class="relative">
                     <!-- Left Arrow -->
                     <button onclick="scrollGroup('track-{{ $group->id }}', -280)" aria-label="Scroll left"
-                        class="cursor-pointer hidden md:flex absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        data-track="track-{{ $group->id }}"
+                        class="group-nav-btn cursor-pointer hidden absolute -left-2 md:-left-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-left"></i>
                     </button>
 
                     <!-- Track: ID -->
                     <div id="track-{{ $group->id }}"
-                        class="flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
+                        class="group-track flex gap-3 md:gap-4 overflow-x-auto scroll-smooth no-scrollbar pb-2 touch-pan-x"
                         style="-ms-overflow-style:none; scrollbar-width:none;">
                         @foreach ($group->products as $product)
                             <div class="flex-shrink-0 w-[165px] md:w-[240px] h-auto">
@@ -291,7 +292,8 @@
 
                     <!-- Right Arrow -->
                     <button onclick="scrollGroup('track-{{ $group->id }}', 280)" aria-label="Scroll right"
-                        class="cursor-pointer hidden md:flex absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
+                        data-track="track-{{ $group->id }}"
+                        class="group-nav-btn cursor-pointer hidden absolute -right-2 md:-right-5 top-[40%] -translate-y-1/2 z-20 w-7 h-7 bg-gray-50 border border-gray-200 rounded-full shadow-lg items-center justify-center hover:bg-gray-50 transition-all text-gray-600">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
@@ -344,12 +346,12 @@
 
                     <!-- Navigation Buttons -->
                     <button onclick="scrollBrands(-200)" aria-label="Scroll left"
-                        class="hidden md:flex absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="brand-nav-btn hidden absolute -left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-left text-xs text-gray-600 cursor-pointer"></i>
                     </button>
 
                     <button onclick="scrollBrands(200)" aria-label="Scroll right"
-                        class="hidden md:flex absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
+                        class="brand-nav-btn hidden absolute -right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full items-center justify-center shadow-md z-10 hover:bg-gray-50 transition-all">
                         <i class="fas fa-chevron-right text-xs text-gray-600 cursor-pointer"></i>
                     </button>
 
@@ -462,6 +464,45 @@
                 behavior: 'smooth'
             });
         }
+
+        function updateScrollNavButtons() {
+            const isDesktop = window.innerWidth >= 768;
+
+            function toggleBtns(trackSelector, btnSelector) {
+                const track = typeof trackSelector === 'string' ? document.querySelector(trackSelector) : trackSelector;
+                if (!track) return;
+                const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
+                if (!buttons || buttons.length === 0) return;
+                const needsScroll = track.scrollWidth > track.clientWidth + 2;
+                buttons.forEach(function(btn) {
+                    // ডেস্কটপে শুধুমাত্র স্ক্রল প্রয়োজন হলেই বাটন দেখাবে, কিন্তু ফোনে/মোবাইলে বাটন হাইড হবে না
+                    const shouldShow = isDesktop ? needsScroll : true;
+                    if (shouldShow) {
+                        btn.classList.remove('hidden');
+                        btn.classList.add('flex');
+                    } else {
+                        btn.classList.add('hidden');
+                        btn.classList.remove('flex');
+                    }
+                });
+            }
+
+            toggleBtns('#cat-slider', '.cat-nav-btn');
+            toggleBtns('#brand-track', '.brand-nav-btn');
+            toggleBtns('#na-track', '.na-nav-btn');
+
+            document.querySelectorAll('.group-track').forEach(function(track) {
+                const trackId = track.id;
+                const buttons = document.querySelectorAll('.group-nav-btn[data-track="' + trackId + '"]');
+                toggleBtns(track, buttons);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', updateScrollNavButtons);
+        window.addEventListener('load', updateScrollNavButtons);
+        window.addEventListener('resize', updateScrollNavButtons);
+        setTimeout(updateScrollNavButtons, 300);
+        setTimeout(updateScrollNavButtons, 1000);
 
         function scrollNA(distance) {
             const track = document.getElementById('na-track');

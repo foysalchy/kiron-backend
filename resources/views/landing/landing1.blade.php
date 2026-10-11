@@ -364,9 +364,9 @@
                             @if ($landing->img_paths && count($landing->img_paths) > 0)
                                 @foreach ($landing->img_paths as $img)
                                     <div class="swiper-slide">
-                                        <div class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
+                                        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden mx-1 mb-10 flex items-center justify-center p-2 shadow-sm min-h-[220px]">
                                             <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
-                                                class="w-full h-auto object-cover" alt="Customer Review">
+                                                class="w-auto h-auto max-w-full max-h-[380px] md:max-h-[450px] object-contain rounded-xl mx-auto" alt="Customer Review">
                                         </div>
                                     </div>
                                 @endforeach
@@ -425,7 +425,7 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        function initRvSwiper() {
             if (typeof Swiper !== 'undefined') {
                 new Swiper('.rv-swiper', {
                     slidesPerView: 1,
@@ -456,7 +456,13 @@
                     }
                 });
             }
-        });
+        }
+
+        if (window.SwiperPromise) {
+            window.SwiperPromise.then(initRvSwiper);
+        } else {
+            document.addEventListener('DOMContentLoaded', initRvSwiper);
+        }
     </script>
 
 </body>
