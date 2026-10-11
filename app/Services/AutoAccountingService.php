@@ -513,37 +513,44 @@ class AutoAccountingService
             $totalAmount = (float)($purchase->grand_total ?? $purchase->total_amount ?? 0);
             $otherCharges = (float)($purchase->other_charges ?? 0);
             
-            // If there's an explicit expense account for other charges, separate it out
-            if ($courierAccountId && $otherCharges > 0) {
-                $inventoryAmount = max(0, round($totalAmount - $otherCharges, 2));
-            } else {
-                $inventoryAmount = $totalAmount;
-                $otherCharges = 0; // Handled within inventory
-            }
+            // Supplier bill is grand_total without courier/other charges
+            $supplierBillAmount = max(0, round($totalAmount - $otherCharges, 2));
+            $inventoryAmount = $supplierBillAmount;
 
             $paidAmount = (float)($purchase->payment_amount ?? $purchase->paid_amount ?? 0);
-            $dueAmount = max(0, round($totalAmount - $paidAmount, 2));
+            // Supplier due must NOT include courier/other charges
+            $supplierDueAmount = max(0, round($supplierBillAmount - $paidAmount, 2));
 
             $items = [];
 
-            // Debit Inventory:
+            // 1. Debit Inventory (Goods value from supplier):
             if ($inventoryAmount > 0 && $inventoryAccountId) {
                 $items[] = ['chart_of_account_id' => $inventoryAccountId, 'debit' => $inventoryAmount, 'credit' => 0];
             }
 
-            // Debit Courier / Freight Expense:
+            // 2. Debit Courier / Freight Expense (Other charges):
             if ($otherCharges > 0 && $courierAccountId) {
                 $items[] = ['chart_of_account_id' => $courierAccountId, 'debit' => $otherCharges, 'credit' => 0];
             }
 
-            // Credit Cash / Bank:
+            // 3. Credit Cash / Bank (Paid amount towards supplier/purchase):
             if ($paidAmount > 0 && $cashAccountId) {
                 $items[] = ['chart_of_account_id' => $cashAccountId, 'debit' => 0, 'credit' => $paidAmount];
             }
 
-            // Credit Accounts Payable (Supplier Due):
-            if ($dueAmount > 0 && $payableAccountId) {
-                $items[] = ['chart_of_account_id' => $payableAccountId, 'debit' => 0, 'credit' => $dueAmount];
+            // 4. Credit Accounts Payable (ONLY Supplier's actual due, excluding courier charges):
+            if ($supplierDueAmount > 0 && $payableAccountId) {
+                $items[] = ['chart_of_account_id' => $payableAccountId, 'debit' => 0, 'credit' => $supplierDueAmount];
+            }
+
+            // 5. Credit Courier Account / Cash for other charges:
+            // Since other_charges belongs to courier (not supplier), credit courier payable or cash
+            if ($otherCharges > 0) {
+                // Credit courier account or cash/bank for the charges
+                $courierCreditAccountId = $courierAccountId ?: ($cashAccountId ?: $payableAccountId);
+                if ($courierCreditAccountId) {
+                    $items[] = ['chart_of_account_id' => $courierCreditAccountId, 'debit' => 0, 'credit' => $otherCharges];
+                }
             }
 
             if (empty($items)) return null;
