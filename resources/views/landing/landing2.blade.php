@@ -207,7 +207,7 @@
                             class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge"
                             style="top: -20px; color: white;">Title</span>@endif
-                            {{ $product->title ?? ($landing->title ?: ($isPreviewMode ? $previewTitle : '')) }}
+                            {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                         </div>
 
                         {{-- Main headline --}}

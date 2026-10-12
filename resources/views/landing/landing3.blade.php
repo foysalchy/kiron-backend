@@ -14,8 +14,10 @@
 
     <style>
         body {
-            font-family:
-                {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!}
+            font-family: {
+                ! ! $setup->lang ==='bn' ? "'Hind Siliguri', sans-serif": "'Manrope', sans-serif" ! !
+            }
+
             ;
             scroll-behavior: smooth;
         }
@@ -109,48 +111,47 @@
         }
     </style>
     <style>
-        @if(isset($isPreview) && $isPreview)
-            .preview-badge-container {
-                position: relative;
-                cursor: pointer;
-            }
+        @if(isset($isPreview) && $isPreview) .preview-badge-container {
+            position: relative;
+            cursor: pointer;
+        }
 
-            .preview-badge-container:hover {
-                outline: 2px dashed #13565e;
-            }
+        .preview-badge-container:hover {
+            outline: 2px dashed #13565e;
+        }
 
-            .preview-badge {
-                position: absolute;
-                top: 0;
-                left: 0;
-                background-color: #13565e;
-                color: #ffffff;
-                font-size: 10px;
-                font-weight: bold;
-                padding: 2px 6px;
-                border-bottom-right-radius: 4px;
-                z-index: 50;
-                opacity: 0.7;
-                transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out;
-                cursor: pointer;
-                pointer-events: auto;
-            }
+        .preview-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #13565e;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-bottom-right-radius: 4px;
+            z-index: 50;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+            pointer-events: auto;
+        }
 
-            .preview-badge:hover {
-                opacity: 1;
-                transform: scale(1.05);
-            }
+        .preview-badge:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
 
-            .preview-badge-container:hover .preview-badge {
-                opacity: 1;
-            }
+        .preview-badge-container:hover .preview-badge {
+            opacity: 1;
+        }
 
         @endif
     </style>
 </head>
 
 <body class="text-gray-800 bg-white overflow-x-hidden">
-@php
+    @php
     $isPreviewMode = !empty($isPreview) || request()->is('*landing/preview*') || !empty($landing->is_preview);
     $productImg = $landing->thumbnail_url ?? $product->display_image_url ?? $product->thumbnail_url ?? '';
 
@@ -158,33 +159,36 @@
     $previewShortDesc = '<p>প্রাকৃতিক পুষ্টিগুণে ভরপুর সুপারফুড, যা আপনার ওজন নিয়ন্ত্রণে রাখবে, এনার্জি বাড়াবে এবং শরীরকে সুস্থ ও ফিট রাখবে প্রতিদিন!</p>';
     $previewRegularPrice = '৳ ১,২০০';
     $previewDiscountPrice = '৳ ৭৫০';
-    $previewDescription = '<div class="py-4"><h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2><p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p></div>';
+    $previewDescription = '<div class="py-4">
+        <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
+        <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
+    </div>';
 
     $previewFeatures = [
-        'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
-        'প্রচুর পরিমাণে ফাইবার থাকায় দীর্ঘক্ষণ পেট ভরা রাখে ও দ্রুত ওজন কমাতে সাহায্য করে',
-        'প্রচুর পরিমাণে অ্যান্টি-অক্সিডেন্ট থাকায় শরীরের রোগ প্রতিরোধ ক্ষমতা বহু গুণ বৃদ্ধি পায়',
-        'হাড় ও দাঁত মজবুত করতে এবং প্রতিদিনের ক্লান্তি দূর করে কর্মক্ষমতা বাড়াতে সাহায্য করে',
+    'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
+    'প্রচুর পরিমাণে ফাইবার থাকায় দীর্ঘক্ষণ পেট ভরা রাখে ও দ্রুত ওজন কমাতে সাহায্য করে',
+    'প্রচুর পরিমাণে অ্যান্টি-অক্সিডেন্ট থাকায় শরীরের রোগ প্রতিরোধ ক্ষমতা বহু গুণ বৃদ্ধি পায়',
+    'হাড় ও দাঁত মজবুত করতে এবং প্রতিদিনের ক্লান্তি দূর করে কর্মক্ষমতা বাড়াতে সাহায্য করে',
     ];
 
     $previewFeatures2 = [
-        'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
-        'কলার থেকে ২ গুণ বেশি পটাশিয়াম।',
-        'পালং শাকের চেয়ে ৩ গুণ বেশি আয়রন।',
-        'কমলার চেয়ে ৭ গুণ বেশি ভিটামিন সি।',
-        'স্যামন মাছের চেয়ে ৮ গুণ বেশি ওমেগা-৩।',
-        'ব্রকলির তুলনায় ১৫ গুণ বেশি ম্যাগনেসিয়াম।',
+    'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
+    'কলার থেকে ২ গুণ বেশি পটাশিয়াম।',
+    'পালং শাকের চেয়ে ৩ গুণ বেশি আয়রন।',
+    'কমলার চেয়ে ৭ গুণ বেশি ভিটামিন সি।',
+    'স্যামন মাছের চেয়ে ৮ গুণ বেশি ওমেগা-৩।',
+    'ব্রকলির তুলনায় ১৫ গুণ বেশি ম্যাগনেসিয়াম।',
     ];
 
     $previewWhyChoose = [
-        ['title' => '১০০% খাঁটি ও ন্যাচারাল', 'description' => 'কোনো প্রকার প্রিজারভেটিভ বা কেমিক্যাল ছাড়া একদম ফ্রেশ।'],
-        ['title' => 'দ্রুত ডেলিভারি', 'description' => 'সারা দেশে ২-৩ দিনের মধ্যে হোম ডেলিভারি সুবিধা।'],
-        ['title' => 'ক্যাশ অন ডেলিভারি', 'description' => 'পণ্য হাতে পেয়ে দেখে মূল্য পরিশোধের সুযোগ।'],
-        ['title' => 'মানিব্যাক গ্যারান্টি', 'description' => 'পণ্য পছন্দ না হলে শতভাগ রিটার্ন ও রিফান্ডের নিশ্চয়তা।'],
+    ['title' => '১০০% খাঁটি ও ন্যাচারাল', 'description' => 'কোনো প্রকার প্রিজারভেটিভ বা কেমিক্যাল ছাড়া একদম ফ্রেশ।'],
+    ['title' => 'দ্রুত ডেলিভারি', 'description' => 'সারা দেশে ২-৩ দিনের মধ্যে হোম ডেলিভারি সুবিধা।'],
+    ['title' => 'ক্যাশ অন ডেলিভারি', 'description' => 'পণ্য হাতে পেয়ে দেখে মূল্য পরিশোধের সুযোগ।'],
+    ['title' => 'মানিব্যাক গ্যারান্টি', 'description' => 'পণ্য পছন্দ না হলে শতভাগ রিটার্ন ও রিফান্ডের নিশ্চয়তা।'],
     ];
 
     $previewReviewImages = array_filter([$productImg, $productImg, $productImg]);
-@endphp
+    @endphp
 
     <main>
         {{-- ══ SECTION 1: HERO (Dynamic Version) ══ --}}
@@ -200,9 +204,9 @@
                 {{-- 1.5 Title --}}
                 <div class="mb-8 md:mb-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px; z-index: 50;">Title</span>@endif
+                        style="top: -20px; z-index: 50;">Title</span>@endif
                     <h1 class="font-bold text-2xl md:text-5xl text-white">
-                        {{ $product->title ?? ($landing->title ?: ($isPreviewMode ? $previewTitle : '')) }}
+                        {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h1>
                 </div>
 
@@ -210,7 +214,7 @@
                 <div
                     class="hero-rich-content mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px; z-index: 50;">Short Description</span>@endif
+                        style="top: -20px; z-index: 50;">Short Description</span>@endif
                     <div class="prose-container text-lg md:text-2xl leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
@@ -243,28 +247,28 @@
         <section class="py-10 md:py-16 px-4 text-center bg-white">
             <div class="w-full max-w-7xl mx-auto mb-10">
                 @if ($landing->video)
-                    <div
-                        class="relative border-[6px] sm:border-[10px] md:border-[15px] border-[#F1F1F1] bg-black rounded-2xl overflow-hidden shadow-2xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge"
+                <div
+                    class="relative border-[6px] sm:border-[10px] md:border-[15px] border-[#F1F1F1] bg-black rounded-2xl overflow-hidden shadow-2xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge"
                         style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
 
-                        <div class="relative w-full h-[200px] sm:h-[350px] md:h-[450px] overflow-hidden bg-black">
-                            <video class="w-full h-full object-cover" controls playsinline
-                                poster="{{ $productImg }}">
-                                <source src="{{ $landing->video_url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        </div>
+                    <div class="relative w-full h-[200px] sm:h-[350px] md:h-[450px] overflow-hidden bg-black">
+                        <video class="w-full h-full object-cover" controls playsinline
+                            poster="{{ $productImg }}">
+                            <source src="{{ $landing->video_url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
+                </div>
                 @else
-                    <div
-                        class="relative w-full {{ $isPreviewMode ? 'preview-badge-container' : '' }} flex justify-center">
-                        @if($isPreviewMode)<span class="preview-badge"
+                <div
+                    class="relative w-full {{ $isPreviewMode ? 'preview-badge-container' : '' }} flex justify-center">
+                    @if($isPreviewMode)<span class="preview-badge"
                         style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
-                        <img src="{{ $productImg }}"
-                            width="600" height="600"
-                            class="max-w-full h-auto rounded-2xl" alt="{{ $landing->name ?? $product->title }}">
-                    </div>
+                    <img src="{{ $productImg }}"
+                        width="600" height="600"
+                        class="max-w-full h-auto rounded-2xl" alt="{{ $landing->name ?? $product->title }}">
+                </div>
                 @endif
             </div>
 
@@ -297,31 +301,31 @@
                 <div
                     class="grid grid-cols-1 gap-3 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px; z-index: 50;">Features</span>@endif
+                        style="top: -20px; z-index: 50;">Features</span>@endif
                     @php
-                        $dynamicBenefits = data_get($landing->extras, 'features');
-                        if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
-                            $dynamicBenefits = $previewFeatures;
-                        } elseif (empty($dynamicBenefits)) {
-                            $dynamicBenefits = [
-                                'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
-                                'এটি শরীরের শক্তি ও কর্মক্ষমতা বাড়ায়',
-                                'প্রচুর পরিমাণে অ্যান্টি-অক্সিডেন্ট থাকায় চিয়া সিড রোগ প্রতিরোধ ক্ষমতাকে আরও শক্তিশালী করে',
-                                'মেটাবলিক সিস্টেমকে উন্নত করার মাধ্যমে এটি ওজন কমাতে সহায়তা করে',
-                            ];
-                        }
+                    $dynamicBenefits = data_get($landing->extras, 'features');
+                    if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
+                    $dynamicBenefits = $previewFeatures;
+                    } elseif (empty($dynamicBenefits)) {
+                    $dynamicBenefits = [
+                    'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
+                    'এটি শরীরের শক্তি ও কর্মক্ষমতা বাড়ায়',
+                    'প্রচুর পরিমাণে অ্যান্টি-অক্সিডেন্ট থাকায় চিয়া সিড রোগ প্রতিরোধ ক্ষমতাকে আরও শক্তিশালী করে',
+                    'মেটাবলিক সিস্টেমকে উন্নত করার মাধ্যমে এটি ওজন কমাতে সহায়তা করে',
+                    ];
+                    }
                     @endphp
 
                     @foreach ($dynamicBenefits as $benefit)
-                        <div
-                            class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <span aria-hidden="true"
-                                class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
+                    <div
+                        class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <span aria-hidden="true"
+                            class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
 
-                            <p class="text-lg md:text-3xl text-gray-700 font-medium">
-                                {{ is_array($benefit) ? ($benefit['title'] ?? '') : $benefit }}
-                            </p>
-                        </div>
+                        <p class="text-lg md:text-3xl text-gray-700 font-medium">
+                            {{ is_array($benefit) ? ($benefit['title'] ?? '') : $benefit }}
+                        </p>
+                    </div>
                     @endforeach
                 </div>
 
@@ -349,37 +353,37 @@
                     <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight max-w-6xl">
 
                         {!! data_get(
-    $landing->extras,
-    'features2_title',
-    'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?',
-) !!}
+                        $landing->extras,
+                        'features2_title',
+                        'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?',
+                        ) !!}
                     </h2>
                 </div>
 
                 <div
                     class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px; z-index: 50;">Features 2</span>@endif
+                        style="top: -20px; z-index: 50;">Features 2</span>@endif
                     @php
-                        $dynamicNutrition = data_get($landing->extras, 'features2');
-                        if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
-                            $dynamicNutrition = $previewFeatures2;
-                        } elseif (empty($dynamicNutrition)) {
-                            $dynamicNutrition = [
-                                'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
-                                'কলার থেকে ২ গুণ বেশি পটাশিয়াম।',
-                                'ব্রকলির তুলনায় ১৫ গুণ বেশি ম্যাগনেসিয়াম।',
-                            ];
-                        }
+                    $dynamicNutrition = data_get($landing->extras, 'features2');
+                    if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
+                    $dynamicNutrition = $previewFeatures2;
+                    } elseif (empty($dynamicNutrition)) {
+                    $dynamicNutrition = [
+                    'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
+                    'কলার থেকে ২ গুণ বেশি পটাশিয়াম।',
+                    'ব্রকলির তুলনায় ১৫ গুণ বেশি ম্যাগনেসিয়াম।',
+                    ];
+                    }
                     @endphp
 
                     @foreach ($dynamicNutrition as $item)
-                        <div
-                            class="bg-[#1D4935] text-white p-8 md:p-10 rounded-xl flex items-center justify-center min-h-[120px] md:min-h-[150px] shadow-lg transition-transform hover:scale-[1.02]">
-                            <p class="text-lg md:text-2xl font-bold leading-snug">
-                                {{ is_array($item) ? ($item['title'] ?? '') : $item }}
-                            </p>
-                        </div>
+                    <div
+                        class="bg-[#1D4935] text-white p-8 md:p-10 rounded-xl flex items-center justify-center min-h-[120px] md:min-h-[150px] shadow-lg transition-transform hover:scale-[1.02]">
+                        <p class="text-lg md:text-2xl font-bold leading-snug">
+                            {{ is_array($item) ? ($item['title'] ?? '') : $item }}
+                        </p>
+                    </div>
                     @endforeach
                 </div>
 
@@ -403,9 +407,9 @@
         <section class="bg-[#1D4935] py-16 md:py-24 px-4 text-center text-white">
             <div class="max-w-7xl mx-auto">
                 @php
-                    $midDescription = $landing->description ?? ($product->description ?: ($isPreviewMode ? $previewDescription : ''));
-                    $regularPrice = $landing->regular_price ?: ($isPreviewMode ? $previewRegularPrice : null);
-                    $discountPrice = $landing->discount_price ?: ($isPreviewMode ? $previewDiscountPrice : null);
+                $midDescription = $landing->description ?? ($product->description ?: ($isPreviewMode ? $previewDescription : ''));
+                $regularPrice = $landing->regular_price ?: ($isPreviewMode ? $previewRegularPrice : null);
+                $discountPrice = $landing->discount_price ?: ($isPreviewMode ? $previewDiscountPrice : null);
                 @endphp
 
                 <div
@@ -416,7 +420,7 @@
             [&_h4]:text-2xl [&_h4]:md:text-4xl [&_h4]:font-bold [&_h4]:mb-6
             [&_p]:text-base [&_p]:md:text-xl [&_p]:leading-relaxed [&_p]:opacity-90 [&_p]:max-w-7xl [&_p]:mx-auto [&_p]:text-start [&_p]:font-medium {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Product
-                    Details</span>@endif
+                        Details</span>@endif
 
                     {!! $midDescription !!}
                 </div>
@@ -438,27 +442,27 @@
                 <div
                     class="inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px;">Title</span>@endif
+                        style="top: -20px;">Title</span>@endif
                     <p class="text-[#CCFF00] font-bold text-lg md:text-4xl">
                         {{ $product->title ?? ($landing->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </p>
                 </div>
 
                 @if($regularPrice)
-                    <p
-                        class="text-2xl md:text-3xl font-medium text-gray-300 line-through decoration-2 mb-4 drop-shadow-md tracking-tight {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge"
+                <p
+                    class="text-2xl md:text-3xl font-medium text-gray-300 line-through decoration-2 mb-4 drop-shadow-md tracking-tight {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge"
                         style="top: -20px; z-index: 50;">Regular Price</span>@endif
-                        {{ $regularPrice }}
-                    </p>
+                    {{ $regularPrice }}
+                </p>
                 @endif
                 @if($discountPrice)
-                    <p
-                        class="text-3xl md:text-4xl font-semibold text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge"
+                <p
+                    class="text-3xl md:text-4xl font-semibold text-yellow-400 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] tracking-tighter {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge"
                         style="top: -20px; z-index: 50;">Discount Price</span>@endif
-                        {{ $discountPrice }}
-                    </p>
+                    {{ $discountPrice }}
+                </p>
                 @endif
 
             </div>
@@ -476,74 +480,74 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
 
                     @php
-                        $featureKeys = ['features3', 'features4', 'features5', 'features6'];
-                        $hasWhyChoose = false;
-                        foreach ($featureKeys as $k) {
-                            if (!empty(data_get($landing->extras, $k . '.0'))) {
-                                $hasWhyChoose = true;
-                                break;
-                            }
-                        }
+                    $featureKeys = ['features3', 'features4', 'features5', 'features6'];
+                    $hasWhyChoose = false;
+                    foreach ($featureKeys as $k) {
+                    if (!empty(data_get($landing->extras, $k . '.0'))) {
+                    $hasWhyChoose = true;
+                    break;
+                    }
+                    }
                     @endphp
 
                     @if ($hasWhyChoose)
-                        @foreach ($featureKeys as $key)
-                            @php
-                                $item = data_get($landing->extras, $key . '.0');
-                                $featureLabel = str_replace('features', 'Feature ', $key);
-                            @endphp
+                    @foreach ($featureKeys as $key)
+                    @php
+                    $item = data_get($landing->extras, $key . '.0');
+                    $featureLabel = str_replace('features', 'Feature ', $key);
+                    @endphp
 
-                            @if($item)
-                                <div
-                                    class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-6 flex flex-col items-center justify-start text-center transition-all hover:-translate-y-2 hover:shadow-2xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                    @if($isPreviewMode)<span class="preview-badge"
-                                    style="top: 0; z-index: 50;">{{ $featureLabel }}</span>@endif
+                    @if($item)
+                    <div
+                        class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-6 flex flex-col items-center justify-start text-center transition-all hover:-translate-y-2 hover:shadow-2xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge"
+                            style="top: 0; z-index: 50;">{{ $featureLabel }}</span>@endif
 
-                                    <div class="w-16 h-16 md:w-24 md:h-24 mb-5 flex-shrink-0 flex items-center justify-center">
-                                        @if(is_array($item) && !empty($item['image']))
-                                            <img src="{{ is_array($item['image']) ? ($item['image']['previewUrl'] ?? '') : (str_starts_with($item['image'], 'blob:') || str_starts_with($item['image'], 'data:') ? $item['image'] : \Illuminate\Support\Facades\Storage::disk('r2')->url($item['image'])) }}"
-                                                width="96" height="96"
-                                                class="max-w-full max-h-full object-contain" alt="{{ $item['title'] ?? 'Feature' }}">
-                                        @else
-                                            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
-                                                width="96" height="96"
-                                                class="w-full h-full object-contain opacity-20" alt="Feature Icon">
-                                        @endif
-                                    </div>
-
-                                    @php
-                                        $itemTitle = is_array($item) ? ($item['title'] ?? 'কোয়ালিটি যাচাই') : $item;
-                                        $hasDescription = is_array($item) && !empty($item['description']);
-                                    @endphp
-                                    <h3 class="text-md md:text-xl font-extrabold text-[#1a3a1a] leading-tight">
-                                        {{ $itemTitle }}
-                                    </h3>
-                                    @if($hasDescription)
-                                        <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
-                                            {!! $item['description'] !!}
-                                        </div>
-                                    @endif
-                                </div>
+                        <div class="w-16 h-16 md:w-24 md:h-24 mb-5 flex-shrink-0 flex items-center justify-center">
+                            @if(is_array($item) && !empty($item['image']))
+                            <img src="{{ is_array($item['image']) ? ($item['image']['previewUrl'] ?? '') : (str_starts_with($item['image'], 'blob:') || str_starts_with($item['image'], 'data:') ? $item['image'] : \Illuminate\Support\Facades\Storage::disk('r2')->url($item['image'])) }}"
+                                width="96" height="96"
+                                class="max-w-full max-h-full object-contain" alt="{{ $item['title'] ?? 'Feature' }}">
+                            @else
+                            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
+                                width="96" height="96"
+                                class="w-full h-full object-contain opacity-20" alt="Feature Icon">
                             @endif
-                        @endforeach
+                        </div>
+
+                        @php
+                        $itemTitle = is_array($item) ? ($item['title'] ?? 'কোয়ালিটি যাচাই') : $item;
+                        $hasDescription = is_array($item) && !empty($item['description']);
+                        @endphp
+                        <h3 class="text-md md:text-xl font-extrabold text-[#1a3a1a] leading-tight">
+                            {{ $itemTitle }}
+                        </h3>
+                        @if($hasDescription)
+                        <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
+                            {!! $item['description'] !!}
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+                    @endforeach
                     @elseif($isPreviewMode)
-                        @foreach ($previewWhyChoose as $idx => $pCard)
-                            <div
-                                class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-6 flex flex-col items-center justify-start text-center transition-all hover:-translate-y-2 hover:shadow-2xl preview-badge-container">
-                                <span class="preview-badge" style="top: 0; z-index: 50;">Feature {{ $idx + 3 }}</span>
-                                <div class="w-16 h-16 md:w-24 md:h-24 mb-5 flex-shrink-0 flex items-center justify-center">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
-                                        width="96" height="96"
-                                        class="w-full h-full object-contain opacity-30" alt="Feature Icon">
-                                </div>
-                                <h3 class="text-md md:text-xl font-extrabold text-[#1a3a1a] leading-tight">
-                                    {{ $pCard['title'] }}
-                                </h3>
-                                <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
-                                    <p>{{ $pCard['description'] }}</p>
-                                </div>
-                            </div>
-                        @endforeach
+                    @foreach ($previewWhyChoose as $idx => $pCard)
+                    <div
+                        class="bg-white rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.06)] border-t-[8px] md:border-t-[12px] border-[#00B22C] p-5 md:p-6 flex flex-col items-center justify-start text-center transition-all hover:-translate-y-2 hover:shadow-2xl preview-badge-container">
+                        <span class="preview-badge" style="top: 0; z-index: 50;">Feature {{ $idx + 3 }}</span>
+                        <div class="w-16 h-16 md:w-24 md:h-24 mb-5 flex-shrink-0 flex items-center justify-center">
+                            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png"
+                                width="96" height="96"
+                                class="w-full h-full object-contain opacity-30" alt="Feature Icon">
+                        </div>
+                        <h3 class="text-md md:text-xl font-extrabold text-[#1a3a1a] leading-tight">
+                            {{ $pCard['title'] }}
+                        </h3>
+                        <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
+                            <p>{{ $pCard['description'] }}</p>
+                        </div>
+                    </div>
+                    @endforeach
                     @endif
 
                 </div>
@@ -553,7 +557,7 @@
         <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
             <div class="container mx-auto {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Review
-                Images</span>@endif
+                    Images</span>@endif
                 <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
                     What our customers say about us
                 </h2>
@@ -563,22 +567,22 @@
                     <div class="swiper rv-swiper">
                         <div class="swiper-wrapper">
                             @php
-                                $reviewImgs = $landing->img_paths ?? [];
-                                if ((empty($reviewImgs) || count($reviewImgs) == 0) && $isPreviewMode) {
-                                    $reviewImgs = $previewReviewImages;
-                                }
+                            $reviewImgs = $landing->img_paths ?? [];
+                            if ((empty($reviewImgs) || count($reviewImgs) == 0) && $isPreviewMode) {
+                            $reviewImgs = $previewReviewImages;
+                            }
                             @endphp
 
                             @if (!empty($reviewImgs) && count($reviewImgs) > 0)
-                                @foreach ($reviewImgs as $img)
-                                    <div class="swiper-slide">
-                                        <div class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
-                                            <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') || str_starts_with($img, 'http') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
-                                                width="400" height="400"
-                                                alt="Customer Review" class="w-full h-auto object-cover">
-                                        </div>
-                                    </div>
-                                @endforeach
+                            @foreach ($reviewImgs as $img)
+                            <div class="swiper-slide">
+                                <div class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
+                                    <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') || str_starts_with($img, 'http') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
+                                        width="400" height="400"
+                                        alt="Customer Review" class="w-full h-auto object-cover">
+                                </div>
+                            </div>
+                            @endforeach
                             @endif
                         </div>
                     </div>
@@ -616,10 +620,10 @@
 
                 <div class="flex gap-8 text-gray-800 font-medium text-sm md:text-base">
                     @php
-                        $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
-                        $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
-                        $privacyLink = $privacy ? ($privacy->icon_url ?? $privacy->text_content) : '#';
-                        $termsLink = $terms ? ($terms->icon_url ?? $terms->text_content) : '#';
+                    $privacy = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::PRIVACY_POLICY)->first();
+                    $terms = \App\Models\ContentSetting::where('company_id', $landing->company_id)->where('page_type', \App\Models\ContentSetting::TERMS_AND_CONDITIONS)->first();
+                    $privacyLink = $privacy ? ($privacy->icon_url ?? $privacy->text_content) : '#';
+                    $termsLink = $terms ? ($terms->icon_url ?? $terms->text_content) : '#';
                     @endphp
                     <a href="{{ $privacyLink }}" target="_blank" class="hover:text-black transition-colors">Privacy
                         Policy</a>
