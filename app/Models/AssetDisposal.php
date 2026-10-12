@@ -14,6 +14,7 @@ class AssetDisposal extends Model
 
     protected $fillable = [
         'company_id',
+        'asset_id',
         'disposal_type_id',
         'date',
         'amount',
@@ -40,6 +41,10 @@ class AssetDisposal extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class);
     }
     public function disposalType(): BelongsTo
     {

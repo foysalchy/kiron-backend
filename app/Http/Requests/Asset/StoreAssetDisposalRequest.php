@@ -25,6 +25,7 @@ class StoreAssetDisposalRequest extends BaseCompanyRequest
     public function rules(): array
     {
         return array_merge($this->companyRules(), [
+            'asset_id'         => ['required', 'integer', 'exists:assets,id'],
             'disposal_type_id' => ['required', 'integer', 'exists:disposal_types,id'],
             'date'             => ['required', 'date'],
             'amount'           => ['required', 'numeric', 'min:0'],
@@ -35,9 +36,15 @@ class StoreAssetDisposalRequest extends BaseCompanyRequest
     public function messages(): array
     {
         return array_merge($this->companyMessages(), [
+            'asset_id.required'         => 'Please select an asset.',
+            'asset_id.exists'           => 'The selected asset is invalid.',
             'disposal_type_id.required' => 'Please select a disposal type.',
             'disposal_type_id.exists'   => 'The selected disposal type is invalid.',
+            'date.required'             => 'Disposal date is required.',
+            'date.date'                 => 'Disposal date must be a valid date.',
+            'amount.required'           => 'Amount is required.',
             'amount.numeric'            => 'Disposal amount must be a number.',
+            'amount.min'                => 'The disposal amount cannot be less than 0.',
         ]);
     }
 

@@ -386,19 +386,26 @@
         <section class="py-14 px-4">
             <div
                 class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#1f5e00] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
-                <h2 class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] mb-2">
+                <h2 class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] mb-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Title</span>@endif
                     {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                 </h2>
                 <p class="text-base md:text-2xl text-[#1f5e00] mb-8">সাশ্রয়ী মূল্যে সেরা পণ্য</p>
                 <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">
                     @if($regularPrice)
-                    <p class="text-base md:text-2xl font-medium mb-3 line-through opacity-80">
-                        {{ $regularPrice }}
-                    </p>
+                    <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Regular Price</span>@endif
+                        <p class="text-base md:text-2xl font-medium mb-3 line-through opacity-80">
+                            {{ $regularPrice }}
+                        </p>
+                    </div>
                     @endif
-                    <h3 class="text-xl sm:text-2xl md:text-4xl font-semibold leading-snug">
-                        {{ $discountPrice ?: $regularPrice }} সীমিত সময়ের জন্য
-                    </h3>
+                    <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Discount Price</span>@endif
+                        <h3 class="text-xl sm:text-2xl md:text-4xl font-semibold leading-snug">
+                            {{ $discountPrice ?: $regularPrice }} সীমিত সময়ের জন্য
+                        </h3>
+                    </div>
                 </div>
             </div>
         </section>

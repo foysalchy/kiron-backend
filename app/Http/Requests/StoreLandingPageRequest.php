@@ -40,7 +40,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'description' => ['nullable', 'string'],
                 'regular_price' => ['nullable', 'string', 'max:255'],
                 'discount_price' => ['nullable', 'string', 'max:255'],
-                'slug' => ['nullable', 'string', 'max:255', 'unique:landing_pages,slug', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
+                'slug' => ['required', 'string', 'max:255', 'unique:landing_pages,slug', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/'],
                 'pixel' => ['nullable', 'string', 'max:255'],
                 'meta_access_token' => ['nullable', 'string'],
                 'header_code' => ['nullable', 'string'],
@@ -63,6 +63,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
             [
                 'name.required' => 'Landing page name is required.',
                 'title.required' => 'Landing page title is required.',
+                'slug.required' => 'Slug is required.',
                 'thumbnail.image' => 'Thumbnail must be an image file.',
                 'thumbnail.max' => 'Thumbnail size cannot exceed 5MB.',
                 'video.mimes' => 'Video must be a valid video file.',

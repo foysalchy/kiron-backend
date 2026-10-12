@@ -17,7 +17,7 @@ class AssetDisposalService
     public function getAllDisposals(array $filters, bool $paginate = true): Collection|LengthAwarePaginator
     {
         try {
-            $query = AssetDisposal::with(['disposalType']);
+            $query = AssetDisposal::with(['disposalType', 'asset']);
 
             // Filter by Status (including Trashed)
             if (isset($filters['status'])) {
@@ -48,7 +48,7 @@ class AssetDisposalService
      */
     public function getDisposalById(int $id): AssetDisposal
     {
-        $disposal = AssetDisposal::with(['disposalType'])->find($id);
+        $disposal = AssetDisposal::with(['disposalType', 'asset'])->find($id);
         if (!$disposal) {
             throw ApiException::notFound('asset disposal');
         }
@@ -70,7 +70,7 @@ class AssetDisposalService
 
             Log::info('Asset disposal created successfully', ['disposal_id' => $disposal->id]);
 
-            return $disposal->load(['disposalType']);
+            return $disposal->load(['disposalType', 'asset']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Asset disposal creation failed: ' . $e->getMessage());
@@ -92,7 +92,7 @@ class AssetDisposalService
             DB::commit();
 
             Log::info('Asset disposal updated successfully', ['disposal_id' => $disposal->id]);
-            return $disposal->fresh(['disposalType']);
+            return $disposal->fresh(['disposalType', 'asset']);
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
