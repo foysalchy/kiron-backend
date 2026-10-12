@@ -32,6 +32,7 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'name' => ['nullable', 'string', 'max:255'],
                 'template_id' => ['nullable'],
                 'title' => ['nullable', 'string', 'max:255'],
+                'button_text' => ['nullable', 'string', 'max:255'],
                 'domain' => ['nullable', 'string'],
                 'short_description' => ['nullable', 'string'],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],

@@ -32,6 +32,7 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'product_id' => ['nullable', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'title' => ['nullable', 'string', 'max:255'],
+                'button_text' => ['nullable', 'string', 'max:255'],
                 'template_id' => ['nullable'],
                 'domain' => [
                     'nullable',
