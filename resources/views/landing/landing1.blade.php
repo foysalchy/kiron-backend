@@ -61,6 +61,7 @@
         @if(isset($isPreview) && $isPreview)
         .preview-badge-container {
             position: relative;
+            cursor: pointer;
         }
         .preview-badge-container:hover {
             outline: 2px dashed #13565e;
@@ -76,9 +77,14 @@
             padding: 2px 6px;
             border-bottom-right-radius: 4px;
             z-index: 50;
-            opacity: 0.5;
-            transition: opacity 0.2s ease-in-out;
-            pointer-events: none;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .preview-badge:hover {
+            opacity: 1;
+            transform: scale(1.05);
         }
         .preview-badge-container:hover .preview-badge {
             opacity: 1;
@@ -256,12 +262,12 @@
                 </div>
 
                 <div class="bg-white rounded-xl overflow-hidden">
-                    <div class="benefits-container text-base md:text-xl p-4 md:p-6">
+                    <div class="benefits-container text-base md:text-xl p-4 md:p-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Content 2</span>@endif
                         <article class="prose prose-slate max-w-none">
                             {!! $content2 ?? '' !!}
                         </article>
                     </div>
-
                 </div>
             </div>
 
@@ -516,6 +522,56 @@
             document.addEventListener('DOMContentLoaded', initRvSwiper);
         }
     </script>
+
+    @if(isset($isPreview) && $isPreview)
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                const badge = e.target.closest('.preview-badge');
+                const container = e.target.closest('.preview-badge-container');
+                const targetEl = badge || container;
+                if (!targetEl) return;
+
+                const badgeEl = badge || targetEl.querySelector('.preview-badge');
+                if (!badgeEl) return;
+
+                const text = badgeEl.textContent.trim().toLowerCase();
+                let field = null;
+
+                if (text.includes('regular price')) {
+                    field = 'regular_price';
+                } else if (text.includes('discount price')) {
+                    field = 'discount_price';
+                } else if (text === 'title') {
+                    field = 'title';
+                } else if (text.includes('short description')) {
+                    field = 'short_description';
+                } else if (text.includes('thumbnail') || text.includes('video')) {
+                    field = 'thumbnail';
+                } else if (text.includes('review')) {
+                    field = 'img_paths';
+                } else if (text.includes('product details') || text.includes('description')) {
+                    field = 'description';
+                } else if (text.includes('features 2')) {
+                    field = 'features2';
+                } else if (text.includes('features')) {
+                    field = 'features';
+                } else if (text.includes('content 2')) {
+                    field = 'content2';
+                } else if (text.includes('content')) {
+                    field = 'content';
+                }
+
+                if (field) {
+                    window.parent.postMessage({
+                        type: 'focus_field',
+                        field: field
+                    }, '*');
+                }
+            });
+        });
+    </script>
+    @endif
 
 </body>
 
