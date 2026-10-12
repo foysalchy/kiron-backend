@@ -203,7 +203,7 @@ class MetaDirectProxyController extends Controller
 
             $response = Http::get("https://graph.facebook.com/v20.0/{$threadId}/messages", [
                 'access_token' => $pageToken,
-                'fields' => 'id,message,created_time,from,to,attachments{mime_type,name,file_url,image_data,video_data}'
+                'fields' => 'id,message,created_time,from,to,shares,attachments{mime_type,name,file_url,image_data,video_data,title,description}'
             ]);
 
             if ($response->failed()) {
@@ -220,20 +220,58 @@ class MetaDirectProxyController extends Controller
 
                 $filePath = null;
                 $type = 'text';
+                $attachments = [];
+                $adContext = null;
 
-                if (isset($msg['attachments']['data'][0])) {
+                // Check shares for ad info
+                if (!empty($msg['shares']['data'])) {
+                    $firstShare = $msg['shares']['data'][0];
+                    $adContext = [
+                        'title' => $firstShare['name'] ?? 'Facebook Ad',
+                        'description' => $firstShare['description'] ?? null,
+                        'link' => $firstShare['link'] ?? null,
+                        'image' => null,
+                    ];
+                }
 
-                    $attachment = $msg['attachments']['data'][0];
+                if (!empty($msg['attachments']['data'])) {
+                    foreach ($msg['attachments']['data'] as $att) {
+                        $attType = 'document';
+                        $attUrl = null;
 
-                    if (isset($attachment['image_data']['url'])) {
-                        $type = 'image';
-                        $filePath = $attachment['image_data']['url'];
-                    } elseif (isset($attachment['video_data']['url'])) {
-                        $type = 'video';
-                        $filePath = $attachment['video_data']['url'];
-                    } elseif (isset($attachment['file_url'])) {
-                        $type = 'document';
-                        $filePath = $attachment['file_url'];
+                        if (isset($att['image_data']['url'])) {
+                            $attType = 'image';
+                            $attUrl = $att['image_data']['url'];
+                        } elseif (isset($att['video_data']['url'])) {
+                            $attType = 'video';
+                            $attUrl = $att['video_data']['url'];
+                        } elseif (isset($att['file_url'])) {
+                            $attType = 'document';
+                            $attUrl = $att['file_url'];
+                        }
+
+                        if ($attUrl) {
+                            $attachments[] = [
+                                'type' => $attType,
+                                'url' => $attUrl,
+                                'name' => $att['name'] ?? null,
+                            ];
+                        }
+
+                        // Check if this attachment represents an ad / story
+                        if (!empty($att['title']) || !empty($att['description'])) {
+                            $adContext = [
+                                'title' => $att['title'] ?? ($adContext['title'] ?? 'Sponsored Ad'),
+                                'description' => $att['description'] ?? ($adContext['description'] ?? null),
+                                'link' => $att['file_url'] ?? ($adContext['link'] ?? null),
+                                'image' => $att['image_data']['url'] ?? ($adContext['image'] ?? null),
+                            ];
+                        }
+                    }
+
+                    if (!empty($attachments)) {
+                        $type = $attachments[0]['type'];
+                        $filePath = $attachments[0]['url'];
                     }
                 }
 
@@ -243,6 +281,8 @@ class MetaDirectProxyController extends Controller
                     'type' => $type,
                     'text' => $msg['message'] ?? '',
                     'file_path' => $filePath,
+                    'attachments' => $attachments,
+                    'ad_context' => $adContext,
                     'created_at' => $msg['created_time']
                 ];
             }, $data);
@@ -272,17 +312,19 @@ class MetaDirectProxyController extends Controller
                 'text' => 'nullable|string',
                 'recipient_psid' => 'required|string',
                 'file' => 'nullable|file|max:25600', // 25MB
+                'file_url' => 'nullable|string',
+                'attachment_type' => 'nullable|string|in:image,video,audio,file',
             ]);
 
-            if (empty($data['text']) && !$request->hasFile('file')) {
-                return response()->json(['error' => 'Either text or file is required.'], 422);
+            if (empty($data['text']) && !$request->hasFile('file') && empty($data['file_url'])) {
+                return response()->json(['error' => 'Either text, file or file_url is required.'], 422);
             }
 
             $results = []; // multiple Meta responses store korbo (image + text alada)
             $fileUrl = null;
             $attachmentType = null;
 
-            // ---- Step 1: File thakle age seta pathai ----
+            // ---- Step 1: File thakle ba file_url thakle age seta pathai ----
             if ($request->hasFile('file')) {
                 $uploadedFile = $request->file('file');
                 $mime = $uploadedFile->getMimeType();
@@ -295,7 +337,16 @@ class MetaDirectProxyController extends Controller
                 $fileUrl = Storage::disk('r2')->url($path);
 
                 Log::info("Meta Proxy: File uploaded via helper. Path: {$path}, URL: {$fileUrl}, Type: {$attachmentType}");
+            } elseif (!empty($data['file_url'])) {
+                $fileUrl = $data['file_url'];
+                $attachmentType = $data['attachment_type'] ?? 'image';
+                if (!str_starts_with($fileUrl, 'http://') && !str_starts_with($fileUrl, 'https://')) {
+                    $fileUrl = Storage::disk('r2')->url($fileUrl);
+                }
+                Log::info("Meta Proxy: Using existing file_url. URL: {$fileUrl}, Type: {$attachmentType}");
+            }
 
+            if ($fileUrl) {
                 $imagePayload = [
                     'access_token' => $pageToken,
                     'recipient' => ['id' => $data['recipient_psid']],
@@ -353,6 +404,89 @@ class MetaDirectProxyController extends Controller
             return response()->json(['error' => 'Validation failed.', 'details' => $e->errors()], 422);
         } catch (\Exception $e) {
             Log::critical("Meta Proxy Critical [SendMessage]: " . $e->getMessage());
+            return response()->json(['error' => 'An unexpected error occurred.'], 500);
+        }
+    }
+
+    public function bulkSendMessage(Request $request, $channelId)
+    {
+        Log::info("Meta Proxy: bulkSendMessage called. Channel ID: {$channelId}");
+
+        try {
+            $channel = Channel::findOrFail($channelId);
+            $pageToken = $channel->page_token;
+
+            if (empty($pageToken)) {
+                return response()->json(['error' => 'This channel has no valid Facebook token.'], 401);
+            }
+
+            $data = $request->validate([
+                'recipients' => 'required|array|min:1',
+                'recipients.*.psid' => 'required|string',
+                'text' => 'nullable|string',
+                'file_url' => 'nullable|string',
+                'attachment_type' => 'nullable|string|in:image,video,audio,file',
+            ]);
+
+            if (empty($data['text']) && empty($data['file_url'])) {
+                return response()->json(['error' => 'Either text or file_url is required.'], 422);
+            }
+
+            $fileUrl = $data['file_url'] ?? null;
+            if ($fileUrl && !str_starts_with($fileUrl, 'http://') && !str_starts_with($fileUrl, 'https://')) {
+                $fileUrl = Storage::disk('r2')->url($fileUrl);
+            }
+            $attachmentType = $data['attachment_type'] ?? 'image';
+
+            $successCount = 0;
+            $failedCount = 0;
+            $errors = [];
+
+            foreach ($data['recipients'] as $recipient) {
+                $psid = $recipient['psid'];
+                try {
+                    if ($fileUrl) {
+                        Http::post("https://graph.facebook.com/v20.0/me/messages", [
+                            'access_token' => $pageToken,
+                            'recipient' => ['id' => $psid],
+                            'message' => [
+                                'attachment' => [
+                                    'type' => $attachmentType,
+                                    'payload' => [
+                                        'url' => $fileUrl,
+                                        'is_reusable' => true
+                                    ]
+                                ]
+                            ],
+                            'messaging_type' => 'RESPONSE',
+                        ]);
+                    }
+
+                    if (!empty($data['text'])) {
+                        Http::post("https://graph.facebook.com/v20.0/me/messages", [
+                            'access_token' => $pageToken,
+                            'recipient' => ['id' => $psid],
+                            'message' => ['text' => $data['text']],
+                            'messaging_type' => 'RESPONSE',
+                        ]);
+                    }
+
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $failedCount++;
+                    $errors[] = "Failed for PSID {$psid}: " . $e->getMessage();
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'total' => count($data['recipients']),
+                'sent_count' => $successCount,
+                'failed_count' => $failedCount,
+                'errors' => $errors,
+            ]);
+        } catch (\Exception $e) {
+            Log::critical("Meta Proxy Critical [BulkSendMessage]: " . $e->getMessage());
             return response()->json(['error' => 'An unexpected error occurred.'], 500);
         }
     }

@@ -158,9 +158,10 @@ class ConversationController extends Controller
             'type' => 'required|in:text,image,document,audio,note',
             'text' => 'nullable|string',
             'file' => 'nullable|file|max:10240',
+            'file_url' => 'nullable|string',
         ]);
 
-        $filePath = null;
+        $filePath = $data['file_url'] ?? null;
         $fileName = null;
 
         if ($request->hasFile('file')) {

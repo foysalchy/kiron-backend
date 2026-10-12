@@ -10,7 +10,10 @@ class QuikReply extends Model
     use CompanyScoped;
     protected $fillable = [
         'company_id',
+        'group_name',
+        'type',
         'shortcut',
         'text',
+        'image_path',
     ];
 }

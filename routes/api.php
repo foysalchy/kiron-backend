@@ -1667,6 +1667,8 @@ Route::prefix('v1')->group(function () {
                 Route::post('/inbox/settings', [OmniSettingsController::class, 'saveSettings']);
                 Route::post('/inbox/quick-replies', [OmniSettingsController::class, 'storeQuickReply']);
                 Route::delete('/inbox/quick-replies/{id}', [OmniSettingsController::class, 'destroyQuickReply']);
+                Route::post('/inbox/ad-mappings', [OmniSettingsController::class, 'storeAdMapping']);
+                Route::delete('/inbox/ad-mappings/{id}', [OmniSettingsController::class, 'destroyAdMapping']);
                 Route::get('/inbox/parties/{id}', [CustomerPanelController::class, 'show']);
                 Route::post('/inbox/parties/{party}/labels', [CustomerPanelController::class, 'addLabel']);
                 Route::post('/inbox/parties/{party}/notes', [CustomerPanelController::class, 'addNote']);
@@ -1687,6 +1689,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/inbox/facebook/{channelId}/conversations', [MetaDirectProxyController::class, 'getConversations']);
                 Route::get('/inbox/facebook/{channelId}/threads/{threadId}/messages', [MetaDirectProxyController::class, 'getMessages']);
                 Route::post('/inbox/facebook/{channelId}/threads/{threadId}/send', [MetaDirectProxyController::class, 'sendMessage']);
+                Route::post('/inbox/facebook/{channelId}/bulk-send', [MetaDirectProxyController::class, 'bulkSendMessage']);
                 Route::post('/inbox/facebook/{channelId}/threads/{threadId}/mark-seen', [MetaDirectProxyController::class, 'markSeen']);
                 Route::put('/inbox/facebook/conversations/{threadId}/archive', [MetaDirectProxyController::class, 'archive']);
                 Route::post('channels/{channelId}/threads/{threadId}/assign', [MetaDirectProxyController::class, 'assignUser']);

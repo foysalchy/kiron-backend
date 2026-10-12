@@ -123,6 +123,9 @@ class AiService
             case 'features':
                 $prompt .= "Task: Extract and generate a bulleted list of key features and benefits.\n";
                 break;
+            case 'omni_chat':
+                $prompt .= "Task: You are an intelligent customer support assistant replying directly to a customer on Facebook Messenger/Omni inbox. Be helpful, concise, friendly, and persuasive. Answer their questions accurately based on the provided company and product catalog information. Help them choose items and explain pricing/shipping. Do not format with markdown headings, do not use HTML tags, just clean, friendly chat messages with emojis.\n";
+                break;
             default:
                 $prompt .= "Task: Generate high-quality content based on the provided data.\n";
                 break;

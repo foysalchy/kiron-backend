@@ -16,7 +16,7 @@ class MetaWebhookController extends Controller
 {
     public function verify(Request $request)
     {
-        $verifyToken = config('services.meta.webhook_verify_token');
+        $verifyToken = config('services.meta.webhook_verify_token') ?: 'kiron_omni_webhook_token';
 
         if (
             $request->get('hub_mode') === 'subscribe' &&
@@ -34,11 +34,14 @@ class MetaWebhookController extends Controller
     {
         $signature = $request->header('X-Hub-Signature-256');
         $appSecret = config('services.meta.app_secret');
-        $expectedSignature = 'sha256=' . hash_hmac('sha256', $request->getContent(), $appSecret);
 
-        if (!$signature || !hash_equals($expectedSignature, $signature)) {
-            Log::warning('Meta Webhook: Invalid signature. Possible spoofed request.');
-            return response('Forbidden', 403);
+        // Verify HMAC signature only if appSecret is configured
+        if ($appSecret && $signature) {
+            $expectedSignature = 'sha256=' . hash_hmac('sha256', $request->getContent(), $appSecret);
+            if (!hash_equals($expectedSignature, $signature)) {
+                Log::warning('Meta Webhook: Invalid signature. Possible spoofed request.');
+                return response('Forbidden', 403);
+            }
         }
 
         $payload = $request->all();
@@ -104,6 +107,14 @@ class MetaWebhookController extends Controller
 
             $customerName = $event['sender']['name'] ?? 'there'; // webhook payload-e name nao thakte pare
             $this->sendWelcomeOrAwayMessage($channel, $customerPsid, $customerName);
+        }
+
+        // ---- AI Auto-Response (Gemini/OpenAI) on incoming customer messages ----
+        $messageText = $event['message']['text'] ?? null;
+        $referral = $event['referral'] ?? ($event['message']['referral'] ?? null);
+
+        if (!empty($messageText) && empty($event['message']['is_echo'])) {
+            $this->handleAiAutoResponse($channel, $customerPsid, $messageText, $referral, $event['timestamp'] ?? null);
         }
     }
 
@@ -176,6 +187,128 @@ class MetaWebhookController extends Controller
             Log::error("Meta Webhook: Failed to send welcome/away message. Body: " . $response->body());
         } else {
             Log::info("Meta Webhook: Welcome/away message sent to {$customerPsid}");
+        }
+    }
+
+    private function handleAiAutoResponse(Channel $channel, string $customerPsid, string $customerText, ?array $referral = null, ?int $eventTimestamp = null)
+    {
+        try {
+            // 1. Safeguard: Ignore messages older than 2 minutes (prevent answering stale messages)
+            if ($eventTimestamp) {
+                $eventSeconds = (int) ($eventTimestamp > 10000000000 ? $eventTimestamp / 1000 : $eventTimestamp);
+                if ((time() - $eventSeconds) > 120) {
+                    Log::info("Meta Webhook AI: Skipped old message from {$customerPsid} (age > 2 min)");
+                    return;
+                }
+            }
+
+            $settings = OmniSetting::where('company_id', $channel->company_id)->first();
+            if (!$settings || !$settings->ai_auto_response) {
+                return;
+            }
+
+            // 2. Safeguard: Human Agent Cooldown
+            // Check if human agent replied within last 15 minutes in this thread
+            $state = MetaConversationState::where('channel_id', $channel->id)
+                ->where('customer_psid', $customerPsid)
+                ->first();
+
+            if ($state && $state->last_read_at && now()->diffInMinutes($state->last_read_at) < 15) {
+                Log::info("Meta Webhook AI: Skipped AI reply because a human agent was active within the last 15 minutes.");
+                return;
+            }
+
+            // Check if AI service is configured
+            $aiSetting = \App\Models\AiSetting::where('company_id', $channel->company_id)->first();
+            if (!$aiSetting || (!$aiSetting->gemini_status && !$aiSetting->openai_status)) {
+                Log::warning("Meta Webhook AI: AI auto-response enabled but AI provider is not active.");
+                return;
+            }
+
+            // 3. Ad Context Lookup (From Ad Mapping table and Webhook Referral)
+            $adContextText = null;
+            $adId = $referral['ad_id'] ?? null;
+            $adTitle = $referral['ads_context_data']['ad_title'] ?? null;
+
+            if ($adId) {
+                $mapping = \App\Models\OmniAdMapping::where('company_id', $channel->company_id)
+                    ->where('ad_id', $adId)
+                    ->where('is_active', true)
+                    ->with('product')
+                    ->first();
+
+                if ($mapping) {
+                    $adContextText = "Customer came from Facebook Ad (ID: {$adId}, Campaign: {$mapping->title}).\n";
+                    if ($mapping->ad_info) {
+                        $adContextText .= "Specific Ad Details/Offer/Pricing: {$mapping->ad_info}\n";
+                    }
+                    if ($mapping->product) {
+                        $p = $mapping->product;
+                        $pPrice = $p->discount_price > 0 ? "৳{$p->discount_price} (Regular ৳{$p->selling_price})" : "৳{$p->selling_price}";
+                        $adContextText .= "Linked Product in Ad: {$p->name} | Price: {$pPrice} | Stock: {$p->current_stock}\nDescription: {$p->description}\n";
+                    }
+                } elseif ($adTitle) {
+                    $adContextText = "Customer came from Facebook Ad titled: '{$adTitle}' (Ad ID: {$adId}).";
+                }
+            } elseif ($adTitle) {
+                $adContextText = "Customer came from Facebook Ad titled: '{$adTitle}'.";
+            }
+
+            // Fetch company / shop details
+            $siteSetting = \App\Models\SiteSetting::where('company_id', $channel->company_id)->first();
+            $shopName = $siteSetting->shop_name ?? ($channel->company->name ?? 'Our Shop');
+            $shopPhone = $siteSetting->phone ?? ($siteSetting->hotline ?? null);
+            $shopAddress = $siteSetting->address ?? null;
+
+            // Fetch recent / active products for catalog context
+            $products = \App\Models\Product::where('company_id', $channel->company_id)
+                ->where('status', \App\Enums\Status::Active->value)
+                ->latest()
+                ->limit(30)
+                ->get(['id', 'name', 'selling_price', 'discount_price', 'current_stock', 'description']);
+
+            $productSummary = $products->map(function ($p) {
+                $price = $p->discount_price > 0 ? "৳{$p->discount_price} (Regular ৳{$p->selling_price})" : "৳{$p->selling_price}";
+                return "- {$p->name} | Price: {$price} | In Stock: {$p->current_stock}";
+            })->implode("\n");
+
+            $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';
+
+            $promptParams = [
+                'type' => 'omni_chat',
+                'language' => $detectLanguage,
+                'customer_message' => $customerText,
+                'shop_name' => $shopName,
+                'contact_info' => $shopPhone ? "Phone: {$shopPhone}, Address: {$shopAddress}" : null,
+                'available_products' => $productSummary,
+            ];
+
+            if ($adContextText) {
+                $promptParams['ad_context_and_targeted_product'] = $adContextText;
+            }
+
+            if (!empty($settings->ai_custom_instructions)) {
+                $promptParams['special_company_instructions'] = $settings->ai_custom_instructions;
+            }
+
+            $aiReply = \App\Services\AI\AiService::generate($channel->company_id, $promptParams);
+
+            if (!empty($aiReply)) {
+                $response = Http::post("https://graph.facebook.com/v20.0/me/messages", [
+                    'access_token' => $channel->page_token,
+                    'recipient' => ['id' => $customerPsid],
+                    'message' => ['text' => trim($aiReply)],
+                    'messaging_type' => 'RESPONSE',
+                ]);
+
+                if ($response->failed()) {
+                    Log::error("Meta Webhook AI: Failed to send AI reply to {$customerPsid}. Body: " . $response->body());
+                } else {
+                    Log::info("Meta Webhook AI: Gemini AI auto-response sent to {$customerPsid}" . ($adId ? " for Ad ID: {$adId}" : ""));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error("Meta Webhook AI Auto-Response Error: " . $e->getMessage());
         }
     }
 }

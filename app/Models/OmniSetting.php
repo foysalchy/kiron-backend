@@ -20,13 +20,15 @@ class OmniSetting extends Model
         'business_hours_end',
         'auto_assign_agents',
         'off_days',
-
+        'ai_auto_response',
+        'ai_custom_instructions',
     ];
     protected $casts = [
         'off_days'            => 'array',
         'auto_assign' => 'boolean',
         'away_mode_active' => 'boolean',
         'welcome_mode_active' => 'boolean',
+        'ai_auto_response' => 'boolean',
         'auto_assign_agents' => 'array',
     ];
 }
