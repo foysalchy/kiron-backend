@@ -20,7 +20,7 @@ class AbandonedCartReportController extends Controller
 
         // Status 1 = Added (not purchased), updated more than 2 hours ago
         $query = Cart::with(['product' => function($q) {
-                $q->select('id', 'title', 'sale_price');
+                $q->select('id', 'title', 'regular_price');
             }])
             ->where('status', Cart::ADDED)
             ->where('updated_at', '<=', Carbon::now()->subHours(2));
