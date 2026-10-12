@@ -1666,6 +1666,8 @@ Route::prefix('v1')->group(function () {
                 Route::get('/inbox/settings', [OmniSettingsController::class, 'getSettings']);
                 Route::post('/inbox/settings', [OmniSettingsController::class, 'saveSettings']);
                 Route::post('/inbox/quick-replies', [OmniSettingsController::class, 'storeQuickReply']);
+                Route::post('/inbox/quick-replies/{id}', [OmniSettingsController::class, 'updateQuickReply']);
+                Route::put('/inbox/quick-replies/{id}', [OmniSettingsController::class, 'updateQuickReply']);
                 Route::delete('/inbox/quick-replies/{id}', [OmniSettingsController::class, 'destroyQuickReply']);
                 Route::post('/inbox/ad-mappings', [OmniSettingsController::class, 'storeAdMapping']);
                 Route::delete('/inbox/ad-mappings/{id}', [OmniSettingsController::class, 'destroyAdMapping']);

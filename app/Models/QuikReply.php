@@ -15,5 +15,10 @@ class QuikReply extends Model
         'shortcut',
         'text',
         'image_path',
+        'image_paths',
+    ];
+
+    protected $casts = [
+        'image_paths' => 'array',
     ];
 }

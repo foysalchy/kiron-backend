@@ -313,18 +313,20 @@ class MetaDirectProxyController extends Controller
                 'recipient_psid' => 'required|string',
                 'file' => 'nullable|file|max:25600', // 25MB
                 'file_url' => 'nullable|string',
+                'file_urls' => 'nullable|array',
+                'file_urls.*' => 'string',
                 'attachment_type' => 'nullable|string|in:image,video,audio,file',
             ]);
 
-            if (empty($data['text']) && !$request->hasFile('file') && empty($data['file_url'])) {
-                return response()->json(['error' => 'Either text, file or file_url is required.'], 422);
+            if (empty($data['text']) && !$request->hasFile('file') && empty($data['file_url']) && empty($data['file_urls'])) {
+                return response()->json(['error' => 'Either text, file, file_url or file_urls is required.'], 422);
             }
 
             $results = []; // multiple Meta responses store korbo (image + text alada)
-            $fileUrl = null;
-            $attachmentType = null;
+            $fileUrls = [];
+            $attachmentType = $data['attachment_type'] ?? 'image';
 
-            // ---- Step 1: File thakle ba file_url thakle age seta pathai ----
+            // ---- Step 1: Collect all files / URLs ----
             if ($request->hasFile('file')) {
                 $uploadedFile = $request->file('file');
                 $mime = $uploadedFile->getMimeType();
@@ -334,19 +336,26 @@ class MetaDirectProxyController extends Controller
                         : (str_starts_with($mime, 'audio/') ? 'audio' : 'file'));
 
                 $path = FileUploadHelper::upload($uploadedFile, 'meta-attachments', 'r2');
-                $fileUrl = Storage::disk('r2')->url($path);
-
-                Log::info("Meta Proxy: File uploaded via helper. Path: {$path}, URL: {$fileUrl}, Type: {$attachmentType}");
-            } elseif (!empty($data['file_url'])) {
-                $fileUrl = $data['file_url'];
-                $attachmentType = $data['attachment_type'] ?? 'image';
-                if (!str_starts_with($fileUrl, 'http://') && !str_starts_with($fileUrl, 'https://')) {
-                    $fileUrl = Storage::disk('r2')->url($fileUrl);
-                }
-                Log::info("Meta Proxy: Using existing file_url. URL: {$fileUrl}, Type: {$attachmentType}");
+                $fileUrls[] = Storage::disk('r2')->url($path);
             }
 
-            if ($fileUrl) {
+            if (!empty($data['file_urls'])) {
+                foreach ($data['file_urls'] as $fUrl) {
+                    if (!str_starts_with($fUrl, 'http://') && !str_starts_with($fUrl, 'https://')) {
+                        $fUrl = Storage::disk('r2')->url($fUrl);
+                    }
+                    $fileUrls[] = $fUrl;
+                }
+            } elseif (!empty($data['file_url'])) {
+                $singleUrl = $data['file_url'];
+                if (!str_starts_with($singleUrl, 'http://') && !str_starts_with($singleUrl, 'https://')) {
+                    $singleUrl = Storage::disk('r2')->url($singleUrl);
+                }
+                $fileUrls[] = $singleUrl;
+            }
+
+            // Send all attachments to Meta
+            foreach ($fileUrls as $url) {
                 $imagePayload = [
                     'access_token' => $pageToken,
                     'recipient' => ['id' => $data['recipient_psid']],
@@ -354,7 +363,7 @@ class MetaDirectProxyController extends Controller
                         'attachment' => [
                             'type' => $attachmentType,
                             'payload' => [
-                                'url' => $fileUrl,
+                                'url' => $url,
                                 'is_reusable' => true
                             ]
                         ]
@@ -363,14 +372,13 @@ class MetaDirectProxyController extends Controller
                 ];
 
                 $imageResponse = Http::post("https://graph.facebook.com/v20.0/me/messages", $imagePayload);
-
-                Log::info("Meta Proxy: Image send response. Status: {$imageResponse->status()}, Body: " . $imageResponse->body());
+                Log::info("Meta Proxy: Attachment send response. Status: {$imageResponse->status()}, Body: " . $imageResponse->body());
 
                 if ($imageResponse->failed()) {
                     return $this->handleMetaError($imageResponse);
                 }
 
-                $results['image'] = $imageResponse->json();
+                $results['attachments'][] = $imageResponse->json();
             }
 
             // ---- Step 2: Text thakle seta alada message hisebe pathai ----

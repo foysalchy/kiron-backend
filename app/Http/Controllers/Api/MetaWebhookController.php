@@ -244,8 +244,11 @@ class MetaWebhookController extends Controller
                     }
                     if ($mapping->product) {
                         $p = $mapping->product;
-                        $pPrice = $p->discount_price > 0 ? "৳{$p->discount_price} (Regular ৳{$p->selling_price})" : "৳{$p->selling_price}";
-                        $adContextText .= "Linked Product in Ad: {$p->name} | Price: {$pPrice} | Stock: {$p->current_stock}\nDescription: {$p->description}\n";
+                        $pTitle = $p->title ?? $p->name ?? 'Product';
+                        $pPrice = "৳" . ($p->regular_price ?? $p->selling_price ?? 0);
+                        $stock = $p->stock_quantity ?? $p->current_stock ?? 'In Stock';
+                        $desc = $p->short_description ?? $p->description ?? '';
+                        $adContextText .= "Linked Product in Ad: {$pTitle} | Price: {$pPrice} | Stock: {$stock}\nDescription: {$desc}\n";
                     }
                 } elseif ($adTitle) {
                     $adContextText = "Customer came from Facebook Ad titled: '{$adTitle}' (Ad ID: {$adId}).";
@@ -265,11 +268,13 @@ class MetaWebhookController extends Controller
                 ->where('status', \App\Enums\Status::Active->value)
                 ->latest()
                 ->limit(30)
-                ->get(['id', 'name', 'selling_price', 'discount_price', 'current_stock', 'description']);
+                ->get(['id', 'title', 'regular_price', 'stock_quantity', 'short_description']);
 
             $productSummary = $products->map(function ($p) {
-                $price = $p->discount_price > 0 ? "৳{$p->discount_price} (Regular ৳{$p->selling_price})" : "৳{$p->selling_price}";
-                return "- {$p->name} | Price: {$price} | In Stock: {$p->current_stock}";
+                $pTitle = $p->title ?? $p->name ?? 'Product';
+                $price = "৳" . ($p->regular_price ?? $p->selling_price ?? 0);
+                $stock = $p->stock_quantity ?? $p->current_stock ?? 'Available';
+                return "- {$pTitle} | Price: {$price} | In Stock: {$stock}";
             })->implode("\n");
 
             $detectLanguage = preg_match('/[\x{0980}-\x{09FF}]/u', $customerText) ? 'bn' : 'en';

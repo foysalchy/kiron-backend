@@ -30,14 +30,20 @@ class OmniSettingsController extends Controller
 
         $quickReplies = QuikReply::orderBy('group_name')->orderBy('created_at', 'desc')->get();
         $adMappings = \App\Models\OmniAdMapping::where('company_id', $companyId)
-            ->with('product:id,name,selling_price')
+            ->with('product:id,title,regular_price')
             ->orderBy('created_at', 'desc')
+            ->get();
+
+        $products = \App\Models\Product::select('id', 'title', 'regular_price')
+            ->where('status', \App\Enums\Status::Active->value)
+            ->orderBy('title', 'asc')
             ->get();
 
         return response()->json([
             'settings' => $settings,
             'quick_replies' => $quickReplies,
             'ad_mappings' => $adMappings,
+            'products' => $products,
         ]);
     }
 
@@ -74,22 +80,29 @@ class OmniSettingsController extends Controller
             'group_name' => 'nullable|string|max:100',
             'type' => 'nullable|string|in:text,image',
             'text' => 'nullable|string',
-            'image' => 'nullable|file|image|max:10240', // 10MB
+            'image' => 'nullable|file|image|max:10240',
+            'images' => 'nullable|array',
+            'images.*' => 'file|image|max:10240',
         ]);
 
-        $type = $data['type'] ?? ($request->hasFile('image') ? 'image' : 'text');
+        $hasImages = $request->hasFile('image') || $request->hasFile('images');
+        $type = $data['type'] ?? ($hasImages ? 'image' : 'text');
 
         if ($type === 'text' && empty($data['text'])) {
             return response()->json(['error' => 'Text response is required for text shortcuts.'], 422);
         }
 
-        if ($type === 'image' && !$request->hasFile('image')) {
-            return response()->json(['error' => 'Image file is required for image shortcuts.'], 422);
+        if ($type === 'image' && !$hasImages) {
+            return response()->json(['error' => 'At least one image file is required for image shortcuts.'], 422);
         }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = FileUploadHelper::upload($request->file('image'), 'quick-replies', 'r2');
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $imagePaths[] = FileUploadHelper::upload($file, 'quick-replies', 'r2');
+            }
+        } elseif ($request->hasFile('image')) {
+            $imagePaths[] = FileUploadHelper::upload($request->file('image'), 'quick-replies', 'r2');
         }
 
         $qr = QuikReply::create([
@@ -97,22 +110,80 @@ class OmniSettingsController extends Controller
             'group_name' => !empty($data['group_name']) ? trim($data['group_name']) : null,
             'type' => $type,
             'text' => $data['text'] ?? null,
-            'image_path' => $imagePath,
+            'image_path' => $imagePaths[0] ?? null,
+            'image_paths' => !empty($imagePaths) ? $imagePaths : null,
         ]);
 
         return response()->json($qr, 201);
     }
 
+    public function updateQuickReply(Request $request, $id)
+    {
+        $qr = QuikReply::findOrFail($id);
+
+        $data = $request->validate([
+            'shortcut' => 'required|string|max:50',
+            'group_name' => 'nullable|string|max:100',
+            'type' => 'nullable|string|in:text,image',
+            'text' => 'nullable|string',
+            'image' => 'nullable|file|image|max:10240',
+            'images' => 'nullable|array',
+            'images.*' => 'file|image|max:10240',
+            'existing_images' => 'nullable|array',
+            'existing_images.*' => 'string',
+        ]);
+
+        $type = $data['type'] ?? $qr->type;
+        $imagePaths = $request->input('existing_images', []);
+
+        // Upload any newly added images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $imagePaths[] = FileUploadHelper::upload($file, 'quick-replies', 'r2');
+            }
+        } elseif ($request->hasFile('image')) {
+            $imagePaths[] = FileUploadHelper::upload($request->file('image'), 'quick-replies', 'r2');
+        }
+
+        // If no images retained and none uploaded, but was previously image type:
+        if ($type === 'image' && empty($imagePaths)) {
+            // Keep existing if nothing passed
+            if (!empty($qr->image_paths)) {
+                $imagePaths = $qr->image_paths;
+            } elseif ($qr->image_path) {
+                $imagePaths = [$qr->image_path];
+            }
+        }
+
+        $qr->update([
+            'shortcut' => $data['shortcut'],
+            'group_name' => !empty($data['group_name']) ? trim($data['group_name']) : null,
+            'type' => $type,
+            'text' => $data['text'] ?? null,
+            'image_path' => $imagePaths[0] ?? null,
+            'image_paths' => !empty($imagePaths) ? array_values($imagePaths) : null,
+        ]);
+
+        return response()->json($qr);
+    }
+
     public function destroyQuickReply(Request $request, $id)
     {
         $qr = QuikReply::findOrFail($id);
-        if ($qr->image_path) {
+
+        $allImages = array_filter(array_unique(array_merge(
+            $qr->image_paths ?? [],
+            $qr->image_path ? [$qr->image_path] : []
+        )));
+
+        foreach ($allImages as $img) {
             try {
-                Storage::disk('r2')->delete($qr->image_path);
+                Storage::disk('r2')->delete($img);
             } catch (\Exception $e) {
-                // Ignore error if file not found
+                // Ignore delete failures
             }
         }
+
         $qr->delete();
         return response()->json(['message' => 'Quick reply deleted']);
     }
@@ -137,7 +208,7 @@ class OmniSettingsController extends Controller
             $data
         );
 
-        $mapping->load('product:id,name,selling_price');
+        $mapping->load('product:id,title,regular_price');
 
         return response()->json($mapping, 201);
     }
