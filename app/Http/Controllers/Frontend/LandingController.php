@@ -103,11 +103,13 @@ class LandingController extends FrontendController
         if (isset($form['extras'])) {
             $landing->extras = is_string($form['extras']) ? json_decode($form['extras'], true) : $form['extras'];
         }
-        if (isset($form['thumbnail']['previewUrl'])) {
-            $landing->thumbnail = $form['thumbnail']['previewUrl'];
-        }
+        $thumbPreview = $form['thumbnail']['previewUrl'] ?? (is_string($form['thumbnail'] ?? null) ? $form['thumbnail'] : null);
+        $landing->thumbnail = is_string($thumbPreview) ? $thumbPreview : null;
 
-        \Illuminate\Support\Facades\Log::info('Thumbnail inside preview: ' . print_r($landing->thumbnail, true));
+        $videoPreview = $form['video']['previewUrl'] ?? (is_string($form['video'] ?? null) ? $form['video'] : null);
+        $landing->video = is_string($videoPreview) ? $videoPreview : null;
+
+        \Illuminate\Support\Facades\Log::info('Thumbnail/Video inside preview: thumb=' . print_r($landing->thumbnail, true) . ' video=' . print_r($landing->video, true));
 
         $product = null;
         if (isset($productData['id'])) {

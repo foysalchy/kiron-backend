@@ -8,6 +8,20 @@ use Illuminate\Contracts\Validation\Validator;
 
 class StoreLandingPageRequest extends BaseCompanyRequest
 {
+    protected function prepareForValidation(): void
+    {
+        if ($this->hasFile('thumbnail')) {
+            $file = $this->file('thumbnail');
+            $mime = $file->getMimeType() ?? '';
+            $ext = strtolower($file->getClientOriginalExtension());
+            $videoExtensions = ['mp4', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+            if (str_starts_with($mime, 'video/') || in_array($ext, $videoExtensions)) {
+                $this->files->set('video', $file);
+                $this->files->remove('thumbnail');
+            }
+        }
+    }
+
     public function rules(): array
     {
 
@@ -21,7 +35,8 @@ class StoreLandingPageRequest extends BaseCompanyRequest
                 'domain' => ['nullable', 'string'],
                 'short_description' => ['nullable', 'string'],
                 'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:5120'],
-                'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv', 'max:51200'],
+                'video' => ['nullable', 'mimes:mp4,mov,avi,wmv,flv,mkv,webm', 'max:51200'],
+                'remove_video' => ['nullable'],
                 'description' => ['nullable', 'string'],
                 'regular_price' => ['nullable', 'string', 'max:255'],
                 'discount_price' => ['nullable', 'string', 'max:255'],

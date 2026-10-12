@@ -247,7 +247,12 @@ class LandingPageService
                 }
             }
 
-            if (isset($data['video'])) {
+            if (!empty($data['remove_video'])) {
+                if ($landingPage->video) {
+                    FileUploadHelper::delete($landingPage->video);
+                }
+                $data['video'] = null;
+            } elseif (isset($data['video']) && !is_string($data['video'])) {
                 $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_video_' . time();
                 $data['video'] = FileUploadHelper::replace(
                     $data['video'],
@@ -328,6 +333,7 @@ class LandingPageService
     {
         try {
             $landingPage = $this->getLandingPageById($id);
+
             $landingPage->delete();
 
             LogHelper::deleted('landing_page', $landingPage->id, $landingPage->company_id, $landingPage->name);
@@ -381,9 +387,8 @@ class LandingPageService
                 throw ApiException::notFound('Landing Page');
             }
 
-            // Delete files
-            FileUploadHelper::delete($landingPage->thumbnail);
-            FileUploadHelper::delete($landingPage->video);
+            // Clean up all R2 files
+            $this->deleteLandingPageFiles($landingPage);
 
             $landingPage->forceDelete();
 
@@ -400,6 +405,54 @@ class LandingPageService
             DB::rollBack();
             Log::error('Landing page permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete landing page');
+        }
+    }
+
+    /**
+     * Delete all files belonging to a landing page from R2 storage
+     */
+    private function deleteLandingPageFiles(LandingPage $landingPage): void
+    {
+        // 1. Delete thumbnail (only if not inherited from product)
+        if ($landingPage->thumbnail) {
+            $isProductThumb = false;
+            if ($landingPage->product_id) {
+                $product = $landingPage->product ?? \App\Models\Product::find($landingPage->product_id);
+                if ($product && $product->thumbnail === $landingPage->thumbnail) {
+                    $isProductThumb = true;
+                }
+            }
+
+            if (!$isProductThumb) {
+                FileUploadHelper::delete($landingPage->thumbnail);
+            }
+        }
+
+        // 2. Delete video
+        if ($landingPage->video) {
+            FileUploadHelper::delete($landingPage->video);
+        }
+
+        // 3. Delete multiple review images (img_paths)
+        if (!empty($landingPage->img_paths) && is_array($landingPage->img_paths)) {
+            foreach ($landingPage->img_paths as $imgPath) {
+                if ($imgPath && is_string($imgPath)) {
+                    FileUploadHelper::delete($imgPath);
+                }
+            }
+        }
+
+        // 4. Delete all card images in extras
+        if (!empty($landingPage->extras) && is_array($landingPage->extras)) {
+            foreach ($landingPage->extras as $fieldValue) {
+                if (is_array($fieldValue)) {
+                    foreach ($fieldValue as $card) {
+                        if (is_array($card) && !empty($card['image']) && is_string($card['image'])) {
+                            FileUploadHelper::delete($card['image']);
+                        }
+                    }
+                }
+            }
         }
     }
 

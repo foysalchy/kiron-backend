@@ -75,22 +75,24 @@ class LandingPage extends Model
 
     public function getThumbnailUrlAttribute(): ?string
     {
-        if (str_starts_with($this->thumbnail ?? '', 'data:') || str_starts_with($this->thumbnail ?? '', 'blob:')) {
+        if (!is_string($this->thumbnail) || empty($this->thumbnail)) {
+            return null;
+        }
+        if (str_starts_with($this->thumbnail, 'data:') || str_starts_with($this->thumbnail, 'blob:')) {
             return $this->thumbnail;
         }
-        return $this->thumbnail
-            ? Storage::disk('r2')->url($this->thumbnail)
-            : null;
+        return Storage::disk('r2')->url($this->thumbnail);
     }
 
     public function getVideoUrlAttribute(): ?string
     {
-        if (str_starts_with($this->video ?? '', 'data:') || str_starts_with($this->video ?? '', 'blob:')) {
+        if (!is_string($this->video) || empty($this->video)) {
+            return null;
+        }
+        if (str_starts_with($this->video, 'data:') || str_starts_with($this->video, 'blob:')) {
             return $this->video;
         }
-        return $this->video
-            ? Storage::disk('r2')->url($this->video)
-            : null;
+        return Storage::disk('r2')->url($this->video);
     }
 
     // Mutators
