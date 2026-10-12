@@ -163,6 +163,7 @@ class LandingController extends FrontendController
             'title' => $product->title ?? 'প্রিমিয়াম কোয়ালিটি অর্গানিক সজিনা পাতা গুঁড়া',
             'template_id' => (int)$template_id,
             'is_preview' => true,
+            'thumbnail' => $product->thumbnail ?? null,
             'regular_price' => $product->regular_price ?? 1200,
             'discount_price' => max(0, ($product->regular_price ?? 1200) - ($product->discount ?? 350)),
         ]);
