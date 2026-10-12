@@ -145,11 +145,11 @@
                 <div class="border border-[#2e8c03] p-4 md:p-6 rounded mb-6">
                     <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge">Title</span>@endif
-                        {{ $product->title ?? ($landing->title ?: ($isPreviewMode ? $previewTitle : '')) }}
+                        {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h1>
                     <p class="prose prose-invert prose-lg md:prose-xl mx-auto leading-snug {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Short Description</span>@endif
-                        {!! $product->short_description ?? ($landing->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
+                        {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </p>
                 </div>
 
@@ -392,7 +392,7 @@
             <div
                 class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#1f5e00] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
                 <h2 class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] mb-2">
-                    {{ $product->title ?? ($landing->title ?: ($isPreviewMode ? $previewTitle : '')) }}
+                    {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                 </h2>
                 <p class="text-base md:text-2xl text-[#1f5e00] mb-8">সাশ্রয়ী মূল্যে সেরা পণ্য</p>
                 <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">
