@@ -98,26 +98,24 @@ class LandingPage extends Model
     // Mutators
     public function setSlugAttribute($value)
     {
-        $this->attributes['slug'] = $value ?: Str::slug($this->name);
+        $this->attributes['slug'] = $value ? Str::slug($value) : null;
     }
 
-    // Boot method to auto-generate slug
+    // Boot method to ensure slug uniqueness if provided
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($landingPage) {
-            if (empty($landingPage->slug)) {
-                $landingPage->slug = Str::slug($landingPage->name);
-            }
+            if (!empty($landingPage->slug)) {
+                // Ensure slug uniqueness
+                $originalSlug = $landingPage->slug;
+                $count = 1;
 
-            // Ensure slug uniqueness
-            $originalSlug = $landingPage->slug;
-            $count = 1;
-
-            while (static::where('slug', $landingPage->slug)->exists()) {
-                $landingPage->slug = $originalSlug . '-' . $count;
-                $count++;
+                while (static::where('slug', $landingPage->slug)->exists()) {
+                    $landingPage->slug = $originalSlug . '-' . $count;
+                    $count++;
+                }
             }
         });
     }

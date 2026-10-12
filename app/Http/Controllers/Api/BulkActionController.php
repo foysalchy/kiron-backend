@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -171,6 +172,13 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
+        // Retrieve models to delete their uploaded files from R2 before permanent deletion
+        $records = $model::withTrashed()
+            ->whereIn('id', $request->ids)
+            ->get();
+
+        $this->deleteResourceFiles($resource, $records);
+
         // withTrashed() so we can target already soft-deleted rows;
         // forceDelete() bypasses the soft-delete and removes permanently.
         $deleted = $model::withTrashed()
@@ -216,5 +224,186 @@ class BulkActionController extends Controller
             'message'  => 'Restored successfully.',
             'restored' => $restored,
         ]);
+    }
+
+    /**
+     * Delete all associated files from R2 storage before permanently deleting records.
+     */
+    private function deleteResourceFiles(string $resource, $records): void
+    {
+        if ($records->isEmpty()) {
+            return;
+        }
+
+        switch ($resource) {
+            case 'landings':
+                foreach ($records as $landingPage) {
+                    // 1. Thumbnail (avoid deleting if shared with existing product)
+                    if (!empty($landingPage->thumbnail)) {
+                        $isProductThumb = false;
+                        if (!empty($landingPage->product_id)) {
+                            $product = \App\Models\Product::find($landingPage->product_id);
+                            if ($product && $product->thumbnail === $landingPage->thumbnail) {
+                                $isProductThumb = true;
+                            }
+                        }
+                        if (!$isProductThumb) {
+                            $this->deleteFile($landingPage->thumbnail);
+                        }
+                    }
+
+                    // 2. Video
+                    if (!empty($landingPage->video)) {
+                        $this->deleteFile($landingPage->video);
+                    }
+
+                    // 3. Review images (img_paths)
+                    $imgPaths = is_string($landingPage->img_paths)
+                        ? json_decode($landingPage->img_paths, true)
+                        : $landingPage->img_paths;
+                    if (is_array($imgPaths)) {
+                        foreach ($imgPaths as $path) {
+                            $this->deleteFile($path);
+                        }
+                    }
+
+                    // 4. Extras card images
+                    $extras = is_string($landingPage->extras)
+                        ? json_decode($landingPage->extras, true)
+                        : $landingPage->extras;
+                    if (is_array($extras)) {
+                        foreach ($extras as $fieldValue) {
+                            if (is_array($fieldValue)) {
+                                foreach ($fieldValue as $card) {
+                                    if (is_array($card) && !empty($card['image']) && is_string($card['image'])) {
+                                        $this->deleteFile($card['image']);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+
+            case 'products':
+                $productIds = $records->pluck('id')->all();
+
+                foreach ($records as $product) {
+                    $this->deleteFile($product->thumbnail);
+                    $this->deleteFile($product->thumbnail_310);
+                    $this->deleteFile($product->thumbnail_95);
+                }
+
+                // Delete galleries for these products
+                $galleries = \App\Models\Gallery::whereIn('product_id', $productIds)->get();
+                foreach ($galleries as $gallery) {
+                    $this->deleteFile($gallery->image);
+                }
+
+                // Delete variation images & variation galleries
+                $variations = \App\Models\ProductVariation::whereIn('product_id', $productIds)->get();
+                if ($variations->isNotEmpty()) {
+                    $variationIds = $variations->pluck('id')->all();
+                    foreach ($variations as $variation) {
+                        $this->deleteFile($variation->image);
+                    }
+
+                    $varGalleries = \App\Models\VariationGallery::whereIn('variation_id', $variationIds)->get();
+                    foreach ($varGalleries as $vg) {
+                        $this->deleteFile($vg->image);
+                    }
+                }
+                break;
+
+            case 'blogs':
+                foreach ($records as $blog) {
+                    $images = is_string($blog->images)
+                        ? json_decode($blog->images, true)
+                        : $blog->images;
+                    if (is_array($images)) {
+                        foreach ($images as $img) {
+                            $this->deleteFile($img);
+                        }
+                    } elseif (is_string($images)) {
+                        $this->deleteFile($images);
+                    }
+                }
+                break;
+
+            default:
+                // Generic handler for all other resources with file/image columns
+                $fileColumns = [
+                    'image',
+                    'logo',
+                    'icon',
+                    'thumbnail',
+                    'file',
+                    'avatar',
+                    'nid_image',
+                    'letter',
+                    'appointment_letter',
+                    'documents',
+                ];
+
+                foreach ($records as $record) {
+                    foreach ($fileColumns as $column) {
+                        if (!isset($record->{$column})) {
+                            continue;
+                        }
+
+                        $value = $record->{$column};
+                        if (empty($value)) {
+                            continue;
+                        }
+
+                        if (is_string($value)) {
+                            // Check if it might be a JSON encoded array of file paths
+                            if (str_starts_with(trim($value), '[') || str_starts_with(trim($value), '{')) {
+                                $decoded = json_decode($value, true);
+                                if (is_array($decoded)) {
+                                    foreach ($decoded as $item) {
+                                        if (is_string($item)) {
+                                            $this->deleteFile($item);
+                                        }
+                                    }
+                                    continue;
+                                }
+                            }
+                            $this->deleteFile($value);
+                        } elseif (is_array($value)) {
+                            foreach ($value as $item) {
+                                if (is_string($item)) {
+                                    $this->deleteFile($item);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    /**
+     * Delete a single file path safely from R2 storage.
+     */
+    private function deleteFile(?string $path): void
+    {
+        if (empty($path) || !is_string($path)) {
+            return;
+        }
+
+        if (str_starts_with($path, 'data:') || str_starts_with($path, 'blob:') || str_starts_with($path, '__file__')) {
+            return;
+        }
+
+        // If it's a full URL, strip scheme and host to extract the relative storage path
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            $parsedPath = parse_url($path, PHP_URL_PATH);
+            if ($parsedPath) {
+                $path = ltrim($parsedPath, '/');
+            }
+        }
+
+        FileUploadHelper::delete($path);
     }
 }
