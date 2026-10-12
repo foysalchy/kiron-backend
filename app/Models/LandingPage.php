@@ -22,6 +22,7 @@ class LandingPage extends Model
         'domain',
         'name',
         'title',
+        'button_text',
         'short_description',
         'thumbnail',
         'video',
