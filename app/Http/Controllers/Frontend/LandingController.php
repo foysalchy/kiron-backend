@@ -24,24 +24,61 @@ class LandingController extends FrontendController
     public function index($slug)
     {
         $companyId = $this->company_id;
+        $user = auth()->user() ?? auth('sanctum')->user() ?? request()->user();
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || !empty($user->is_super_admin) || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()));
+        if (!$companyId && $user && !$isSuperAdmin && $user->company_id) {
+            $companyId = $user->company_id;
+        }
+
         $ttl = now()->addHours(6);
         $landing = Cache::remember("landing_page_view_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
-            return LandingPage::where('company_id', $companyId)
+            return LandingPage::when($companyId, fn($q) => $q->where('company_id', $companyId))
                 ->where('status', Status::Active->value)->with('product:id,company_id,title,slug,thumbnail,regular_price,discount,discount_type,type,short_description,warehouse_info,is_free_delivery')
                 ->where('slug', $slug)->firstOrFail();
         });
         $product = $landing->product;
         abort_if($product === null, 404);
 
-        $setup = \App\Models\SiteSetting::where('company_id', $landing->company_id)
-            ->orWhereNull('company_id')
-            ->orderByRaw('company_id IS NULL ASC')
-            ->first() ?? new \App\Models\SiteSetting();
+        $setup = $this->resolveSiteSetting($landing->company_id ?? $companyId);
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
         \Illuminate\Support\Facades\View::share('isPreview', false);
 
         return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
+    }
+
+    /**
+     * Resolve the active SiteSetting considering SuperAdmin vs Shop login.
+     */
+    protected function resolveSiteSetting(?int $companyId = null): \App\Models\SiteSetting
+    {
+        $user = auth()->user() ?? auth('sanctum')->user() ?? request()->user();
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || !empty($user->is_super_admin) || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()));
+
+        if ($user) {
+            // When Super Admin is logged in, show Super Admin platform settings (company_id: null)
+            // When Shop user is logged in, show their Shop's settings (company_id: $user->company_id)
+            $targetCompanyId = $isSuperAdmin ? null : ($user->company_id ?: $companyId);
+        } else {
+            // Guest visitor: show the landing/shop company settings, fallback to current company
+            $targetCompanyId = $companyId ?: ($this->company_id ?: (getCurrentCompany()->company_id ?? null));
+        }
+
+        $setup = null;
+        if (!empty($targetCompanyId)) {
+            $setup = \App\Models\SiteSetting::withoutGlobalScopes()
+                ->where('company_id', $targetCompanyId)
+                ->first();
+        }
+
+        // Fallback to super admin (platform) SiteSetting
+        if (!$setup) {
+            $setup = \App\Models\SiteSetting::withoutGlobalScopes()
+                ->whereNull('company_id')
+                ->first();
+        }
+
+        return $setup ?? new \App\Models\SiteSetting();
     }
 
     public function preview(Request $request, $template_id)
@@ -84,10 +121,8 @@ class LandingController extends FrontendController
             $product->id = $productData['id'];
         }
 
-        $setup = \App\Models\SiteSetting::where('company_id', $this->company_id)
-            ->orWhereNull('company_id')
-            ->orderByRaw('company_id IS NULL ASC')
-            ->first() ?? new \App\Models\SiteSetting();
+        $companyFromPayload = $productData['company_id'] ?? ($form['company_id'] ?? null);
+        $setup = $this->resolveSiteSetting($companyFromPayload);
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
         \Illuminate\Support\Facades\View::share('isPreview', (bool)$isPreview);
@@ -102,7 +137,13 @@ class LandingController extends FrontendController
 
     public function directPreview(Request $request, $template_id = 1)
     {
+        $user = auth()->user() ?? auth('sanctum')->user() ?? request()->user();
+        $isSuperAdmin = $user && ($user->role === 'super_admin' || !empty($user->is_super_admin) || (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()));
+
         $companyId = $this->company_id;
+        if (!$companyId && $user && !$isSuperAdmin && $user->company_id) {
+            $companyId = $user->company_id;
+        }
 
         $product = Product::when($companyId, fn($q) => $q->where('company_id', $companyId))
             ->where('status', Status::Active->value)
@@ -124,10 +165,7 @@ class LandingController extends FrontendController
             'discount_price' => max(0, ($product->regular_price ?? 1200) - ($product->discount ?? 350)),
         ]);
 
-        $setup = \App\Models\SiteSetting::when($companyId, fn($q) => $q->where('company_id', $companyId))
-            ->orWhereNull('company_id')
-            ->orderByRaw('company_id IS NULL ASC')
-            ->first() ?? new \App\Models\SiteSetting();
+        $setup = $this->resolveSiteSetting($companyId);
 
         \Illuminate\Support\Facades\View::share('setup', $setup);
         \Illuminate\Support\Facades\View::share('isPreview', true);
