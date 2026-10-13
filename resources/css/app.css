@@ -7,10 +7,10 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-
 @font-face {
     font-family: "Hind Siliguri";
-    src: url("../fonts/hind-siliguri/HindSiliguri-Regular-Bengali.woff2") format("woff2");
+    src: url("../fonts/hind-siliguri/HindSiliguri-Regular-Bengali.woff2")
+        format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -19,7 +19,8 @@
 
 @font-face {
     font-family: "Hind Siliguri";
-    src: url("../fonts/hind-siliguri/HindSiliguri-Bold-Bengali.woff2") format("woff2");
+    src: url("../fonts/hind-siliguri/HindSiliguri-Bold-Bengali.woff2")
+        format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -39,13 +40,14 @@
 }
 
 @font-face {
-    font-family: 'Geist';
+    font-family: "Geist";
     font-style: normal;
     font-weight: 100 900;
-    src: url(../fonts/geist/geist.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-        U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F,
-        U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    src: url(../fonts/geist/geist.woff2) format("woff2");
+    unicode-range:
+        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+        U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+        U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @theme {
@@ -125,23 +127,23 @@ h6 {
     right: 20px !important;
 }
 
-#toast-container>.toast-success {
+#toast-container > .toast-success {
     background-color: #ff6a00 !important;
     opacity: 1;
 }
 
-#toast-container>.toast-error {
+#toast-container > .toast-error {
     background-color: #e11d48 !important;
     opacity: 1;
 }
 
-#toast-container>.toast-warning,
-#toast-container>.toast-info {
+#toast-container > .toast-warning,
+#toast-container > .toast-info {
     background-color: #f59e0b !important;
     opacity: 1 !important;
 }
 
-#toast-container>.toast .toast-progress {
+#toast-container > .toast .toast-progress {
     background-color: #ffffff;
     opacity: 0.3;
 }
@@ -284,72 +286,4 @@ html.lenis {
 
 .lenis.lenis-stopped {
     overflow: hidden;
-}
-
-.prose h1 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 22px !important;
-    line-height: 28px;
-    font-weight: 400;
-}
-
-.prose h2 {
-    margin-top: 20px;
-    margin-bottom: 0;
-    font-size: 22px !important;
-    line-height: 28px;
-    font-weight: 400;
-}
-
-.prose h3 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 16px !important;
-    line-height: 24px;
-    font-weight: 600;
-}
-
-.prose h4 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 15px;
-    line-height: 20px;
-    font-weight: 600;
-}
-
-.prose hr {
-    margin: 10px 0px !important;
-}
-
-.prose h5 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 14px;
-    line-height: 1.4;
-    font-weight: 600;
-}
-
-.prose h6 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    font-size: 13px;
-    line-height: 1.4;
-    font-weight: 600;
-}
-
-.prose p {
-    margin-top: 0 !important;
-    margin-bottom: 8px;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.prose h1+p,
-.prose h2+p,
-.prose h3+p,
-.prose h4+p,
-.prose h5+p,
-.prose h6+p {
-    margin-top: 0;
 }
