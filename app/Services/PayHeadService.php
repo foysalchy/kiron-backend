@@ -202,4 +202,34 @@ class PayHeadService
             throw ApiException::serverError('Failed to permanently delete pay head');
         }
     }
+    /**
+     * Toggle pay head status
+     */
+    public function toggleStatus(int $id): PayHead
+    {
+        DB::beginTransaction();
+
+        try {
+            $payHead = $this->getPayHeadById($id);
+            $newStatus = ((int)$payHead->status === Status::Active->value)
+                ? Status::Inactive->value
+                : Status::Active->value;
+
+            $payHead->update(['status' => $newStatus]);
+            LogHelper::updated('payHead', $payHead->id, $payHead->company_id, $payHead->name);
+
+            DB::commit();
+
+            Log::info('Pay head status toggled successfully', ['pay_head_id' => $id, 'status' => $newStatus]);
+
+            return $payHead->fresh();
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Pay head toggle status failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle pay head status');
+        }
+    }
 }

@@ -16,6 +16,7 @@ class PayHead extends Model
         'name',
         'type',// addition / deduction
         'description',
+        'status',
     ];
     protected $hidden = ['deleted_at'];
     const TYPE_ADDITION = 'addition';

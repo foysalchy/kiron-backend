@@ -108,4 +108,14 @@ class PayRollPayHeadController extends Controller
 
         return ResponseHelper::success(null, 'Record permanently deleted');
     }
+
+    /**
+     * Toggle record status (Active/Inactive).
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        $data = $this->service->toggleStatus($id);
+
+        return ResponseHelper::success($data, 'Status updated successfully');
+    }
 }

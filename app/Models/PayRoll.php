@@ -17,6 +17,7 @@ class PayRoll extends Model
         'name',
         'period_type_id',
         'payment_type',
+        'status',
     ];
     protected $hidden = ['deleted_at'];
     // Scopes

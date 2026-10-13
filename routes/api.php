@@ -981,6 +981,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}', [PayHeadController::class, 'destroy']);
                     Route::get('{id}/restore', [PayHeadController::class, 'restore']);
                     Route::delete('{id}/force', [PayHeadController::class, 'forceDestroy']);
+                    Route::patch('/{id}/toggle-status', [PayHeadController::class, 'toggleStatus']);
                 });
                 //period-types routes
                 Route::prefix('period-types')->group(function () {
@@ -1012,6 +1013,7 @@ Route::prefix('v1')->group(function () {
                     Route::get('{id}/restore', [PayRollController::class, 'restore']);
                     Route::delete('{id}/force', [PayRollController::class, 'forceDestroy']);
                     Route::post('/{id}/assign-periods', [PayRollController::class, 'assignPeriods']);
+                    Route::patch('/{id}/toggle-status', [PayRollController::class, 'toggleStatus']);
                 });
                 //pay-roll-pay-heads routes
                 Route::prefix('pay-roll-pay-heads')->group(function () {
@@ -1022,6 +1024,7 @@ Route::prefix('v1')->group(function () {
                     Route::delete('/{id}', [PayRollPayHeadController::class, 'destroy']);
                     Route::get('{id}/restore', [PayRollPayHeadController::class, 'restore']);
                     Route::delete('{id}/force', [PayRollPayHeadController::class, 'forceDestroy']);
+                    Route::patch('/{id}/toggle-status', [PayRollPayHeadController::class, 'toggleStatus']);
                 });
                 //positions routes
                 Route::prefix('positions')->group(function () {
