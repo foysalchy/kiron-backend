@@ -219,7 +219,7 @@
                     class="mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Short
                     Description</span>@endif
-                    <div class="prose prose-invert max-w-none text-lg md:text-2xl leading-relaxed">
+                    <div class="prose prose-invert max-w-none leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
                 </div>
@@ -531,8 +531,20 @@
                                     style="top: 0; z-index: 50;">{{ $featureLabel }}</span>@endif
 
                                     <div class="w-16 h-16 md:w-24 md:h-24 mb-5 flex-shrink-0 flex items-center justify-center">
-                                        @if(is_array($item) && !empty($item['image']))
-                                            <img src="{{ is_array($item['image']) ? ($item['image']['previewUrl'] ?? '') : (str_starts_with($item['image'], 'blob:') || str_starts_with($item['image'], 'data:') ? $item['image'] : \Illuminate\Support\Facades\Storage::disk('r2')->url($item['image'])) }}"
+                                        @php
+                                            $fImg = is_array($item) ? ($item['image'] ?? null) : null;
+                                            if (is_array($fImg)) {
+                                                $fImgSrc = $fImg['previewUrl'] ?? $fImg['url'] ?? $fImg['path'] ?? '';
+                                            } elseif (is_string($fImg)) {
+                                                $fImgSrc = (str_starts_with($fImg, 'blob:') || str_starts_with($fImg, 'data:') || str_starts_with($fImg, 'http') || str_starts_with($fImg, '/'))
+                                                    ? $fImg
+                                                    : \Illuminate\Support\Facades\Storage::disk('r2')->url($fImg);
+                                            } else {
+                                                $fImgSrc = '';
+                                            }
+                                        @endphp
+                                        @if(!empty($fImgSrc))
+                                            <img src="{{ $fImgSrc }}"
                                                 width="96" height="96" class="max-w-full max-h-full object-contain"
                                                 alt="{{ $item['title'] ?? 'Feature' }}">
                                         @else
