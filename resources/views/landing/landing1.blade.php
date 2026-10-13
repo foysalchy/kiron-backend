@@ -244,7 +244,7 @@
         // Static fallback preview data (Only used in Preview mode when actual data is missing)
         $previewTitle = 'প্রিমিয়াম কোয়ালিটি অর্গানিক সজিনা পাতা গুঁড়া (Moringa Powder)';
         $previewButtonText = 'অর্ডার করতে ক্লিক করুন';
-        $previewPhone = '01234567890';
+        $previewPhone = '017XXXXXXXX';
         $previewShortDesc = '<p>৫২৫ গ্রাম প্রিমিয়াম সজিনা পাউডার + ১০০ গ্রাম কালোজিরা মধু ফ্রি ।</p>';
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';

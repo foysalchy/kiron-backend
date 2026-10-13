@@ -165,7 +165,7 @@ class LandingController extends FrontendController
             'is_preview' => true,
             'thumbnail' => $product->thumbnail ?? null,
             'button_text' => 'অর্ডার করতে ক্লিক করুন',
-            'phone_number' => '01234567890',
+            'phone_number' => '017XXXXXXXX',
             'regular_price' => '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=',
             'discount_price' => '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/= সীমিত সময়ের জন্য',
         ]);
