@@ -248,38 +248,34 @@
         $previewShortDesc = '<p>৫২৫ গ্রাম প্রিমিয়াম সজিনা পাউডার + ১০০ গ্রাম কালোজিরা মধু ফ্রি ।</p>';
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';
-        $previewContent1 = '<div class="Landing__34__benifit_content">
-                                                                            <h2>সজিনা পাতার উপকারিতা</h2>
-                                                                            <ul>
-                                                                                <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
-                                                                                <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
-                                                                                <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
-                                                                                <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
-                                                                                <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
-                                                                                <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
-                                                                                <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
-                                                                                <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
-                                                                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                                            </ul>
-                                                                        </div>';
+        $previewContent1 = '<h2>সজিনা পাতার উপকারিতা</h2>
+                                    <ul>
+                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
+                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
+                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
+                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
+                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
+                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
+                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
+                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
+                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                    </ul>';
 
-        $previewContent2 = '<div class="Landing__34__benifit_content">
-                                                                            <h2>সেবনে সঠিক নিয়ম</h2>
-                                                                            <ul>
-                                                                                <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
-                                                                                <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
-                                                                                <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                                            </ul>
-                                                                        </div>';
+        $previewContent2 = '<h2>সেবনে সঠিক নিয়ম</h2>
+                                    <ul>
+                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
+                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
+                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                    </ul>';
         $previewDescription = '<p class="text-lg sm:text-xl md:text-[24px] font-normal text-[#0d2601] leading-relaxed m-0">গ্রাম থেকে সংগ্রহ করা শতভাগ ন্যাচারাল সজিনা পাতা নিজেদের তত্বাবধানে স্বাস্থ্য সম্মত পরিবেশে রোদে শুকিয়ে গুড়া করা হয়।প্রোডাক্ট হাতে পেয়ে, দেখে, কোয়ালিটি চেক করে পেমেন্টে করার সুবিধা ।</p>';
 
         $previewFeatures2 = [
@@ -329,8 +325,7 @@
                 <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }} mb-6">
                     @if($isPreviewMode)<span class="preview-badge !text-[10px] !leading-normal"
                     style="top: -20px;">Short Description</span>@endif
-                    <div
-                        class="prose prose-invert max-w-none text-lg md:text-2xl mx-auto leading-relaxed">
+                    <div class="prose prose-invert max-w-none mx-auto leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
                 </div>
@@ -443,16 +438,22 @@
             <section class="Landing__34__benifit_sec px-4 mt-8 md:mt-10">
                 <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch">
 
-                    <div class="relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    <div
+                        class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge"
                         style="top: -15px; left: 10px; z-index: 50;">Content</span>@endif
-                        {!! $content1 ?? '' !!}
+                        <div class="prose prose-slate max-w-none text-left">
+                            {!! $content1 ?? '' !!}
+                        </div>
                     </div>
 
-                    <div class="relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    <div
+                        class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Content
                         2</span>@endif
-                        {!! $content2 ?? '' !!}
+                        <div class="prose prose-slate max-w-none text-left">
+                            {!! $content2 ?? '' !!}
+                        </div>
                     </div>
                 </div>
 
@@ -512,12 +513,19 @@
 
                                     @php
                                         $fImg = !empty($feature['image']) ? $feature['image'] : ($isPreviewMode ? $productImg : null);
+                                        $fImgSrc = '';
+                                        if (is_array($fImg)) {
+                                            $fImgSrc = $fImg['previewUrl'] ?? $fImg['url'] ?? $fImg['path'] ?? '';
+                                        } elseif (is_string($fImg)) {
+                                            $fImgSrc = (str_starts_with($fImg, 'blob:') || str_starts_with($fImg, 'data:') || str_starts_with($fImg, 'http') || str_starts_with($fImg, '/'))
+                                                ? $fImg
+                                                : \Illuminate\Support\Facades\Storage::disk('r2')->url($fImg);
+                                        }
                                     @endphp
-                                    @if (!empty($fImg))
+                                    @if (!empty($fImgSrc))
                                         <div class="rounded-lg overflow-hidden flex justify-center">
-                                            <img src="{{ is_array($fImg) ? ($fImg['previewUrl'] ?? '') : (str_starts_with($fImg, 'blob:') || str_starts_with($fImg, 'data:') || str_starts_with($fImg, 'http') || str_starts_with($fImg, '/') ? $fImg : \Illuminate\Support\Facades\Storage::disk('r2')->url($fImg)) }}"
-                                                alt="{{ $feature['title'] ?? 'Feature' }}" width="400" height="300" loading="lazy"
-                                                decoding="async"
+                                            <img src="{{ $fImgSrc }}" alt="{{ $feature['title'] ?? 'Feature' }}" width="400"
+                                                height="300" loading="lazy" decoding="async"
                                                 class="w-full max-h-[300px] object-contain rounded-lg transform hover:scale-105 transition-transform duration-500">
                                         </div>
                                     @endif
@@ -579,7 +587,7 @@
                 <div
                     class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#1f5e00] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
                     <h2
-                        class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] mb-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] leading-snug md:leading-normal mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Title</span>@endif
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h2>

@@ -184,7 +184,7 @@ class LandingPageService
     private function handleExtrasImages(array $extras, array $existingExtras = [], $request, string $baseSlug = 'landing-page'): array
     {
         foreach ($extras as $fieldName => &$fieldValue) {
-            if (is_array($fieldValue) && !empty($fieldValue) && isset($fieldValue[0]['title'])) {
+            if (is_array($fieldValue) && !empty($fieldValue) && is_array($fieldValue[0])) {
                 foreach ($fieldValue as $i => &$card) {
                     $fileKey = "extras_{$fieldName}_image_{$i}";
 
