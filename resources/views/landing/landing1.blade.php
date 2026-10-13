@@ -706,7 +706,7 @@
         })();
     </script>
 
-    @if(isset($isPreview) && $isPreview)
+    @if(!empty($isPreviewMode) || (isset($isPreview) && $isPreview))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 document.addEventListener('click', function (e) {
@@ -718,7 +718,8 @@
                     const badgeEl = badge || targetEl.querySelector('.preview-badge');
                     if (!badgeEl) return;
 
-                    const text = badgeEl.textContent.trim().toLowerCase();
+                    // Normalize whitespace and newlines so multi-line text matches single-space strings
+                    const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
                     let field = null;
 
                     if (text.includes('regular price')) {
@@ -733,16 +734,24 @@
                         field = 'thumbnail';
                     } else if (text.includes('review')) {
                         field = 'img_paths';
-                    } else if (text.includes('product details') || text.includes('description')) {
+                    } else if (text.includes('details') || text.includes('description')) {
                         field = 'description';
-                    } else if (text.includes('features 2')) {
-                        field = 'features2';
-                    } else if (text.includes('features')) {
-                        field = 'features';
+                    } else if (text.includes('phone')) {
+                        field = 'phone_number';
                     } else if (text.includes('button text')) {
                         field = 'button_text';
-                    } else if (text.includes('phone number')) {
-                        field = 'phone_number';
+                    } else if (text.includes('features 6') || text.includes('feature 6')) {
+                        field = 'features6';
+                    } else if (text.includes('features 5') || text.includes('feature 5')) {
+                        field = 'features5';
+                    } else if (text.includes('features 4') || text.includes('feature 4')) {
+                        field = 'features4';
+                    } else if (text.includes('features 3') || text.includes('feature 3')) {
+                        field = 'features3';
+                    } else if (text.includes('features 2') || text.includes('feature 2')) {
+                        field = 'features2';
+                    } else if (text.includes('features') || text.includes('feature')) {
+                        field = 'features';
                     } else if (text.includes('content 2')) {
                         field = 'content2';
                     } else if (text.includes('content')) {
