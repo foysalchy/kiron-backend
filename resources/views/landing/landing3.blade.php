@@ -8,6 +8,7 @@
     <meta name="description"
         content="{{ \Illuminate\Support\Str::limit(strip_tags($landing->short_description ?: $landing->description ?: $landing->title), 160) }}">
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     @vite(['resources/css/landing3.css', 'resources/js/landing3.js'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
@@ -62,17 +63,28 @@
         }
 
         /* Swiper Pagination Style */
-        .rv-swiper .swiper-pagination-bullet {
+        .swiper-pagination-bullet {
             width: 10px;
             height: 10px;
             background: #d1d5db;
             opacity: 1;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
 
-        .rv-swiper .swiper-pagination-bullet-active {
+        .swiper-pagination-bullet-active {
             background: #0D2601 !important;
             width: 30px;
             border-radius: 10px;
+        }
+
+        .swiper-pagination {
+            position: relative !important;
+            margin-top: 15px !important;
+            z-index: 20 !important;
+            pointer-events: auto !important;
         }
 
         .swiper-slide {
@@ -102,8 +114,6 @@
             border: 3px dashed #7DF9FF;
             background: rgba(255, 255, 255, 0.05);
         }
-
-
     </style>
     <style>
         @if(isset($isPreview) && $isPreview)
@@ -158,9 +168,9 @@
         $previewRegularPrice = '৳ ১,২০০';
         $previewDiscountPrice = '৳ ৭৫০';
         $previewDescription = '<div class="py-4">
-                                        <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
-                                        <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
-                                    </div>';
+                                                <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
+                                                <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
+                                            </div>';
 
         $previewFeatures = [
             'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
@@ -209,14 +219,14 @@
                 {{-- 1.5 Title --}}
                 <div class="mb-8 md:mb-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Title</span>@endif
-                    <h1 class="font-bold text-2xl md:text-5xl text-white">
+                    <h1
+                        class="font-bold text-2xl sm:text-3xl md:text-[45px] text-white leading-snug md:leading-tight break-words">
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h1>
                 </div>
 
                 {{-- 2. Dynamic Short Description --}}
-                <div
-                    class="mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                <div class="mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Short
                     Description</span>@endif
                     <div class="prose prose-invert max-w-none leading-relaxed">
@@ -249,7 +259,7 @@
             </div>
         </section>
         {{-- Video Section --}}
-        <section class="py-10 md:py-16 px-4 text-center bg-white">
+        <section class="py-10 px-4 text-center bg-white">
             <div class="w-full max-w-7xl mx-auto mb-10">
                 @if ($landing->video)
                     <div
@@ -268,7 +278,8 @@
                     <div class="relative w-full {{ $isPreviewMode ? 'preview-badge-container' : '' }} flex justify-center">
                         @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail /
                         Video</span>@endif
-                        <img src="{{ $productImg }}" width="600" height="600" class="max-w-full h-auto rounded-2xl"
+                        <img src="{{ $productImg }}" width="600" height="600" loading="eager" decoding="async"
+                            class="max-w-full sm:max-w-xl md:max-w-2xl max-h-[500px] w-auto h-auto object-contain rounded-2xl shadow-md"
                             alt="{{ $landing->name ?? $product->title }}">
                     </div>
                 @endif
@@ -303,7 +314,7 @@
                             @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
                             Title</span>@endif
                             <h2
-                                class="bg-[#dcfce7] text-[#0D2601] px-5 sm:px-8 md:px-16 py-2.5 sm:py-3 rounded-2xl md:rounded-full text-base sm:text-xl md:text-4xl font-black border border-[#1f8a54] max-w-full leading-snug">
+                                class="bg-[#dcfce7] text-[#0D2601] px-5 sm:px-8 md:px-16 py-2.5 sm:py-3 rounded-2xl md:rounded-full text-xl sm:text-2xl md:text-4xl font-bold border border-[#1f8a54] max-w-full leading-normal md:leading-relaxed">
                                 {{ $featuresTitle }}
                             </h2>
                         </div>
@@ -366,7 +377,8 @@
                             Title</span>@endif
                             <div
                                 class="bg-[#dcfce7] px-6 md:px-10 py-4 md:py-6 rounded-2xl md:rounded-[60px] border border-[#c1e9cd]">
-                                <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight max-w-6xl">
+                                <h2
+                                    class="text-xl sm:text-2xl md:text-4xl font-bold text-[#0D2601] leading-normal md:leading-relaxed max-w-6xl">
                                     {!! $features2Title !!}
                                 </h2>
                             </div>
@@ -494,10 +506,13 @@
                     $whyChooseTitle = data_get($landing->extras, 'content') ?: ($landing->content ?? ($isPreviewMode ? 'আমাদের কাছ থেকে কেন কিনবেন?' : null));
                 @endphp
                 @if($whyChooseTitle || $isPreviewMode)
-                    <div class="inline-block relative mb-12 md:mb-16 px-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    <div
+                        class="inline-block relative mb-12 md:mb-16 px-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Content</span>@endif
-                        <div class="bg-[#dcfce7] px-6 sm:px-8 md:px-20 py-3 sm:py-4 rounded-2xl md:rounded-full border border-[#c1e9cd]">
-                            <div class="prose max-w-none text-xl md:text-4xl font-bold text-[#0D2601] leading-tight [&_*]:my-0 inline-block">
+                        <div
+                            class="bg-[#dcfce7] px-6 sm:px-8 md:px-20 py-3 sm:py-4 rounded-2xl md:rounded-full border border-[#c1e9cd]">
+                            <div
+                                class="prose max-w-none text-xl sm:text-2xl md:text-4xl font-bold text-[#0D2601] leading-normal md:leading-relaxed [&_*]:my-0 inline-block">
                                 {!! $whyChooseTitle ?: 'আমাদের কাছ থেকে <span class="text-[#145a32]">কেন কিনবেন?</span>' !!}
                             </div>
                         </div>
@@ -544,9 +559,8 @@
                                             }
                                         @endphp
                                         @if(!empty($fImgSrc))
-                                            <img src="{{ $fImgSrc }}"
-                                                width="96" height="96" class="max-w-full max-h-full object-contain"
-                                                alt="{{ $item['title'] ?? 'Feature' }}">
+                                            <img src="{{ $fImgSrc }}" width="96" height="96"
+                                                class="max-w-full max-h-full object-contain" alt="{{ $item['title'] ?? 'Feature' }}">
                                         @else
                                             <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="96" height="96"
                                                 class="w-full h-full object-contain opacity-20" alt="Feature Icon">
@@ -595,7 +609,8 @@
             <div class="container mx-auto {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Review
                 Images</span>@endif
-                <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
+                <h2
+                    class="text-xl sm:text-2xl md:text-4xl font-bold text-center mb-12 text-[#0D2601] leading-normal md:leading-relaxed">
                     আমাদের কাস্টমার রিভিউ
                 </h2>
 
@@ -630,7 +645,9 @@
         {{-- ══ SECTION 7: ORDER FORM (Dynamic Component) ══ --}}
         <section id="order" class="py-20 px-4 bg-white border-t border-gray-100">
             <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-5xl font-black text-red-600 italic">তাই আর দেরি না করে আজই অর্ডার করুন</h2>
+                <h2
+                    class="text-xl sm:text-2xl md:text-4xl font-bold text-red-600 italic leading-normal md:leading-relaxed">
+                    তাই আর দেরি না করে আজই অর্ডার করুন</h2>
             </div>
             <x-landing.order-form :landing="$landing" :isPreview="$isPreviewMode" />
         </section>
@@ -677,6 +694,63 @@
 
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        (function () {
+            function startLanding3Swiper() {
+                const el = document.querySelector('.rv-swiper');
+                if (!el || typeof Swiper === 'undefined') return;
+
+                if (el.swiper) {
+                    el.swiper.destroy(true, true);
+                }
+
+                const totalSlides = el.querySelectorAll('.swiper-slide').length;
+                const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
+
+                new Swiper(el, {
+                    slidesPerView: 1,
+                    spaceBetween: 20,
+                    loop: totalSlides >= 2,
+                    slideToClickedSlide: true,
+                    autoplay: {
+                        delay: 2500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    },
+                    pagination: {
+                        el: paginationEl,
+                        clickable: true,
+                    },
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                    breakpoints: {
+                        640: {
+                            slidesPerView: Math.min(2, totalSlides),
+                            spaceBetween: 20,
+                        },
+                        1024: {
+                            slidesPerView: Math.min(3, totalSlides),
+                            spaceBetween: 30,
+                        }
+                    }
+                });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startLanding3Swiper);
+            } else {
+                startLanding3Swiper();
+            }
+
+            window.addEventListener('load', startLanding3Swiper);
+            setTimeout(startLanding3Swiper, 500);
+            setTimeout(startLanding3Swiper, 1500);
+        })();
+    </script>
 
     @if(!empty($isPreviewMode) || (isset($isPreview) && $isPreview))
         <script>

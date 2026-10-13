@@ -22,7 +22,7 @@ function initLanding3Swiper() {
             pauseOnMouseEnter: true,
         },
         pagination: {
-            el: '.swiper-pagination',
+            el: el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination',
             clickable: true,
         },
         navigation: {
