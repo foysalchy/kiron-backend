@@ -19,6 +19,28 @@
             ;
         }
 
+        .prose ol {
+            list-style-type: decimal !important;
+            padding-left: 1.5rem !important;
+            margin-top: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+            text-align: left !important;
+        }
+
+        .prose ul {
+            list-style-type: disc !important;
+            padding-left: 1.5rem !important;
+            margin-top: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+            text-align: left !important;
+        }
+
+        .prose li {
+            display: list-item !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+
         .bg-grid-blue {
 
             background-image:

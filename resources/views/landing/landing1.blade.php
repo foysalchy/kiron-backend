@@ -23,6 +23,22 @@
             ;
         }
 
+        .prose ol {
+            list-style-type: decimal !important;
+            padding-left: 1.5rem !important;
+        }
+
+        .prose ul {
+            list-style-type: disc !important;
+            padding-left: 1.5rem !important;
+        }
+
+        .prose li {
+            display: list-item !important;
+            margin-top: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+
         /* Fix: prevent horizontal scroll on mobile */
         .rv-track-wrap {
             overflow: hidden;
