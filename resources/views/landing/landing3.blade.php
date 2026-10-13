@@ -14,7 +14,9 @@
 
     <style>
         body {
-            font-family: {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!};
+            font-family:
+                {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!}
+            ;
             scroll-behavior: smooth;
         }
 
@@ -181,9 +183,9 @@
         $previewRegularPrice = '৳ ১,২০০';
         $previewDiscountPrice = '৳ ৭৫০';
         $previewDescription = '<div class="py-4">
-                                <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
-                                <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
-                            </div>';
+                                        <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
+                                        <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
+                                    </div>';
 
         $previewFeatures = [
             'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
@@ -323,7 +325,8 @@
                 @if($featuresTitle || $isPreviewMode)
                     <div class="text-center mb-8 md:mb-10 px-2">
                         <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features Title</span>@endif
+                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
+                            Title</span>@endif
                             <h2
                                 class="bg-[#dcfce7] text-[#0D2601] px-5 sm:px-8 md:px-16 py-2.5 sm:py-3 rounded-2xl md:rounded-full text-base sm:text-xl md:text-4xl font-black border border-[#1f8a54] max-w-full leading-snug">
                                 {{ $featuresTitle }}
@@ -344,18 +347,18 @@
                         @if($isPreviewMode)<span class="preview-badge"
                         style="top: -20px; z-index: 50;">Features</span>@endif
 
-                    @foreach ($dynamicBenefits as $benefit)
-                        <div
-                            class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                            <span aria-hidden="true"
-                                class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
+                        @foreach ($dynamicBenefits as $benefit)
+                            <div
+                                class="flex items-center gap-3 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                                <span aria-hidden="true"
+                                    class="text-white bg-[#1f8a54] p-1 rounded-full text-[10px] shrink-0">✓</span>
 
-                            <p class="text-lg md:text-3xl text-gray-700 font-medium">
-                                {{ is_array($benefit) ? ($benefit['title'] ?? '') : $benefit }}
-                            </p>
-                        </div>
-                    @endforeach
-                </div>
+                                <p class="text-lg md:text-3xl text-gray-700 font-medium">
+                                    {{ is_array($benefit) ? ($benefit['title'] ?? '') : $benefit }}
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
                 @endif
 
                 <div class="mb-4 text-center mt-8 md:mt-12">
@@ -384,7 +387,8 @@
                 @if($features2Title || $isPreviewMode)
                     <div class="text-center mb-8 md:mb-12 px-2">
                         <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2 Title</span>@endif
+                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2
+                            Title</span>@endif
                             <div
                                 class="bg-[#dcfce7] px-6 md:px-10 py-4 md:py-6 rounded-2xl md:rounded-[60px] border border-[#c1e9cd]">
                                 <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight max-w-6xl">
@@ -405,17 +409,18 @@
                 @if(!empty($dynamicNutrition) && count($dynamicNutrition) > 0)
                     <div
                         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2</span>@endif
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
+                        2</span>@endif
 
-                    @foreach ($dynamicNutrition as $item)
-                        <div
-                            class="bg-[#1D4935] text-white p-8 md:p-10 rounded-xl flex items-center justify-center min-h-[120px] md:min-h-[150px] shadow-lg transition-transform hover:scale-[1.02]">
-                            <p class="text-lg md:text-2xl font-bold leading-snug">
-                                {{ is_array($item) ? ($item['title'] ?? '') : $item }}
-                            </p>
-                        </div>
-                    @endforeach
-                </div>
+                        @foreach ($dynamicNutrition as $item)
+                            <div
+                                class="bg-[#1D4935] text-white p-8 md:p-10 rounded-xl flex items-center justify-center min-h-[120px] md:min-h-[150px] shadow-lg transition-transform hover:scale-[1.02]">
+                                <p class="text-lg md:text-2xl font-bold leading-snug">
+                                    {{ is_array($item) ? ($item['title'] ?? '') : $item }}
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
                 @endif
 
                 {{-- ৩. বাটন --}}
@@ -689,6 +694,7 @@
 
                     const badgeEl = badge || targetEl.querySelector('.preview-badge');
                     if (!badgeEl) return;
+                    e.preventDefault();
 
                     // Normalize whitespace and newlines so multi-line text matches single-space strings
                     const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
