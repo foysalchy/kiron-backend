@@ -71,9 +71,7 @@
             height: 100%;
         }
 
-        .Landing__34__benifit_content h1,
-        .Landing__34__benifit_content h2,
-        .Landing__34__benifit_content h3 {
+        .Landing__34__benifit_content h2 {
             width: 100%;
             color: #0d2601;
             font-size: 32px;
@@ -88,9 +86,7 @@
         }
 
         @media (min-width: 768px) {
-            .Landing__34__benifit_content h1,
-            .Landing__34__benifit_content h2,
-            .Landing__34__benifit_content h3 {
+            .Landing__34__benifit_content h2 {
                 font-size: 38px;
                 border: 11px solid #2e8c03;
                 padding: 15px 30px;
@@ -253,33 +249,33 @@
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';
         $previewContent1 = '<h2>সজিনা পাতার উপকারিতা</h2>
-                            <ul>
-                                <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
-                                <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
-                                <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
-                                <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
-                                <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
-                                <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
-                                <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
-                                <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
-                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                            </ul>';
+                                    <ul>
+                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
+                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
+                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
+                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
+                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
+                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
+                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
+                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
+                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                    </ul>';
 
         $previewContent2 = '<h2>সেবনে সঠিক নিয়ম</h2>
-                            <ul>
-                                <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
-                                <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
-                                <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
-                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                            </ul>';
+                                    <ul>
+                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
+                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
+                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
+                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                    </ul>';
         $previewDescription = '<p class="text-lg sm:text-xl md:text-[24px] font-normal text-[#0d2601] leading-relaxed m-0">গ্রাম থেকে সংগ্রহ করা শতভাগ ন্যাচারাল সজিনা পাতা নিজেদের তত্বাবধানে স্বাস্থ্য সম্মত পরিবেশে রোদে শুকিয়ে গুড়া করা হয়।প্রোডাক্ট হাতে পেয়ে, দেখে, কোয়ালিটি চেক করে পেমেন্টে করার সুবিধা ।</p>';
 
         $previewFeatures2 = [
@@ -329,8 +325,7 @@
                 <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }} mb-6">
                     @if($isPreviewMode)<span class="preview-badge !text-[10px] !leading-normal"
                     style="top: -20px;">Short Description</span>@endif
-                    <div
-                        class="prose prose-invert max-w-none mx-auto leading-relaxed">
+                    <div class="prose prose-invert max-w-none mx-auto leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
                 </div>
@@ -443,7 +438,8 @@
             <section class="Landing__34__benifit_sec px-4 mt-8 md:mt-10">
                 <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch">
 
-                    <div class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    <div
+                        class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge"
                         style="top: -15px; left: 10px; z-index: 50;">Content</span>@endif
                         <div class="prose prose-slate max-w-none text-left">
@@ -451,7 +447,8 @@
                         </div>
                     </div>
 
-                    <div class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    <div
+                        class="Landing__34__benifit_content relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Content
                         2</span>@endif
                         <div class="prose prose-slate max-w-none text-left">
@@ -527,9 +524,8 @@
                                     @endphp
                                     @if (!empty($fImgSrc))
                                         <div class="rounded-lg overflow-hidden flex justify-center">
-                                            <img src="{{ $fImgSrc }}"
-                                                alt="{{ $feature['title'] ?? 'Feature' }}" width="400" height="300" loading="lazy"
-                                                decoding="async"
+                                            <img src="{{ $fImgSrc }}" alt="{{ $feature['title'] ?? 'Feature' }}" width="400"
+                                                height="300" loading="lazy" decoding="async"
                                                 class="w-full max-h-[300px] object-contain rounded-lg transform hover:scale-105 transition-transform duration-500">
                                         </div>
                                     @endif
