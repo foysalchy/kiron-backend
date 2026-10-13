@@ -440,7 +440,7 @@
                 <hr class="border-[#00D05E]/40 mb-12 max-w-5xl mx-auto">
 
                 @php
-                    $displayPhone = $landing->phone_number ?: ($isPreviewMode ? $previewPhone : ($setup->phone ?? ''));
+                    $displayPhone = $landing->phone_number ?: ($isPreviewMode ? $previewPhone : null);
                 @endphp
                 @if($displayPhone)
                     <div class="mb-12 space-y-4">
