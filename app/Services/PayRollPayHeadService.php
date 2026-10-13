@@ -223,4 +223,35 @@ class PayRollPayHeadService
             throw ApiException::serverError('Failed to permanently delete record');
         }
     }
+
+    /**
+     * Toggle status (Active/Inactive)
+     */
+    public function toggleStatus(int $id): PayRollPayHead
+    {
+        DB::beginTransaction();
+        try {
+            $record = $this->getById($id);
+            $currentStatus = Status::from($record->status);
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+
+            $record->update([
+                'status' => $newStatus->value
+            ]);
+
+            LogHelper::statusChanged('payRollPayHead', $record->id, $record->company_id, $record->type . ' amount ' . $record->amount . ' new status ' . $newStatus->label());
+
+            DB::commit();
+            return $record;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PayRollPayHead status toggle failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle status');
+        }
+    }
 }

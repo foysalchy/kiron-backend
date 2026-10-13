@@ -47,7 +47,9 @@ class BulkActionController extends Controller
         'leave-types'      => \App\Models\LeaveType::class,
         'assign-leaves'    => \App\Models\AssignLeaveType::class,
         'pay-rolls'        => \App\Models\PayRoll::class,
+        'pay-heads'        => \App\Models\PayHead::class,
         'positions'        => \App\Models\Position::class,
+        'pay-roll-pay-heads'        => \App\Models\PayRollPayHead::class,
         'pricing-packages'        => \App\Models\PricingPackage::class,
         'landings'        => \App\Models\LandingPage::class,
         'resign-rules'        => \App\Models\ResignRule::class,
@@ -67,7 +69,6 @@ class BulkActionController extends Controller
         'account-groups'        => \App\Models\AccountGroup::class,
         'account-expenses'        => \App\Models\TransactionExpense::class,
         'account-incomes'        => \App\Models\TransactionIncome::class,
-        'product-groups'        => \App\Models\ProductGroup::class,
         'product-groups'        => \App\Models\ProductGroup::class,
     ];
 

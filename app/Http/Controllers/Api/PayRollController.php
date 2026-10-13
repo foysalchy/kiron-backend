@@ -106,4 +106,14 @@ class PayRollController extends Controller
 
         return ResponseHelper::success(null, 'Payroll permanently deleted');
     }
+
+    /**
+     * Toggle payroll status (Active/Inactive).
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        $data = $this->payRollService->toggleStatus($id);
+
+        return ResponseHelper::success($data, 'Payroll status updated successfully');
+    }
 }

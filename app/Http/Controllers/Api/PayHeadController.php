@@ -94,4 +94,13 @@ class PayHeadController extends Controller
     }
 
 
+    /**
+     * Toggle status of pay head.
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        $payHead = $this->payHeadService->toggleStatus($id);
+
+        return ResponseHelper::success($payHead, 'Pay head status updated successfully');
+    }
 }

@@ -17,6 +17,7 @@ class PayRollPayHead extends Model
         'pay_head_id',
         'type',
         'amount',
+        'status',
     ];
     protected $hidden = ['deleted_at'];
         // Scopes

@@ -227,4 +227,39 @@ class PayRollService
             throw ApiException::serverError('Failed to permanently delete payroll');
         }
     }
+
+    /**
+     * Toggle payroll status (Active/Inactive)
+     */
+    public function toggleStatus(int $id): PayRoll
+    {
+        DB::beginTransaction();
+        try {
+            $payRoll = PayRoll::find($id);
+            if (!$payRoll) {
+                throw ApiException::notFound('PayRoll');
+            }
+
+            $currentStatus = Status::from($payRoll->status);
+            $newStatus = $currentStatus === Status::Active
+                ? Status::Inactive
+                : Status::Active;
+
+            $payRoll->update([
+                'status' => $newStatus->value
+            ]);
+
+            LogHelper::statusChanged('payroll', $payRoll->id, $payRoll->company_id, $payRoll->name . ' new status ' . $newStatus->label());
+
+            DB::commit();
+            return $payRoll;
+        } catch (ApiException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PayRoll status toggle failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to toggle payroll status');
+        }
+    }
 }
