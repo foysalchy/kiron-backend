@@ -8,7 +8,7 @@
     <meta name="description"
         content="{{ \Illuminate\Support\Str::limit(strip_tags($landing->short_description ?: $landing->description ?: $landing->title), 160) }}">
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
-    @vite('resources/css/landing2.css')
+    @vite(['resources/css/app.css', 'resources/css/landing2.css'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
 
@@ -226,22 +226,23 @@
                         decoding="async" fetchpriority="high" class="mx-auto h-12 md:h-16 w-auto object-contain">
                 </div>
             </div>
-            <div class="main-container bg-[#ebf0fa]/60 p-10">
+            <div class="main-container bg-[#ebf0fa]/60 p-4 sm:p-6 md:p-10">
 
                 {{-- ══ HERO ══ --}}
                 <section class="py-4 px-4 text-center">
-                    <div class="max-w-5xl mx-auto">
+                    <div class="max-w-6xl mx-auto">
 
-                        {{-- Blue badge --}}
-                        <div
-                            class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-6 py-3 rounded-xl font-bold text-base md:text-3xl mb-8 shadow-lg {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        {{-- Blue badge Hero Title --}}
+                        <h1
+                            class="inline-block bg-gradient-to-r from-[#005EFF] to-[#003A9C] text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-2xl sm:text-3xl md:text-[38px] leading-snug md:leading-tight mb-8 shadow-lg max-w-full break-words {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge"
                             style="top: -20px; color: white;">Title</span>@endif
                             {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
-                        </div>
+                        </h1>
 
                         {{-- Main headline --}}
-                        <div class="prose prose-slate max-w-none mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        <div
+                            class="prose max-w-none mx-auto mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Short
                             Description</span>@endif
                             {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
@@ -281,7 +282,7 @@
                                     $fFirstPart = implode(' ', $fWords);
                                 @endphp
                                 <div class="mb-10 text-center">
-                                    <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                                    <h2 class="text-xl sm:text-2xl md:text-4xl font-bold leading-normal md:leading-relaxed">
                                         {{ $fFirstPart }}
                                         <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
                                             {{ implode(' ', $fLastPart) }}
@@ -307,7 +308,7 @@
 
                                     @if(!empty($landing->extras['features'][2]) || $isPreviewMode)
                                         <span
-                                            class="bg-[#fc4124] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0">
+                                            class="bg-[#c9250b] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0 font-medium">
                                             {{ $landing->extras['features'][2] ?? ($isPreviewMode ? '১০০% নিরাপদ ও টেকসই' : '') }}
                                         </span>
                                     @endif
@@ -331,7 +332,7 @@
                             <div class="mb-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
                                 2</span>@endif
-                                <h2 class="text-xl md:text-4xl font-semibold leading-snug">
+                                <h2 class="text-xl sm:text-2xl md:text-4xl font-bold leading-normal md:leading-relaxed">
                                     {{ $firstPart }}
                                     <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
                                         {{ implode(' ', $lastPart) }}
@@ -359,12 +360,13 @@
                                         $catMapSrc = $productImg;
                                     }
                                 @endphp
-                                <img src="{{ $catMapSrc ?: $productImg }}"
-                                    alt="Categories" width="600" height="600" loading="lazy" decoding="async"
+                                <img src="{{ $catMapSrc ?: $productImg }}" alt="Categories" width="600" height="600"
+                                    loading="lazy" decoding="async"
                                     class="w-auto h-auto max-w-full max-h-[550px] mx-auto object-contain rounded-xl">
 
                                 @if($categoryDesc)
-                                    <div class="mt-6 prose prose-slate max-w-none text-gray-700 leading-relaxed text-center md:text-left">
+                                    <div
+                                        class="mt-6 prose prose-slate max-w-none text-gray-700 leading-relaxed text-center md:text-left">
                                         {!! $categoryDesc !!}
                                     </div>
                                 @endif
@@ -373,7 +375,7 @@
 
                         @if(!empty($landing->extras['features3']) || $isPreviewMode)
                             <div
-                                class="container mx-auto space-y-6 mb-16 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                                class="w-full max-w-4xl mx-auto space-y-4 md:space-y-6 mb-16 text-left {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
                                 3</span>@endif
                                 @php
@@ -383,70 +385,70 @@
 
                                 @if(empty($features3))
                                     <!-- Point 1 -->
-                                    <div class="flex gap-3 text-lg font-bold items-start md:pl-48">
+                                    <div class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start md:pl-48">
                                         <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
                                         </div>
-                                        <p class="leading-relaxed text-gray-800">
+                                        <p class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                             বাজারের সবচেয়ে লেটেস্ট আপডেটে <span class="text-[#fc4124]">৫১০ টি কার্ডে</span>
                                             রয়েছে ৪২টি ক্যাটাগরির শব্দ
                                         </p>
                                     </div>
 
                                     <!-- Point 2 -->
-                                    <div class="flex gap-3 text-lg font-bold items-start md:pl-32">
+                                    <div class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start md:pl-32">
                                         <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
                                         </div>
-                                        <p class="leading-relaxed text-gray-800">
+                                        <p class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                             স্মার্ট ও টেকসই ডিজাইন লেমিনেটেড কাগজ, <span class="text-[#fc4124]">সম্পূর্ণ
                                                 ওয়াটারপ্রুফ খুবই মজবুত,</span> সহজে ছিঁড়ে যায় না বা নষ্ট হয় না
                                         </p>
                                     </div>
 
                                     <!-- Point 3 -->
-                                    <div class="flex gap-3 text-lg font-bold items-start md:pl-16">
+                                    <div class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start md:pl-16">
                                         <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
                                         </div>
-                                        <p class="leading-relaxed text-gray-800">
+                                        <p class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                             ভয়েস রিপিট ফিচার, <span class="text-[#fc4124]">শিশু যা বলবে, বইটি তা-ই রিপিট
                                                 করবে।</span> এতে করে শেখা হবে আরও মজাদার, বাড়বে আত্মবিশ্বাস ও পড়ার আগ্রহ.
                                         </p>
                                     </div>
 
                                     <!-- Point 4 -->
-                                    <div class="flex gap-3 text-lg font-bold items-start md:pl-8">
+                                    <div class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start md:pl-8">
                                         <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
                                         </div>
-                                        <p class="leading-relaxed text-gray-800">
+                                        <p class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                             প্রাথমিক শিক্ষার সকল কিছু যেমন <span class="text-[#fc4124]">বাংলা বর্ণমালা,
                                                 Alphabet, আরবি বর্ণমালা, বাংলা সাংখ্যা, ইংরেজি সংখ্যা</span> রয়েছে এই বইটিতে
                                         </p>
                                     </div>
 
                                     <!-- Point 5 -->
-                                    <div class="flex gap-3 text-lg font-bold items-start md:pl-0">
+                                    <div class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start md:pl-0">
                                         <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
                                                     d="M5 13l4 4L19 7"></path>
                                             </svg>
                                         </div>
-                                        <p class="leading-relaxed text-gray-800">
+                                        <p class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                             পবিত্র কোরআনের ১৫টি সুরা ১৫টি শ্রুতিমধুর ইসলামিক গজল নতুন সংযোজন হয়েছে, <span
                                                 class="text-[#fc4124]">এতে আপনার শিশু</span> ধর্মীয় শিক্ষায় সুশিক্ষা লাভ করবে
                                         </p>
@@ -454,7 +456,7 @@
                                 @else
                                     @foreach ($features3 as $index => $point)
                                         <div
-                                            class="flex gap-3 text-lg font-bold items-start {{ $paddingClasses[$index] ?? 'md:pl-0' }}">
+                                            class="flex gap-2.5 sm:gap-3 text-base md:text-lg font-bold items-start {{ $paddingClasses[$index] ?? 'md:pl-0' }}">
                                             <div class="bg-[#50d084] rounded p-0.5 text-white flex-shrink-0 mt-1 shadow-sm">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
@@ -462,7 +464,7 @@
                                                 </svg>
                                             </div>
 
-                                            <div class="leading-relaxed text-gray-800">
+                                            <div class="leading-relaxed text-gray-800 min-w-0 flex-1 break-words">
                                                 {!! $point !!}
                                             </div>
                                         </div>
@@ -485,7 +487,8 @@
                             $promoImage = $promoData['image'] ?? null;
                         @endphp
                         <!-- Heading -->
-                        <h3 class="text-2xl md:text-3xl font-bold mb-6 flex items-center justify-center gap-2">
+                        <h3
+                            class="text-xl sm:text-2xl md:text-4xl font-bold mb-6 flex items-center justify-center gap-2 leading-normal md:leading-relaxed">
                             {!! $promoHeading !!}
                         </h3>
 
@@ -505,8 +508,8 @@
                         <div
                             class="max-w-xl mx-auto rounded-xl overflow-hidden mb-8 border-2 border-white border-dashed shadow-2xl bg-white/5">
 
-                            <img src="{{ $promoImgSrc ?: $productImg }}"
-                                alt="Offer Product" width="600" height="600" loading="lazy" decoding="async"
+                            <img src="{{ $promoImgSrc ?: $productImg }}" alt="Offer Product" width="600" height="600"
+                                loading="lazy" decoding="async"
                                 class="w-auto h-auto max-w-full max-h-[500px] mx-auto object-contain">
                         </div>
 
@@ -544,7 +547,8 @@
                 <div class="mt-14 text-center">
                     <a href="#order"
                         class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Button Text</span>@endif
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Button
+                        Text</span>@endif
                         <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"></circle>

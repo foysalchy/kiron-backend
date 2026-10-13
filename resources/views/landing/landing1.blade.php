@@ -7,7 +7,6 @@
     <title>{{ $landing->title }}</title>
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @include('components.fontawesome')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
@@ -51,6 +50,10 @@
             margin-top: 0 !important;
             margin-bottom: 0 !important;
             display: inline !important;
+        }
+
+        .prose hr {
+            margin: 10px 0 !important;
         }
 
         /* Fix: prevent horizontal scroll on mobile */
@@ -152,20 +155,28 @@
         }
     </style>
     <style>
-        .rv-swiper .swiper-pagination-bullet {
+        .swiper-pagination-bullet {
             width: 10px;
             height: 10px;
             background: #d1d5db;
-            /* Gray color */
             opacity: 1;
             transition: all 0.3s ease;
             border-radius: 50%;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
 
-        .rv-swiper .swiper-pagination-bullet-active {
+        .swiper-pagination-bullet-active {
             background: #0D2601 !important;
             width: 30px;
             border-radius: 10px;
+        }
+
+        .swiper-pagination {
+            position: relative !important;
+            margin-top: 15px !important;
+            z-index: 20 !important;
+            pointer-events: auto !important;
         }
 
         .swiper-button-next,
@@ -316,8 +327,7 @@
                     class="mx-auto mb-6 h-12 md:h-16 w-auto object-contain">
 
                 <div class="border border-[#2e8c03] p-4 md:p-6 rounded mb-6">
-                    <h1 class="text-[45px] font-bold mb-4 leading-tight {{ $isPreviewMode ? 'preview-badge-container' : '' }}"
-                        style="font-size: 45px;">
+                    <h1 class="text-2xl sm:text-3xl md:text-[45px] font-bold leading-snug md:leading-tight break-words {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge">Title</span>@endif
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h1>
@@ -384,7 +394,7 @@
                             $phone = $landing->phone_number ?: ($isPreviewMode ? $previewPhone : null);
                         @endphp
                         <div
-                            class="bg-[#C00000] text-white py-6 text-xl md:text-4xl font-medium rounded-xl mb-12 shadow-lg w-full leading-tight {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            class="bg-[#C00000] text-white py-6 px-4 text-xl sm:text-2xl md:text-4xl font-bold rounded-xl mb-12 shadow-lg w-full leading-normal md:leading-relaxed {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Phone
                             Number</span>@endif
                             আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন @if($phone) <b
@@ -502,7 +512,7 @@
                                 class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Features
                                 2</span>@endif
-                                <h2 class="text-2xl md:text-[35px] font-bold text-[#1a3a1a] mb-4">
+                                <h2 class="text-xl sm:text-2xl md:text-4xl font-bold text-[#1a3a1a] leading-normal md:leading-relaxed mb-4">
                                     {{ $feature['title'] ?? '' }}
                                 </h2>
 
@@ -587,7 +597,7 @@
                 <div
                     class="max-w-7xl mx-auto border-4 md:border-6 border-dashed border-[#1f5e00] rounded-3xl p-6 md:p-14 text-center bg-white shadow-sm">
                     <h2
-                        class="text-2xl sm:text-3xl md:text-5xl font-semibold text-[#1f5e00] leading-snug md:leading-normal mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        class="text-xl sm:text-2xl md:text-4xl font-bold text-[#1f5e00] leading-normal md:leading-relaxed mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Title</span>@endif
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h2>
@@ -625,7 +635,7 @@
             <section class="py-14 px-4 md:px-[14%] bg-gray-50 overflow-hidden">
                 <div class="container mx-auto {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Review Images</span>@endif
-                    <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
+                    <h2 class="text-xl sm:text-2xl md:text-4xl font-bold text-center mb-12 text-[#0D2601] leading-normal md:leading-relaxed">
                         সম্মানিত কাস্টমারদের মতামত
                     </h2>
 
@@ -653,7 +663,7 @@
 
 
         {{-- ══ SECTION 9: ORDER FORM ══ --}}
-        <section id="order" class="py-14 px-4 bg-[#f8faff]">
+        <section id="order" class="py-14 px-4 bg-[#f8faff] [&_#landing-order-form_h2]:!text-xl sm:[&_#landing-order-form_h2]:!text-2xl md:[&_#landing-order-form_h2]:!text-4xl [&_#landing-order-form_h2]:!font-bold [&_#landing-order-form_h2]:!leading-normal md:[&_#landing-order-form_h2]:!leading-relaxed">
             <x-landing.order-form :landing="$landing" :isPreview="$isPreviewMode" />
         </section>
 
@@ -690,48 +700,58 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         (function () {
             function startSwiper() {
                 const el = document.querySelector('.rv-swiper');
-                if (!el || typeof Swiper === 'undefined') return;
+                if (!el) return;
 
-                // If already initialized, destroy first
-                if (el.swiper) {
-                    el.swiper.destroy(true, true);
-                }
-
-                const totalSlides = el.querySelectorAll('.swiper-slide').length;
-
-                new Swiper(el, {
-                    slidesPerView: 1,
-                    spaceBetween: 20,
-                    loop: totalSlides >= 2,
-                    autoplay: {
-                        delay: 2500,
-                        disableOnInteraction: false,
-                        pauseOnMouseEnter: true,
-                    },
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                    breakpoints: {
-                        640: {
-                            slidesPerView: Math.min(2, totalSlides),
-                            spaceBetween: 20,
-                        },
-                        1024: {
-                            slidesPerView: Math.min(3, totalSlides),
-                            spaceBetween: 30,
-                        }
+                const runInit = function (SwiperClass) {
+                    if (!SwiperClass || !el) return;
+                    if (el.swiper) {
+                        el.swiper.destroy(true, true);
                     }
-                });
+
+                    const totalSlides = el.querySelectorAll('.swiper-slide').length;
+                    const paginationEl = el.parentElement.querySelector('.swiper-pagination') || '.swiper-pagination';
+
+                    new SwiperClass(el, {
+                        slidesPerView: 1,
+                        spaceBetween: 20,
+                        loop: totalSlides >= 2,
+                        autoplay: {
+                            delay: 2500,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        },
+                        pagination: {
+                            el: paginationEl,
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                        breakpoints: {
+                            640: {
+                                slidesPerView: Math.min(2, totalSlides),
+                                spaceBetween: 20,
+                            },
+                            1024: {
+                                slidesPerView: Math.min(3, totalSlides),
+                                spaceBetween: 30,
+                            }
+                        }
+                    });
+                };
+
+                if (window.Swiper) {
+                    runInit(window.Swiper);
+                } else if (window.SwiperPromise) {
+                    window.SwiperPromise.then(function (SwiperClass) {
+                        if (SwiperClass) runInit(SwiperClass);
+                    });
+                }
             }
 
             if (document.readyState === 'loading') {

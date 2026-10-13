@@ -62,7 +62,7 @@
 
         {{-- Header --}}
         <div class="text-center mb-10">
-            <h2 class="text-2xl md:text-3xl font-bold mb-5 text-black">অর্ডার করতে সঠিক তথ্য দিয়ে</h2>
+            <h2 class="text-xl sm:text-2xl md:text-4xl font-bold mb-5 text-black leading-normal md:leading-relaxed">অর্ডার করতে সঠিক তথ্য দিয়ে</h2>
             <div
                 class="inline-block bg-[#1f8a54] text-white px-10 py-3 rounded-lg text-xl md:text-2xl shadow-md font-bold">
                 নিচের ফর্মটি পূরণ করুন</div>

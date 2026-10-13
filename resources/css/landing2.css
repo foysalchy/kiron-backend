@@ -9,16 +9,6 @@ html {
     scroll-behavior: smooth;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: "Outfit", "Noto Sans Bengali", sans-serif;
-    font-weight: 600;
-}
-
 .container {
     width: 100%;
     padding-left: 16px;
@@ -61,41 +51,4 @@ h6 {
     .container {
         max-width: 1440px;
     }
-}
-
-.prose li p {
-    margin-bottom: 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    margin-top: 0 !important;
-}
-
-.prose li {
-    margin: 0 !important;
-}
-
-.prose ul {
-    margin-top: 0 !important;
-}
-
-.prose a {
-    color: rgb(50, 50, 230);
-}
-
-
-
-.prose ol {
-    list-style-type: decimal !important;
-    padding-left: 1.5rem !important;
-}
-
-.prose ul {
-    list-style-type: disc !important;
-    padding-left: 1.5rem !important;
-}
-
-.prose li {
-    display: list-item !important;
-    margin-top: 0.25rem !important;
-    margin-bottom: 0.25rem !important;
 }
