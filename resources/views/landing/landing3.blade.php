@@ -64,14 +64,29 @@
 
         /* Swiper Pagination Style */
         .swiper-pagination-bullet {
-            width: 10px;
-            height: 10px;
+            position: relative;
+            width: 12px;
+            height: 12px;
+            margin: 0 8px !important;
             background: #d1d5db;
             opacity: 1;
             transition: all 0.3s ease;
             border-radius: 50%;
             cursor: pointer !important;
             pointer-events: auto !important;
+            display: inline-block;
+        }
+
+        .swiper-pagination-bullet::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .swiper-pagination-bullet-active {
@@ -511,10 +526,10 @@
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Content</span>@endif
                         <div
                             class="bg-[#dcfce7] px-6 sm:px-8 md:px-20 py-3 sm:py-4 rounded-2xl md:rounded-full border border-[#c1e9cd]">
-                            <div
+                            <h2
                                 class="prose max-w-none text-xl sm:text-2xl md:text-4xl font-bold text-[#0D2601] leading-normal md:leading-relaxed [&_*]:my-0 inline-block">
                                 {!! $whyChooseTitle ?: 'আমাদের কাছ থেকে <span class="text-[#145a32]">কেন কিনবেন?</span>' !!}
-                            </div>
+                            </h2>
                         </div>
                     </div>
                 @endif
@@ -575,7 +590,7 @@
                                         {{ $itemTitle }}
                                     </h3>
                                     @if($hasDescription)
-                                        <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
+                                        <div class="mt-3 text-sm text-gray-600 prose prose-sm leading-relaxed prose-p:my-0 text-center">
                                             {!! $item['description'] !!}
                                         </div>
                                     @endif
@@ -594,7 +609,7 @@
                                 <h3 class="text-md md:text-xl font-extrabold text-[#1a3a1a] leading-tight">
                                     {{ $pCard['title'] }}
                                 </h3>
-                                <div class="mt-3 text-sm text-gray-500 prose prose-sm leading-relaxed prose-p:my-0 text-center">
+                                <div class="mt-3 text-sm text-gray-600 prose prose-sm leading-relaxed prose-p:my-0 text-center">
                                     <p>{{ $pCard['description'] }}</p>
                                 </div>
                             </div>
