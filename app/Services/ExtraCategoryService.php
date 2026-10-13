@@ -33,8 +33,12 @@ class ExtraCategoryService
                 $query->where('mini_category_id', $filters['mini_category_id']);
             }
 
-            if (isset($filters['status'])) {
-                $query->where('status', $filters['status']);
+               if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
             }
 
             if (isset($filters['search'])) {

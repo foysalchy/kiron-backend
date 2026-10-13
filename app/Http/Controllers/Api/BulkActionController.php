@@ -343,6 +343,7 @@ class BulkActionController extends Controller
                     'letter',
                     'appointment_letter',
                     'documents',
+                    'profile',
                 ];
 
                 foreach ($records as $record) {
