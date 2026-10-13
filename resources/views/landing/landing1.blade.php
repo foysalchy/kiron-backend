@@ -26,17 +26,31 @@
         .prose ol {
             list-style-type: decimal !important;
             padding-left: 1.5rem !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            text-align: left !important;
         }
 
         .prose ul {
             list-style-type: disc !important;
             padding-left: 1.5rem !important;
+            margin-top: 0.5rem !important;
+            margin-bottom: 0.5rem !important;
+            text-align: left !important;
         }
 
         .prose li {
             display: list-item !important;
-            margin-top: 0.25rem !important;
-            margin-bottom: 0.25rem !important;
+            margin-top: 2px !important;
+            margin-bottom: 2px !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        .prose li p {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            display: inline !important;
         }
 
         /* Fix: prevent horizontal scroll on mobile */
