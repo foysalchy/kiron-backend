@@ -13,9 +13,7 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            background-color: transparent;
+            align-items: flex-start;            min-height: 100vh;            background-color: transparent;
             overflow: hidden; /* Hide scrollbars */
         }
         .card-container {
@@ -37,8 +35,8 @@
                 $storeSettings = new \stdClass();
                 $storeSettings->is_review = false;
             }
-            $templateName = request('preview_card') ? 'template' . request('preview_card') : ($template ?? 'template1');
-            $componentName = $templateName . '.product-card';
+
+            $componentName = 'template1'. '.product-card';
         @endphp
         <x-dynamic-component :component="$componentName" :product="$product" />
     </div>

@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariation;
 use App\Models\PurchaseDetail;
 use App\Models\TransactionExpense;
+use App\Models\TransactionExpenseCategory;
 use Illuminate\Support\Facades\DB;
 
 class ProfitLossReportService
@@ -83,6 +84,23 @@ class ProfitLossReportService
             ->where('status', Status::Approved->value)
             ->sum('total_amount');
 
+        $expenseBreakdown = TransactionExpenseCategory::whereHas('expense', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate])
+                    ->where('status', Status::Approved->value);
+            })
+            ->with('chartOfAccount:id,name')
+            ->selectRaw('chart_of_account_id, SUM(amount) as amount')
+            ->groupBy('chart_of_account_id')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category_name' => $item->chartOfAccount?->name ?? 'Uncategorized',
+                    'amount'        => round((float) $item->amount, 2),
+                ];
+            })
+            ->sortByDesc('amount')
+            ->values();
+
         $totalCost = $totalPurchaseCost + $shippingCost + (float) $approvedExpense;
         // ── 5. Totals ──
         $deliveredSales = $deliveredOrders->total ?? 0;
@@ -119,6 +137,11 @@ class ProfitLossReportService
                     'amount' => round($totalPurchaseCost, 2)
                 ],
                 'shipping_cost'         => ['qty' => $shippingQty,  'amount' => round($shippingCost, 2)],
+                'other_expenses'        => [
+                    'qty'       => null,
+                    'amount'    => round($approvedExpense, 2),
+                    'breakdown' => $expenseBreakdown,
+                ],
                 'ads_expense'           => ['qty' => null,           'amount' => round($approvedExpense, 2)],
                 'total_cost'            => round($totalCost, 2),
             ],
