@@ -425,12 +425,12 @@
                 @endphp
 
                 <div
-                    class="mb-12
+                    class="prose prose-invert max-w-none mb-12 text-start
             [&_h1]:text-3xl [&_h1]:md:text-5xl [&_h1]:font-bold [&_h1]:mb-8
             [&_h2]:text-3xl [&_h2]:md:text-5xl [&_h2]:font-bold [&_h2]:mb-8 [&_h2]:inline-block
             [&_h3]:text-3xl [&_h3]:md:text-5xl [&_h3]:font-bold [&_h3]:mb-10 [&_h3]:inline-block [&_h3]:pb-2 [&_h3]:uppercase
             [&_h4]:text-2xl [&_h4]:md:text-4xl [&_h4]:font-bold [&_h4]:mb-6
-            [&_p]:text-base [&_p]:md:text-xl [&_p]:leading-relaxed [&_p]:opacity-90 [&_p]:max-w-7xl [&_p]:mx-auto [&_p]:text-start [&_p]:font-medium {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+            [&_p]:text-base [&_p]:md:text-xl [&_p]:leading-relaxed [&_p]:opacity-90 [&_p]:max-w-7xl [&_p]:mx-auto [&_p]:font-medium {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Product
                     Details</span>@endif
 
