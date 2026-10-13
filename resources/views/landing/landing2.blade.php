@@ -182,6 +182,7 @@
         $previewShortDesc = '<h1>আপনার সোনামণির মেধা বিকাশ ও </h1><p class="text-3xl lg:text-4xl">ডিজিটাল আসক্তি দূর করতে সেরা উপহার!</p>';
         $previewRegularPrice = '৳ ১,৫০০';
         $previewDiscountPrice = '৳ ৯৫০';
+        $previewButtonText = 'আপনারটি নিন এখনই 😍';
     @endphp
 
     <main>
@@ -494,13 +495,14 @@
                 @endif
                 <div class="mt-14 text-center">
                     <a href="#order"
-                        class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase">
+                        class="inline-flex items-center gap-3 bg-red-600 hover:border-none text-white px-4 md:px-12 py-3 rounded-xl font-bold text-sm md:text-2xl border-2 border-blue-900 uppercase {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Button Text</span>@endif
                         <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"></circle>
                             <path d="M12 7v10m-5-5 5 5 5-5"></path>
                         </svg>
-                        আপনারটি নিন এখনই 😍
+                        <span>{{ $landing->button_text ?: ($isPreviewMode ? $previewButtonText : 'আপনারটি নিন এখনই 😍') }}</span>
                     </a>
                 </div>
             </div>
