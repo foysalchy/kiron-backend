@@ -140,7 +140,7 @@
                                         <p class="text-xs text-[#145a32] font-bold uppercase">Option:
                                             {{ $variation->display_name }}</p>
                                         @if($vOutOfStock)
-                                            <span class="bg-red-100 text-red-600 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">স্টক আউট</span>
+                                            <span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">স্টক আউট</span>
                                         @endif
                                     </div>
                                 </div>
@@ -163,7 +163,7 @@
                         <div class="text-left">
                             <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
                             @if($isSingleOutOfStock)
-                                <span class="inline-block mt-1 bg-red-100 text-red-600 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)</span>
+                                <span class="inline-block mt-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)</span>
                             @endif
                         </div>
                     </div>
@@ -237,10 +237,10 @@
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-bold text-gray-700">Quantity</span>
                             <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
-                                <button type="button" onclick="changeQty(-1)"
+                                <button type="button" onclick="changeQty(-1)" aria-label="Decrease quantity"
                                     class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 font-bold cursor-pointer">−</button>
                                 <span id="qty-display" class="w-10 text-center font-bold text-sm">1</span>
-                                <button type="button" onclick="changeQty(1)"
+                                <button type="button" onclick="changeQty(1)" aria-label="Increase quantity"
                                     class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-l border-gray-300 font-bold cursor-pointer">+</button>
                             </div>
                         </div>

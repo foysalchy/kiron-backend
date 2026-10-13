@@ -156,14 +156,29 @@
     </style>
     <style>
         .swiper-pagination-bullet {
-            width: 10px;
-            height: 10px;
+            position: relative;
+            width: 12px;
+            height: 12px;
+            margin: 0 8px !important;
             background: #d1d5db;
             opacity: 1;
             transition: all 0.3s ease;
             border-radius: 50%;
             cursor: pointer !important;
             pointer-events: auto !important;
+            display: inline-block;
+        }
+
+        .swiper-pagination-bullet::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
         }
 
         .swiper-pagination-bullet-active {
@@ -607,7 +622,7 @@
                             <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Regular
                                 Price</span>@endif
-                                <p class="text-base md:text-2xl font-medium mb-3 line-through opacity-80">
+                                <p class="text-base md:text-2xl font-medium mb-3 line-through text-white">
                                     {{ $regularPrice }}
                                 </p>
                             </div>
