@@ -349,13 +349,22 @@
                                 @php
                                     $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
                                     $categoryDesc = $landing->extras['features2'][0]['description'] ?? ($isPreviewMode ? '<p>স্মার্ট লার্নিং কার্ড ও আকর্ষণীয় ছবি দিয়ে তৈরি, যা বাচ্চাদের খেলাচ্ছলে নতুন বিষয় শিখতে উৎসাহিত করে। এতে করে তাদের শেখার আগ্রহ বহুগুণ বেড়ে যায়।</p>' : null);
+                                    if (is_array($categoryMap)) {
+                                        $catMapSrc = $categoryMap['previewUrl'] ?? $categoryMap['url'] ?? $categoryMap['path'] ?? '';
+                                    } elseif (is_string($categoryMap)) {
+                                        $catMapSrc = (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') || str_starts_with($categoryMap, 'http') || str_starts_with($categoryMap, '/'))
+                                            ? $categoryMap
+                                            : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap);
+                                    } else {
+                                        $catMapSrc = $productImg;
+                                    }
                                 @endphp
-                                <img src="{{ $categoryMap ? (is_array($categoryMap) ? ($categoryMap['previewUrl'] ?? '') : (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') ? $categoryMap : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap))) : $productImg }}"
+                                <img src="{{ $catMapSrc ?: $productImg }}"
                                     alt="Categories" width="600" height="600" loading="lazy" decoding="async"
                                     class="w-auto h-auto max-w-full max-h-[550px] mx-auto object-contain rounded-xl">
 
                                 @if($categoryDesc)
-                                    <div class="mt-6 text-lg text-gray-700 leading-relaxed text-center md:text-left">
+                                    <div class="mt-6 prose prose-slate max-w-none text-gray-700 leading-relaxed text-center md:text-left">
                                         {!! $categoryDesc !!}
                                     </div>
                                 @endif
@@ -480,11 +489,23 @@
                             {!! $promoHeading !!}
                         </h3>
 
+                        @php
+                            $promoImage = $promoData['image'] ?? null;
+                            if (is_array($promoImage)) {
+                                $promoImgSrc = $promoImage['previewUrl'] ?? $promoImage['url'] ?? $promoImage['path'] ?? '';
+                            } elseif (is_string($promoImage)) {
+                                $promoImgSrc = (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') || str_starts_with($promoImage, 'http') || str_starts_with($promoImage, '/'))
+                                    ? $promoImage
+                                    : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage);
+                            } else {
+                                $promoImgSrc = $productImg;
+                            }
+                        @endphp
                         <!-- Product Image in Frame -->
                         <div
                             class="max-w-xl mx-auto rounded-xl overflow-hidden mb-8 border-2 border-white border-dashed shadow-2xl bg-white/5">
 
-                            <img src="{{ $promoImage ? (is_array($promoImage) ? ($promoImage['previewUrl'] ?? '') : (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') ? $promoImage : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage))) : $productImg }}"
+                            <img src="{{ $promoImgSrc ?: $productImg }}"
                                 alt="Offer Product" width="600" height="600" loading="lazy" decoding="async"
                                 class="w-auto h-auto max-w-full max-h-[500px] mx-auto object-contain">
                         </div>
@@ -493,7 +514,7 @@
                             $promoDesc = $promoData['description'] ?? ($isPreviewMode ? '<p>স্টক সীমিত! আপনার সোনামণির উজ্জ্বল ভবিষ্যতের জন্য এখনই অর্ডার সম্পন্ন করুন।</p>' : null);
                         @endphp
                         @if($promoDesc)
-                            <div class="mb-12 text-lg md:text-xl text-white/90 leading-relaxed text-center">
+                            <div class="mb-12 prose prose-invert max-w-none text-white/90 leading-relaxed text-center">
                                 {!! $promoDesc !!}
                             </div>
                         @endif
