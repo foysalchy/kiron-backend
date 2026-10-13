@@ -315,7 +315,7 @@ class MetaDirectProxyController extends Controller
                 'file_url' => 'nullable|string',
                 'file_urls' => 'nullable|array',
                 'file_urls.*' => 'string',
-                'attachment_type' => 'nullable|string|in:image,video,audio,file',
+                'attachment_type' => 'nullable|string|in:image,video,audio,file,text',
             ]);
 
             if (empty($data['text']) && !$request->hasFile('file') && empty($data['file_url']) && empty($data['file_urls'])) {
@@ -324,7 +324,7 @@ class MetaDirectProxyController extends Controller
 
             $results = []; // multiple Meta responses store korbo (image + text alada)
             $fileUrls = [];
-            $attachmentType = $data['attachment_type'] ?? 'image';
+            $attachmentType = (!empty($data['attachment_type']) && $data['attachment_type'] !== 'text') ? $data['attachment_type'] : 'image';
 
             // ---- Step 1: Collect all files / URLs ----
             if ($request->hasFile('file')) {
