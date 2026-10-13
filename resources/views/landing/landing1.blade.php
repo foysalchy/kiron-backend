@@ -7,6 +7,7 @@
     <title>{{ $landing->title }}</title>
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @include('components.fontawesome')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @include('components.meta-info.pixel', ['landing' => $landing, 'setup' => $setup])
@@ -25,6 +26,99 @@
         /* Fix: prevent horizontal scroll on mobile */
         .rv-track-wrap {
             overflow: hidden;
+        }
+
+        .Landing__34__benifit_sec {
+            padding: 70px 0;
+            background-color: #f3ffed;
+        }
+
+        .Landing__34__benifit_content {
+            background-color: #fff;
+            border-radius: 20px;
+            padding: 30px 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .Landing__34__benifit_content h2 {
+            width: 100%;
+            color: #0d2601;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: normal;
+            letter-spacing: .2px;
+            border-radius: 24px;
+            border: 8px solid #2e8c03;
+            text-align: center;
+            padding: 12px 20px;
+            margin: 0 auto 35px auto;
+        }
+
+        @media (min-width: 768px) {
+            .Landing__34__benifit_content h2 {
+                font-size: 38px;
+                border: 11px solid #2e8c03;
+                padding: 15px 30px;
+            }
+        }
+
+        .Landing__34__benifit_content ul {
+            list-style: none !important;
+            padding-left: 0 !important;
+            margin: 0 !important;
+        }
+
+        .Landing__34__benifit_content ul li {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e5eaf4;
+            padding: 12px 5px;
+            margin: 0 !important;
+        }
+
+        .Landing__34__benifit_content ul li:last-child {
+            border-bottom: none;
+        }
+
+        .Landing__34__benifit_content ul li p {
+            color: #0d2601;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: .2px;
+            margin: 0 !important;
+            line-height: 1.6;
+        }
+
+        @media (min-width: 768px) {
+            .Landing__34__benifit_content ul li p {
+                font-size: 18px;
+            }
+        }
+
+        .Landing__34__Banner2 {
+            text-align: center;
+        }
+
+        .Landing__34__Banner2 h4,
+        .Landing__34__Banner2 p,
+        .Landing__34__Banner2 article,
+        .Landing__34__Banner2 {
+            color: #0d2601;
+            font-size: 20px;
+            font-weight: 400 !important;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        @media (min-width: 768px) {
+
+            .Landing__34__Banner2 h4,
+            .Landing__34__Banner2 p,
+            .Landing__34__Banner2 article,
+            .Landing__34__Banner2 {
+                font-size: 24px !important;
+            }
         }
     </style>
     <style>
@@ -51,10 +145,24 @@
 
         .swiper-slide {
             transition: transform 0.3s ease;
+            height: auto;
+            display: flex;
+            justify-content: center;
         }
 
         .swiper-slide:hover {
             transform: translateY(-5px);
+        }
+
+        /* Prevent 1 or 2 images from stretching across the entire screen */
+        .rv-swiper .swiper-slide {
+            max-width: 360px;
+        }
+
+        @media (max-width: 640px) {
+            .rv-swiper .swiper-slide {
+                max-width: 100%;
+            }
         }
     </style>
     <style>
@@ -107,16 +215,46 @@
         $previewTitle = 'প্রিমিয়াম কোয়ালিটি অর্গানিক সজিনা পাতা গুঁড়া (Moringa Powder)';
         $previewButtonText = 'অর্ডার করতে ক্লিক করুন';
         $previewPhone = '01234567890';
-        $previewShortDesc = '<p>১০০% খাঁটি ও প্রাকৃতিক উপাদান দিয়ে তৈরি, যা আপনার রোগ প্রতিরোধ ক্ষমতা বৃদ্ধি করে, রক্তচাপ নিয়ন্ত্রণে রাখে এবং শরীরকে রাখে সতেজ ও প্রাণবন্ত।</p>';
+        $previewShortDesc = '<p>৫২৫ গ্রাম প্রিমিয়াম সজিনা পাউডার + ১০০ গ্রাম কালোজিরা মধু ফ্রি ।</p>';
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';
-        $previewContent1 = '<h2 class="text-xl md:text-2xl font-bold mb-3">আমাদের পণ্যের বিশেষ বৈশিষ্ট্যসমূহ:</h2><ul><li>১০০% ন্যাচারাল ও কেমিক্যাল মুক্ত উপাদান</li><li>অরিজিনাল সজিনা পাতা থেকে বৈজ্ঞানিক উপায়ে প্রক্রিয়াজাত</li><li>সহজে হজমযোগ্য এবং প্রচুর পরিমাণে ভিটামিন ও মিনারেল সমৃদ্ধ</li><li>প্রতিদিনের পুষ্টির চাহিদা মেটাতে অত্যন্ত কার্যকর</li></ul>';
-        $previewContent2 = '<h2 class="text-xl md:text-2xl font-bold mb-3">কেন আমাদের থেকে অর্ডার করবেন?</h2><ul><li>সরাসরি সংগৃহীত ফ্রেশ ও প্রিমিয়াম গ্রেড পণ্য</li><li>সারাদেশে দ্রুত ক্যাশ অন ডেলিভারি সুবিধা</li><li>পণ্য হাতে পেয়ে দেখে মূল্য পরিশোধের সুযোগ</li><li>১০০% মানিব্যাক ও রিটার্ন গ্যারান্টি</li></ul>';
-        $previewDescription = '<div class="text-center py-4"><h2 class="text-2xl md:text-3xl font-bold mb-3 text-[#1f5e00]">শতভাগ খাঁটি ও নিরাপদ স্বাস্থ্য সুরক্ষায়</h2><p class="text-base md:text-lg text-gray-700 leading-relaxed">আমাদের এই পণ্যটি আপনার দৈনন্দিন জীবনে এনে দেবে প্রাকৃতিক শক্তি ও পুষ্টি। কোনো ক্ষতিকর উপাদান ব্যবহার করা হয়নি। আজই অর্ডার করুন এবং সুস্থ জীবনের সূচনা করুন।</p></div>';
+        $previewContent1 = '<div class="Landing__34__benifit_content">
+                                                    <h2>সজিনা পাতার উপকারিতা</h2>
+                                                    <ul>
+                                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
+                                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
+                                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
+                                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
+                                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
+                                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
+                                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
+                                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
+                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                    </ul>
+                                                </div>';
+
+        $previewContent2 = '<div class="Landing__34__benifit_content">
+                                                    <h2>সেবনে সঠিক নিয়ম</h2>
+                                                    <ul>
+                                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
+                                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
+                                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                    </ul>
+                                                </div>';
+        $previewDescription = '<p class="text-lg sm:text-xl md:text-[24px] font-normal text-[#0d2601] leading-relaxed m-0">গ্রাম থেকে সংগ্রহ করা শতভাগ ন্যাচারাল সজিনা পাতা নিজেদের তত্বাবধানে স্বাস্থ্য সম্মত পরিবেশে রোদে শুকিয়ে গুড়া করা হয়।প্রোডাক্ট হাতে পেয়ে, দেখে, কোয়ালিটি চেক করে পেমেন্টে করার সুবিধা ।</p>';
 
         $previewFeatures2 = [
             [
-                'title' => '১০০% বিশুদ্ধ ও পরীক্ষিত মান',
+                'title' => 'এতো কিছু থাকতে সজিনা পাতার গুড়া কেনো খাবেন ?',
                 'description' => '<p>প্রতিটি ব্যাচ সর্বোচ্চ সতর্কতার সাথে পরীক্ষা করে তৈরি করা হয়, যাতে এর প্রাকৃতিক গুনাগুণ ও পুষ্টিমান অক্ষুণ্ন থাকে।</p>',
                 'image' => $productImg
             ]
@@ -133,7 +271,14 @@
             'ক্লান্তি দূর করে সারাদিন শরীরকে সতেজ ও কর্মক্ষম রাখে।'
         ];
 
-        $previewReviewImages = array_filter([$productImg, $productImg, $productImg]);
+        $previewReviewImages = [
+            'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+        ];
     @endphp
 
     <main>
@@ -151,11 +296,12 @@
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h1>
                 </div>
-                <p class="prose prose-invert text-[30px] [&_*]:!text-[30px] mx-auto leading-snug {{ $isPreviewMode ? 'preview-badge-container' : '' }}"
-                    style="font-size: 30px;">
-                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Short Description</span>@endif
-                    {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
-                </p>
+                <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }} mb-6">
+                    @if($isPreviewMode)<span class="preview-badge !text-[10px] !leading-normal" style="top: -20px;">Short Description</span>@endif
+                    <div class="prose prose-invert text-[22px] md:text-[30px] [&_*]:!text-[22px] md:[&_*]:!text-[30px] mx-auto leading-relaxed">
+                        {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
+                    </div>
+                </div>
 
                 <a href="#order"
                     class="inline-flex items-center justify-center gap-2 md:gap-3 bg-[linear-gradient(90deg,#f2a413_0%,#d8a13a_51%,#f2a413_100%)] bg-[length:200%_auto] hover:bg-[position:100%] hover:brightness-105 text-white mt-6 md:mt-8 mb-6 px-8 sm:px-10 md:px-[50px] py-3 md:py-[15px] border-[3px] border-[#ad7419] rounded-[10px] font-bold text-lg sm:text-xl md:text-[30px] leading-snug md:leading-[45px] shadow-[0_20px_20px_0_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-500 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -212,8 +358,10 @@
                         @endphp
                         <div
                             class="bg-[#C00000] text-white py-6 text-xl md:text-4xl font-medium rounded-xl mb-12 shadow-lg w-full leading-tight {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Phone Number</span>@endif
-                            আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন @if($phone) <b class="font-bold ml-1 tracking-wider">{{ $phone }}</b> @endif
+                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Phone
+                            Number</span>@endif
+                            আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন @if($phone) <b
+                            class="font-bold ml-1 tracking-wider">{{ $phone }}</b> @endif
                         </div>
 
                         <!-- White Price Box -->
@@ -231,7 +379,7 @@
                             <div class="border-t-2 border-dotted border-[#2e8c03] mx-6"></div>
 
                             <!-- Offer Price -->
-                            <div class="py-10 px-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            <div class="py-6 px-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Discount
                                 Price</span>@endif
                                 <p class="text-[#2e8c03] font-medium text-2xl md:text-4xl">
@@ -260,28 +408,19 @@
         @endphp
         @if($content1 || $content2)
             {{-- ══ SECTION 3: BENEFITS ══ --}}
-            <section class="bg-[#f1fcf1] py-16 px-4 mt-8 md:mt-10">
-                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+            <section class="Landing__34__benifit_sec px-4 mt-8 md:mt-10">
+                <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 items-stretch">
 
-                    <div class="bg-white rounded-xl overflow-hidden">
-                        <div
-                            class="benefits-container text-base md:text-xl p-4 md:p-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Content</span>@endif
-                            <article class="prose prose-slate max-w-none">
-                                {!! $content1 ?? '' !!}
-                            </article>
-                        </div>
+                    <div class="relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge"
+                        style="top: -15px; left: 10px; z-index: 50;">Content</span>@endif
+                        {!! $content1 ?? '' !!}
                     </div>
 
-                    <div class="bg-white rounded-xl overflow-hidden">
-                        <div
-                            class="benefits-container text-base md:text-xl p-4 md:p-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Content
-                            2</span>@endif
-                            <article class="prose prose-slate max-w-none">
-                                {!! $content2 ?? '' !!}
-                            </article>
-                        </div>
+                    <div class="relative h-full {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Content
+                        2</span>@endif
+                        {!! $content2 ?? '' !!}
                     </div>
                 </div>
 
@@ -301,11 +440,15 @@
         @endphp
         @if(!empty($desc))
             {{-- ══ SECTION 4: PRODUCT BANNER ══ --}}
-            <section class="py-12 px-4">
-                <div class="max-w-2xl mx-auto text-center">
-                    <article class="prose prose-slate max-w-none">
-                        {!! $desc !!}
-                    </article>
+            <section class="py-12 md:py-16 px-4 bg-white">
+                <div class="max-w-4xl mx-auto text-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge"
+                    style="top: -15px; left: 10px; z-index: 50;">Details</span>@endif
+                    <div class="Landing__34__Banner2 max-w-3xl mx-auto">
+                        <article class="prose prose-slate max-w-none text-center">
+                            {!! $desc !!}
+                        </article>
+                    </div>
                 </div>
             </section>
         @endif
@@ -326,7 +469,7 @@
                                 class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Features
                                 2</span>@endif
-                                <h2 class="text-2xl font-bold text-[#1a3a1a] mb-4">
+                                <h2 class="text-2xl md:text-[35px] font-bold text-[#1a3a1a] mb-4">
                                     {{ $feature['title'] ?? '' }}
                                 </h2>
 
@@ -374,8 +517,8 @@
                 <div class="max-w-7xl mx-auto text-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Features</span>@endif
                     <div
-                        class="inline-block border-4 md:border-10 border-[#4caf50] px-4 py-4 rounded-lg text-base sm:text-lg md:text-2xl font-semibold mb-10 uppercase">
-                        {{ data_get($landing->extras, 'features_title') ?: ($isPreviewMode ? 'কেন এই পণ্যটি ব্যবহার করবেন?' : 'বিশেষ উপকারিতাসমূহ') }}
+                        class="inline-block border-4 md:border-10 border-[#4caf50] px-4 py-4 rounded-lg text-base sm:text-lg md:text-[35px] font-bold mb-10 uppercase">
+                        {{ data_get($landing->extras, 'features_title') ?: ($isPreviewMode ? 'এতো কিছু থাকতে সজিনা পাতার গুড়া কেনো খাবেন ?' : 'বিশেষ উপকারিতাসমূহ') }}
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-sm sm:text-base md:text-xl">
@@ -449,14 +592,13 @@
                     <div class="relative px-4 md:px-10">
                         <!-- Swiper Container -->
                         <div class="swiper rv-swiper">
-                            <div class="swiper-wrapper">
+                            <div class="swiper-wrapper {{ count($reviewImgs) < 3 ? '!justify-center' : '' }}">
                                 @foreach ($reviewImgs as $img)
-                                    <div class="swiper-slide">
+                                    <div class="swiper-slide !flex !justify-center">
                                         <div
-                                            class="bg-white rounded-2xl border border-gray-100 overflow-hidden mx-1 mb-10 flex items-center justify-center p-2 shadow-sm min-h-[220px]">
+                                            class="w-full max-w-[340px] bg-white rounded-2xl border border-gray-100 overflow-hidden mx-auto mb-10 flex items-center justify-center p-3 shadow-sm h-[320px] md:h-[380px]">
                                             <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') || str_starts_with($img, 'http') || str_starts_with($img, '/') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
-                                                class="w-auto h-auto max-w-full max-h-[380px] md:max-h-[450px] object-contain rounded-xl mx-auto"
-                                                alt="Customer Review">
+                                                class="w-full h-full object-cover rounded-xl" alt="Customer Review">
                                         </div>
                                     </div>
                                 @endforeach
@@ -508,17 +650,28 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        function initRvSwiper() {
-            if (typeof Swiper !== 'undefined') {
-                new Swiper('.rv-swiper', {
+        (function () {
+            function startSwiper() {
+                const el = document.querySelector('.rv-swiper');
+                if (!el || typeof Swiper === 'undefined') return;
+
+                // If already initialized, destroy first
+                if (el.swiper) {
+                    el.swiper.destroy(true, true);
+                }
+
+                const totalSlides = el.querySelectorAll('.swiper-slide').length;
+
+                new Swiper(el, {
                     slidesPerView: 1,
                     spaceBetween: 20,
-                    loop: true,
-                    centeredSlides: false,
+                    loop: totalSlides >= 2,
                     autoplay: {
-                        delay: 3000,
+                        delay: 2500,
                         disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
                     },
                     pagination: {
                         el: '.swiper-pagination',
@@ -529,24 +682,28 @@
                         prevEl: '.swiper-button-prev',
                     },
                     breakpoints: {
-                        768: {
-                            slidesPerView: 2,
-                            spaceBetween: 30,
+                        640: {
+                            slidesPerView: Math.min(2, totalSlides),
+                            spaceBetween: 20,
                         },
                         1024: {
-                            slidesPerView: 3,
+                            slidesPerView: Math.min(3, totalSlides),
                             spaceBetween: 30,
                         }
                     }
                 });
             }
-        }
 
-        if (window.SwiperPromise) {
-            window.SwiperPromise.then(initRvSwiper);
-        } else {
-            document.addEventListener('DOMContentLoaded', initRvSwiper);
-        }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startSwiper);
+            } else {
+                startSwiper();
+            }
+
+            window.addEventListener('load', startSwiper);
+            setTimeout(startSwiper, 500);
+            setTimeout(startSwiper, 1500);
+        })();
     </script>
 
     @if(isset($isPreview) && $isPreview)
