@@ -490,11 +490,19 @@
         <section class="py-10 px-4 bg-white text-center">
             <div class="max-w-7xl mx-auto">
 
-                <div class="inline-block bg-[#dcfce7] px-8 md:px-20 py-4 rounded-full mb-16 border border-[#c1e9cd]">
-                    <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight">
-                        আমাদের কাছ থেকে <span class="text-[#145a32]">কেন কিনবেন?</span>
-                    </h2>
-                </div>
+                @php
+                    $whyChooseTitle = data_get($landing->extras, 'content') ?: ($landing->content ?? ($isPreviewMode ? 'আমাদের কাছ থেকে কেন কিনবেন?' : null));
+                @endphp
+                @if($whyChooseTitle || $isPreviewMode)
+                    <div class="inline-block relative mb-12 md:mb-16 px-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Content</span>@endif
+                        <div class="bg-[#dcfce7] px-6 sm:px-8 md:px-20 py-3 sm:py-4 rounded-2xl md:rounded-full border border-[#c1e9cd]">
+                            <div class="prose max-w-none text-xl md:text-4xl font-bold text-[#0D2601] leading-tight [&_*]:my-0 inline-block">
+                                {!! $whyChooseTitle ?: 'আমাদের কাছ থেকে <span class="text-[#145a32]">কেন কিনবেন?</span>' !!}
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
 
