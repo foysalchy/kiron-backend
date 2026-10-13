@@ -211,10 +211,7 @@
                         </div>
 
                         {{-- Main headline --}}
-                        <div class="prose prose-slate max-w-none mb-4
-                        prose-h1:text-6xl lg:prose-h1:text-7xl
-                        prose-p:text-3xl lg:prose-p:text-4xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}
-                        ">
+                        <div class="prose prose-slate max-w-none mb-4 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Short
                             Description</span>@endif
                             {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}

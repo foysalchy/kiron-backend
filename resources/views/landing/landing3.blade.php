@@ -103,32 +103,7 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        .hero-rich-content p {
-            margin-bottom: 1rem;
-            line-height: 1.4;
-            font-size: 1.5rem;
-        }
 
-        .hero-rich-content strong {
-            font-weight: 800;
-            display: inline-block;
-            font-size: 1.5rem;
-        }
-
-        @media (min-width: 768px) {
-            .hero-rich-content p {
-                font-size: 2rem;
-            }
-
-            .hero-rich-content strong {
-                font-size: 3.5rem;
-                letter-spacing: -1px;
-            }
-        }
-
-        .hero-rich-content span {
-            display: inline-block;
-        }
     </style>
     <style>
         @if(isset($isPreview) && $isPreview)
@@ -241,10 +216,10 @@
 
                 {{-- 2. Dynamic Short Description --}}
                 <div
-                    class="hero-rich-content mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    class="mb-8 md:mb-12 mx-auto max-w-6xl {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                     @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Short
                     Description</span>@endif
-                    <div class="prose-container text-lg md:text-2xl leading-relaxed">
+                    <div class="prose prose-invert max-w-none text-lg md:text-2xl leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
                 </div>
