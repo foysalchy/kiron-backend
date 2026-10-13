@@ -222,20 +222,22 @@
 
                         {{-- Product image --}}
                         <div
-                            class="max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl mb-8 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            class="max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl mb-8 flex justify-center items-center bg-white/40 p-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge"
                             style="top: 0; z-index: 50;">Thumbnail / Video</span>@endif
                             @if ($landing->video)
-                                <video class="w-full h-[600px] " controls playsinline
-                                    poster="{{ $productImg }}">
-                                    <source src="{{ $landing->video_url }}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
+                                <div class="w-full relative aspect-video rounded-xl overflow-hidden bg-black">
+                                    <video class="w-full h-full object-contain" controls playsinline
+                                        poster="{{ $productImg }}">
+                                        <source src="{{ $landing->video_url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
                             @else
-                                <img src="{{ $productImg }}" width="600"
+                                <img src="{{ $productImg }}" width="800"
                                     height="600"
                                     loading="eager" decoding="async" fetchpriority="high"
-                                    class="w-full aspect-square object-contain" alt="{{ $landing->name ?? $product->title }}">
+                                    class="w-auto h-auto max-w-full max-h-[550px] object-contain rounded-xl shadow-sm" alt="{{ $landing->name ?? $product->title }}">
                             @endif
                         </div>
 
@@ -323,7 +325,7 @@
                             <img src="{{ $categoryMap ? (is_array($categoryMap) ? ($categoryMap['previewUrl'] ?? '') : (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') ? $categoryMap : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap))) : $productImg }}"
                                 alt="Categories" width="600" height="600"
                                 loading="lazy" decoding="async"
-                                class="w-full aspect-square object-contain">
+                                class="w-auto h-auto max-w-full max-h-[550px] mx-auto object-contain rounded-xl">
 
                             @if($categoryDesc)
                                 <div class="mt-6 text-lg text-gray-700 leading-relaxed text-center md:text-left">
@@ -459,7 +461,7 @@
                         <img src="{{ $promoImage ? (is_array($promoImage) ? ($promoImage['previewUrl'] ?? '') : (str_starts_with($promoImage, 'blob:') || str_starts_with($promoImage, 'data:') ? $promoImage : \Illuminate\Support\Facades\Storage::disk('r2')->url($promoImage))) : $productImg }}"
                             alt="Offer Product" width="600" height="600"
                             loading="lazy" decoding="async"
-                            class="w-full aspect-square object-contain">
+                            class="w-auto h-auto max-w-full max-h-[500px] mx-auto object-contain">
                     </div>
 
                     @php
@@ -536,10 +538,10 @@
         </div>
     </footer>
 
-    @if(isset($isPreview) && $isPreview)
+    @if(!empty($isPreviewMode) || (isset($isPreview) && $isPreview))
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.addEventListener('click', function(e) {
+        document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('click', function (e) {
                 const badge = e.target.closest('.preview-badge');
                 const container = e.target.closest('.preview-badge-container');
                 const targetEl = badge || container;
@@ -548,7 +550,8 @@
                 const badgeEl = badge || targetEl.querySelector('.preview-badge');
                 if (!badgeEl) return;
 
-                const text = badgeEl.textContent.trim().toLowerCase();
+                // Normalize whitespace and newlines so multi-line text matches single-space strings
+                const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
                 let field = null;
 
                 if (text.includes('regular price')) {
@@ -563,8 +566,16 @@
                     field = 'thumbnail';
                 } else if (text.includes('review')) {
                     field = 'img_paths';
-                } else if (text.includes('product details') || text.includes('description')) {
+                } else if (text.includes('details') || text.includes('description')) {
                     field = 'description';
+                } else if (text.includes('phone')) {
+                    field = 'phone_number';
+                } else if (text.includes('button text')) {
+                    field = 'button_text';
+                } else if (text.includes('features 6') || text.includes('feature 6')) {
+                    field = 'features6';
+                } else if (text.includes('features 5') || text.includes('feature 5')) {
+                    field = 'features5';
                 } else if (text.includes('features 4') || text.includes('feature 4')) {
                     field = 'features4';
                 } else if (text.includes('features 3') || text.includes('feature 3')) {

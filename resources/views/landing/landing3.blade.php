@@ -14,11 +14,7 @@
 
     <style>
         body {
-            font-family: {
-                ! ! $setup->lang ==='bn' ? "'Hind Siliguri', sans-serif": "'Manrope', sans-serif" ! !
-            }
-
-            ;
+            font-family: {!! $setup->lang === 'bn' ? "'Hind Siliguri', sans-serif" : "'Manrope', sans-serif" !!};
             scroll-behavior: smooth;
         }
 
@@ -75,6 +71,28 @@
             background: #0D2601 !important;
             width: 30px;
             border-radius: 10px;
+        }
+
+        .swiper-slide {
+            transition: transform 0.3s ease;
+            height: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .swiper-slide:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Prevent 1 or 2 images from stretching across the entire screen */
+        .rv-swiper .swiper-slide {
+            max-width: 360px;
+        }
+
+        @media (max-width: 640px) {
+            .rv-swiper .swiper-slide {
+                max-width: 100%;
+            }
         }
 
         /* Dashed Border Box */
@@ -157,13 +175,15 @@
         $productImg = $landing->thumbnail_url ?? $product->display_image_url ?? $product->thumbnail_url ?? '';
 
         $previewTitle = 'প্রিমিয়াম কোয়ালিটি অর্গানিক চিয়া সিড (Organic Chia Seed)';
+        $previewButtonText = 'অর্ডার করতে ক্লিক করুন';
+        $previewPhone = '017XXXXXXXX';
         $previewShortDesc = '<p>প্রাকৃতিক পুষ্টিগুণে ভরপুর সুপারফুড, যা আপনার ওজন নিয়ন্ত্রণে রাখবে, এনার্জি বাড়াবে এবং শরীরকে সুস্থ ও ফিট রাখবে প্রতিদিন!</p>';
         $previewRegularPrice = '৳ ১,২০০';
         $previewDiscountPrice = '৳ ৭৫০';
         $previewDescription = '<div class="py-4">
-                <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
-                <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
-            </div>';
+                                <h2 class="text-3xl font-bold mb-4 text-[#00D05E]">১০০% প্রিমিয়াম ও ফ্রেশ উপাদান</h2>
+                                <p class="text-xl leading-relaxed opacity-90">আমাদের সংগৃহীত চিয়া সিড সম্পূর্ণ প্রাকৃতিকভাবে প্রক্রিয়াজাত। কোনো প্রকার ভেজাল বা কেমিক্যাল ছাড়াই সর্বোচ্চ পুষ্টিমান বজায় রেখে প্যাকেটজাত করা হয়। সুস্থ জীবনের জন্য নিয়মিত চিয়া সিড গ্রহণ করুন।</p>
+                            </div>';
 
         $previewFeatures = [
             'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
@@ -188,7 +208,14 @@
             ['title' => 'মানিব্যাক গ্যারান্টি', 'description' => 'পণ্য পছন্দ না হলে শতভাগ রিটার্ন ও রিফান্ডের নিশ্চয়তা।'],
         ];
 
-        $previewReviewImages = array_filter([$productImg, $productImg, $productImg]);
+        $previewReviewImages = [
+            'https://images.unsplash.com/photo-1544717305-2782549b5136?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+        ];
     @endphp
 
     <main>
@@ -223,8 +250,9 @@
                 {{-- 3. CTA Button --}}
                 <div class="mb-6 md:mb-10">
                     <a href="#order"
-                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-10 md:px-16 py-3 md:py-5 rounded-full font-black text-lg sm:text-xl md:text-3xl transition-all active:translate-y-1 md:active:translate-y-2 active:shadow-none uppercase shadow-lg shadow-green-900/20">
-                        অর্ডার করতে ক্লিক করুন
+                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-10 md:px-16 py-3 md:py-5 rounded-full font-black text-lg sm:text-xl md:text-3xl transition-all active:translate-y-1 md:active:translate-y-2 active:shadow-none uppercase shadow-lg shadow-green-900/20 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
+                        <span>{{ $landing->button_text ?: ($isPreviewMode ? $previewButtonText : 'অর্ডার করতে ক্লিক করুন') }}</span>
                         <svg aria-hidden="true" class="w-5 h-5 md:w-8 md:h-8 ml-1" fill="none" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                             <circle cx="9" cy="21" r="1"></circle>
@@ -272,8 +300,9 @@
             {{-- CTA Button --}}
             <div class="mb-4">
                 <a href="#order"
-                    class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase">
-                    অর্ডার করতে ক্লিক করুন
+                    class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
+                    <span>{{ $landing->button_text ?: ($isPreviewMode ? $previewButtonText : 'অর্ডার করতে ক্লিক করুন') }}</span>
                     <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none" stroke="currentColor"
                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="9" cy="21" r="1"></circle>
@@ -288,29 +317,32 @@
         <section class="py-10 px-4 bg-white">
             <div class="max-w-7xl mx-auto">
 
-                <div class="text-center mb-10">
-                    <span
-                        class="bg-[#dcfce7] text-[#0D2601] px-8 md:px-16 py-3 rounded-full text-xl md:text-4xl font-black border border-[#1f8a54]">
-                        {{ data_get($landing->extras, 'features_title', 'চিয়া সিড কেন খাবেন? খাওয়ার উপকারিতা') }}
-                    </span>
-                </div>
+                @php
+                    $featuresTitle = data_get($landing->extras, 'features_title') ?: ($isPreviewMode ? 'চিয়া সিড কেন খাবেন? খাওয়ার উপকারিতা' : null);
+                @endphp
+                @if($featuresTitle || $isPreviewMode)
+                    <div class="text-center mb-8 md:mb-10 px-2">
+                        <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features Title</span>@endif
+                            <h2
+                                class="bg-[#dcfce7] text-[#0D2601] px-5 sm:px-8 md:px-16 py-2.5 sm:py-3 rounded-2xl md:rounded-full text-base sm:text-xl md:text-4xl font-black border border-[#1f8a54] max-w-full leading-snug">
+                                {{ $featuresTitle }}
+                            </h2>
+                        </div>
+                    </div>
+                @endif
 
-                <div class="grid grid-cols-1 gap-3 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                    @if($isPreviewMode)<span class="preview-badge"
-                    style="top: -20px; z-index: 50;">Features</span>@endif
-                    @php
-                        $dynamicBenefits = data_get($landing->extras, 'features');
-                        if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
-                            $dynamicBenefits = $previewFeatures;
-                        } elseif (empty($dynamicBenefits)) {
-                            $dynamicBenefits = [
-                                'চিয়া সিডে আছে ওমেগা-৩, যা হৃদরোগের ঝুঁকি ও ক্ষতিকর কোলেস্টেরল কমাতেও সাহায্য করে',
-                                'এটি শরীরের শক্তি ও কর্মক্ষমতা বাড়ায়',
-                                'প্রচুর পরিমাণে অ্যান্টি-অক্সিডেন্ট থাকায় চিয়া সিড রোগ প্রতিরোধ ক্ষমতাকে আরও শক্তিশালী করে',
-                                'মেটাবলিক সিস্টেমকে উন্নত করার মাধ্যমে এটি ওজন কমাতে সহায়তা করে',
-                            ];
-                        }
-                    @endphp
+                @php
+                    $dynamicBenefits = data_get($landing->extras, 'features');
+                    if ((empty($dynamicBenefits) || count($dynamicBenefits) == 0) && $isPreviewMode) {
+                        $dynamicBenefits = $previewFeatures;
+                    }
+                @endphp
+
+                @if(!empty($dynamicBenefits) && count($dynamicBenefits) > 0)
+                    <div class="grid grid-cols-1 gap-3 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge"
+                        style="top: -20px; z-index: 50;">Features</span>@endif
 
                     @foreach ($dynamicBenefits as $benefit)
                         <div
@@ -324,11 +356,13 @@
                         </div>
                     @endforeach
                 </div>
+                @endif
 
                 <div class="mb-4 text-center mt-8 md:mt-12">
                     <a href="#order"
-                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase">
-                        অর্ডার করতে ক্লিক করুন
+                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 sm:px-12 py-3 md:py-5 rounded-full font-black text-lg sm:text-2xl md:text-3xl transition-all uppercase {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
+                        <span>{{ $landing->button_text ?: ($isPreviewMode ? $previewButtonText : 'অর্ডার করতে ক্লিক করুন') }}</span>
                         <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                             <circle cx="9" cy="21" r="1"></circle>
@@ -344,34 +378,34 @@
         <section class="py-10 px-4 bg-white">
             <div class="max-w-7xl mx-auto text-center">
 
-                <div
-                    class="inline-block bg-[#dcfce7] px-6 md:px-10 py-6 md:py-8 rounded-[40px] md:rounded-[60px] mb-12 border border-[#c1e9cd]">
-                    <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight max-w-6xl">
+                @php
+                    $features2Title = data_get($landing->extras, 'features2_title') ?: ($isPreviewMode ? 'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?' : null);
+                @endphp
+                @if($features2Title || $isPreviewMode)
+                    <div class="text-center mb-8 md:mb-12 px-2">
+                        <div class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2 Title</span>@endif
+                            <div
+                                class="bg-[#dcfce7] px-6 md:px-10 py-4 md:py-6 rounded-2xl md:rounded-[60px] border border-[#c1e9cd]">
+                                <h2 class="text-xl md:text-4xl font-bold text-[#0D2601] leading-tight max-w-6xl">
+                                    {!! $features2Title !!}
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                @endif
 
-                        {!! data_get(
-    $landing->extras,
-    'features2_title',
-    'কেন চিয়া সিড পৃথিবীর ১ নাম্বার সুপারফুড?',
-) !!}
-                    </h2>
-                </div>
+                @php
+                    $dynamicNutrition = data_get($landing->extras, 'features2');
+                    if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
+                        $dynamicNutrition = $previewFeatures2;
+                    }
+                @endphp
 
-                <div
-                    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
-                    2</span>@endif
-                    @php
-                        $dynamicNutrition = data_get($landing->extras, 'features2');
-                        if ((empty($dynamicNutrition) || count($dynamicNutrition) == 0) && $isPreviewMode) {
-                            $dynamicNutrition = $previewFeatures2;
-                        } elseif (empty($dynamicNutrition)) {
-                            $dynamicNutrition = [
-                                'দুধের তুলনায় ৫ গুণ বেশি ক্যালসিয়াম।',
-                                'কলার থেকে ২ গুণ বেশি পটাশিয়াম।',
-                                'ব্রকলির তুলনায় ১৫ গুণ বেশি ম্যাগনেসিয়াম।',
-                            ];
-                        }
-                    @endphp
+                @if(!empty($dynamicNutrition) && count($dynamicNutrition) > 0)
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features 2</span>@endif
 
                     @foreach ($dynamicNutrition as $item)
                         <div
@@ -382,12 +416,14 @@
                         </div>
                     @endforeach
                 </div>
+                @endif
 
                 {{-- ৩. বাটন --}}
                 <div class="text-center mt-12">
                     <a href="#order"
-                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 md:px-14 py-3 md:py-5 rounded-full font-black text-lg md:text-3xl transition-all uppercase">
-                        অর্ডার করতে ক্লিক করুন
+                        class="inline-flex items-center gap-2 md:gap-4 bg-[#00D05E] hover:bg-[#00B853] text-[#0D2601] px-8 md:px-14 py-3 md:py-5 rounded-full font-black text-lg md:text-3xl transition-all uppercase {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
+                        <span>{{ $landing->button_text ?: ($isPreviewMode ? $previewButtonText : 'অর্ডার করতে ক্লিক করুন') }}</span>
                         <svg aria-hidden="true" class="w-6 h-6 md:w-8 md:h-8 ml-1" fill="none" stroke="currentColor"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
                             <circle cx="9" cy="21" r="1"></circle>
@@ -423,17 +459,25 @@
 
                 <hr class="border-[#00D05E]/40 mb-12 max-w-5xl mx-auto">
 
-                <div class="mb-12 space-y-4">
-                    <p class="text-[#CCFF00] font-bold text-lg md:text-3xl tracking-wide uppercase">
-                        যে কোন তথ্যের জন্য যোগাযোগ করুন
-                    </p>
-                    <p class="text-white font-black text-2xl md:text-3xl">
-                        মোবাইল:
-                        <a href="tel:{{ $setup->phone }}" class="hover:text-[#CCFF00] transition-all">
-                            {{ $setup->phone }}
-                        </a>
-                    </p>
-                </div>
+                @php
+                    $displayPhone = $landing->phone_number ?: ($isPreviewMode ? $previewPhone : ($setup->phone ?? ''));
+                @endphp
+                @if($displayPhone)
+                    <div class="mb-12 space-y-4">
+                        <p class="text-[#CCFF00] font-bold text-lg md:text-3xl tracking-wide uppercase">
+                            যে কোন তথ্যের জন্য যোগাযোগ করুন
+                        </p>
+                        <p
+                            class="text-white font-black text-2xl md:text-3xl relative inline-block {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Phone
+                            Number</span>@endif
+                            মোবাইল:
+                            <a href="tel:{{ $displayPhone }}" class="hover:text-[#CCFF00] transition-all">
+                                {{ $displayPhone }}
+                            </a>
+                        </p>
+                    </div>
+                @endif
 
                 <div
                     class="inline-block bg-[#225A40] px-8 md:px-16 py-4 md:py-7 rounded-full mb-12 shadow-inner border border-white/10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -552,43 +596,41 @@
                 @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Review
                 Images</span>@endif
                 <h2 class="text-2xl sm:text-3xl md:text-5xl font-black text-center mb-12 text-[#0D2601]">
-                    What our customers say about us
+                    আমাদের কাস্টমার রিভিউ
                 </h2>
 
-                <div class="relative px-4 md:px-10">
-                    <!-- Swiper Container -->
-                    <div class="swiper rv-swiper">
-                        <div class="swiper-wrapper">
-                            @php
-                                $reviewImgs = $landing->img_paths ?? [];
-                                if ((empty($reviewImgs) || count($reviewImgs) == 0) && $isPreviewMode) {
-                                    $reviewImgs = $previewReviewImages;
-                                }
-                            @endphp
-
-                            @if (!empty($reviewImgs) && count($reviewImgs) > 0)
+                @php
+                    $reviewImgs = (!empty($landing->img_paths) && count($landing->img_paths) > 0)
+                        ? $landing->img_paths
+                        : ($isPreviewMode ? $previewReviewImages : []);
+                @endphp
+                @if(!empty($reviewImgs) && count($reviewImgs) > 0)
+                    <div class="relative px-4 md:px-10">
+                        <!-- Swiper Container -->
+                        <div class="swiper rv-swiper">
+                            <div class="swiper-wrapper {{ count($reviewImgs) < 3 ? '!justify-center' : '' }}">
                                 @foreach ($reviewImgs as $img)
-                                    <div class="swiper-slide">
-                                        <div class="bg-white rounded-2xl border border-gray-50 overflow-hidden mx-1 mb-10">
-                                            <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') || str_starts_with($img, 'http') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
-                                                width="400" height="400" alt="Customer Review"
-                                                class="w-full h-auto object-cover">
+                                    <div class="swiper-slide !flex !justify-center">
+                                        <div
+                                            class="w-full max-w-[340px] bg-white rounded-2xl border border-gray-100 overflow-hidden mx-auto mb-10 flex items-center justify-center p-3 shadow-sm h-[320px] md:h-[380px]">
+                                            <img src="{{ is_array($img) ? ($img['previewUrl'] ?? '') : (str_starts_with($img, 'blob:') || str_starts_with($img, 'data:') || str_starts_with($img, 'http') || str_starts_with($img, '/') ? $img : \Illuminate\Support\Facades\Storage::disk('r2')->url($img)) }}"
+                                                class="w-full h-full object-cover rounded-xl" alt="Customer Review">
                                         </div>
                                     </div>
                                 @endforeach
-                            @endif
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="swiper-pagination !-bottom-2"></div>
-                </div>
+                        <div class="swiper-pagination !-bottom-2"></div>
+                    </div>
+                @endif
             </div>
         </section>
 
         {{-- ══ SECTION 7: ORDER FORM (Dynamic Component) ══ --}}
         <section id="order" class="py-20 px-4 bg-white border-t border-gray-100">
             <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-6xl font-black text-red-600 italic">তাই আর দেরি না করে আজই অর্ডার করুন</h2>
+                <h2 class="text-3xl md:text-5xl font-black text-red-600 italic">তাই আর দেরি না করে আজই অর্ডার করুন</h2>
             </div>
             <x-landing.order-form :landing="$landing" :isPreview="$isPreviewMode" />
         </section>
@@ -636,7 +678,7 @@
         </div>
     </footer>
 
-    @if(isset($isPreview) && $isPreview)
+    @if(!empty($isPreviewMode) || (isset($isPreview) && $isPreview))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 document.addEventListener('click', function (e) {
@@ -648,7 +690,8 @@
                     const badgeEl = badge || targetEl.querySelector('.preview-badge');
                     if (!badgeEl) return;
 
-                    const text = badgeEl.textContent.trim().toLowerCase();
+                    // Normalize whitespace and newlines so multi-line text matches single-space strings
+                    const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
                     let field = null;
 
                     if (text.includes('regular price')) {
@@ -663,8 +706,12 @@
                         field = 'thumbnail';
                     } else if (text.includes('review')) {
                         field = 'img_paths';
-                    } else if (text.includes('product details') || text.includes('description')) {
+                    } else if (text.includes('details') || text.includes('description')) {
                         field = 'description';
+                    } else if (text.includes('phone')) {
+                        field = 'phone_number';
+                    } else if (text.includes('button text')) {
+                        field = 'button_text';
                     } else if (text.includes('features 6') || text.includes('feature 6')) {
                         field = 'features6';
                     } else if (text.includes('features 5') || text.includes('feature 5')) {

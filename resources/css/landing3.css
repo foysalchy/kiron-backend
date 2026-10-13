@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
 @import "./landing3-fonts.css";
+@import "swiper/css/bundle";
 
 @source "../views/landing/landing3.blade.php";
 @source "../views/components/landing/order-form.blade.php";

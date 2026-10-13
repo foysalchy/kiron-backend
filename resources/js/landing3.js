@@ -1,49 +1,52 @@
-const slider = document.querySelector('.rv-swiper');
+import Swiper from 'swiper';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 
-if (slider) {
-    const initializeSlider = async () => {
-        const [{ default: Swiper }, { Autoplay, Pagination }] = await Promise.all([
-            import('swiper'),
-            import('swiper/modules'),
-        ]);
+function initLanding3Swiper() {
+    const el = document.querySelector('.rv-swiper');
+    if (!el) return;
 
-        new Swiper(slider, {
-            modules: [Autoplay, Pagination],
-            slidesPerView: 1,
-            spaceBetween: 20,
-            loop: true,
-            centeredSlides: false,
-            autoplay: {
-                delay: 3000,
-                disableOnInteraction: false,
-            },
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            breakpoints: {
-                768: {
-                    slidesPerView: 2,
-                    spaceBetween: 30,
-                },
-                1024: {
-                    slidesPerView: 3,
-                    spaceBetween: 30,
-                },
-            },
-        });
-    };
-
-    if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) {
-                observer.disconnect();
-                initializeSlider();
-            }
-        }, { rootMargin: '300px' });
-
-        observer.observe(slider);
-    } else {
-        initializeSlider();
+    if (el.swiper) {
+        el.swiper.destroy(true, true);
     }
+
+    const totalSlides = el.querySelectorAll('.swiper-slide').length;
+
+    new Swiper(el, {
+        modules: [Autoplay, Navigation, Pagination],
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: totalSlides >= 2,
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        breakpoints: {
+            640: {
+                slidesPerView: Math.min(2, totalSlides),
+                spaceBetween: 20,
+            },
+            1024: {
+                slidesPerView: Math.min(3, totalSlides),
+                spaceBetween: 30,
+            },
+        },
+    });
 }
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLanding3Swiper);
+} else {
+    initLanding3Swiper();
+}
+
+window.addEventListener('load', initLanding3Swiper);
+setTimeout(initLanding3Swiper, 500);
