@@ -300,7 +300,7 @@
                     @if($isPreviewMode)<span class="preview-badge !text-[10px] !leading-normal"
                     style="top: -20px;">Short Description</span>@endif
                     <div
-                        class="prose prose-invert text-[22px] md:text-[30px] [&_*]:!text-[22px] md:[&_*]:!text-[30px] mx-auto leading-relaxed">
+                        class="prose prose-invert max-w-none text-lg md:text-2xl mx-auto leading-relaxed">
                         {!! $landing->short_description ?? ($product->short_description ?: ($isPreviewMode ? $previewShortDesc : '')) !!}
                     </div>
                 </div>
