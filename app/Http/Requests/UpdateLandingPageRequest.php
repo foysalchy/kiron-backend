@@ -30,6 +30,8 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
             $this->companyRules(),
             [
                 'product_id' => ['nullable', 'exists:products,id'],
+                'product_ids' => ['nullable', 'array'],
+                'product_ids.*' => ['integer', 'exists:products,id'],
                 'name' => ['nullable', 'string', 'max:255'],
                 'title' => ['nullable', 'string', 'max:255'],
                 'button_text' => ['nullable', 'string', 'max:255'],

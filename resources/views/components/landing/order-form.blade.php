@@ -1,15 +1,19 @@
-@props(['landing', 'isPreview' => null])
+@props(['landing', 'products' => null, 'isPreview' => null])
 @php
-    $mainProduct = $landing->product;
+    $allProducts = ($products && $products->isNotEmpty()) ? $products : collect([$landing->product]);
+    $isMultiProductMode = $allProducts->count() > 1;
+    $mainProduct = $landing->product ?? $allProducts->first();
+    $defaultInsideCharge = $setup->inside_charge ?? 60;
+    $defaultOutsideCharge = $setup->outside_charge ?? 100;
     $isFree = \App\Models\Product::where('id', $mainProduct->id)->value('is_free_delivery');
-    $insideCharge = $isFree == 1 ? 0 : ($setup->inside_charge ?? 60);
-    $outsideCharge = $isFree == 1 ? 0 : ($setup->outside_charge ?? 100);
+    $insideCharge = $isFree == 1 ? 0 : $defaultInsideCharge;
+    $outsideCharge = $isFree == 1 ? 0 : $defaultOutsideCharge;
     $isPreviewMode = !empty($isPreview) || request()->is('*landing/preview*') || !empty($landing->is_preview);
 
     $isSingleProduct = $mainProduct->type === 'single';
     // stock check only if manage_stock is true or stock_status is out_of_stock
     $isSingleOutOfStock = $isSingleProduct && (
-        $mainProduct->stock_status === 'out_of_stock' || 
+        $mainProduct->stock_status === 'out_of_stock' ||
         ($mainProduct->manage_stock && ($mainProduct->available_stock <= 0))
     );
 
@@ -81,7 +85,136 @@
                 @endif
             </div>
 
-            @if ($mainProduct->type === 'variation')
+            @if ($isMultiProductMode)
+                {{-- Empty state prompt if nothing is added yet --}}
+                <div id="multi-product-empty-notice" class="p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
+                    <div class="text-center mb-4">
+                        <p class="text-base font-bold text-gray-800 mb-1">কোনো পণ্য এখনো কার্টে যোগ করা হয়নি</p>
+                        <p class="text-sm text-gray-500 font-medium">উপরের প্রোডাক্ট কার্ড থেকে পছন্দের পণ্য বেছে নিয়ে কার্টে যোগ করুন।</p>
+                    </div>
+                    <div class="flex justify-center">
+                        <a href="#landing-products-section"
+                            onclick="const el = document.getElementById('landing-products-section') || document.querySelector('.product-card'); if (el) { el.scrollIntoView({ behavior: 'smooth' }); return false; }"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#15803d] hover:bg-[#166534] text-white text-sm font-bold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer">
+                            <i class="fa-solid fa-cart-plus text-sm"></i>
+                            <span>পণ্য পছন্দ করুন</span>
+                            <i class="fa-solid fa-arrow-up text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                {{-- MULTI-PRODUCT SELECTION LIST --}}
+                <div class="space-y-6" id="multi-product-list-wrapper">
+                    @foreach ($allProducts as $p)
+                        @php
+                            $pHasVars = ($p->type === 'variation') && ($p->variations && $p->variations->count() > 0);
+                            $pIsSingleOutOfStock = ($p->type === 'single') && (
+                                $p->stock_status === 'out_of_stock' ||
+                                ($p->manage_stock && ($p->available_stock <= 0))
+                            );
+                            $pImg = $p->thumbnail_url ?? $p->display_image_url ?? asset('images/default.webp');
+                            $pPrice = $p->sale_price ?? ($p->regular_price - ($p->discount ?? 0));
+                        @endphp
+
+                        <div class="order-product-item-wrapper border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm space-y-3 hidden" data-order-product-id="{{ $p->id }}">
+                            <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden flex-shrink-0">
+                                        <img src="{{ $pImg }}" class="w-full h-full object-contain" alt="{{ $p->title }}">
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800 text-sm md:text-base leading-snug">{{ $p->title }}</h4>
+                                        <span class="text-xs text-gray-500 font-semibold">মূল্য: {{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if ($pHasVars)
+                                {{-- Variations of this product --}}
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    @foreach ($p->variations as $variation)
+                                        @php
+                                            $vSalePrice = $variation->regular_price - ($variation->discount ?? 0);
+                                            $vImage = $variation->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($variation->image)) : $pImg;
+                                            $vOutOfStock = (
+                                                $variation->stock_status === 'out_of_stock' ||
+                                                ($p->manage_stock && ($variation->available_stock <= 0))
+                                            );
+                                            $maxStock = $p->manage_stock ? ($variation->available_stock ?? 0) : 999999;
+                                        @endphp
+                                        <label class="relative {{ $vOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
+                                            <input type="checkbox" name="variation_ids[]" value="{{ $variation->id }}"
+                                                data-price="{{ $vSalePrice }}"
+                                                data-name="{{ $variation->display_name }}"
+                                                data-title="{{ $p->title }}"
+                                                data-img="{{ $vImage }}"
+                                                data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                                data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
+                                                data-max-stock="{{ $maxStock }}"
+                                                {{ $vOutOfStock ? 'disabled' : '' }}
+                                                onchange="onVariationCheckboxChange()"
+                                                class="hidden peer variant-checkbox">
+
+                                            <div class="variant-card-box flex items-center justify-between gap-3 p-3 border-2 border-gray-200 rounded-xl transition-all hover:border-gray-300 bg-white">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
+                                                        <svg class="w-3.5 h-3.5 text-white hidden checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                        </svg>
+                                                    </div>
+                                                    <div class="w-10 h-10 rounded border border-gray-100 overflow-hidden flex-shrink-0 bg-white">
+                                                        <img src="{{ $vImage }}" class="w-full h-full object-contain" alt="VAR">
+                                                    </div>
+                                                    <div class="text-left">
+                                                        <p class="text-xs font-bold text-gray-800">{{ $variation->display_name }}</p>
+                                                        @if($vOutOfStock)
+                                                            <span class="text-[10px] text-red-600 font-bold">স্টক আউট</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs font-bold text-gray-900">{{ number_format($vSalePrice, 2) }}{{ $setup->currency }}</span>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @else
+                                {{-- Single product item selection --}}
+                                <label class="relative {{ $pIsSingleOutOfStock ? 'cursor-not-allowed opacity-60' : 'cursor-pointer' }} block">
+                                    <input type="checkbox" name="product_ids[]" value="{{ $p->id }}"
+                                        data-price="{{ $pPrice }}"
+                                        data-name="Regular"
+                                        data-title="{{ $p->title }}"
+                                        data-img="{{ $pImg }}"
+                                        data-is-product="1"
+                                        data-is-free="{{ $p->is_free_delivery ? '1' : '0' }}"
+                                        data-out-of-stock="{{ $pIsSingleOutOfStock ? '1' : '0' }}"
+                                        data-max-stock="{{ $p->manage_stock ? ($p->available_stock ?? 0) : 999999 }}"
+                                        {{ $pIsSingleOutOfStock ? 'disabled' : '' }}
+                                        onchange="onVariationCheckboxChange()"
+                                        class="hidden peer variant-checkbox">
+
+                                    <div class="variant-card-box flex items-center justify-between gap-3 p-3 border-2 border-gray-200 rounded-xl transition-all hover:border-gray-300 bg-white">
+                                        <div class="flex items-center gap-3">
+                                            <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
+                                                <svg class="w-3.5 h-3.5 text-white hidden checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                                </svg>
+                                            </div>
+                                            <div class="text-left">
+                                                <p class="text-xs font-bold text-gray-800">এই প্রোডাক্টটি কার্টে যোগ করুন</p>
+                                                @if($pIsSingleOutOfStock)
+                                                    <span class="text-[10px] text-red-600 font-bold">স্টক আউট</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <span class="text-xs font-bold text-gray-900">{{ number_format($pPrice, 2) }}{{ $setup->currency }}</span>
+                                    </div>
+                                </label>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @elseif ($mainProduct->type === 'variation')
                 @foreach ($mainProduct->variations as $index => $variation)
                     @php
                         $vSalePrice = $variation->regular_price - $variation->discount;
@@ -103,6 +236,7 @@
                                 data-price="{{ $vSalePrice }}"
                                 data-name="{{ $variation->display_name }}"
                                 data-img="{{ $vImage }}"
+                                data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
                                 data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
                                 data-max-stock="{{ $maxStock }}"
                                 {{ $vOutOfStock ? 'disabled' : '' }}
@@ -113,6 +247,7 @@
                                 data-price="{{ $vSalePrice }}"
                                 data-name="{{ $variation->display_name }}"
                                 data-img="{{ $vImage }}"
+                                data-is-free="{{ $mainProduct->is_free_delivery ? '1' : '0' }}"
                                 data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"
                                 data-max-stock="{{ $maxStock }}"
                                 {{ $vOutOfStock ? 'disabled' : '' }}
@@ -121,10 +256,10 @@
                         @endif
 
                         <div
-                            class="flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all {{ !$vOutOfStock ? 'peer-checked:border-[#1f8a54] peer-checked:bg-green-50 hover:border-gray-300' : 'bg-gray-50 border-gray-200' }} bg-white">
+                            class="variant-card-box flex flex-col md:flex-row items-center justify-between gap-4 p-4 border-2 border-gray-200 rounded-xl transition-all {{ !$vOutOfStock ? 'hover:border-gray-300' : 'bg-gray-50 border-gray-200' }} bg-white">
                             <div class="flex items-center gap-4 w-full">
                                 @if ($isMultipleAttribute)
-                                    <div class="w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 peer-checked:border-[#1f8a54] peer-checked:bg-[#1f8a54] flex items-center justify-center transition-colors">
+                                    <div class="checkmark-box w-5 h-5 flex-shrink-0 rounded border-2 border-gray-300 bg-white flex items-center justify-center transition-colors">
                                         <svg class="w-3.5 h-3.5 text-white {{ $isChecked ? '' : 'hidden' }} checkmark-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                         </svg>
@@ -208,33 +343,33 @@
                         <span>Product</span><span class="text-right">Price</span>
                     </div>
 
-                    {{-- Product Info Row --}}
-                    <div
-                        class="flex justify-between items-start gap-4 pb-5 mb-5 border-b border-dashed border-gray-200">
-                        <div class="flex items-start gap-3">
-                            <div
-                                class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
-                                <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" width="56" height="56"
-                                    alt="{{ $landing->product->title ?? 'Product Image' }}"
-                                    class="w-full h-full object-contain">
+                    {{-- Product Info Rows Container (Dynamic) --}}
+                    <div id="summary-items-list" class="space-y-3 pb-5 mb-5 border-b border-dashed border-gray-200">
+                        <div class="flex justify-between items-start gap-4">
+                            <div class="flex items-start gap-3">
+                                <div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 bg-gray-50">
+                                    <img id="summary-img" src="{{ $mainProduct->thumbnail_url }}" width="56" height="56"
+                                        alt="{{ $landing->product->title ?? 'Product Image' }}"
+                                        class="w-full h-full object-contain">
+                                </div>
+                                <div class="max-w-[150px]">
+                                    <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
+                                    <p id="summary-variant-name"
+                                        class="text-[10px] text-green-800 font-bold mt-1 uppercase"></p>
+                                </div>
                             </div>
-                            <div class="max-w-[150px]">
-                                <p class="text-xs font-bold text-gray-800 leading-tight">{{ $mainProduct->title }}</p>
-                                <p id="summary-variant-name"
-                                    class="text-[10px] text-green-800 font-bold mt-1 uppercase"></p>
+                            <div class="text-right whitespace-nowrap pt-1">
+                                <span class="text-sm font-bold text-gray-800">
+                                    <span class="text-gray-400">×</span> <span id="summary-qty">1</span>
+                                    <span id="summary-unit-price" class="ml-1"></span>{{ $setup->currency }}
+                                </span>
                             </div>
-                        </div>
-                        <div class="text-right whitespace-nowrap pt-1">
-                            <span class="text-sm font-bold text-gray-800">
-                                <span class="text-gray-400">×</span> <span id="summary-qty">1</span>
-                                <span id="summary-unit-price" class="ml-1"></span>{{ $setup->currency }}
-                            </span>
                         </div>
                     </div>
 
                     {{-- Qty Selector & Shipping Area (Inside Summary) --}}
                     <div class="px-2 space-y-4 mb-6">
-                        <div class="flex items-center justify-between">
+                        <div id="global-qty-wrapper" class="flex items-center justify-between">
                             <span class="text-sm font-bold text-gray-700">Quantity</span>
                             <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
                                 <button type="button" onclick="changeQty(-1)" aria-label="Decrease quantity"
@@ -245,32 +380,28 @@
                             </div>
                         </div>
 
-                        @if(!$isFree)
-                        <div class="space-y-2">
+                        <div id="delivery-area-section" class="space-y-2 {{ $isFree ? 'hidden' : '' }}">
                             <label class="block text-sm font-bold text-gray-500 uppercase tracking-wide">Delivery
                                 Area</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="shipping_area" value="inside" checked
-                                        onchange="updateDeliveryCharge({{ $insideCharge }})" class="hidden peer">
+                                    <input type="radio" name="shipping_area" id="shipping-area-inside" value="inside" checked
+                                        onchange="updateDeliveryCharge({{ $defaultInsideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Inside Dhaka <span class="text-xs font-bold ml-1">{{ $insideCharge == 0 ? '(Free)' : '('.$insideCharge.$setup->currency.')' }}</span>
+                                        Inside Dhaka <span class="text-xs font-bold ml-1">({{ $defaultInsideCharge.$setup->currency }})</span>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="shipping_area" value="outside"
-                                        onchange="updateDeliveryCharge({{ $outsideCharge }})" class="hidden peer">
+                                    <input type="radio" name="shipping_area" id="shipping-area-outside" value="outside"
+                                        onchange="updateDeliveryCharge({{ $defaultOutsideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Outside Dhaka <span class="text-xs font-bold ml-1">{{ $outsideCharge == 0 ? '(Free)' : '('.$outsideCharge.$setup->currency.')' }}</span>
+                                        Outside Dhaka <span class="text-xs font-bold ml-1">({{ $defaultOutsideCharge.$setup->currency }})</span>
                                     </div>
                                 </label>
                             </div>
                         </div>
-                        @else
-                        <input type="hidden" name="shipping_area" value="inside">
-                        @endif
                     </div>
 
                     {{-- Calculations --}}
@@ -375,7 +506,28 @@
     </div>
 @endif
 
+@if($isMultiProductMode)
+    {{-- Floating Cart Pill / Button for Multi-Product Mode --}}
+    <div id="landing-floating-cart" 
+        onclick="const el = document.getElementById('order'); if (el) el.scrollIntoView({ behavior: 'smooth' });"
+        class="fixed bottom-6 right-5 z-[999] hidden items-center gap-3 bg-[#0D2601] hover:bg-[#1a4a03] text-white px-4 py-3 rounded-full shadow-2xl border-2 border-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105 active:scale-95 group">
+        <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#35B11E] text-white">
+            <i class="fa-solid fa-cart-shopping text-sm"></i>
+            <span id="floating-cart-count" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center border border-white">0</span>
+        </div>
+        <div class="text-left pr-1">
+            <p class="text-[10px] uppercase font-bold text-gray-300 tracking-wider leading-none">কার্ট দেখুন</p>
+            <p class="text-sm font-extrabold text-[#7dfa6b] leading-tight mt-0.5">
+                <span id="floating-cart-total">0.00</span>{{ $setup->currency }}
+            </p>
+        </div>
+        <i class="fa-solid fa-chevron-down text-xs text-gray-300 group-hover:translate-y-0.5 transition-transform"></i>
+    </div>
+@endif
+
 <script>
+    const DEFAULT_INSIDE_CHARGE = parseFloat("{{ $defaultInsideCharge }}") || 60;
+    const DEFAULT_OUTSIDE_CHARGE = parseFloat("{{ $defaultOutsideCharge }}") || 100;
     let UNIT_PRICE = parseFloat("{{ $mainProduct->type === 'single' ? $mainProduct->sale_price : 0 }}") || 0;
     let DELIVERY = parseFloat("{{ $insideCharge }}");
     const CURRENCY = "{{ $setup->currency }}";
@@ -386,8 +538,12 @@
     let currentVariationOutOfStock = {{ $isEntirelyOutOfStock ? 'true' : 'false' }};
     let currentMaxStock = {{ ($isSingleProduct && $mainProduct->manage_stock && $mainProduct->available_stock !== null) ? $mainProduct->available_stock : 999999 }};
 
+    const isMultiProductMode = {{ $isMultiProductMode ? 'true' : 'false' }};
+
     document.addEventListener("DOMContentLoaded", function () {
-        if (isVarProduct) {
+        if (isMultiProductMode) {
+            onVariationCheckboxChange();
+        } else if (isVarProduct) {
             if (isMultipleAttribute) {
                 onVariationCheckboxChange();
             } else {
@@ -399,73 +555,284 @@
         }
     });
 
+    const PRODUCT_TITLE = @json($mainProduct->title);
+    const PRODUCT_THUMB = @json($mainProduct->thumbnail_url);
+
+    // Map to store per-variation quantities: { [variationId]: quantity }
+    let variationQuantities = {};
+
+    function renderSummaryItems(items, isMulti = false) {
+        const container = document.getElementById('summary-items-list');
+        const globalQtyWrapper = document.getElementById('global-qty-wrapper');
+        if (!container) return;
+
+        // Toggle global quantity visibility
+        if (globalQtyWrapper) {
+            if (isMulti) {
+                globalQtyWrapper.classList.add('hidden');
+            } else {
+                globalQtyWrapper.classList.remove('hidden');
+            }
+        }
+
+        if (!items || items.length === 0) {
+            container.innerHTML = `
+                <div class="py-3 text-center text-xs text-gray-500 font-medium bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                    কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি
+                </div>`;
+            return;
+        }
+
+        let html = '';
+        items.forEach(item => {
+            const itemKey = item.storageKey || item.id;
+            const itemQty = isMulti ? (variationQuantities[itemKey] || 1) : qty;
+            const price = parseFloat(item.price) || 0;
+            const lineTotalFormatted = (price * itemQty).toLocaleString(undefined, { minimumFractionDigits: 2 });
+
+            html += `
+                <div class="flex justify-between items-center gap-3 py-2.5 border-b border-gray-100 last:border-0" data-item-id="${item.id}">
+                    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+                        <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200 bg-white p-0.5">
+                            <img src="${item.img || PRODUCT_THUMB}" width="48" height="48"
+                                alt="${item.title || PRODUCT_TITLE}"
+                                class="w-full h-full object-contain">
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-gray-800 truncate">${item.title || PRODUCT_TITLE}</p>
+                            ${item.option ? `<p class="text-[11px] text-[#145a32] font-semibold mt-0.5 uppercase">${item.option}</p>` : ''}
+                            <p class="text-[11px] text-gray-500 font-medium">${price.toFixed(2)}${CURRENCY}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        ${isMulti ? `
+                            <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden shadow-sm">
+                                <button type="button" onclick="changeItemQty('${itemKey}', -1, ${item.maxStock})"
+                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-r border-gray-300 cursor-pointer text-gray-600">−</button>
+                                <span class="w-7 text-center font-bold text-xs text-gray-800">${itemQty}</span>
+                                <button type="button" onclick="changeItemQty('${itemKey}', 1, ${item.maxStock})"
+                                    class="w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-gray-100 border-l border-gray-300 cursor-pointer text-gray-600">+</button>
+                            </div>
+                            <button type="button" onclick="removeVariationItem('${item.id}', ${item.isProduct ? 'true' : 'false'})"
+                                class="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                                title="রিমুভ করুন">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                            ${item.isProduct
+                                ? `<input type="hidden" name="product_quantities[${item.id}]" value="${itemQty}">`
+                                : `<input type="hidden" name="variation_quantities[${item.id}]" value="${itemQty}">`
+                            }
+                        ` : `
+                            <span class="text-xs font-bold text-gray-700">
+                                <span class="text-gray-400">×</span> <span class="item-summary-qty">${qty}</span>
+                            </span>
+                        `}
+                        <div class="text-right w-16">
+                            <span class="text-xs font-bold text-gray-900">${lineTotalFormatted}${CURRENCY}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function changeItemQty(storageKey, delta, maxStock = 999999) {
+        const current = variationQuantities[storageKey] || 1;
+        const newQty = current + delta;
+
+        if (newQty < 1) return;
+        if (manageStockEnabled && maxStock !== null && newQty > maxStock) {
+            alert('দুঃখিত! এই পণ্যের সর্বোচ্চ ' + maxStock + ' টি স্টকে রয়েছে।');
+            return;
+        }
+
+        variationQuantities[storageKey] = newQty;
+        onVariationCheckboxChange();
+    }
+
+    function removeVariationItem(id, isProduct = false) {
+        const selector = isProduct
+            ? `input[name="product_ids[]"][value="${id}"]`
+            : `.variant-checkbox[value="${id}"]`;
+        const cb = document.querySelector(selector);
+        if (cb) {
+            cb.checked = false;
+            const storageKey = isProduct ? ('prod_' + id) : id;
+            delete variationQuantities[storageKey];
+            onVariationCheckboxChange();
+        }
+    }
+
     function onVariationCheckboxChange() {
         const checkboxes = Array.from(document.querySelectorAll('.variant-checkbox'));
         const checkedList = checkboxes.filter(cb => cb.checked);
 
-        // Update visual checkmark icons
+        // Update visual checkmark icons and box highlights
         checkboxes.forEach(cb => {
             const label = cb.closest('label');
             if (label) {
+                const box = label.querySelector('.checkmark-box');
+                const card = label.querySelector('.variant-card-box');
                 const icon = label.querySelector('.checkmark-icon');
-                if (icon) {
-                    if (cb.checked) {
+
+                if (cb.checked) {
+                    if (box) {
+                        box.classList.remove('bg-white', 'border-gray-300');
+                        box.classList.add('bg-[#1f8a54]', 'border-[#1f8a54]');
+                    }
+                    if (card) {
+                        card.classList.remove('border-gray-200', 'bg-white');
+                        card.classList.add('border-[#1f8a54]', 'bg-green-50/70');
+                    }
+                    if (icon) {
                         icon.classList.remove('hidden');
-                    } else {
+                    }
+                } else {
+                    if (box) {
+                        box.classList.remove('bg-[#1f8a54]', 'border-[#1f8a54]');
+                        box.classList.add('bg-white', 'border-gray-300');
+                    }
+                    if (card) {
+                        card.classList.remove('border-[#1f8a54]', 'bg-green-50/70');
+                        card.classList.add('border-gray-200', 'bg-white');
+                    }
+                    if (icon) {
                         icon.classList.add('hidden');
                     }
                 }
             }
         });
 
-        const selectedIds = checkedList.map(cb => cb.value);
+        // Show/hide product cards in form based on whether any checkbox in that product is checked
+        let anyProductVisible = false;
+        document.querySelectorAll('.order-product-item-wrapper').forEach(wrapper => {
+            const hasChecked = wrapper.querySelector('.variant-checkbox:checked');
+            if (hasChecked) {
+                wrapper.classList.remove('hidden');
+                anyProductVisible = true;
+            } else {
+                wrapper.classList.add('hidden');
+            }
+        });
+
+        const emptyNotice = document.getElementById('multi-product-empty-notice');
+        if (emptyNotice) {
+            if (anyProductVisible) {
+                emptyNotice.classList.add('hidden');
+            } else {
+                emptyNotice.classList.remove('hidden');
+            }
+        }
+
+        const selectedIds = checkedList
+            .filter(cb => !cb.dataset.isProduct)
+            .map(cb => cb.value);
+
         const selectedIdInput = document.getElementById('selected-variation-id');
         if (selectedIdInput) {
             selectedIdInput.value = selectedIds.join(',');
         }
 
+        // Update Floating Cart Widget
+        const floatingCart = document.getElementById('landing-floating-cart');
+        const floatingCount = document.getElementById('floating-cart-count');
+        const floatingTotal = document.getElementById('floating-cart-total');
+
+        // Update hero section order button visibility if present
+        const heroOrderBtn = document.getElementById('hero-order-btn-wrapper');
+
         if (checkedList.length === 0) {
             UNIT_PRICE = 0;
-            const varLabel = document.getElementById('summary-variant-name');
-            if (varLabel) varLabel.innerText = "কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি";
             currentVariationOutOfStock = false;
             updateBtnState(false, true);
-            updateUI();
+            renderSummaryItems([], true);
+            updateUI(0);
+            if (floatingCart) {
+                floatingCart.classList.add('hidden');
+                floatingCart.classList.remove('flex');
+            }
+            if (heroOrderBtn) {
+                heroOrderBtn.classList.add('hidden');
+            }
             return;
         }
 
-        // Sum prices of checked variations
-        let totalUnitPrice = 0;
-        let names = [];
-        let minStock = 999999;
+        let calculatedSubtotal = 0;
         let anyOutOfStock = false;
+        let items = [];
+        let totalItemsCount = 0;
 
         checkedList.forEach(cb => {
-            totalUnitPrice += parseFloat(cb.dataset.price) || 0;
-            names.push(cb.dataset.name);
+            const itemId = cb.value;
+            const isProd = cb.dataset.isProduct === '1';
+            const storageKey = isProd ? ('prod_' + itemId) : itemId;
+
+            if (!variationQuantities[storageKey]) {
+                variationQuantities[storageKey] = 1;
+            }
+            const p = parseFloat(cb.dataset.price) || 0;
             const stock = parseInt(cb.dataset.maxStock) || 999999;
-            if (stock < minStock) minStock = stock;
+            const itemQty = variationQuantities[storageKey];
+
+            calculatedSubtotal += (p * itemQty);
+            totalItemsCount += itemQty;
             if (cb.dataset.outOfStock === '1') anyOutOfStock = true;
+
+            items.push({
+                id: itemId,
+                storageKey: storageKey,
+                isProduct: isProd,
+                title: cb.dataset.title || PRODUCT_TITLE,
+                option: isProd ? '' : cb.dataset.name,
+                img: cb.dataset.img || PRODUCT_THUMB,
+                price: p,
+                maxStock: stock
+            });
         });
 
-        UNIT_PRICE = totalUnitPrice;
-        currentMaxStock = minStock;
+        // Check if all selected products have free delivery
+        let allFreeDelivery = checkedList.length > 0 && checkedList.every(cb => cb.dataset.isFree === '1');
+        const deliveryAreaSection = document.getElementById('delivery-area-section');
+
+        if (allFreeDelivery) {
+            DELIVERY = 0;
+            if (deliveryAreaSection) deliveryAreaSection.classList.add('hidden');
+        } else {
+            const currentArea = document.querySelector('input[name="shipping_area"]:checked')?.value || 'inside';
+            DELIVERY = (currentArea === 'outside') ? DEFAULT_OUTSIDE_CHARGE : DEFAULT_INSIDE_CHARGE;
+            if (deliveryAreaSection) deliveryAreaSection.classList.remove('hidden');
+        }
+
         currentVariationOutOfStock = anyOutOfStock;
-
-        // Update image and names
-        const firstChecked = checkedList[0];
-        if (firstChecked && firstChecked.dataset.img) {
-            const summaryImg = document.getElementById('summary-img');
-            if (summaryImg) summaryImg.src = firstChecked.dataset.img;
-        }
-
-        const varLabel = document.getElementById('summary-variant-name');
-        if (varLabel) {
-            varLabel.innerText = "Option: " + names.join(', ');
-        }
-
+        renderSummaryItems(items, true);
         updateBtnState(currentVariationOutOfStock, false);
-        updateUI();
+        updateUI(calculatedSubtotal);
+
+        // Update floating cart UI
+        if (floatingCart) {
+            if (totalItemsCount > 0) {
+                if (floatingCount) floatingCount.innerText = totalItemsCount;
+                if (floatingTotal) floatingTotal.innerText = calculatedSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
+                floatingCart.classList.remove('hidden');
+                floatingCart.classList.add('flex');
+            } else {
+                floatingCart.classList.add('hidden');
+                floatingCart.classList.remove('flex');
+            }
+        }
+
+        // Show hero order button if items are in cart
+        if (heroOrderBtn) {
+            if (totalItemsCount > 0) {
+                heroOrderBtn.classList.remove('hidden');
+            } else {
+                heroOrderBtn.classList.add('hidden');
+            }
+        }
     }
 
     function updateBtnState(isOutOfStock, isEmptySelection = false) {
@@ -491,13 +858,18 @@
         const selectedIdInput = document.getElementById('selected-variation-id');
         if (selectedIdInput) selectedIdInput.value = id;
         UNIT_PRICE = parseFloat(price);
-        const summaryImg = document.getElementById('summary-img');
-        if (summaryImg) summaryImg.src = img;
-        const varLabel = document.getElementById('summary-variant-name');
-        if (varLabel) varLabel.innerText = "Option: " + name;
 
         currentVariationOutOfStock = isOutOfStock;
         currentMaxStock = maxStock;
+
+        renderSummaryItems([{
+            id: id,
+            title: PRODUCT_TITLE,
+            option: name,
+            img: img || PRODUCT_THUMB,
+            price: UNIT_PRICE,
+            maxStock: maxStock
+        }], false);
 
         updateBtnState(isOutOfStock, false);
         updateUI();
@@ -505,7 +877,11 @@
 
     function updateDeliveryCharge(amount) {
         DELIVERY = parseFloat(amount);
-        updateUI();
+        if (isMultiProductMode || isMultipleAttribute) {
+            onVariationCheckboxChange();
+        } else {
+            updateUI();
+        }
     }
 
     function changeQty(delta) {
@@ -517,8 +893,8 @@
         updateUI();
     }
 
-    function updateUI() {
-        const sub = qty * UNIT_PRICE;
+    function updateUI(explicitSubtotal = null) {
+        const sub = explicitSubtotal !== null ? explicitSubtotal : (qty * UNIT_PRICE);
         const total = sub + DELIVERY;
 
         const elQtyDisplay = document.getElementById('qty-display');
@@ -529,6 +905,10 @@
 
         const elSummaryQty = document.getElementById('summary-qty');
         if (elSummaryQty) elSummaryQty.innerText = qty;
+
+        document.querySelectorAll('.item-summary-qty').forEach(el => {
+            el.innerText = qty;
+        });
 
         const unitFormatted = UNIT_PRICE.toLocaleString(undefined, { minimumFractionDigits: 2 });
         const subFormatted = sub.toLocaleString(undefined, { minimumFractionDigits: 2 });
@@ -678,9 +1058,16 @@
             const draftOrderId = document.getElementById('draft-order-id')?.value || null;
             const qtyVal = document.getElementById('input-qty')?.value || 1;
             const variationId = document.getElementById('selected-variation-id')?.value || null;
-            const shippingArea = (form && form.querySelector('input[name="shipping_area"]:checked')?.value) 
-                || (form && form.querySelector('input[name="shipping_area"]')?.value) 
+            const shippingArea = (form && form.querySelector('input[name="shipping_area"]:checked')?.value)
+                || (form && form.querySelector('input[name="shipping_area"]')?.value)
                 || 'inside';
+
+            const selectedProdCheckboxes = Array.from(document.querySelectorAll('input[name="product_ids[]"]:checked'));
+            const selectedProdIds = selectedProdCheckboxes.map(cb => cb.value);
+            let productQuantities = {};
+            selectedProdIds.forEach(pId => {
+                productQuantities[pId] = variationQuantities['prod_' + pId] || 1;
+            });
 
             fetch("{{ route('landing.order.partial') }}", {
                 method: 'POST',
@@ -698,6 +1085,9 @@
                     draft_order_id: draftOrderId,
                     qty: qtyVal,
                     variation_id: variationId,
+                    variation_quantities: ((isMultipleAttribute || isMultiProductMode) && typeof variationQuantities === 'object') ? variationQuantities : null,
+                    product_ids: selectedProdIds.length > 0 ? selectedProdIds : null,
+                    product_quantities: Object.keys(productQuantities).length > 0 ? productQuantities : null,
                     shipping_area: shippingArea
                 })
             })
@@ -756,7 +1146,14 @@
                 showOrderErrorModal('দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।');
                 return false;
             }
-            if (isVarProduct && !document.getElementById('selected-variation-id').value) {
+            if (isMultiProductMode) {
+                const checkedAny = document.querySelector('.variant-checkbox:checked');
+                if (!checkedAny) {
+                    e.preventDefault();
+                    alert('দয়া করে অন্তত একটি পণ্য বা ভ্যারিয়েন্ট যোগ করুন!');
+                    return false;
+                }
+            } else if (isVarProduct && !document.getElementById('selected-variation-id').value) {
                 e.preventDefault();
                 alert('দয়া করে পণ্য সিলেক্ট করুন!');
                 return false;

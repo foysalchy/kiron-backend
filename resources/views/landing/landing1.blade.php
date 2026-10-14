@@ -678,7 +678,7 @@
 
 
         {{-- ══ SECTION 9: ORDER FORM ══ --}}
-        <section id="order" class="py-14 px-4 bg-[#f8faff] [&_#landing-order-form_h2]:!text-xl sm:[&_#landing-order-form_h2]:!text-2xl md:[&_#landing-order-form_h2]:!text-4xl [&_#landing-order-form_h2]:!font-bold [&_#landing-order-form_h2]:!leading-normal md:[&_#landing-order-form_h2]:!leading-relaxed">
+        <section id="order" class="py-10 px-4 bg-[#f8faff] [&_#landing-order-form_h2]:!text-xl sm:[&_#landing-order-form_h2]:!text-2xl md:[&_#landing-order-form_h2]:!text-4xl [&_#landing-order-form_h2]:!font-bold [&_#landing-order-form_h2]:!leading-normal md:[&_#landing-order-form_h2]:!leading-relaxed">
             <x-landing.order-form :landing="$landing" :isPreview="$isPreviewMode" />
         </section>
 
