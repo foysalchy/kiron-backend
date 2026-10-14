@@ -764,6 +764,8 @@ Route::prefix('v1')->group(function () {
                     Route::get('/products/{id}', [OrderController::class, 'orderProducts']);
                 });
                 Route::post('/orders/bulk-status-update', [OrderController::class, 'bulkStatusUpdate']);
+                Route::post('/orders/picking-slip', [OrderController::class, 'pickingSlip']);
+                Route::patch('/orders/{id}/toggle-packed', [OrderController::class, 'togglePacked']);
                 Route::get('/courier-check', [OrderController::class, 'checkCourier']);
 
                 Route::prefix('orders-return')->group(function () {

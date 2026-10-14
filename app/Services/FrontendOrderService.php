@@ -429,6 +429,7 @@ class FrontendOrderService
             'consignmentId'  => $info['consignment_id'] ?? null,
             'note'           => $info['note'] ?? null,
             'appliedAt'      => $info['applied_at'] ?? null,
+            'is_packed'      => !empty($info['is_packed']),
         ];
     }
     private function getCourierMethod()
