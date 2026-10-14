@@ -376,21 +376,21 @@
                                 </video>
                             </div>
                         </div>
-                    @elseif ($multiProducts->count() > 1)
-                        {{-- Multi-Product Cards Grid --}}
+                    @elseif ($multiProducts->isNotEmpty())
+                        {{-- Product Cards Grid (supports 1 or more products) --}}
                         <div id="landing-products-section"
                             class="relative scroll-mt-20 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: -24px; z-index: 50;">Selected
                             Products ({{ $multiProducts->count() }})</span>@endif
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3' }} gap-6">
                                 @foreach($multiProducts as $p)
                                     <x-landing.landing-product-card-1 :product="$p" :setup="$setup" />
                                 @endforeach
                             </div>
                         </div>
                     @else
-                        {{-- Single Product Fallback --}}
+                        {{-- Fallback --}}
                         <div
                             class="relative rounded-2xl overflow-hidden flex justify-center items-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Thumbnail /
@@ -403,7 +403,7 @@
                 </div>
 
                 {{-- Order Button Below Product Cards --}}
-                <div id="hero-order-btn-wrapper" class="mt-8 md:mt-10 {{ $multiProducts->count() > 1 ? 'hidden' : '' }}">
+                <div id="hero-order-btn-wrapper" class="mt-8 md:mt-10 {{ $multiProducts->isNotEmpty() ? 'hidden' : '' }}">
                     <a href="#order"
                         class="inline-flex items-center justify-center gap-2 md:gap-3 bg-[linear-gradient(90deg,#f2a413_0%,#d8a13a_51%,#f2a413_100%)] bg-[length:200%_auto] hover:bg-[position:100%] hover:brightness-105 text-white px-8 sm:px-10 md:px-[50px] py-3 md:py-[15px] border-[3px] border-[#ad7419] rounded-[10px] font-bold text-lg sm:text-xl md:text-[30px] leading-snug md:leading-[45px] shadow-[0_20px_20px_0_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-500 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
