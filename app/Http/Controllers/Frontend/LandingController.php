@@ -301,15 +301,17 @@ class LandingController extends FrontendController
                         $primaryWarehouseId = $itemWarehouseId;
                     }
 
+                    $actualProductId = $variation->product_id ?? $productId;
+
                     $orderItems[] = [
-                        'product_id'   => $productId,
+                        'product_id'   => $actualProductId,
                         'variation_id' => $vId,
                         'quantity'     => $itemQty,
                         'unit_price'   => $vUnitPrice,
                     ];
 
                     $warehouseInfoList[] = [
-                        'product_id'   => (int) $productId,
+                        'product_id'   => (int) $actualProductId,
                         'variation_id' => (int) $vId,
                         'warehouse_id' => (int) $itemWarehouseId,
                         'bin_id'       => null,
@@ -563,9 +565,10 @@ class LandingController extends FrontendController
 
                 // Deduct stock for the confirmed order
                 $productService = app(\App\Services\ProductService::class);
-                $productObj = Product::find($productId);
-                if ($productObj && $productObj->manage_stock) {
-                    foreach ($warehouseInfoList as $wInfo) {
+                foreach ($warehouseInfoList as $wInfo) {
+                    $itemProdId = $wInfo['product_id'] ?? $productId;
+                    $itemProdObj = Product::find($itemProdId);
+                    if ($itemProdObj && $itemProdObj->manage_stock) {
                         $stockData = [
                             'warehouse_id'     => $wInfo['warehouse_id'],
                             'bin_id'           => null,
@@ -580,7 +583,7 @@ class LandingController extends FrontendController
                         if (!empty($wInfo['variation_id'])) {
                             $stockData['variation_id'] = $wInfo['variation_id'];
                         }
-                        $productService->removeStockFromWarehouse($productId, $stockData);
+                        $productService->removeStockFromWarehouse($itemProdId, $stockData);
                     }
                 }
 
