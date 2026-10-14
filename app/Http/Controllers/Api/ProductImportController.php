@@ -222,14 +222,72 @@ class ProductImportController extends Controller
                     }
                 }
 
-                // Image Upload
+                // Image Upload (Generates 3 versions: main thumbnail, 310x310, and 95x95 like ProductService)
                 $thumbnailPath = null;
+                $thumbnail310Path = null;
+                $thumbnail95Path = null;
                 $isImageMissing = empty($thumbnailUrl) && !$request->hasFile("rows.$index.imageFile");
                 
-                if ($request->hasFile("rows.$index.imageFile")) {
-                    $thumbnailPath = FileUploadHelper::upload($request->file("rows.$index.imageFile"), 'products', 'r2', true);
-                } elseif ($thumbnailUrl && filter_var($thumbnailUrl, FILTER_VALIDATE_URL)) {
-                    $thumbnailPath = FileUploadHelper::uploadFromUrl($thumbnailUrl, 'products', 'r2', true);
+                if (!$isPreview) {
+                    $customFileName = Str::slug($sku ?: ($title ?: 'product')) . '-' . time() . '-' . rand(100, 999);
+                    
+                    if ($request->hasFile("rows.$index.imageFile")) {
+                        $imgFile = $request->file("rows.$index.imageFile");
+                        try {
+                            $thumbnailPath = FileUploadHelper::uploadImage(
+                                $imgFile,
+                                'products/thumbnails',
+                                'r2',
+                                2048,
+                                $customFileName,
+                                true
+                            );
+                            $thumbnail310Path = FileUploadHelper::uploadResizedWebpImage(
+                                $imgFile,
+                                'products/thumbnails',
+                                310,
+                                310,
+                                'r2',
+                                $customFileName . '-310x310',
+                                true
+                            );
+                            $thumbnail95Path = FileUploadHelper::uploadResizedWebpImage(
+                                $imgFile,
+                                'products/thumbnails',
+                                95,
+                                95,
+                                'r2',
+                                $customFileName . '-95x95',
+                                true
+                            );
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to upload multipart image for row {$index}: " . $e->getMessage());
+                        }
+                    } elseif ($thumbnailUrl && filter_var($thumbnailUrl, FILTER_VALIDATE_URL)) {
+                        try {
+                            $thumbnailPath = FileUploadHelper::uploadFromUrl($thumbnailUrl, 'products', 'r2', true);
+                            if ($thumbnailPath) {
+                                $thumbnail310Path = FileUploadHelper::generateResizedFromExisting(
+                                    $thumbnailPath,
+                                    'products/thumbnails',
+                                    310,
+                                    310,
+                                    'r2',
+                                    $customFileName . '-310x310'
+                                );
+                                $thumbnail95Path = FileUploadHelper::generateResizedFromExisting(
+                                    $thumbnailPath,
+                                    'products/thumbnails',
+                                    95,
+                                    95,
+                                    'r2',
+                                    $customFileName . '-95x95'
+                                );
+                            }
+                        } catch (\Exception $e) {
+                            Log::warning("Failed to upload image from URL for row {$index}: " . $e->getMessage());
+                        }
+                    }
                 }
 
                 // Determine if this is a child variation (has parent SKU) or a parent variation
@@ -393,6 +451,8 @@ class ProductImportController extends Controller
                             'stock_status' => $stockStatus,
                             'purpose' => $purpose,
                             'thumbnail' => $thumbnailPath,
+                            'thumbnail_310' => $thumbnail310Path,
+                            'thumbnail_95' => $thumbnail95Path,
                             'short_description' => $shortDescription,
                             'full_description' => $fullDescription,
                             'meta_title' => $metaTitle,
