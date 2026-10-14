@@ -56,6 +56,8 @@ class StoreSiteSettingRequest extends BaseCompanyRequest
                 'founder_name'        => ['nullable', 'string', 'max:255'],
                 'founder_designation' => ['nullable', 'string', 'max:255'],
                 'established'         => ['nullable', 'date'],
+                'free_shipping_rules' => ['nullable'],
+                'free_shipping_text'  => ['nullable', 'string'],
             ]
         );
     }
