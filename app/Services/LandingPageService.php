@@ -69,6 +69,8 @@ class LandingPageService
             throw ApiException::notFound('Landing Page');
         }
 
+        $landingPage->append(['products', 'product_ids']);
+
         return $landingPage;
     }
     public function getLandingProductById(int $id, ?string $search = null)
@@ -150,7 +152,22 @@ class LandingPageService
                 }
                 $data['img_paths'] = $newPaths;
             }
-            unset($data['existing_img_paths']); // create-এ দরকার নেই
+            // Multi-product support via product_ids
+            if (!empty($data['product_ids']) && is_array($data['product_ids'])) {
+                $cleanProductIds = array_values(array_filter(array_map('intval', $data['product_ids'])));
+                if (!empty($cleanProductIds)) {
+                    if (empty($data['product_id'])) {
+                        $data['product_id'] = $cleanProductIds[0];
+                    }
+                    if (!isset($data['extras'])) {
+                        $data['extras'] = [];
+                    } elseif (is_string($data['extras'])) {
+                        $data['extras'] = json_decode($data['extras'], true) ?? [];
+                    }
+                    $data['extras']['product_ids'] = $cleanProductIds;
+                }
+            }
+            unset($data['product_ids']);
 
             if (isset($data['extras']) && is_string($data['extras'])) {
                 $data['extras'] = json_decode($data['extras'], true);
@@ -293,6 +310,28 @@ class LandingPageService
                 $data['img_paths'] = $data['existing_img_paths'] ?? $landingPage->img_paths ?? [];
             }
             unset($data['existing_img_paths']);
+
+            // Multi-product support via product_ids
+            if (array_key_exists('product_ids', $data)) {
+                $existingExtras = is_string($landingPage->extras) ? json_decode($landingPage->extras, true) : ($landingPage->extras ?? []);
+                if (is_array($data['product_ids']) && !empty($data['product_ids'])) {
+                    $cleanProductIds = array_values(array_filter(array_map('intval', $data['product_ids'])));
+                    if (empty($data['product_id']) && !empty($cleanProductIds)) {
+                        $data['product_id'] = $cleanProductIds[0];
+                    }
+                    if (!isset($data['extras'])) {
+                        $data['extras'] = $existingExtras;
+                    } elseif (is_string($data['extras'])) {
+                        $data['extras'] = json_decode($data['extras'], true) ?? [];
+                    }
+                    $data['extras']['product_ids'] = $cleanProductIds;
+                } else {
+                    if (isset($data['extras']) && is_array($data['extras'])) {
+                        unset($data['extras']['product_ids']);
+                    }
+                }
+            }
+            unset($data['product_ids']);
 
             if (isset($data['extras']) && is_string($data['extras'])) {
                 $data['extras'] = json_decode($data['extras'], true);

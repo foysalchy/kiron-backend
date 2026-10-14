@@ -44,7 +44,9 @@ class LandingController extends FrontendController
         \Illuminate\Support\Facades\View::share('setup', $setup);
         \Illuminate\Support\Facades\View::share('isPreview', false);
 
-        return view('landing.landing' . $landing->template_id, compact('landing', 'product'));
+        $products = $landing->products;
+
+        return view('landing.landing' . $landing->template_id, compact('landing', 'product', 'products'));
     }
 
     /**
@@ -134,7 +136,14 @@ class LandingController extends FrontendController
 
         $landing->setRelation('product', $product);
 
-        return view('landing.landing' . $template_id, compact('landing', 'product', 'isPreview'));
+        $multiProductIds = $form['product_ids'] ?? ($landing->extras['product_ids'] ?? []);
+        if (!empty($multiProductIds) && is_array($multiProductIds)) {
+            $products = \App\Models\Product::whereIn('id', $multiProductIds)->get();
+        } else {
+            $products = $product ? collect([$product]) : collect();
+        }
+
+        return view('landing.landing' . $template_id, compact('landing', 'product', 'products', 'isPreview'));
     }
 
     public function directPreview(Request $request, $template_id = 1)
@@ -180,9 +189,16 @@ class LandingController extends FrontendController
 
         $landing->setRelation('product', $product);
 
+        $demoProducts = Product::when($companyId, fn($q) => $q->where('company_id', $companyId))
+            ->where('status', Status::Active->value)
+            ->take(4)
+            ->get();
+        $products = $demoProducts->isNotEmpty() ? $demoProducts : collect([$product]);
+
         return view('landing.landing' . $template_id, [
             'landing' => $landing,
             'product' => $product,
+            'products' => $products,
             'isPreview' => true,
         ]);
     }
@@ -234,11 +250,12 @@ class LandingController extends FrontendController
             $totalQuantity = 0;
 
             if (!empty($variationIds)) {
+                $vQuantities = $request->variation_quantities ?? [];
                 foreach ($variationIds as $vId) {
                     $variation = ProductVariation::with('product')->findOrFail($vId);
                     $product = $variation->product;
                     $vUnitPrice = $variation->regular_price - $variation->discount;
-                    $itemQty = (int)$request->qty;
+                    $itemQty = isset($vQuantities[$vId]) ? max(1, (int)$vQuantities[$vId]) : max(1, (int)($request->qty ?? 1));
                     $itemWarehouseId = null;
 
                     // Manual out of stock check
@@ -302,7 +319,86 @@ class LandingController extends FrontendController
                     $totalItemAmount += ($itemQty * $vUnitPrice);
                     $totalQuantity += $itemQty;
                 }
-            } else {
+            }
+
+            // Also check for multiple standalone products (e.g. from multi-product landing page)
+            $rawProductIds = $request->product_ids;
+            $multiProdIds = [];
+            if (is_array($rawProductIds)) {
+                $multiProdIds = array_filter(array_map('trim', $rawProductIds));
+            } elseif (is_string($rawProductIds)) {
+                $multiProdIds = array_filter(explode(',', $rawProductIds));
+            }
+
+            if (!empty($multiProdIds)) {
+                $pQuantities = $request->product_quantities ?? [];
+                foreach ($multiProdIds as $pId) {
+                    $prodObj = Product::find($pId);
+                    if (!$prodObj) continue;
+
+                    $itemQty = isset($pQuantities[$pId]) ? max(1, (int)$pQuantities[$pId]) : max(1, (int)($request->qty ?? 1));
+                    $unitPrice = $prodObj->sale_price ?? ($prodObj->regular_price - ($prodObj->discount ?? 0));
+
+                    if ($prodObj->stock_status === 'out_of_stock') {
+                        $stockMsg = 'দুঃখিত! ' . $prodObj->title . ' বর্তমানে স্টকে নেই।';
+                        if ($request->ajax() || $request->wantsJson()) {
+                            return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                        }
+                        return back()->with('error', $stockMsg);
+                    }
+
+                    $prodWarehouseId = null;
+                    if ($prodObj->manage_stock) {
+                        if ($prodObj->available_stock < $itemQty) {
+                            $stockMsg = 'দুঃখিত! ' . $prodObj->title . ' পর্যাপ্ত স্টকে নেই।';
+                            if ($request->ajax() || $request->wantsJson()) {
+                                return response()->json(['success' => false, 'message' => $stockMsg], 422);
+                            }
+                            return back()->with('error', $stockMsg);
+                        }
+
+                        $pWarehouseInfo = $prodObj->warehouse_info ?? [];
+                        foreach ($pWarehouseInfo as $info) {
+                            if (($info['quantity'] ?? 0) >= $itemQty) {
+                                $prodWarehouseId = $info['warehouse_id'];
+                                break;
+                            }
+                        }
+                    } else {
+                        $pWarehouseInfo = $prodObj->warehouse_info ?? [];
+                        $prodWarehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
+                        if (!$prodWarehouseId) {
+                            $prodWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                        }
+                    }
+
+                    if (!$prodWarehouseId) {
+                        $prodWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    }
+
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = $prodWarehouseId;
+                    }
+
+                    $orderItems[] = [
+                        'product_id'   => $pId,
+                        'variation_id' => null,
+                        'quantity'     => $itemQty,
+                        'unit_price'   => $unitPrice,
+                    ];
+
+                    $warehouseInfoList[] = [
+                        'product_id'   => (int) $pId,
+                        'variation_id' => null,
+                        'warehouse_id' => (int) $prodWarehouseId,
+                        'bin_id'       => null,
+                        'quantity'     => (int) $itemQty,
+                    ];
+
+                    $totalItemAmount += ($itemQty * $unitPrice);
+                    $totalQuantity += $itemQty;
+                }
+            } elseif (empty($variationIds)) {
                 $product = Product::findOrFail($productId);
                 $unitPrice = $product->sale_price;
                 $itemQty = (int)$request->qty;
@@ -373,9 +469,22 @@ class LandingController extends FrontendController
                 ? ($settings->inside_charge ?? 60)
                 : ($settings->outside_charge ?? 100);
 
-            $productForShipping = Product::find($productId);
-            if ($productForShipping && $productForShipping->is_free_delivery) {
-                $shippingCost = 0;
+            $orderProductIds = collect($orderItems)->pluck('product_id')->filter()->unique()->values();
+            if ($orderProductIds->isNotEmpty()) {
+                $hasNonFreeProduct = Product::whereIn('id', $orderProductIds)
+                    ->where(function ($query) {
+                        $query->whereNull('is_free_delivery')->orWhere('is_free_delivery', false);
+                    })
+                    ->exists();
+
+                if (!$hasNonFreeProduct) {
+                    $shippingCost = 0;
+                }
+            } else {
+                $productForShipping = Product::find($productId);
+                if ($productForShipping && $productForShipping->is_free_delivery) {
+                    $shippingCost = 0;
+                }
             }
 
             $orderData = [
@@ -555,6 +664,7 @@ class LandingController extends FrontendController
             $totalQuantity = 0;
 
             if (!empty($variationIds)) {
+                $vQuantities = $request->variation_quantities ?? [];
                 foreach ($variationIds as $vId) {
                     $variation = ProductVariation::with('product')->find($vId);
                     if (!$variation) {
@@ -562,6 +672,7 @@ class LandingController extends FrontendController
                     }
                     $product = $variation->product;
                     $vUnitPrice = $variation->regular_price - $variation->discount;
+                    $itemQty = isset($vQuantities[$vId]) ? max(1, (int)$vQuantities[$vId]) : $qty;
                     $itemWarehouseId = null;
 
                     // Manual out of stock check
@@ -570,12 +681,12 @@ class LandingController extends FrontendController
                     }
 
                     if ($product && $product->manage_stock) {
-                        if ($variation->available_stock < $qty) {
+                        if ($variation->available_stock < $itemQty) {
                             return response()->json(['success' => false, 'message' => 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।'], 422);
                         }
 
                         $vStock = ProductVariationStock::where('product_variation_id', $vId)
-                            ->where('quantity', '>=', $qty)
+                            ->where('quantity', '>=', $itemQty)
                             ->first();
                         $itemWarehouseId = $vStock ? $vStock->warehouse_id : null;
                     } else {
@@ -595,24 +706,95 @@ class LandingController extends FrontendController
                     }
 
                     $orderItems[] = [
-                        'product_id'   => $productId,
+                        'product_id'   => $product->id ?? $productId,
                         'variation_id' => $vId,
-                        'quantity'     => $qty,
+                        'quantity'     => $itemQty,
                         'unit_price'   => $vUnitPrice,
                     ];
 
                     $warehouseInfoList[] = [
-                        'product_id'   => (int) $productId,
+                        'product_id'   => (int) ($product->id ?? $productId),
                         'variation_id' => (int) $vId,
                         'warehouse_id' => (int) $itemWarehouseId,
                         'bin_id'       => null,
-                        'quantity'     => (int) $qty,
+                        'quantity'     => (int) $itemQty,
                     ];
 
-                    $totalItemAmount += ($qty * $vUnitPrice);
-                    $totalQuantity += $qty;
+                    $totalItemAmount += ($itemQty * $vUnitPrice);
+                    $totalQuantity += $itemQty;
                 }
-            } else {
+            }
+
+            // Also check for multiple standalone products in AJAX submission
+            $rawProductIds = $request->product_ids;
+            $multiProdIds = [];
+            if (is_array($rawProductIds)) {
+                $multiProdIds = array_filter(array_map('trim', $rawProductIds));
+            } elseif (is_string($rawProductIds)) {
+                $multiProdIds = array_filter(explode(',', $rawProductIds));
+            }
+
+            if (!empty($multiProdIds)) {
+                $pQuantities = $request->product_quantities ?? [];
+                foreach ($multiProdIds as $pId) {
+                    $prodObj = Product::find($pId);
+                    if (!$prodObj) continue;
+
+                    $itemQty = isset($pQuantities[$pId]) ? max(1, (int)$pQuantities[$pId]) : max(1, (int)($request->qty ?? 1));
+                    $unitPrice = $prodObj->sale_price ?? ($prodObj->regular_price - ($prodObj->discount ?? 0));
+
+                    if ($prodObj->stock_status === 'out_of_stock') {
+                        return response()->json(['success' => false, 'message' => 'দুঃখিত! ' . $prodObj->title . ' বর্তমানে স্টকে নেই।'], 422);
+                    }
+
+                    $prodWarehouseId = null;
+                    if ($prodObj->manage_stock) {
+                        if ($prodObj->available_stock < $itemQty) {
+                            return response()->json(['success' => false, 'message' => 'দুঃখিত! ' . $prodObj->title . ' পর্যাপ্ত স্টকে নেই।'], 422);
+                        }
+
+                        $pWarehouseInfo = $prodObj->warehouse_info ?? [];
+                        foreach ($pWarehouseInfo as $info) {
+                            if (($info['quantity'] ?? 0) >= $itemQty) {
+                                $prodWarehouseId = $info['warehouse_id'];
+                                break;
+                            }
+                        }
+                    } else {
+                        $pWarehouseInfo = $prodObj->warehouse_info ?? [];
+                        $prodWarehouseId = $pWarehouseInfo[0]['warehouse_id'] ?? null;
+                        if (!$prodWarehouseId) {
+                            $prodWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                        }
+                    }
+
+                    if (!$prodWarehouseId) {
+                        $prodWarehouseId = DB::table('warehouses')->where('company_id', $this->company_id)->value('id');
+                    }
+
+                    if (!$primaryWarehouseId) {
+                        $primaryWarehouseId = $prodWarehouseId;
+                    }
+
+                    $orderItems[] = [
+                        'product_id'   => $pId,
+                        'variation_id' => null,
+                        'quantity'     => (int) $itemQty,
+                        'unit_price'   => $unitPrice,
+                    ];
+
+                    $warehouseInfoList[] = [
+                        'product_id'   => (int) $pId,
+                        'variation_id' => null,
+                        'warehouse_id' => (int) $prodWarehouseId,
+                        'bin_id'       => null,
+                        'quantity'     => (int) $itemQty,
+                    ];
+
+                    $totalItemAmount += ($itemQty * $unitPrice);
+                    $totalQuantity += $itemQty;
+                }
+            } elseif (empty($variationIds)) {
                 $product = Product::find($productId);
                 if (!$product) {
                     return response()->json(['success' => false, 'message' => 'Product not found'], 404);
@@ -672,9 +854,22 @@ class LandingController extends FrontendController
                 ? ($settings->inside_charge ?? 60)
                 : ($settings->outside_charge ?? 100);
 
-            $productForShipping = Product::find($productId);
-            if ($productForShipping && $productForShipping->is_free_delivery) {
-                $shippingCost = 0;
+            $orderProductIds = collect($orderItems)->pluck('product_id')->filter()->unique()->values();
+            if ($orderProductIds->isNotEmpty()) {
+                $hasNonFreeProduct = Product::whereIn('id', $orderProductIds)
+                    ->where(function ($query) {
+                        $query->whereNull('is_free_delivery')->orWhere('is_free_delivery', false);
+                    })
+                    ->exists();
+
+                if (!$hasNonFreeProduct) {
+                    $shippingCost = 0;
+                }
+            } else {
+                $productForShipping = Product::find($productId);
+                if ($productForShipping && $productForShipping->is_free_delivery) {
+                    $shippingCost = 0;
+                }
             }
 
             // Strict customer match: only find and update draft belonging to THIS customer

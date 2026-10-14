@@ -58,6 +58,29 @@ class LandingPage extends Model
         return $this->belongsTo(Product::class);
     }
 
+    /**
+     * Get multi-products list (falls back to single product)
+     */
+    public function getProductsAttribute()
+    {
+        $ids = $this->product_ids;
+        if (empty($ids)) {
+            return $this->product ? collect([$this->product]) : collect();
+        }
+        return Product::whereIn('id', $ids)->get();
+    }
+
+    /**
+     * Get array of product ids
+     */
+    public function getProductIdsAttribute(): array
+    {
+        if (!empty($this->extras['product_ids']) && is_array($this->extras['product_ids'])) {
+            return array_values(array_filter(array_map('intval', $this->extras['product_ids'])));
+        }
+        return $this->product_id ? [(int)$this->product_id] : [];
+    }
+
     // Scopes
     public function scopeActive($query)
     {
