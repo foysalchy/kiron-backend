@@ -963,6 +963,8 @@
                         field = 'regular_price';
                     } else if (text.includes('discount price')) {
                         field = 'discount_price';
+                    } else if (text.includes('selected products') || text.includes('product')) {
+                        field = 'product_ids';
                     } else if (text === 'title') {
                         field = 'title';
                     } else if (text.includes('short description')) {
