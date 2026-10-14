@@ -26,16 +26,22 @@ class StatusMappingController extends Controller
 
         DB::beginTransaction();
         try {
-            foreach ($mappingsData as $data) {
-                StatusMapping::updateOrCreate(
-                    [
-                        'company_id' => $companyId,
-                        'self_status' => $data['self_status']
-                    ],
-                    [
-                        'mappings' => $data['mappings']
-                    ]
-                );
+            // Remove existing mappings for this company to handle changed/reassigned self_status
+            StatusMapping::where('company_id', $companyId)->delete();
+
+            if (is_array($mappingsData)) {
+                foreach ($mappingsData as $data) {
+                    if (isset($data['self_status'])) {
+                        $selfStatus = (int) $data['self_status'];
+                        $providerMappings = $data['mappings'] ?? [];
+
+                        StatusMapping::create([
+                            'company_id' => $companyId,
+                            'self_status' => $selfStatus,
+                            'mappings' => $providerMappings,
+                        ]);
+                    }
+                }
             }
             DB::commit();
             

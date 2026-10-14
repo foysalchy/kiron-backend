@@ -354,4 +354,300 @@ class OrderController extends Controller
             throw ApiException::serverError('Unable to fetch courier history.');
         }
     }
+
+    /**
+     * Get order product list slip grouped by category (MegaCategory)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function pickingSlip(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'order_ids' => 'required|array|min:1',
+            'order_ids.*' => 'integer',
+            'with_suppliers' => 'nullable|boolean',
+            'group_by' => 'nullable|string|in:category,order',
+        ]);
+
+        $orderIds = $validated['order_ids'];
+        $withSuppliers = $request->boolean('with_suppliers', false);
+        $groupBy = $request->input('group_by', 'category');
+
+        // If order-wise requested
+        if ($groupBy === 'order') {
+            $orders = \App\Models\Order::whereIn('id', $orderIds)
+                ->with([
+                    'customer:id,name,phone',
+                    'orderDetails.product' => function ($query) {
+                        $query->select('id', 'title', 'thumbnail', 'thumbnail_95');
+                    },
+                    'orderDetails.variation.attributes.attributeGroup',
+                    'orderDetails.variation.attributes.attributeValue',
+                ])
+                ->get();
+
+            if ($orders->isEmpty()) {
+                return ResponseHelper::success(['orders' => [], 'total_products' => 0], 'No orders found.');
+            }
+
+            $orderList = [];
+            $totalProductsCount = 0;
+
+            foreach ($orders as $order) {
+                $shipping = $order->shipping_address ?? [];
+                $customerName = $order->customer?->name ?? ($shipping['name'] ?? null);
+                $customerPhone = $order->customer?->phone ?? ($shipping['phone'] ?? null);
+
+                $items = [];
+                foreach ($order->orderDetails as $detail) {
+                    $product = $detail->product;
+                    if (!$product) {
+                        continue;
+                    }
+
+                    $variationTitle = '';
+                    if ($detail->variation && $detail->variation->attributes) {
+                        $attrs = $detail->variation->attributes->map(function ($attr) {
+                            $group = $attr->attributeGroup->name ?? '';
+                            $val = $attr->attributeValue->name ?? '';
+                            return trim("{$group}: {$val}");
+                        })->filter()->implode(', ');
+                        if (!empty($attrs)) {
+                            $variationTitle = " ({$attrs})";
+                        }
+                    }
+
+                    $thumbnail = null;
+                    if ($detail->variation && !empty($detail->variation->image)) {
+                        $thumbnail = $detail->variation->image_url;
+                    }
+                    if (!$thumbnail) {
+                        $thumbnail = $product->thumbnail_95_url ?: ($product->thumbnail_url ?: null);
+                    }
+
+                    $items[] = [
+                        'product_id' => $product->id,
+                        'variation_id' => $detail->variation_id,
+                        'title' => $product->title . $variationTitle,
+                        'thumbnail_95' => $thumbnail,
+                        'quantity' => (int) $detail->quantity,
+                    ];
+                    $totalProductsCount += (int) $detail->quantity;
+                }
+
+                $orderList[] = [
+                    'order_id' => $order->id,
+                    'order_no' => $order->order_no ?: (string) $order->id,
+                    'customer_name' => $customerName,
+                    'customer_phone' => $customerPhone,
+                    'items' => $items,
+                ];
+            }
+
+            return ResponseHelper::success([
+                'total_products' => $totalProductsCount,
+                'orders' => $orderList,
+                'group_by' => 'order',
+            ], 'Order-wise product picking slip generated successfully.');
+        }
+
+        // Fetch order details for the given orders
+        $orderDetails = \App\Models\OrderDetail::whereIn('order_id', $orderIds)
+            ->with([
+                'product' => function ($query) {
+                    $query->select('id', 'title', 'thumbnail', 'thumbnail_95', 'mega_category_ids');
+                },
+                'variation.attributes.attributeGroup',
+                'variation.attributes.attributeValue',
+            ])
+            ->get();
+
+        if ($orderDetails->isEmpty()) {
+            return ResponseHelper::success(['categories' => []], 'No products found for selected orders.');
+        }
+
+        // Aggregate by product and variation: key = productId_variationId
+        $aggregatedItems = [];
+        $allProductIds = [];
+
+        foreach ($orderDetails as $detail) {
+            $product = $detail->product;
+            if (!$product) {
+                continue;
+            }
+
+            $productId = $product->id;
+            $variationId = $detail->variation_id ?: 0;
+            $key = "{$productId}_{$variationId}";
+
+            $allProductIds[$productId] = $productId;
+
+            // Variation label if available
+            $variationTitle = '';
+            if ($detail->variation && $detail->variation->attributes) {
+                $attrs = $detail->variation->attributes->map(function ($attr) {
+                    $group = $attr->attributeGroup->name ?? '';
+                    $val = $attr->attributeValue->name ?? '';
+                    return trim("{$group}: {$val}");
+                })->filter()->implode(', ');
+                if (!empty($attrs)) {
+                    $variationTitle = " ({$attrs})";
+                }
+            }
+
+            if (!isset($aggregatedItems[$key])) {
+                // Variation image優先, fallback to product thumbnail_95
+                $thumbnail = null;
+                if ($detail->variation && !empty($detail->variation->image)) {
+                    $thumbnail = $detail->variation->image_url;
+                }
+                if (!$thumbnail) {
+                    $thumbnail = $product->thumbnail_95_url ?: ($product->thumbnail_url ?: null);
+                }
+
+                $aggregatedItems[$key] = [
+                    'product_id' => $productId,
+                    'variation_id' => $detail->variation_id,
+                    'title' => $product->title . $variationTitle,
+                    'thumbnail_95' => $thumbnail,
+                    'quantity' => 0,
+                    'mega_category_ids' => $product->mega_category_ids ?? [],
+                    'suppliers' => [],
+                ];
+            }
+
+            $aggregatedItems[$key]['quantity'] += (int) $detail->quantity;
+        }
+
+        // Fetch last 3 unique suppliers per product if requested
+        if ($withSuppliers && !empty($allProductIds)) {
+            $purchaseDetails = \App\Models\PurchaseDetail::whereIn('product_id', array_values($allProductIds))
+                ->join('purchases', 'purchases.id', '=', 'purchase_details.purchase_id')
+                ->join('parties', 'parties.id', '=', 'purchases.supplier_id')
+                ->whereNull('purchases.deleted_at')
+                ->select(
+                    'purchase_details.product_id',
+                    'parties.id as supplier_id',
+                    'parties.name as supplier_name',
+                    'purchases.purchase_date',
+                    'purchases.id as purchase_id'
+                )
+                ->orderBy('purchases.purchase_date', 'desc')
+                ->orderBy('purchases.id', 'desc')
+                ->get();
+
+            $suppliersByProduct = [];
+            foreach ($purchaseDetails as $pd) {
+                $pId = $pd->product_id;
+                if (!isset($suppliersByProduct[$pId])) {
+                    $suppliersByProduct[$pId] = [];
+                }
+                // Check if supplier already in the list
+                $exists = false;
+                foreach ($suppliersByProduct[$pId] as $s) {
+                    if ($s['id'] == $pd->supplier_id) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                if (!$exists && count($suppliersByProduct[$pId]) < 3) {
+                    $suppliersByProduct[$pId][] = [
+                        'id' => $pd->supplier_id,
+                        'name' => $pd->supplier_name,
+                    ];
+                }
+            }
+
+            foreach ($aggregatedItems as &$item) {
+                $pId = $item['product_id'];
+                $item['suppliers'] = $suppliersByProduct[$pId] ?? [];
+            }
+            unset($item);
+        }
+
+        // Collect all distinct mega_category_ids to query Category names
+        $allCategoryIds = [];
+        foreach ($aggregatedItems as $item) {
+            if (!empty($item['mega_category_ids']) && is_array($item['mega_category_ids'])) {
+                foreach ($item['mega_category_ids'] as $catId) {
+                    $allCategoryIds[$catId] = $catId;
+                }
+            }
+        }
+
+        $megaCategories = [];
+        if (!empty($allCategoryIds)) {
+            $megaCategories = \App\Models\MegaCategory::whereIn('id', array_values($allCategoryIds))
+                ->pluck('name', 'id')
+                ->toArray();
+        }
+
+        // Group aggregated items by MegaCategory
+        $grouped = [];
+        foreach ($aggregatedItems as $item) {
+            $catIds = $item['mega_category_ids'] ?? [];
+            $assignedCatName = 'Uncategorized';
+            $assignedCatId = 0;
+
+            if (!empty($catIds) && is_array($catIds)) {
+                $firstId = $catIds[0];
+                if (isset($megaCategories[$firstId])) {
+                    $assignedCatName = $megaCategories[$firstId];
+                    $assignedCatId = $firstId;
+                }
+            }
+
+            $catKey = "cat_{$assignedCatId}";
+            if (!isset($grouped[$catKey])) {
+                $grouped[$catKey] = [
+                    'category_id' => $assignedCatId,
+                    'category_name' => $assignedCatName,
+                    'items' => [],
+                ];
+            }
+
+            $grouped[$catKey]['items'][] = $item;
+        }
+
+        // Sort so that Uncategorized (category_id === 0) is always at the end
+        $categoriesList = array_values($grouped);
+        usort($categoriesList, function ($a, $b) {
+            if ($a['category_id'] === 0) return 1;
+            if ($b['category_id'] === 0) return -1;
+            return strcasecmp($a['category_name'], $b['category_name']);
+        });
+
+        return ResponseHelper::success([
+            'total_products' => count($aggregatedItems),
+            'categories' => $categoriesList,
+        ], 'Product picking slip generated successfully.');
+    }
+
+    /**
+     * Toggle packed status for courier parcel
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function togglePacked(int $id): JsonResponse
+    {
+        $order = Order::findOrFail($id);
+
+        $courierInfo = $order->courier_info;
+        if (!is_array($courierInfo)) {
+            $courierInfo = json_decode($courierInfo, true) ?: [];
+        }
+
+        $currentPacked = !empty($courierInfo['is_packed']);
+        $newPacked = !$currentPacked;
+        $courierInfo['is_packed'] = $newPacked;
+
+        $order->courier_info = $courierInfo;
+        $order->save();
+
+        return ResponseHelper::success([
+            'is_packed' => $newPacked,
+        ], $newPacked ? 'Order marked as packed.' : 'Order marked as unpacked.');
+    }
 }

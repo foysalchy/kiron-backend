@@ -8,6 +8,7 @@ use App\Models\PurchaseDetail;
 use App\Models\Purchase;
 use App\Models\TransactionIncome;
 use App\Models\TransactionExpense;
+use App\Models\TransactionExpenseCategory;
 
 class BalanceSheetReportService
 {
@@ -49,6 +50,23 @@ class BalanceSheetReportService
             ->selectRaw('COUNT(*) as count, COALESCE(SUM(total_amount), 0) as amount')
             ->first();
 
+        $expenseBreakdown = TransactionExpenseCategory::whereHas('expense', function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate])
+                    ->where('status', Status::Approved->value);
+            })
+            ->with('chartOfAccount:id,name')
+            ->selectRaw('chart_of_account_id, SUM(amount) as amount')
+            ->groupBy('chart_of_account_id')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'category_name' => $item->chartOfAccount?->name ?? 'Uncategorized',
+                    'amount'        => round((float) $item->amount, 2),
+                ];
+            })
+            ->sortByDesc('amount')
+            ->values();
+
         $totalExpense = (float) $purchaseCost->amount + (float) $transactionExpenses->amount;
 
         // ══════════════════════════════
@@ -81,9 +99,10 @@ class BalanceSheetReportService
                     'amount' => round((float) $purchaseCost->amount, 2),
                 ],
                 'transaction_expense' => [
-                    'label'  => 'Other Expenses',
-                    'count'  => (int) $transactionExpenses->count,
-                    'amount' => round((float) $transactionExpenses->amount, 2),
+                    'label'     => 'Other Expenses',
+                    'count'     => (int) $transactionExpenses->count,
+                    'amount'    => round((float) $transactionExpenses->amount, 2),
+                    'breakdown' => $expenseBreakdown,
                 ],
                 'total_expense' => round($totalExpense, 2),
             ],

@@ -19,9 +19,12 @@ class AbandonedCartReportController extends Controller
         ]);
 
         // Status 1 = Added (not purchased), updated more than 2 hours ago
-        $query = Cart::with(['product' => function($q) {
-                $q->select('id', 'title', 'regular_price');
-            }])
+        $query = Cart::with([
+                'product' => function($q) {
+                    $q->select('id', 'title', 'regular_price');
+                },
+                'customer:id,name,phone'
+            ])
             ->where('status', Cart::ADDED)
             ->where('updated_at', '<=', Carbon::now()->subHours(2));
 
@@ -42,6 +45,8 @@ class AbandonedCartReportController extends Controller
                 $report[$identifier] = [
                     'identifier' => $identifier,
                     'is_guest' => is_null($cart->customer_id),
+                    'customer_name' => $cart->customer?->name ?? null,
+                    'customer_phone' => $cart->customer?->phone ?? null,
                     'items_count' => 0,
                     'potential_revenue' => 0,
                     'last_active' => $cart->updated_at->diffForHumans(),
