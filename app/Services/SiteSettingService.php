@@ -141,8 +141,13 @@ class SiteSettingService
         try {
             $setting = $this->getSiteSettingById($id);
 
-            // Handle logo replace
-            if (isset($data['logo'])) {
+            // Handle logo replace or remove
+            if (!empty($data['remove_logo'])) {
+                if ($setting->logo) {
+                    FileUploadHelper::delete($setting->logo);
+                }
+                $data['logo'] = null;
+            } elseif (isset($data['logo'])) {
                 $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-logo') . '_logo_' . time();
                 $data['logo'] = FileUploadHelper::replace(
                     $data['logo'],
@@ -153,8 +158,13 @@ class SiteSettingService
                 );
             }
 
-            // Handle favicon replace
-            if (isset($data['favicon'])) {
+            // Handle favicon replace or remove
+            if (!empty($data['remove_favicon'])) {
+                if ($setting->favicon) {
+                    FileUploadHelper::delete($setting->favicon);
+                }
+                $data['favicon'] = null;
+            } elseif (isset($data['favicon'])) {
                 $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-favicon') . '_favicon_' . time();
                 $data['favicon'] = FileUploadHelper::replace(
                     $data['favicon'],
@@ -164,7 +174,14 @@ class SiteSettingService
                     $customFileName
                 );
             }
-            if (isset($data['meta_image'])) {
+
+            // Handle meta image replace or remove
+            if (!empty($data['remove_meta_image'])) {
+                if ($setting->meta_image) {
+                    FileUploadHelper::delete($setting->meta_image);
+                }
+                $data['meta_image'] = null;
+            } elseif (isset($data['meta_image'])) {
                 $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-meta') . '_meta_' . time();
                 $data['meta_image'] = FileUploadHelper::replace(
                     $data['meta_image'],
@@ -174,7 +191,31 @@ class SiteSettingService
                     $customFileName
                 );
             }
-            if (isset($data['watermark_logo'])) {
+
+            // Handle dark logo replace or remove
+            if (!empty($data['remove_dark_logo'])) {
+                if ($setting->dark_logo) {
+                    FileUploadHelper::delete($setting->dark_logo);
+                }
+                $data['dark_logo'] = null;
+            } elseif (isset($data['dark_logo'])) {
+                $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-dark-logo') . '_dark_logo_' . time();
+                $data['dark_logo'] = FileUploadHelper::replace(
+                    $data['dark_logo'],
+                    $setting->dark_logo,
+                    'settings/dark_logos',
+                    'r2',
+                    $customFileName
+                );
+            }
+
+            // Handle watermark logo replace or remove
+            if (!empty($data['remove_watermark_logo'])) {
+                if ($setting->watermark_logo) {
+                    FileUploadHelper::delete($setting->watermark_logo);
+                }
+                $data['watermark_logo'] = null;
+            } elseif (isset($data['watermark_logo'])) {
                 $customFileName = Str::slug($data['shop_name'] ?? $data['title'] ?? $setting->shop_name ?? 'site-watermark') . '_watermark_' . time();
                 $data['watermark_logo'] = FileUploadHelper::replace(
                     $data['watermark_logo'],

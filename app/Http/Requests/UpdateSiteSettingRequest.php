@@ -51,6 +51,11 @@ class UpdateSiteSettingRequest extends UpdateBaseCompanyRequest
                 'allow_search_engine_index' => ['nullable', 'boolean'],
                 'watermark_status' => ['nullable', 'boolean'],
                 'watermark_logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+                'remove_watermark_logo' => ['nullable'],
+                'remove_logo'         => ['nullable'],
+                'remove_favicon'      => ['nullable'],
+                'remove_meta_image'   => ['nullable'],
+                'remove_dark_logo'    => ['nullable'],
                 'manage_warehouse'     => ['nullable'],
                 'meta_image'          => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'], // SEO ইমেজ ২ এমবি-র নিচে
                 'dark_logo'           => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
