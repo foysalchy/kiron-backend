@@ -50,7 +50,7 @@ class OrderController extends FrontendController
 
         $settings = \Illuminate\Support\Facades\Cache::remember("site_settings_{$this->company_id}", 86400, function () {
             return SiteSetting::where('company_id', $this->company_id)
-                ->select(['id', 'company_id', 'inside_charge', 'outside_charge'])
+                ->select(['id', 'company_id', 'inside_charge', 'outside_charge', 'free_shipping_rules', 'free_shipping_text'])
                 ->first();
         });
 
@@ -81,6 +81,12 @@ class OrderController extends FrontendController
 
         if ($is_free_delivery) {
             $shipping = 0;
+        } elseif ($settings && method_exists($settings, 'isEligibleForFreeShipping')) {
+            $totalQty = (int) Cart::count();
+            if ($settings->isEligibleForFreeShipping($totalQty, $subtotal, false)) {
+                $is_free_delivery = true;
+                $shipping = 0;
+            }
         }
 
         $discount = session()->has('coupon') ? session('coupon')['discount_amount'] : 0;
@@ -222,6 +228,16 @@ class OrderController extends FrontendController
 
             if ($is_free_delivery) {
                 $shipping_cost = 0;
+            } else {
+                $settings = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
+                if ($settings && method_exists($settings, 'isEligibleForFreeShipping')) {
+                    $totalQty = (int) Cart::count();
+                    $subtotal = (float) str_replace(',', '', Cart::subtotal());
+                    if ($settings->isEligibleForFreeShipping($totalQty, $subtotal, false)) {
+                        $is_free_delivery = true;
+                        $shipping_cost = 0;
+                    }
+                }
             }
 
             $orderData = [

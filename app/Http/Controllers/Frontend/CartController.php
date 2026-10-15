@@ -57,6 +57,12 @@ class CartController extends FrontendController
 
         if ($is_free_delivery) {
             $shipping = 0;
+        } elseif ($settings && method_exists($settings, 'isEligibleForFreeShipping')) {
+            $totalQty = (int) Cart::count();
+            if ($settings->isEligibleForFreeShipping($totalQty, $subtotal, false)) {
+                $is_free_delivery = true;
+                $shipping = 0;
+            }
         }
 
         //coupon discount
@@ -202,6 +208,15 @@ class CartController extends FrontendController
 
             if ($is_free_delivery) {
                 $cost = 0;
+            } else {
+                $settings = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
+                if ($settings && method_exists($settings, 'isEligibleForFreeShipping')) {
+                    $totalQty = (int) Cart::count();
+                    if ($settings->isEligibleForFreeShipping($totalQty, $subtotal, false)) {
+                        $is_free_delivery = true;
+                        $cost = 0;
+                    }
+                }
             }
 
             $total = ($subtotal - $discount) + $cost;

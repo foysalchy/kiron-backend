@@ -92,6 +92,21 @@
                     <section class="lg:col-span-5 bg-white p-4 sm:p-5 md:p-6 rounded-lg border border-gray-100 shadow-sm">
                         <h3 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Order Summary</h3>
 
+                        {{-- Free Shipping Banner / Threshold Indicator --}}
+                        @if(!empty($setup->free_shipping_text))
+                            @if(isset($is_free_delivery) && $is_free_delivery)
+                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                    <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            @elseif(!empty($setup->active_free_shipping_rule))
+                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                                    <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            @endif
+                        @endif
+
                         <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
                             <span class="text-base md:text-lg lg:text-xl text-gray-600">Subtotal</span>
                              <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
