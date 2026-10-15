@@ -338,11 +338,21 @@
                 <div class="bg-white p-2 sticky top-8 ">
 
                     {{-- Free Shipping Banner / Threshold Indicator --}}
+                    @php
+                        $freeDeliverySuccessText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
+                    @endphp
                     @if(!empty($setup->free_shipping_text))
-                        <div id="landing-free-shipping-banner" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
-                            <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
-                            <span id="landing-free-shipping-text">{{ $setup->free_shipping_text }}</span>
-                        </div>
+                        @if($isFree)
+                            <div id="landing-free-shipping-banner" class="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs">
+                                <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                                <span id="landing-free-shipping-text">{{ $freeDeliverySuccessText }}</span>
+                            </div>
+                        @else
+                            <div id="landing-free-shipping-banner" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                                <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
+                                <span id="landing-free-shipping-text">{{ $setup->free_shipping_text }}</span>
+                            </div>
+                        @endif
                     @endif
 
                     {{-- Table Header --}}
@@ -548,6 +558,8 @@
 
     const isMultiProductMode = {{ $isMultiProductMode ? 'true' : 'false' }};
     const activeFreeShippingRule = @json($setup->active_free_shipping_rule ?? null);
+    const FREE_SHIPPING_SUCCESS_TEXT = "{{ $freeDeliverySuccessText }}";
+    const GLOBAL_FREE_SHIPPING_TEXT = @json($setup->free_shipping_text ?? '');
 
     function checkFreeShippingEligibility(totalQty, subtotal) {
         if (!activeFreeShippingRule) return false;
@@ -825,7 +837,7 @@
         // Check if all selected products have free delivery
         let allFreeDelivery = checkedList.length > 0 && checkedList.every(cb => cb.dataset.isFree === '1');
         const deliveryAreaSection = document.getElementById('delivery-area-section');
-        const isEligibleRule = checkFreeShippingEligibility(totalItemsCount, calculatedSubtotal);
+        const isEligibleRule = !allFreeDelivery && checkFreeShippingEligibility(totalItemsCount, calculatedSubtotal);
 
         if (allFreeDelivery || isEligibleRule) {
             DELIVERY = 0;
@@ -838,15 +850,23 @@
 
         // Update Banner visual state
         const bannerEl = document.getElementById('landing-free-shipping-banner');
+        const bannerTextEl = document.getElementById('landing-free-shipping-text');
         if (bannerEl) {
-            if (allFreeDelivery || isEligibleRule) {
+            if (allFreeDelivery) {
                 bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
                 const icon = bannerEl.querySelector('i');
                 if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+                if (bannerTextEl) bannerTextEl.innerText = FREE_SHIPPING_SUCCESS_TEXT;
+            } else if (isEligibleRule) {
+                bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
+                const icon = bannerEl.querySelector('i');
+                if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+                if (bannerTextEl) bannerTextEl.innerText = GLOBAL_FREE_SHIPPING_TEXT;
             } else {
                 bannerEl.className = "mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium";
                 const icon = bannerEl.querySelector('i');
                 if (icon) icon.className = "fa-solid fa-gift text-amber-600 text-sm";
+                if (bannerTextEl) bannerTextEl.innerText = GLOBAL_FREE_SHIPPING_TEXT;
             }
         }
 
@@ -942,7 +962,7 @@
         if (!isMultiProductMode && !isMultipleAttribute) {
             const isSingleFree = (typeof isFree !== 'undefined' && isFree) || ({{ $isFree ? 'true' : 'false' }});
             const deliveryAreaSection = document.getElementById('delivery-area-section');
-            const isEligibleRule = checkFreeShippingEligibility(qty, sub);
+            const isEligibleRule = !isSingleFree && checkFreeShippingEligibility(qty, sub);
 
             if (isSingleFree || isEligibleRule) {
                 DELIVERY = 0;
@@ -954,15 +974,23 @@
             }
 
             const bannerEl = document.getElementById('landing-free-shipping-banner');
+            const bannerTextEl = document.getElementById('landing-free-shipping-text');
             if (bannerEl) {
-                if (isSingleFree || isEligibleRule) {
+                if (isSingleFree) {
                     bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
                     const icon = bannerEl.querySelector('i');
                     if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+                    if (bannerTextEl) bannerTextEl.innerText = FREE_SHIPPING_SUCCESS_TEXT;
+                } else if (isEligibleRule) {
+                    bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
+                    const icon = bannerEl.querySelector('i');
+                    if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+                    if (bannerTextEl) bannerTextEl.innerText = GLOBAL_FREE_SHIPPING_TEXT;
                 } else {
                     bannerEl.className = "mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium";
                     const icon = bannerEl.querySelector('i');
                     if (icon) icon.className = "fa-solid fa-gift text-amber-600 text-sm";
+                    if (bannerTextEl) bannerTextEl.innerText = GLOBAL_FREE_SHIPPING_TEXT;
                 }
             }
         }

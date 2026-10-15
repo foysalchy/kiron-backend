@@ -46,6 +46,18 @@
         }
     }
     
+    // Calculate discount label (Percentage or Fixed amount)
+    $discountLabel = '';
+    if ($pRegularPrice > $pSalePrice && $pRegularPrice > 0) {
+        $diff = $pRegularPrice - $pSalePrice;
+        $percentage = round(($diff / $pRegularPrice) * 100);
+        if ($percentage > 0) {
+            $discountLabel = $percentage . '% ছাড়';
+        } else {
+            $discountLabel = number_format($diff) . ($setup->currency ?? '৳') . ' ছাড়';
+        }
+    }
+
     // Overall initial out of stock status for this card
     $initialOutOfStock = $hasVariations ? $allVariationsOutOfStock : $pIsSingleOutOfStock;
 @endphp
@@ -60,9 +72,13 @@
                 loading="lazy"
                 class="card-img w-full h-full object-contain group-hover:scale-105 transition-transform duration-300">
             
-            @if(!empty($product->discount) && $product->discount > 0)
-                <span class="absolute top-2 left-2 bg-[#b45309] text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
-                    ছাড়
+            <span class="card-discount-badge absolute top-2 left-2 bg-[#b45309] text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-sm {{ empty($discountLabel) ? 'hidden' : '' }}">
+                {{ $discountLabel }}
+            </span>
+
+            @if($product->is_free_delivery)
+                <span class="absolute bottom-2 left-2 z-10 bg-gray-800 text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+                    Free Shipping
                 </span>
             @endif
 
@@ -94,15 +110,23 @@
                         class="card-variant-select w-full appearance-none bg-gray-50 hover:bg-gray-100 focus:bg-white border border-gray-300 focus:border-[#35B11E] rounded-lg px-3 py-2 pr-8 text-xs font-semibold text-gray-800 outline-none transition-colors cursor-pointer shadow-sm">
                         @foreach($product->variations as $idx => $v)
                             @php
-                                $vPrice = $v->regular_price - ($v->discount ?? 0);
+                                $vDiscount = $v->discount ?? 0;
+                                $vPrice = $v->regular_price - $vDiscount;
                                 $vImg = $v->image ? (\Illuminate\Support\Facades\Storage::disk('r2')->url($v->image)) : $pImg;
                                 // Only check available_stock if manage_stock is true
                                 $vOutOfStock = ($v->stock_status === 'out_of_stock') || ($product->manage_stock && ($v->available_stock <= 0));
                                 $isSelected = ($firstInStockVariationIndex !== null) ? ($idx === $firstInStockVariationIndex) : ($idx === 0);
+                                $vDiscountLabel = '';
+                                if ($v->regular_price > $vPrice && $v->regular_price > 0) {
+                                    $vDiff = $v->regular_price - $vPrice;
+                                    $vPerc = round(($vDiff / $v->regular_price) * 100);
+                                    $vDiscountLabel = $vPerc > 0 ? ($vPerc . '% ছাড়') : (number_format($vDiff) . ($setup->currency ?? '৳') . ' ছাড়');
+                                }
                             @endphp
                             <option value="{{ $v->id }}" 
                                 data-price="{{ $vPrice }}" 
                                 data-regular="{{ $v->regular_price }}"
+                                data-discount-label="{{ $vDiscountLabel }}"
                                 data-img="{{ $vImg }}"
                                 data-name="{{ $v->display_name }}"
                                 data-out-of-stock="{{ $vOutOfStock ? '1' : '0' }}"

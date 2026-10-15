@@ -62,7 +62,7 @@ class OrderController extends FrontendController
         $shipping = session()->get('shipping_cost', $defaultInside);
         $shipping_area = session()->get('shipping_area', 'inside');
 
-        $is_free_delivery = $cartContent->isNotEmpty();
+        $is_product_free_delivery = $cartContent->isNotEmpty();
         foreach ($cartContent as $item) {
             $pId = $item->id;
             if (str_starts_with($pId, 'var_')) {
@@ -73,20 +73,27 @@ class OrderController extends FrontendController
             if ($pId) {
                 $product = Product::find($pId);
                 if ($product && !$product->is_free_delivery) {
-                    $is_free_delivery = false;
+                    $is_product_free_delivery = false;
                     break;
                 }
             }
         }
 
-        if ($is_free_delivery) {
+        $is_rule_free_shipping = false;
+        if ($is_product_free_delivery) {
             $shipping = 0;
+            $is_free_delivery = true;
         } elseif ($settings && method_exists($settings, 'isEligibleForFreeShipping')) {
             $totalQty = (int) Cart::count();
             if ($settings->isEligibleForFreeShipping($totalQty, $subtotal, false)) {
+                $is_rule_free_shipping = true;
                 $is_free_delivery = true;
                 $shipping = 0;
+            } else {
+                $is_free_delivery = false;
             }
+        } else {
+            $is_free_delivery = false;
         }
 
         $discount = session()->has('coupon') ? session('coupon')['discount_amount'] : 0;
@@ -104,7 +111,9 @@ class OrderController extends FrontendController
             'shipping_area',
             'paymentMethods',
             'draftOrderId',
-            'is_free_delivery'
+            'is_free_delivery',
+            'is_product_free_delivery',
+            'is_rule_free_shipping'
         ));
     }
 
