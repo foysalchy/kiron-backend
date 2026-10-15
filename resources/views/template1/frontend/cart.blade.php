@@ -96,8 +96,16 @@
                     <div class="bg-white rounded-lg   shadow-xs p-4 md:p-6 lg:sticky lg:top-24">
                         <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
 
+                        @php
+                            $freeProductText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
+                        @endphp
                         @if(!empty($setup->free_shipping_text))
-                            @if(isset($is_free_delivery) && $is_free_delivery)
+                            @if(!empty($is_product_free_delivery))
+                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                    <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                                    <span>{{ $freeProductText }}</span>
+                                </div>
+                            @elseif(!empty($is_rule_free_shipping))
                                 <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>

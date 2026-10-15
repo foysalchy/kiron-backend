@@ -834,6 +834,18 @@
                     regPriceEl.innerText = regFormatted + "{{ $setup->currency }}";
                 }
 
+                // Update discount badge on variation change
+                const discountBadgeEl = card.querySelector('.card-discount-badge');
+                if (discountBadgeEl) {
+                    const dLabel = selectedOpt.dataset.discountLabel || '';
+                    if (dLabel) {
+                        discountBadgeEl.innerText = dLabel;
+                        discountBadgeEl.classList.remove('hidden');
+                    } else {
+                        discountBadgeEl.classList.add('hidden');
+                    }
+                }
+
                 // Check out of stock status of selected variant
                 const isOutOfStock = selectedOpt.dataset.outOfStock === '1';
                 const orderBtn = card.querySelector('.card-order-btn');
