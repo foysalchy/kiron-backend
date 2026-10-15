@@ -337,6 +337,14 @@
             <div class="lg:col-span-5">
                 <div class="bg-white p-2 sticky top-8 ">
 
+                    {{-- Free Shipping Banner / Threshold Indicator --}}
+                    @if(!empty($setup->free_shipping_text))
+                        <div id="landing-free-shipping-banner" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                            <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
+                            <span id="landing-free-shipping-text">{{ $setup->free_shipping_text }}</span>
+                        </div>
+                    @endif
+
                     {{-- Table Header --}}
                     <div
                         class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 pb-3 border-b border-dashed border-gray-200">
@@ -539,6 +547,26 @@
     let currentMaxStock = {{ ($isSingleProduct && $mainProduct->manage_stock && $mainProduct->available_stock !== null) ? $mainProduct->available_stock : 999999 }};
 
     const isMultiProductMode = {{ $isMultiProductMode ? 'true' : 'false' }};
+    const activeFreeShippingRule = @json($setup->active_free_shipping_rule ?? null);
+
+    function checkFreeShippingEligibility(totalQty, subtotal) {
+        if (!activeFreeShippingRule) return false;
+        if (!activeFreeShippingRule.apply_in_landing && !activeFreeShippingRule.landing) return false;
+
+        const minQty = parseInt(activeFreeShippingRule.qty || 0, 10);
+        const minPrice = parseFloat(activeFreeShippingRule.price || 0);
+
+        if (minQty > 0 && minPrice > 0) {
+            return (totalQty >= minQty && subtotal >= minPrice);
+        }
+        if (minQty > 0) {
+            return (totalQty >= minQty);
+        }
+        if (minPrice > 0) {
+            return (subtotal >= minPrice);
+        }
+        return false;
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
         if (isMultiProductMode) {
@@ -797,14 +825,29 @@
         // Check if all selected products have free delivery
         let allFreeDelivery = checkedList.length > 0 && checkedList.every(cb => cb.dataset.isFree === '1');
         const deliveryAreaSection = document.getElementById('delivery-area-section');
+        const isEligibleRule = checkFreeShippingEligibility(totalItemsCount, calculatedSubtotal);
 
-        if (allFreeDelivery) {
+        if (allFreeDelivery || isEligibleRule) {
             DELIVERY = 0;
             if (deliveryAreaSection) deliveryAreaSection.classList.add('hidden');
         } else {
             const currentArea = document.querySelector('input[name="shipping_area"]:checked')?.value || 'inside';
             DELIVERY = (currentArea === 'outside') ? DEFAULT_OUTSIDE_CHARGE : DEFAULT_INSIDE_CHARGE;
             if (deliveryAreaSection) deliveryAreaSection.classList.remove('hidden');
+        }
+
+        // Update Banner visual state
+        const bannerEl = document.getElementById('landing-free-shipping-banner');
+        if (bannerEl) {
+            if (allFreeDelivery || isEligibleRule) {
+                bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
+                const icon = bannerEl.querySelector('i');
+                if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+            } else {
+                bannerEl.className = "mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium";
+                const icon = bannerEl.querySelector('i');
+                if (icon) icon.className = "fa-solid fa-gift text-amber-600 text-sm";
+            }
         }
 
         currentVariationOutOfStock = anyOutOfStock;
@@ -895,6 +938,35 @@
 
     function updateUI(explicitSubtotal = null) {
         const sub = explicitSubtotal !== null ? explicitSubtotal : (qty * UNIT_PRICE);
+
+        if (!isMultiProductMode && !isMultipleAttribute) {
+            const isSingleFree = (typeof isFree !== 'undefined' && isFree) || ({{ $isFree ? 'true' : 'false' }});
+            const deliveryAreaSection = document.getElementById('delivery-area-section');
+            const isEligibleRule = checkFreeShippingEligibility(qty, sub);
+
+            if (isSingleFree || isEligibleRule) {
+                DELIVERY = 0;
+                if (deliveryAreaSection) deliveryAreaSection.classList.add('hidden');
+            } else {
+                const currentArea = document.querySelector('input[name="shipping_area"]:checked')?.value || 'inside';
+                DELIVERY = (currentArea === 'outside') ? DEFAULT_OUTSIDE_CHARGE : DEFAULT_INSIDE_CHARGE;
+                if (deliveryAreaSection) deliveryAreaSection.classList.remove('hidden');
+            }
+
+            const bannerEl = document.getElementById('landing-free-shipping-banner');
+            if (bannerEl) {
+                if (isSingleFree || isEligibleRule) {
+                    bannerEl.className = "mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs";
+                    const icon = bannerEl.querySelector('i');
+                    if (icon) icon.className = "fa-solid fa-truck-fast text-emerald-600 text-base";
+                } else {
+                    bannerEl.className = "mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium";
+                    const icon = bannerEl.querySelector('i');
+                    if (icon) icon.className = "fa-solid fa-gift text-amber-600 text-sm";
+                }
+            }
+        }
+
         const total = sub + DELIVERY;
 
         const elQtyDisplay = document.getElementById('qty-display');

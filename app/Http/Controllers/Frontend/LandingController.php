@@ -466,12 +466,13 @@ class LandingController extends FrontendController
                 $totalQuantity = $itemQty;
             }
 
-            $settings = DB::table('site_settings')->where('company_id', $this->company_id)->first();
+            $settingsModel = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
             $shippingCost = ($request->shipping_area == 'inside')
-                ? ($settings->inside_charge ?? 60)
-                : ($settings->outside_charge ?? 100);
+                ? ($settingsModel->inside_charge ?? $settings->inside_charge ?? 60)
+                : ($settingsModel->outside_charge ?? $settings->outside_charge ?? 100);
 
             $orderProductIds = collect($orderItems)->pluck('product_id')->filter()->unique()->values();
+            $isFreeDelivery = false;
             if ($orderProductIds->isNotEmpty()) {
                 $hasNonFreeProduct = Product::whereIn('id', $orderProductIds)
                     ->where(function ($query) {
@@ -480,11 +481,19 @@ class LandingController extends FrontendController
                     ->exists();
 
                 if (!$hasNonFreeProduct) {
+                    $isFreeDelivery = true;
                     $shippingCost = 0;
                 }
             } else {
                 $productForShipping = Product::find($productId);
                 if ($productForShipping && $productForShipping->is_free_delivery) {
+                    $isFreeDelivery = true;
+                    $shippingCost = 0;
+                }
+            }
+
+            if (!$isFreeDelivery && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
+                if ($settingsModel->isEligibleForFreeShipping((int)$totalQuantity, (float)$totalItemAmount, true)) {
                     $shippingCost = 0;
                 }
             }
@@ -852,12 +861,13 @@ class LandingController extends FrontendController
                 $totalQuantity = $qty;
             }
 
-            $settings = DB::table('site_settings')->where('company_id', $this->company_id)->first();
+            $settingsModel = \App\Models\SiteSetting::where('company_id', $this->company_id)->first();
             $shippingCost = ($request->shipping_area == 'inside')
-                ? ($settings->inside_charge ?? 60)
-                : ($settings->outside_charge ?? 100);
+                ? ($settingsModel->inside_charge ?? $settings->inside_charge ?? 60)
+                : ($settingsModel->outside_charge ?? $settings->outside_charge ?? 100);
 
             $orderProductIds = collect($orderItems)->pluck('product_id')->filter()->unique()->values();
+            $isFreeDelivery = false;
             if ($orderProductIds->isNotEmpty()) {
                 $hasNonFreeProduct = Product::whereIn('id', $orderProductIds)
                     ->where(function ($query) {
@@ -866,11 +876,19 @@ class LandingController extends FrontendController
                     ->exists();
 
                 if (!$hasNonFreeProduct) {
+                    $isFreeDelivery = true;
                     $shippingCost = 0;
                 }
             } else {
                 $productForShipping = Product::find($productId);
                 if ($productForShipping && $productForShipping->is_free_delivery) {
+                    $isFreeDelivery = true;
+                    $shippingCost = 0;
+                }
+            }
+
+            if (!$isFreeDelivery && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
+                if ($settingsModel->isEligibleForFreeShipping((int)$totalQuantity, (float)$totalItemAmount, true)) {
                     $shippingCost = 0;
                 }
             }

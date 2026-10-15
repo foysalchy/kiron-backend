@@ -160,6 +160,14 @@
                     <!-- Hidden Input for Selected Variation -->
                     <input type="hidden" id="selected-variation-id" value="">
 
+                    {{-- Free Shipping Notice --}}
+                    @if (!empty($setup->free_shipping_text))
+                        <div class="mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-emerald-800 text-xs md:text-sm font-semibold">
+                            <i class="fa-solid fa-truck-fast text-emerald-600"></i>
+                            <span>{{ $setup->free_shipping_text }}</span>
+                        </div>
+                    @endif
+
                     <!-- Action Buttons -->
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 mb-8">
                         <!-- 1. Add To Cart -->

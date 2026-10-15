@@ -107,6 +107,20 @@
                 <div class="lg:col-span-1 lg:order-2 space-y-6">
                     <div class="bg-white rounded-lg shadow-xs p-5 md:p-6 lg:sticky lg:top-24">
 
+                        @if(!empty($setup->free_shipping_text))
+                            @if(isset($is_free_delivery) && $is_free_delivery)
+                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                    <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            @elseif(!empty($setup->active_free_shipping_rule))
+                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                                    <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            @endif
+                        @endif
+
                         <!-- 1. Delivery Selection (Synced with Logic) -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
                         <div class="mb-8">

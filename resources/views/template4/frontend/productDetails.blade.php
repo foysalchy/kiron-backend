@@ -140,6 +140,14 @@
                     </div>
 
                     <div>
+                        {{-- Free Shipping Notice --}}
+                        @if (!empty($setup->free_shipping_text))
+                            <div class="mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-emerald-800 text-xs md:text-sm font-semibold">
+                                <i class="fa-solid fa-truck-fast text-emerald-600"></i>
+                                <span>{{ $setup->free_shipping_text }}</span>
+                            </div>
+                        @endif
+
                         <!-- Quantity & Action Buttons -->
                         <div class="flex flex-col xl:flex-row items-start xl:items-center gap-4 md:gap-6">
                             <div class="flex items-center gap-3 md:gap-4">
