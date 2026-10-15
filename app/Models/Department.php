@@ -32,6 +32,17 @@ class Department extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'parent_department');
+    }
+
+    public function inChargeEmployee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class, 'in_charge');
+    }
+
     public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);

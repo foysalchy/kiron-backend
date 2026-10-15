@@ -46,7 +46,7 @@ class DepartmentService
 
             $sortBy = $filters['sort_by'] ?? 'created_at';
             $sortOrder = $filters['sort_order'] ?? 'desc';
-            $query->orderBy($sortBy, $sortOrder);
+            $query->with(['parent:id,name', 'inChargeEmployee:id,name'])->orderBy($sortBy, $sortOrder);
 
             return $paginate ? $query->paginate($filters['per_page'] ?? 15) : $query->get();
         } catch (\Throwable $e) {

@@ -47,8 +47,8 @@ class JobTitleService
                 ? $query->paginate($filters['per_page'] ?? 15)
                 : $query->get();
         } catch (\Throwable $e) {
-            Log::error('Error fetching job titles: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to fetch job titles');
+            Log::error('Error fetching Designations: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to fetch Designations');
         }
     }
 
@@ -74,12 +74,12 @@ class JobTitleService
             $jobTitle = JobTitle::create($data);
             LogHelper::created('job_title', $jobTitle->id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
-            Log::info('Job Title created successfully', ['id' => $jobTitle->id]);
+            Log::info('Designation created successfully', ['id' => $jobTitle->id]);
             return $jobTitle;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Job Title creation failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to create job title');
+            Log::error('Designation creation failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to create Designation');
         }
     }
 
@@ -95,15 +95,15 @@ class JobTitleService
             $jobTitle->update($data);
             LogHelper::updated('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
-            Log::info('Job Title updated successfully', ['id' => $id]);
+            Log::info('Designation updated successfully', ['id' => $id]);
             return $jobTitle->fresh();
         } catch (ApiException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Job Title update failed: ' . $e->getMessage());
-            throw ApiException::serverError('Failed to update job title');
+            Log::error('Designation update failed: ' . $e->getMessage());
+            throw ApiException::serverError('Failed to update Designation');
         }
     }
 
@@ -114,13 +114,13 @@ class JobTitleService
             $jobTitle = $this->getJobTitleById($id);
             $jobTitle->delete();
             LogHelper::deleted('job_title', $id, $jobTitle->company_id, $jobTitle->title);
-            Log::info('Job Title deleted (Soft)', ['id' => $id]);
+            Log::info('Designation deleted (Soft)', ['id' => $id]);
 
             DB::commit();
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            throw ApiException::serverError('Failed to delete job title');
+            throw ApiException::serverError('Failed to delete Designation');
         }
     }
 
@@ -129,7 +129,7 @@ class JobTitleService
         DB::beginTransaction();
         try {
             $jobTitle = JobTitle::withTrashed()->find($id);
-            if (!$jobTitle) throw ApiException::notFound('Job Title');
+            if (!$jobTitle) throw ApiException::notFound('Designation');
             $jobTitle->restore();
             LogHelper::restored('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
@@ -145,7 +145,7 @@ class JobTitleService
         DB::beginTransaction();
         try {
             $jobTitle = JobTitle::withTrashed()->find($id);
-            if (!$jobTitle) throw ApiException::notFound('Job Title');
+            if (!$jobTitle) throw ApiException::notFound('Designation');
             $jobTitle->forceDelete();
             LogHelper::forceDeleted('job_title', $id, $jobTitle->company_id, $jobTitle->title);
             DB::commit();
@@ -155,7 +155,7 @@ class JobTitleService
             throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Job Title permanent deletion failed: ' . $e->getMessage());
+            Log::error('Designation permanent deletion failed: ' . $e->getMessage());
             throw ApiException::serverError('Failed to permanently delete');
         }
     }

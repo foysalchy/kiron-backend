@@ -28,55 +28,55 @@ class JobTitleController extends Controller
 
         $data = $this->jobTitleService->getAllJobTitles($filters, true);
 
-        return ResponseHelper::success($data, 'Job titles retrieved successfully');
+        return ResponseHelper::success($data, 'Designations retrieved successfully');
     }
 
     public function store(StoreJobTitleRequest $request): JsonResponse
     {
         $data = $this->jobTitleService->createJobTitle($request->validated());
 
-        return ResponseHelper::success($data, 'Job title created successfully', 201);
+        return ResponseHelper::success($data, 'Designation created successfully', 201);
     }
 
     public function show(int $id): JsonResponse
     {
         $data = $this->jobTitleService->getJobTitleById($id);
 
-        return ResponseHelper::success($data, 'Job title retrieved successfully');
+        return ResponseHelper::success($data, 'Designation retrieved successfully');
     }
 
     public function update(UpdateJobTitleRequest $request, int $id): JsonResponse
     {
         $data = $this->jobTitleService->updateJobTitle($id, $request->validated());
 
-        return ResponseHelper::success($data, 'Job title updated successfully');
+        return ResponseHelper::success($data, 'Designation updated successfully');
     }
 
     public function destroy(int $id): JsonResponse
     {
         $this->jobTitleService->deleteJobTitle($id);
 
-        return ResponseHelper::success(null, 'Job title deleted successfully');
+        return ResponseHelper::success(null, 'Designation deleted successfully');
     }
 
     public function restore(int $id): JsonResponse
     {
         $data = $this->jobTitleService->restoreJobTitle($id);
 
-        return ResponseHelper::success($data, 'Job title restored successfully');
+        return ResponseHelper::success($data, 'Designation restored successfully');
     }
 
     public function forceDestroy(int $id): JsonResponse
     {
         $this->jobTitleService->forceDeleteJobTitle($id);
 
-        return ResponseHelper::success(null, 'Job title permanently deleted');
+        return ResponseHelper::success(null, 'Designation permanently deleted');
     }
 
     public function toggleStatus(int $id): JsonResponse
     {
         $data = $this->jobTitleService->toggleStatus($id);
 
-        return ResponseHelper::success($data, 'Job title status updated successfully');
+        return ResponseHelper::success($data, 'Designation status updated successfully');
     }
 }

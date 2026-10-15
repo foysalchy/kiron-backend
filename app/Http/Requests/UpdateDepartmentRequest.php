@@ -24,10 +24,17 @@ class UpdateDepartmentRequest extends UpdateBaseCompanyRequest
      */
     public function rules(): array
     {
+        $currentId = $this->route('id');
+
         return array_merge($this->companyRules(), [
             'name'              => ['sometimes', 'required', 'string', 'max:255'],
             'code'              => ['sometimes', 'required', 'string', 'max:50'],
-            'parent_department' => ['nullable', 'string', 'max:255'],
+            'parent_department' => [
+                'nullable',
+                'string',
+                'max:255',
+                $currentId ? 'not_in:' . $currentId : '',
+            ],
             'in_charge'         => ['nullable', 'string', 'max:255'],
             'description'       => ['nullable', 'string'],
             'status'            => ['sometimes', 'integer', 'in:0,1'],
@@ -38,8 +45,9 @@ class UpdateDepartmentRequest extends UpdateBaseCompanyRequest
         return array_merge(
             $this->companyMessages(),
             [
-                'name.required'        => 'Department name is required',
-                'code.required'        => 'Department code is required',
+                'name.required'                => 'Department name is required',
+                'code.required'                => 'Department code is required',
+                'parent_department.not_in'     => 'A department cannot be its own parent department',
             ]
         );
     }

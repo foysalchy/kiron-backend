@@ -17,7 +17,7 @@ class PathaoWebhookController extends Controller
      */
     protected function webhookResponse(array $data, int $statusCode = 200, ?string $secret = null)
     {
-        $secret = $secret 
+        $secret = $secret
             ?: request()->header('X-Pathao-Merchant-Webhook-Integration-Secret')
             ?: request()->header('X-PATHAO-Signature')
             ?: 'f3992ecc-59da-4cbe-a049-a13da2018d51';
@@ -49,8 +49,8 @@ class PathaoWebhookController extends Controller
 
             // Determine default secret
             $courier = Courier::where('name', 'pathao')->first();
-            $defaultSecret = $courier->method_details['webhook_token'] 
-                ?? $courier->method_details['webhook_secret'] 
+            $defaultSecret = $courier->method_details['webhook_token']
+                ?? $courier->method_details['webhook_secret']
                 ?? 'f3992ecc-59da-4cbe-a049-a13da2018d51';
 
             $secret = $request->header('X-Pathao-Merchant-Webhook-Integration-Secret')
@@ -68,24 +68,24 @@ class PathaoWebhookController extends Controller
             }
 
             // Extract Consignment ID, Event, Status, and Merchant Order ID
-            $consignmentId = $payload['consignment_id'] 
-                ?? $payload['consignmentId'] 
-                ?? $payload['data']['consignment_id'] 
+            $consignmentId = $payload['consignment_id']
+                ?? $payload['consignmentId']
+                ?? $payload['data']['consignment_id']
                 ?? null;
 
-            $pathaoEvent = $payload['event'] 
-                ?? $payload['order_status'] 
-                ?? $payload['status'] 
-                ?? $payload['data']['event'] 
+            $pathaoEvent = $payload['event']
+                ?? $payload['order_status']
+                ?? $payload['status']
+                ?? $payload['data']['event']
                 ?? null;
 
-            $orderStatus = $payload['order_status'] 
-                ?? $payload['status'] 
+            $orderStatus = $payload['order_status']
+                ?? $payload['status']
                 ?? null;
 
-            $merchantOrderId = $payload['merchant_order_id'] 
-                ?? $payload['merchantOrderId'] 
-                ?? $payload['data']['merchant_order_id'] 
+            $merchantOrderId = $payload['merchant_order_id']
+                ?? $payload['merchantOrderId']
+                ?? $payload['data']['merchant_order_id']
                 ?? null;
 
             // If it's a test payload from Pathao (e.g. merchant_order_id is 'TEST' or consignment_id starts with 'DL')
@@ -140,10 +140,10 @@ class PathaoWebhookController extends Controller
             $orderCourier = Courier::where('company_id', $order->company_id)
                 ->where('name', 'pathao')
                 ->first();
-                
+
             if ($orderCourier) {
-                $savedToken = $orderCourier->method_details['webhook_token'] 
-                    ?? $orderCourier->method_details['webhook_secret'] 
+                $savedToken = $orderCourier->method_details['webhook_token']
+                    ?? $orderCourier->method_details['webhook_secret']
                     ?? null;
 
                 if ($savedToken) {
@@ -219,15 +219,15 @@ class PathaoWebhookController extends Controller
             }
 
             // 7. Update courier_info
-            $courierInfo = is_array($order->courier_info) 
-                ? $order->courier_info 
+            $courierInfo = is_array($order->courier_info)
+                ? $order->courier_info
                 : (json_decode($order->courier_info, true) ?: []);
 
             $courierInfo['status'] = $orderStatus ?: $pathaoEvent;
             $courierInfo['updated_at'] = now()->toDateTimeString();
 
             // Process delivery fee
-            $deliveryFee = $payload['delivery_fee'] ?? null;
+            $deliveryFee = $payload['delivery_fee'] ?? $payload['data']['delivery_fee'] ?? null;
             if ($deliveryFee !== null) {
                 $courierInfo['courier_charge'] = (float)$deliveryFee;
                 $courierInfo['delivery_charge'] = (float)$deliveryFee;
@@ -264,7 +264,6 @@ class PathaoWebhookController extends Controller
                 'status'  => 'success',
                 'message' => 'Webhook received successfully.'
             ], 200, $secret);
-
         } catch (\Throwable $e) {
             Log::error('Pathao Webhook Exception: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString()

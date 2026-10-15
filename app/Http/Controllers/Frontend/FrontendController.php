@@ -44,20 +44,36 @@ class FrontendController extends Controller
             return response('No products available for preview', 200);
         }
 
-        if (!view()->shared('themeColor')) {
-            $themeColor = new \stdClass();
-            $themeColor->theme_template = [];
-            \Illuminate\Support\Facades\View::share('themeColor', $themeColor);
-        }
+        $company = getCurrentCompany();
+        $themeTemplate = $company->theme_template ?? [];
 
-        if (!view()->shared('storeSettings')) {
-            $storeSettings = new \stdClass();
-            $storeSettings->is_review = false;
-            \Illuminate\Support\Facades\View::share('storeSettings', $storeSettings);
-        }
-        
-        // Render a minimal view with Tailwind injected (if not already included in layout)
-        // Since we want exactly the card styles, we can wrap it in a div that loads app.css
-        return view('preview-card', ['product' => $dummyProduct, 'template' => $this->template]);
+        $themeColor = new \stdClass();
+        $themeColor->theme_template = [
+            'primary_color'        => request('primary_color') ?: ($themeTemplate['primary_color'] ?? '#13565e'),
+            'primary_text_color'   => request('primary_text_color') ?: ($themeTemplate['primary_text_color'] ?? '#ffffff'),
+            'primary_hover_color'  => request('primary_hover_color') ?: ($themeTemplate['primary_hover_color'] ?? '#0d3d43'),
+            'primary_hover_text'   => request('primary_hover_text') ?: ($themeTemplate['primary_hover_text'] ?? '#ffffff'),
+            'secondary_color'      => request('secondary_color') ?: ($themeTemplate['secondary_color'] ?? '#f3f4f6'),
+            'secondary_text_color' => request('secondary_text_color') ?: ($themeTemplate['secondary_text_color'] ?? '#1f2937'),
+            'header_color'         => request('header_color') ?: ($themeTemplate['header_color'] ?? '#ffffff'),
+            'header_text_color'    => request('header_text_color') ?: ($themeTemplate['header_text_color'] ?? '#1f2937'),
+            'footer_color'         => request('footer_color') ?: ($themeTemplate['footer_color'] ?? '#1f2937'),
+            'footer_text_color'    => request('footer_text_color') ?: ($themeTemplate['footer_text_color'] ?? '#ffffff'),
+        ];
+        \Illuminate\Support\Facades\View::share('themeColor', $themeColor);
+
+        $storeSettings = new \stdClass();
+        $storeSettings->is_review = (bool)($company->is_review ?? false);
+        \Illuminate\Support\Facades\View::share('storeSettings', $storeSettings);
+
+        $setup = \App\Models\SiteSetting::where('company_id', $this->company_id)->first() ?? new \App\Models\SiteSetting();
+        \Illuminate\Support\Facades\View::share('setup', $setup);
+
+        return view('preview-card', [
+            'product'  => $dummyProduct,
+            'template' => $this->template,
+            'company'  => $company,
+            'setup'    => $setup,
+        ]);
     }
 }

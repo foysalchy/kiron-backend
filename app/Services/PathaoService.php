@@ -297,8 +297,9 @@ class PathaoService
                 $info['updated_at'] = now()->toDateTimeString();
 
                 if (isset($resData['delivery_fee']) && is_numeric($resData['delivery_fee'])) {
-                    $order->other_charges = (float) $resData['delivery_fee'];
-                    $info['delivery_fee'] = (float) $resData['delivery_fee'];
+                    $fee = (float) $resData['delivery_fee'];
+                    $info['courier_charge']  = $fee;
+                    $info['delivery_charge'] = $fee;
                 }
 
                 $order->courier_info = $info;
@@ -308,7 +309,6 @@ class PathaoService
                     'status' => 200,
                     'message' => 'Status updated successfully',
                     'delivery_status' => $info['status'],
-                    'other_charges' => $order->other_charges,
                     'order_id' => $order->id
                 ];
             }

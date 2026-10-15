@@ -93,14 +93,14 @@
         @endif
       </div>
 
-<div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+<div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto flex-nowrap">
 
     <!-- Order Now Button -->
 <button
     {{ $isOutOfStock ? 'disabled' : '' }}
     aria-label="{{ $isOutOfStock ? 'Stock Out' : (isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Order Now') }}"
     onclick="event.stopPropagation(); {{ $product->type === 'single' ? "addSingleToCart($product->id, true)" : "openVariationModal($product->id, true)" }}"
-    class="flex-1 h-9 px-2 md:px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
+    class="flex-1 whitespace-nowrap h-9 px-3 rounded-full flex items-center justify-center transition-colors shrink-0 text-xs sm:text-sm font-medium
     {{ $isOutOfStock
         ? 'bg-smoke-300 text-white cursor-not-allowed'
         : 'bg-[var(--secondary-color)] text-white hover:bg-[var(--secondary-color)]/90 cursor-pointer' }}"

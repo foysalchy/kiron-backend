@@ -46,25 +46,25 @@ class PartyService
                 $type = $filters['type'] ?? null;
                 if ($type == Party::TYPE_CUSTOMER || $type == 2) {
                     if ($filters['balance'] === 'receive') {
-                        // Customer Due to Receive
-                        $query->where(function ($q) {
-                            $q->where('due_amount', '>', 0)
-                                ->orWhereRaw('(balance + 0) < 0');
-                        });
+                        // Customer Due to Receive (বকেয়া)
+                        $query->where('due_amount', '>', 0);
                     } elseif ($filters['balance'] === 'pay') {
-                        // Customer Advance / Store Credit
-                        $query->whereRaw('(balance + 0) > 0');
+                        // Customer Advance / Store Credit (কোনো Due ছাড়া প্রকৃত Advance)
+                        $query->whereRaw('(balance + 0) > 0')
+                            ->where(function ($q) {
+                                $q->whereNull('due_amount')->orWhere('due_amount', '<=', 0);
+                            });
                     }
                 } elseif ($type == Party::TYPE_SUPPLIER || $type == 1) {
                     if ($filters['balance'] === 'pay') {
-                        // Supplier Due to Pay
-                        $query->where(function ($q) {
-                            $q->where('due_amount', '>', 0)
-                                ->orWhereRaw('(balance + 0) < 0');
-                        });
+                        // Supplier Due to Pay (দেনা/বকেয়া)
+                        $query->where('due_amount', '>', 0);
                     } elseif ($filters['balance'] === 'receive') {
-                        // Supplier Advance Given
-                        $query->whereRaw('(balance + 0) > 0');
+                        // Supplier Advance Given (অগ্রিম দেওয়া)
+                        $query->whereRaw('(balance + 0) > 0')
+                            ->where(function ($q) {
+                                $q->whereNull('due_amount')->orWhere('due_amount', '<=', 0);
+                            });
                     }
                 } else {
                     if ($filters['balance'] === 'receive' || $filters['balance'] === 'pay') {
@@ -98,6 +98,51 @@ class PartyService
             throw ApiException::serverError('Failed to fetch parties');
         }
     }
+
+    /**
+     * Get summary statistics for parties (company scoped)
+     */
+    public function getPartySummary(array $filters = []): array
+    {
+        try {
+            $query = Party::query();
+
+            if (isset($filters['type'])) {
+                $query->where('type', $filters['type']);
+            }
+
+            if (isset($filters['status'])) {
+                if ($filters['status'] == Status::Trashed->value) {
+                    $query->onlyTrashed();
+                } else {
+                    $query->where('status', $filters['status']);
+                }
+            }
+
+            $totalDue = (float) (clone $query)->sum('due_amount');
+            $totalAdvance = (float) (clone $query)
+                ->where('balance', '>', 0)
+                ->where(function ($q) {
+                    $q->whereNull('due_amount')->orWhere('due_amount', '<=', 0);
+                })
+                ->sum('balance');
+            $totalParties = (int) (clone $query)->count();
+
+            return [
+                'total_due' => $totalDue,
+                'total_advance' => $totalAdvance,
+                'total_count' => $totalParties,
+            ];
+        } catch (\Exception $e) {
+            Log::error('Error fetching party summary: ' . $e->getMessage());
+            return [
+                'total_due' => 0,
+                'total_advance' => 0,
+                'total_count' => 0,
+            ];
+        }
+    }
+
 
     /**
      * Get party by ID

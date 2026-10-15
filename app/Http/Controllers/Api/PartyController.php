@@ -37,8 +37,12 @@ class PartyController extends Controller
         }
 
         $parties = $this->partyService->getAllParties($filters, true, $columns);
+        $summary = $this->partyService->getPartySummary($filters);
 
-        return ResponseHelper::success($parties, 'Parties retrieved successfully');
+        $responseData = $parties->toArray();
+        $responseData['summary'] = $summary;
+
+        return ResponseHelper::success($responseData, 'Parties retrieved successfully');
     }
 
     public function store(StorePartyRequest $request): JsonResponse
