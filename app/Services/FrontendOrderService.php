@@ -430,6 +430,8 @@ class FrontendOrderService
             'note'           => $info['note'] ?? null,
             'appliedAt'      => $info['applied_at'] ?? null,
             'is_packed'      => !empty($info['is_packed']),
+            'courier_charge' => isset($info['courier_charge']) ? (float)$info['courier_charge'] : (isset($info['delivery_charge']) ? (float)$info['delivery_charge'] : null),
+            'delivery_charge'=> isset($info['delivery_charge']) ? (float)$info['delivery_charge'] : (isset($info['courier_charge']) ? (float)$info['courier_charge'] : null),
         ];
     }
     private function getCourierMethod()
