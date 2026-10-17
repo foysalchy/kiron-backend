@@ -13,6 +13,7 @@ use App\Models\MiniCategory;
 use App\Models\ExtraCategory;
 use App\Models\Warehouse;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Helpers\FileUploadHelper;
 use Illuminate\Support\Str;
 use Exception;
@@ -107,6 +108,7 @@ class ProductImportController extends Controller
             // We need to keep track of parent products created in this session
             // to link variations if they reference Parent SKU
             $parentProductsBySku = [];
+            $seenSkus = [];
 
             foreach ($data as $index => $row) {
                 // If it's from Excel, $index is numeric and row is array of columns.
@@ -169,11 +171,47 @@ class ProductImportController extends Controller
                     continue;
                 }
 
-                if (Product::where('sku_code', $sku)->exists()) {
-                    $skipped++;
-                    $errors[] = "Row $index: SKU ($sku) already exists.";
-                    continue;
+                $companyId = auth()->user()->company_id ?? null;
+
+                // Auto-generate unique SKU if already exists or duplicated in current batch
+                $originalSku = $sku;
+                $skuCandidate = $sku;
+                $copyIndex = 1;
+
+                while (true) {
+                    $inBatch = in_array(strtolower($skuCandidate), $seenSkus);
+                    $inProducts = Product::withoutGlobalScopes()
+                        ->where(function($q) use ($skuCandidate) {
+                            $q->where('sku_code', $skuCandidate)
+                              ->orWhere('sku_code', '"' . $skuCandidate . '"')
+                              ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$skuCandidate]);
+                        })
+                        ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                        ->exists();
+
+                    $inVariations = ProductVariation::where('sku', $skuCandidate)
+                        ->whereHas('product', function($q) use ($companyId) {
+                            $q->withoutGlobalScopes();
+                            if ($companyId) {
+                                $q->where('company_id', $companyId);
+                            }
+                        })
+                        ->exists();
+
+                    if (!$inBatch && !$inProducts && !$inVariations) {
+                        break;
+                    }
+
+                    if ($copyIndex === 1) {
+                        $skuCandidate = $originalSku . '_COPY';
+                    } else {
+                        $skuCandidate = $originalSku . '_COPY_' . $copyIndex;
+                    }
+                    $copyIndex++;
                 }
+
+                $sku = $skuCandidate;
+                $seenSkus[] = strtolower($sku);
 
                 // Lookups
                 $brandId = $row['brand_id'] ?? null;
@@ -515,9 +553,21 @@ class ProductImportController extends Controller
                     $actualType = ($type === 'variable' || $type === 'variation') ? 'variation' : 'single';
                     
                     if (!$isPreview) {
+                        // Generate clean sequential slug: title -> title-1 -> title-2 -> ...
+                        $baseSlug = Str::slug($title);
+                        $slugCandidate = $baseSlug;
+                        $slugCounter = 1;
+
+                        while (Product::where('slug', $slugCandidate)
+                            ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                            ->exists()) {
+                            $slugCandidate = $baseSlug . '-' . $slugCounter;
+                            $slugCounter++;
+                        }
+
                         $product = Product::create([
                             'title' => $title,
-                            'slug' => Str::slug($title) . '-' . time() . '-' . rand(100,999),
+                            'slug' => $slugCandidate,
                             'sku_code' => $sku,
                             'type' => $actualType,
                             'product_type' => 'finished',
