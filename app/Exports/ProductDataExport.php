@@ -44,7 +44,7 @@ class ProductDataExport implements FromCollection, WithHeadings, WithMapping, Wi
             'Stock Status',      // in_stock, out_of_stock
             'Purpose',           // both, website, pos
             'Brand Slug',        // e.g. 'nike'
-            'Mega Category Slug',// e.g. 'mens-fashion'
+            'Category Slug',     // e.g. 'mens-fashion'
             'Attributes',        // For variation e.g. 'Size:XL, Color:Red'
             'Thumbnail URL',     // Public URL of the image
             'Short Description',

@@ -447,25 +447,46 @@
 
         {{-- ══ SECTION 3: BENEFITS SECTION (OUR BENEFITS) ══ --}}
         @php
-            // Features data detection (features, features2, features3..6)
+            // Features data detection (feature1..6, features3..6, features2, features)
             $rawFeatures = [];
-            if (!empty($landing->extras['features2']) && is_array($landing->extras['features2'])) {
-                $rawFeatures = $landing->extras['features2'];
-            } elseif (!empty($landing->extras['features']) && is_array($landing->extras['features'])) {
-                $rawFeatures = $landing->extras['features'];
-            } else {
-                // Check if features3, features4, features5, features6 exist (like landing3)
-                $tempKeys = ['features3', 'features4', 'features5', 'features6'];
-                $collected = [];
-                foreach ($tempKeys as $k) {
-                    $val = data_get($landing->extras, $k . '.0');
-                    if ($val) {
-                        $collected[] = $val;
+
+            // 1. Check if individual feature card objects exist (feature1..6 or features1..6)
+            $tempKeys = [
+                ['feature1', 'features1'],
+                ['feature2', 'features2_single', 'features'],
+                ['feature3', 'features3'],
+                ['feature4', 'features4'],
+                ['feature5', 'features5'],
+                ['feature6', 'features6'],
+            ];
+
+            $individualFeatures = [];
+            foreach ($tempKeys as $idx => $aliasGroup) {
+                $val = null;
+                foreach ($aliasGroup as $k) {
+                    $item = data_get($landing->extras, $k);
+                    if (!empty($item)) {
+                        // If card component saved as array with index 0
+                        $val = is_array($item) && isset($item[0]) && is_array($item[0]) ? $item[0] : $item;
+                        if (!empty($val['title']) || !empty($val['description']) || !empty($val['desc']) || !empty($val['content']) || !empty($val['image'])) {
+                            break;
+                        }
                     }
                 }
-                if (count($collected) > 0) {
-                    $rawFeatures = $collected;
+                if ($val && (!empty($val['title']) || !empty($val['description']) || !empty($val['desc']) || !empty($val['content']) || !empty($val['image']))) {
+                    $individualFeatures[$idx] = $val;
                 }
+            }
+
+            if (count($individualFeatures) > 0) {
+                // If at least one individual feature card has custom text, fill with custom or fallback
+                for ($i = 0; $i < 6; $i++) {
+                    $rawFeatures[$i] = $individualFeatures[$i] ?? ($previewBenefits[$i] ?? []);
+                }
+            } elseif (!empty($landing->extras['features2']) && is_array($landing->extras['features2']) && count($landing->extras['features2']) > 1) {
+                $rawFeatures = $landing->extras['features2'];
+            } elseif (!empty($landing->extras['features']) && is_array($landing->extras['features']) && count($landing->extras['features']) > 1) {
+                $rawFeatures = $landing->extras['features'];
             }
 
             $hasCustomFeatures = count($rawFeatures) > 0;
@@ -1055,17 +1076,19 @@
                     } else if (text.includes('phone')) {
                         field = 'phone_number';
                     } else if (text.includes('features 6') || text.includes('feature 6')) {
-                        field = 'features6';
+                        field = 'feature6';
                     } else if (text.includes('features 5') || text.includes('feature 5')) {
-                        field = 'features5';
+                        field = 'feature5';
                     } else if (text.includes('features 4') || text.includes('feature 4')) {
-                        field = 'features4';
+                        field = 'feature4';
                     } else if (text.includes('features 3') || text.includes('feature 3')) {
-                        field = 'features3';
+                        field = 'feature3';
                     } else if (text.includes('features 2') || text.includes('feature 2')) {
-                        field = 'features2';
+                        field = 'feature2';
+                    } else if (text.includes('features 1') || text.includes('feature 1')) {
+                        field = 'feature1';
                     } else if (text.includes('features') || text.includes('feature')) {
-                        field = 'features';
+                        field = 'feature1';
                     } else if (text.includes('button text')) {
                         field = 'button_text';
                     } else if (text.includes('content 2')) {
