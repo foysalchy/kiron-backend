@@ -151,10 +151,10 @@
                     <!-- Hidden Input for Selected Variation -->
                     <input type="hidden" id="selected-variation-id" value="">
 
-                    {{-- Free Shipping Notice --}}
-                    @if (!empty($setup->free_shipping_text))
-                        <div class="mb-4 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2 text-emerald-800 text-xs md:text-sm font-semibold">
-                            <i class="fa-solid fa-truck-fast text-emerald-600"></i>
+                    {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
+                    @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
+                        <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-sm font-medium">
+                            <i class="fa-solid fa-gift text-amber-600"></i>
                             <span>{{ $setup->free_shipping_text }}</span>
                         </div>
                     @endif

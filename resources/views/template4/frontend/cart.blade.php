@@ -92,9 +92,16 @@
                     <section class="lg:col-span-5 bg-white p-4 sm:p-5 md:p-6 rounded-lg border border-gray-100 shadow-sm">
                         <h3 class="text-lg md:text-xl font-bold text-[#0f172a] mb-4 md:mb-6">Order Summary</h3>
 
-                        {{-- Free Shipping Banner / Threshold Indicator --}}
+                        @php
+                            $freeProductText = ($setup->lang ?? 'bn') === 'bn' ? 'এই পণ্যে ফ্রি ডেলিভারি সুবিধা রয়েছে!' : 'Free Delivery on this product!';
+                        @endphp
                         @if(!empty($setup->free_shipping_text))
-                            @if(isset($is_free_delivery) && $is_free_delivery)
+                            @if(!empty($is_product_free_delivery))
+                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                    <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
+                                    <span>{{ $freeProductText }}</span>
+                                </div>
+                            @elseif(!empty($is_rule_free_shipping))
                                 <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
