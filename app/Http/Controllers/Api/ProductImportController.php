@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Brand;
 use App\Models\MegaCategory;
+use App\Models\SubCategory;
+use App\Models\MiniCategory;
+use App\Models\ExtraCategory;
 use App\Models\Warehouse;
 use App\Models\Product;
 use App\Helpers\FileUploadHelper;
@@ -192,21 +195,97 @@ class ProductImportController extends Controller
                         : [intval($rawMegaCatIds)];
                 }
 
+                $rawSubCatIds = $row['sub_category_ids'] ?? null;
+                $subCatIds = !empty($rawSubCatIds)
+                    ? (is_array($rawSubCatIds) ? array_values(array_filter(array_map('intval', $rawSubCatIds))) : [intval($rawSubCatIds)])
+                    : null;
+
+                $rawMiniCatIds = $row['mini_category_ids'] ?? null;
+                $miniCatIds = !empty($rawMiniCatIds)
+                    ? (is_array($rawMiniCatIds) ? array_values(array_filter(array_map('intval', $rawMiniCatIds))) : [intval($rawMiniCatIds)])
+                    : null;
+
+                $rawExtraCatIds = $row['extra_category_ids'] ?? null;
+                $extraCatIds = !empty($rawExtraCatIds)
+                    ? (is_array($rawExtraCatIds) ? array_values(array_filter(array_map('intval', $rawExtraCatIds))) : [intval($rawExtraCatIds)])
+                    : null;
+
                 $isCategoryMissing = false;
-                if (empty($megaCatIds) && $megaCatSlug) {
+                if ((empty($megaCatIds) && empty($subCatIds) && empty($miniCatIds) && empty($extraCatIds)) && $megaCatSlug) {
                     // Split by comma to support multiple categories in Excel (e.g. "Electronics, Gadgets" or "men, shoes")
                     $catSlugsOrNames = array_values(array_filter(array_map('trim', explode(',', $megaCatSlug))));
-                    $resolvedCatIds = [];
+                    $resolvedMega = [];
+                    $resolvedSub = [];
+                    $resolvedMini = [];
+                    $resolvedExtra = [];
+                    $matchedCount = 0;
+
                     foreach ($catSlugsOrNames as $singleCat) {
+                        // 1. Check in MegaCategory
                         $megaCat = MegaCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
                         if ($megaCat) {
-                            $resolvedCatIds[] = (int)$megaCat->id;
+                            $resolvedMega[] = (int)$megaCat->id;
+                            $matchedCount++;
+                            continue;
+                        }
+
+                        // 2. Check in SubCategory (and auto-link parent mega_category_id)
+                        $subCat = SubCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($subCat) {
+                            $resolvedSub[] = (int)$subCat->id;
+                            if ($subCat->mega_category_id) {
+                                $resolvedMega[] = (int)$subCat->mega_category_id;
+                            }
+                            $matchedCount++;
+                            continue;
+                        }
+
+                        // 3. Check in MiniCategory (and auto-link parent sub_category_id & mega_category_id)
+                        $miniCat = MiniCategory::with('subCategory')->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($miniCat) {
+                            $resolvedMini[] = (int)$miniCat->id;
+                            if ($miniCat->sub_category_id) {
+                                $resolvedSub[] = (int)$miniCat->sub_category_id;
+                            }
+                            if ($miniCat->subCategory && $miniCat->subCategory->mega_category_id) {
+                                $resolvedMega[] = (int)$miniCat->subCategory->mega_category_id;
+                            }
+                            $matchedCount++;
+                            continue;
+                        }
+
+                        // 4. Check in ExtraCategory (and auto-link parent hierarchy)
+                        $extraCat = ExtraCategory::with(['miniCategory.subCategory'])->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($extraCat) {
+                            $resolvedExtra[] = (int)$extraCat->id;
+                            if ($extraCat->mini_category_id) {
+                                $resolvedMini[] = (int)$extraCat->mini_category_id;
+                            }
+                            if ($extraCat->miniCategory && $extraCat->miniCategory->sub_category_id) {
+                                $resolvedSub[] = (int)$extraCat->miniCategory->sub_category_id;
+                            }
+                            if ($extraCat->miniCategory && $extraCat->miniCategory->subCategory && $extraCat->miniCategory->subCategory->mega_category_id) {
+                                $resolvedMega[] = (int)$extraCat->miniCategory->subCategory->mega_category_id;
+                            }
+                            $matchedCount++;
+                            continue;
                         }
                     }
-                    if (!empty($resolvedCatIds)) {
-                        $megaCatIds = array_values(array_unique($resolvedCatIds));
+
+                    if (!empty($resolvedMega)) {
+                        $megaCatIds = array_values(array_unique(array_merge($megaCatIds ?: [], $resolvedMega)));
                     }
-                    if (empty($megaCatIds) || count($resolvedCatIds) < count($catSlugsOrNames)) {
+                    if (!empty($resolvedSub)) {
+                        $subCatIds = array_values(array_unique(array_merge($subCatIds ?: [], $resolvedSub)));
+                    }
+                    if (!empty($resolvedMini)) {
+                        $miniCatIds = array_values(array_unique(array_merge($miniCatIds ?: [], $resolvedMini)));
+                    }
+                    if (!empty($resolvedExtra)) {
+                        $extraCatIds = array_values(array_unique(array_merge($extraCatIds ?: [], $resolvedExtra)));
+                    }
+
+                    if ($matchedCount < count($catSlugsOrNames) || (empty($megaCatIds) && empty($subCatIds) && empty($miniCatIds) && empty($extraCatIds))) {
                         $isCategoryMissing = true;
                     }
                 }
@@ -444,6 +523,9 @@ class ProductImportController extends Controller
                             'product_type' => 'finished',
                             'brand_id' => $brandId,
                             'mega_category_ids' => $megaCatIds ?: [],
+                            'sub_category_ids' => $subCatIds ?: [],
+                            'mini_category_ids' => $miniCatIds ?: [],
+                            'extra_category_ids' => $extraCatIds ?: [],
                             'regular_price' => $regularPrice,
                             'discount' => $discount,
                             'discount_type' => $discountType,
@@ -525,7 +607,10 @@ class ProductImportController extends Controller
                         
                         // Resolved IDs (if they were found)
                         'brand_id' => $brandId,
-                        'mega_category_ids' => $megaCatIds,
+                        'mega_category_ids' => $megaCatIds ?: [],
+                        'sub_category_ids' => $subCatIds ?: [],
+                        'mini_category_ids' => $miniCatIds ?: [],
+                        'extra_category_ids' => $extraCatIds ?: [],
                         'warehouse_id' => $warehouseId,
                     ];
                 }

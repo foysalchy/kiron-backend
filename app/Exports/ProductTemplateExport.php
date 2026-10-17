@@ -26,7 +26,7 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
             'Stock Status',      // in_stock, out_of_stock
             'Purpose',           // both, website, pos
             'Brand Slug',        // e.g. 'nike'
-            'Mega Category Slug', // e.g. 'mens-fashion'
+            'Category Slug',     // e.g. 'mens-fashion' or sub/mini category slug/name
             'Attributes',        // For variation e.g. 'Size:XL, Color:Red'
             'Thumbnail URL',     // Public URL of the image
             'Short Description',
