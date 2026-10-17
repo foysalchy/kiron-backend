@@ -581,6 +581,8 @@ class ProductImportController extends Controller
                         'parentSku' => $parentSku,
                         'is_child_variation' => $isChildVariation,
                         'price' => $regularPrice,
+                        'discount' => $discount,
+                        'discount_type' => $discountType,
                         'stock' => $stockQuantity,
                         'manage_stock' => $manageStock,
                         
