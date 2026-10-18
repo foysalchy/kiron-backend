@@ -147,6 +147,74 @@ margin: 0;
   line-height: 24px;
   height: auto;
 }
+
+.prose h1 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 22px !important;
+    line-height: 28px;
+    font-weight: 400;
+}
+
+.prose h2 {
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-size: 22px !important;
+    line-height: 28px;
+    font-weight: 400;
+}
+
+.prose h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 16px !important;
+    line-height: 24px;
+    font-weight: 600;
+}
+
+.prose h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.prose hr {
+    margin: 10px 0px !important;
+}
+
+.prose h5 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.prose h6 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 600;
+}
+
+.prose p {
+    margin-top: 0 !important;
+    margin-bottom: 8px;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.prose h1+p,
+.prose h2+p,
+.prose h3+p,
+.prose h4+p,
+.prose h5+p,
+.prose h6+p {
+    margin-top: 0;
+}
     </style>
     @stack('styles')
     @if(isset($footerCodes))
