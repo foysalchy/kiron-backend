@@ -131,6 +131,10 @@ class RenameLegacyImagesCommand extends Command
                 'Key' => $newPath,
                 'CopySource' => $bucket . '/' . $oldPath,
                 'MetadataDirective' => 'REPLACE',
+                'Metadata' => [
+                    'title' => $baseName . ' Price in Bangladesh',
+                    'description' => $baseName . ' - Product Image',
+                ],
                 'CacheControl' => 'public, max-age=31536000, immutable',
                 'ContentType' => $disk->mimeType($oldPath) ?: 'image/jpeg',
             ]);
