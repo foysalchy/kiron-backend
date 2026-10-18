@@ -85,6 +85,7 @@ Route::middleware(SubdomainMiddleware::class)->group(function () {
     Route::post('/landing-order', [LandingController::class, 'storeLandingOrder'])->name('landing.order.store');
     Route::post('/landing-order/partial', [LandingController::class, 'partialSave'])->name('landing.order.partial');
     Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/notice/{slug}', [HomeController::class, 'showNotice'])->name('notice.details');
     Route::get('/reservation', [App\Http\Controllers\Frontend\ReservationController::class, 'index'])->name('reservation.index');
     Route::get('/reservation/availability', [App\Http\Controllers\Frontend\ReservationController::class, 'availability'])->name('reservation.availability');
     Route::post('/reservation/store', [App\Http\Controllers\Frontend\ReservationController::class, 'store'])->name('reservation.store');

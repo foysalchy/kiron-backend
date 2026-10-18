@@ -410,10 +410,17 @@
                             $callText = data_get($landing->extras, 'call_text') ?: ($landing->call_text ?? 'আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন');
                         @endphp
                         <div
-                            class="bg-[#C00000] text-white py-6 px-4 text-xl sm:text-2xl md:text-4xl font-bold rounded-xl mb-12 shadow-lg w-full leading-normal md:leading-relaxed {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Call Text</span>@endif
-                            {{ $callText }} @if($phone) <b
-                            class="font-bold ml-1 tracking-wider">{{ $phone }}</b> @endif
+                            class="bg-[#C00000] text-white py-6 px-4 text-xl sm:text-2xl md:text-4xl font-bold rounded-xl mb-12 shadow-lg w-full leading-normal md:leading-relaxed">
+                            <span class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                                @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Call Text</span>@endif
+                                {{ $callText }}
+                            </span>
+                            @if($phone)
+                                <span class="inline-block relative ml-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Phone Number</span>@endif
+                                    <b class="font-bold tracking-wider">{{ $phone }}</b>
+                                </span>
+                            @endif
                         </div>
 
                         <!-- White Price Box -->

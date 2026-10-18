@@ -4,13 +4,21 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Traits\CompanyScoped;
+use App\Traits\HasHomepageCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Notice extends Model
 {
-    use SoftDeletes, CompanyScoped;
+    use SoftDeletes, CompanyScoped,HasHomepageCache;
+
+
+    public static function homepageCacheKeys(): array
+    {
+        return ['home_notices'];
+    }
 
     protected $fillable = [
         'company_id',
@@ -22,6 +30,15 @@ class Notice extends Model
     ];
 
     protected $hidden = ['deleted_at'];
+    protected $appends = ['image_url'];
+
+    // Accessors
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image
+            ? Storage::disk('r2')->url($this->image)
+            : null;
+    }
 
     // Relationships
     public function company(): BelongsTo

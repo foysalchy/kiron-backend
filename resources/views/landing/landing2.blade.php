@@ -271,8 +271,7 @@
 
                         {{-- Stock status --}}
                         @if(!empty($landing->extras['features']) || $isPreviewMode)
-                            <div
-                                class="space-y-3 mb-10 text-lg md:text-2xl font-bold text-left md:text-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            <div class="mb-14 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge"
                                 style="top: -20px; z-index: 50;">Features</span>@endif
                                 @php
@@ -280,6 +279,10 @@
                                     $fWords = explode(' ', $featuresTitle);
                                     $fLastPart = count($fWords) > 2 ? array_splice($fWords, -2) : array_splice($fWords, -1);
                                     $fFirstPart = implode(' ', $fWords);
+                                    $allFeatures = $landing->extras['features'] ?? [];
+                                    if (!is_array($allFeatures)) {
+                                        $allFeatures = array_filter([$allFeatures]);
+                                    }
                                 @endphp
                                 <div class="mb-10 text-center">
                                     <h2 class="text-xl sm:text-2xl md:text-4xl font-bold leading-normal md:leading-relaxed">
@@ -295,81 +298,90 @@
                                     </h2>
                                 </div>
 
-                                <p class="mb-4">
-                                    {{ $landing->extras['features'][0] ?? ($isPreviewMode ? '📱 মোবাইল আসক্তি কমাবে' : '') }}
-                                </p>
-
-                                <p>
-                                    @if(empty($landing->extras['features'][1]) && empty($landing->extras['features'][2]) && !$isPreviewMode)
-                                        💥 ⏰
+                                <div class="space-y-4 mb-8 text-lg md:text-2xl font-bold text-left md:text-center">
+                                    @if(empty($allFeatures) && $isPreviewMode)
+                                        <p class="mb-4">📱 মোবাইল আসক্তি কমাবে</p>
+                                        <p>
+                                            💥 দ্রুত বুদ্ধি ও মেধা বিকাশে দারুণ সহায়ক
+                                            <span class="bg-[#c9250b] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0 font-medium">
+                                                ১০০% নিরাপদ ও টেকসই
+                                            </span>
+                                        </p>
+                                    @elseif(count($allFeatures) <= 3)
+                                        @foreach($allFeatures as $item)
+                                            <p class="mb-2">{!! $item !!}</p>
+                                        @endforeach
                                     @else
-                                        {{ $landing->extras['features'][1] ?? ($isPreviewMode ? '💥 দ্রুত বুদ্ধি ও মেধা বিকাশে দারুণ সহায়ক' : '') }}
+                                        @foreach(array_slice($allFeatures, 0, count($allFeatures) - 1) as $item)
+                                            <p class="mb-2">{!! $item !!}</p>
+                                        @endforeach
                                     @endif
+                                </div>
 
-                                    @if(!empty($landing->extras['features'][2]) || $isPreviewMode)
-                                        <span
-                                            class="bg-[#c9250b] text-white px-3 py-2 rounded-lg ml-1 inline-block mt-2 md:mt-0 font-medium">
-                                            {{ $landing->extras['features'][2] ?? ($isPreviewMode ? '১০০% নিরাপদ ও টেকসই' : '') }}
-                                        </span>
-                                    @endif
-                                </p>
-                            </div>
-                            <div
-                                class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] px-6 md:px-8 py-3 rounded-xl font-bold text-xl md:text-3xl mb-14 shadow-lg text-black">
-                                {{ $landing->extras['features'][3] ?? ($isPreviewMode ? 'সাথে ১ বছরের রিপ্লেসমেন্ট গ্যারান্টি 😍' : 'সাথে ১ বছরের রিপ্লেসমেন্ট 😍') }}
+                                @php
+                                    $highlightFeature = count($allFeatures) >= 4 ? end($allFeatures) : ($landing->extras['features'][3] ?? ($isPreviewMode ? 'সাথে ১ বছরের রিপ্লেসমেন্ট গ্যারান্টি 😍' : null));
+                                @endphp
+                                @if(!empty($highlightFeature))
+                                    <div
+                                        class="inline-block bg-gradient-to-r from-[#EEA727] to-[#FFEF5F] px-6 md:px-8 py-3 rounded-xl font-bold text-xl md:text-3xl shadow-lg text-black">
+                                        {!! $highlightFeature !!}
+                                    </div>
+                                @endif
                             </div>
                         @endif
 
                         {{-- Why best section --}}
                         @if(!empty($landing->extras['features2']) || $isPreviewMode)
-                            @php
-                                $feature2Title =
-                                    $landing->extras['features2'][0]['title'] ?? ($isPreviewMode ? 'এটি কেন আপনার সোনামণির জন্য সেরা?' : '');
-                                $words = explode(' ', $feature2Title);
-                                $lastPart = array_splice($words, -3); //
-                                $firstPart = implode(' ', $words);
-                            @endphp
-                            <div class="mb-10 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                            <div class="mb-14 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                                 @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Features
                                 2</span>@endif
-                                <h2 class="text-xl sm:text-2xl md:text-4xl font-bold leading-normal md:leading-relaxed">
-                                    {{ $firstPart }}
-                                    <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
-                                        {{ implode(' ', $lastPart) }}
-                                        <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
-                                            preserveAspectRatio="none">
-                                            <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
-                                                stroke="#fc4124" fill="transparent" stroke-width="4" />
-                                        </svg>
-                                    </span>
-                                </h2>
-                            </div>
-
-                            {{-- Category map image --}}
-                            <div class="max-w-3xl mx-auto mb-14 overflow-hidden rounded-xl">
                                 @php
-                                    $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
-                                    $categoryDesc = $landing->extras['features2'][0]['description'] ?? ($isPreviewMode ? '<p>স্মার্ট লার্নিং কার্ড ও আকর্ষণীয় ছবি দিয়ে তৈরি, যা বাচ্চাদের খেলাচ্ছলে নতুন বিষয় শিখতে উৎসাহিত করে। এতে করে তাদের শেখার আগ্রহ বহুগুণ বেড়ে যায়।</p>' : null);
-                                    if (is_array($categoryMap)) {
-                                        $catMapSrc = $categoryMap['previewUrl'] ?? $categoryMap['url'] ?? $categoryMap['path'] ?? '';
-                                    } elseif (is_string($categoryMap)) {
-                                        $catMapSrc = (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') || str_starts_with($categoryMap, 'http') || str_starts_with($categoryMap, '/'))
-                                            ? $categoryMap
-                                            : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap);
-                                    } else {
-                                        $catMapSrc = $productImg;
-                                    }
+                                    $feature2Title =
+                                        $landing->extras['features2'][0]['title'] ?? ($isPreviewMode ? 'এটি কেন আপনার সোনামণির জন্য সেরা?' : '');
+                                    $words = explode(' ', $feature2Title);
+                                    $lastPart = array_splice($words, -3); //
+                                    $firstPart = implode(' ', $words);
                                 @endphp
-                                <img src="{{ $catMapSrc ?: $productImg }}" alt="Categories" width="600" height="600"
-                                    loading="lazy" decoding="async"
-                                    class="w-auto h-auto max-w-full max-h-[550px] mx-auto object-contain rounded-xl">
+                                <div class="mb-10 text-center">
+                                    <h2 class="text-xl sm:text-2xl md:text-4xl font-bold leading-normal md:leading-relaxed">
+                                        {{ $firstPart }}
+                                        <span class="wavy-underline text-[#fc4124] px-1 relative inline-block">
+                                            {{ implode(' ', $lastPart) }}
+                                            <svg class="absolute left-0 bottom-[-10px] w-full" viewBox="0 0 500 40"
+                                                preserveAspectRatio="none">
+                                                <path d="M3,20c49.3-3,150.7-7.6,199.7-7.4c121.9,0.4,189.9,5,282.3,7.2"
+                                                    stroke="#fc4124" fill="transparent" stroke-width="4" />
+                                            </svg>
+                                        </span>
+                                    </h2>
+                                </div>
 
-                                @if($categoryDesc)
-                                    <div
-                                        class="mt-6 prose prose-slate max-w-none text-gray-700 leading-relaxed text-center md:text-left">
-                                        {!! $categoryDesc !!}
-                                    </div>
-                                @endif
+                                {{-- Category map image --}}
+                                <div class="max-w-3xl mx-auto overflow-hidden rounded-xl">
+                                    @php
+                                        $categoryMap = $landing->extras['features2'][0]['image'] ?? null;
+                                        $categoryDesc = $landing->extras['features2'][0]['description'] ?? ($isPreviewMode ? '<p>স্মার্ট লার্নিং কার্ড ও আকর্ষণীয় ছবি দিয়ে তৈরি, যা বাচ্চাদের খেলাচ্ছলে নতুন বিষয় শিখতে উৎসাহিত করে। এতে করে তাদের শেখার আগ্রহ বহুগুণ বেড়ে যায়।</p>' : null);
+                                        if (is_array($categoryMap)) {
+                                            $catMapSrc = $categoryMap['previewUrl'] ?? $categoryMap['url'] ?? $categoryMap['path'] ?? '';
+                                        } elseif (is_string($categoryMap)) {
+                                            $catMapSrc = (str_starts_with($categoryMap, 'blob:') || str_starts_with($categoryMap, 'data:') || str_starts_with($categoryMap, 'http') || str_starts_with($categoryMap, '/'))
+                                                ? $categoryMap
+                                                : \Illuminate\Support\Facades\Storage::disk('r2')->url($categoryMap);
+                                        } else {
+                                            $catMapSrc = $productImg;
+                                        }
+                                    @endphp
+                                    <img src="{{ $catMapSrc ?: $productImg }}" alt="Categories" width="600" height="600"
+                                        loading="lazy" decoding="async"
+                                        class="w-auto h-auto max-w-full max-h-[550px] mx-auto object-contain rounded-xl">
+
+                                    @if($categoryDesc)
+                                        <div
+                                            class="mt-6 prose prose-slate max-w-none text-gray-700 leading-relaxed text-center md:text-left">
+                                            {!! $categoryDesc !!}
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         @endif
 
