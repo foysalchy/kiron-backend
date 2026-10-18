@@ -178,7 +178,8 @@ class FileUploadHelper
         string $url,
         string $folder = 'images',
         string $disk = 'r2',
-        bool $applyWatermark = false
+        bool $applyWatermark = false,
+        ?string $customFileName = null
     ): ?string {
         try {
             $contents = file_get_contents($url);
@@ -189,7 +190,7 @@ class FileUploadHelper
             $companyFolder = $companyId === null ? 'admin' : self::getCompanyPrefix((int) $companyId) . "_{$companyId}";
             $fullFolder = "{$companyFolder}/{$folder}";
 
-            $fileName = Str::random(40) . '.webp';
+            $fileName = ($customFileName ? $customFileName : Str::random(40)) . '.webp';
             $fullPath = "{$fullFolder}/{$fileName}";
 
             $options = ['disk' => $disk];

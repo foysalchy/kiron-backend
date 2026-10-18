@@ -71,6 +71,7 @@ class SuperAdminPermissionSeeder extends Seeder
         $addCrud('cms_pages',                'CMS Pages');
         $addCrud('cms_sliders',              'CMS Sliders');
         $addCrud('cms_blogs',                'CMS Blogs');
+        $addCrud('cms_notices',              'CMS Notices');
         $addCrud('social_settings',          'Social Settings');
 
         // ── Security ───────────────────────────────────────

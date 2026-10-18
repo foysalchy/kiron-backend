@@ -339,76 +339,130 @@ class ProductImportController extends Controller
                     }
                 }
 
-                // Image Upload (Generates 3 versions: main thumbnail, 310x310, and 95x95 like ProductService)
+                // Determine if this is a child variation (has parent SKU) or a parent variation
+                $isChildVariation = ($type === 'variation' && !empty($parentSku));
+                $companyId = auth()->user()->company_id ?? null;
+
+                // Pre-resolve parent product or slug candidate to align image naming with ProductService standards
+                $parent = null;
+                $slugCandidate = null;
+                if ($isChildVariation) {
+                    $parentQuery = Product::where('sku_code', $parentSku)->where('type', 'variation');
+                    if ($companyId) {
+                        $parentQuery->where('company_id', $companyId);
+                    }
+                    $parent = $parentQuery->first();
+                    if (!$parent && isset($parentProductsBySku[$parentSku])) {
+                        $parent = $parentProductsBySku[$parentSku];
+                    }
+                } else {
+                    $baseSlug = Str::slug($title ?: 'product');
+                    $slugCandidate = $baseSlug;
+                    $slugCounter = 1;
+                    while (Product::where('slug', $slugCandidate)->when($companyId, fn($q) => $q->where('company_id', $companyId))->exists()) {
+                        $slugCandidate = $baseSlug . '-' . $slugCounter;
+                        $slugCounter++;
+                    }
+                }
+
+                // Image Upload (Generates WebP according to ProductService conventions)
                 $thumbnailPath = null;
                 $thumbnail310Path = null;
                 $thumbnail95Path = null;
                 $isImageMissing = empty($thumbnailUrl) && !$request->hasFile("rows.$index.imageFile");
                 
                 if (!$isPreview) {
-                    $customFileName = Str::slug($sku ?: ($title ?: 'product')) . '-' . time() . '-' . rand(100, 999);
-                    
-                    if ($request->hasFile("rows.$index.imageFile")) {
-                        $imgFile = $request->file("rows.$index.imageFile");
-                        try {
-                            $thumbnailPath = FileUploadHelper::uploadImage(
-                                $imgFile,
-                                'products/thumbnails',
-                                'r2',
-                                2048,
-                                $customFileName,
-                                true
-                            );
-                            $thumbnail310Path = FileUploadHelper::uploadResizedWebpImage(
-                                $imgFile,
-                                'products/thumbnails',
-                                310,
-                                310,
-                                'r2',
-                                $customFileName . '-310x310',
-                                true
-                            );
-                            $thumbnail95Path = FileUploadHelper::uploadResizedWebpImage(
-                                $imgFile,
-                                'products/thumbnails',
-                                95,
-                                95,
-                                'r2',
-                                $customFileName . '-95x95',
-                                true
-                            );
-                        } catch (\Exception $e) {
-                            Log::warning("Failed to upload multipart image for row {$index}: " . $e->getMessage());
-                        }
-                    } elseif ($thumbnailUrl && filter_var($thumbnailUrl, FILTER_VALIDATE_URL)) {
-                        try {
-                            $thumbnailPath = FileUploadHelper::uploadFromUrl($thumbnailUrl, 'products', 'r2', true);
-                            if ($thumbnailPath) {
-                                $thumbnail310Path = FileUploadHelper::generateResizedFromExisting(
-                                    $thumbnailPath,
-                                    'products/thumbnails',
-                                    310,
-                                    310,
+                    if ($isChildVariation) {
+                        // Follow ProductService: Str::slug($parent->slug) . '_variation_' . uniqid() . '-' . time() in 'products/variation'
+                        $parentSlug = $parent ? $parent->slug : Str::slug($parentSku ?: 'product');
+                        $customFileName = Str::slug($parentSlug) . '_variation_' . uniqid() . '-' . time();
+                        $targetFolder = 'products/variation';
+
+                        if ($request->hasFile("rows.$index.imageFile")) {
+                            $imgFile = $request->file("rows.$index.imageFile");
+                            try {
+                                $thumbnailPath = FileUploadHelper::uploadImage(
+                                    $imgFile,
+                                    $targetFolder,
                                     'r2',
-                                    $customFileName . '-310x310'
+                                    2048,
+                                    $customFileName,
+                                    true
                                 );
-                                $thumbnail95Path = FileUploadHelper::generateResizedFromExisting(
-                                    $thumbnailPath,
-                                    'products/thumbnails',
-                                    95,
-                                    95,
-                                    'r2',
-                                    $customFileName . '-95x95'
-                                );
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to upload variation multipart image for row {$index}: " . $e->getMessage());
                             }
-                        } catch (\Exception $e) {
-                            Log::warning("Failed to upload image from URL for row {$index}: " . $e->getMessage());
+                        } elseif ($thumbnailUrl && filter_var($thumbnailUrl, FILTER_VALIDATE_URL)) {
+                            try {
+                                $thumbnailPath = FileUploadHelper::uploadFromUrl($thumbnailUrl, $targetFolder, 'r2', true, $customFileName);
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to upload variation image from URL for row {$index}: " . $e->getMessage());
+                            }
+                        }
+                    } else {
+                        // Single / Parent Product: Str::slug($slugCandidate) . '-' . time() with 310x310 and 95x95 thumbnails
+                        $customFileName = Str::slug($slugCandidate) . '-' . time();
+                        $targetFolder = 'products/thumbnails';
+
+                        if ($request->hasFile("rows.$index.imageFile")) {
+                            $imgFile = $request->file("rows.$index.imageFile");
+                            try {
+                                $thumbnailPath = FileUploadHelper::uploadImage(
+                                    $imgFile,
+                                    $targetFolder,
+                                    'r2',
+                                    2048,
+                                    $customFileName,
+                                    true
+                                );
+                                $thumbnail310Path = FileUploadHelper::uploadResizedWebpImage(
+                                    $imgFile,
+                                    $targetFolder,
+                                    310,
+                                    310,
+                                    'r2',
+                                    $customFileName . '-310x310',
+                                    true
+                                );
+                                $thumbnail95Path = FileUploadHelper::uploadResizedWebpImage(
+                                    $imgFile,
+                                    $targetFolder,
+                                    95,
+                                    95,
+                                    'r2',
+                                    $customFileName . '-95x95',
+                                    true
+                                );
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to upload multipart image for row {$index}: " . $e->getMessage());
+                            }
+                        } elseif ($thumbnailUrl && filter_var($thumbnailUrl, FILTER_VALIDATE_URL)) {
+                            try {
+                                $thumbnailPath = FileUploadHelper::uploadFromUrl($thumbnailUrl, $targetFolder, 'r2', true, $customFileName);
+                                if ($thumbnailPath) {
+                                    $thumbnail310Path = FileUploadHelper::generateResizedFromExisting(
+                                        $thumbnailPath,
+                                        $targetFolder,
+                                        310,
+                                        310,
+                                        'r2',
+                                        $customFileName . '-310x310'
+                                    );
+                                    $thumbnail95Path = FileUploadHelper::generateResizedFromExisting(
+                                        $thumbnailPath,
+                                        $targetFolder,
+                                        95,
+                                        95,
+                                        'r2',
+                                        $customFileName . '-95x95'
+                                    );
+                                }
+                            } catch (\Exception $e) {
+                                Log::warning("Failed to upload image from URL for row {$index}: " . $e->getMessage());
+                            }
                         }
                     }
                 }
-
-                // Determine if this is a child variation (has parent SKU) or a parent variation
-                $isChildVariation = ($type === 'variation' && !empty($parentSku));
 
                 // Attribute validation for child variation
                 $isAttributeMissing = false;
@@ -553,16 +607,18 @@ class ProductImportController extends Controller
                     $actualType = ($type === 'variable' || $type === 'variation') ? 'variation' : 'single';
                     
                     if (!$isPreview) {
-                        // Generate clean sequential slug: title -> title-1 -> title-2 -> ...
-                        $baseSlug = Str::slug($title);
-                        $slugCandidate = $baseSlug;
-                        $slugCounter = 1;
+                        // $slugCandidate was already pre-calculated prior to image upload
+                        if (empty($slugCandidate)) {
+                            $baseSlug = Str::slug($title ?: 'product');
+                            $slugCandidate = $baseSlug;
+                            $slugCounter = 1;
 
-                        while (Product::where('slug', $slugCandidate)
-                            ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-                            ->exists()) {
-                            $slugCandidate = $baseSlug . '-' . $slugCounter;
-                            $slugCounter++;
+                            while (Product::where('slug', $slugCandidate)
+                                ->when($companyId, fn($q) => $q->where('company_id', $companyId))
+                                ->exists()) {
+                                $slugCandidate = $baseSlug . '-' . $slugCounter;
+                                $slugCounter++;
+                            }
                         }
 
                         $product = Product::create([

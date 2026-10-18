@@ -407,12 +407,12 @@
                         <!-- Red Header Banner -->
                         @php
                             $phone = $landing->phone_number ?: ($isPreviewMode ? $previewPhone : null);
+                            $callText = data_get($landing->extras, 'call_text') ?: ($landing->call_text ?? 'আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন');
                         @endphp
                         <div
                             class="bg-[#C00000] text-white py-6 px-4 text-xl sm:text-2xl md:text-4xl font-bold rounded-xl mb-12 shadow-lg w-full leading-normal md:leading-relaxed {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Phone
-                            Number</span>@endif
-                            আমাদের থেকে বিস্তারিত জানতে এই নাম্বারে কল করুন @if($phone) <b
+                            @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Call Text</span>@endif
+                            {{ $callText }} @if($phone) <b
                             class="font-bold ml-1 tracking-wider">{{ $phone }}</b> @endif
                         </div>
 
@@ -616,7 +616,13 @@
                         @if($isPreviewMode)<span class="preview-badge" style="top: 0; z-index: 50;">Title</span>@endif
                         {{ $landing->title ?? ($product->title ?: ($isPreviewMode ? $previewTitle : '')) }}
                     </h2>
-                    <p class="text-base md:text-2xl text-[#1f5e00] mb-8">সাশ্রয়ী মূল্যে সেরা পণ্য</p>
+                    @php
+                        $pricingSubtitle = data_get($landing->extras, 'pricing_subtitle') ?: ($landing->pricing_subtitle ?? 'সাশ্রয়ী মূল্যে সেরা পণ্য');
+                    @endphp
+                    <p class="text-base md:text-2xl text-[#1f5e00] mb-8 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Pricing Subtitle</span>@endif
+                        {{ $pricingSubtitle }}
+                    </p>
                     <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">
                         @if($regularPrice)
                             <div class="{{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -798,7 +804,11 @@
                     const text = badgeEl.textContent.toLowerCase().replace(/\s+/g, ' ').trim();
                     let field = null;
 
-                    if (text.includes('regular price')) {
+                    if (text.includes('call text') || text === 'call text' || text.includes('call')) {
+                        field = 'call_text';
+                    } else if (text.includes('pricing subtitle') || text.includes('subtitle')) {
+                        field = 'pricing_subtitle';
+                    } else if (text.includes('regular price')) {
                         field = 'regular_price';
                     } else if (text.includes('discount price')) {
                         field = 'discount_price';
