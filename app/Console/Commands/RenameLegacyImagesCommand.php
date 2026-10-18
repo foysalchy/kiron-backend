@@ -118,9 +118,9 @@ class RenameLegacyImagesCommand extends Command
 
         $extension = pathinfo($oldPath, PATHINFO_EXTENSION) ?: 'jpg';
         $suffix = $index ? "-{$index}-" : '-';
-        $newFileName = Str::slug($baseName) . $suffix . time() . '.' . $extension;
+        $newFileName = Str::slug($baseName) . '.' . $extension;
         $newPath = $folder . '/' . $newFileName;
-
+ 
         try {
             // Get S3 Client to perform a server-side copy with Cache-Control
             $client = $disk->getClient();
