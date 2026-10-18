@@ -83,6 +83,7 @@ use App\Http\Controllers\Api\MetaWebhookController;
 use App\Http\Controllers\Api\MetaDirectProxyController;
 use App\Http\Controllers\Api\MiniCategoryController;
 use App\Http\Controllers\Api\NoteTemplateController;
+use App\Http\Controllers\Api\NoticeController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ContactMessageController;
 use App\Http\Controllers\Api\OfficeLocationController;
@@ -1304,6 +1305,18 @@ Route::prefix('v1')->group(function () {
                     Route::get('/{id}/restore', [KnowledgeBaseController::class, 'restore']);
                     Route::delete('/{id}/force', [KnowledgeBaseController::class, 'forceDestroy']);
                     Route::patch('/{id}/toggle-status', [KnowledgeBaseController::class, 'toggleStatus']);
+                });
+
+                // Notice Routes
+                Route::prefix('notices')->group(function () {
+                    Route::get('/', [NoticeController::class, 'index']);
+                    Route::post('/', [NoticeController::class, 'store']);
+                    Route::get('/{id}', [NoticeController::class, 'show']);
+                    Route::post('/update/{id}', [NoticeController::class, 'update']);
+                    Route::delete('/{id}', [NoticeController::class, 'destroy']);
+                    Route::get('/{id}/restore', [NoticeController::class, 'restore']);
+                    Route::delete('/{id}/force', [NoticeController::class, 'forceDestroy']);
+                    Route::patch('/{id}/toggle-status', [NoticeController::class, 'toggleStatus']);
                 });
                 //change-pass routes
                 Route::prefix('change-pass')->group(function () {

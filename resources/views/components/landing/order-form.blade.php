@@ -48,6 +48,58 @@
         }
     }
     $isEntirelyOutOfStock = $isSingleProduct ? $isSingleOutOfStock : $allVariationsOutOfStock;
+
+    // Determine language (bn or en, default bn)
+    $formLang = data_get($landing->extras, 'order_form_lang') ?: ($landing->order_form_lang ?? 'bn');
+    $isEn = ($formLang === 'en');
+
+    $trans = [
+        'header_title' => $isEn ? 'Fill in the information to order' : 'অর্ডার করতে সঠিক তথ্য দিয়ে',
+        'header_subtitle' => $isEn ? 'Complete the form below' : 'নিচের ফর্মটি পূরণ করুন',
+        'select_product' => $isEn ? 'Select the product' : 'পণ্যটি সিলেক্ট করুন',
+        'multiple_products_hint' => $isEn ? 'You can select multiple products' : 'একাধিক পণ্য সিলেক্ট করতে পারেন',
+        'no_product_empty_title' => $isEn ? 'No product added to cart yet' : 'কোনো পণ্য এখনো কার্টে যোগ করা হয়নি',
+        'no_product_empty_subtitle' => $isEn ? 'Please choose your desired product from above and add to cart.' : 'উপরের প্রোডাক্ট কার্ড থেকে পছন্দের পণ্য বেছে নিয়ে কার্টে যোগ করুন।',
+        'choose_product_btn' => $isEn ? 'Choose Product' : 'পণ্য পছন্দ করুন',
+        'price_label' => $isEn ? 'Price:' : 'মূল্য:',
+        'out_of_stock' => $isEn ? 'Out of Stock' : 'স্টক আউট',
+        'out_of_stock_full' => $isEn ? 'Out of Stock (Currently unavailable)' : 'স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)',
+        'out_of_stock_btn' => $isEn ? 'Out of Stock (Unavailable)' : 'স্টক আউট (পণ্যটি শেষ)',
+        'add_product_to_cart' => $isEn ? 'Add this product to cart' : 'এই প্রোডাক্টটি কার্টে যোগ করুন',
+        'your_name' => $isEn ? 'Your Name' : 'আপনার নাম লিখুন',
+        'phone_number' => $isEn ? 'Mobile Number' : 'মোবাইল নাম্বার লিখুন',
+        'full_address' => $isEn ? 'Full Address' : 'সম্পূর্ণ ঠিকানা লিখুন',
+        'product' => $isEn ? 'Product' : 'Product',
+        'price' => $isEn ? 'Price' : 'Price',
+        'quantity' => $isEn ? 'Quantity' : 'Quantity',
+        'delivery_area' => $isEn ? 'Delivery Area' : 'Delivery Area',
+        'inside_dhaka' => $isEn ? 'Inside Dhaka' : 'Inside Dhaka',
+        'outside_dhaka' => $isEn ? 'Outside Dhaka' : 'Outside Dhaka',
+        'subtotal' => $isEn ? 'Subtotal' : 'Subtotal',
+        'shipping_charge' => $isEn ? 'Shipping Charge' : 'Shipping Charge',
+        'total' => $isEn ? 'Total' : 'Total',
+        'free' => $isEn ? 'Free' : 'Free',
+        'place_order' => $isEn ? 'Place Order' : 'অর্ডার করুন',
+        'select_product_btn' => $isEn ? 'Select a product' : 'পণ্য নির্বাচন করুন',
+        'view_cart' => $isEn ? 'View Cart' : 'কার্ট দেখুন',
+        'no_variant_selected' => $isEn ? 'No variant selected' : 'কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি',
+        'remove' => $isEn ? 'Remove' : 'রিমুভ করুন',
+        'order_failed_title' => $isEn ? 'Sorry! Order could not be placed' : 'দুঃখিত! অর্ডার সম্পন্ন হয়নি',
+        'order_failed_msg' => $isEn ? 'There was a problem placing your order.' : 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে।',
+        'try_again' => $isEn ? 'Try Again' : 'আবার চেষ্টা করুন',
+        'order_success_title' => $isEn ? 'Congratulations! Your order was successful' : 'অভিনন্দন! আপনার অর্ডার সফল হয়েছে',
+        'order_id' => $isEn ? 'Order ID:' : 'অর্ডার আইডি:',
+        'order_success_msg' => $isEn ? 'Our representative will contact you shortly to confirm your order.' : 'কিছুক্ষণের মধ্যে আমাদের প্রতিনিধি আপনার সাথে ফোনে যোগাযোগ করে অর্ডারটি কনফার্ম করবে।',
+        'ok' => $isEn ? 'OK' : 'ঠিক আছে',
+        'processing' => $isEn ? 'Processing...' : 'প্রসেসিং...',
+        'stock_limit_alert' => $isEn ? 'Sorry! Maximum :count items available in stock.' : 'দুঃখিত! এই পণ্যের সর্বোচ্চ :count টি স্টকে রয়েছে।',
+        'stock_out_alert' => $isEn ? 'Sorry! No more items in stock (Maximum :count allowed).' : 'দুঃখিত! স্টকে আর পণ্য নেই (সর্বোচ্চ :count টি প্রযোজ্য)।',
+        'selected_item_out_of_stock' => $isEn ? 'Sorry! The selected product is currently out of stock.' : 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।',
+        'select_at_least_one' => $isEn ? 'Please add at least one product or variant!' : 'দয়া করে অন্তত একটি পণ্য বা ভ্যারিয়েন্ট যোগ করুন!',
+        'select_product_prompt' => $isEn ? 'Please select a product!' : 'দয়া করে পণ্য সিলেক্ট করুন!',
+        'order_failed_retry' => $isEn ? 'There was a problem placing your order. Please try again.' : 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+        'server_error_retry' => $isEn ? 'Server error occurred. Please try again.' : 'সার্ভারে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+    ];
 @endphp
 
 <div class="max-w-7xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-sm">
@@ -66,21 +118,21 @@
 
         {{-- Header --}}
         <div class="text-center mb-10">
-            <h2 class="text-xl sm:text-2xl md:text-4xl font-bold mb-5 text-black leading-normal md:leading-relaxed">অর্ডার করতে সঠিক তথ্য দিয়ে</h2>
+            <h2 class="text-xl sm:text-2xl md:text-4xl font-bold mb-5 text-black leading-normal md:leading-relaxed">{{ $trans['header_title'] }}</h2>
             <div
                 class="inline-block bg-[#1f8a54] text-white px-10 py-3 rounded-lg text-xl md:text-2xl shadow-md font-bold">
-                নিচের ফর্মটি পূরণ করুন</div>
+                {{ $trans['header_subtitle'] }}</div>
         </div>
 
         {{-- Product Selection Area --}}
         <div class="space-y-4 mb-10">
             <div class="flex items-center justify-between">
                 <label class="block text-lg font-bold text-gray-800">
-                    পণ্যটি সিলেক্ট করুন <span class="text-red-500">*</span>
+                    {{ $trans['select_product'] }} <span class="text-red-500">*</span>
                 </label>
                 @if ($mainProduct->type === 'variation' && $isMultipleAttribute)
                     <span class="text-xs font-bold text-[#14532d] bg-[#dcfce7] px-3 py-1 rounded-full border border-[#86efac]">
-                        একাধিক পণ্য সিলেক্ট করতে পারেন
+                        {{ $trans['multiple_products_hint'] }}
                     </span>
                 @endif
             </div>
@@ -89,15 +141,15 @@
                 {{-- Empty state prompt if nothing is added yet --}}
                 <div id="multi-product-empty-notice" class="p-6 bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl">
                     <div class="text-center mb-4">
-                        <p class="text-base font-bold text-gray-800 mb-1">কোনো পণ্য এখনো কার্টে যোগ করা হয়নি</p>
-                        <p class="text-sm text-gray-500 font-medium">উপরের প্রোডাক্ট কার্ড থেকে পছন্দের পণ্য বেছে নিয়ে কার্টে যোগ করুন।</p>
+                        <p class="text-base font-bold text-gray-800 mb-1">{{ $trans['no_product_empty_title'] }}</p>
+                        <p class="text-sm text-gray-500 font-medium">{{ $trans['no_product_empty_subtitle'] }}</p>
                     </div>
                     <div class="flex justify-center">
                         <a href="#landing-products-section"
                             onclick="const el = document.getElementById('landing-products-section') || document.querySelector('.product-card'); if (el) { el.scrollIntoView({ behavior: 'smooth' }); return false; }"
                             class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#15803d] hover:bg-[#166534] text-white text-sm font-bold rounded-xl shadow-sm hover:shadow transition-all active:scale-95 cursor-pointer">
                             <i class="fa-solid fa-cart-plus text-sm"></i>
-                            <span>পণ্য পছন্দ করুন</span>
+                            <span>{{ $trans['choose_product_btn'] }}</span>
                             <i class="fa-solid fa-arrow-up text-xs"></i>
                         </a>
                     </div>
@@ -168,7 +220,7 @@
                                                     <div class="text-left">
                                                         <p class="text-xs font-bold text-gray-800">{{ $variation->display_name }}</p>
                                                         @if($vOutOfStock)
-                                                            <span class="text-[10px] text-red-600 font-bold">স্টক আউট</span>
+                                                            <span class="text-[10px] text-red-600 font-bold">{{ $trans['out_of_stock'] }}</span>
                                                         @endif
                                                     </div>
                                                 </div>
@@ -201,9 +253,9 @@
                                                 </svg>
                                             </div>
                                             <div class="text-left">
-                                                <p class="text-xs font-bold text-gray-800">এই প্রোডাক্টটি কার্টে যোগ করুন</p>
+                                                <p class="text-xs font-bold text-gray-800">{{ $trans['add_product_to_cart'] }}</p>
                                                 @if($pIsSingleOutOfStock)
-                                                    <span class="text-[10px] text-red-600 font-bold">স্টক আউট</span>
+                                                    <span class="text-[10px] text-red-600 font-bold">{{ $trans['out_of_stock'] }}</span>
                                                 @endif
                                             </div>
                                         </div>
@@ -275,7 +327,7 @@
                                         <p class="text-xs text-[#145a32] font-bold uppercase">Option:
                                             {{ $variation->display_name }}</p>
                                         @if($vOutOfStock)
-                                            <span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">স্টক আউট</span>
+                                            <span class="bg-red-100 text-red-700 text-[11px] font-bold px-2 py-0.5 rounded-full border border-red-200">{{ $trans['out_of_stock'] }}</span>
                                         @endif
                                     </div>
                                 </div>
@@ -298,7 +350,7 @@
                         <div class="text-left">
                             <p class="text-md font-bold text-gray-800">{{ $landing->product->title }}</p>
                             @if($isSingleOutOfStock)
-                                <span class="inline-block mt-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">স্টক আউট (বর্তমানে পণ্যটি স্টকে নেই)</span>
+                                <span class="inline-block mt-1 bg-red-100 text-red-700 text-xs font-bold px-2.5 py-0.5 rounded-full border border-red-200">{{ $trans['out_of_stock_full'] }}</span>
                             @endif
                         </div>
                     </div>
@@ -314,19 +366,19 @@
             {{-- LEFT: Billing Info --}}
             <div class="lg:col-span-7 space-y-6">
                 <div>
-                    <label for="name" class="block text-md font-bold mb-2 text-gray-800">আপনার নাম লিখুন <span
+                    <label for="name" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['your_name'] }} <span
                             class="text-red-500">*</span></label>
                     <input id="name" type="text" name="name" required
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
-                    <label for="phone" class="block text-md font-bold mb-2 text-gray-800">মোবাইল নাম্বার লিখুন <span
+                    <label for="phone" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['phone_number'] }} <span
                             class="text-red-500">*</span></label>
                     <input type="tel" id="phone" name="phone" required
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
                 </div>
                 <div>
-                    <label for="address" class="block text-md font-bold mb-2 text-gray-800">সম্পূর্ণ ঠিকানা লিখুন <span
+                    <label for="address" class="block text-md font-bold mb-2 text-gray-800">{{ $trans['full_address'] }} <span
                             class="text-red-500">*</span></label>
                     <input type="text" id="address" name="address" required
                         class="w-full border-2 border-dashed border-gray-300 rounded-lg p-3 bg-white focus:border-[#1f8a54] outline-none">
@@ -358,7 +410,7 @@
                     {{-- Table Header --}}
                     <div
                         class="flex justify-between text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 pb-3 border-b border-dashed border-gray-200">
-                        <span>Product</span><span class="text-right">Price</span>
+                        <span>{{ $trans['product'] }}</span><span class="text-right">{{ $trans['price'] }}</span>
                     </div>
 
                     {{-- Product Info Rows Container (Dynamic) --}}
@@ -388,7 +440,7 @@
                     {{-- Qty Selector & Shipping Area (Inside Summary) --}}
                     <div class="px-2 space-y-4 mb-6">
                         <div id="global-qty-wrapper" class="flex items-center justify-between">
-                            <span class="text-sm font-bold text-gray-700">Quantity</span>
+                            <span class="text-sm font-bold text-gray-700">{{ $trans['quantity'] }}</span>
                             <div class="flex items-center border border-gray-300 rounded bg-white overflow-hidden">
                                 <button type="button" onclick="changeQty(-1)" aria-label="Decrease quantity"
                                     class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 border-r border-gray-300 font-bold cursor-pointer">−</button>
@@ -399,15 +451,14 @@
                         </div>
 
                         <div id="delivery-area-section" class="space-y-2 {{ $isFree ? 'hidden' : '' }}">
-                            <label class="block text-sm font-bold text-gray-500 uppercase tracking-wide">Delivery
-                                Area</label>
+                            <label class="block text-sm font-bold text-gray-500 uppercase tracking-wide">{{ $trans['delivery_area'] }}</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <label class="cursor-pointer">
                                     <input type="radio" name="shipping_area" id="shipping-area-inside" value="inside" checked
                                         onchange="updateDeliveryCharge({{ $defaultInsideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Inside Dhaka <span class="text-xs font-bold ml-1">({{ $defaultInsideCharge.$setup->currency }})</span>
+                                        {{ $trans['inside_dhaka'] }} <span class="text-xs font-bold ml-1">({{ $defaultInsideCharge.$setup->currency }})</span>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
@@ -415,7 +466,7 @@
                                         onchange="updateDeliveryCharge({{ $defaultOutsideCharge }})" class="hidden peer">
                                     <div
                                         class="p-2 border-2 border-gray-100 rounded-lg text-center text-sm font-semibold text-gray-600 peer-checked:border-[#1f8a54] peer-checked:text-[#145a32] bg-gray-50">
-                                        Outside Dhaka <span class="text-xs font-bold ml-1">({{ $defaultOutsideCharge.$setup->currency }})</span>
+                                        {{ $trans['outside_dhaka'] }} <span class="text-xs font-bold ml-1">({{ $defaultOutsideCharge.$setup->currency }})</span>
                                     </div>
                                 </label>
                             </div>
@@ -425,19 +476,19 @@
                     {{-- Calculations --}}
                     <div class="px-2 space-y-2 border-t border-dashed border-gray-100 pt-4 mb-6">
                         <div class="flex justify-between text-sm md:text-base text-gray-800">
-                            <span>Subtotal</span>
+                            <span>{{ $trans['subtotal'] }}</span>
                             <span class="font-bold text-gray-800"><span
                                     id="summary-subtotal"></span>{{ $setup->currency }}</span>
                         </div>
                         <div class="flex justify-between text-sm md:text-base text-gray-800">
-                            <span>Shipping Charge</span>
+                            <span>{{ $trans['shipping_charge'] }}</span>
                             <span class="font-bold text-red-600" id="delivery-charge-display-wrapper">
                                 +<span id="delivery-charge-display"></span>{{ $setup->currency }}
                             </span>
                         </div>
                         <div
                             class="flex justify-between items-center text-lg font-bold text-gray-900 pt-2 border-t border-gray-50">
-                            <span>Total</span>
+                            <span>{{ $trans['total'] }}</span>
                             <span id="summary-total" class="text-2xl font-black"></span>
                         </div>
                     </div>
@@ -448,9 +499,9 @@
                         @if($isPreviewMode) onclick="showPreviewAlert()" @endif
                         class="w-full {{ $isEntirelyOutOfStock ? 'bg-gray-400 cursor-not-allowed opacity-75' : 'bg-[#1f8a54] hover:bg-[#176840] cursor-pointer' }} text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2">
                         @if($isEntirelyOutOfStock)
-                            <span>স্টক আউট (পণ্যটি শেষ)</span>
+                            <span>{{ $trans['out_of_stock_btn'] }}</span>
                         @else
-                            <span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>{{ $setup->currency }}
+                            <span id="btn-text">{{ $trans['place_order'] }}</span> <span id="btn-total"></span>{{ $setup->currency }}
                         @endif
                     </button>
                 </div>
@@ -469,14 +520,14 @@
             </svg>
         </div>
         <!-- Title -->
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">দুঃখিত! অর্ডার সম্পন্ন হয়নি</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ $trans['order_failed_title'] }}</h3>
         <!-- Error message -->
         <div id="order-error-modal-message" class="bg-red-50 text-red-700 text-sm md:text-base font-medium rounded-xl p-3.5 mb-6 border border-red-200/60 leading-relaxed">
-            {{ session('error') ?? 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে।' }}
+            {{ session('error') ?? $trans['order_failed_msg'] }}
         </div>
         <!-- Action Button -->
         <button type="button" onclick="closeOrderErrorModal()" class="w-full py-3.5 px-6 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98">
-            আবার চেষ্টা করুন
+            {{ $trans['try_again'] }}
         </button>
     </div>
 </div>
@@ -491,15 +542,15 @@
             </svg>
         </div>
         <!-- Title -->
-        <h3 class="text-2xl font-bold text-gray-900 mb-1">অভিনন্দন! আপনার অর্ডার সফল হয়েছে</h3>
-        <p id="order-success-modal-code" class="text-sm font-bold text-[#1f8a54] mb-3 {{ session('order_code') ? '' : 'hidden' }}">অর্ডার আইডি: <span>{{ session('order_code') }}</span></p>
+        <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $trans['order_success_title'] }}</h3>
+        <p id="order-success-modal-code" class="text-sm font-bold text-[#1f8a54] mb-3 {{ session('order_code') ? '' : 'hidden' }}">{{ $trans['order_id'] }} <span>{{ session('order_code') }}</span></p>
         <!-- Success message -->
         <div id="order-success-modal-message" class="bg-green-50 text-green-800 text-sm md:text-base font-medium rounded-xl p-3.5 mb-6 border border-green-200/60 leading-relaxed">
-            {{ session('success') ?? 'কিছুক্ষণের মধ্যে আমাদের প্রতিনিধি আপনার সাথে ফোনে যোগাযোগ করে অর্ডারটি কনফার্ম করবে।' }}
+            {{ session('success') ?? $trans['order_success_msg'] }}
         </div>
         <!-- Action Button -->
         <button type="button" onclick="closeOrderSuccessModal()" class="w-full py-3.5 px-6 bg-[#1f8a54] hover:bg-[#176840] text-white font-bold text-lg rounded-xl transition-all shadow-lg hover:shadow-xl cursor-pointer active:scale-98">
-            ঠিক আছে
+            {{ $trans['ok'] }}
         </button>
     </div>
 </div>
@@ -534,7 +585,7 @@
             <span id="floating-cart-count" class="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-black rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center border border-white">0</span>
         </div>
         <div class="text-left pr-1">
-            <p class="text-[10px] uppercase font-bold text-gray-300 tracking-wider leading-none">কার্ট দেখুন</p>
+            <p class="text-[10px] uppercase font-bold text-gray-300 tracking-wider leading-none">{{ $trans['view_cart'] }}</p>
             <p class="text-sm font-extrabold text-[#7dfa6b] leading-tight mt-0.5">
                 <span id="floating-cart-total">0.00</span>{{ $setup->currency }}
             </p>
@@ -555,6 +606,7 @@
     const manageStockEnabled = {{ $mainProduct->manage_stock ? 'true' : 'false' }};
     let currentVariationOutOfStock = {{ $isEntirelyOutOfStock ? 'true' : 'false' }};
     let currentMaxStock = {{ ($isSingleProduct && $mainProduct->manage_stock && $mainProduct->available_stock !== null) ? $mainProduct->available_stock : 999999 }};
+    const FORM_TRANS = @json($trans);
 
     const isMultiProductMode = {{ $isMultiProductMode ? 'true' : 'false' }};
     const activeFreeShippingRule = @json($setup->active_free_shipping_rule ?? null);
@@ -618,7 +670,7 @@
         if (!items || items.length === 0) {
             container.innerHTML = `
                 <div class="py-3 text-center text-xs text-gray-500 font-medium bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                    কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি
+                    ${FORM_TRANS.no_variant_selected || 'কোনো ভ্যারিয়েন্ট সিলেক্ট করা হয়নি'}
                 </div>`;
             return;
         }
@@ -656,7 +708,7 @@
                             </div>
                             <button type="button" onclick="removeVariationItem('${item.id}', ${item.isProduct ? 'true' : 'false'})"
                                 class="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                                title="রিমুভ করুন">
+                                title="${FORM_TRANS.remove || 'রিমুভ করুন'}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
@@ -686,7 +738,8 @@
 
         if (newQty < 1) return;
         if (manageStockEnabled && maxStock !== null && newQty > maxStock) {
-            alert('দুঃখিত! এই পণ্যের সর্বোচ্চ ' + maxStock + ' টি স্টকে রয়েছে।');
+            const stockMsg = (FORM_TRANS.stock_limit_alert || 'দুঃখিত! এই পণ্যের সর্বোচ্চ :count টি স্টকে রয়েছে।').replace(':count', maxStock);
+            alert(stockMsg);
             return;
         }
 
@@ -905,15 +958,15 @@
         if (isOutOfStock) {
             btn.disabled = true;
             btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
-            btn.innerHTML = '<span>স্টক আউট (পণ্যটি শেষ)</span>';
+            btn.innerHTML = `<span>${FORM_TRANS.out_of_stock_btn || 'স্টক আউট (পণ্যটি শেষ)'}</span>`;
         } else if (isEmptySelection) {
             btn.disabled = true;
             btn.className = "w-full bg-gray-400 cursor-not-allowed opacity-75 text-white font-bold py-5 rounded-xl text-2xl flex items-center justify-center gap-2";
-            btn.innerHTML = '<span>পণ্য নির্বাচন করুন</span>';
+            btn.innerHTML = `<span>${FORM_TRANS.select_product_btn || 'পণ্য নির্বাচন করুন'}</span>`;
         } else {
             btn.disabled = false;
             btn.className = "w-full bg-[#1f8a54] hover:bg-[#176840] cursor-pointer text-white font-bold py-5 rounded-xl text-2xl active:translate-y-1 transition-all flex items-center justify-center gap-2";
-            btn.innerHTML = '<span id="btn-text">অর্ডার করুন</span> <span id="btn-total"></span>' + CURRENCY;
+            btn.innerHTML = `<span id="btn-text">${FORM_TRANS.place_order || 'অর্ডার করুন'}</span> <span id="btn-total"></span>` + CURRENCY;
         }
     }
 
@@ -949,7 +1002,8 @@
 
     function changeQty(delta) {
         if (delta > 0 && manageStockEnabled && currentMaxStock !== null && (qty + delta) > currentMaxStock) {
-            alert('দুঃখিত! স্টকে আর পণ্য নেই (সর্বোচ্চ ' + currentMaxStock + ' টি প্রযোজ্য)।');
+            const stockMsg = (FORM_TRANS.stock_out_alert || 'দুঃখিত! স্টকে আর পণ্য নেই (সর্বোচ্চ :count টি প্রযোজ্য)।').replace(':count', currentMaxStock);
+            alert(stockMsg);
             return;
         }
         qty = Math.max(1, qty + delta);
@@ -1087,7 +1141,7 @@
                     if (span) {
                         span.innerText = orderCode;
                     } else {
-                        codeEl.innerText = 'অর্ডার আইডি: ' + orderCode;
+                        codeEl.innerText = (FORM_TRANS.order_id || 'অর্ডার আইডি:') + ' ' + orderCode;
                     }
                     codeEl.classList.remove('hidden');
                 } else {
@@ -1243,19 +1297,19 @@
             }
             if (currentVariationOutOfStock) {
                 e.preventDefault();
-                showOrderErrorModal('দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।');
+                showOrderErrorModal(FORM_TRANS.selected_item_out_of_stock || 'দুঃখিত! নির্বাচিত পণ্যটি বর্তমানে স্টকে নেই।');
                 return false;
             }
             if (isMultiProductMode) {
                 const checkedAny = document.querySelector('.variant-checkbox:checked');
                 if (!checkedAny) {
                     e.preventDefault();
-                    alert('দয়া করে অন্তত একটি পণ্য বা ভ্যারিয়েন্ট যোগ করুন!');
+                    alert(FORM_TRANS.select_at_least_one || 'দয়া করে অন্তত একটি পণ্য বা ভ্যারিয়েন্ট যোগ করুন!');
                     return false;
                 }
             } else if (isVarProduct && !document.getElementById('selected-variation-id').value) {
                 e.preventDefault();
-                alert('দয়া করে পণ্য সিলেক্ট করুন!');
+                alert(FORM_TRANS.select_product_prompt || 'দয়া করে পণ্য সিলেক্ট করুন!');
                 return false;
             }
 
@@ -1269,7 +1323,7 @@
                     <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                    </svg> প্রসেসিং...
+                    </svg> ${FORM_TRANS.processing || 'প্রসেসিং...'}
                 `;
             }
 
@@ -1311,7 +1365,7 @@
                         console.warn("Reset error:", e);
                     }
                 } else {
-                    let msg = data.message || 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।';
+                    let msg = data.message || (FORM_TRANS.order_failed_retry || 'অর্ডার সম্পন্ন করতে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
                     if (data.errors && typeof data.errors === 'object') {
                         const firstKey = Object.keys(data.errors)[0];
                         if (firstKey && data.errors[firstKey] && data.errors[firstKey][0]) {
@@ -1323,7 +1377,7 @@
             })
             .catch((err) => {
                 console.error("Order error:", err);
-                showOrderErrorModal('সার্ভারে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                showOrderErrorModal(FORM_TRANS.server_error_retry || 'সার্ভারে সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।');
             })
             .finally(() => {
                 isSubmittingOrder = false;

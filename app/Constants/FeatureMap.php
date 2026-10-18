@@ -21,6 +21,7 @@ class FeatureMap
         'Employees'                              => 'hrm_module',
         'Ticket System'                          => 'support_module',
         'Support Departments'                    => 'support_module',
+        'Notice Module'                          => 'notice_module',
         'Asset Tracking'                         => 'asset_management',
         'Disposal'                               => 'asset_management',
         'Login History'                          => null, // global
