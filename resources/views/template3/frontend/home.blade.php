@@ -8,6 +8,9 @@
     @endif
 @endsection
 @section('content')
+    <!-- NOTICE TICKER -->
+    @include('components.frontend.notice-marquee', ['notices' => $notices])
+
     <!-- HERO SECTION (Full Width Slider) -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <div class="w-full h-[220px] sm:h-[300px] md:h-[400px] lg:h-[500px]">

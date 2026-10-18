@@ -8,6 +8,9 @@
     @endif
 @endsection
 @section('content')
+    <!-- NOTICE TICKER -->
+    @include('components.frontend.notice-marquee', ['notices' => $notices])
+
     <!-- HERO SECTION -->
     <section class="py-4 md:py-6 container mx-auto px-4 lg:px-0">
         <!-- Main 3-Column Layout -->

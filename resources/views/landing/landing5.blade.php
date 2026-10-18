@@ -774,12 +774,11 @@
         @endif
 
         {{-- ══ SECTION 6: CUSTOMER REVIEWS (আমাদের সন্তুষ্ট ক্রেতাদের মতামত) ══ --}}
-        <section class="w-full bg-[#00703c] py-12 md:py-20 px-4 text-white relative">
+        <section class="w-full bg-[#00703c] py-12 md:py-20 px-4 text-white relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+            @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 0; z-index: 50;">Review</span>@endif
             <div class="max-w-6xl mx-auto space-y-8">
                 <div class="text-center">
-                    <h3
-                        class="text-2xl sm:text-3xl md:text-4xl font-black text-white {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top:-12px;">Review</span>@endif
+                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-white">
                         আমাদের সন্তুষ্ট ক্রেতাদের মতামত
                     </h3>
                 </div>
@@ -890,22 +889,34 @@
             <section class="w-full py-10 md:py-14 px-4 bg-white text-center border-b border-gray-100">
                 <div class="max-w-3xl mx-auto space-y-3 sm:space-y-4">
 
-                    {{-- Green Top Subtitle --}}
-                    <p class="text-sm sm:text-base md:text-lg font-bold text-[#00703c] tracking-wide">
-                        অর্ডার করতে কোনো সমস্যা?
-                    </p>
+                    @php
+                        $supportContent = data_get($landing->extras, 'content') ?: ($landing->content ?? null);
+                    @endphp
+                    <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 0; z-index: 50;">Content</span>@endif
+                        @if(!empty($supportContent))
+                            <div class="prose max-w-none text-[#00703c] leading-relaxed [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm">
+                                {!! $supportContent !!}
+                            </div>
+                        @else
+                            {{-- Green Top Subtitle --}}
+                            <p class="text-sm sm:text-base md:text-lg font-bold text-[#00703c] tracking-wide mb-2">
+                                অর্ডার করতে কোনো সমস্যা?
+                            </p>
 
-                    {{-- Main Headline --}}
-                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-[#00703c] leading-snug">
-                        কল করুন বা WhatsApp / Messenger-এ মেসেজ দিন
-                    </h3>
+                            {{-- Main Headline --}}
+                            <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-[#00703c] leading-snug mb-3">
+                                কল করুন বা WhatsApp / Messenger-এ মেসেজ দিন
+                            </h3>
 
-                    {{-- Helper Notice Text with Phone Icon --}}
-                    <p class="text-xs sm:text-sm text-gray-600 font-medium flex items-center justify-center gap-2 pt-1">
-                        <i class="fa-solid fa-phone text-gray-700 text-xs"></i>
-                        <span>সরাসরি কল করুন, অথবা WhatsApp / Messenger-এ যেকোনো সময় মেসেজ করুন – আমরা দ্রুত রেসপন্স
-                            করি।</span>
-                    </p>
+                            {{-- Helper Notice Text with Phone Icon --}}
+                            <p class="text-xs sm:text-sm text-gray-600 font-medium flex items-center justify-center gap-2 pt-1">
+                                <i class="fa-solid fa-phone text-gray-700 text-xs"></i>
+                                <span>সরাসরি কল করুন, অথবা WhatsApp / Messenger-এ যেকোনো সময় মেসেজ করুন – আমরা দ্রুত রেসপন্স
+                                    করি।</span>
+                            </p>
+                        @endif
+                    </div>
 
                     {{-- 3-Action Buttons Grid: WhatsApp, Messenger, Phone --}}
                     <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-3">

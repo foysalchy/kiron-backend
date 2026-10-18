@@ -55,6 +55,9 @@
     }
   }
 </style>
+<!-- NOTICE TICKER -->
+@include('components.frontend.notice-marquee', ['notices' => $notices])
+
 <!-- ============ HERO ============ -->
 <section class="relative bg-hero overflow-hidden">
 

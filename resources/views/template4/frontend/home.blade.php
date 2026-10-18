@@ -142,6 +142,9 @@
 </style>
 @endpush
 @section('content')
+<!-- NOTICE TICKER -->
+@include('components.frontend.notice-marquee', ['notices' => $notices])
+
 <!-- hero section -->
 <section class="container mx-auto mt-6 px-4 ">
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">

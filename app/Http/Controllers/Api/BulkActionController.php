@@ -8,6 +8,7 @@ use App\Helpers\LogHelper;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class BulkActionController extends Controller
 {
@@ -70,6 +71,7 @@ class BulkActionController extends Controller
         'account-expenses'        => \App\Models\TransactionExpense::class,
         'account-incomes'        => \App\Models\TransactionIncome::class,
         'product-groups'        => \App\Models\ProductGroup::class,
+        'notices'        => \App\Models\Notice::class,
     ];
 
     /**
@@ -118,8 +120,12 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
+        $records = $model::whereIn('id', $request->ids)->get(['id', 'slug']);
+
         $updated = $model::whereIn('id', $request->ids)
             ->update(['status' => $request->status]);
+
+        $this->clearModelCaches($model, $companyId, $records);
 
         foreach ($request->ids as $id) {
             LogHelper::statusChanged($resource, $id, $companyId, $actionType);
@@ -145,7 +151,11 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
+        $records = $model::whereIn('id', $request->ids)->get(['id', 'slug']);
+
         $deleted = $model::whereIn('id', $request->ids)->delete();
+
+        $this->clearModelCaches($model, $companyId, $records);
 
         foreach ($request->ids as $id) {
             LogHelper::deleted($resource, $id, $companyId, $actionType);
@@ -186,6 +196,8 @@ class BulkActionController extends Controller
             ->whereIn('id', $request->ids)
             ->forceDelete();
 
+        $this->clearModelCaches($model, $companyId, $records);
+
         foreach ($request->ids as $id) {
             LogHelper::forceDeleted($resource, $id, $companyId, $actionType);
         }
@@ -212,10 +224,16 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
+        $records = $model::onlyTrashed()
+            ->whereIn('id', $request->ids)
+            ->get(['id', 'slug']);
+
         // onlyTrashed() ensures we only touch soft-deleted rows.
         $restored = $model::onlyTrashed()
             ->whereIn('id', $request->ids)
             ->restore();
+
+        $this->clearModelCaches($model, $companyId, $records);
 
         foreach ($request->ids as $id) {
             LogHelper::restored($resource, $id, $companyId, $actionType);
@@ -407,5 +425,47 @@ class BulkActionController extends Controller
         }
 
         FileUploadHelper::delete($path);
+    }
+
+    /**
+     * Clear all associated model caches across all cache traits for bulk operations.
+     */
+    private function clearModelCaches(string $model, ?int $companyId, $records = null): void
+    {
+        // 1. HasHomepageCache (Notice, Slider, Product, Category, etc.)
+        if (method_exists($model, 'clearHomepageCache')) {
+            $model::clearHomepageCache($companyId);
+        }
+
+        // 2. HasCachedOptions (Category, Brand, Attribute, Dropdowns)
+        if (method_exists($model, 'clearOptionsCache')) {
+            $model::clearOptionsCache($companyId);
+        }
+
+        // 3. HasGlobalLayoutCache (Header, Footer, Menu, Site Settings)
+        if (method_exists($model, 'clearGlobalLayoutCache') && method_exists($model, 'globalLayoutSections')) {
+            foreach ($model::globalLayoutSections() as $section) {
+                $model::clearGlobalLayoutCache($companyId, $section);
+            }
+        }
+
+        // 4. HasSaasCache (SaaS keys)
+        if (is_null($companyId) && method_exists($model, 'clearSaasCache') && method_exists($model, 'saasCacheKeys')) {
+            foreach ($model::saasCacheKeys() as $key) {
+                $model::clearSaasCache($key);
+            }
+        }
+
+        // 5. Slug-based caches (Page, Blog, Notice, etc.)
+        if ($records) {
+            foreach ($records as $record) {
+                if (!empty($record->slug)) {
+                    Cache::forget("notice_details_{$companyId}_{$record->slug}");
+                    Cache::forget("page_content_{$companyId}_{$record->slug}");
+                    Cache::forget("blog_single_{$companyId}_{$record->slug}");
+                    Cache::forget("slug_type_{$record->slug}");
+                }
+            }
+        }
     }
 }

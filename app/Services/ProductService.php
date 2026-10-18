@@ -71,12 +71,41 @@ class ProductService
                 });
             }
             if (!empty($filters['mega_category_id'])) {
-
-                $categoryIds = array_map('intval', $filters['mega_category_id']);
+                $categoryIds = array_map('intval', (array) $filters['mega_category_id']);
 
                 $query->where(function ($q) use ($categoryIds) {
                     foreach ($categoryIds as $id) {
                         $q->orWhereJsonContains('mega_category_ids', $id);
+                    }
+                });
+            }
+
+            if (!empty($filters['sub_category_id'])) {
+                $subCategoryIds = array_map('intval', (array) $filters['sub_category_id']);
+
+                $query->where(function ($q) use ($subCategoryIds) {
+                    foreach ($subCategoryIds as $id) {
+                        $q->orWhereJsonContains('sub_category_ids', $id);
+                    }
+                });
+            }
+
+            if (!empty($filters['mini_category_id'])) {
+                $miniCategoryIds = array_map('intval', (array) $filters['mini_category_id']);
+
+                $query->where(function ($q) use ($miniCategoryIds) {
+                    foreach ($miniCategoryIds as $id) {
+                        $q->orWhereJsonContains('mini_category_ids', $id);
+                    }
+                });
+            }
+
+            if (!empty($filters['extra_category_id'])) {
+                $extraCategoryIds = array_map('intval', (array) $filters['extra_category_id']);
+
+                $query->where(function ($q) use ($extraCategoryIds) {
+                    foreach ($extraCategoryIds as $id) {
+                        $q->orWhereJsonContains('extra_category_ids', $id);
                     }
                 });
             }
@@ -134,8 +163,14 @@ class ProductService
             }
 
             if (isset($filters['search'])) {
-                $query->where(function ($q) use ($filters) {
-                    $q->where('title', 'like', "%{$filters['search']}%");
+                $search = $filters['search'];
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('slug', 'like', "%{$search}%")
+                        ->orWhere('sku_code', 'like', "%{$search}%")
+                        ->orWhereHas('variations', function ($varQuery) use ($search) {
+                            $varQuery->where('sku', 'like', "%{$search}%");
+                        });
                 });
             }
 

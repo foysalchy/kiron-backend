@@ -14,6 +14,7 @@ use App\Models\Page;
 use App\Models\Brand;
 use App\Models\LandingPage;
 use App\Models\Blog;
+use App\Models\Notice;
 
 class DynamicRouteController extends Controller
 {
@@ -30,7 +31,8 @@ class DynamicRouteController extends Controller
                 ->unionAll(DB::query()->selectRaw("'extra_category'")->from((new ExtraCategory)->getTable())->where('slug', $slug))
                 ->unionAll(DB::query()->selectRaw("'page'")->from((new Page)->getTable())->where('slug', $slug))
                 ->unionAll(DB::query()->selectRaw("'brand'")->from((new Brand)->getTable())->where('slug', $slug))
-                ->unionAll(DB::query()->selectRaw("'blog'")->from((new Blog)->getTable())->where('slug', $slug));
+                ->unionAll(DB::query()->selectRaw("'blog'")->from((new Blog)->getTable())->where('slug', $slug))
+                ->unionAll(DB::query()->selectRaw("'notice'")->from((new Notice)->getTable())->where('slug', $slug));
 
             return $slugTypeQuery->first()->type ?? 'not_found';
         });
@@ -54,6 +56,9 @@ class DynamicRouteController extends Controller
 
             case 'blog':
                 return app(BlogController::class)->blogDetails($slug);
+
+            case 'notice':
+                return app(HomeController::class)->showNotice($slug);
 
             default:
                 abort(404);

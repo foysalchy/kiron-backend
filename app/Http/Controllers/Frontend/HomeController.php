@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\KnowledgeBase;
 use App\Models\MegaCategory;
 use App\Models\MenuSetting;
+use App\Models\Notice;
 use App\Models\Product;
 use App\Models\ProductGroup;
 use App\Models\ProductReview;
@@ -28,11 +29,11 @@ class HomeController extends FrontendController
 
         // কোন টেমপ্লেটে কোন ডেটা প্রয়োজন তার একটি ম্যাপিং
         $requirements = [
-            'template1' => ['homePageData', 'faqs', 'categories', 'featureCategory', 'newArrivals', 'productGroups', 'brands', 'popularProducts', 'allProducts', 'mainSliders', 'sidebarSliders', 'middleSliders'],
-            'template2' => ['homePageData', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'sidebarSliders'],
-            'template3' => ['categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'middleSliders', 'allReviews'],
-            'template4' => ['homePageData', 'featureCategory', 'latestOffers', 'productGroups', 'popularProducts', 'mainSliders', 'sidebarSliders'],
-            'template5' => ['faqs', 'categories', 'featureCategory', 'latestOffers', 'popularProducts', 'mainSliders'],
+            'template1' => ['notices', 'homePageData', 'faqs', 'categories', 'featureCategory', 'newArrivals', 'productGroups', 'brands', 'popularProducts', 'allProducts', 'mainSliders', 'sidebarSliders', 'middleSliders'],
+            'template2' => ['notices', 'homePageData', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'sidebarSliders'],
+            'template3' => ['notices', 'categories', 'featureCategory', 'productGroups', 'allProducts', 'mainSliders', 'middleSliders', 'allReviews'],
+            'template4' => ['notices', 'homePageData', 'featureCategory', 'latestOffers', 'productGroups', 'popularProducts', 'mainSliders', 'sidebarSliders'],
+            'template5' => ['notices', 'faqs', 'categories', 'featureCategory', 'latestOffers', 'popularProducts', 'mainSliders'],
         ];
 
         // যদি কোনো কারণে টেমপ্লেট ম্যাচ না করে তবে ডিফল্ট হিসেবে template1 ধরতে পারি
@@ -69,6 +70,7 @@ class HomeController extends FrontendController
         }
 
         // ডিফল্ট ভ্যারিয়েবল (যাতে ভিউতে undefined variable error না দেয়)
+        $notices = collect();
         $homePageData = null;
         $faqs = collect();
         $categories = collect();
@@ -85,6 +87,16 @@ class HomeController extends FrontendController
         $middleSliders = collect();
         $allReviews = collect();
 
+        // ০. নোটিশ (Flash News / Ticker)
+        if (in_array('notices', $reqs)) {
+            $notices = Cache::remember("home_notices_{$companyId}", $ttl, function () use ($companyId) {
+                return Notice::where('company_id', $companyId)
+                    ->where('status', Status::Active->value)
+                    ->select('id', 'title', 'slug')
+                    ->latest()
+                    ->get();
+            });
+        }
 
         // ১. হোমপেজ মেটা/সেটিংস ডেটা
         if (in_array('homePageData', $reqs)) {
@@ -308,8 +320,23 @@ class HomeController extends FrontendController
             'allReviews',
             'faqs',
             'latestOffers',
-            'homePageData'
+            'homePageData',
+            'notices'
         ));
+    }
+    public function showNotice($slug)
+    {
+        $companyId = $this->company_id;
+        $ttl = now()->addHours(6);
+
+        $notice = Cache::remember("notice_details_{$companyId}_{$slug}", $ttl, function () use ($slug, $companyId) {
+            return Notice::where('slug', $slug)
+                ->where('company_id', $companyId)
+                ->where('status', Status::Active->value)
+                ->firstOrFail();
+        });
+
+        return $this->view('frontend.noticeDetails', compact('notice'));
     }
     public function allCategories()
     {
