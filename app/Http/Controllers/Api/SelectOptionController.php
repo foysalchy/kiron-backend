@@ -495,14 +495,14 @@ class SelectOptionController extends Controller
     public function productsubCategoryOptions()
     {
         return response()->json(
-            SubCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+            SubCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug', 'mega_category_id'])
         );
     }
 
     public function productminiCategoryOptions()
     {
         return response()->json(
-            MiniCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug'])
+            MiniCategory::getActiveCachedOptions(auth()->user()->company_id, ['id', 'name', 'slug', 'sub_category_id'])
         );
     }
 
