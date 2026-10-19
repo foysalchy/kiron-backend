@@ -520,6 +520,11 @@ class LandingPageService
                 }
             }
         }
+
+        // 5. Delete meta_image
+        if (!empty($landingPage->meta_image) && is_string($landingPage->meta_image)) {
+            FileUploadHelper::delete($landingPage->meta_image);
+        }
     }
 
     /**
