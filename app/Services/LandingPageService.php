@@ -136,6 +136,17 @@ class LandingPageService
                 );
             }
 
+            if (isset($data['meta_image']) && !is_string($data['meta_image'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? 'landing-page') . '_meta_' . time();
+                $data['meta_image'] = FileUploadHelper::uploadImage(
+                    $data['meta_image'],
+                    'landing-pages/meta-images',
+                    'r2',
+                    2048,
+                    $customFileName
+                );
+            }
+
 
             $request = request();
             if ($request->hasFile('img_paths')) {
@@ -275,6 +286,22 @@ class LandingPageService
                     $data['video'],
                     $landingPage->video,
                     'landing-pages/videos',
+                    'r2',
+                    $customFileName
+                );
+            }
+
+            if (!empty($data['remove_meta_image'])) {
+                if ($landingPage->meta_image) {
+                    FileUploadHelper::delete($landingPage->meta_image);
+                }
+                $data['meta_image'] = null;
+            } elseif (isset($data['meta_image']) && !is_string($data['meta_image'])) {
+                $customFileName = Str::slug($data['title'] ?? $data['name'] ?? $landingPage->title ?? 'landing-page') . '_meta_' . time();
+                $data['meta_image'] = FileUploadHelper::replace(
+                    $data['meta_image'],
+                    $landingPage->meta_image,
+                    'landing-pages/meta-images',
                     'r2',
                     $customFileName
                 );
@@ -492,6 +519,11 @@ class LandingPageService
                     }
                 }
             }
+        }
+
+        // 5. Delete meta_image
+        if (!empty($landingPage->meta_image) && is_string($landingPage->meta_image)) {
+            FileUploadHelper::delete($landingPage->meta_image);
         }
     }
 
