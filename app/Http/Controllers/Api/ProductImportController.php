@@ -259,15 +259,37 @@ class ProductImportController extends Controller
                     $matchedCount = 0;
 
                     foreach ($catSlugsOrNames as $singleCat) {
-                        // 1. Check in MegaCategory
-                        $megaCat = MegaCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
-                        if ($megaCat) {
-                            $resolvedMega[] = (int)$megaCat->id;
+                        // 1. Check in ExtraCategory first (and auto-link mini, sub, mega)
+                        $extraCat = ExtraCategory::with(['miniCategory.subCategory'])->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($extraCat) {
+                            $resolvedExtra[] = (int)$extraCat->id;
+                            $miniId = $extraCat->mini_category_id;
+                            $subId = $extraCat->sub_category_id ?: ($extraCat->miniCategory ? $extraCat->miniCategory->sub_category_id : null);
+                            $megaId = $extraCat->mega_category_id ?: ($extraCat->miniCategory && $extraCat->miniCategory->subCategory ? $extraCat->miniCategory->subCategory->mega_category_id : null);
+
+                            if ($miniId) $resolvedMini[] = (int)$miniId;
+                            if ($subId) $resolvedSub[] = (int)$subId;
+                            if ($megaId) $resolvedMega[] = (int)$megaId;
+
                             $matchedCount++;
                             continue;
                         }
 
-                        // 2. Check in SubCategory (and auto-link parent mega_category_id)
+                        // 2. Check in MiniCategory (and auto-link sub, mega)
+                        $miniCat = MiniCategory::with('subCategory')->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($miniCat) {
+                            $resolvedMini[] = (int)$miniCat->id;
+                            $subId = $miniCat->sub_category_id;
+                            $megaId = $miniCat->mega_category_id ?: ($miniCat->subCategory ? $miniCat->subCategory->mega_category_id : null);
+
+                            if ($subId) $resolvedSub[] = (int)$subId;
+                            if ($megaId) $resolvedMega[] = (int)$megaId;
+
+                            $matchedCount++;
+                            continue;
+                        }
+
+                        // 3. Check in SubCategory (and auto-link mega)
                         $subCat = SubCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
                         if ($subCat) {
                             $resolvedSub[] = (int)$subCat->id;
@@ -278,33 +300,10 @@ class ProductImportController extends Controller
                             continue;
                         }
 
-                        // 3. Check in MiniCategory (and auto-link parent sub_category_id & mega_category_id)
-                        $miniCat = MiniCategory::with('subCategory')->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
-                        if ($miniCat) {
-                            $resolvedMini[] = (int)$miniCat->id;
-                            if ($miniCat->sub_category_id) {
-                                $resolvedSub[] = (int)$miniCat->sub_category_id;
-                            }
-                            if ($miniCat->subCategory && $miniCat->subCategory->mega_category_id) {
-                                $resolvedMega[] = (int)$miniCat->subCategory->mega_category_id;
-                            }
-                            $matchedCount++;
-                            continue;
-                        }
-
-                        // 4. Check in ExtraCategory (and auto-link parent hierarchy)
-                        $extraCat = ExtraCategory::with(['miniCategory.subCategory'])->where('slug', $singleCat)->orWhere('name', $singleCat)->first();
-                        if ($extraCat) {
-                            $resolvedExtra[] = (int)$extraCat->id;
-                            if ($extraCat->mini_category_id) {
-                                $resolvedMini[] = (int)$extraCat->mini_category_id;
-                            }
-                            if ($extraCat->miniCategory && $extraCat->miniCategory->sub_category_id) {
-                                $resolvedSub[] = (int)$extraCat->miniCategory->sub_category_id;
-                            }
-                            if ($extraCat->miniCategory && $extraCat->miniCategory->subCategory && $extraCat->miniCategory->subCategory->mega_category_id) {
-                                $resolvedMega[] = (int)$extraCat->miniCategory->subCategory->mega_category_id;
-                            }
+                        // 4. Check in MegaCategory
+                        $megaCat = MegaCategory::where('slug', $singleCat)->orWhere('name', $singleCat)->first();
+                        if ($megaCat) {
+                            $resolvedMega[] = (int)$megaCat->id;
                             $matchedCount++;
                             continue;
                         }
