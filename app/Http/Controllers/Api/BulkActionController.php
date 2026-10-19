@@ -120,7 +120,7 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
-        $records = $model::whereIn('id', $request->ids)->get(['id', 'slug']);
+        $records = $model::whereIn('id', $request->ids)->get();
 
         $updated = $model::whereIn('id', $request->ids)
             ->update(['status' => $request->status]);
@@ -151,7 +151,7 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
-        $records = $model::whereIn('id', $request->ids)->get(['id', 'slug']);
+        $records = $model::whereIn('id', $request->ids)->get();
 
         $deleted = $model::whereIn('id', $request->ids)->delete();
 
@@ -226,7 +226,7 @@ class BulkActionController extends Controller
 
         $records = $model::onlyTrashed()
             ->whereIn('id', $request->ids)
-            ->get(['id', 'slug']);
+            ->get();
 
         // onlyTrashed() ensures we only touch soft-deleted rows.
         $restored = $model::onlyTrashed()
