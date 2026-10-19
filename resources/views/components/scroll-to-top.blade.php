@@ -96,3 +96,43 @@
         updateProgress();
     })();
 </script>
+
+@if(!empty($activePreviewTheme))
+<script>
+    (function() {
+        const previewTheme = @json($activePreviewTheme);
+        if (!previewTheme) return;
+
+        function appendPreviewTheme(urlStr) {
+            try {
+                const url = new URL(urlStr, window.location.origin);
+                if (url.origin === window.location.origin && !url.searchParams.has('preview_theme')) {
+                    url.searchParams.set('preview_theme', previewTheme);
+                    return url.toString();
+                }
+            } catch (e) {}
+            return urlStr;
+        }
+
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (!link || !link.href) return;
+
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('tel:') || href.startsWith('mailto:')) {
+                return;
+            }
+
+            try {
+                const targetUrl = new URL(link.href, window.location.origin);
+                if (targetUrl.origin === window.location.origin) {
+                    if (!targetUrl.searchParams.has('preview_theme')) {
+                        targetUrl.searchParams.set('preview_theme', previewTheme);
+                        link.href = targetUrl.toString();
+                    }
+                }
+            } catch (err) {}
+        }, true);
+    })();
+</script>
+@endif

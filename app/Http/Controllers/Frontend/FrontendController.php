@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Frontend;
-
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -15,8 +13,10 @@ class FrontendController extends Controller
     {
         $this->company  = getCurrentCompany();
         
-        if (request()->has('preview_theme')) {
-            $this->template = 'template' . request('preview_theme');
+        $previewTheme = request('preview_theme');
+
+        if ($previewTheme) {
+            $this->template = 'template' . $previewTheme;
         } else {
             $this->template = $this->company ? $this->company->template_name : 'template1';
         }
@@ -27,12 +27,10 @@ class FrontendController extends Controller
     protected function view(string $view, array $data = [])
     {
         $company = getCurrentCompany();
-        
-        if (request()->has('preview_theme')) {
-            $templateName = 'template' . request('preview_theme');
-        } else {
-            $templateName = $company->template_name ?? '';
-        }
+        $templateName = $this->template ?: ($company->template_name ?? 'template1');
+
+        $previewTheme = request('preview_theme');
+        \Illuminate\Support\Facades\View::share('activePreviewTheme', $previewTheme);
 
         return view($templateName . '.' . $view, $data);
     }
