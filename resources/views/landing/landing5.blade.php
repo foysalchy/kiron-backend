@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $landing->title ?? ($product->title ?? 'Landing Page') }}</title>
+    @include('components.meta-info.ecommerce-meta.landing-meta', ['landing' => $landing, 'setup' => $setup])
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @include('components.fontawesome')
     @vite(['resources/css/app.css', 'resources/js/app.js'])

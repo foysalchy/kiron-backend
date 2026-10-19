@@ -60,6 +60,10 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'existing_img_paths' => ['nullable', 'array'],
                 'existing_img_paths.*' => ['nullable', 'string'],
                 'status' => ['nullable'],
+                'meta_title' => ['nullable', 'string'],
+                'meta_description' => ['nullable', 'string'],
+                'meta_keywords' => ['nullable'],
+                'meta_image' => ['nullable', 'string'],
             ]
         );
     }
