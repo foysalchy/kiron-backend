@@ -7,6 +7,7 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\LogHelper;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -183,29 +184,77 @@ class BulkActionController extends Controller
         $actionType = class_basename($model);
         $companyId = $this->currentCompanyId();
 
-        // Retrieve models to delete their uploaded files from R2 before permanent deletion
         $records = $model::withTrashed()
             ->whereIn('id', $request->ids)
             ->get();
 
-        $this->deleteResourceFiles($resource, $records);
-
-        // withTrashed() so we can target already soft-deleted rows;
-        // forceDelete() bypasses the soft-delete and removes permanently.
-        $deleted = $model::withTrashed()
-            ->whereIn('id', $request->ids)
-            ->forceDelete();
-
-        $this->clearModelCaches($model, $companyId, $records);
-
-        foreach ($request->ids as $id) {
-            LogHelper::forceDeleted($resource, $id, $companyId, $actionType);
+        if ($records->isEmpty()) {
+            return response()->json([
+                'message' => 'No records found to delete.',
+                'deleted' => 0,
+                'skipped' => 0,
+            ]);
         }
 
-        return response()->json([
-            'message' => 'Permanently deleted successfully.',
-            'deleted' => $deleted,
-        ]);
+        // ── 1. Happy Path: Try fast single batch delete first ──
+        try {
+            $deleted = $model::withTrashed()
+                ->whereIn('id', $request->ids)
+                ->forceDelete();
+
+            $this->deleteResourceFiles($resource, $records);
+            $this->clearModelCaches($model, $companyId, $records);
+
+            foreach ($request->ids as $id) {
+                LogHelper::forceDeleted($resource, $id, $companyId, $actionType);
+            }
+
+            return response()->json([
+                'message' => 'Permanently deleted successfully.',
+                'deleted' => $deleted,
+                'skipped' => 0,
+            ]);
+        } catch (QueryException $e) {
+            // Check if it's a Foreign Key Constraint error (1451 / 23000)
+            if ($e->getCode() != 23000 && !str_contains($e->getMessage(), '1451')) {
+                throw $e;
+            }
+
+            // ── 2. Fallback Path: Identify which records can be safely deleted ──
+            $deletedRecords = collect();
+            $skippedCount = 0;
+
+            foreach ($records as $record) {
+                try {
+                    // Test single delete in savepoint
+                    $record->forceDelete();
+                    $deletedRecords->push($record);
+                } catch (QueryException $subException) {
+                    $skippedCount++;
+                }
+            }
+
+            $deletedCount = $deletedRecords->count();
+
+            if ($deletedCount > 0) {
+                $this->deleteResourceFiles($resource, $deletedRecords);
+                $this->clearModelCaches($model, $companyId, $deletedRecords);
+
+                foreach ($deletedRecords as $delRecord) {
+                    LogHelper::forceDeleted($resource, $delRecord->id, $companyId, $actionType);
+                }
+            }
+
+            $msg = $deletedCount > 0
+                ? "{$deletedCount} record(s) permanently deleted. {$skippedCount} record(s) skipped because they are in use."
+                : "Cannot delete selected record(s) because they are in use in orders or transactions.";
+
+            return response()->json([
+                'message' => $msg,
+                'deleted' => $deletedCount,
+                'skipped' => $skippedCount,
+            ]);
+        }
     }
 
     /**
@@ -300,6 +349,11 @@ class BulkActionController extends Controller
                                 }
                             }
                         }
+                    }
+
+                    // 5. Meta image
+                    if (!empty($landingPage->meta_image) && is_string($landingPage->meta_image)) {
+                        $this->deleteFile($landingPage->meta_image);
                     }
                 }
                 break;
