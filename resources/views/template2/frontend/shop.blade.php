@@ -267,13 +267,13 @@
 
 
                     </div>
-                    <div class="mt-12 flex flex-col items-center">
-                        {{-- pagination --}}
-                        {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
-
-                        {{-- <p class="text-xs text-gray-400 font-semibold uppercase tracking-widest mt-2">
-                            Showing {{ $products->firstItem() }}-{{ $products->lastItem() }} of {{ $products->total() }} Products
-                        </p> --}}
+                    <div class="px-3 md:px-4 py-4 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="shrink-0">
+                            {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-500 font-medium">
+                            Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} ({{ $products->lastPage() }} Pages)
+                        </p>
                     </div>
                 </div>
 

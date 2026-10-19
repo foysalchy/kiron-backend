@@ -104,7 +104,7 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
-        
+
         $requirements = [
             'template1' => ['brands', 'attributeGroups'],
             'template2' => ['brands', 'attributeGroups'],
@@ -288,7 +288,7 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
-        
+
         $requirements = [
             'template1' => ['brands', 'attributeGroups'],
             'template2' => ['brands', 'attributeGroups'],
@@ -627,7 +627,7 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
-        
+
         $requirements = [
             'template1' => ['brands', 'attributeGroups'],
             'template2' => ['brands', 'attributeGroups'],
@@ -707,7 +707,7 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
-        
+
         $requirements = [
             'template1' => ['brands', 'attributeGroups'],
             'template2' => ['brands', 'attributeGroups'],
@@ -839,7 +839,7 @@ class ProductController extends FrontendController
         $products->setCollection(Product::loadCategoriesForCollection($products->getCollection()));
 
         $template = $this->template ?? 'template1';
-        
+
         $requirements = [
             'template1' => ['brands', 'attributeGroups'],
             'template2' => ['brands', 'attributeGroups'],

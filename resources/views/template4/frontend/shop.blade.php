@@ -412,8 +412,13 @@
                         @endforelse
                     </div>
                 </div>
-                <div class="flex justify-center sm:justify-end mt-8 md:mt-12 mb-4 md:mb-6">
-                    {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
+                <div class="px-3 md:px-4 py-4 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="shrink-0">
+                        {{ $products->appends(request()->query())->links('components.template1.custom-pagiantion') }}
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-500 font-medium">
+                        Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} ({{ $products->lastPage() }} Pages)
+                    </p>
                 </div>
                 @if (isset($category->description) && $category->description)
                     <section class="mt-12  border-t border-gray-100">
