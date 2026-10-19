@@ -63,7 +63,8 @@ class UpdateLandingPageRequest extends BaseCompanyRequest
                 'meta_title' => ['nullable', 'string'],
                 'meta_description' => ['nullable', 'string'],
                 'meta_keywords' => ['nullable'],
-                'meta_image' => ['nullable', 'string'],
+                'meta_image' => ['nullable'],
+                'remove_meta_image' => ['nullable'],
             ]
         );
     }
