@@ -39,10 +39,15 @@ class LandingPage extends Model
         'instruction_title',
         'img_paths',
         'status',
+        'meta_title',
+        'meta_description',
+        'meta_keywords',
+        'meta_image',
     ];
     protected $casts = [
         'extras' => 'array',
         'img_paths' => 'array',
+        'meta_keywords' => 'array',
     ];
     protected $hidden = ['deleted_at', 'meta_access_token'];
 
@@ -102,10 +107,21 @@ class LandingPage extends Model
         if (!is_string($this->thumbnail) || empty($this->thumbnail)) {
             return null;
         }
-        if (str_starts_with($this->thumbnail, 'data:') || str_starts_with($this->thumbnail, 'blob:')) {
+        if (str_starts_with($this->thumbnail, 'data:') || str_starts_with($this->thumbnail, 'blob:') || str_starts_with($this->thumbnail, 'http')) {
             return $this->thumbnail;
         }
         return Storage::disk('r2')->url($this->thumbnail);
+    }
+
+    public function getMetaImageUrlAttribute(): ?string
+    {
+        if (!is_string($this->meta_image) || empty($this->meta_image)) {
+            return null;
+        }
+        if (str_starts_with($this->meta_image, 'data:') || str_starts_with($this->meta_image, 'blob:') || str_starts_with($this->meta_image, 'http')) {
+            return $this->meta_image;
+        }
+        return Storage::disk('r2')->url($this->meta_image);
     }
 
     public function getVideoUrlAttribute(): ?string

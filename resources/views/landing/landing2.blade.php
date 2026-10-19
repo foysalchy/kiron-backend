@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $landing->title }}</title>
-    <meta name="description"
-        content="{{ \Illuminate\Support\Str::limit(strip_tags($landing->short_description ?: $landing->description ?: $landing->title), 160) }}">
+    @include('components.meta-info.ecommerce-meta.landing-meta', ['landing' => $landing, 'setup' => $setup])
     <link rel="icon" type="image/x-icon" href="{{ $setup->favicon_url }}">
     @vite(['resources/css/app.css', 'resources/css/landing2.css'])
 
