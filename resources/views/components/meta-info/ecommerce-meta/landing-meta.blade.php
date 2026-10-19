@@ -37,7 +37,7 @@
         ?: ($landing->thumbnail_url 
             ?: ($landing->product->thumbnail_url ?? ($setup->meta_image_url ?? $setup->logo_url)));
 
-    $canonicalUrl = url($landing->slug);
+    $canonicalUrl = $landing->slug ? url($landing->slug) : url()->current();
 
     $breadcrumbItems = [
         [
