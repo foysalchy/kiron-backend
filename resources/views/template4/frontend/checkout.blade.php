@@ -144,7 +144,7 @@
                                 <span>{{ $setup->free_shipping_text }}</span>
                             </div>
                         @elseif(!empty($setup->active_free_shipping_rule))
-                            <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                            <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                 <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                 <span>{{ $setup->free_shipping_text }}</span>
                             </div>
@@ -403,7 +403,7 @@
                         document.getElementById('remove-coupon-btn').classList.remove('hidden');
 
                         toastr.success(data.message);
-                        
+
                         btn.innerHTML = originalText;
                         btn.disabled = false;
                     } else {

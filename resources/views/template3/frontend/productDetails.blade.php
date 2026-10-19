@@ -15,7 +15,7 @@
 
         <nav aria-label="Breadcrumb"
             class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
-            
+
             <a href="{{ route('home') }}"
                 class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
                 <i class="fas fa-home text-xs"></i> Home
@@ -118,7 +118,7 @@
                                 {{ number_format($product->display_price_data->sale_price) }} {{ $setup->currency }}
                             @endif
                         </span>
-                        
+
                         @if ($product->is_free_delivery == 1)
                             <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
                                 Free Shipping
@@ -153,7 +153,7 @@
 
                     {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                     @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                        <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-sm font-medium">
+                        <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
                             <i class="fa-solid fa-gift text-amber-600"></i>
                             <span>{{ $setup->free_shipping_text }}</span>
                         </div>

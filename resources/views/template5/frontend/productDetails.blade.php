@@ -177,7 +177,7 @@
 
                 {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                 @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                    <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-amber-800 text-xs md:text-sm font-medium">
+                    <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
                         <i class="fa-solid fa-gift text-amber-600"></i>
                         <span>{{ $setup->free_shipping_text }}</span>
                     </div>

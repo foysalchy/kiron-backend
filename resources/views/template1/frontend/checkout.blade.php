@@ -122,7 +122,7 @@
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
                             @elseif(!empty($setup->active_free_shipping_rule))
-                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                     <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
@@ -216,7 +216,7 @@
                                     class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center {{ session()->has('coupon') ? '' : 'hidden' }}">
                                     <i class="fas fa-times text-white"></i>
                                 </button>
-                                
+
                                 <button type="button" id="apply-coupon-btn" onclick="applyCoupon(this)"
                                     class="bg-white border border-gray-200 rounded-lg px-4 py-2.5 hover:bg-gray-50 transition-all font-bold {{ session()->has('coupon') ? 'hidden' : '' }}">
                                     Apply Now
@@ -390,13 +390,13 @@
                         document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
                         document.getElementById('discount-code-display').innerText = '(' + data.coupon_code + ')';
                         document.getElementById('discount-row').classList.remove('hidden');
-                        
+
                         codeInput.setAttribute('readonly', 'readonly');
                         document.getElementById('apply-coupon-btn').classList.add('hidden');
                         document.getElementById('remove-coupon-btn').classList.remove('hidden');
-                        
+
                         toastr.success(data.message);
-                        
+
                         btn.innerText = originalText;
                         btn.disabled = false;
                     } else {
@@ -424,14 +424,14 @@
                 if (data.success) {
                     document.getElementById('total-display').innerText = data.grand_total.toLocaleString();
                     document.getElementById('discount-row').classList.add('hidden');
-                    
+
                     const codeInput = document.getElementById('coupon-code-input');
                     codeInput.removeAttribute('readonly');
                     codeInput.value = '';
-                    
+
                     document.getElementById('apply-coupon-btn').classList.remove('hidden');
                     document.getElementById('remove-coupon-btn').classList.add('hidden');
-                    
+
                     toastr.success(data.message);
                 }
             });

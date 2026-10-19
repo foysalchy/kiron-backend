@@ -395,12 +395,12 @@
                     @endphp
                     @if(!empty($setup->free_shipping_text))
                         @if($isFree)
-                            <div id="landing-free-shipping-banner" class="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm font-semibold shadow-xs">
+                            <div id="landing-free-shipping-banner" class="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-xs sm:text-lg font-semibold shadow-xs">
                                 <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                 <span id="landing-free-shipping-text">{{ $freeDeliverySuccessText }}</span>
                             </div>
                         @else
-                            <div id="landing-free-shipping-banner" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-sm font-medium">
+                            <div id="landing-free-shipping-banner" class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                 <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                 <span id="landing-free-shipping-text">{{ $setup->free_shipping_text }}</span>
                             </div>
@@ -577,7 +577,7 @@
 
 @if($isMultiProductMode)
     {{-- Floating Cart Pill / Button for Multi-Product Mode --}}
-    <div id="landing-floating-cart" 
+    <div id="landing-floating-cart"
         onclick="const el = document.getElementById('order'); if (el) el.scrollIntoView({ behavior: 'smooth' });"
         class="fixed bottom-6 right-5 z-[999] hidden items-center gap-3 bg-[#0D2601] hover:bg-[#1a4a03] text-white px-4 py-3 rounded-full shadow-2xl border-2 border-white/20 cursor-pointer transition-all duration-300 transform hover:scale-105 active:scale-95 group">
         <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-[#35B11E] text-white">
