@@ -256,100 +256,119 @@
             </div>
         </div>
 
+        @php
+            $hasDescription = !empty(trim(strip_tags($product->full_description ?? '')));
+
+            $grouped = [];
+            if ($product->type === 'variation') {
+                foreach ($product->variations as $variation) {
+                    foreach ($variation->attributes as $attr) {
+                        $name = $attr->attributeGroup->name ?? '';
+                        $val = $attr->attributeValue->name ?? '';
+                        if (!isset($grouped[$name])) {
+                            $grouped[$name] = [];
+                        }
+                        if (!in_array($val, $grouped[$name])) {
+                            $grouped[$name][] = $val;
+                        }
+                    }
+                }
+            }
+
+            $hasSku = !empty($skus);
+            $hasSpecs = !empty($product->brand) || $hasSku || (!empty($grouped) && count($grouped) > 0) || !empty($product->mega_categories->first());
+            $hasReviews = true; // Reviews tab always exists (shows reviews or "No reviews yet" + review form)
+            $hasAnyTab = $hasDescription || $hasSpecs || $hasReviews;
+            $hasRelated = isset($relatedProducts) && $relatedProducts->count() > 0;
+
+            // Pick first visible tab
+            $firstTab = $hasDescription ? 'description' : ($hasSpecs ? 'specification' : 'review');
+        @endphp
+
+        @if($hasAnyTab || $hasRelated)
         <!-- 3. TABS & RELATED PRODUCTS SECTION -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-start">
 
             <!-- Left Column: Tabs Section -->
-            <div class="md:col-span-7 lg:col-span-8 bg-white rounded-lg shadow-xs relative overflow-hidden">
+            <div class="{{ $hasAnyTab ? 'md:col-span-7 lg:col-span-8' : 'hidden' }} bg-white rounded-lg shadow-xs relative overflow-hidden">
                 <!-- Tab Buttons -->
                 <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
                     id="tabs-nav">
-                    <button onclick="switchTab('description')" id="tab-btn-description"
-                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-[#FF6A00] text-gray-900 bg-white font-bold">Description</button>
+                    @if($hasDescription)
+                        <button onclick="switchTab('description')" id="tab-btn-description"
+                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'description' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Description</button>
+                    @endif
 
-                    <button onclick="switchTab('specification')" id="tab-btn-specification"
-                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">Specification</button>
+                    @if($hasSpecs)
+                        <button onclick="switchTab('specification')" id="tab-btn-specification"
+                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'specification' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Specification</button>
+                    @endif
 
-                    <button onclick="switchTab('review')" id="tab-btn-review"
-                        class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 border-transparent text-gray-600 hover:text-gray-900 font-bold">
-                        Reviews ({{ $product->reviews->count() }})
-                    </button>
+                    @if($hasReviews)
+                        <button onclick="switchTab('review')" id="tab-btn-review"
+                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'review' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">
+                            Reviews ({{ $product->reviews->count() }})
+                        </button>
+                    @endif
                 </div>
 
                 <!-- Tab Content Area -->
                 <div class="p-6 md:p-10">
 
-                    <!-- Section: Description  -->
-                    <div id="tab-content-description" class="tab-content block">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
-                        <div class="text-[18px] prose prose-orange max-w-none">
-                            {!! $product->full_description ?? 'No detailed description available for this product.' !!}
+                    @if($hasDescription)
+                        <!-- Section: Description  -->
+                        <div id="tab-content-description" class="tab-content {{ $firstTab === 'description' ? 'block' : 'hidden' }}">
+                            <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
+                            <div class="text-[18px] prose prose-orange max-w-none">
+                                {!! $product->full_description !!}
+                            </div>
                         </div>
-                    </div>
+                    @endif
 
-                    <!-- Section: Specification  -->
-                    <div id="tab-content-specification" class="tab-content hidden">
-                        <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
+                    @if($hasSpecs)
+                        <!-- Section: Specification  -->
+                        <div id="tab-content-specification" class="tab-content {{ $firstTab === 'specification' ? 'block' : 'hidden' }}">
+                            <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
-                            @if(!empty($product->brand))
+                                @if(!empty($product->brand))
+                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                        <span class="font-medium text-gray-500">Brand:</span>
+                                        <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                    </div>
+                                @endif
+
+                                @if($hasSku)
+                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                        <span class="font-medium text-gray-500">SKU:</span>
+                                        <span id="tab-sku" class="font-mono font-bold">{{ implode(', ', $skus) }}</span>
+                                    </div>
+                                @endif
+
                                 <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                    <span class="font-medium text-gray-500">Brand:</span>
-                                    <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                    <span class="font-medium text-gray-500">Availability:</span>
+                                    <span
+                                        class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
+                                        {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
                                 </div>
-                            @endif
 
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-medium text-gray-500">SKU:</span>
-                                <span id="tab-sku" class="font-mono font-bold">
-                                    @if(!empty($skus))
-                                        {{ implode(', ', $skus) }}
-                                    @else
-                                        N/A
-                                    @endif
-                                </span>
+                                @if($product->mega_categories->first())
+                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                        <span class="font-medium text-gray-500">Category:</span>
+                                        <span class="font-bold">{{ $product->mega_categories->first()->name }}</span>
+                                    </div>
+                                @endif
+
+                                @foreach ($grouped as $groupName => $values)
+                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                        <span class="font-medium text-gray-500">{{ $groupName }}:</span>
+                                        <span class="font-bold">{{ implode(', ', $values) }}</span>
+                                    </div>
+                                @endforeach
                             </div>
-
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-medium text-gray-500">Availability:</span>
-                                <span
-                                    class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
-                                    {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
-                                </span>
-                            </div>
-
-                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                <span class="font-medium text-gray-500">Category:</span>
-                                <span class="font-bold">{{ $product->mega_categories->first()->name ?? 'N/A' }}</span>
-                            </div>
-
-                            @php
-                                $grouped = [];
-
-                                if ($product->type === 'variation') {
-                                    foreach ($product->variations as $variation) {
-                                        foreach ($variation->attributes as $attr) {
-                                            $name = $attr->attributeGroup->name ?? '';
-                                            $val = $attr->attributeValue->name ?? '';
-                                            if (!isset($grouped[$name])) {
-                                                $grouped[$name] = [];
-                                            }
-                                            if (!in_array($val, $grouped[$name])) {
-                                                $grouped[$name][] = $val;
-                                            }
-                                        }
-                                    }
-                                }
-                            @endphp
-
-                            @foreach ($grouped as $groupName => $values)
-                                <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                    <span class="font-medium text-gray-500">{{ $groupName }}:</span>
-                                    <span class="font-bold">{{ implode(', ', $values) }}</span>
-                                </div>
-                            @endforeach
                         </div>
-                    </div>
+                    @endif
 
 
                     <!-- Section: Review -->
@@ -529,6 +548,7 @@
                 </div>
             @endif
         </div>
+        @endif
 
     </section>
 @endsection

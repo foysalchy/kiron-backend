@@ -17,7 +17,7 @@
         <!-- Dynamic Breadcrumbs -->
         <nav aria-label="Breadcrumb"
             class="container mx-auto px-4 flex items-center gap-2 mb-4 text-sm font-medium text-gray-600 overflow-x-auto no-scrollbar whitespace-nowrap pt-2 md:pt-4">
-            
+
             <a href="{{ route('home') }}"
                 class="hover:text-[var(--primary-color)] transition-colors flex items-center gap-1">
                 <i class="fas fa-home text-xs"></i> Home
@@ -92,11 +92,12 @@
                         <h1 class="text-xl md:text-2xl lg:text-3xl font-normal text-gray-900 leading-tight">
                             {{ $product->title }}
                         </h1>
-
+                        @if(!empty($product->brand))
                         <p class="text-gray-600 mt-1 text-lg font-medium pt-2 ">
                             Brand Name: <span
                                 class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
                         </p>
+                        @endif
 
                         <div class="flex items-baseline gap-2 md:gap-3 pt-3 md:pt-4">
                             <span id="sale-price" class="text-2xl md:text-3xl font-bold text-[var(--primary-color)]">
@@ -214,109 +215,154 @@
     </section>
 
     <!-- ─── BOTTOM SECTION: ALL DETAILS SECTION (Stacked with Sticky Nav) ─── -->
+    @php
+        $hasDescription = !empty(trim(strip_tags($product->full_description ?? '')));
+        $hasFeatures = !empty(trim(strip_tags($product->short_description ?? '')));
+
+        $grouped = [];
+        if ($product->type === 'variation') {
+            foreach ($product->variations as $variation) {
+                foreach ($variation->attributes as $attr) {
+                    $groupName = $attr->attributeGroup->name ?? null;
+                    $valName = $attr->attributeValue->name ?? null;
+
+                    if ($groupName && $valName) {
+                        if (!isset($grouped[$groupName])) {
+                            $grouped[$groupName] = [];
+                        }
+
+                        if (!in_array($valName, $grouped[$groupName])) {
+                            $grouped[$groupName][] = $valName;
+                        }
+                    }
+                }
+            }
+        }
+
+        $hasSku = !empty($product->sku_code) && (is_array($product->sku_code) ? count(array_filter($product->sku_code)) > 0 : trim($product->sku_code) !== '');
+        $hasSpecs = !empty($product->brand) || $hasSku || (!empty($grouped) && count($grouped) > 0);
+        $hasAnyTab = $hasDescription || $hasFeatures || $hasSpecs;
+        $hasRelated = isset($relatedProducts) && $relatedProducts->isNotEmpty();
+
+        // Identify the first visible tab to set active border
+        $firstTab = $hasDescription ? 'description' : ($hasFeatures ? 'features' : ($hasSpecs ? 'specifications' : null));
+    @endphp
+
+    @if($hasAnyTab || $hasRelated)
     <section id="product-listing-page" class="container mx-auto px-4 py-4">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 items-start">
 
             <!-- LEFT COLUMN: All Sections -->
-            <div class="lg:col-span-3 flex flex-col gap-6 md:gap-8">
+            <div class="{{ $hasAnyTab ? 'lg:col-span-3' : 'hidden' }} flex flex-col gap-6 md:gap-8">
 
-                <!-- Sticky Navigation Bar (৩টি ট্যাব) -->
-                <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
-                    <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
-                        <button onclick="scrollToSection('section-description', this)" role="tab" aria-selected="true"
-                            aria-controls="section-description" {}
-                            class="tab-nav-btn flex-1 bg-white text-[var(--primary-color)] font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-[var(--primary-color)]">
-                            Description
-                        </button>
-                        <button onclick="scrollToSection('section-features', this)" role="tab" aria-selected="false"
-                            aria-controls="section-features"
-                            class="tab-nav-btn flex-1 bg-white text-gray-600 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
-                            Features
-                        </button>
-                        <button onclick="scrollToSection('section-specifications', this)" role="tab" aria-selected="false"
-                            aria-controls="section-specifications"
-                            class="tab-nav-btn flex-1 bg-white text-gray-600 hover:bg-gray-100 font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 border-transparent">
-                            Specifications
-                        </button>
+                @if($hasAnyTab)
+                    <!-- Sticky Navigation Bar (Tabs) -->
+                    <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
+                        <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
+                            @if($hasDescription)
+                                <button onclick="scrollToSection('section-description', this)" role="tab"
+                                    aria-selected="{{ $firstTab === 'description' ? 'true' : 'false' }}"
+                                    aria-controls="section-description"
+                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'description' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                    Description
+                                </button>
+                            @endif
+
+                            @if($hasFeatures)
+                                <button onclick="scrollToSection('section-features', this)" role="tab"
+                                    aria-selected="{{ $firstTab === 'features' ? 'true' : 'false' }}"
+                                    aria-controls="section-features"
+                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'features' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                    Features
+                                </button>
+                            @endif
+
+                            @if($hasSpecs)
+                                <button onclick="scrollToSection('section-specifications', this)" role="tab"
+                                    aria-selected="{{ $firstTab === 'specifications' ? 'true' : 'false' }}"
+                                    aria-controls="section-specifications"
+                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'specifications' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                    Specifications
+                                </button>
+                            @endif
+                        </div>
                     </div>
-                </div>
+                @endif
 
-                <!-- Content Area: All Sections Visible simultaneously -->
+                <!-- Content Area: Visible Sections -->
                 <div class="flex flex-col gap-6 md:gap-8">
 
-                    <!-- 1. Description Content (scroll-mt-32 দিয়ে উপরে জায়গা রাখা হয়েছে) -->
-                    <div id="section-description"
-                        class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2
-                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                            Product Description
-                        </h2>
-                        <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
-                            {!! $product->full_description !!}
-                        </div>
-                    </div>
-
-                    <!-- 2. Features Content (short_description থেকে ডাটা নেওয়া হয়েছে) -->
-                    <div id="section-features"
-                        class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2
-                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                            Product Features
-                        </h2>
-                        <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
-                            {!! $product->short_description !!}
-                        </div>
-                    </div>
-
-                    <!-- 3. Specifications Content -->
-                    <div id="section-specifications"
-                        class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                        <h2
-                            class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                            Product Specifications
-                        </h2>
-                        <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
-                            <div class="flex justify-between py-2 border-b border-gray-100">
-                                <span class="text-gray-600 font-medium">Brand:</span>
-                                <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                    @if($hasDescription)
+                        <!-- 1. Description Content -->
+                        <div id="section-description"
+                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                            <h2
+                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                Product Description
+                            </h2>
+                            <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
+                                {!! $product->full_description !!}
                             </div>
-                            <div class="flex justify-between py-2 border-b border-gray-100">
-                                <span class="text-gray-600 font-medium">SKU:</span>
-                                <span
-                                    class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
+                        </div>
+                    @endif
+
+                    @if($hasFeatures)
+                        <!-- 2. Features Content -->
+                        <div id="section-features"
+                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                            <h2
+                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                Product Features
+                            </h2>
+                            <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
+                                {!! $product->short_description !!}
                             </div>
-                            @php
-                                $grouped = [];
-                                if ($product->type === 'variation') {
-                                    foreach ($product->variations as $variation) {
-                                        foreach ($variation->attributes as $attr) {
-                                            $groupName = $attr->attributeGroup->name ?? null;
-                                            $valName = $attr->attributeValue->name ?? null;
+                        </div>
+                    @endif
 
-                                            if ($groupName && $valName) {
-                                                if (!isset($grouped[$groupName])) {
-                                                    $grouped[$groupName] = [];
-                                                }
+                    @if($hasSpecs)
+                        <!-- 3. Specifications Content -->
+                        <div id="section-specifications"
+                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                            <h2
+                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                Product Specifications
+                            </h2>
+                            <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
+                                @if(!empty($product->brand))
+                                    <div class="flex justify-between py-2 border-b border-gray-100">
+                                        <span class="text-gray-600 font-medium">Brand:</span>
+                                        <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                    </div>
+                                @endif
 
-                                                if (!in_array($valName, $grouped[$groupName])) {
-                                                    $grouped[$groupName][] = $valName;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @foreach ($grouped as $groupName => $values)
+                                @if($hasSku)
+                                    <div class="flex justify-between py-2 border-b border-gray-100">
+                                        <span class="text-gray-600 font-medium">SKU:</span>
+                                        <span class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
+                                    </div>
+                                @endif
+
                                 <div class="flex justify-between py-2 border-b border-gray-100">
-                                    <span class="text-gray-600 font-medium">{{ $groupName }}:</span>
-                                    <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
+                                    <span class="text-gray-600 font-medium">Availability:</span>
+                                    <span class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                                        {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
+                                    </span>
                                 </div>
-                            @endforeach
+
+                                @foreach ($grouped as $groupName => $values)
+                                    <div class="flex justify-between py-2 border-b border-gray-100">
+                                        <span class="text-gray-600 font-medium">{{ $groupName }}:</span>
+                                        <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
 
+            @if($hasRelated)
             <!-- RIGHT COLUMN: Related Products (Sticky Sidebar) -->
             <aside class="lg:col-span-2 flex flex-col gap-6 sticky top-24">
                 <div class="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
@@ -342,8 +388,10 @@
         </div>
                 </div>
             </aside>
+            @endif
         </div>
     </section>
+    @endif
 
     {{-- Hidden input for JS --}}
     <input type="hidden" id="main-qty" value="1">
@@ -446,8 +494,8 @@
             document.getElementById('selected-variation-id').value = finalSelectedVariationIds.join(',');
         }
 
-        
-        
+
+
         function updatePriceDisplay(salePrice, regularPrice) {
             const saleEl = document.getElementById('sale-price');
             const regularEl = document.getElementById('regular-price');
@@ -511,7 +559,7 @@
         function updateSkuDisplay() {
             const skuEl = document.getElementById('product-sku');
             const tabSkuEl = document.getElementById('tab-sku');
-            
+
             if (finalSelectedVariationIds.length === 0) {
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
                 if (allSkus.length > 0) {
@@ -521,13 +569,13 @@
                 }
                 return;
             }
-            
+
             let selectedSkus = [];
             finalSelectedVariationIds.forEach(id => {
                 const v = allVariations.find(v => v.id === id);
                 if (v && v.sku) selectedSkus.push(v.sku);
             });
-            
+
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");
                 if(skuEl) skuEl.innerText = text;
