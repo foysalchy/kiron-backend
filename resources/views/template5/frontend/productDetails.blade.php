@@ -19,17 +19,17 @@
         $secondaryColor = str_replace('##', '#', $themeColor->theme_template['secondary_color'] ?? '#000000');
         $secondaryHex = ltrim($secondaryColor, '#');
         if (preg_match('/^[0-9a-fA-F]{3}$/', $secondaryHex)) {
-            $secondaryHex = implode('', array_map(fn ($digit) => $digit . $digit, str_split($secondaryHex)));
+            $secondaryHex = implode('', array_map(fn($digit) => $digit . $digit, str_split($secondaryHex)));
         }
 
         $orderButtonTextColor = trim($themeColor->theme_template['secondary_text_color'] ?? '#18130F');
         if (preg_match('/^[0-9a-fA-F]{6}$/', $secondaryHex)) {
             $rgb = array_map(
-                fn ($channel) => hexdec($channel) / 255,
+                fn($channel) => hexdec($channel) / 255,
                 str_split($secondaryHex, 2)
             );
             $linearRgb = array_map(
-                fn ($channel) => $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4,
+                fn($channel) => $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4,
                 $rgb
             );
             $luminance = 0.2126 * $linearRgb[0] + 0.7152 * $linearRgb[1] + 0.0722 * $linearRgb[2];
@@ -45,7 +45,8 @@
     <section class="max-w-7xl mx-auto px-6 lg:px-10 py-10 lg:py-20">
 
         <!-- Dynamic Breadcrumb -->
-        <div class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
+        <div
+            class="flex items-center gap-2 mb-4 text-sm font-medium text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap">
             <a href="{{ url('/') }}" class="flex items-center gap-1.5 hover:text-[var(--primary-color)] transition-colors">
                 <i class="fas fa-home text-xs"></i>
                 Home
@@ -53,7 +54,8 @@
 
             @php $mega = $product->mega_categories?->first(); @endphp
             @if ($mega)
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    class="opacity-40 shrink-0">
                     <path d="M9 18l6-6-6-6" />
                 </svg>
                 <a href="{{ url($mega->slug) }}"
@@ -62,13 +64,15 @@
 
             @php $sub = $product->sub_categories?->first(); @endphp
             @if ($sub)
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    class="opacity-40 shrink-0">
                     <path d="M9 18l6-6-6-6" />
                 </svg>
                 <a href="{{ url($sub->slug) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $sub->name }}</a>
             @endif
 
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="opacity-40 shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="opacity-40 shrink-0">
                 <path d="M9 18l6-6-6-6" />
             </svg>
             <span class="text-coal font-medium truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
@@ -78,7 +82,8 @@
             <div class="space-y-4 min-w-0">
                 <div
                     class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
-                    <img id="mainImage" src="{{ $product->display_image_url ?? $product->thumbnail_url }}"
+                    <img id="mainImage"
+                        src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/cover.webp') }}"
                         alt="{{ $product->title }}" class="w-full h-full object-cover">
 
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
@@ -93,7 +98,8 @@
                 <!-- Thumbnail Gallery with Arrows -->
                 <div class="relative group/gallery">
                     <!-- Left Arrow -->
-                    <button type="button" id="thumb-arrow-left" aria-label="Scroll product images left" onclick="scrollThumbnails(-1)"
+                    <button type="button" id="thumb-arrow-left" aria-label="Scroll product images left"
+                        onclick="scrollThumbnails(-1)"
                         class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -left-2 md:-left-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
                         <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.4">
@@ -107,16 +113,16 @@
                             <button type="button" aria-label="View product image {{ $index + 1 }}"
                                 onclick="changeImage('{{ $imgUrl }}')"
                                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
-                                <img src="{{ $imgUrl }}"
-                                    alt="{{ $product->title }} image {{ $index + 1 }}"
-                                    onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
+                                <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
+                                    onerror="this.src='{{ asset('images/template1/frontend/cover.webp') }}'"
                                     class="w-full h-full object-cover pointer-events-none">
                             </button>
                         @endforeach
                     </div>
 
                     <!-- Right Arrow -->
-                    <button type="button" id="thumb-arrow-right" aria-label="Scroll product images right" onclick="scrollThumbnails(1)"
+                    <button type="button" id="thumb-arrow-right" aria-label="Scroll product images right"
+                        onclick="scrollThumbnails(1)"
                         class="{{ count($allProductImages) > 3 ? 'flex' : 'hidden' }} absolute -right-2 md:-right-3 top-1/2 -translate-y-1/2 z-10 w-6 h-6 md:w-8 md:h-8 rounded-full bg-white border border-coal/10 shadow-md items-center justify-center hover:bg-[var(--primary-color)] hover:text-white hover:border-[var(--primary-color)] transition-colors">
                         <svg width="12" height="12" class="md:w-[14px] md:h-[14px]" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.4">
@@ -161,7 +167,9 @@
                             {{ number_format($product->display_price_data->regular_price) }} {{ $setup->currency }}
                         @endif
                     </span>
-                    @if ($product->is_free_delivery == 1) <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">Free Shipping</span> @endif
+                    @if ($product->is_free_delivery == 1) <span
+                        class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">Free
+                    Shipping</span> @endif
                 </p>
 
                 <div class="text-gray-700 leading-relaxed mb-8">
@@ -177,7 +185,8 @@
 
                 {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                 @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                    <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                    <div
+                        class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
                         <i class="fa-solid fa-gift text-amber-600"></i>
                         <span>{{ $setup->free_shipping_text }}</span>
                     </div>
@@ -202,7 +211,7 @@
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             aria-label="{{ $isWishlisted ? 'Remove ' . $product->title . ' from wishlist' : 'Add ' . $product->title . ' to wishlist' }}"
                             class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
-            {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
+                    {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
                             <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
                                 fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
                                 <path
@@ -317,10 +326,10 @@
             container.innerHTML = '';
             images.forEach((img, i) => {
                 container.innerHTML += `
-              <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
-                class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
-                <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
-              </button>`;
+                      <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
+                        class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
+                        <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
+                      </button>`;
             });
 
             // ============ Arrow visibility + container padding dynamically আপডেট ============
@@ -375,7 +384,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                        {{ $product->display_price_data->sale_price ?? 0 }},
+                                {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;

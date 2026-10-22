@@ -5,7 +5,7 @@
 @forelse($cartItems as $item)
     <div class="flex gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0" data-row-id="{{ $item->rowId }}">
         <div class="w-16 h-16 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
-            <img src="{{ $item->options->thumbnail ?? asset('images/no-image.png') }}" alt="{{ $item->name }}" class="w-full h-full object-contain">
+            <img src="{{ $item->options->thumbnail ?? asset('images/cover.webp') }}" alt="{{ $item->name }}" class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
             <h3 class="text-[13px] font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
@@ -15,7 +15,7 @@
                 <span class="text-[13px] font-bold text-[var(--primary-color)]" data-unit-price="{{ $item->price }}">
                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                 </span>
-                  
+
                     <div class="flex items-center border border-gray-200 rounded-full h-7 w-20">
                         <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', -1)"
                             class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">-</button>
@@ -28,11 +28,11 @@
                         data-item-subtotal-raw="{{ $item->subtotal }}">
                         {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                     </span>
-                 
+
                 <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" aria-label="Remove {{ $item->name }} from cart" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
             </div>
 
-          
+
         </div>
     </div>
 @empty
@@ -78,7 +78,7 @@
     function recalculateOverallSubtotal() {
         const subtotalValEl = document.getElementById('mini-cart-subtotal-val');
         const floatingSubtotalEl = document.getElementById('floating-cart-subtotal');
-        
+
         let total = 0;
         document.querySelectorAll('[data-item-subtotal-raw]').forEach(el => {
             total += parseFloat(el.getAttribute('data-item-subtotal-raw')) || 0;
