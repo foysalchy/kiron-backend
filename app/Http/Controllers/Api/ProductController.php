@@ -417,18 +417,40 @@ class ProductController extends Controller
 
     public function checkSku(Request $request): JsonResponse
     {
-        $sku = $request->query('sku');
+        $sku = trim((string) $request->query('sku'));
         $excludeId = $request->query('exclude_id');
+        $excludeType = $request->query('type'); // 'product' or 'variation'
+        $companyId = $request->user()?->company_id;
+
+        if ($sku === '') {
+            return response()->json(['available' => true]);
+        }
 
         // products table-এ check — sku_code column
-        $existsInProducts = Product::where('sku_code', $sku)
-            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
-            ->exists();
+        $productQuery = Product::withoutGlobalScopes()
+            ->where(function ($q) use ($sku) {
+                $q->where('sku_code', $sku)
+                  ->orWhere('sku_code', '"' . $sku . '"')
+                  ->orWhereRaw("REPLACE(sku_code, char(34), '') = ?", [$sku]);
+            });
+
+        if ($companyId) {
+            $productQuery->where('company_id', $companyId);
+        }
+        if ($excludeId && ($excludeType === 'product' || empty($excludeType))) {
+            $productQuery->where('id', '!=', $excludeId);
+        }
+        $existsInProducts = $productQuery->exists();
 
         // product_variations table-এ check — sku column
-        $existsInVariations = ProductVariation::where('sku', $sku)
-            ->when($excludeId, fn($q) => $q->where('id', '!=', $excludeId))
-            ->exists();
+        $variationQuery = ProductVariation::where('sku', $sku);
+        if ($companyId) {
+            $variationQuery->whereHas('product', fn($q) => $q->withoutGlobalScopes()->where('company_id', $companyId));
+        }
+        if ($excludeId && $excludeType === 'variation') {
+            $variationQuery->where('id', '!=', $excludeId);
+        }
+        $existsInVariations = $variationQuery->exists();
 
         return response()->json([
             'available' => !$existsInProducts && !$existsInVariations,
