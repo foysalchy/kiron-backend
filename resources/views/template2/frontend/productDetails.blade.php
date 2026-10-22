@@ -51,15 +51,16 @@
                 <!-- Left: Image Gallery -->
                 <div class="  lg:border-r border-b lg:border-b-0 border-gray-100">
                     <div class="  mb-4 overflow-hidden rounded-xl bg-white border border-gray-100 relative group">
-                        <img id="mainImage" src="{{ $product->thumbnail_url }}" alt="{{ $product->title }}"
-                            class="m-auto  object-contain transition-transform duration-500">
+                        <img id="mainImage"
+                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
+                            alt="{{ $product->title }}" class="m-auto  object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
                         @foreach ($allProductImages as $imgUrl)
                             <button onclick="changeImage('{{ $imgUrl }}')"
                                 class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
                                 <img src="{{ $imgUrl }}"
-                                    onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
                                     class="w-full h-full object-contain" alt="Product Image" loading="lazy" width="800"
                                     height="800">
                             </button>
@@ -129,7 +130,8 @@
                         </span>
 
                         @if ($product->is_free_delivery == 1)
-                            <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
+                            <span
+                                class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
                                 Free Shipping
                             </span>
                         @endif
@@ -162,7 +164,8 @@
 
                     {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                     @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                        <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                        <div
+                            class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
                             <i class="fa-solid fa-gift text-amber-600"></i>
                             <span>{{ $setup->free_shipping_text }}</span>
                         </div>
@@ -181,7 +184,7 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="order-3 md:order-3 col-span-1 md:col-span-1 flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                                                {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                                                                {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -257,307 +260,312 @@
                     </div>
                 </div>
             </div>
-        @php
-            $hasDescription = !empty(trim(strip_tags($product->full_description ?? '')));
+            @php
+                $hasDescription = !empty(trim(strip_tags($product->full_description ?? '')));
 
-            $grouped = [];
-            if ($product->type === 'variation') {
-                foreach ($product->variations as $variation) {
-                    foreach ($variation->attributes as $attr) {
-                        $name = $attr->attributeGroup->name ?? '';
-                        $val = $attr->attributeValue->name ?? '';
-                        if (!isset($grouped[$name])) {
-                            $grouped[$name] = [];
-                        }
-                        if (!in_array($val, $grouped[$name])) {
-                            $grouped[$name][] = $val;
+                $grouped = [];
+                if ($product->type === 'variation') {
+                    foreach ($product->variations as $variation) {
+                        foreach ($variation->attributes as $attr) {
+                            $name = $attr->attributeGroup->name ?? '';
+                            $val = $attr->attributeValue->name ?? '';
+                            if (!isset($grouped[$name])) {
+                                $grouped[$name] = [];
+                            }
+                            if (!in_array($val, $grouped[$name])) {
+                                $grouped[$name][] = $val;
+                            }
                         }
                     }
                 }
-            }
 
-            $hasSku = !empty($skus);
-            $hasSpecs = !empty($product->brand) || $hasSku || (!empty($grouped) && count($grouped) > 0) || !empty($product->mega_categories->first());
-            $hasReviews = true;
-            $hasAnyTab = $hasDescription || $hasSpecs || $hasReviews;
-            $hasRelated = isset($relatedProducts) && $relatedProducts->count() > 0;
+                $hasSku = !empty($skus);
+                $hasSpecs = !empty($product->brand) || $hasSku || (!empty($grouped) && count($grouped) > 0) || !empty($product->mega_categories->first());
+                $hasReviews = true;
+                $hasAnyTab = $hasDescription || $hasSpecs || $hasReviews;
+                $hasRelated = isset($relatedProducts) && $relatedProducts->count() > 0;
 
-            // Pick first visible tab
-            $firstTab = $hasDescription ? 'description' : ($hasSpecs ? 'specification' : 'review');
-        @endphp
+                // Pick first visible tab
+                $firstTab = $hasDescription ? 'description' : ($hasSpecs ? 'specification' : 'review');
+            @endphp
 
-        @if($hasAnyTab || $hasRelated)
-        <!-- 3. TABS & RELATED PRODUCTS SECTION -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-start">
+            @if($hasAnyTab || $hasRelated)
+                <!-- 3. TABS & RELATED PRODUCTS SECTION -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12 items-start">
 
-            <!-- Left Column: Tabs Section -->
-            <div class="{{ $hasAnyTab ? 'md:col-span-7 lg:col-span-8' : 'hidden' }} bg-white rounded-lg shadow-xs relative overflow-hidden">
-                <!-- Tab Buttons -->
-                <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
-                    id="tabs-nav">
-                    @if($hasDescription)
-                        <button onclick="switchTab('description')" id="tab-btn-description"
-                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'description' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Description</button>
-                    @endif
+                    <!-- Left Column: Tabs Section -->
+                    <div
+                        class="{{ $hasAnyTab ? 'md:col-span-7 lg:col-span-8' : 'hidden' }} bg-white rounded-lg shadow-xs relative overflow-hidden">
+                        <!-- Tab Buttons -->
+                        <div class="flex items-center border-b border-gray-100 bg-[#F9FAFB] overflow-x-auto no-scrollbar"
+                            id="tabs-nav">
+                            @if($hasDescription)
+                                <button onclick="switchTab('description')" id="tab-btn-description"
+                                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'description' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Description</button>
+                            @endif
 
-                    @if($hasSpecs)
-                        <button onclick="switchTab('specification')" id="tab-btn-specification"
-                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'specification' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Specification</button>
-                    @endif
+                            @if($hasSpecs)
+                                <button onclick="switchTab('specification')" id="tab-btn-specification"
+                                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'specification' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">Specification</button>
+                            @endif
 
-                    @if($hasReviews)
-                        <button onclick="switchTab('review')" id="tab-btn-review"
-                            class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'review' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">
-                            Reviews ({{ $product->reviews->count() }})
-                        </button>
-                    @endif
-                </div>
-
-                <!-- Tab Content Area -->
-                <div class="p-6 md:p-10">
-
-                    @if($hasDescription)
-                        <!-- Section: Description  -->
-                        <div id="tab-content-description" class="tab-content {{ $firstTab === 'description' ? 'block' : 'hidden' }}">
-                            <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
-                            <div class="text-lg prose prose-orange max-w-none">
-                                {!! $product->full_description !!}
-                            </div>
+                            @if($hasReviews)
+                                <button onclick="switchTab('review')" id="tab-btn-review"
+                                    class="tab-btn px-4 md:px-8 py-3 md:py-4 text-xs md:text-sm whitespace-nowrap transition-all border-b-2 {{ $firstTab === 'review' ? 'border-[#FF6A00] text-gray-900 bg-white' : 'border-transparent text-gray-600 hover:text-gray-900' }} font-bold">
+                                    Reviews ({{ $product->reviews->count() }})
+                                </button>
+                            @endif
                         </div>
-                    @endif
 
-                    @if($hasSpecs)
-                        <!-- Section: Specification  -->
-                        <div id="tab-content-specification" class="tab-content {{ $firstTab === 'specification' ? 'block' : 'hidden' }}">
-                            <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
+                        <!-- Tab Content Area -->
+                        <div class="p-6 md:p-10">
 
-                                @if(!empty($product->brand))
-                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                        <span class="font-medium text-gray-500">Brand:</span>
-                                        <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                            @if($hasDescription)
+                                <!-- Section: Description  -->
+                                <div id="tab-content-description"
+                                    class="tab-content {{ $firstTab === 'description' ? 'block' : 'hidden' }}">
+                                    <h2 class="text-xl font-bold text-gray-900 mb-6">Product Description</h2>
+                                    <div class="text-lg prose prose-orange max-w-none">
+                                        {!! $product->full_description !!}
                                     </div>
-                                @endif
-
-                                @if($hasSku)
-                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                        <span class="font-medium text-gray-500">SKU:</span>
-                                        <span id="tab-sku" class="font-mono font-bold">{{ implode(', ', $skus) }}</span>
-                                    </div>
-                                @endif
-
-                                <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                    <span class="font-medium text-gray-500">Availability:</span>
-                                    <span
-                                        class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
-                                        {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
-                                    </span>
                                 </div>
+                            @endif
 
-                                @if($product->mega_categories->first())
-                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                        <span class="font-medium text-gray-500">Category:</span>
-                                        <span class="font-bold">{{ $product->mega_categories->first()->name }}</span>
-                                    </div>
-                                @endif
+                            @if($hasSpecs)
+                                <!-- Section: Specification  -->
+                                <div id="tab-content-specification"
+                                    class="tab-content {{ $firstTab === 'specification' ? 'block' : 'hidden' }}">
+                                    <h2 class="text-xl font-bold text-gray-900 mb-8">Product Specification</h2>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2 text-md text-gray-800">
 
-                                @foreach ($grouped as $groupName => $values)
-                                    <div class="flex items-center justify-between py-3 border-b border-gray-100">
-                                        <span class="font-medium text-gray-500">{{ $groupName }}:</span>
-                                        <span class="font-bold">{{ implode(', ', $values) }}</span>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
+                                        @if(!empty($product->brand))
+                                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                                <span class="font-medium text-gray-500">Brand:</span>
+                                                <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                            </div>
+                                        @endif
 
+                                        @if($hasSku)
+                                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                                <span class="font-medium text-gray-500">SKU:</span>
+                                                <span id="tab-sku" class="font-mono font-bold">{{ implode(', ', $skus) }}</span>
+                                            </div>
+                                        @endif
 
-                    <!-- Section: Review -->
-                    <div id="tab-content-review" class="tab-content hidden px-2">
-                        <h2 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h2>
-
-                        @php
-                            $reviews = $product->reviews;
-                            $avgRating = $reviews->avg('rating') ?? 0;
-                            $totalReviews = $reviews->count();
-                            $avatarColors = ['bg-orange-600', 'bg-blue-600', 'bg-purple-600', 'bg-indigo-600'];
-                        @endphp
-
-                        <!-- Review Summary Card -->
-                        <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
-                            <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
-                            <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i
-                                        class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-300' }}"></i>
-                                @endfor
-                            </div>
-                            <div class="text-sm text-gray-900 font-bold">{{ $totalReviews }} Reviews</div>
-                        </div>
-
-                        <!-- Individual Reviews List -->
-                        <div class="space-y-0">
-                            @forelse($reviews as $index => $review)
-                                <div class="py-8 border-b border-gray-100 last:border-0">
-                                    <div class="flex items-start gap-5">
-
-                                        <!-- Initials Avatar (Like "RH" or "F") -->
-                                        @php
-                                            $nameParts = explode(' ', $review->customer->name ?? 'User');
-                                            $initials = '';
-                                            foreach ($nameParts as $part) {
-                                                $initials .= substr($part, 0, 1);
-                                            }
-                                            $initials = strtoupper(substr($initials, 0, 2));
-                                        @endphp
-
-                                        <div
-                                            class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-primary rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
-                                            {{ $initials }}
+                                        <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                            <span class="font-medium text-gray-500">Availability:</span>
+                                            <span
+                                                class="font-bold {{ $product->available_stock > 0 ? 'text-green-700' : 'text-red-500' }}">
+                                                {{ $product->available_stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                            </span>
                                         </div>
 
-                                        <div class="flex-1">
-                                            <!-- Header Line: Name, Stars, Date -->
-                                            <div class="flex items-center gap-3 mb-2">
-                                                <h3 class="text-md font-bold text-gray-900">
-                                                    {{ $review->customer->name ?? 'Customer' }}
-                                                </h3>
-
-                                                <div class="flex text-yellow-400 text-[10px] gap-0.5">
-                                                    @for ($i = 1; $i <= 5; $i++)
-                                                        <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
-                                                    @endfor
-                                                </div>
-
-                                                <span class="text-sm text-gray-500 font-medium ml-1">
-                                                    {{ $review->created_at->diffForHumans() }}
-                                                </span>
+                                        @if($product->mega_categories->first())
+                                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                                <span class="font-medium text-gray-500">Category:</span>
+                                                <span class="font-bold">{{ $product->mega_categories->first()->name }}</span>
                                             </div>
+                                        @endif
 
-                                            <!-- Review Content inside the loop -->
-                                            <p class="text-md text-gray-700 leading-relaxed mb-4">
-                                                {{ $review->comment }}
-                                            </p>
+                                        @foreach ($grouped as $groupName => $values)
+                                            <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                                                <span class="font-medium text-gray-500">{{ $groupName }}:</span>
+                                                <span class="font-bold">{{ implode(', ', $values) }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
 
-                                            @if ($review->images && count($review->images) > 0)
-                                                <!-- Thumbnails -->
-                                                <div class="flex flex-wrap gap-3 mb-4">
-                                                    @foreach ($review->images as $img)
-                                                        <div
-                                                            class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
-                                                            <img src="{{ asset('storage/' . $img) }}"
-                                                                onclick="expandReviewImage(this.src, '{{ $review->id }}')"
-                                                                class="w-full h-full object-cover" alt="Review Image">
-                                                        </div>
-                                                    @endforeach
+
+                            <!-- Section: Review -->
+                            <div id="tab-content-review" class="tab-content hidden px-2">
+                                <h2 class="text-xl font-bold text-gray-900 mb-6 mt-4">Customer Reviews</h2>
+
+                                @php
+                                    $reviews = $product->reviews;
+                                    $avgRating = $reviews->avg('rating') ?? 0;
+                                    $totalReviews = $reviews->count();
+                                    $avatarColors = ['bg-orange-600', 'bg-blue-600', 'bg-purple-600', 'bg-indigo-600'];
+                                @endphp
+
+                                <!-- Review Summary Card -->
+                                <div class="bg-gray-50/50 rounded-2xl p-8 mb-10 border border-gray-100">
+                                    <div class="text-4xl font-bold text-[#FF6A00] mb-2">{{ number_format($avgRating, 1) }}</div>
+                                    <div class="flex text-yellow-400 text-sm mb-2 gap-0.5">
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <i
+                                                class="{{ $i <= round($avgRating) ? 'fas' : 'far' }} fa-star {{ $i <= round($avgRating) ? '' : 'text-gray-300' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <div class="text-sm text-gray-900 font-bold">{{ $totalReviews }} Reviews</div>
+                                </div>
+
+                                <!-- Individual Reviews List -->
+                                <div class="space-y-0">
+                                    @forelse($reviews as $index => $review)
+                                        <div class="py-8 border-b border-gray-100 last:border-0">
+                                            <div class="flex items-start gap-5">
+
+                                                <!-- Initials Avatar (Like "RH" or "F") -->
+                                                @php
+                                                    $nameParts = explode(' ', $review->customer->name ?? 'User');
+                                                    $initials = '';
+                                                    foreach ($nameParts as $part) {
+                                                        $initials .= substr($part, 0, 1);
+                                                    }
+                                                    $initials = strtoupper(substr($initials, 0, 2));
+                                                @endphp
+
+                                                <div
+                                                    class="w-11 h-11 {{ $avatarColors[$index % count($avatarColors)] }} text-primary rounded-full flex items-center justify-center text-sm font-black shrink-0 shadow-sm">
+                                                    {{ $initials }}
                                                 </div>
 
-                                                <!-- Expanded Image Container (Hidden by default) -->
-                                                <div id="expanded-container-{{ $review->id }}"
-                                                    class="hidden mb-6 transition-all duration-500">
-                                                    <div class="relative inline-block group">
-                                                        <img id="large-view-{{ $review->id }}" src="" alt="Expanded review image"
-                                                            class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
+                                                <div class="flex-1">
+                                                    <!-- Header Line: Name, Stars, Date -->
+                                                    <div class="flex items-center gap-3 mb-2">
+                                                        <h3 class="text-md font-bold text-gray-900">
+                                                            {{ $review->customer->name ?? 'Customer' }}
+                                                        </h3>
 
-                                                        <!-- Close Button -->
-                                                        <button onclick="closeReviewImage('{{ $review->id }}')"
-                                                            class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-primary w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
-                                                            <i class="fas fa-times text-xs"></i>
-                                                        </button>
+                                                        <div class="flex text-yellow-400 text-[10px] gap-0.5">
+                                                            @for ($i = 1; $i <= 5; $i++)
+                                                                <i class="{{ $i <= $review->rating ? 'fas' : 'far' }} fa-star"></i>
+                                                            @endfor
+                                                        </div>
+
+                                                        <span class="text-sm text-gray-500 font-medium ml-1">
+                                                            {{ $review->created_at->diffForHumans() }}
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Review Content inside the loop -->
+                                                    <p class="text-md text-gray-700 leading-relaxed mb-4">
+                                                        {{ $review->comment }}
+                                                    </p>
+
+                                                    @if ($review->images && count($review->images) > 0)
+                                                        <!-- Thumbnails -->
+                                                        <div class="flex flex-wrap gap-3 mb-4">
+                                                            @foreach ($review->images as $img)
+                                                                <div
+                                                                    class="w-20 h-20 rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:ring-2 hover:ring-[#FF6A00] transition-all cursor-pointer">
+                                                                    <img src="{{ asset('storage/' . $img) }}"
+                                                                        onclick="expandReviewImage(this.src, '{{ $review->id }}')"
+                                                                        class="w-full h-full object-cover" alt="Review Image">
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+
+                                                        <!-- Expanded Image Container (Hidden by default) -->
+                                                        <div id="expanded-container-{{ $review->id }}"
+                                                            class="hidden mb-6 transition-all duration-500">
+                                                            <div class="relative inline-block group">
+                                                                <img id="large-view-{{ $review->id }}" src=""
+                                                                    alt="Expanded review image"
+                                                                    class="max-w-full md:max-w-[450px] max-h-[500px] rounded-2xl border border-gray-100 shadow-xl object-contain bg-white">
+
+                                                                <!-- Close Button -->
+                                                                <button onclick="closeReviewImage('{{ $review->id }}')"
+                                                                    class="absolute top-3 right-3 bg-black/50 hover:bg-red-500 text-primary w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer">
+                                                                    <i class="fas fa-times text-xs"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    <!-- Variant Tag -->
+                                                    <div
+                                                        class="inline-block bg-[#F3F4F6] text-gray-500 text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">
+                                                        @if ($review->variation)
+                                                            {{ $review->variation->display_name }}
+                                                        @else
+                                                            Single Product
+                                                        @endif
                                                     </div>
                                                 </div>
-                                            @endif
-
-                                            <!-- Variant Tag -->
-                                            <div
-                                                class="inline-block bg-[#F3F4F6] text-gray-500 text-[10px] font-bold px-3 py-1.5 rounded-md uppercase tracking-tight">
-                                                @if ($review->variation)
-                                                    {{ $review->variation->display_name }}
-                                                @else
-                                                    Single Product
-                                                @endif
                                             </div>
                                         </div>
-                                    </div>
+                                    @empty
+                                        <div class="text-center py-20 bg-white">
+                                            <p class="text-gray-500 font-medium italic">No reviews yet. Be the first to share your
+                                                experience!</p>
+                                        </div>
+                                    @endforelse
                                 </div>
-                            @empty
-                                <div class="text-center py-20 bg-white">
-                                    <p class="text-gray-500 font-medium italic">No reviews yet. Be the first to share your
-                                        experience!</p>
-                                </div>
-                            @endforelse
+                            </div>
+
                         </div>
                     </div>
+                    <!-- /Left Column -->
 
-                </div>
-            </div>
-            <!-- /Left Column -->
-
-            @if($hasRelated)
-            <!-- Right Column: Related Products (Sticky Sidebar) -->
-            <aside class="md:col-span-5 lg:col-span-4 flex flex-col gap-6 sticky top-24">
-                <div class="bg-white rounded-lg shadow-xs border border-gray-100 overflow-hidden">
-                    <div class="px-5 py-4 bg-[#F9FAFB] border-b border-gray-100 flex items-center justify-between">
-                        <h2 class="font-bold text-gray-900 text-base md:text-lg flex items-center gap-2">
-                            <span class="w-1.5 h-5 bg-[var(--primary-color)] rounded-full inline-block"></span>
-                            Related Products
-                        </h2>
-                        @if ($product->mega_categories->first())
-                            <a href="{{ url($product->mega_categories->first()->slug) }}"
-                                class="text-xs font-semibold text-[var(--primary-color)] hover:underline">
-                                See All
-                            </a>
-                        @endif
-                    </div>
-
-                    <div class="divide-y divide-gray-100 p-2">
-                        @php
-                            $currency = $setup->currency ?? '৳';
-                            $isL = ($setup->currency_position ?? 'left') == 'left';
-                        @endphp
-
-                        @foreach ($relatedProducts->take(6) as $rel)
-                            @php
-                                $priceData = $rel->display_price_data;
-                                $relSalePrice = (float) ($priceData->sale_price ?? $rel->sale_price ?? $rel->regular_price ?? 0);
-                                $relRegularPrice = (float) ($priceData->regular_price ?? $rel->regular_price ?? 0);
-                                $hasDiscount = $relRegularPrice > $relSalePrice;
-                            @endphp
-                            <a href="{{ url($rel->slug) }}"
-                                class="p-2.5 sm:p-3 flex items-center gap-3.5 hover:bg-gray-50/80 rounded-lg transition-all group">
-                                <!-- Thumbnail -->
-                                <div
-                                    class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-md overflow-hidden shrink-0 border border-gray-100 p-1 flex items-center justify-center">
-                                    <img src="{{ $rel->thumbnail_95_url }}" alt="{{ $rel->title }}" loading="lazy"
-                                        class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                    @if($hasRelated)
+                        <!-- Right Column: Related Products (Sticky Sidebar) -->
+                        <aside class="md:col-span-5 lg:col-span-4 flex flex-col gap-6 sticky top-24">
+                            <div class="bg-white rounded-lg shadow-xs border border-gray-100 overflow-hidden">
+                                <div class="px-5 py-4 bg-[#F9FAFB] border-b border-gray-100 flex items-center justify-between">
+                                    <h2 class="font-bold text-gray-900 text-base md:text-lg flex items-center gap-2">
+                                        <span class="w-1.5 h-5 bg-[var(--primary-color)] rounded-full inline-block"></span>
+                                        Related Products
+                                    </h2>
+                                    @if ($product->mega_categories->first())
+                                        <a href="{{ url($product->mega_categories->first()->slug) }}"
+                                            class="text-xs font-semibold text-[var(--primary-color)] hover:underline">
+                                            See All
+                                        </a>
+                                    @endif
                                 </div>
 
-                                <!-- Info -->
-                                <div class="min-w-0 flex-1">
-                                    <h3
-                                        class="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
-                                        {{ $rel->title }}
-                                    </h3>
-                                    <div class="flex items-baseline gap-2 mt-1.5">
-                                        <span class="text-sm sm:text-base font-bold text-[var(--primary-color)]">
-                                            {{ $isL ? $currency : '' }}{{ number_format($relSalePrice) }}{{ !$isL ? $currency : '' }}
-                                        </span>
-                                        @if ($hasDiscount)
-                                            <span class="text-xs text-gray-500 line-through">
-                                                {{ $isL ? $currency : '' }}{{ number_format($relRegularPrice) }}{{ !$isL ? $currency : '' }}
-                                            </span>
-                                        @endif
-                                    </div>
+                                <div class="divide-y divide-gray-100 p-2">
+                                    @php
+                                        $currency = $setup->currency ?? '৳';
+                                        $isL = ($setup->currency_position ?? 'left') == 'left';
+                                    @endphp
+
+                                    @foreach ($relatedProducts->take(6) as $rel)
+                                        @php
+                                            $priceData = $rel->display_price_data;
+                                            $relSalePrice = (float) ($priceData->sale_price ?? $rel->sale_price ?? $rel->regular_price ?? 0);
+                                            $relRegularPrice = (float) ($priceData->regular_price ?? $rel->regular_price ?? 0);
+                                            $hasDiscount = $relRegularPrice > $relSalePrice;
+                                        @endphp
+                                        <a href="{{ url($rel->slug) }}"
+                                            class="p-2.5 sm:p-3 flex items-center gap-3.5 hover:bg-gray-50/80 rounded-lg transition-all group">
+                                            <!-- Thumbnail -->
+                                            <div
+                                                class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-md overflow-hidden shrink-0 border border-gray-100 p-1 flex items-center justify-center">
+                                                <img src="{{ $rel->thumbnail_95_url ?? asset('./images/template1/frontend/cover.webp') }}"
+                                                    alt="{{ $rel->title }}" loading="lazy"
+                                                    class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                                            </div>
+
+                                            <!-- Info -->
+                                            <div class="min-w-0 flex-1">
+                                                <h3
+                                                    class="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-[var(--primary-color)] transition-colors leading-snug">
+                                                    {{ $rel->title }}
+                                                </h3>
+                                                <div class="flex items-baseline gap-2 mt-1.5">
+                                                    <span class="text-sm sm:text-base font-bold text-[var(--primary-color)]">
+                                                        {{ $isL ? $currency : '' }}{{ number_format($relSalePrice) }}{{ !$isL ? $currency : '' }}
+                                                    </span>
+                                                    @if ($hasDiscount)
+                                                        <span class="text-xs text-gray-500 line-through">
+                                                            {{ $isL ? $currency : '' }}{{ number_format($relRegularPrice) }}{{ !$isL ? $currency : '' }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endforeach
                                 </div>
-                            </a>
-                        @endforeach
-                    </div>
+                            </div>
+                        </aside>
+                    @endif
+
                 </div>
-            </aside>
             @endif
-
-        </div>
-        @endif
 
     </section>
 @endsection
@@ -618,10 +626,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                                                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                                                onclick="changeImage('${imgUrl}', this)">
-                                                                <img src="${imgUrl}" alt="Product Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
-                                                            </button>`;
+                                                                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                                                                onclick="changeImage('${imgUrl}', this)">
+                                                                                <img src="${imgUrl}" alt="Product Image" onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
+                                                                            </button>`;
             });
         }
 
@@ -710,7 +718,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                            {{ $product->display_price_data->sale_price ?? 0 }},
+                                            {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;

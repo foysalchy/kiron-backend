@@ -134,17 +134,20 @@
                     @endphp
                     @if(!empty($setup->free_shipping_text))
                         @if(!empty($is_product_free_delivery))
-                            <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                            <div
+                                class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                 <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                 <span>{{ $freeProductText }}</span>
                             </div>
                         @elseif(!empty($is_rule_free_shipping))
-                            <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                            <div
+                                class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                 <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                 <span>{{ $setup->free_shipping_text }}</span>
                             </div>
                         @elseif(!empty($setup->active_free_shipping_rule))
-                            <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
+                            <div
+                                class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                 <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                 <span>{{ $setup->free_shipping_text }}</span>
                             </div>
@@ -156,9 +159,8 @@
                             <div class="bg-[#F9FAFB] rounded-xl p-4 flex items-center gap-4">
                                 <!-- Actual Product Image -->
                                 <div class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                    <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/default.webp') }}"
-                                        alt="{{ $item->name }}"
-                                        class="w-full h-full object-cover">
+                                    <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/cover.webp') }}"
+                                        alt="{{ $item->name }}" class="w-full h-full object-cover">
                                 </div>
 
                                 <div class="flex-1">
@@ -208,7 +210,8 @@
                                 class="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-[#016738] transition-all"
                                 {{ session()->has('coupon') ? 'readonly' : '' }}>
 
-                            <button type="button" id="remove-coupon-btn" onclick="removeCoupon()" aria-label="Remove coupon" title="Remove coupon"
+                            <button type="button" id="remove-coupon-btn" onclick="removeCoupon()" aria-label="Remove coupon"
+                                title="Remove coupon"
                                 class="bg-red-500 text-white rounded-lg px-4 py-2.5 hover:bg-red-600 flex items-center {{ session()->has('coupon') ? '' : 'hidden' }}">
                                 <i class="fas fa-times text-white" aria-hidden="true"></i>
                                 <span class="sr-only">Remove coupon</span>
@@ -223,23 +226,23 @@
 
                     <!-- Delivery Area Selector -->
                     @if(!isset($is_free_delivery) || !$is_free_delivery)
-                    <div class="py-4 border-b border-gray-100">
-                        <p class="text-xs font-bold text-gray-500 uppercase mb-3">Delivery Area</p>
-                        <div class="space-y-3">
-                            <label class="flex items-center justify-between cursor-pointer text-sm">
-                                <span>Inside Dhaka
-                                    ({{ $setup->currency }}{{ number_format($setup->inside_charge, 2) }})</span>
-                                <input type="radio" name="delivery_area" value="inside"
-                                    onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
-                            </label>
-                            <label class="flex items-center justify-between cursor-pointer text-sm">
-                                <span>Outside Dhaka
-                                    ({{ $setup->currency }}{{ number_format($setup->outside_charge, 2) }})</span>
-                                <input type="radio" name="delivery_area" value="outside"
-                                    onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
-                            </label>
+                        <div class="py-4 border-b border-gray-100">
+                            <p class="text-xs font-bold text-gray-500 uppercase mb-3">Delivery Area</p>
+                            <div class="space-y-3">
+                                <label class="flex items-center justify-between cursor-pointer text-sm">
+                                    <span>Inside Dhaka
+                                        ({{ $setup->currency }}{{ number_format($setup->inside_charge, 2) }})</span>
+                                    <input type="radio" name="delivery_area" value="inside"
+                                        onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'inside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer text-sm">
+                                    <span>Outside Dhaka
+                                        ({{ $setup->currency }}{{ number_format($setup->outside_charge, 2) }})</span>
+                                    <input type="radio" name="delivery_area" value="outside"
+                                        onchange="updateCheckoutShipping(this.value)" {{ $shipping_area == 'outside' ? 'checked' : '' }} class="accent-[var(--primary-color)] w-4 h-4">
+                                </label>
+                            </div>
                         </div>
-                    </div>
                     @endif
 
                     <div class="space-y-3 border-t border-gray-100 pt-4">
@@ -248,7 +251,8 @@
                         <div class="flex justify-between items-center text-gray-700">
                             <span class="text-sm md:text-base font-medium">Subtotal</span>
                             <span class="text-sm md:text-base font-bold text-gray-900">
-                                {{ $isL ? $setup->currency : '' }} {{ number_format($subtotal) }} {{ !$isL ? $setup->currency : '' }}
+                                {{ $isL ? $setup->currency : '' }} {{ number_format($subtotal) }}
+                                {{ !$isL ? $setup->currency : '' }}
                             </span>
                         </div>
 
@@ -259,22 +263,30 @@
                                 @if(isset($is_free_delivery) && $is_free_delivery)
                                     Free
                                 @else
-                                    {{ $isL ? $setup->currency : '' }} <span id="shipping-display">{{ number_format($shipping, 2) }}</span> {{ !$isL ? $setup->currency : '' }}
+                                    {{ $isL ? $setup->currency : '' }} <span
+                                        id="shipping-display">{{ number_format($shipping, 2) }}</span>
+                                    {{ !$isL ? $setup->currency : '' }}
                                 @endif
                             </span>
                         </div>
 
                         <!-- ৩. ডিসকাউন্ট (যদি থাকে) -->
-                        <div id="discount-row" class="flex justify-between items-center text-green-700 font-bold {{ $discount > 0 ? '' : 'hidden' }}">
-                            <span>Discount <span id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span></span>
-                            <span>- {{ $isL ? $setup->currency : '' }} <span id="discount-display">{{ number_format($discount) }}</span> {{ !$isL ? $setup->currency : '' }}</span>
+                        <div id="discount-row"
+                            class="flex justify-between items-center text-green-700 font-bold {{ $discount > 0 ? '' : 'hidden' }}">
+                            <span>Discount <span
+                                    id="discount-code-display">{{ session()->has('coupon') ? '(' . session('coupon')['coupon_code'] . ')' : '' }}</span></span>
+                            <span>- {{ $isL ? $setup->currency : '' }} <span
+                                    id="discount-display">{{ number_format($discount) }}</span>
+                                {{ !$isL ? $setup->currency : '' }}</span>
                         </div>
 
                         <!-- ৪. সর্বমোট (Total) -->
                         <div class="flex justify-between items-center py-4 border-t border-gray-100 mt-2">
                             <span class="text-base md:text-lg font-black text-gray-800">Total Payable</span>
                             <span class="text-xl md:text-2xl font-extrabold text-[#1147aa]">
-                                {{ $isL ? $setup->currency : '' }} <span id="total-display">{{ number_format($total) }}</span> {{ !$isL ? $setup->currency : '' }}
+                                {{ $isL ? $setup->currency : '' }} <span
+                                    id="total-display">{{ number_format($total) }}</span>
+                                {{ !$isL ? $setup->currency : '' }}
                             </span>
                         </div>
                     </div>

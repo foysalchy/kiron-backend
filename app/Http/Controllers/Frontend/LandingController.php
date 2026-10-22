@@ -492,7 +492,15 @@ class LandingController extends FrontendController
                 }
             }
 
-            if (!$isFreeDelivery && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
+            $isMultiLanding = !empty($multiProdIds);
+            if (!$isMultiLanding && !empty($request->landing_page_id)) {
+                $landingObj = LandingPage::find($request->landing_page_id);
+                if ($landingObj && count($landingObj->product_ids ?? []) > 1) {
+                    $isMultiLanding = true;
+                }
+            }
+
+            if (!$isFreeDelivery && $isMultiLanding && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
                 if ($settingsModel->isEligibleForFreeShipping((int)$totalQuantity, (float)$totalItemAmount, true)) {
                     $shippingCost = 0;
                 }
@@ -887,7 +895,15 @@ class LandingController extends FrontendController
                 }
             }
 
-            if (!$isFreeDelivery && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
+            $isMultiLanding = !empty($multiProdIds);
+            if (!$isMultiLanding && !empty($request->landing_page_id)) {
+                $landingObj = LandingPage::find($request->landing_page_id);
+                if ($landingObj && count($landingObj->product_ids ?? []) > 1) {
+                    $isMultiLanding = true;
+                }
+            }
+
+            if (!$isFreeDelivery && $isMultiLanding && $settingsModel && method_exists($settingsModel, 'isEligibleForFreeShipping')) {
                 if ($settingsModel->isEligibleForFreeShipping((int)$totalQuantity, (float)$totalItemAmount, true)) {
                     $shippingCost = 0;
                 }
