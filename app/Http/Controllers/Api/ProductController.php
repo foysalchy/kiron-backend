@@ -62,6 +62,31 @@ class ProductController extends Controller
         return ResponseHelper::success($data, 'Product retrieved successfully');
     }
 
+    public function bulkGet(Request $request): JsonResponse
+    {
+        $rawIds = $request->query('ids', []);
+        if (is_string($rawIds)) {
+            $rawIds = explode(',', $rawIds);
+        }
+        $ids = array_filter(array_map('intval', (array) $rawIds));
+
+        if (empty($ids)) {
+            return ResponseHelper::success([], 'No products requested');
+        }
+
+        $products = Product::with([
+            'brand',
+            'galleries',
+            'variations.attributes.attributeValue.attributeGroup',
+            'variations.stocks.warehouse',
+            'variations.galleries',
+        ])->whereIn('id', $ids)->get();
+
+        Product::loadCategoriesForCollection($products);
+
+        return ResponseHelper::success($products, 'Products retrieved successfully');
+    }
+
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
         $data = $this->productService->updateProduct($id, $request->validated());
