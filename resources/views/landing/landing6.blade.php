@@ -286,8 +286,13 @@
         $desc = ($isPreviewMode && (empty($landing->description) || str_contains($landing->description, 'Diaper') || str_contains($landing->description, 'About This Product'))) ? $exactImgTrustDesc : ($landing->description ?: $exactImgTrustDesc);
 
         // Content 1 & 2 resolving
-        $content1 = ($isPreviewMode && (empty($landing->extras['content']) || str_contains($landing->extras['content'], 'Product Overview'))) ? $exactImgContent1 : (!empty($landing->extras['content']) ? $landing->extras['content'] : $exactImgContent1);
-        $content2 = ($isPreviewMode && (empty($landing->extras['content2']) || str_contains($landing->extras['content2'], 'Product Overview'))) ? $exactImgContent2 : (!empty($landing->extras['content2']) ? $landing->extras['content2'] : $exactImgContent2);
+        $content1 = ($isPreviewMode && (empty($landing->extras['content']) || str_contains($landing->extras['content'], 'Product Overview')))
+            ? $exactImgContent1
+            : (!empty($landing->extras['content']) ? $landing->extras['content'] : ($isPreviewMode ? $exactImgContent1 : null));
+
+        $content2 = ($isPreviewMode && (empty($landing->extras['content2']) || str_contains($landing->extras['content2'], 'Product Overview')))
+            ? $exactImgContent2
+            : (!empty($landing->extras['content2']) ? $landing->extras['content2'] : ($isPreviewMode ? $exactImgContent2 : null));
 
         // Reviews sample data matching image style (review cards with rating, quote, and product pack thumbnail)
         $previewReviewCards = [
@@ -698,10 +703,9 @@
             </section>
         @endif
 
-        {{-- ══ SECTION 4: SPECIAL DISCOUNT & OFFER BOX (Overlapping Green Boundary on Desktop, Fully Contained on
-        Mobile) ══ --}}
+        {{-- ══ SECTION 4: SPECIAL DISCOUNT & OFFER BOX ══ --}}
         @if($regularPrice || $discountPrice || $isPreviewMode)
-            <section class="w-full bg-[#00703c] pt-8 sm:pt-12 md:pt-14 pb-8 sm:pb-12 md:pb-28 px-4 text-center relative">
+            <section class="w-full bg-[#00703c] pt-8 sm:pt-12 md:pt-14 pb-16 sm:pb-20 md:pb-24 px-4 text-center relative mb-16 sm:mb-20 md:mb-24">
                 <div class="max-w-4xl mx-auto mb-6 md:mb-4">
                     <h2
                         class="text-xl sm:text-2xl md:text-4xl font-black text-white tracking-wide leading-snug {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
@@ -711,9 +715,8 @@
                     </h2>
                 </div>
 
-                {{-- Offer Card: Relative in mobile flow (prevents text overflow), Absolute overlapping 50% on Desktop
-                (md:absolute md:-bottom-28) --}}
-                <div class="max-w-4xl mx-auto relative md:absolute md:left-4 md:right-4 md:-bottom-28 z-20 mt-4 md:mt-0">
+                {{-- Offer Card: Relative in document flow on ALL devices with -mb overlap so it perfectly overlaps the green bottom edge without breaking into next sections --}}
+                <div class="max-w-4xl mx-auto relative z-20 -mb-28 sm:-mb-32 md:-mb-36">
                     <div class="bg-white rounded-xl p-5 sm:p-7 md:p-9 shadow-xl border-2 border-[#b5e0c8] w-full mx-auto">
                         <div class="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8 md:gap-12">
 
@@ -799,10 +802,10 @@
 
         {{-- ══ SECTION 5: WHY CHOOSE US (আমাদের থেকে কেন কিনবেন?) ══ --}}
         @if($content2)
-            <section class="w-full pt-10 sm:pt-14 md:pt-48 pb-12 md:pb-20 px-4 bg-pattern border-b border-gray-100">
+            <section class="w-full pt-10 sm:pt-14 md:pt-16 pb-12 md:pb-20 px-4 bg-pattern border-b border-gray-100">
                 <div class="max-w-4xl mx-auto space-y-8">
                     <div
-                        class="bg-white/90 backdrop-blur-sm p-6 sm:p-10 rounded-3xl shadow-md border border-emerald-100 text-left prose prose-emerald max-w-none text-gray-700 leading-relaxed {{ $isPreviewMode ? 'preview-badge-container' : '' }} [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:text-[#00703c] [&_h1]:text-center [&_h1]:mb-6 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h2]:text-center [&_h2]:mb-6 [&_h3]:text-2xl [&_h3]:sm:text-3xl [&_h3]:md:text-4xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_h3]:text-center [&_h3]:mb-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-2xl [&_img]:my-5 [&_img]:mx-auto [&_img]:shadow-md [&_ul]:space-y-2 [&_ul]:pl-5 [&_li]:text-sm sm:[&_li]:text-base [&_li]:font-normal">
+                        class="bg-white/90 backdrop-blur-sm p-6 sm:p-10 rounded-xl shadow-md border border-emerald-100 text-left prose prose-emerald max-w-none text-gray-700 leading-relaxed {{ $isPreviewMode ? 'preview-badge-container [&_h1]:text-2xl [&_h1]:sm:text-3xl [&_h1]:md:text-4xl [&_h1]:font-black [&_h1]:text-[#00703c] [&_h1]:text-center [&_h1]:mb-6 [&_h2]:text-2xl [&_h2]:sm:text-3xl [&_h2]:md:text-4xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h2]:text-center [&_h2]:mb-6 [&_h3]:text-2xl [&_h3]:sm:text-3xl [&_h3]:md:text-4xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_h3]:text-center [&_h3]:mb-6 [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-2xl [&_img]:my-5 [&_img]:mx-auto [&_img]:shadow-md [&_ul]:space-y-2 [&_ul]:pl-5 [&_li]:text-sm sm:[&_li]:text-base [&_li]:font-normal' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge">Content 2</span>@endif
                         {!! $content2 !!}
                     </div>
@@ -881,33 +884,28 @@
 
         {{-- ══ SECTION 7: DIRECT CALL / WHATSAPP / MESSENGER BANNER ══ --}}
         @php
-            // 1. Resolve Phone
-            $rawPhone = $phone ?: ($setup->phone ?? ($setup->alt_phone ?? null));
-            $cleanPhone = preg_replace('/[^0-9]/', '', $rawPhone ?: '01700000000');
+            // 1. Resolve Phone: ONLY from landing page phone_number
+            $rawPhone = $landing->phone_number ?: ($isPreviewMode ? $exactImgPhone : null);
 
-            // 2. Resolve WhatsApp Link from Social Settings or Phone
+            // 2. Resolve WhatsApp Link: ONLY from store social settings
             $whatsappSocial = isset($socialLinks) ? $socialLinks->first(function ($item) {
                 $name = strtolower($item->icon_name ?? '');
                 $link = strtolower($item->link ?? '');
                 return str_contains($name, 'whatsapp') || str_contains($link, 'wa.me') || str_contains($link, 'whatsapp');
             }) : null;
 
-            if ($whatsappSocial && !empty($whatsappSocial->link)) {
-                $whatsappUrl = $whatsappSocial->link;
-            } elseif (!empty($cleanPhone)) {
-                $whatsappUrl = 'https://wa.me/' . (str_starts_with($cleanPhone, '88') ? $cleanPhone : '88' . $cleanPhone);
-            } else {
-                $whatsappUrl = 'https://wa.me/';
-            }
+            $whatsappUrl = ($whatsappSocial && !empty($whatsappSocial->link))
+                ? $whatsappSocial->link
+                : ($isPreviewMode ? 'https://wa.me/' : null);
 
-            // 3. Resolve Messenger Link from Social Settings, Site Settings, or Landing Extras
+            // 3. Resolve Messenger Link: ONLY from store social settings or setup->facebook
             $messengerSocial = isset($socialLinks) ? $socialLinks->first(function ($item) {
                 $name = strtolower($item->icon_name ?? '');
                 $link = strtolower($item->link ?? '');
                 return str_contains($name, 'messenger') || str_contains($name, 'facebook') || str_contains($link, 'm.me') || str_contains($link, 'facebook.com');
             }) : null;
 
-            $fbLink = $messengerSocial ? $messengerSocial->link : (data_get($landing->extras, 'fb_page') ?: data_get($landing->extras, 'facebook') ?: ($setup->facebook ?? ''));
+            $fbLink = $messengerSocial ? $messengerSocial->link : ($setup->facebook ?? '');
 
             if (!empty($fbLink)) {
                 if (str_contains($fbLink, 'm.me')) {
@@ -919,7 +917,7 @@
                     $messengerUrl = !empty($cleanFbUser) ? 'https://m.me/' . $cleanFbUser : 'https://m.me/';
                 }
             } else {
-                $messengerUrl = 'https://m.me/';
+                $messengerUrl = $isPreviewMode ? 'https://m.me/' : null;
             }
         @endphp
 
@@ -933,7 +931,7 @@
                     <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 0; z-index: 50;">Content</span>@endif
                         @if(!empty($supportContent))
-                            <div class="prose max-w-none text-[#00703c] leading-relaxed [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm">
+                            <div class="prose max-w-none text-[#00703c] leading-relaxed {{ $isPreviewMode ? '[&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm' : '' }}">
                                 {!! $supportContent !!}
                             </div>
                         @else
@@ -956,30 +954,38 @@
                         @endif
                     </div>
 
-                    {{-- 3-Action Buttons Grid: WhatsApp, Messenger, Phone --}}
+                    {{-- Action Buttons Grid: WhatsApp, Messenger, Phone (Shows only if available) --}}
+                    @if(!empty($whatsappUrl) || !empty($messengerUrl) || !empty($rawPhone))
                     <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 pt-3">
                         {{-- WhatsApp Button --}}
+                        @if(!empty($whatsappUrl))
                         <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer"
                             class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#075E54] hover:bg-[#05463f] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all">
                             <i class="fa-brands fa-whatsapp text-base sm:text-lg"></i>
                             <span>WhatsApp-এ মেসেজ করুন</span>
                         </a>
+                        @endif
 
                         {{-- Messenger Button --}}
+                        @if(!empty($messengerUrl))
                         <a href="{{ $messengerUrl }}" target="_blank" rel="noopener noreferrer"
                             class="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#0066d6] hover:bg-[#0052ad] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all">
                             <i class="fa-brands fa-facebook-messenger text-base sm:text-lg"></i>
                             <span>Messenger-এ মেসেজ দিন</span>
                         </a>
+                        @endif
 
-                        {{-- Phone Call Button with Preview Badge --}}
+                        {{-- Phone Call Button with Preview Badge (Only if phone number exists or preview) --}}
+                        @if(!empty($rawPhone))
                         <a href="tel:{{ $rawPhone }}"
                             class="relative inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#0e2a47] hover:bg-[#091b2e] text-white font-bold rounded-lg text-xs sm:text-sm md:text-base shadow-sm hover:shadow transition-all {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                             @if($isPreviewMode)<span class="preview-badge" style="top: -12px;">Phone Number</span>@endif
                             <i class="fa-solid fa-phone text-xs sm:text-sm"></i>
                             <span>Phone-এ কল করুন</span>
                         </a>
+                        @endif
                     </div>
+                    @endif
 
                 </div>
             </section>
