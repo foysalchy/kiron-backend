@@ -451,6 +451,13 @@
                         </p>
                     </div>
 
+                    @if(!empty($setup->free_shipping_text))
+                        <div class="mb-8 p-3.5 bg-amber-50 border-2 border-dashed border-amber-400 rounded-xl flex items-center justify-center gap-2.5 text-amber-900 text-sm sm:text-base md:text-xl font-bold shadow-xs">
+                            <i class="fa-solid fa-gift text-amber-600 text-lg sm:text-xl animate-bounce"></i>
+                            <span>{{ $setup->free_shipping_text }}</span>
+                        </div>
+                    @endif
+
                     {{-- Products Grid --}}
                     <div
                         class="grid grid-cols-1 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : ($multiProducts->count() === 2 ? 'sm:grid-cols-2 max-w-3xl mx-auto' : 'sm:grid-cols-2 md:grid-cols-3') }} gap-6 md:gap-8">

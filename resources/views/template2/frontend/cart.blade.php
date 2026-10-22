@@ -32,7 +32,7 @@
                                         <!-- Image -->
                                         <div class="w-20 h-20 md:w-24 md:h-24 bg-gray-50 rounded-lg overflow-hidden shrink-0 ">
                                             <img src="{{ $item->options->thumbnail }}" alt="{{ $item->name ?? 'Product Image' }}"
-                                                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                                onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
                                                 class="w-full h-full object-cover">
                                         </div>
 

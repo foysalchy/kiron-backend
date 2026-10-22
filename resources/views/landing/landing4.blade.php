@@ -275,33 +275,33 @@
         $previewRegularPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের রেগুলার প্রাইস- ১৫০০/=';
         $previewDiscountPrice = '৪০০ গ্রাম সজিনা পাতার পাউডারের অফার প্রাইস- ১০৫০/=';
         $previewContent1 = '<h2>সজিনা পাতার উপকারিতা</h2>
-                                                            <ul>
-                                                                <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
-                                                                <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
-                                                                <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
-                                                                <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
-                                                                <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
-                                                                <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
-                                                                <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
-                                                                <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
-                                                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                            </ul>';
+                                                                    <ul>
+                                                                        <li><p>উচ্চ রক্তচাপ নিয়ন্ত্রণে রাখে।</p></li>
+                                                                        <li><p>এটির এন্টি-ব্যাকটেরিয়াল বৈশিষ্ট্য বিদ্যমান। এটি যকৃত ও কিডনী সুস্থ্য রাখতে এবং রূপের সৌন্দর্য বর্ধক হিসেবেও কাজ করে থাকে।</p></li>
+                                                                        <li><p>রক্তে কোলেস্টেরল কমায়।</p></li>
+                                                                        <li><p>এসিডিটি বা গ্যাস্ট্রিক নিয়ন্ত্রণে রাখে।</p></li>
+                                                                        <li><p>শরীরে কোলেস্টেরল এর মাত্রা নিয়ন্ত্রণেও অন্যতম অবদান রাখে।</p></li>
+                                                                        <li><p>রক্ত স্বল্পতা দুর করে।</p></li>
+                                                                        <li><p>মানুষের শরীরের যে ৯ টি এমাইনো এসিড খাদ্যের মাধ্যমে সরবরাহ করতে হয়, তার সবগুলোই এই সজনে পাতা গুড়ার মধ্যে বিদ্যমান।</p></li>
+                                                                        <li><p>শরীরে সুগারের মাত্রা নিয়ন্ত্রণের মাধ্যমে ডায়াবেটিসের মত কঠিন রোগের বিরুদ্ধে কাজ করে থাকে।</p></li>
+                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                                    </ul>';
 
         $previewContent2 = '<h2>সেবনে সঠিক নিয়ম</h2>
-                                                            <ul>
-                                                                <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
-                                                                <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
-                                                                <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
-                                                                <li><p>ত্বকের জন্য উপকারী।</p></li>
-                                                                <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
-                                                            </ul>';
+                                                                    <ul>
+                                                                        <li><p>খালি পেটে এক গ্লাস পানিতে ২ চা চামচ সজনে পাতা মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>মধুর সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>দুধের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>ডালের সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>বিভিন্ন ধরনের ভাজির সাথে মিশিয়ে খাওয়া যায়।</p></li>
+                                                                        <li><p>পেয়ারার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>আমড়ার সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>কাঁচা আমের সাথে মিশিয়ে খেতে পারেন।</p></li>
+                                                                        <li><p>তরকারির সাথে মিক্স করে খেতে পারেন।</p></li>
+                                                                        <li><p>ত্বকের জন্য উপকারী।</p></li>
+                                                                        <li><p>ঠান্ডা জনিত সমস্যা দূর করে।</p></li>
+                                                                    </ul>';
         $previewDescription = '<p class="text-lg sm:text-xl md:text-[24px] font-normal text-[#0d2601] leading-relaxed m-0">গ্রাম থেকে সংগ্রহ করা শতভাগ ন্যাচারাল সজিনা পাতা নিজেদের তত্বাবধানে স্বাস্থ্য সম্মত পরিবেশে রোদে শুকিয়ে গুড়া করা হয়।প্রোডাক্ট হাতে পেয়ে, দেখে, কোয়ালিটি চেক করে পেমেন্টে করার সুবিধা ।</p>';
 
         $previewFeatures2 = [
@@ -383,7 +383,16 @@
                             @if($isPreviewMode)<span class="preview-badge" style="top: -24px; z-index: 50;">Selected
                             Products ({{ $multiProducts->count() }})</span>@endif
 
-                            <div class="grid grid-cols-1 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3' }} gap-6">
+                            @if(!empty($setup->free_shipping_text))
+                                <div
+                                    class="mb-6 p-3.5 bg-amber-500/10 border-2 border-dashed border-[#f2a413] rounded-xl flex items-center justify-center gap-3 text-[#ffdd80] text-sm sm:text-base md:text-xl font-bold shadow-md">
+                                    <i class="fa-solid fa-gift text-[#f2a413] text-lg sm:text-xl animate-bounce"></i>
+                                    <span>{{ $setup->free_shipping_text }}</span>
+                                </div>
+                            @endif
+
+                            <div
+                                class="grid grid-cols-1 {{ $multiProducts->count() === 1 ? 'max-w-md mx-auto' : 'sm:grid-cols-2 md:grid-cols-3' }} gap-6">
                                 @foreach($multiProducts as $p)
                                     <x-landing.landing-product-card-1 :product="$p" :setup="$setup" />
                                 @endforeach
@@ -403,7 +412,8 @@
                 </div>
 
                 {{-- Order Button Below Product Cards --}}
-                <div id="hero-order-btn-wrapper" class="mt-8 md:mt-10 {{ $multiProducts->isNotEmpty() ? 'hidden' : '' }}">
+                <div id="hero-order-btn-wrapper"
+                    class="mt-8 md:mt-10 {{ $multiProducts->isNotEmpty() ? 'hidden' : '' }}">
                     <a href="#order"
                         class="inline-flex items-center justify-center gap-2 md:gap-3 bg-[linear-gradient(90deg,#f2a413_0%,#d8a13a_51%,#f2a413_100%)] bg-[length:200%_auto] hover:bg-[position:100%] hover:brightness-105 text-white px-8 sm:px-10 md:px-[50px] py-3 md:py-[15px] border-[3px] border-[#ad7419] rounded-[10px] font-bold text-lg sm:text-xl md:text-[30px] leading-snug md:leading-[45px] shadow-[0_20px_20px_0_rgba(0,0,0,0.1)] hover:shadow-2xl transition-all duration-500 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge" style="top: -20px;">Button Text</span>@endif
@@ -438,12 +448,14 @@
                         <div
                             class="bg-[#C00000] text-white py-6 px-4 text-xl sm:text-2xl md:text-4xl font-bold rounded-xl mb-12 shadow-lg w-full leading-normal md:leading-relaxed">
                             <span class="inline-block relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Call Text</span>@endif
+                                @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Call
+                                Text</span>@endif
                                 {{ $callText }}
                             </span>
                             @if($phone)
                                 <span class="inline-block relative ml-2 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Phone Number</span>@endif
+                                    @if($isPreviewMode)<span class="preview-badge" style="top: -20px; z-index: 50;">Phone
+                                    Number</span>@endif
                                     <b class="font-bold tracking-wider">{{ $phone }}</b>
                                 </span>
                             @endif
@@ -653,8 +665,10 @@
                     @php
                         $pricingSubtitle = data_get($landing->extras, 'pricing_subtitle') ?: ($landing->pricing_subtitle ?? 'সাশ্রয়ী মূল্যে সেরা পণ্য');
                     @endphp
-                    <p class="text-base md:text-2xl text-[#1f5e00] mb-8 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Pricing Subtitle</span>@endif
+                    <p
+                        class="text-base md:text-2xl text-[#1f5e00] mb-8 {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 10px; z-index: 50;">Pricing
+                        Subtitle</span>@endif
                         {{ $pricingSubtitle }}
                     </p>
                     <div class="bg-[#C00000] text-white p-6 md:p-10 rounded-xl shadow-lg">

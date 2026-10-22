@@ -33,14 +33,13 @@
                                         <a href="{{ url($item->options->slug ?? $item->id) }}"
                                             class="shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
                                             <img src="{{ $item->options->thumbnail ?? '' }}" alt="cart thumbnail" loading="lazy"
-                                                onerror="this.src='{{ asset('./images/template1/frontend/default.webp') }}'"
+                                                onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
                                                 class="w-16 h-16 md:w-20 md:h-20 object-cover rounded-xl border border-gray-100" />
                                         </a>
 
                                         <div class="min-w-0">
                                             <!-- Product Name Link -->
-                                            <a href="{{ url($item->options->slug ?? $item->id) }}"
-                                                class="cursor-pointer group">
+                                            <a href="{{ url($item->options->slug ?? $item->id) }}" class="cursor-pointer group">
                                                 <h3
                                                     class="text-base md:text-lg lg:text-xl font-bold text-gray-900 truncate  transition-colors">
                                                     {{ $item->name }}
@@ -97,17 +96,20 @@
                         @endphp
                         @if(!empty($setup->free_shipping_text))
                             @if(!empty($is_product_free_delivery))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $freeProductText }}</span>
                                 </div>
                             @elseif(!empty($is_rule_free_shipping))
-                                <div class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
+                                <div
+                                    class="mb-5 p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-2.5 text-emerald-800 text-sm font-semibold shadow-xs">
                                     <i class="fa-solid fa-truck-fast text-emerald-600 text-base"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
                             @elseif(!empty($setup->active_free_shipping_rule))
-                                <div class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
+                                <div
+                                    class="mb-5 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2.5 text-amber-800 text-xs sm:text-lg font-medium">
                                     <i class="fa-solid fa-gift text-amber-600 text-sm"></i>
                                     <span>{{ $setup->free_shipping_text }}</span>
                                 </div>
@@ -116,45 +118,45 @@
 
                         <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
                             <span class="text-base md:text-lg lg:text-xl text-gray-600">Subtotal</span>
-                             <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
+                            <span class="text-base md:text-lg lg:text-xl font-bold text-gray-900">
                                 {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($subtotal) : number_format($subtotal) . ' ' . $setup->currency }}
                             </span>
                         </div>
 
                         <!-- Shipping Selection -->
                         @if(!isset($is_free_delivery) || !$is_free_delivery)
-                        <div class="py-4 md:py-5 border-b border-gray-100 w-full">
-                            <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
-                                @csrf
-                                <div class="flex flex-col sm:flex-row items-start sm:justify-between gap-3 md:gap-4 w-full">
-                                    <span class="text-sm md:text-base text-gray-600 sm:mt-0.5 shrink-0">Shipping</span>
-                                    <div class="flex flex-col gap-3 w-full ml-auto">
-                                        <label
-                                            class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full ">
-                                            <span class="text-left sm:text-right leading-tight">Inside Dhaka:
-                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge) : number_format($setup->inside_charge) . ' ' . $setup->currency }}
-                                            </span>
-                                            <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }}
-                                            class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
+                            <div class="py-4 md:py-5 border-b border-gray-100 w-full">
+                                <form action="{{ route('cart.shipping') }}" method="POST" id="shipping-form">
+                                    @csrf
+                                    <div class="flex flex-col sm:flex-row items-start sm:justify-between gap-3 md:gap-4 w-full">
+                                        <span class="text-sm md:text-base text-gray-600 sm:mt-0.5 shrink-0">Shipping</span>
+                                        <div class="flex flex-col gap-3 w-full ml-auto">
+                                            <label
+                                                class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full ">
+                                                <span class="text-left sm:text-right leading-tight">Inside Dhaka:
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->inside_charge) : number_format($setup->inside_charge) . ' ' . $setup->currency }}
+                                                </span>
+                                                <input type="radio" name="area" value="inside" onchange="this.form.submit()" {{ $shipping_area == 'inside' ? 'checked' : '' }}
+                                                    class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
 
-                                        </label>
-                                        <label
-                                            class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
-                                            <span class="text-left sm:text-right leading-tight">Outside Dhaka:
-                                                {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge) : number_format($setup->outside_charge) . ' ' . $setup->currency }}
-                                            </span>
-                                            <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }}
-                                            class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
-                                        </label>
+                                            </label>
+                                            <label
+                                                class="flex items-center justify-between sm:justify-end gap-3 cursor-pointer text-xs md:text-sm text-gray-700 hover:text-gray-900 w-full">
+                                                <span class="text-left sm:text-right leading-tight">Outside Dhaka:
+                                                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency . ' ' . number_format($setup->outside_charge) : number_format($setup->outside_charge) . ' ' . $setup->currency }}
+                                                </span>
+                                                <input type="radio" name="area" value="outside" onchange="this.form.submit()" {{ $shipping_area == 'outside' ? 'checked' : '' }}
+                                                    class="shrink-0 w-4 h-4 accent-[var(--primary-color)] border-gray-300 cursor-pointer" />
+                                            </label>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
-                        </div>
+                                </form>
+                            </div>
                         @else
-                        <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
-                            <span class="text-sm md:text-base text-gray-600">Shipping</span>
-                            <span class="text-sm md:text-base font-bold text-gray-900">Free</span>
-                        </div>
+                            <div class="flex justify-between items-center py-3 md:py-4 border-b border-gray-100">
+                                <span class="text-sm md:text-base text-gray-600">Shipping</span>
+                                <span class="text-sm md:text-base font-bold text-gray-900">Free</span>
+                            </div>
                         @endif
 
                         <!-- Tax & Discount -->
@@ -236,35 +238,35 @@
                 body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === 'success') {
-                    document.querySelectorAll('.cart-count-nav').forEach(badge => {
-                        badge.innerText = data.cart_count;
-                    });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.querySelectorAll('.cart-count-nav').forEach(badge => {
+                            badge.innerText = data.cart_count;
+                        });
 
-                    fetch(window.location.href)
-                    .then(r => r.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const newMain = doc.querySelector('main');
-                        const currentMain = document.querySelector('main');
-                        if(newMain && currentMain) {
-                            currentMain.innerHTML = newMain.innerHTML;
-                        } else {
-                            location.reload();
-                        }
-                    });
-                } else if (typeof toastr !== 'undefined') {
-                    toastr.error(data.message || 'Unable to update cart.');
-                }
-            })
-            .catch(() => {
-                if (typeof toastr !== 'undefined') {
-                    toastr.error('Unable to update cart. Please try again.');
-                }
-            });
+                        fetch(window.location.href)
+                            .then(r => r.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newMain = doc.querySelector('main');
+                                const currentMain = document.querySelector('main');
+                                if (newMain && currentMain) {
+                                    currentMain.innerHTML = newMain.innerHTML;
+                                } else {
+                                    location.reload();
+                                }
+                            });
+                    } else if (typeof toastr !== 'undefined') {
+                        toastr.error(data.message || 'Unable to update cart.');
+                    }
+                })
+                .catch(() => {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Unable to update cart. Please try again.');
+                    }
+                });
         }
     </script>
 @endpush
