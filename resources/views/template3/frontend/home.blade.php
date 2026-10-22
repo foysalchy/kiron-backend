@@ -80,7 +80,7 @@
                         </h3>
                     </div>
                     <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $tItem['image'] ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                        <img src="{{ $tItem['image'] ?? asset('images/cover.webp') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                             alt="{{ $tItem['label'] }}">
                     </div>
                     <a href="{{ url($tItem['link'] ?? '#') }}"
@@ -128,7 +128,7 @@
                         </h3>
                     </div>
                     <div class="px-6 pb-16 h-48 md:h-56 flex items-center justify-center">
-                        <img src="{{ $subCat->image_url ?? asset('images/no-image.png') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
+                        <img src="{{ $subCat->image_url ?? asset('images/cover.webp') }}" loading="lazy" width="250" height="250" class="max-h-full max-w-full object-contain transform group-hover:scale-110 transition-transform duration-500"
                             alt="{{ $subCat->name }}">
                     </div>
                     <a href="{{ url($subCat->slug) }}"
@@ -465,7 +465,7 @@
                 if (!track) return;
                 const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
                 if (!buttons || buttons.length === 0) return;
-                
+
                 // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
                 const needsScroll = track.scrollWidth > track.clientWidth + 4;
                 buttons.forEach(function(btn) {

@@ -26,7 +26,7 @@
             </button>
 
           <img src="{{ $item->options->thumbnail }}"
-               onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'"
+               onerror="this.src='{{ asset('images/template1/frontend/cover.webp') }}'"
                alt="{{ $item->name }}"
                class="w-24 h-24 rounded-xl object-cover">
 

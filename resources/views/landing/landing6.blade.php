@@ -811,6 +811,10 @@
         @endif
 
         {{-- ══ SECTION 6: CUSTOMER REVIEWS (আমাদের সন্তুষ্ট ক্রেতাদের মতামত) ══ --}}
+        @php
+            $displayReviews = (!empty($reviewImgs) && count($reviewImgs) > 0) ? $reviewImgs : ($isPreviewMode ? $previewDefaultReviewImgs : []);
+        @endphp
+        @if(!empty($displayReviews) && count($displayReviews) > 0)
         <section class="w-full bg-[#00703c] py-12 md:py-20 px-4 text-white relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
             @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 0; z-index: 50;">Review</span>@endif
             <div class="max-w-6xl mx-auto space-y-8">
@@ -821,10 +825,6 @@
                 </div>
 
                 {{-- Authentic Testimonial Slider Matching Reference Image --}}
-                @php
-                    $displayReviews = (!empty($reviewImgs) && count($reviewImgs) > 0) ? $reviewImgs : $previewDefaultReviewImgs;
-                @endphp
-
                 <div class="relative px-2 sm:px-6">
                     <div class="swiper rv-swiper landing6-swiper max-w-6xl mx-auto">
                         <div class="swiper-wrapper py-6">
@@ -877,6 +877,7 @@
                 </div>
             </div>
         </section>
+        @endif
 
         {{-- ══ SECTION 7: DIRECT CALL / WHATSAPP / MESSENGER BANNER ══ --}}
         @php

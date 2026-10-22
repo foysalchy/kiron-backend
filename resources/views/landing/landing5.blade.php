@@ -202,14 +202,14 @@
         $exactImgContent1 = '<h2 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#1b3a27] leading-snug">ঘি এর বিশেষ উপকারিতা যা আমাদের প্রোডাক্টকে অনন্য করে তোলে</h2><p class="text-xs sm:text-sm md:text-base text-gray-600 font-medium mt-2">খাঁটি উপাদান আর স্বাস্থ্যকর প্রস্তুত প্রণালী – জেনে নিন কেন আমাদের ঘি পরিবারের সবার জন্য সেরা।</p>';
 
         $exactImgContent2 = '<h3>আমাদের থেকে কেন কিনবেন?</h3>
-                                                <ul>
-                                                    <li>মাত্র ৭ দিনে চুল পড়া হ্রাস</li>
-                                                    <li>খুশকি ও মাথার চুলকানি দূর করে</li>
-                                                    <li>চুল ঘন, লম্বা ও ঝলমলে করে</li>
-                                                    <li>১০০% প্রাকৃতিক উপাদান</li>
-                                                    <li>কোনো পার্শ্বপ্রতিক্রিয়া নেই</li>
-                                                    <li>নারী ও পুরুষ উভয়ের জন্য উপযোগী</li>
-                                                </ul>';
+                                                        <ul>
+                                                            <li>মাত্র ৭ দিনে চুল পড়া হ্রাস</li>
+                                                            <li>খুশকি ও মাথার চুলকানি দূর করে</li>
+                                                            <li>চুল ঘন, লম্বা ও ঝলমলে করে</li>
+                                                            <li>১০০% প্রাকৃতিক উপাদান</li>
+                                                            <li>কোনো পার্শ্বপ্রতিক্রিয়া নেই</li>
+                                                            <li>নারী ও পুরুষ উভয়ের জন্য উপযোগী</li>
+                                                        </ul>';
 
         $exactImgRegularPrice = 'সাধারণ মূল্য: ৫০০ গ্রাম - ৭৪৯ টাকা, ১ কেজি - ১৪৭৫ টাকা';
         $exactImgDiscountPrice = 'অফার মূল্য: মাত্র ৩২০৳!**';
@@ -321,6 +321,20 @@
             'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80',
         ];
 
+        $previewDefaultGalleryImgs = [
+            'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=800&auto=format&fit=crop&q=80',
+            'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=800&auto=format&fit=crop&q=80',
+        ];
+
         $reviewImgs = (!empty($landing->img_paths) && count($landing->img_paths) > 0)
             ? $landing->img_paths
             : (!empty($landing->extras['img_paths']) ? $landing->extras['img_paths'] : ($isPreviewMode ? $previewDefaultReviewImgs : []));
@@ -425,11 +439,86 @@
                     <div
                         class="relative w-full max-w-[480px] aspect-square rounded-md sm:rounded-lg overflow-hidden border border-[#52af82] p-1 bg-white shadow-sm flex items-center justify-center {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
                         @if($isPreviewMode)<span class="preview-badge">Thumbnail</span>@endif
-                        <img src="{{ $productImg }}" alt="{{ $title }}" width="480" height="480"
-                            class="w-full h-full object-cover rounded-sm sm:rounded">
+                        <img id="landing5-main-product-img" src="{{ $productImg }}" alt="{{ $title }}" width="480"
+                            height="480"
+                            class="w-full h-full object-cover rounded-sm sm:rounded transition-opacity duration-200">
                     </div>
                 </div>
             </div>
+
+            {{-- Product Gallery Slider (Pure standalone slider with own CSS & JS, independent of any other section)
+            --}}
+            @php
+                $heroGalleries = [];
+                if (isset($product) && $product->relationLoaded('galleries') ? $product->galleries : ($product->galleries ?? null)) {
+                    foreach ($product->galleries as $g) {
+                        if (!empty($g->image_url)) {
+                            $heroGalleries[] = $g->image_url;
+                        }
+                    }
+                }
+                // For preview mode, ensure there are enough images to showcase the full slider capability
+                if ($isPreviewMode && count($heroGalleries) < 8) {
+                    $heroGalleries = array_values(array_unique(array_filter(array_merge($heroGalleries, $previewDefaultGalleryImgs))));
+                }
+            @endphp
+
+            @if(!empty($heroGalleries) && count($heroGalleries) > 0)
+                <div
+                    class="max-w-6xl mx-auto mt-6 sm:mt-8 pt-4 relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                    @if($isPreviewMode)<span class="preview-badge" style="top: -12px;">Product Gallery</span>@endif
+
+                    <div class="relative group px-1 sm:px-4">
+                        {{-- Prev Arrow --}}
+                        <button type="button" aria-label="Previous slide"
+                            class="l5-gal-prev absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-[#52af82] shadow-md flex items-center justify-center text-[#00703c] hover:bg-[#00703c] hover:text-white transition-all">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+
+                        {{-- Swiper Container --}}
+                        <div class="swiper rv-swiper landing5-gallery-swiper w-full">
+                            <div class="swiper-wrapper py-2">
+                                @foreach($heroGalleries as $gIndex => $gImg)
+                                    <div class="swiper-slide !w-auto !flex-shrink-0">
+                                        <button type="button" onclick="selectL5GalleryImage(this, '{{ $gImg }}')"
+                                            class="l5-gal-item w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-lg overflow-hidden border-2 {{ $gIndex === 0 ? 'border-[#00703c] ring-2 ring-[#00703c]/20' : 'border-[#52af82]/50 hover:border-[#00703c]' }} bg-white shadow-xs p-1 transition-all duration-200 hover:scale-105 cursor-pointer block">
+                                            <img src="{{ $gImg }}" alt="Gallery image {{ $gIndex + 1 }}" loading="lazy"
+                                                onerror="this.src='{{ $productImg }}'" class="w-full h-full object-cover rounded pointer-events-none">
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        {{-- Next Arrow --}}
+                        <button type="button" aria-label="Next slide"
+                            class="l5-gal-next absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-white border border-[#52af82] shadow-md flex items-center justify-center text-[#00703c] hover:bg-[#00703c] hover:text-white transition-all">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+
+                    <script>
+                        function selectL5GalleryImage(btnEl, imgSrc) {
+                            const mainImg = document.getElementById('landing5-main-product-img');
+                            if (mainImg && imgSrc) {
+                                mainImg.style.opacity = '0.3';
+                                setTimeout(() => {
+                                    mainImg.src = imgSrc;
+                                    mainImg.style.opacity = '1';
+                                }, 150);
+                            }
+                            document.querySelectorAll('.l5-gal-item').forEach(el => {
+                                el.classList.remove('border-[#00703c]', 'ring-2', 'ring-[#00703c]/20');
+                                el.classList.add('border-[#52af82]/50');
+                            });
+                            if (btnEl) {
+                                btnEl.classList.remove('border-[#52af82]/50');
+                                btnEl.classList.add('border-[#00703c]', 'ring-2', 'ring-[#00703c]/20');
+                            }
+                        }
+                    </script>
+                </div>
+            @endif
         </header>
 
         {{-- ══ SECTION 2: GREEN TRUST BANNER ══ --}}
@@ -774,72 +863,74 @@
         @endif
 
         {{-- ══ SECTION 6: CUSTOMER REVIEWS (আমাদের সন্তুষ্ট ক্রেতাদের মতামত) ══ --}}
-        <section class="w-full bg-[#00703c] py-12 md:py-20 px-4 text-white relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-            @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 0; z-index: 50;">Review</span>@endif
-            <div class="max-w-6xl mx-auto space-y-8">
-                <div class="text-center">
-                    <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-white">
-                        আমাদের সন্তুষ্ট ক্রেতাদের মতামত
-                    </h3>
-                </div>
+        @php
+            $displayReviews = (!empty($reviewImgs) && count($reviewImgs) > 0) ? $reviewImgs : ($isPreviewMode ? $previewDefaultReviewImgs : []);
+        @endphp
+        @if(!empty($displayReviews) && count($displayReviews) > 0)
+            <section
+                class="w-full bg-[#00703c] py-12 md:py-20 px-4 text-white relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
+                @if($isPreviewMode)<span class="preview-badge" style="top: 0; left: 0; z-index: 50;">Review</span>@endif
+                <div class="max-w-6xl mx-auto space-y-8">
+                    <div class="text-center">
+                        <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-white">
+                            আমাদের সন্তুষ্ট ক্রেতাদের মতামত
+                        </h3>
+                    </div>
 
-                {{-- Authentic Testimonial Slider Matching Reference Image --}}
-                @php
-                    $displayReviews = (!empty($reviewImgs) && count($reviewImgs) > 0) ? $reviewImgs : $previewDefaultReviewImgs;
-                @endphp
-
-                <div class="relative px-2 sm:px-6">
-                    <div class="swiper rv-swiper landing5-swiper max-w-6xl mx-auto">
-                        <div class="swiper-wrapper py-6">
-                            @foreach ($displayReviews as $index => $imgItem)
-                                @php
-                                    $imgSrc = is_array($imgItem) ? ($imgItem['previewUrl'] ?? '') : (str_starts_with($imgItem, 'blob:') || str_starts_with($imgItem, 'data:') || str_starts_with($imgItem, 'http') || str_starts_with($imgItem, '/') ? $imgItem : \Illuminate\Support\Facades\Storage::disk('r2')->url($imgItem));
-                                    $cardData = $previewReviewCards[$index % count($previewReviewCards)];
-                                @endphp
-                                <div class="swiper-slide !flex !justify-center">
-                                    {{-- Outer Green Border Card with symmetrical top and bottom spacing --}}
-                                    <div
-                                        class="w-full max-w-[350px] rounded-2xl border border-white/40 bg-[#0e7845]/80 backdrop-blur-sm p-4 sm:p-5 flex flex-col shadow-xl relative text-left">
-                                        {{-- Inner White Box: Displaying Customer Review Image (From img_paths like
-                                        landing1) --}}
+                    {{-- Authentic Testimonial Slider Matching Reference Image --}}
+                    <div class="relative px-2 sm:px-6">
+                        <div class="swiper rv-swiper landing5-swiper max-w-6xl mx-auto">
+                            <div class="swiper-wrapper py-6">
+                                @foreach ($displayReviews as $index => $imgItem)
+                                    @php
+                                        $imgSrc = is_array($imgItem) ? ($imgItem['previewUrl'] ?? '') : (str_starts_with($imgItem, 'blob:') || str_starts_with($imgItem, 'data:') || str_starts_with($imgItem, 'http') || str_starts_with($imgItem, '/') ? $imgItem : \Illuminate\Support\Facades\Storage::disk('r2')->url($imgItem));
+                                        $cardData = $previewReviewCards[$index % count($previewReviewCards)];
+                                    @endphp
+                                    <div class="swiper-slide !flex !justify-center">
+                                        {{-- Outer Green Border Card with symmetrical top and bottom spacing --}}
                                         <div
-                                            class="bg-white rounded-xl p-2.5 sm:p-3 shadow-sm relative z-10 h-[210px] sm:h-[230px] flex items-center justify-center overflow-hidden border border-gray-100">
-                                            <img src="{{ $imgSrc }}" alt="Customer Review" width="320" height="230"
-                                                class="w-full h-full object-contain rounded-lg">
-                                        </div>
-
-                                        {{-- Bottom Section: Equalized Top and Bottom Spacing --}}
-                                        <div class="relative mt-4 flex items-center justify-between min-h-[64px]">
-                                            {{-- Left Side: Location & Store Link --}}
-                                            <div class="space-y-1 z-20 max-w-[60%] text-left">
-                                                <p class="text-xs sm:text-sm text-white font-medium leading-snug">
-                                                    {{ $setup->store_address ?? '100% Organic & Pure' }}
-                                                </p>
-                                                <p
-                                                    class="text-[11px] sm:text-xs text-white/95 font-bold tracking-wider font-mono">
-                                                    {{ strtolower(preg_replace('/[^a-zA-Z0-9\.]/', '', $setup->shop_name ?? 'falao.shop')) }}
-                                                </p>
+                                            class="w-full max-w-[350px] rounded-2xl border border-white/40 bg-[#0e7845]/80 backdrop-blur-sm p-4 sm:p-5 flex flex-col shadow-xl relative text-left">
+                                            {{-- Inner White Box: Displaying Customer Review Image (From img_paths like
+                                            landing1) --}}
+                                            <div
+                                                class="bg-white rounded-xl p-2.5 sm:p-3 shadow-sm relative z-10 h-[210px] sm:h-[230px] flex items-center justify-center overflow-hidden border border-gray-100">
+                                                <img src="{{ $imgSrc }}" alt="Customer Review" width="320" height="230"
+                                                    class="w-full h-full object-contain rounded-lg">
                                             </div>
 
-                                            {{-- Right Side: Floating Product Polaroid Photo - Locked within card bottom
-                                            boundary --}}
-                                            <div
-                                                class="absolute bottom-0 right-0 w-20 h-20 sm:w-22 sm:h-22 p-1.5 bg-white rounded-md shadow-2xl border border-gray-200 rotate-6 z-30 hover:rotate-0 transition-transform flex items-center justify-center -translate-y-2">
-                                                <img src="{{ $productImg }}" alt="Product" width="88" height="88"
-                                                    class="w-full h-full object-cover rounded-xs">
+                                            {{-- Bottom Section: Equalized Top and Bottom Spacing --}}
+                                            <div class="relative mt-4 flex items-center justify-between min-h-[64px]">
+                                                {{-- Left Side: Location & Store Link --}}
+                                                <div class="space-y-1 z-20 max-w-[60%] text-left">
+                                                    <p class="text-xs sm:text-sm text-white font-medium leading-snug">
+                                                        {{ $setup->store_address ?? '100% Organic & Pure' }}
+                                                    </p>
+                                                    <p
+                                                        class="text-[11px] sm:text-xs text-white/95 font-bold tracking-wider font-mono">
+                                                        {{ strtolower(preg_replace('/[^a-zA-Z0-9\.]/', '', $setup->shop_name ?? 'falao.shop')) }}
+                                                    </p>
+                                                </div>
+
+                                                {{-- Right Side: Floating Product Polaroid Photo - Locked within card bottom
+                                                boundary --}}
+                                                <div
+                                                    class="absolute bottom-0 right-0 w-20 h-20 sm:w-22 sm:h-22 p-1.5 bg-white rounded-md shadow-2xl border border-gray-200 rotate-6 z-30 hover:rotate-0 transition-transform flex items-center justify-center -translate-y-2">
+                                                    <img src="{{ $productImg }}" alt="Product" width="88" height="88"
+                                                        class="w-full h-full object-cover rounded-xs">
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        {{-- Symmetrical White Clickable Pagination Dots --}}
-                        <div class="swiper-pagination landing5-pagination mt-6 flex justify-center items-center gap-2">
+                                @endforeach
+                            </div>
+                            {{-- Symmetrical White Clickable Pagination Dots --}}
+                            <div class="swiper-pagination landing5-pagination mt-6 flex justify-center items-center gap-2">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        @endif
 
         {{-- ══ SECTION 7: DIRECT CALL / WHATSAPP / MESSENGER BANNER ══ --}}
         @php
@@ -893,9 +984,11 @@
                         $supportContent = data_get($landing->extras, 'content') ?: ($landing->content ?? null);
                     @endphp
                     <div class="relative {{ $isPreviewMode ? 'preview-badge-container' : '' }}">
-                        @if($isPreviewMode)<span class="preview-badge" style="top: -15px; left: 0; z-index: 50;">Content</span>@endif
+                        @if($isPreviewMode)<span class="preview-badge"
+                        style="top: -15px; left: 0; z-index: 50;">Content</span>@endif
                         @if(!empty($supportContent))
-                            <div class="prose max-w-none text-[#00703c] leading-relaxed [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm">
+                            <div
+                                class="prose max-w-none text-[#00703c] leading-relaxed [&_h2]:text-xl [&_h2]:sm:text-2xl [&_h2]:md:text-3xl [&_h2]:font-black [&_h2]:text-[#00703c] [&_h3]:text-xl [&_h3]:sm:text-2xl [&_h3]:md:text-3xl [&_h3]:font-black [&_h3]:text-[#00703c] [&_p]:text-gray-600 [&_p]:text-xs [&_p]:sm:text-sm">
                                 {!! $supportContent !!}
                             </div>
                         @else
@@ -992,6 +1085,29 @@
                             pagination: {
                                 el: '.benefit-pagination',
                                 clickable: true,
+                            },
+                        });
+                    }
+
+                    // Section 1 Header: Product Gallery Slider (Infinite Loop)
+                    const galSwiperEl = document.querySelector('.landing5-gallery-swiper');
+                    if (galSwiperEl && !galSwiperEl.swiper) {
+                        const totalGalSlides = galSwiperEl.querySelectorAll('.swiper-slide').length;
+                        new SwiperClass(galSwiperEl, {
+                            slidesPerView: 'auto',
+                            spaceBetween: 12,
+                            loop: totalGalSlides >= 4,
+                            grabCursor: true,
+                            observer: true,
+                            observeParents: true,
+                            autoplay: totalGalSlides >= 4 ? {
+                                delay: 3000,
+                                disableOnInteraction: false,
+                                pauseOnMouseEnter: true,
+                            } : false,
+                            navigation: {
+                                nextEl: '.l5-gal-next',
+                                prevEl: '.l5-gal-prev',
                             },
                         });
                     }
