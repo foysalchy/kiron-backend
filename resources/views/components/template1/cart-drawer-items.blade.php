@@ -5,7 +5,8 @@
 @forelse($cartItems as $item)
     <div class="flex gap-3 mb-4 pb-4 border-b border-gray-100 last:border-0" data-row-id="{{ $item->rowId }}">
         <div class="w-16 h-16 flex-shrink-0 bg-gray-50 rounded overflow-hidden">
-            <img src="{{ $item->options->thumbnail ?? asset('images/cover.webp') }}" alt="{{ $item->name }}" class="w-full h-full object-contain">
+            <img src="{{ $item->options->thumbnail ?? asset('images/product-thumbnail.webp') }}" alt="{{ $item->name }}"
+                class="w-full h-full object-contain">
         </div>
         <div class="flex-1">
             <h3 class="text-[13px] font-bold text-gray-800 leading-tight">{{ $item->name }}</h3>
@@ -16,20 +17,21 @@
                     {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->price, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
                 </span>
 
-                    <div class="flex items-center border border-gray-200 rounded-full h-7 w-20">
-                        <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', -1)"
-                            class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">-</button>
-                        <span class="flex-1 text-center text-[11px] font-bold" data-qty-display>{{ $item->qty }}</span>
-                        <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', 1)"
-                            class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">+</button>
-                    </div>
-                    <span class="text-[13px] font-bold text-gray-700"
-                        data-item-subtotal
-                        data-item-subtotal-raw="{{ $item->subtotal }}">
-                        {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
-                    </span>
+                <div class="flex items-center border border-gray-200 rounded-full h-7 w-20">
+                    <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', -1)"
+                        class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">-</button>
+                    <span class="flex-1 text-center text-[11px] font-bold" data-qty-display>{{ $item->qty }}</span>
+                    <button type="button" onclick="changeItemQty(this, '{{ $item->rowId }}', 1)"
+                        class="w-6 flex items-center justify-center text-gray-500 hover:text-[var(--primary-color)] text-xs cursor-pointer">+</button>
+                </div>
+                <span class="text-[13px] font-bold text-gray-700" data-item-subtotal
+                    data-item-subtotal-raw="{{ $item->subtotal }}">
+                    {{ ($setup->currency_position ?? 'left') == 'left' ? $setup->currency : '' }}{{ number_format($item->subtotal, 0) }}{{ ($setup->currency_position ?? 'left') == 'right' ? $setup->currency : '' }}
+                </span>
 
-                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')" aria-label="Remove {{ $item->name }} from cart" class="text-gray-400 hover:text-red-500"><i class="fa-regular fa-circle-xmark"></i></button>
+                <button onclick="removeCartItem('{{ $item->rowId }}', '{{ $removeMessage }}')"
+                    aria-label="Remove {{ $item->name }} from cart" class="text-gray-400 hover:text-red-500"><i
+                        class="fa-regular fa-circle-xmark"></i></button>
             </div>
 
 
@@ -114,18 +116,18 @@
         const token = document.querySelector('meta[name="csrf-token"]').content;
 
         fetch("{{ route('cart.update') }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({
-                    rowId: rowId,
-                    qty: newQty
-                })
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': token
+            },
+            body: JSON.stringify({
+                rowId: rowId,
+                qty: newQty
             })
+        })
             .then(res => res.json())
             .then(data => {
                 if (data.status !== 'success') {
@@ -147,38 +149,38 @@
             });
     }
 
-function removeCartItem(rowId, customMessage) {
-    const card = document.querySelector(`[data-row-id="${rowId}"]`);
-    if (card) card.remove();
+    function removeCartItem(rowId, customMessage) {
+        const card = document.querySelector(`[data-row-id="${rowId}"]`);
+        if (card) card.remove();
 
-    recalculateOverallSubtotal();
+        recalculateOverallSubtotal();
 
-    fetch(`/cart/remove/${rowId}`, {
+        fetch(`/cart/remove/${rowId}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             }
         })
-        .then(res => res.json())
-        .then(data => {
-            refreshMiniCart();
+            .then(res => res.json())
+            .then(data => {
+                refreshMiniCart();
 
-            // ============ পরিবর্তন: ম্যানুয়াল decrement বাদ দিয়ে server থেকে আসল cart_count ব্যবহার ============
-            if (data && data.cart_count !== undefined) {
-                document.querySelectorAll('.cart-count-nav').forEach(el => {
-                    el.innerText = data.cart_count;
-                });
-            }
+                // ============ পরিবর্তন: ম্যানুয়াল decrement বাদ দিয়ে server থেকে আসল cart_count ব্যবহার ============
+                if (data && data.cart_count !== undefined) {
+                    document.querySelectorAll('.cart-count-nav').forEach(el => {
+                        el.innerText = data.cart_count;
+                    });
+                }
 
-            if (typeof refreshCartUI === 'function') refreshCartUI();
-            toastr.success((data && data.message) || customMessage || 'The item has been removed from the cart.');
-        })
-        .catch(err => {
-            console.error('Error removing item:', err);
-            toastr.error('Failed to remove item.');
-            refreshMiniCart();
-        });
-}
+                if (typeof refreshCartUI === 'function') refreshCartUI();
+                toastr.success((data && data.message) || customMessage || 'The item has been removed from the cart.');
+            })
+            .catch(err => {
+                console.error('Error removing item:', err);
+                toastr.error('Failed to remove item.');
+                refreshMiniCart();
+            });
+    }
 
     function toggleCartDrawer() {
         const drawer = document.getElementById('cart-drawer');

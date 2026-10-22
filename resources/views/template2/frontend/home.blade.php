@@ -3,8 +3,8 @@
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
     @if(isset($mainSliders) && $mainSliders->isNotEmpty())
         @php $firstSlider = $mainSliders->first(); @endphp
-        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)" fetchpriority="high">
-        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}" media="(max-width: 767px)" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}" media="(min-width: 768px)" fetchpriority="high">
     @endif
 @endsection
 @section('content')
@@ -25,9 +25,9 @@
                             <div class="min-w-full h-full">
                                 <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
                                     <picture class="block w-full h-full">
-                                        <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}">
-                                        <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}">
-                                        <img src="{{ $slider->image_url ?? asset('images/template1/frontend/cover.webp') }}"
+                                        <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}">
+                                        <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}">
+                                        <img src="{{ $slider->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
                                             class="w-full h-full object-cover" alt="{{ $slider->title }}"
                                             @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
                                     </picture>
@@ -116,7 +116,7 @@
                                     {{ $tItem['label'] }}
                                 </span>
                                 <span class="text-[#0f172a9c] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[10px] md:text-[12px]">
-                                    {{ $tItem['product_count'] ?? 0 }} Items 
+                                    {{ $tItem['product_count'] ?? 0 }} Items
                                 </span>
                             </a>
                         @endif
@@ -167,7 +167,7 @@
 
                             <!-- Category Name -->
                             <span class="text-[#0f172a9c] font-normal leading-tight text-center group-hover:text-[var(--primary-color)] transition-colors line-clamp-2 text-[10px] md:text-[12px]">
-                                {{ $category->product_count ?? 0 }} Items 
+                                {{ $category->product_count ?? 0 }} Items
                             </span>
                         </a>
                     @endforeach
@@ -229,11 +229,11 @@
                                 <!-- Price Logic (Corrected Fields) -->
                                 <div class="text-[var(--primary-color)] font-black text-sm md:text-lg flex flex-wrap items-center gap-2">
                                     @if ($isVar && $minPrice > 0)
-                                        
+
                                         <span>{{ number_format($minPrice, 0) }}{{ $currency }} -
                                             {{ number_format($maxPrice, 0) }}{{ $currency }}</span>
                                     @else
-                                        
+
                                         @if ($salePrice < $regularPrice && $salePrice > 0)
                                             <span
                                                 class="line-through text-gray-500 text-xs md:text-sm font-bold">{{ number_format($regularPrice, 0) }}{{ $currency }}</span>
@@ -263,9 +263,9 @@
         <div class="bg-white rounded-lg shadow-xs  p-2 md:p-6">
 
             <!-- Header -->
-             
+
                 <h2 class="text-md md:text-lg font-bold lg:mb-4 mb-2 uppercase tracking-tight">All Products</h2>
-            
+
 
             <!-- Product Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-5">
@@ -367,7 +367,7 @@
                 if (!track) return;
                 const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
                 if (!buttons || buttons.length === 0) return;
-                
+
                 // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
                 const needsScroll = track.scrollWidth > track.clientWidth + 4;
                 buttons.forEach(function(btn) {

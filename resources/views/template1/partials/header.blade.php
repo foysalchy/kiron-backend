@@ -51,8 +51,8 @@
             <!-- Logo Section -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 @if ($setup && $setup->logo)
-                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200" height="80"
-                        class="h-8 md:h-12 w-auto object-contain">
+                    <img src="{{ $setup->logo_url ?? asset('images/logo.jpeg') }}" alt="{{ $setup->shop_name }}" width="200"
+                        height="80" class="h-8 md:h-12 w-auto object-contain">
                 @else
                     <span class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
                         {{ $setup->shop_name ?? 'Bhaiya Digital' }}
@@ -121,7 +121,8 @@
 
 
             <!-- Mobile Search Toggle -->
-            <button class="sm:hidden text-xl hover-text" aria-label="Toggle Mobile Search" onclick="toggleMobileSearch()">
+            <button class="sm:hidden text-xl hover-text" aria-label="Toggle Mobile Search"
+                onclick="toggleMobileSearch()">
                 <i class="fas fa-search"></i>
             </button>
 
@@ -265,7 +266,7 @@
                                 class="flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
                                 <img src="{{ $p->thumbnail_url }}"
                                     class="w-6 h-6 rounded object-cover border border-gray-100"
-                                    onerror="this.src='{{ asset('images/cover.webp') }}'">
+                                    onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'">
                                 <span class="truncate">{{ $p->title }}</span>
                             </a>
                         @endforeach
@@ -514,19 +515,22 @@
 
         <!-- Home -->
         <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 text-gray-700">
-            <img src="{{ asset('./images/template1/frontend/home.png') }}" alt="home" height="24px" width="24px" loading="lazy">
+            <img src="{{ asset('./images/template1/frontend/home.png') }}" alt="home" height="24px" width="24px"
+                loading="lazy">
             <span class="text-xs font-medium">Home</span>
         </a>
 
         <!-- Category (Triggers the existing Mobile Menu) -->
         <button onclick="toggleMobileMenu()" class="flex flex-col items-center gap-1 text-gray-700">
-            <img src="{{ asset('./images/template1/frontend/app.png') }}" height="24px" width="24px" alt="Category" loading="lazy">
+            <img src="{{ asset('./images/template1/frontend/app.png') }}" height="24px" width="24px" alt="Category"
+                loading="lazy">
             <span class="text-xs font-medium">Category</span>
         </button>
 
         <!-- Cart -->
         <a href="{{ route('cart.index') }}" class="flex flex-col items-center gap-1 text-gray-700 relative">
-            <img src="{{ asset('./images/template1/frontend/sell.png') }}" alt="Cart" height="24px" width="24px" loading="lazy">
+            <img src="{{ asset('./images/template1/frontend/sell.png') }}" alt="Cart" height="24px" width="24px"
+                loading="lazy">
             <span
                 class="absolute -top-1 -right-2 primary-bg text-primary text-[9px] font-bold px-1 rounded-full border border-white">
                 {{ \Gloudemans\Shoppingcart\Facades\Cart::count() }}
@@ -545,7 +549,8 @@
                     <p class="text-xs font-medium">{{ auth('customer')->user()->name }}</p>
                 </div>
             @else
-                <img src="{{ asset('./images/template1/frontend/people.png') }}" alt="Profile" height="24px" width="24px" loading="lazy">
+                <img src="{{ asset('./images/template1/frontend/people.png') }}" alt="Profile" height="24px" width="24px"
+                    loading="lazy">
                 <span class="text-xs font-medium">Profile</span>
             @endauth
         </a>
@@ -642,9 +647,9 @@
                                             link.className =
                                                 "flex items-center gap-3 px-5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition-colors";
                                             link.innerHTML = `
-                                                <img src="${item.thumbnail_95_url}" class="w-7 h-7 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/cover.webp') }}'" loading="lazy" width="800" height="800">
-                                                <span class="truncate">${item.title}</span>
-                                            `;
+                                                    <img src="${item.thumbnail_95_url}" class="w-7 h-7 rounded object-cover border border-gray-100" onerror="this.src='{{ asset('images/product-thumbnail.webp') }}'" loading="lazy" width="800" height="800">
+                                                    <span class="truncate">${item.title}</span>
+                                                `;
                                             config.results.appendChild(link);
                                         });
                                     } else {

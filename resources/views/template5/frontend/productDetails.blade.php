@@ -83,7 +83,7 @@
                 <div
                     class="relative h-[400px] lg:h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-sm sear-corner">
                     <img id="mainImage"
-                        src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/cover.webp') }}"
+                        src="{{ $product->display_image_url ?? $product->thumbnail_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
                         alt="{{ $product->title }}" class="w-full h-full object-cover">
 
                     @if ($product->display_price_data->regular_price > $product->display_price_data->sale_price)
@@ -114,7 +114,7 @@
                                 onclick="changeImage('{{ $imgUrl }}')"
                                 class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors {{ $index == 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50' }}">
                                 <img src="{{ $imgUrl }}" alt="{{ $product->title }} image {{ $index + 1 }}"
-                                    onerror="this.src='{{ asset('images/template1/frontend/cover.webp') }}'"
+                                    onerror="this.src='{{ asset('images/template1/frontend/product-thumbnail.webp') }}'"
                                     class="w-full h-full object-cover pointer-events-none">
                             </button>
                         @endforeach
@@ -211,7 +211,7 @@
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             aria-label="{{ $isWishlisted ? 'Remove ' . $product->title . ' from wishlist' : 'Add ' . $product->title . ' to wishlist' }}"
                             class="w-12 h-12 rounded-full border flex items-center justify-center transition-colors shrink-0 sm:order-4
-                    {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
+                        {{ $isWishlisted ? 'border-[var(--primary-color)] text-[var(--primary-color)] bg-[var(--primary-color)]/5' : 'border-coal/15 text-coal hover:border-[var(--primary-color)] hover:text-[var(--primary-color)]' }}">
                             <svg id="wish-icon-main" width="20" height="20" viewBox="0 0 24 24"
                                 fill="{{ $isWishlisted ? '#D6431F' : 'none' }}" stroke="currentColor" stroke-width="2">
                                 <path
@@ -326,10 +326,10 @@
             container.innerHTML = '';
             images.forEach((img, i) => {
                 container.innerHTML += `
-                      <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
-                        class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
-                        <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
-                      </button>`;
+                          <button type="button" aria-label="View product image ${i + 1}" onclick="changeImage('${img}')"
+                            class="h-20 w-20 md:h-24 md:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-colors ${i === 0 ? 'border-[var(--primary-color)] ring-offset-2 ring-2 ring-[var(--primary-color)]/20' : 'border-coal/10 hover:border-[var(--primary-color)]/50'}">
+                            <img src="${img}" alt="{{ addslashes($product->title) }} image ${i + 1}" onerror="this.src='{{ asset('images/template1/frontend/default.webp') }}'" class="w-full h-full object-cover pointer-events-none">
+                          </button>`;
             });
 
             // ============ Arrow visibility + container padding dynamically আপডেট ============
@@ -384,7 +384,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                                {{ $product->display_price_data->sale_price ?? 0 }},
+                                    {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;

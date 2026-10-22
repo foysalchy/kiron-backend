@@ -49,7 +49,7 @@
                     <div
                         class="aspect-square mb-4 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 relative group">
                         <img id="mainImage"
-                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
+                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                             class="w-full h-full object-contain transition-transform duration-500">
                     </div>
                     <div id="thumbnail-container" class="grid grid-cols-5 sm:grid-cols-6 gap-2 md:gap-3">
@@ -57,7 +57,7 @@
                             <button onclick="changeImage('{{ $imgUrl }}')"
                                 class="aspect-square rounded-lg border border-gray-200 p-1 bg-white hover:border-[#FF6A00] transition-colors overflow-hidden">
                                 <img src="{{ $imgUrl }}"
-                                    onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'"
+                                    onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'"
                                     class="w-full h-full object-contain" alt="Product Image" loading="lazy" width="800"
                                     height="800">
                             </button>
@@ -178,7 +178,7 @@
                         <!--  Wishlist -->
                         <button id="btn-wish" type="button" onclick="toggleWishlist({{ $product->id }})"
                             class="flex-1 border-2 h-12 rounded-lg font-bold flex items-center justify-center gap-2 transition-all
-                                                {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
+                                                    {{ $isWishlisted ? 'bg-orange-50 text-[#FF6A00] border-[#FF6A00]' : 'bg-white border-gray-100 text-gray-600' }}">
 
                             <i id="wish-icon-main"
                                 class="{{ $isWishlisted ? 'fas fa-heart text-red-500' : 'far fa-heart' }}"></i>
@@ -594,10 +594,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                                                onclick="changeImage('${imgUrl}', this)">
-                                                <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
-                                            </button>`;
+                                                <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                                    onclick="changeImage('${imgUrl}', this)">
+                                                    <img src="${imgUrl}" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-cover" / loading="lazy" width="800" height="800">
+                                                </button>`;
             });
         }
 
@@ -685,7 +685,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                                    {{ $product->display_price_data->sale_price ?? 0 }},
+                                        {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;

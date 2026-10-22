@@ -161,7 +161,7 @@
                                     <!-- Actual Product Image -->
                                     <div
                                         class="w-16 h-16 bg-white rounded-lg overflow-hidden border border-gray-100 shrink-0">
-                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/cover.webp') }}" alt="{{ $item->name ?? 'Product Image' }}"
+                                        <img src="{{ $item->options->thumbnail ?? asset('./images/template1/frontend/product-thumbnail.webp') }}" alt="{{ $item->name ?? 'Product Image' }}"
                                             class="w-full h-full object-cover">
                                     </div>
 

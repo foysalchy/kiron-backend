@@ -3,8 +3,12 @@
     @include('components.meta-info.ecommerce-meta.index-meta', ['setup' => $setup])
     @if(isset($mainSliders) && $mainSliders->isNotEmpty())
         @php $firstSlider = $mainSliders->first(); @endphp
-        <link rel="preload" as="image" href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(max-width: 767px)" fetchpriority="high">
-        <link rel="preload" as="image" href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/cover.webp') }}" media="(min-width: 768px)" fetchpriority="high">
+        <link rel="preload" as="image"
+            href="{{ $firstSlider->mobile_image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+            media="(max-width: 767px)" fetchpriority="high">
+        <link rel="preload" as="image"
+            href="{{ $firstSlider->image_url ?? asset('images/template1/frontend/product-thumbnail.webp') }}"
+            media="(min-width: 768px)" fetchpriority="high">
     @endif
 @endsection
 @section('content')
@@ -22,53 +26,53 @@
                     Explore Categories</div>
                 <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
                     @foreach ($categories as $category)
-                    <div class="group border-b border-gray-200">
-                        <a href="{{ url($category->slug) }}"
-                            class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
-                            <div class="flex items-center gap-3 ">
-                                <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
-                                    class="w-8 h-8 rounded-full object-cover border border-gray-100"
-                                    alt="{{ $category->name }}">
-                                <span class="text-lg text-gray-800">{{ $category->name }}</span>
-                            </div>
+                        <div class="group border-b border-gray-200">
+                            <a href="{{ url($category->slug) }}"
+                                class="w-full flex items-center justify-between p-3 hover:bg-orange-50 rounded-xl transition-all">
+                                <div class="flex items-center gap-3 ">
+                                    <img src="{{ !empty($category->image) ? $category->image_url : asset('./images/template1/frontend/default.webp') }}"
+                                        class="w-8 h-8 rounded-full object-cover border border-gray-100"
+                                        alt="{{ $category->name }}">
+                                    <span class="text-lg text-gray-800">{{ $category->name }}</span>
+                                </div>
+                                @if ($category->subCategories->count() > 0)
+                                    <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
+                                @endif
+                            </a>
+
+                            <!-- subcategory panel -->
                             @if ($category->subCategories->count() > 0)
-                                <i class="fas fa-chevron-right text-[10px] text-gray-400"></i>
-                            @endif
-                        </a>
+                                <div
+                                    class="absolute left-full top-0 w-[240px] h-full min-h-max bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 transition-all duration-300">
 
-                        <!-- subcategory panel -->
-                        @if ($category->subCategories->count() > 0)
-                            <div
-                                class="absolute left-full top-0 w-[240px] h-full min-h-max bg-white shadow-xs rounded-lg border border-gray-100 py-2 hidden group-hover:block z-40 transition-all duration-300">
+                                    @foreach ($category->subCategories as $subCategory)
+                                        <!-- sub category -->
+                                        <div class="group/sub">
+                                            <a href="{{ url($subCategory->slug) }}"
+                                                class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[var(--primary-color)] transition-colors">
+                                                <span>{{ $subCategory->name }}</span>
+                                                @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
+                                                    <i class="fas fa-chevron-right text-[9px]"></i>
+                                                @endif
+                                            </a>
 
-                                @foreach ($category->subCategories as $subCategory)
-                                    <!-- sub category -->
-                                    <div class="group/sub">
-                                        <a href="{{ url($subCategory->slug) }}"
-                                            class="flex items-center justify-between px-4 py-2.5 hover:bg-orange-50 text-sm text-gray-700 hover:text-[var(--primary-color)] transition-colors">
-                                            <span>{{ $subCategory->name }}</span>
+                                            <!-- mini category pannel -->
                                             @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
-                                                <i class="fas fa-chevron-right text-[9px]"></i>
+                                                <div
+                                                    class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
+                                                    @foreach ($subCategory->miniCategories as $miniCategory)
+                                                        <a href="{{ url($miniCategory->slug) }}"
+                                                            class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
+                                                            {{ $miniCategory->name }}
+                                                        </a>
+                                                    @endforeach
+                                                </div>
                                             @endif
-                                        </a>
-
-                                        <!-- mini category pannel -->
-                                        @if ($subCategory->miniCategories && $subCategory->miniCategories->count() > 0)
-                                            <div
-                                                class="absolute left-full top-0 w-[220px] h-full bg-white shadow-2xl rounded-xl border border-gray-100 py-2 hidden group-hover/sub:block z-50 ml-0.5 transition-all duration-200">
-                                                @foreach ($subCategory->miniCategories as $miniCategory)
-                                                    <a href="{{ url($miniCategory->slug) }}"
-                                                        class="block px-4 py-2 text-sm text-gray-600 hover:text-[var(--primary-color)] hover:bg-orange-50 transition-colors">
-                                                        {{ $miniCategory->name }}
-                                                    </a>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
                     @endforeach
                 </div>
 
@@ -85,13 +89,15 @@
                                         <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url }}">
                                         <source media="(min-width: 768px)" srcset="{{ $slider->image_url }}">
                                         <img src="{{ $slider->image_url }}" class="w-full h-full object-cover"
-                                            alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager" @else loading="lazy" @endif>
+                                            alt="{{ $slider->title }}" @if($loop->first) fetchpriority="high" loading="eager"
+                                            @else loading="lazy" @endif>
                                     </picture>
                                 </a>
                             </div>
                         @empty
                             <div class="min-w-full h-full"><img src="{{ asset('./images/template1/frontend/default.webp') }}"
-                                    alt="default image" class="w-full h-full object-cover" loading="lazy" width="800" height="800"></div>
+                                    alt="default image" class="w-full h-full object-cover" loading="lazy" width="800"
+                                    height="800"></div>
                         @endforelse
                     </div>
 
@@ -152,7 +158,8 @@
                                         <img src="{{ $tItem['image'] ?? asset('images/template1/frontend/default.webp') }}"
                                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             alt="{{ $tItem['label'] }}"
-                                            onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';" loading="lazy" width="800" height="800">
+                                            onerror="this.onerror=null;this.src='{{ asset('images/template1/frontend/default.webp') }}';"
+                                            loading="lazy" width="800" height="800">
                                     </div>
                                     <span class="md:text-md text-sm text-gray-800 text-center w-full px-1">
                                         {{ $tItem['label'] }}
@@ -181,8 +188,7 @@
                     </button>
                     <div id="cat-slider" class="flex items-start gap-3 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth">
                         @foreach ($categories as $category)
-                            <a href="{{ url($category->slug) }}"
-                                class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
+                            <a href="{{ url($category->slug) }}" class="flex flex-col items-center md:min-w-[110px] min-w-[85px] ">
                                 <div
                                     class="w-16 h-16 md:w-24 md:h-24 rounded-full group overflow-hidden mb-2 md:mb-3 border border-gray-100">
                                     <img src="{{ $category->image_url ?? asset('images/template1/frontend/default.webp') }}"
@@ -310,13 +316,15 @@
             <div class="flex flex-col md:flex-row gap-3 md:gap-5">
 
                 @foreach ($middleSliders as $slider)
-              
+
                     <div
                         class="flex-1 h-32 sm:h-40 md:h-48 lg:h-76 overflow-hidden rounded-lg shadow-xs hover:shadow-md transition-shadow duration-300 cursor-pointer group">
                         <a href="{{ $slider->url ?? '#' }}" class="block w-full h-full">
                             <picture class="block w-full h-full">
-                                <source media="(max-width: 767px)" srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
-                                <source media="(min-width: 768px)" srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                <source media="(max-width: 767px)"
+                                    srcset="{{ $slider->mobile_image_url ?? asset('./images/template1/frontend/default.webp') }}">
+                                <source media="(min-width: 768px)"
+                                    srcset="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}">
                                 <img src="{{ $slider->image_url ?? asset('./images/template1/frontend/default.webp') }}"
                                     alt="{{ $slider->title }}" loading="lazy"
                                     class="w-full h-full rounded-md object-cover transition-transform duration-700 ease-in-out group-hover:scale-105">
@@ -474,10 +482,10 @@
                 if (!track) return;
                 const buttons = typeof btnSelector === 'string' ? document.querySelectorAll(btnSelector) : btnSelector;
                 if (!buttons || buttons.length === 0) return;
-                
+
                 // শুধুমাত্র তখনই বাটন দেখাবে যদি কন্টেন্ট কনটেইনারের চেয়ে বড় হয় এবং স্ক্রল করার প্রয়োজন থাকে (মোবাইল ও ডেস্কটপ উভয়েই)
                 const needsScroll = track.scrollWidth > track.clientWidth + 4;
-                buttons.forEach(function(btn) {
+                buttons.forEach(function (btn) {
                     if (needsScroll) {
                         btn.classList.remove('hidden');
                         btn.classList.add('flex');
@@ -492,7 +500,7 @@
             toggleBtns('#brand-track', '.brand-nav-btn');
             toggleBtns('#na-track', '.na-nav-btn');
 
-            document.querySelectorAll('.group-track').forEach(function(track) {
+            document.querySelectorAll('.group-track').forEach(function (track) {
                 const trackId = track.id;
                 const buttons = document.querySelectorAll('.group-nav-btn[data-track="' + trackId + '"]');
                 toggleBtns(track, buttons);

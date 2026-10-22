@@ -32,14 +32,16 @@
         <!-- Discount Badge -->
         <!-- Discount Badge (Top Left) -->
         @if ($discountLabel)
-            <div class="absolute top-3 left-3 z-20 bg-[#be123c] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+            <div
+                class="absolute top-3 left-3 z-20 bg-[#be123c] text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                 -{{ $discountLabel }}
             </div>
         @endif
 
         <!-- Free Delivery Badge (Bottom Left) -->
         @if ($product->is_free_delivery)
-            <div class="absolute bottom-3 left-3 z-20 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
+            <div
+                class="absolute bottom-3 left-3 z-20 bg-gray-800 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-sm">
                 Free Shipping
             </div>
         @endif
@@ -51,9 +53,8 @@
                 class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart text-red-500' : 'fa-regular fa-heart text-gray-400' }} text-sm"></i>
         </button>
 
-        <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full "
-            aria-label="product details">
-            <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}"
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block w-full h-full " aria-label="product details">
+            <img src="{{ $product->thumbnail_310_url ?? $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
                 alt="{{ $product->title }}" width="300" height="300" loading="lazy"
                 class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110">
         </a>
@@ -66,8 +67,7 @@
             {{ $product->mega_categories?->pluck('name')->implode(', ') ?: 'General' }}
         </div> --}}
 
-        <a href="{{ url($product->slug ?? $product->id) }}" class="block flex-grow"
-            aria-label="product details">
+        <a href="{{ url($product->slug ?? $product->id) }}" class="block flex-grow" aria-label="product details">
             <p
                 class="  md:text-[17px] text-[15px]  text-gray-800 line-clamp-2  min-h-[30px] group-hover/title:text-[#BD4F00] transition-colors">
                 {{ $product->title }}

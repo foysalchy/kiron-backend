@@ -29,7 +29,8 @@
                         class="w-4 h-4 text-gray-600 shrink-0" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
                     </svg>
-                    <a href="{{ url($item['slug']) }}" class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
+                    <a href="{{ url($item['slug']) }}"
+                        class="hover:text-[var(--primary-color)] transition-colors">{{ $item['name'] }}</a>
                 @endforeach
             @endif
 
@@ -37,7 +38,8 @@
                 class="w-4 h-4 text-gray-600 shrink-0" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"></path>
             </svg>
-            <span class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
+            <span
+                class="text-[var(--primary-color)] font-bold truncate max-w-[200px] md:max-w-none">{{ $product->title }}</span>
         </nav>
     </section>
 
@@ -59,16 +61,18 @@
                                 <button aria-label="View product image"
                                     class="thumb-btn border {{ $loop->first ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200' }} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
                                     onclick="changeImage('{{ $imgUrl }}', this)">
-                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover" alt="Product thumbnail" / loading="lazy" width="800" height="800">
+                                    <img src="{{ $imgUrl }}" class="w-full h-full object-cover" alt="Product thumbnail" /
+                                        loading="lazy" width="800" height="800">
                                 </button>
                             @endforeach
                         </div>
                     </div>
 
                     <!-- Main Image Box -->
-                    <div
-                        class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2  ">
-                        <img id="mainImage" src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/cover.webp') }}" alt="{{ $product->title ?? 'Product Image' }}" loading="lazy" width="800" height="800"
+                    <div class="relative flex-1 border border-gray-100 rounded overflow-hidden order-1 md:order-2  ">
+                        <img id="mainImage"
+                            src="{{ $product->thumbnail_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                            alt="{{ $product->title ?? 'Product Image' }}" loading="lazy" width="800" height="800"
                             alt="main image" class=" m-auto object-contain transition-all duration-500" />
 
                         <!-- Wishlist Button -->
@@ -77,10 +81,9 @@
                             data-wishlist-add-label="Add {{ $product->title }} to wishlist"
                             data-wishlist-remove-label="Remove {{ $product->title }} from wishlist"
                             class="absolute top-3 left-3 md:top-4 md:left-4 p-2 rounded-full shadow-md transition-all active:scale-90 cursor-pointer z-10
-                                {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
+                                    {{ $isWishlisted ? 'bg-red-500 text-white' : 'bg-white text-[var(--primary-color)]' }}">
 
-                            <i
-                                class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"
+                            <i class="wish-icon-{{ $product->id }} {{ $isWishlisted ? 'fa-solid fa-heart' : 'fa-regular fa-heart' }} text-lg"
                                 aria-hidden="true"></i>
                         </button>
                     </div>
@@ -93,10 +96,10 @@
                             {{ $product->title }}
                         </h1>
                         @if(!empty($product->brand))
-                        <p class="text-gray-600 mt-1 text-lg font-medium pt-2 ">
-                            Brand Name: <span
-                                class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
-                        </p>
+                            <p class="text-gray-600 mt-1 text-lg font-medium pt-2 ">
+                                Brand Name: <span
+                                    class="text-[var(--primary-color)] font-semibold">{{ $product->brand->name ?? 'No Brand' }}</span>
+                            </p>
                         @endif
 
                         <div class="flex items-baseline gap-2 md:gap-3 pt-3 md:pt-4">
@@ -119,7 +122,8 @@
                             @endif
 
                             @if ($product->is_free_delivery == 1)
-                                <span class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
+                                <span
+                                    class="bg-green-100 text-green-700 border border-green-200 text-[10px] md:text-xs font-bold px-2 py-1 rounded self-center ml-2">
                                     Free Shipping
                                 </span>
                             @endif
@@ -143,7 +147,8 @@
                     <div>
                         {{-- Free Shipping Notice (Only if product does not have its own free delivery) --}}
                         @if ($product->is_free_delivery != 1 && !empty($setup->free_shipping_text))
-                            <div class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
+                            <div
+                                class="mb-4 p-2.5 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2 text-amber-800 text-xs md:text-xl font-medium">
                                 <i class="fa-solid fa-gift text-amber-600"></i>
                                 <span>{{ $setup->free_shipping_text }}</span>
                             </div>
@@ -165,18 +170,18 @@
 
                             <div class="flex-1 flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
                                 <!-- Add to Cart Button -->
-                                <button onclick="handleAddToCart()"
-                                    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart()" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 border border-gray-200 text-[#0f172a] font-bold py-2.5 rounded-2xl hover:bg-gray-50 transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'কার্টে যোগ করুন' : 'Add To Cart' }}</button>
 
                                 <!-- Buy Now Button -->
-                                <button onclick="handleAddToCart(true)"
-                                    {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
+                                <button onclick="handleAddToCart(true)" {{ ($product->manage_stock && $product->available_stock <= 0) ? 'disabled' : '' }}
                                     class="flex-1 flex items-center justify-center gap-2 primary-bg hover:bg-[#52166d] text-white font-bold py-2.5 rounded-2xl transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">{{ isset($setup->lang) && $setup->lang == 'bn' ? 'অর্ডার করুন' : 'Buy Now' }}</button>
                             </div>
                         </div>
-                        <p class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
-                            <i class="fas {{ (!$product->manage_stock || $product->available_stock > 0) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
+                        <p
+                            class="text-sm mt-4 {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-700' : 'text-red-500' }}">
+                            <i
+                                class="fas {{ (!$product->manage_stock || $product->available_stock > 0) ? 'fa-check-circle' : 'fa-times-circle' }} mr-1"></i>
                             {{ !$product->manage_stock ? 'In Stock' : ($product->available_stock > 0 ? $product->available_stock . ' in stock' : 'Out of stock') }}
                         </p>
 
@@ -200,8 +205,7 @@
                                 </a>
 
                                 <!-- WhatsApp -->
-                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}"
-                                    target="_blank"
+                                <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $setup->phone) }}" target="_blank"
                                     class="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:border-green-300 hover:bg-green-50 hover:text-green-600 transition-all duration-200">
                                     <i class="fa-brands fa-whatsapp text-base"></i>
                                     <span>WhatsApp</span>
@@ -249,148 +253,151 @@
     @endphp
 
     @if($hasAnyTab || $hasRelated)
-    <section id="product-listing-page" class="container mx-auto px-4 py-4">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 items-start">
+        <section id="product-listing-page" class="container mx-auto px-4 py-4">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-8 items-start">
 
-            <!-- LEFT COLUMN: All Sections -->
-            <div class="{{ $hasAnyTab ? 'lg:col-span-3' : 'hidden' }} flex flex-col gap-6 md:gap-8">
+                <!-- LEFT COLUMN: All Sections -->
+                <div class="{{ $hasAnyTab ? 'lg:col-span-3' : 'hidden' }} flex flex-col gap-6 md:gap-8">
 
-                @if($hasAnyTab)
-                    <!-- Sticky Navigation Bar (Tabs) -->
-                    <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
-                        <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
-                            @if($hasDescription)
-                                <button onclick="scrollToSection('section-description', this)" role="tab"
-                                    aria-selected="{{ $firstTab === 'description' ? 'true' : 'false' }}"
-                                    aria-controls="section-description"
-                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'description' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
-                                    Description
-                                </button>
-                            @endif
+                    @if($hasAnyTab)
+                        <!-- Sticky Navigation Bar (Tabs) -->
+                        <div class="sticky top-0 z-30 py-2 md:py-4 bg-[#F9F9F9]">
+                            <div class="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar" role="tablist">
+                                @if($hasDescription)
+                                    <button onclick="scrollToSection('section-description', this)" role="tab"
+                                        aria-selected="{{ $firstTab === 'description' ? 'true' : 'false' }}"
+                                        aria-controls="section-description"
+                                        class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'description' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                        Description
+                                    </button>
+                                @endif
 
-                            @if($hasFeatures)
-                                <button onclick="scrollToSection('section-features', this)" role="tab"
-                                    aria-selected="{{ $firstTab === 'features' ? 'true' : 'false' }}"
-                                    aria-controls="section-features"
-                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'features' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
-                                    Features
-                                </button>
-                            @endif
+                                @if($hasFeatures)
+                                    <button onclick="scrollToSection('section-features', this)" role="tab"
+                                        aria-selected="{{ $firstTab === 'features' ? 'true' : 'false' }}"
+                                        aria-controls="section-features"
+                                        class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'features' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                        Features
+                                    </button>
+                                @endif
 
-                            @if($hasSpecs)
-                                <button onclick="scrollToSection('section-specifications', this)" role="tab"
-                                    aria-selected="{{ $firstTab === 'specifications' ? 'true' : 'false' }}"
-                                    aria-controls="section-specifications"
-                                    class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'specifications' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
-                                    Specifications
-                                </button>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Content Area: Visible Sections -->
-                <div class="flex flex-col gap-6 md:gap-8">
-
-                    @if($hasDescription)
-                        <!-- 1. Description Content -->
-                        <div id="section-description"
-                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                            <h2
-                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                                Product Description
-                            </h2>
-                            <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
-                                {!! $product->full_description !!}
+                                @if($hasSpecs)
+                                    <button onclick="scrollToSection('section-specifications', this)" role="tab"
+                                        aria-selected="{{ $firstTab === 'specifications' ? 'true' : 'false' }}"
+                                        aria-controls="section-specifications"
+                                        class="tab-nav-btn flex-1 bg-white font-bold text-sm md:text-lg py-2.5 px-4 text-center rounded-lg shadow-sm border-2 {{ $firstTab === 'specifications' ? 'text-[var(--primary-color)] border-[var(--primary-color)]' : 'text-gray-600 hover:bg-gray-100 border-transparent' }}">
+                                        Specifications
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     @endif
 
-                    @if($hasFeatures)
-                        <!-- 2. Features Content -->
-                        <div id="section-features"
-                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                            <h2
-                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                                Product Features
-                            </h2>
-                            <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
-                                {!! $product->short_description !!}
-                            </div>
-                        </div>
-                    @endif
+                    <!-- Content Area: Visible Sections -->
+                    <div class="flex flex-col gap-6 md:gap-8">
 
-                    @if($hasSpecs)
-                        <!-- 3. Specifications Content -->
-                        <div id="section-specifications"
-                            class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
-                            <h2
-                                class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
-                                Product Specifications
-                            </h2>
-                            <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
-                                @if(!empty($product->brand))
-                                    <div class="flex justify-between py-2 border-b border-gray-100">
-                                        <span class="text-gray-600 font-medium">Brand:</span>
-                                        <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
-                                    </div>
-                                @endif
-
-                                @if($hasSku)
-                                    <div class="flex justify-between py-2 border-b border-gray-100">
-                                        <span class="text-gray-600 font-medium">SKU:</span>
-                                        <span class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
-                                    </div>
-                                @endif
-
-                                <div class="flex justify-between py-2 border-b border-gray-100">
-                                    <span class="text-gray-600 font-medium">Availability:</span>
-                                    <span class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
-                                        {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
-                                    </span>
+                        @if($hasDescription)
+                            <!-- 1. Description Content -->
+                            <div id="section-description"
+                                class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                                <h2
+                                    class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                    Product Description
+                                </h2>
+                                <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
+                                    {!! $product->full_description !!}
                                 </div>
+                            </div>
+                        @endif
 
-                                @foreach ($grouped as $groupName => $values)
+                        @if($hasFeatures)
+                            <!-- 2. Features Content -->
+                            <div id="section-features"
+                                class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                                <h2
+                                    class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                    Product Features
+                                </h2>
+                                <div class="text-sm md:text-base text-gray-700 leading-relaxed prose max-w-none">
+                                    {!! $product->short_description !!}
+                                </div>
+                            </div>
+                        @endif
+
+                        @if($hasSpecs)
+                            <!-- 3. Specifications Content -->
+                            <div id="section-specifications"
+                                class="bg-white p-4 sm:p-6 border border-gray-100 rounded shadow-sm scroll-mt-32">
+                                <h2
+                                    class="text-lg md:text-xl font-bold text-gray-900 border-l-4 border-[var(--primary-color)] pl-3 mb-4">
+                                    Product Specifications
+                                </h2>
+                                <div class="grid grid-cols-1 gap-y-3 text-sm md:text-base text-gray-800">
+                                    @if(!empty($product->brand))
+                                        <div class="flex justify-between py-2 border-b border-gray-100">
+                                            <span class="text-gray-600 font-medium">Brand:</span>
+                                            <span class="font-bold">{{ $product->brand->name ?? 'N/A' }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if($hasSku)
+                                        <div class="flex justify-between py-2 border-b border-gray-100">
+                                            <span class="text-gray-600 font-medium">SKU:</span>
+                                            <span
+                                                class="font-mono font-bold">{{ is_array($product->sku_code) ? implode(', ', $product->sku_code) : $product->sku_code }}</span>
+                                        </div>
+                                    @endif
+
                                     <div class="flex justify-between py-2 border-b border-gray-100">
-                                        <span class="text-gray-600 font-medium">{{ $groupName }}:</span>
-                                        <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
+                                        <span class="text-gray-600 font-medium">Availability:</span>
+                                        <span
+                                            class="font-bold {{ (!$product->manage_stock || $product->available_stock > 0) ? 'text-green-600' : 'text-red-500' }}">
+                                            {{ (!$product->manage_stock || $product->available_stock > 0) ? 'In Stock' : 'Out of Stock' }}
+                                        </span>
                                     </div>
+
+                                    @foreach ($grouped as $groupName => $values)
+                                        <div class="flex justify-between py-2 border-b border-gray-100">
+                                            <span class="text-gray-600 font-medium">{{ $groupName }}:</span>
+                                            <span class="font-bold">{{ implode(', ', array_unique($values)) }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                @if($hasRelated)
+                    <!-- RIGHT COLUMN: Related Products (Sticky Sidebar) -->
+                    <aside class="lg:col-span-2 flex flex-col gap-6 sticky top-24">
+                        <div class="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
+                            <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
+                                <h3 class="font-bold text-gray-900 text-lg">Related Products</h3>
+                            </div>
+                            <div class="divide-y divide-gray-200">
+                                @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
+
+                                @foreach ($relatedProducts->take(5) as $rel)
+                                    <a href="{{ url($rel->slug) }}" class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
+                                        <img src="{{ $rel->thumbnail_95_url ?? asset('./images/template1/frontend/product-thumbnail.webp') }}"
+                                            alt="{{ $rel->title ?? 'Related Product' }}" loading="lazy" width="64" height="64"
+                                            alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
+                                            <p class="text-xs font-bold text-[var(--primary-color)] mt-1">
+                                                {{ $isL ? $setup->currency : '' }} {{ number_format($rel->sale_price) }}
+                                                {{ !$isL ? $setup->currency : '' }}
+                                            </p>
+                                        </div>
+                                    </a>
                                 @endforeach
                             </div>
                         </div>
-                    @endif
-                </div>
+                    </aside>
+                @endif
             </div>
-
-            @if($hasRelated)
-            <!-- RIGHT COLUMN: Related Products (Sticky Sidebar) -->
-            <aside class="lg:col-span-2 flex flex-col gap-6 sticky top-24">
-                <div class="bg-white border border-gray-100 rounded-lg overflow-hidden shadow-sm">
-                    <div class="px-4 py-3 bg-gray-50 border-b border-gray-100">
-                        <h3 class="font-bold text-gray-900 text-lg">Related Products</h3>
-                    </div>
-                   <div class="divide-y divide-gray-200">
-            @php $isL = ($setup->currency_position ?? 'left') == 'left'; @endphp
-
-            @foreach ($relatedProducts->take(5) as $rel)
-                <a href="{{ url($rel->slug) }}"
-                    class="p-3 flex items-center gap-3 hover:bg-gray-50 transition">
-                    <img src="{{ $rel->thumbnail_95_url ?? asset('./images/template1/frontend/cover.webp') }}" alt="{{ $rel->title ?? 'Related Product' }}" loading="lazy" width="64" height="64"
-                        alt="related product image" class="w-16 h-16 object-cover rounded-lg shrink-0" />
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $rel->title }}</p>
-                        <p class="text-xs font-bold text-[var(--primary-color)] mt-1">
-                            {{ $isL ? $setup->currency : '' }} {{ number_format($rel->sale_price) }} {{ !$isL ? $setup->currency : '' }}
-                        </p>
-                    </div>
-                </a>
-            @endforeach
-        </div>
-                </div>
-            </aside>
-            @endif
-        </div>
-    </section>
+        </section>
     @endif
 
     {{-- Hidden input for JS --}}
@@ -445,10 +452,10 @@
             images.forEach((imgUrl, index) => {
                 const borderClass = (index === 0) ? 'border-2 border-[var(--primary-color)]' : 'border-gray-200';
                 container.innerHTML += `
-                        <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
-                            onclick="changeImage('${imgUrl}', this)">
-                            <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='{{ asset('./images/template1/frontend/cover.webp') }}'" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
-                        </button>`;
+                            <button class="thumb-btn border ${borderClass} p-0.5 rounded overflow-hidden w-16 h-16 md:w-full md:h-auto aspect-square shrink-0"
+                                onclick="changeImage('${imgUrl}', this)">
+                                <img src="${imgUrl}" alt="Gallery Image" onerror="this.src='{{ asset('./images/template1/frontend/product-thumbnail.webp') }}'" class="w-full h-full object-cover" loading="lazy" width="800" height="800">
+                            </button>`;
             });
         }
 
@@ -518,7 +525,7 @@
                         : `${formattedRegular} ${currency}`;
                     regularEl.classList.remove('hidden');
                 } else {
-                    if(regularEl) regularEl.classList.add('hidden');
+                    if (regularEl) regularEl.classList.add('hidden');
                 }
             }
 
@@ -528,7 +535,7 @@
                     badgeEl.innerText = percent + '% OFF';
                     badgeEl.classList.remove('hidden');
                 } else {
-                    if(badgeEl) badgeEl.classList.add('hidden');
+                    if (badgeEl) badgeEl.classList.add('hidden');
                 }
             }
         }
@@ -536,7 +543,7 @@
         function recalculateSelectedPrice() {
             if (finalSelectedVariationIds.length === 0) {
                 updatePriceDisplay(
-                    {{ $product->display_price_data->sale_price ?? 0 }},
+                        {{ $product->display_price_data->sale_price ?? 0 }},
                     {{ $product->display_price_data->regular_price ?? 0 }}
                 );
                 return;
@@ -564,8 +571,8 @@
                 const allSkus = allVariations.map(v => v.sku).filter(sku => sku);
                 if (allSkus.length > 0) {
                     const text = [...new Set(allSkus)].join(", ");
-                    if(skuEl) skuEl.innerText = text;
-                    if(tabSkuEl) tabSkuEl.innerText = text;
+                    if (skuEl) skuEl.innerText = text;
+                    if (tabSkuEl) tabSkuEl.innerText = text;
                 }
                 return;
             }
@@ -578,8 +585,8 @@
 
             if (selectedSkus.length > 0) {
                 const text = [...new Set(selectedSkus)].join(", ");
-                if(skuEl) skuEl.innerText = text;
-                if(tabSkuEl) tabSkuEl.innerText = text;
+                if (skuEl) skuEl.innerText = text;
+                if (tabSkuEl) tabSkuEl.innerText = text;
             }
         }
 
